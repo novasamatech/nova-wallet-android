@@ -3,8 +3,7 @@
     android:height="6dp"
     android:viewportWidth="7"
     android:viewportHeight="6">
-  <path
-      android:pathData="M3.5,3m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"
-      android:fillColor="#000000"
-      android:fillAlpha="0.48"/>
+    <path
+        android:fillColor="@color/voting_slider_indicator_inactive"
+        android:pathData="M3.5,3m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
 </vector>

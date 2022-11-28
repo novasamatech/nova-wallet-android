@@ -5,13 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingBottom="4dp">
+    android:paddingBottom="4dp"
+    tools:background="@color/bottom_sheet_background">
 
     <View
         style="@style/Widget.Nova.Puller"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="16dp"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="6dp" />
 
     <io.novafoundation.nova.feature_account_api.view.ChainChipView
         android:id="@+id/externalActionsChain"
@@ -35,6 +36,7 @@
         android:layout_marginBottom="8dp"
         android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
+        android:textColor="@color/text_secondary"
         tools:text="P15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu" />
 
 </LinearLayout>

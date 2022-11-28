@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/accountDetailsToolbar"
@@ -33,7 +33,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        tools:styleBackgroundColor="@color/white_12"
+        tools:styleBackgroundColor="@color/block_background"
         tools:styleIcon="@drawable/ic_watch"
         tools:text="@string/account_details_watch_only_alert" />
 

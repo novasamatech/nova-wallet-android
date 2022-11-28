@@ -80,8 +80,8 @@ android {
             def localReleaseNotes = releaseNotes()
             def localFirebaseGroup = firebaseGroup()
             firebaseAppDistribution {
-              releaseNotes = localReleaseNotes
-              groups = localFirebaseGroup
+                releaseNotes = localReleaseNotes
+                groups = localFirebaseGroup
             }
         }
         instrumentialTest {
@@ -239,7 +239,7 @@ dependencies {
 }
 
 task printVersion {
-  doLast {
-    println "versionName:${computeVersionName()}"
-  }
+    doLast {
+        println "versionName:${computeVersionName()}"
+    }
 }

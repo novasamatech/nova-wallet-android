@@ -67,7 +67,7 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
         viewModel.selectedValidatorModels.observe(adapter::submitList)
 
         viewModel.selectionStateFlow.observe {
-            reviewCustomValidatorsAccounts.setTextColorRes(if (it.isOverflow) R.color.red else R.color.white_80)
+            reviewCustomValidatorsAccounts.setTextColorRes(if (it.isOverflow) R.color.text_negative else R.color.text_primary)
             reviewCustomValidatorsAccounts.text = it.selectedHeaderText
 
             reviewCustomValidatorsNext.setState(if (it.isOverflow) ButtonState.DISABLED else ButtonState.NORMAL)

@@ -91,7 +91,7 @@ suspend fun mapValidatorToValidatorModel(
 fun rewardsToScoring(rewardsGain: BigDecimal?) = rewardsToColoredText(rewardsGain)?.let(StakeTargetModel.Scoring::OneField)
 
 fun rewardsToColoredText(rewardsGain: BigDecimal?) = formatStakeTargetRewardsOrNull(rewardsGain)?.let {
-    StakeTargetModel.ColoredText(it, R.color.green)
+    StakeTargetModel.ColoredText(it, R.color.text_positive)
 }
 
 fun stakeToScoring(stakeInPlanks: BigInteger?, token: Token): StakeTargetModel.Scoring.TwoFields? {
@@ -190,7 +190,7 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
                 status = ValidatorStakeModel.Status(
                     text = resourceManager.getString(R.string.staking_nominator_status_inactive),
                     icon = R.drawable.ic_time_16,
-                    iconTint = R.color.white_48
+                    iconTint = R.color.icon_secondary
                 ),
                 activeStakeModel = null
             )
@@ -207,7 +207,7 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
                     status = ValidatorStakeModel.Status(
                         text = resourceManager.getString(R.string.staking_nominator_status_active),
                         icon = R.drawable.ic_checkmark_circle_16,
-                        iconTint = R.color.green
+                        iconTint = R.color.icon_positive
                     ),
                     activeStakeModel = ValidatorStakeModel.ActiveStakeModel(
                         totalStake = totalStakeModel,

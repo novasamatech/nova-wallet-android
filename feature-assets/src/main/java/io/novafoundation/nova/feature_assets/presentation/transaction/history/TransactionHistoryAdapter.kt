@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.recyclerview.item.OperationListItem
 import io.novafoundation.nova.feature_assets.R
@@ -70,6 +71,7 @@ class TransactionHolder(
             if (item.statusAppearance != OperationStatusAppearance.COMPLETED) {
                 status.makeVisible()
                 status.setImageResource(item.statusAppearance.icon)
+                status.setImageTintRes(item.statusAppearance.statusIconTint)
             } else {
                 status.makeGone()
             }
@@ -93,7 +95,7 @@ class DayHolder(view: View) : GroupedListHolder(view) {
 
 object TransactionHistoryDiffCallback : BaseGroupedDiffCallback<DayHeader, OperationModel>(DayHeader::class.java) {
     override fun areGroupItemsTheSame(oldItem: DayHeader, newItem: DayHeader): Boolean {
-        return oldItem.daysSinceEpoch == oldItem.daysSinceEpoch
+        return oldItem.daysSinceEpoch == newItem.daysSinceEpoch
     }
 
     override fun areGroupContentsTheSame(oldItem: DayHeader, newItem: DayHeader): Boolean {

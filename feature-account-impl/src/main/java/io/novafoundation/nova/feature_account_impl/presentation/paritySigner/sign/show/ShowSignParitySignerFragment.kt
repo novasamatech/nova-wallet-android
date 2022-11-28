@@ -46,7 +46,7 @@ class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>
         signParitySignerShowToolbar.applyStatusBarInsets()
         signParitySignerShowToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        signParitySignerShowQr.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.white)
+        signParitySignerShowQr.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.text_primary)
         signParitySignerShowQr.clipToOutline = true // for round corners
 
         signParitySignerShowAddress.setWholeClickListener { viewModel.addressClicked() }

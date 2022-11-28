@@ -6,7 +6,7 @@ import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.view.shape.getBlurDrawable
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.synthetic.main.view_network_info.view.stakingNetworkCollapsibleView
 import kotlinx.android.synthetic.main.view_network_info.view.stakingNetworkInfoTitle
@@ -34,7 +34,7 @@ class NetworkInfoView @JvmOverloads constructor(
         View.inflate(context, R.layout.view_network_info, this)
 
         with(context) {
-            background = getBlurDrawable()
+            background = getBlockDrawable()
         }
 
         orientation = VERTICAL

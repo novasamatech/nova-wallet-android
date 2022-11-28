@@ -99,7 +99,7 @@ private class TuringStakeActionsComponent(
         return ManageStakeAction(
             id = YIELD_BOOST_ACTION,
             label = resourceManager.getString(R.string.staking_turing_yield_boost),
-            iconRes = R.drawable.ic_up_circle_outline,
+            iconRes = R.drawable.ic_chevron_up_circle_outline,
             badge = run {
                 val resId = if (yieldBoostActive) R.string.common_on else R.string.common_off
 

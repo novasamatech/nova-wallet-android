@@ -95,8 +95,8 @@
         <item name="android:textSize">12sp</item>
     </style>
 
-    <style name="TextAppearance.NovaFoundation.Regular.Caption1.Translucent" parent="TextAppearance.NovaFoundation.Regular.Caption1">
-        <item name="android:textColor">@color/white_64</item>
+    <style name="TextAppearance.NovaFoundation.Regular.Caption1.Tertiary" parent="TextAppearance.NovaFoundation.Regular.Caption1">
+        <item name="android:textColor">@color/text_secondary</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.Caps" parent="TextAppearance.NovaFoundation.Regular">
@@ -118,8 +118,12 @@
         <item name="lineHeight">18sp</item>
     </style>
 
-    <style name="TextAppearance.NovaFoundation.Regular.Footnote.Translucent" parent="TextAppearance.NovaFoundation.Regular.Footnote">
-        <item name="android:textColor">@color/white_64</item>
+    <style name="TextAppearance.NovaFoundation.Regular.Footnote.Primary" parent="TextAppearance.NovaFoundation.Regular.Footnote">
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Regular.Footnote.Tertiary" parent="TextAppearance.NovaFoundation.Regular.Footnote">
+        <item name="android:textColor">@color/text_secondary</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.SubHeadline">
@@ -186,6 +190,11 @@
         <item name="android:textSize">?attr/textSizeB3</item>
     </style>
 
+    <style name="TextAppearance.NovaFoundation.Regular.Monospace">
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+
     <!-- Buttons -->
 
     <style name="Widget.Nova.Button" parent="Widget.AppCompat.Button">
@@ -248,11 +257,11 @@
     <!--   Misc   -->
 
     <style name="AccentBlue" parent="">
-        <item name="colorAccent">@color/accentBlue</item>
+        <item name="colorAccent">@color/button_background_primary</item>
     </style>
 
     <style name="NegativeAccent" parent="">
-        <item name="colorAccent">@color/white_8</item>
+        <item name="colorAccent">@color/divider</item>
     </style>
 
     <style name="Widget.Nova.Action" parent="">
@@ -274,8 +283,9 @@
     </style>
 
     <style name="Widget.Nova.Puller" parent="">
-        <item name="android:layout_height">3dp</item>
-        <item name="android:layout_width">35dp</item>
+        <item name="android:layout_height">4dp</item>
+        <item name="android:layout_width">28dp</item>
+        <item name="android:layout_marginTop">6dp</item>
         <item name="android:background">@drawable/bg_puller</item>
     </style>
 
@@ -292,7 +302,7 @@
 
     <style name="Widget.Nova.Text.Number" parent="">
         <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.Body</item>
-        <item name="android:textColor">@color/white_64</item>
+        <item name="android:textColor">@color/chip_text</item>
         <item name="android:background">@drawable/bg_round_number</item>
         <item name="android:gravity">center</item>
         <item name="android:includeFontPadding">false</item>
@@ -317,7 +327,7 @@
 
     <style name="Widget.Nova.RadioButton" parent="">
         <item name="android:paddingStart">4dp</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/text_primary</item>
         <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.Footnote
         </item>
         <item name="buttonTint">@color/tint_radio_button</item>
@@ -328,15 +338,17 @@
         <item name="android:paddingTop">1.5dp</item>
         <item name="android:paddingEnd">8dp</item>
         <item name="android:paddingBottom">2.5dp</item>
-        <item name="android:textColor">@color/white_80</item>
+        <item name="android:textColor">@color/chip_text</item>
     </style>
 
     <style name="Widget.Nova.ChipLabel" parent="">
         <item name="android:paddingStart">6dp</item>
-        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingTop">4dp</item>
         <item name="android:paddingEnd">8dp</item>
-        <item name="android:paddingBottom">3dp</item>
-        <item name="android:textColor">@color/white_80</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:textColor">@color/chip_text</item>
+        <item name="android:gravity">center</item>
+        <item name="minHeight">22dp</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.SemiBold.Caps1
         </item>
@@ -347,7 +359,8 @@
         <item name="android:paddingBottom">8dp</item>
         <item name="android:gravity">center</item>
         <item name="android:textColor">@color/tab_item_text_color</item>
-        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.Footnote</item>
+        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.Footnote
+        </item>
     </style>
 
     <!-- Buttons -->
@@ -359,35 +372,39 @@
     </style>
 
     <style name="Widget.Nova.Input.Primary.External" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
-        <item name="android:textColorHint">@color/colorHint</item>
-        <item name="hintTextColor">@color/colorHint</item>
+        <item name="android:textColorHint">@color/hint_text</item>
+        <item name="hintTextColor">@color/hint_text</item>
         <item name="boxStrokeWidth">0dp</item>
         <item name="boxStrokeWidthFocused">0dp</item>
         <item name="boxCollapsedPaddingTop">@dimen/x1</item>
     </style>
 
     <style name="Widget.Nova.Input.Primary.Internal" parent="Base.Widget.AppCompat.EditText">
-        <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Body1</item>
+        <item name="android:textAppearance">
+            @style/TextAppearance.NovaFoundation.Regular.SubHeadline
+        </item>
         <item name="android:paddingStart">@dimen/x2</item>
         <item name="android:paddingEnd">@dimen/x2</item>
         <item name="android:paddingTop">@dimen/x3</item>
         <item name="android:paddingBottom">@dimen/x1</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/text_primary</item>
         <item name="android:textCursorDrawable">@null</item>
+        <item name="android:textColorHint">@color/hint_text</item>
+        <item name="hintTextColor">@color/hint_text</item>
     </style>
 
     <style name="Widget.Nova.Input.Text" parent="Widget.Nova.Input.EditText">
         <item name="android:textAppearance">
             @style/TextAppearance.NovaFoundation.Regular.SubHeadline
         </item>
-        <item name="android:textColorHint">@color/white_32</item>
+        <item name="android:textColorHint">@color/hint_text</item>
         <item name="android:paddingStart">12dp</item>
         <item name="android:paddingEnd">12dp</item>
         <item name="android:paddingTop">14dp</item>
         <item name="android:paddingBottom">14dp</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/text_primary</item>
         <item name="android:maxLines">1</item>
         <item name="android:inputType">text</item>
         <item name="android:textCursorDrawable">@null</item>
@@ -397,20 +414,19 @@
 
     <!-- Dialog -->
 
-    <style name="Widget.Nova.ProgressBar" parent="Widget.AppCompat.ProgressBar">
+    <style name="Widget.Nova.ProgressBar.Indeterminate" parent="Widget.AppCompat.ProgressBar">
         <item name="android:indeterminate">true</item>
-        <item name="android:indeterminateDrawable">@anim/progress_rotate</item>
-        <item name="android:indeterminateDuration">1300</item>
+        <item name="android:indeterminateTint">@color/icon_primary</item>
     </style>
 
     <style name="BottomSheetDialog" parent="Theme.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/bottomSheetStyleWrapper</item>
-        <item name="colorAccent">@color/accentBlue</item>
+        <item name="colorAccent">@color/android_system_accent</item>
     </style>
 
     <style name="bottomSheetStyleWrapper" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="behavior_peekHeight">600dp</item>
-        <item name="backgroundTint">@color/bg_bottom_sheet</item>
+        <item name="backgroundTint">@color/bottom_sheet_background</item>
         <item name="shapeAppearanceOverlay">@style/CustomShapeAppearanceBottomSheetDialog</item>
     </style>
 
@@ -428,11 +444,11 @@
     </style>
 
     <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/text_primary</item>
     </style>
 
     <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/text_primary</item>
     </style>
 
     <style name="AccentAlertDialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
@@ -450,7 +466,7 @@
     </style>
 
     <style name="AccentDialogNegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/red</item>
+        <item name="android:textColor">@color/text_negative</item>
     </style>
 
     <!-- Dialog -->

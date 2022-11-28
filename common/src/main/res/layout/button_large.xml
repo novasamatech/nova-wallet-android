@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    tools:background="@color/button_background_primary"
     tools:minHeight="52dp"
-    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout"
-    tools:background="@color/accentBlue">
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <ImageView
         android:id="@+id/buttonLargeIcon"
@@ -16,6 +16,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/icon_primary"
         tools:srcCompat="@drawable/ic_add_circle" />
 
     <TextView
@@ -25,6 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:includeFontPadding="false"
+        android:textColor="@color/text_primary"
         app:layout_constraintBottom_toTopOf="@+id/buttonLargeSubtitle"
         app:layout_constraintStart_toEndOf="@id/buttonLargeIcon"
         app:layout_constraintTop_toTopOf="parent"
@@ -36,9 +38,9 @@
         style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:layout_marginStart="12dp"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/buttonLargeIcon"
         app:layout_constraintTop_toBottomOf="@+id/buttonLargeTitle"

@@ -29,7 +29,7 @@ class MnemonicContainerView @JvmOverloads constructor(
 
     private fun setShowBackground(show: Boolean) {
         val background = if (show) {
-            context.getRoundedCornerDrawable(fillColorRes = R.color.white_8)
+            context.getRoundedCornerDrawable(fillColorRes = R.color.input_background)
         } else {
             null
         }

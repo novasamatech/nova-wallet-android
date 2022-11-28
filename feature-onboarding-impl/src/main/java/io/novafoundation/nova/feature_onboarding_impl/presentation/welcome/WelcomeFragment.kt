@@ -66,7 +66,7 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel>() {
     }
 
     private fun configureTermsAndPrivacy(sourceText: String, terms: String, privacy: String) {
-        val linkColor = requireContext().getColor(R.color.white)
+        val linkColor = requireContext().getColor(R.color.text_primary)
 
         termsTv.text = styleText(sourceText) {
             clickable(terms, linkColor) {

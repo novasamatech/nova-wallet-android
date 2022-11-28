@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <TextView
@@ -14,10 +14,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:textColor="@color/white_64"
+        android:text="@string/common_price"
+        android:textColor="@color/text_secondary"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="@string/common_price" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/sectionPriceToken"
@@ -25,9 +25,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="2dp"
+        android:textColor="@color/text_primary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/sectionTitle"
         tools:text="1 KSM" />
@@ -37,14 +36,15 @@
         style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="16dp"
         android:ellipsize="end"
         android:singleLine="true"
+        android:textColor="@color/text_secondary"
         app:layout_constrainedWidth="true"
-        app:layout_constraintBottom_toBottomOf="@+id/sectionPriceToken"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@+id/sectionPriceToken"
-        app:layout_constraintTop_toTopOf="@+id/sectionPriceToken"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sectionPriceToken"
         tools:text="($245.44)" />
 </merge>

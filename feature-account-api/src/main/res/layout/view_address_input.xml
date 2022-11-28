@@ -4,18 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:parentTag="android.widget.LinearLayout"
+    tools:background="@color/input_background"
     tools:gravity="center_vertical"
     tools:orientation="horizontal"
-    tools:background="@color/black">
+    tools:parentTag="android.widget.LinearLayout">
 
     <ImageView
+        android:id="@+id/addressInputIdenticon"
         android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="13dp"
         android:layout_marginBottom="13dp"
-        android:layout_height="24dp"
-        android:id="@+id/addressInputIdenticon"
-        android:layout_marginStart="12dp"
         tools:src="@drawable/ic_identicon_placeholder" />
 
     <EditText
@@ -33,8 +33,8 @@
         android:paddingEnd="12dp"
         android:paddingBottom="9dp"
         android:singleLine="true"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white_32" />
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/hint_text" />
 
     <TextView
         android:id="@+id/addressInputMyself"
@@ -46,9 +46,9 @@
         android:paddingTop="6dp"
         android:paddingRight="12dp"
         android:paddingBottom="8dp"
-        android:textColor="@color/accentBlue"
-        tools:background="@color/white_8"
-        android:text="@string/wallet_send_myself" />
+        android:text="@string/wallet_send_myself"
+        android:textColor="@color/button_text_accent"
+        tools:background="@color/button_background_secondary" />
 
     <TextView
         android:id="@+id/addressInputPaste"
@@ -60,9 +60,9 @@
         android:paddingTop="6dp"
         android:paddingRight="12dp"
         android:paddingBottom="8dp"
-        android:textColor="@color/accentBlue"
-        tools:background="@color/white_8"
-        android:text="@string/common_paste" />
+        android:text="@string/common_paste"
+        android:textColor="@color/button_text_accent"
+        tools:background="@color/button_background_secondary" />
 
     <ImageView
         android:id="@+id/addressInputScan"
@@ -73,9 +73,9 @@
         android:paddingTop="6dp"
         android:paddingRight="8dp"
         android:paddingBottom="6dp"
-        android:src="@drawable/ic_scan_qr"
-        app:tint="@color/accentBlue"
-        tools:background="@color/white_8" />
+        android:src="@drawable/ic_scan"
+        app:tint="@color/icon_accent"
+        tools:background="@color/divider" />
 
     <ImageView
         android:id="@+id/addressInputClear"
@@ -85,6 +85,6 @@
         android:layout_marginEnd="16dp"
         android:src="@drawable/ic_close_circle"
         android:visibility="gone"
-        app:tint="@color/white_64"
+        app:tint="@color/icon_secondary"
         tools:visibility="visible" />
 </merge>

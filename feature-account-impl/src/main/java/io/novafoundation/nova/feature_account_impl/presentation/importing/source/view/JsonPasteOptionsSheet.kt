@@ -17,11 +17,11 @@ class JsonPasteOptionsSheet(
 
         setTitle(R.string.recovery_json)
 
-        item(icon = R.drawable.ic_copy, titleRes = R.string.import_json_paste) {
+        item(icon = R.drawable.ic_copy_outline, titleRes = R.string.import_json_paste) {
             onPaste()
         }
 
-        item(icon = R.drawable.ic_file_upload, titleRes = R.string.recover_json_upload) {
+        item(icon = R.drawable.ic_json_file_upload_outline, titleRes = R.string.recover_json_upload) {
             onOpenFile()
         }
     }

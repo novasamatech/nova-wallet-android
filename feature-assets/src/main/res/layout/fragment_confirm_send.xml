@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/confirmSendToolbar"
@@ -54,8 +54,8 @@
                     android:id="@+id/confirmSendSender"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueIcon="@drawable/ic_info_16"
-                    app:primaryValueIconTint="@color/white_64"
+                    app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                    app:primaryValueIconTint="@color/icon_secondary"
                     app:title="@string/wallet_sender" />
 
                 <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
@@ -74,7 +74,7 @@
                 android:id="@+id/confirmSendHints"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp" />
+                android:layout_marginTop="8dp" />
 
             <io.novafoundation.nova.common.view.TableView
                 android:layout_width="match_parent"
@@ -92,8 +92,8 @@
                     android:id="@+id/confirmSendRecipient"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueIcon="@drawable/ic_info_16"
-                    app:primaryValueIconTint="@color/white_64"
+                    app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                    app:primaryValueIconTint="@color/icon_secondary"
                     app:title="@string/wallet_recipient" />
 
             </io.novafoundation.nova.common.view.TableView>

@@ -7,9 +7,9 @@
         android:start="-14dp" />
 
     <item
+        android:id="@android:id/progress"
         android:end="-14dp"
-        android:start="-14dp"
-        android:id="@android:id/progress">
+        android:start="-14dp">
         <clip android:drawable="@drawable/bg_seekbar_active" />
     </item>
 </layer-list>

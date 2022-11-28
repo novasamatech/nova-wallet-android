@@ -5,17 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    android:background="@drawable/bg_shimmering_dark"
+    android:background="@drawable/bg_shimmering_container"
     android:paddingHorizontal="16dp"
     android:paddingTop="18dp"
     android:paddingBottom="21dp"
-    tools:background="@color/blurColor">
+    tools:background="@color/block_background">
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/itemReferendumShimmeringStatus"
         android:layout_width="60dp"
         android:layout_height="12dp"
-        android:background="@drawable/bg_shimmering_light"
+        android:background="@drawable/bg_shimmering"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,7 +23,7 @@
         android:id="@+id/itermReferendumShimmeringTime"
         android:layout_width="116dp"
         android:layout_height="12dp"
-        android:background="@drawable/bg_shimmering_light"
+        android:background="@drawable/bg_shimmering"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -32,7 +32,7 @@
         android:layout_width="178dp"
         android:layout_height="12dp"
         android:layout_marginTop="14dp"
-        android:background="@drawable/bg_shimmering_light"
+        android:background="@drawable/bg_shimmering"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemReferendumShimmeringStatus" />
 
@@ -41,7 +41,7 @@
         android:layout_width="121dp"
         android:layout_height="22dp"
         android:layout_marginTop="16dp"
-        android:background="@drawable/bg_shimerring_light_8"
+        android:background="@drawable/bg_shimerring_8"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemReferendumShimmeringName" />
 
@@ -51,7 +51,7 @@
         android:layout_height="22dp"
         android:layout_marginTop="16dp"
         android:layout_marginStart="6dp"
-        android:background="@drawable/bg_shimerring_light_8"
+        android:background="@drawable/bg_shimerring_8"
         app:layout_constraintStart_toEndOf="@+id/itemReferendumShimmeringTrack"
         app:layout_constraintTop_toBottomOf="@+id/itemReferendumShimmeringName" />
 
@@ -60,8 +60,8 @@
         android:layout_width="121dp"
         android:layout_height="8dp"
         android:layout_marginTop="21dp"
-        android:background="@drawable/bg_shimmering_light"
-        android:textColor="@color/black2"
+        android:background="@drawable/bg_shimmering"
+        android:textColor="@color/text_secondary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemReferendumShimmeringTrack" />
 
@@ -79,8 +79,7 @@
         android:layout_width="0dp"
         android:layout_height="5dp"
         android:layout_marginTop="14dp"
-        android:background="@drawable/bg_shimmering_light"
-        android:textColor="@color/black2"
+        android:background="@drawable/bg_shimmering"
         app:layout_constraintEnd_toStartOf="@+id/space"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemReferendumShimmeringThresholdInfo" />
@@ -90,8 +89,7 @@
         android:layout_width="0dp"
         android:layout_height="5dp"
         android:layout_marginTop="14dp"
-        android:background="@drawable/bg_shimmering_light"
-        android:textColor="@color/black2"
+        android:background="@drawable/bg_shimmering"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/space"
         app:layout_constraintTop_toBottomOf="@+id/itemReferendumShimmeringThresholdInfo" />
@@ -100,7 +98,7 @@
         android:layout_width="60dp"
         android:layout_height="8dp"
         android:layout_marginTop="14dp"
-        android:background="@drawable/bg_shimmering_light"
+        android:background="@drawable/bg_shimmering"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemReferendumShimmeringPositive" />
 
@@ -108,7 +106,7 @@
         android:layout_width="60dp"
         android:layout_height="8dp"
         android:layout_marginTop="14dp"
-        android:background="@drawable/bg_shimmering_light"
+        android:background="@drawable/bg_shimmering"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemReferendumShimmeringPositive" />
@@ -117,7 +115,7 @@
         android:layout_width="60dp"
         android:layout_height="8dp"
         android:layout_marginTop="14dp"
-        android:background="@drawable/bg_shimmering_light"
+        android:background="@drawable/bg_shimmering"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemReferendumShimmeringPositive" />
 

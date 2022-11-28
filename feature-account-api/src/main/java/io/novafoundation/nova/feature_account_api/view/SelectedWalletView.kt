@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWall
 import kotlinx.android.synthetic.main.view_selected_wallet.view.viewSelectedWalletAccountIcon
 import kotlinx.android.synthetic.main.view_selected_wallet.view.viewSelectedWalletTypeIcon
 
-class SelectedWalletView @kotlin.jvm.JvmOverloads constructor(
+class SelectedWalletView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -29,8 +29,7 @@ class SelectedWalletView @kotlin.jvm.JvmOverloads constructor(
 
         if (model.typeIcon != null) {
             background = context.getRoundedCornerDrawable(
-                fillColorRes = R.color.white_16,
-                strokeColorRes = R.color.white_8,
+                fillColorRes = R.color.chips_background,
                 cornerSizeInDp = 80,
             )
 

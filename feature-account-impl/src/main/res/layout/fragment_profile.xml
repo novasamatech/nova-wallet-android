@@ -5,10 +5,8 @@
     android:id="@+id/settingsContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
-    android:clipToPadding="false"
-    android:orientation="vertical"
-    android:paddingBottom="32dp">
+    android:background="@color/secondary_screen_background"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +14,9 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="25dp"
         android:layout_marginEnd="16dp"
-        android:orientation="vertical">
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:paddingBottom="96dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -30,7 +30,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_weight="1"
                 android:text="@string/profile_settings_title"
-                android:textColor="@color/white" />
+                android:textColor="@color/text_primary" />
 
             <io.novafoundation.nova.feature_account_api.view.SelectedWalletView
                 android:id="@+id/settingsAvatar"
@@ -59,7 +59,7 @@
                 android:id="@+id/settingsWallets"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_wallet_24"
+                app:icon="@drawable/ic_buy_outline"
                 app:title="@string/profile_accounts_title_2_0" />
 
             <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsItemView
@@ -199,14 +199,14 @@
                 android:id="@+id/settingsTerms"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_document"
+                app:icon="@drawable/ic_file_outline"
                 app:title="@string/about_terms_v2_2_0" />
 
             <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsItemView
                 android:id="@+id/settingsPrivacy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_document"
+                app:icon="@drawable/ic_file_outline"
                 app:title="@string/about_privacy" />
         </io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsGroupView>
 
@@ -215,8 +215,7 @@
             android:layout_height="32dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="40dp"
-            android:src="@drawable/ic_nova"
-            app:tint="@color/white_48" />
+            android:src="@drawable/ic_nova_logo"/>
 
         <TextView
             android:id="@+id/settingsAppVersion"
@@ -225,7 +224,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp"
-            android:textColor="@color/white_64"
+            android:textColor="@color/text_secondary"
             tools:text="Nova Wallet v2.0" />
     </LinearLayout>
 

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/setupYieldBoostContainer"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:layout_width="match_parent"
@@ -35,6 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:textColor="@color/text_primary"
                 android:text="@string/staking_turing_collator_title" />
 
             <io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.view.SelectCollatorView
@@ -48,6 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textColor="@color/text_primary"
                 android:text="@string/staking_turing_restake_title" />
 
             <io.novafoundation.nova.feature_staking_impl.presentation.view.RewardDestinationView
@@ -71,7 +73,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/setupYieldBoostFrequency"
                 android:layout_marginTop="16dp"
-                tools:text="@string/staking_turing_frequency_title" />
+                android:textColor="@color/text_primary"
+                tools:text="Frequency" />
 
             <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
                 android:id="@+id/setupYieldBoostThreshold"

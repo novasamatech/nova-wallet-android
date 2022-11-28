@@ -11,7 +11,7 @@
     <View
         style="@style/Widget.Nova.Puller"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="6dp" />
 
     <TextView
         android:id="@+id/copierValue"
@@ -22,7 +22,7 @@
         android:paddingHorizontal="48dp"
         android:paddingTop="16dp"
         android:paddingBottom="8dp"
-        android:textColor="@color/white_48"
+        android:textColor="@color/text_secondary"
         android:textSize="13sp"
         tools:text="value" />
 </LinearLayout>

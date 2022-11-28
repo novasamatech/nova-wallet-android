@@ -70,6 +70,10 @@ class GoNextView @JvmOverloads constructor(
         icon.setVisible(drawable != null)
     }
 
+    fun setIconTint(colorStateList: ColorStateList?) {
+        icon.imageTintList = colorStateList
+    }
+
     fun setActionTint(@ColorInt color: Int) {
         goNextActionImage.imageTintList = ColorStateList.valueOf(color)
         goNextBadgeText.setTextColor(color)
@@ -87,6 +91,9 @@ class GoNextView @JvmOverloads constructor(
         val iconDrawable = typedArray.getDrawable(R.styleable.GoNextView_icon)
         setIcon(iconDrawable)
 
+        val iconTint = typedArray.getColorStateList(R.styleable.GoNextView_iconTint)
+        setIconTint(iconTint)
+
         val actionIconDrawable = typedArray.getDrawable(R.styleable.GoNextView_actionIcon)
         goNextActionImage.setImageDrawable(actionIconDrawable)
 
@@ -99,7 +106,7 @@ class GoNextView @JvmOverloads constructor(
         val textAppearance = typedArray.getResourceIdOrNull(R.styleable.GoNextView_android_textAppearance)
         textAppearance?.let(title::setTextAppearance)
 
-        val actionTint = typedArray.getColor(R.styleable.GoNextView_actionTint, context.getColor(R.color.white))
+        val actionTint = typedArray.getColor(R.styleable.GoNextView_actionTint, context.getColor(R.color.icon_primary))
         setActionTint(actionTint)
 
         typedArray.recycle()

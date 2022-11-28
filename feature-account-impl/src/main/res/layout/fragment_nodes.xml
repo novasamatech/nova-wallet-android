@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/novaToolbar"
@@ -33,11 +33,11 @@
         style="@style/TextAppearance.NovaFoundation.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/gray4"
         android:drawableStart="@drawable/ic_plus_accent_24"
         android:drawableEnd="@drawable/ic_chevron_right"
         android:drawablePadding="16dp"
         android:padding="16dp"
+        android:textColor="@color/text_primary"
         android:text="@string/connections_add_connection"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

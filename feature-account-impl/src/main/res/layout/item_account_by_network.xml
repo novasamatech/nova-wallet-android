@@ -8,7 +8,7 @@
     android:orientation="horizontal"
     android:paddingStart="4dp"
     android:paddingEnd="14dp"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <ImageView
         android:id="@+id/accountIcon"
@@ -18,7 +18,7 @@
         android:layout_margin="16dp"
         tools:layout_height="24dp"
         tools:layout_width="24dp"
-        tools:src="@color/colorAccent" />
+        tools:src="@color/icon_accent" />
 
     <TextView
         android:id="@+id/accountTitle"
@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         tools:text="Account Name" />
 
 </LinearLayout>

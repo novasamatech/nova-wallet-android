@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
-    android:opacity="opaque">
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:drawable="@drawable/bg_welcome" />
+    <item>
+        <color android:color="@color/splash_background_color" />
+    </item>
 
     <item
-        android:width="193dp"
-        android:height="265dp"
-        android:gravity="center"
-        android:drawable="@drawable/drawable_nova_logo" />
+        android:width="800dp"
+        android:height="800dp"
+        android:bottom="120dp"
+        android:drawable="@drawable/ic_splash_background"
+        android:gravity="center_horizontal|top" />
+
+    <item
+        android:width="325dp"
+        android:height="341dp"
+        android:drawable="@drawable/ic_loading_screen_logo"
+        android:gravity="center_horizontal|top"
+        android:top="60dp" />
+
+    <item
+        android:width="124dp"
+        android:height="60dp"
+        android:bottom="58dp"
+        android:drawable="@drawable/ic_loading_screen_developed_by"
+        android:gravity="center_horizontal|bottom" />
 
 </layer-list>
