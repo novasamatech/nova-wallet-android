@@ -15,6 +15,7 @@
         android:layout_marginTop="25dp"
         android:includeFontPadding="false"
         android:text="@string/dapp_dapps"
+        android:textColor="@color/text_primary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,59 +28,47 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
+    <io.novafoundation.nova.common.view.BannerView
         android:id="@+id/dappMainWelcomeGroup"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/bg_dapp_welcome"
-        app:layout_constraintBottom_toBottomOf="@+id/dappMainWelcomeBottomMargin"
+        android:src="@drawable/ic_cycle"
+        app:bannerBackground="@drawable/ic_main_banner_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dappMainTitle" />
+        app:layout_constraintTop_toBottomOf="@id/dappMainTitle">
 
-    <TextView
-        android:id="@+id/dappMainWelcomeTitle"
-        style="@style/TextAppearance.NovaFoundation.Bold.Title2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="24dp"
-        android:gravity="center"
-        android:text="@string/dapp_main_welcome_title"
-        app:layout_constraintEnd_toEndOf="@id/dappMainWelcomeGroup"
-        app:layout_constraintStart_toStartOf="@id/dappMainWelcomeGroup"
-        app:layout_constraintTop_toTopOf="@id/dappMainWelcomeGroup" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="24dp"
+            android:layout_marginStart="16dp">
 
-    <TextView
-        android:id="@+id/dappMainWelcomeSubtitle"
-        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
-        android:gravity="center"
-        android:text="@string/dapp_main_welcome_subtitle"
-        android:textColor="@color/white_64"
-        app:layout_constraintEnd_toEndOf="@id/dappMainWelcomeGroup"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@id/dappMainWelcomeGroup"
-        app:layout_constraintTop_toBottomOf="@+id/dappMainWelcomeTitle"
-        app:layout_constraintVertical_bias="0.0"
-        app:layout_goneMarginBottom="24dp" />
+            <TextView
+                android:id="@+id/dappMainWelcomeTitle"
+                style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/dapp_main_welcome_title"
+                android:textColor="@color/text_primary"/>
 
-    <Space
-        android:id="@+id/dappMainWelcomeBottomMargin"
-        android:layout_width="wrap_content"
-        android:layout_height="24dp"
-        app:layout_constraintStart_toStartOf="@id/dappMainWelcomeSubtitle"
-        app:layout_constraintTop_toBottomOf="@+id/dappMainWelcomeSubtitle" />
+            <TextView
+                android:id="@+id/dappMainWelcomeSubtitle"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/dapp_main_welcome_subtitle"
+                android:textColor="@color/text_secondary" />
+
+        </LinearLayout>
+
+    </io.novafoundation.nova.common.view.BannerView>
 
     <io.novafoundation.nova.feature_dapp_impl.presentation.main.view.TapToSearchView
         android:id="@+id/dappMainSearch"
@@ -100,6 +89,7 @@
         android:layout_marginTop="24dp"
         android:includeFontPadding="false"
         android:text="@string/dapp_catalog"
+        android:textColor="@color/text_primary"
         app:layout_constraintStart_toStartOf="@+id/dappMainSearch"
         app:layout_constraintTop_toBottomOf="@+id/dappMainSearch" />
 

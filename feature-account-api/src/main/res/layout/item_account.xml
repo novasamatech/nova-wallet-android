@@ -29,7 +29,7 @@
         app:layout_constraintStart_toEndOf="@+id/itemAccountDelete"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_goneMarginStart="16dp"
-        tools:src="@color/colorAccent" />
+        tools:src="@color/icon_primary" />
 
     <TextView
         android:id="@+id/itemAccountTitle"
@@ -42,7 +42,7 @@
         android:ellipsize="end"
         android:includeFontPadding="false"
         android:singleLine="true"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         app:layout_constraintBottom_toTopOf="@+id/itemAccountSubtitle"
         app:layout_constraintEnd_toStartOf="@+id/itemAccountEndBarrier"
         app:layout_constraintHorizontal_bias="0.5"
@@ -64,7 +64,7 @@
         android:includeFontPadding="false"
         android:lines="1"
         android:minHeight="18dp"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/itemAccountEndBarrier"
         app:layout_constraintHorizontal_bias="0.5"
@@ -82,7 +82,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white_48" />
+        app:tint="@color/icon_secondary" />
 
     <RadioButton
         android:id="@+id/itemAccountCheck"

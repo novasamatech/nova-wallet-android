@@ -287,6 +287,7 @@
     <string name="common_warning">Предупреждение</string>
     <string name="common_yes">Да</string>
     <string name="common_zero_amount_error">Сумма должна быть больше нуля</string>
+    <string name="common_no_app_to_handle_import_intent">Приложение для импорта файлов не найдено на устройстве. Пожалуйста, установите его и повторите попытку</string>
     <string name="confirm_referendum_vote_referendum">Референдум</string>
     <string name="confirm_referendum_vote_title">Голосование</string>
     <string name="confirm_referendum_vote_track">Трек</string>
@@ -375,8 +376,8 @@
     <string name="dapp_favourites_remove_description">”%s” DApp будет удален из Избранного</string>
     <string name="dapp_favourites_remove_title">Удалить из Избранного?</string>
     <string name="dapp_list_placeholder">Список DApps появится здесь</string>
-    <string name="dapp_main_welcome_subtitle">Подключайтесь к приложениям\nэкосистемы Полькадот &amp; Кусама,\nиспользуя аккаунты из Nova Wallet</string>
-    <string name="dapp_main_welcome_title">Добро пожаловать\nна портал приложений</string>
+    <string name="dapp_main_welcome_subtitle">Подключайтесь к приложениям экосистемы Полькадот &amp; Кусама, используя аккаунты из Nova Wallet</string>
+    <string name="dapp_main_welcome_title">Добро пожаловать на портал приложений</string>
     <string name="dapp_phishing_go_back">Хорошо, уходим отсюда</string>
     <string name="dapp_phishing_subtitle">Nova Wallet считает, что этот веб-сайт может поставить под угрозу безопасность ваших учетных записей и ваших токенов.</string>
     <string name="dapp_phishing_title">Обнаружен фишинг</string>
@@ -577,6 +578,7 @@
     <string name="referendum_votes_format">%s голосов</string>
     <string name="referendum_whitelisted_caller">fellowship: белый список</string>
     <string name="referendum_your_vote_format">Ваш голос: %s голосов</string>
+    <string name="referenda_list_placeholder">Информация о референдумах появится здесь, когда они начнутся</string>
     <string name="refrendum_vote_already_completed_message">Референдум завершен, голосовать больше нельзя</string>
     <string name="refrendum_vote_already_completed_title">Референдум завершен</string>
     <string name="refrendum_vote_already_delegating_message">Вы делегируете голоса в треке данного референдума. Пожалуйста, либо попросите делегата проголосовать, либо удалите делегирование, чтобы иметь возможность голосовать напрямую.</string>

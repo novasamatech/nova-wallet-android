@@ -28,7 +28,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.unbond
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.validators
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.mainStakingValidationFailure
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -44,7 +44,7 @@ class RelaychainStakeActionsComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: SingleAssetSharedState.AssetWithChain,
+        assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext
     ): StakeActionsComponent = RelaychainStakeActionsComponent(
         stakingInteractor = stakingInteractor,
@@ -63,7 +63,7 @@ private class RelaychainStakeActionsComponent(
     private val stakeActionsValidations: Map<String, StakeActionsValidationSystem>,
 
     private val hostContext: ComponentHostContext,
-    private val assetWithChain: SingleAssetSharedState.AssetWithChain,
+    private val assetWithChain: ChainWithAsset,
 ) : StakeActionsComponent,
     CoroutineScope by hostContext.scope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {

@@ -9,10 +9,10 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.shape.addRipple
-import io.novafoundation.nova.common.view.shape.getBlurDrawable
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull.StatefulCrowdloanMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorModel
 import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanAbout
 import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanAssetSelector
 import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanMainDescription
@@ -33,7 +33,7 @@ class CrowdloanHeaderAdapter(
         fun onClickContributionsInfo()
     }
 
-    private var assetModel: AssetModel? = null
+    private var assetModel: AssetSelectorModel? = null
     private var showShimmering: Boolean = false
     private var contributionsInfo: StatefulCrowdloanMixin.ContributionsInfo? = null
     private var aboutDescription: String? = null
@@ -64,7 +64,7 @@ class CrowdloanHeaderAdapter(
         return 1
     }
 
-    fun setAsset(assetModel: AssetModel) {
+    fun setAsset(assetModel: AssetSelectorModel) {
         this.assetModel = assetModel
         notifyItemChanged(0, Payload.ASSET)
     }
@@ -96,18 +96,18 @@ class HeaderHolder(
         itemView.crowdloanTotalContributedContainer.setOnClickListener { handler.onClickContributionsInfo() }
 
         with(itemView) {
-            crowdloanAbout.background = context.getBlurDrawable()
-            crowdloanTotalContributedContainer.background = context.addRipple(context.getBlurDrawable())
-            crowdloanTotalContributedShimmering.background = context.getBlurDrawable()
+            crowdloanAbout.background = context.getBlockDrawable()
+            crowdloanTotalContributedContainer.background = context.addRipple(context.getBlockDrawable())
+            crowdloanTotalContributedShimmering.background = context.getBlockDrawable()
         }
     }
 
-    fun bind(assetModel: AssetModel?, contributionsInfo: StatefulCrowdloanMixin.ContributionsInfo?, showShimmering: Boolean) {
+    fun bind(assetModel: AssetSelectorModel?, contributionsInfo: StatefulCrowdloanMixin.ContributionsInfo?, showShimmering: Boolean) {
         bindAsset(assetModel)
         bindContributionsInfo(contributionsInfo, showShimmering)
     }
 
-    fun bindAsset(assetModel: AssetModel?) {
+    fun bindAsset(assetModel: AssetSelectorModel?) {
         assetModel?.let { itemView.crowdloanAssetSelector.setState(imageLoader, assetModel) }
     }
 

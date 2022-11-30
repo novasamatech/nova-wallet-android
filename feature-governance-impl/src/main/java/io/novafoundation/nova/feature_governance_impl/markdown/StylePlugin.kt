@@ -9,6 +9,6 @@ class StylePlugin(private val context: Context) : AbstractMarkwonPlugin() {
 
     override fun configureTheme(builder: MarkwonTheme.Builder) {
         builder.isLinkUnderlined(false)
-            .linkColor(context.getColor(R.color.accentBlue))
+            .linkColor(context.getColor(R.color.button_background_primary))
     }
 }

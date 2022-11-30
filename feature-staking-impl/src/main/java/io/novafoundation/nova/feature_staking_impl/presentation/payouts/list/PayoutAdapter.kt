@@ -46,7 +46,7 @@ class PayoutViewHolder(override val containerView: View) : RecyclerView.ViewHold
         with(payout) {
             itemListElementDescriptionLeft.startTimer(timeLeft, createdAt) {
                 it.text = context.getText(R.string.staking_payout_expired)
-                it.setTextColor(context.getColor(R.color.red))
+                it.setTextColor(context.getColor(R.color.text_negative))
             }
 
             itemListElementTitleLeft.text = validatorTitle

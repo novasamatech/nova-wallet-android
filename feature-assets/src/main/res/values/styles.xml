@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="Widget.Nova.NftPreview" parent="">
         <item name="android:layout_height">32dp</item>
         <item name="android:layout_width">32dp</item>
-        <item name="android:background">@drawable/bg_nft_preview</item>
-        <item name="android:padding">2dp</item>
+        <item name="android:background">@color/shimmering_indicator</item>
         <item name="android:scaleType">centerCrop</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.TransactionDetailToolbar" parent="TextAppearance.NovaFoundation.Regular.Footnote">
-        <item name="android:textColor">@color/white_64</item>
+        <item name="android:textColor">@color/text_secondary</item>
     </style>
 </resources>

@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.asLiveData
 import io.novafoundation.nova.common.utils.childScope
 import io.novafoundation.nova.common.utils.switchMap
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
@@ -13,7 +14,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState.AssetWithChain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.Flow
@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 
-typealias ComponentCreator<S, E, A> = (AssetWithChain, hostContext: ComponentHostContext) -> StatefullComponent<S, E, A>
+typealias ComponentCreator<S, E, A> = (ChainWithAsset, hostContext: ComponentHostContext) -> StatefullComponent<S, E, A>
 
 class CompoundStakingComponentFactory(
     private val singleAssetSharedState: SingleAssetSharedState,
@@ -74,7 +74,7 @@ private class CompoundStakingComponent<S, E, A>(
         }
     }
 
-    private fun createDelegate(assetWithChain: AssetWithChain): StatefullComponent<S, E, A> {
+    private fun createDelegate(assetWithChain: ChainWithAsset): StatefullComponent<S, E, A> {
         return when (assetWithChain.asset.staking) {
             UNSUPPORTED -> UnsupportedComponent()
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainComponentCreator(assetWithChain, childHostContext)

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:id="@+id/confirmSetControllerContainer"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/setControllerToolbar"
@@ -53,6 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
+                android:textColor="@color/text_primary"
                 android:text="@string/staking_stash" />
 
             <TextView
@@ -60,6 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
+                android:textColor="@color/text_secondary"
                 android:text="@string/staking_stash_can_hint_v2_2_0" />
 
             <io.novafoundation.nova.feature_account_api.view.AccountView
@@ -67,13 +69,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                app:actionIcon="@drawable/ic_info_16" />
+                app:actionIcon="@drawable/ic_info_cicrle_filled_16" />
 
             <TextView
                 style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
+                android:textColor="@color/text_primary"
                 android:text="@string/staking_controller" />
 
             <TextView
@@ -81,6 +84,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
+                android:textColor="@color/text_secondary"
                 android:text="@string/staking_controller_can_hint_v2_2_0" />
 
             <io.novafoundation.nova.feature_account_api.view.AccountView

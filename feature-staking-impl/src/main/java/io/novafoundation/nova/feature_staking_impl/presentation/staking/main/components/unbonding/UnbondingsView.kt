@@ -24,7 +24,7 @@ class UnbondingsView @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_unbondings, this)
 
-        background = context.getRoundedCornerDrawable(R.color.black_48)
+        background = context.getRoundedCornerDrawable(R.color.block_background)
 
         unbondingsList.adapter = unbondingsAdapter
     }

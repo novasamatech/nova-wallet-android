@@ -5,7 +5,7 @@
     android:id="@+id/referendumDetailsContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/referendumDetailsToolbar"
@@ -25,7 +25,7 @@
                 android:id="@+id/referendumDetailsTrack"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:backgroundColor="@color/white_16"
+                app:backgroundColor="@color/chips_background"
                 tools:chipIcon="@drawable/ic_info_16"
                 tools:text="main agenda" />
 
@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:layout_marginEnd="16dp"
-                app:backgroundColor="@color/white_16"
+                app:backgroundColor="@color/chips_background"
                 tools:text="#228" />
 
         </LinearLayout>
@@ -74,6 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                android:textColor="@color/text_primary"
                 tools:text="Polkadot and Kusama participation in the 10th Pais Digital Chile Summit." />
 
             <LinearLayout
@@ -88,7 +89,7 @@
                     style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white_64"
+                    android:textColor="@color/text_secondary"
                     tools:text="Sovereign Nature Initiative (SNI) is a non-profit foundation that has brought together multiple partners and engineers from the Kusama ecosystem including Kodadot, Unique Network, Kilt Protocol, Momentum, and Ocean Protocol, to support the building of Web3 capacities for wildlife" />
 
                 <TextView
@@ -100,9 +101,9 @@
                     android:includeFontPadding="false"
                     android:paddingVertical="7dp"
                     android:text="@string/common_read_more"
-                    android:textColor="@color/accentBlue"
+                    android:textColor="@color/button_text_accent"
                     app:drawableEndCompat="@drawable/ic_chevron_right"
-                    app:drawableTint="@color/accentBlue" />
+                    app:drawableTint="@color/icon_accent" />
             </LinearLayout>
 
             <LinearLayout
@@ -110,9 +111,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_primary_list_item"
                 android:orientation="vertical"
-                tools:background="@color/white_8">
+                tools:background="@color/block_background">
 
                 <TextView
                     style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -122,7 +122,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="20dp"
                     android:text="@string/referendum_details_requested_amount"
-                    android:textColor="@color/white_64" />
+                    android:textColor="@color/text_secondary" />
 
                 <TextView
                     android:id="@+id/referendumDetailsRequestedAmount"
@@ -132,7 +132,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="2dp"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_primary"
                     tools:text="1,158.47 KSM" />
 
                 <TextView
@@ -144,7 +144,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="2dp"
                     android:layout_marginBottom="24dp"
-                    android:textColor="@color/white_64"
+                    android:textColor="@color/text_secondary"
                     tools:text="$51,158.3" />
 
             </LinearLayout>
@@ -174,7 +174,7 @@
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
                 android:paddingTop="16dp"
-                tools:background="@color/white_8">
+                tools:background="@color/block_background">
 
                 <TextView
                     style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -182,7 +182,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:text="@string/referendum_details_timeline"
-                    android:textColor="@color/white_64" />
+                    android:textColor="@color/text_secondary" />
 
                 <io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.timeline.TimelineLayout
                     android:id="@+id/referendumDetailsTimeline"
@@ -200,7 +200,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_primary_list_item"
-                tools:background="@color/white_8">
+                tools:background="@color/block_background">
 
                 <TextView
                     style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -210,7 +210,7 @@
                     android:layout_marginVertical="17dp"
                     android:layout_marginStart="16dp"
                     android:text="@string/referendum_details_full_details"
-                    android:textColor="@color/accentBlue" />
+                    android:textColor="@color/button_text_accent" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -219,7 +219,7 @@
                     android:layout_marginVertical="14dp"
                     android:layout_marginEnd="16dp"
                     android:src="@drawable/ic_chevron_right"
-                    app:tint="@color/white_48" />
+                    app:tint="@color/icon_secondary" />
 
             </FrameLayout>
 
@@ -229,9 +229,9 @@
 
     <ProgressBar
         android:id="@+id/referendumDetailsProgress"
+        style="@style/Widget.Nova.ProgressBar.Indeterminate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:indeterminateTint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

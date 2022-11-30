@@ -13,9 +13,9 @@ fun mapTokenToTokenModel(token: Token): TokenModel {
         val rateChange = token.recentRateChange
 
         val changeColorRes = when {
-            rateChange == null -> R.color.gray2
-            rateChange.isNonNegative -> R.color.green
-            else -> R.color.red
+            rateChange == null -> R.color.text_secondary
+            rateChange.isNonNegative -> R.color.text_positive
+            else -> R.color.text_negative
         }
 
         TokenModel(

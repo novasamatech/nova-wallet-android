@@ -14,7 +14,7 @@
         android:layout_marginVertical="10dp"
         android:layout_marginStart="16dp"
         android:includeFontPadding="false"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         tools:text="50 KSM" />
 
     <TextView
@@ -27,7 +27,7 @@
         android:layout_marginEnd="16dp"
         android:gravity="center_vertical"
         android:includeFontPadding="false"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         tools:text="40 days left" />
 
 </FrameLayout>

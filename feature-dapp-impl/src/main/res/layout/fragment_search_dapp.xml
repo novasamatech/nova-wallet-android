@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:id="@+id/searchDappSearhContainer"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.SearchToolbar
         android:layout_width="match_parent"
@@ -21,6 +21,5 @@
         android:clipToPadding="false"
         android:layout_weight="1"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        android:id="@+id/searchDappList"
-        tools:listitem="@layout/view_dapp" />
+        android:id="@+id/searchDappList" />
 </LinearLayout>

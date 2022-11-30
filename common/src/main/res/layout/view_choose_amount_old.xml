@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="80dp"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <TextView
@@ -16,7 +16,7 @@
         android:layout_marginTop="8dp"
         android:includeFontPadding="false"
         android:text="@string/common_amount"
-        android:textColor="@color/gray1"
+        android:textColor="@color/text_secondary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -28,7 +28,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        android:textColor="@color/gray1"
+        android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toTopOf="@+id/stakingAmountInput"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -39,6 +39,7 @@
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:layout_marginStart="16dp"
+        app:tint="@color/icon_primary"
         app:layout_constraintBottom_toBottomOf="@id/stakingAssetToken"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/stakingAssetToken"
@@ -52,6 +53,7 @@
         android:layout_marginStart="6dp"
         android:layout_marginTop="9dp"
         android:includeFontPadding="false"
+        android:textColor="@color/text_primary"
         app:layout_constraintStart_toEndOf="@id/stakingAssetImage"
         app:layout_constraintTop_toBottomOf="@id/stakingTitle"
         tools:text="KSM" />
@@ -68,8 +70,8 @@
         android:hint="0"
         android:inputType="numberDecimal"
         android:paddingBottom="27dp"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white_30"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/hint_text"
         android:textCursorDrawable="@null"
         android:textStyle="bold"
         app:layout_constraintBaseline_toBaselineOf="@id/stakingAssetToken"
@@ -86,7 +88,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="8dp"
         android:includeFontPadding="false"
-        android:textColor="@color/gray1"
+        android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/stakingAssetToken"

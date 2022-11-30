@@ -38,7 +38,7 @@ class MoonPayProvider(
         }
 
         private fun createPurchaseLink(context: Context): String {
-            val color = context.getColor(R.color.colorAccent).toHexColor()
+            val color = context.getColor(R.color.button_background_primary).toHexColor()
 
             val urlParams = buildString {
                 append("?").append("apiKey").append("=").append(publicKey)

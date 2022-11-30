@@ -2,14 +2,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Theme.NovaFoundation.Nova" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorAccent">@color/android_system_accent</item>
+        <item name="colorPrimary">@color/android_system_accent</item>
 
         <!--        <item name="android:windowTranslucentStatus">true</item>-->
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowTranslucentNavigation">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowBackground">@drawable/bg_splash</item>
-        <item name="android:navigationBarColor">@color/black</item>
+        <item name="android:navigationBarColor">@color/secondary_screen_background</item>
 
         <!--text sizes-->
         <item name="textSizeH1">@dimen/text_size_h1</item>
@@ -38,8 +39,6 @@
         <item name="fontExtraLight">@font/public_sans_extra_light</item>
         <!--fonts-->
 
-        <item name="colorAccent">@color/accentBlue</item>
-
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
 
         <item name="editTextStyle">@style/Widget.Nova.Input.EditText</item>
@@ -50,6 +49,6 @@
     </style>
 
     <style name="WhiteOverlay" parent="ThemeOverlay.AppCompat">
-        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimary">@color/text_primary</item>
     </style>
 </resources>

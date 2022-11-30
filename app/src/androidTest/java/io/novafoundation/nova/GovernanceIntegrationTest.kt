@@ -7,8 +7,11 @@ import io.novafoundation.nova.common.utils.childScope
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
+import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
+import io.novafoundation.nova.feature_governance_impl.data.RealGovernanceAdditionalState
 import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
@@ -29,7 +32,9 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
     @Test
     fun shouldRetrieveOnChainReferenda() = runBlocking<Unit> {
         val chain = chain()
-        val onChainReferendaRepository = source(chain).referenda
+        val selectedGovernance = supportedGovernanceOption(chain, Chain.Governance.V1)
+
+        val onChainReferendaRepository = source(selectedGovernance).referenda
 
         val referenda = onChainReferendaRepository.getAllOnChainReferenda(chain.id)
 
@@ -39,7 +44,9 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
     @Test
     fun shouldRetrieveConvictionVotes() = runBlocking<Unit> {
         val chain = chain()
-        val convictionVotingRepository = source(chain).convictionVoting
+        val selectedGovernance = supportedGovernanceOption(chain, Chain.Governance.V1)
+
+        val convictionVotingRepository = source(selectedGovernance).convictionVoting
 
         val accountId = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".toAccountId()
 
@@ -50,7 +57,9 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
     @Test
     fun shouldRetrieveTrackLocks() = runBlocking<Unit> {
         val chain = chain()
-        val convictionVotingRepository = source(chain).convictionVoting
+        val selectedGovernance = supportedGovernanceOption(chain, Chain.Governance.V1)
+
+        val convictionVotingRepository = source(selectedGovernance).convictionVoting
 
         val accountId = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".toAccountId()
 
@@ -63,7 +72,9 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
     @Test
     fun shouldRetrieveReferendaTracks() = runBlocking<Unit> {
         val chain = chain()
-        val onChainReferendaRepository = source(chain).referenda
+        val selectedGovernance = supportedGovernanceOption(chain, Chain.Governance.V1)
+
+        val onChainReferendaRepository = source(selectedGovernance).referenda
 
         val tracks = onChainReferendaRepository.getTracks(chain.id)
 
@@ -71,7 +82,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
     }
 
     @Test
-    fun shouldRetrieveDomainReferendaPreviews() = runBlocking<Unit> {
+    fun shouldRetrieveDomainReferendaPreviews() = runBlocking {
         val childScope = childScope()
 
         val referendaListInteractor = governanceApi.referendaListInteractor
@@ -84,8 +95,9 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
         val accountId = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".toAccountId()
 
         val chain = chain()
+        val selectedGovernance = supportedGovernanceOption(chain, Chain.Governance.V1)
 
-        val referendaByGroup = referendaListInteractor.referendaListStateFlow(accountId, chain, chain.utilityAsset).first()
+        val referendaByGroup = referendaListInteractor.referendaListStateFlow(accountId, selectedGovernance).first()
         val referenda = referendaByGroup.groupedReferenda.values.flatten()
 
         Log.d(this@GovernanceIntegrationTest.LOG_TAG,referenda.joinToString("\n"))
@@ -94,7 +106,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
     }
 
     @Test
-    fun shouldRetrieveDomainReferendumDetails() = runBlocking<Unit> {
+    fun shouldRetrieveDomainReferendumDetails() = runBlocking {
         val childScope = childScope()
 
         val referendumDetailsInteractor = governanceApi.referendumDetailsInteractor
@@ -107,8 +119,9 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
         val accountId = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".toAccountId()
         val referendumId = ReferendumId(BigInteger.ZERO)
         val chain = chain()
+        val selectedGovernance = supportedGovernanceOption(chain, Chain.Governance.V1)
 
-        val referendumDetails = referendumDetailsInteractor.referendumDetailsFlow(referendumId, chain, accountId)
+        val referendumDetails = referendumDetailsInteractor.referendumDetailsFlow(referendumId, selectedGovernance, accountId)
             .first()
 
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, referendumDetails.toString())
@@ -128,18 +141,25 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
         val interactor = governanceApi.referendumVotersInteractor
 
         val referendumId = ReferendumId(BigInteger.ZERO)
-        val chain = chain()
-
-        val referendumVoters = interactor.votersFlow(referendumId, chain.utilityAsset, VoteType.AYE)
+        val referendumVoters = interactor.votersFlow(referendumId, VoteType.AYE)
             .first()
 
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, referendumVoters.toString())
     }
 
-    private suspend fun source(chain: Chain) = governanceApi.governanceSourceRegistry.sourceFor(chain.id)
+    private suspend fun source(supportedGovernance: SupportedGovernanceOption) = governanceApi.governanceSourceRegistry.sourceFor(supportedGovernance)
+
+    private fun supportedGovernanceOption(chain: Chain, governance: Chain.Governance) =
+        SupportedGovernanceOption(
+            ChainWithAsset(chain, chain.utilityAsset),
+            RealGovernanceAdditionalState(
+                governance,
+                false
+            )
+        )
 
     private suspend fun chain(): Chain = chainRegistry.currentChains.map { chains ->
-        chains.find { it.governance != Chain.Governance.NONE }
+        chains.find { it.governance.isNotEmpty() }
     }
         .filterNotNull()
         .first()

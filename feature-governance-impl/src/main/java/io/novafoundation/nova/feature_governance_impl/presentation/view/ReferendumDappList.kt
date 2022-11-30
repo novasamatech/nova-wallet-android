@@ -21,7 +21,7 @@ class ReferendumDappList @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.view_referendum_dapp_list, this)
-        background = getRoundedCornerDrawable(R.color.white_8)
+        background = getRoundedCornerDrawable(R.color.block_background)
         orientation = VERTICAL
         setPadding(0, 16.dp, 0, 8.dp)
     }
@@ -48,7 +48,7 @@ class ReferendumDappList @JvmOverloads constructor(
             setTitle(model.name)
             setSubtitle(model.description)
             setIconUrl(model.iconUrl)
-            setActionResource(iconRes = R.drawable.ic_chevron_right, colorRes = R.color.white_48)
+            setActionResource(iconRes = R.drawable.ic_chevron_right, colorRes = R.color.icon_secondary)
             setActionEndPadding(16.dp)
 
             setOnClickListener { onDAppClicked?.invoke(model) }

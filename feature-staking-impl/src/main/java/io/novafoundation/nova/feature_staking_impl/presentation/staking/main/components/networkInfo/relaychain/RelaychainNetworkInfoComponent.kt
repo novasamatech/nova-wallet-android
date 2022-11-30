@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.BaseNetworkInfoComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.NetworkInfoComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.NetworkInfoItem
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -25,7 +25,7 @@ class RelaychainNetworkInfoComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: SingleAssetSharedState.AssetWithChain,
+        assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext
     ): NetworkInfoComponent = RelaychainNetworkInfoComponent(
         stakingInteractor = stakingInteractor,
@@ -42,7 +42,7 @@ private class RelaychainNetworkInfoComponent(
     resourceManager: ResourceManager,
 
     private val hostContext: ComponentHostContext,
-    private val assetWithChain: SingleAssetSharedState.AssetWithChain,
+    private val assetWithChain: ChainWithAsset,
 ) : BaseNetworkInfoComponent(resourceManager, hostContext.scope) {
 
     private val selectedAccountStakingStateFlow = hostContext.selectedAccount.flatMapLatest {

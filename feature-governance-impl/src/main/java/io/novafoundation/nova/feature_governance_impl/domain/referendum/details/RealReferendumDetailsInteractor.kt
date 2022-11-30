@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_governance_api.data.repository.PreImageReq
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest.FetchCondition.ALWAYS
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.data.thresold.gov1.asGovV1VotingThresholdOrNull
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumProposer
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
@@ -50,10 +51,10 @@ class RealReferendumDetailsInteractor(
 
     override fun referendumDetailsFlow(
         referendumId: ReferendumId,
-        chain: Chain,
+        selectedGovernanceOption: SupportedGovernanceOption,
         voterAccountId: AccountId?,
     ): Flow<ReferendumDetails> {
-        return flowOfAll { referendumDetailsFlowSuspend(referendumId, chain, voterAccountId) }
+        return flowOfAll { referendumDetailsFlowSuspend(referendumId, selectedGovernanceOption, voterAccountId) }
     }
 
     override suspend fun detailsFor(preImage: PreImage, chain: Chain): ReferendumCall? {
@@ -79,10 +80,12 @@ class RealReferendumDetailsInteractor(
 
     private suspend fun referendumDetailsFlowSuspend(
         referendumId: ReferendumId,
-        chain: Chain,
+        selectedGovernanceOption: SupportedGovernanceOption,
         voterAccountId: AccountId?,
     ): Flow<ReferendumDetails> {
-        val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
+        val chain = selectedGovernanceOption.assetWithChain.chain
+
+        val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
         val offChainInfo = governanceSource.offChainInfo.referendumDetails(referendumId, chain)
         val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
@@ -109,7 +112,7 @@ class RealReferendumDetailsInteractor(
             )
 
             val currentStatus = referendaConstructor.constructReferendumStatus(
-                chain = chain,
+                selectedGovernanceOption = selectedGovernanceOption,
                 onChainReferendum = onChainReferendum,
                 tracksById = tracksById,
                 currentBlockNumber = currentBlockNumber,

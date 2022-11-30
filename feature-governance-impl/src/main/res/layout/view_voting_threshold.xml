@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:parentTag="android.widget.LinearLayout">
 
     <TextView
@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:includeFontPadding="false"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         tools:text="Threshold: 16,492 of 15,392.5 KSM " />
 
     <io.novafoundation.nova.feature_governance_impl.presentation.view.VotesView
@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:textColor="@color/white_64"
+            android:textColor="@color/text_secondary"
             tools:text="Aye: 80%" />
 
         <TextView
@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textColor="@color/white_64"
+            android:textColor="@color/text_secondary"
             tools:text="To pass: 50%" />
 
         <TextView
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:textColor="@color/white_64"
+            android:textColor="@color/text_secondary"
             tools:text="Nay: 20%" />
     </FrameLayout>
 

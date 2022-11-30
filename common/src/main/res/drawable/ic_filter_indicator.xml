@@ -9,5 +9,5 @@
       android:fillType="evenOdd"/>
   <path
       android:pathData="M24,4C24,6.2091 22.2091,8 20,8C17.7909,8 16,6.2091 16,4C16,1.7909 17.7909,0 20,0C22.2091,0 24,1.7909 24,4Z"
-      android:fillColor="@color/accentBlue"/>
+      android:fillColor="@color/button_background_primary"/>
 </vector>

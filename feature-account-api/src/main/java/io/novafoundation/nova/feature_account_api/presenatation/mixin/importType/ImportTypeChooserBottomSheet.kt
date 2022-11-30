@@ -26,21 +26,21 @@ class ImportTypeChooserBottomSheet(
             type = SecretType.MNEMONIC,
             title = R.string.recovery_passphrase,
             subtitle = R.string.account_mnmonic_length_variants,
-            icon = R.drawable.ic_text_phrase
+            icon = R.drawable.ic_mnemonic_phrase
         )
 
         item(
             type = SecretType.SEED,
             title = R.string.recovery_raw_seed,
             subtitle = R.string.account_private_key,
-            icon = R.drawable.ic_text_0x
+            icon = R.drawable.ic_raw_seed
         )
 
         item(
             type = SecretType.JSON,
             title = R.string.recovery_json,
             subtitle = R.string.account_json_file,
-            icon = R.drawable.ic_document
+            icon = R.drawable.ic_file_outline
         )
     }
 

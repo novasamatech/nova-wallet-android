@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/blurColor"
+    tools:background="@color/block_background"
     tools:orientation="vertical"
     tools:parentTag="android.widget.LinearLayout">
 
@@ -19,10 +19,11 @@
         android:paddingTop="14dp"
         android:paddingEnd="16dp"
         android:paddingBottom="14dp"
+        android:textColor="@color/text_primary"
         android:text="@string/staking_about"
         app:drawableEndCompat="@drawable/ic_chevron_down"
-        app:drawableTint="@color/white_48"
-        tools:textColor="@color/white" />
+        app:drawableTint="@color/icon_secondary"
+        tools:textColor="@color/text_primary" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/stakingNetworkCollapsibleView"

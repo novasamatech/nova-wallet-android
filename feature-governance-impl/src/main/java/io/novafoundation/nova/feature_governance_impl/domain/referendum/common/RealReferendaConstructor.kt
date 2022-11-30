@@ -12,15 +12,16 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackQueue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.asOngoing
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.sinceOrThrow
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ayeVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.inQueue
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.nayVotes
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.orEmpty
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.positionOf
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.sinceOrThrow
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.track
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.passing
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline
@@ -45,7 +46,7 @@ interface ReferendaConstructor {
     ): ReferendumVoting?
 
     suspend fun constructReferendaStatuses(
-        chain: Chain,
+        selectedGovernanceOption: SupportedGovernanceOption,
         onChainReferenda: Collection<OnChainReferendum>,
         votingByReferenda: Map<ReferendumId, ReferendumVoting?>,
         tracksById: Map<TrackId, TrackInfo>,
@@ -61,13 +62,13 @@ interface ReferendaConstructor {
 }
 
 suspend fun ReferendaConstructor.constructReferendumStatus(
-    chain: Chain,
+    selectedGovernanceOption: SupportedGovernanceOption,
     onChainReferendum: OnChainReferendum,
     tracksById: Map<TrackId, TrackInfo>,
     votingByReferenda: Map<ReferendumId, ReferendumVoting?>,
     currentBlockNumber: BlockNumber,
 ): ReferendumStatus = constructReferendaStatuses(
-    chain = chain,
+    selectedGovernanceOption = selectedGovernanceOption,
     onChainReferenda = listOf(onChainReferendum),
     tracksById = tracksById,
     currentBlockNumber = currentBlockNumber,
@@ -115,13 +116,14 @@ class RealReferendaConstructor(
     }
 
     override suspend fun constructReferendaStatuses(
-        chain: Chain,
+        selectedGovernanceOption: SupportedGovernanceOption,
         onChainReferenda: Collection<OnChainReferendum>,
         votingByReferenda: Map<ReferendumId, ReferendumVoting?>,
         tracksById: Map<TrackId, TrackInfo>,
         currentBlockNumber: BlockNumber,
     ): Map<ReferendumId, ReferendumStatus> {
-        val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
+        val chain = selectedGovernanceOption.assetWithChain.chain
+        val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
 
         val blockTime = chainStateRepository.predictedBlockTime(chain.id)
         val blockDurationEstimator = BlockDurationEstimator(currentBlock = currentBlockNumber, blockTimeMillis = blockTime)

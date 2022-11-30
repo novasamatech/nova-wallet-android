@@ -123,7 +123,7 @@ fun AssetGroupingDecoration.Companion.applyDefaultTo(
     adapter: ListAdapter<*, *>
 ) {
     val groupBackground = with(recyclerView.context) {
-        addRipple(getRoundedCornerDrawable(R.color.blurColor))
+        addRipple(getRoundedCornerDrawable(R.color.block_background))
     }
     val decoration = AssetGroupingDecoration(
         background = groupBackground,

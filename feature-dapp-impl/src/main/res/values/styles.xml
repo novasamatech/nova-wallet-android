@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="GoNextTransactionDetailsTextAppearance">
-        <item name="android:textColor">@color/white_64</item>
+        <item name="android:textColor">@color/text_secondary</item>
     </style>
 
     <style name="Widget.Nova.DappCategory.Shimmering" parent="">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">10dp</item>
-        <item name="android:background">@drawable/bg_shimmering_light</item>
+        <item name="android:background">@drawable/bg_shimmering</item>
         <item name="android:layout_marginEnd">32dp</item>
     </style>
 </resources>

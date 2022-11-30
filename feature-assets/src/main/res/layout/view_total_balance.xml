@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingVertical="20dp"
-    tools:background="@color/black_48"
+    tools:background="@color/block_background"
     tools:gravity="center_horizontal"
     tools:orientation="vertical"
     tools:parentTag="android.widget.LinearLayout">
@@ -18,8 +18,8 @@
         android:gravity="center_vertical"
         android:includeFontPadding="false"
         android:text="@string/wallet_balance_details_total"
-        android:textColor="@color/white_64"
-        app:drawableTint="@color/white_48" />
+        android:textColor="@color/text_secondary"
+        app:drawableTint="@color/icon_secondary" />
 
     <TextView
         android:id="@+id/viewAssetsTotalBalanceTotal"
@@ -30,7 +30,7 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="16dp"
         android:gravity="center_horizontal"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         android:visibility="gone"
         tools:text="$214.66"
         tools:visibility="visible" />
@@ -47,11 +47,11 @@
         android:paddingTop="1dp"
         android:paddingEnd="6dp"
         android:paddingBottom="1dp"
-        android:textColor="@color/white_64"
+        android:textColor="@color/chip_text"
         android:visibility="gone"
         app:drawableStartCompat="@drawable/ic_lock"
-        app:drawableTint="@color/white_64"
-        tools:background="@color/white_16"
+        app:drawableTint="@color/chip_icon"
+        tools:background="@color/chips_background"
         tools:drawableStart="@drawable/ic_lock"
         tools:text="$214.66"
         tools:visibility="visible" />
@@ -73,13 +73,13 @@
             <View
                 android:layout_width="136dp"
                 android:layout_height="32dp"
-                android:background="@drawable/bg_shimmering_light" />
+                android:background="@drawable/bg_shimmering" />
 
             <View
                 android:layout_width="80dp"
                 android:layout_height="18dp"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/bg_shimmering_light"
+                android:background="@drawable/bg_shimmering"
                 android:visibility="gone" />
         </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>

@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryState
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
@@ -28,7 +28,7 @@ class ParachainStakeSummaryComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: SingleAssetSharedState.AssetWithChain,
+        assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext,
     ): StakeSummaryComponent = ParachainStakeSummaryComponent(
         resourceManager = resourceManager,
@@ -45,7 +45,7 @@ private class ParachainStakeSummaryComponent(
     private val interactor: ParachainStakingStakeSummaryInteractor,
     private val resourceManager: ResourceManager,
 
-    assetWithChain: SingleAssetSharedState.AssetWithChain,
+    assetWithChain: ChainWithAsset,
     private val hostContext: ComponentHostContext,
 ) : BaseStakeSummaryComponent(hostContext.scope) {
 
