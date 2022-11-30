@@ -40,9 +40,9 @@ interface AssetsRouter {
 
     fun openManageChainTokens(payload: ManageChainTokensPayload)
 
-    fun openAddTokenSelectChain()
-
     fun openAddTokenEnterInfo(payload: AddTokenEnterInfoPayload)
+
+    fun openAddTokenSelectChain()
 
     fun openNfts()
 
