@@ -5,7 +5,6 @@ import android.net.Uri
 import io.novafoundation.nova.common.utils.appendNullableQueryParameter
 import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
 import io.novafoundation.nova.feature_assets.data.buyToken.ExternalProvider
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
@@ -24,10 +23,6 @@ class RampProvider(
     override val icon: Int = R.drawable.ic_ramp
 
     override fun createIntegrator(chainAsset: Chain.Asset, address: String): ExternalProvider.Integrator {
-        if (!isTokenSupported(chainAsset)) {
-            throw BuyTokenRegistry.Provider.UnsupportedTokenException()
-        }
-
         return RampIntegrator(host, apiToken, chainAsset, address)
     }
 

@@ -1,16 +1,16 @@
 package io.novafoundation.nova.feature_assets.data.buyToken.providers
 
 import android.content.Context
-import io.novafoundation.nova.common.utils.hmacSHA256
+import android.net.Uri
 import io.novafoundation.nova.common.utils.sha512
 import io.novafoundation.nova.common.utils.showBrowser
-import io.novafoundation.nova.common.utils.toBase64
-import io.novafoundation.nova.common.utils.toHexColor
 import io.novafoundation.nova.common.utils.urlEncoded
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.data.buyToken.ExternalProvider
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
+
+private const val TYPE_BUY = "buy"
 
 class MercuryoProvider(
     private val host: String,
@@ -20,7 +20,7 @@ class MercuryoProvider(
 
     override val id: String = "mercuryo"
 
-    override val name: String = "mercuryo"
+    override val name: String = "Mercuryo"
     override val icon: Int = R.drawable.ic_mercuryo
 
     override fun createIntegrator(chainAsset: Chain.Asset, address: String): ExternalProvider.Integrator {
@@ -44,19 +44,17 @@ class MercuryoProvider(
                 .sha512()
                 .toHexString()
 
-            val urlParams = buildString {
-                append("?").append("widget_id").append("=").append(widgetId)
-                append("&").append("type").append("=").append("buy")
-                append("&").append("currency").append("=").append(tokenType.symbol)
-                append("&").append("address").append("=").append(address)
-                append("&").append("return_url").append("=").append(ExternalProvider.REDIRECT_URL_BASE.urlEncoded())
-                append("&").append("signature").append("=").append(signature)
-            }
-
-            return buildString {
-                append("https://").append(host)
-                append(urlParams)
-            }
+            return Uri.Builder()
+                .scheme("https")
+                .authority(host)
+                .appendQueryParameter("widget_id", widgetId)
+                .appendQueryParameter("type", TYPE_BUY)
+                .appendQueryParameter("currency", tokenType.symbol)
+                .appendQueryParameter("address", address)
+                .appendQueryParameter("return_url", ExternalProvider.REDIRECT_URL_BASE.urlEncoded())
+                .appendQueryParameter("signature", signature)
+                .build()
+                .toString()
         }
     }
 }
