@@ -15,7 +15,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class Gov2OffChainReferendaInfoRepository(
     private val polkassemblyApi: PolkassemblyV2Api
-): OffChainReferendaInfoRepository {
+) : OffChainReferendaInfoRepository {
 
     override suspend fun referendumPreviews(chain: Chain): List<OffChainReferendumPreview> {
         return runCatching {
