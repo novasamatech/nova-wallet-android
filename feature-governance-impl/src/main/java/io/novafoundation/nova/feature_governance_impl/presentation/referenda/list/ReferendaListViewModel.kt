@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDAppsInteractor
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
@@ -33,7 +34,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 
@@ -41,7 +41,7 @@ class ReferendaListViewModel(
     assetSelectorFactory: AssetSelectorFactory,
     private val referendaListInteractor: ReferendaListInteractor,
     private val selectedAccountUseCase: SelectedAccountUseCase,
-    private val selectedAssetSharedState: SingleAssetSharedState,
+    private val selectedAssetSharedState: GovernanceSharedState,
     private val resourceManager: ResourceManager,
     private val updateSystem: UpdateSystem,
     private val governanceRouter: GovernanceRouter,
@@ -55,14 +55,15 @@ class ReferendaListViewModel(
     )
 
     private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
-    private val selectedChainAndAssetFlow = selectedAssetSharedState.assetWithChain
+    private val selectedChainAndAssetFlow = selectedAssetSharedState.selectedOption
 
     private val accountAndChainFlow = combineToPair(selectedAccount, selectedChainAndAssetFlow)
 
-    private val referendaListStateFlow = accountAndChainFlow.withLoading { (account, chainAndAsset) ->
+    private val referendaListStateFlow = accountAndChainFlow.withLoading { (account, supportedOption) ->
+        val chainAndAsset = supportedOption.assetWithChain
         val accountId = account.accountIdIn(chainAndAsset.chain)
 
-        referendaListInteractor.referendaListStateFlow(accountId, chainAndAsset.chain, chainAndAsset.asset)
+        referendaListInteractor.referendaListStateFlow(accountId, supportedOption)
     }
         .inBackground()
         .shareWhileSubscribed()

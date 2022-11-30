@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.parachainStaking.loadDelegatingState
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -32,7 +32,7 @@ class ParachainAlertsComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: SingleAssetSharedState.AssetWithChain,
+        assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext,
     ): AlertsComponent = ParachainAlertsComponent(
         delegatorStateUseCase = delegatorStateUseCase,
@@ -49,7 +49,7 @@ private class ParachainAlertsComponent(
     private val interactor: ParachainStakingAlertsInteractor,
     private val resourceManager: ResourceManager,
 
-    private val assetWithChain: SingleAssetSharedState.AssetWithChain,
+    private val assetWithChain: ChainWithAsset,
     private val hostContext: ComponentHostContext,
     private val router: ParachainStakingRouter
 ) : AlertsComponent,

@@ -27,7 +27,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.from
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState.AssetWithChain
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -46,7 +47,7 @@ class ParachainUnbondingComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: AssetWithChain,
+        assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext,
     ): UnbondingComponent = ParachainUnbondingComponent(
         assetWithChain = assetWithChain,
@@ -65,7 +66,7 @@ private class ParachainUnbondingComponent(
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
 
-    private val assetWithChain: AssetWithChain,
+    private val assetWithChain: ChainWithAsset,
     private val hostContext: ComponentHostContext,
     private val router: ParachainStakingRouter
 ) : UnbondingComponent,

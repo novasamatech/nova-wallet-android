@@ -9,16 +9,22 @@ import kotlinx.coroutines.flow.Flow
 
 interface AssetSelectorMixin {
 
-    val showAssetChooser: LiveData<Event<DynamicListBottomSheet.Payload<AssetModel>>>
+    val showAssetChooser: LiveData<Event<DynamicListBottomSheet.Payload<AssetSelectorModel>>>
 
     fun assetSelectorClicked()
 
-    fun assetChosen(assetModel: AssetModel)
+    fun assetChosen(selectorModel: AssetSelectorModel)
 
-    val selectedAssetModelFlow: Flow<AssetModel>
+    val selectedAssetModelFlow: Flow<AssetSelectorModel>
 
     interface Presentation : AssetSelectorMixin {
 
         val selectedAssetFlow: Flow<Asset>
     }
 }
+
+data class AssetSelectorModel(
+    val assetModel: AssetModel,
+    val title: String,
+    val additionalIdentifier: String,
+)

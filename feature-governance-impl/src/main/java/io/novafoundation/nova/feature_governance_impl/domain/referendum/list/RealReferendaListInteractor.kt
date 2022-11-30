@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_governance_api.data.repository.PreImageReq
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.data.source.trackLocksFlowOrEmpty
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimScheduleCalculator
 import io.novafoundation.nova.feature_governance_api.domain.locks.RealClaimScheduleCalculator
@@ -61,12 +62,18 @@ class RealReferendaListInteractor(
     private val referendaSortingProvider: ReferendaSortingProvider,
 ) : ReferendaListInteractor {
 
-    override fun referendaListStateFlow(voterAccountId: AccountId?, chain: Chain, chainAsset: Chain.Asset): Flow<ReferendaListState> {
-        return flowOfAll { referendaListStateFlowSuspend(voterAccountId, chain, chainAsset) }
+    override fun referendaListStateFlow(voterAccountId: AccountId?, selectedGovernanceOption: SupportedGovernanceOption): Flow<ReferendaListState> {
+        return flowOfAll { referendaListStateFlowSuspend(voterAccountId, selectedGovernanceOption) }
     }
 
-    private suspend fun referendaListStateFlowSuspend(voterAccountId: AccountId?, chain: Chain, asset: Chain.Asset): Flow<ReferendaListState> {
-        val governanceSource = governanceSourceRegistry.sourceFor(chain.id)
+    private suspend fun referendaListStateFlowSuspend(
+        voterAccountId: AccountId?,
+        selectedGovernanceOption: SupportedGovernanceOption
+    ): Flow<ReferendaListState> {
+        val chain = selectedGovernanceOption.assetWithChain.chain
+        val asset = selectedGovernanceOption.assetWithChain.asset
+
+        val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
         val undecidingTimeout = governanceSource.referenda.undecidingTimeout(chain.id)
         val voteLockingPeriod = governanceSource.convictionVoting.voteLockingPeriod(chain.id)
@@ -83,7 +90,7 @@ class RealReferendaListInteractor(
             val referenda = governanceSource.constructReferendumPreviews(
                 voting = voting,
                 onChainReferenda = onChainReferenda,
-                chain = chain,
+                selectedGovernanceOption = selectedGovernanceOption,
                 tracksById = tracksById,
                 currentBlockNumber = currentBlockNumber,
                 offChainInfo = offChainInfo,
@@ -135,14 +142,14 @@ class RealReferendaListInteractor(
     private suspend fun GovernanceSource.constructReferendumPreviews(
         voting: Map<TrackId, Voting>,
         onChainReferenda: Collection<OnChainReferendum>,
-        chain: Chain,
+        selectedGovernanceOption: SupportedGovernanceOption,
         tracksById: Map<TrackId, TrackInfo>,
         currentBlockNumber: BlockNumber,
         offChainInfo: Map<ReferendumId, OffChainReferendumPreview>,
         totalIssuance: BigInteger
     ): List<ReferendumPreview> {
         val userVotes = voting.flattenCastingVotes()
-        val proposals = constructReferendaProposals(onChainReferenda, chain)
+        val proposals = constructReferendaProposals(onChainReferenda, selectedGovernanceOption.assetWithChain.chain)
 
         val votingsById = onChainReferenda.associateBy(
             keySelector = { it.id },
@@ -157,7 +164,7 @@ class RealReferendaListInteractor(
         )
 
         val statuses = referendaConstructor.constructReferendaStatuses(
-            chain = chain,
+            selectedGovernanceOption = selectedGovernanceOption,
             onChainReferenda = onChainReferenda,
             tracksById = tracksById,
             currentBlockNumber = currentBlockNumber,

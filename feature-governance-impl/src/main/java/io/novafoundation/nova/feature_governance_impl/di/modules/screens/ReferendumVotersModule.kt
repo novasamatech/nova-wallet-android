@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_account_api.domain.account.identity.Identi
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ReferendumVotersInteractor
+import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.voters.RealReferendumVotersInteractor
 
 @Module
@@ -17,8 +18,10 @@ class ReferendumVotersModule {
     fun provideReferendaVotersInteractor(
         governanceSourceRegistry: GovernanceSourceRegistry,
         @OnChainIdentity identityProvider: IdentityProvider,
+        governanceSharedState: GovernanceSharedState,
     ): ReferendumVotersInteractor = RealReferendumVotersInteractor(
         governanceSourceRegistry = governanceSourceRegistry,
-        identityProvider = identityProvider
+        identityProvider = identityProvider,
+        governanceSharedState = governanceSharedState,
     )
 }
