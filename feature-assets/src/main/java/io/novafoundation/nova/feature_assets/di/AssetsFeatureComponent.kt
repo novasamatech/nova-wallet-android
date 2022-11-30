@@ -20,7 +20,6 @@ import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.d
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChain.di.AddTokenSelectChainComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.di.ManageChainTokensComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.di.ManageTokensComponent
-import io.novafoundation.nova.feature_assets.presentation.tokens.add.di.AddTokenSelectChainComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.ExtrinsicDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.RewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.TransactionDetailComponent
