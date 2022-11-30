@@ -3,6 +3,7 @@
     <!-- Colors not included in the design system -->
     <color name="address_icon_background">#eeeeee</color>
     <color name="splash_background_color">#05081C</color>
+    <color name="qr_code_background">#FFFFFF</color>
 
     <!-- System -->
     <color name="android_system_accent">#1F78FF</color>
