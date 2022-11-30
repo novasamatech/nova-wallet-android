@@ -1,12 +1,12 @@
-package io.novafoundation.nova.feature_governance_impl.data.offchain.remote.model.request
+package io.novafoundation.nova.feature_governance_impl.data.offchain.v2.request
 
 import java.math.BigInteger
 
-class ReferendumDetailsRequest(id: BigInteger) {
+class ReferendumDetailsV2Request(id: BigInteger) {
     val query = """
         query {
             posts(
-                where: {onchain_link: {onchain_referendum_id: {_eq: $id}}}
+                where: {onchain_link: {onchain_referendumv2_id: {_eq: $id}}}
             ) {
                 title
                 content
@@ -14,7 +14,7 @@ class ReferendumDetailsRequest(id: BigInteger) {
                     username
                 }
                 onchain_link {
-                    onchain_referendum{
+                    onchain_referendumv2 {
                         referendumStatus {
                             blockNumber {
                                 startDateTime

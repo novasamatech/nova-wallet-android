@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_governance_impl.di
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -14,7 +13,6 @@ import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRep
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.data.offchain.remote.PolkassemblyApi
 import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
 import io.novafoundation.nova.feature_governance_impl.data.preimage.RealPreImageSizer
 import io.novafoundation.nova.feature_governance_impl.data.repository.RealTreasuryRepository
@@ -64,10 +62,6 @@ import javax.inject.Named
     ]
 )
 class GovernanceFeatureModule {
-
-    @Provides
-    @FeatureScope
-    fun providePolkassemblyApi(apiCreator: NetworkApiCreator) = apiCreator.create(PolkassemblyApi::class.java)
 
     @Provides
     @FeatureScope
