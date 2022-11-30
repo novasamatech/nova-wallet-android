@@ -92,8 +92,6 @@ class AssetsFeatureModule {
                 rampProvider,
                 transakProvider,
                 mercuryoProvider
-                // TODO waiting for secret keys for Moonpay
-//                MoonPayProvider(host = BuildConfig.MOONPAY_HOST, publicKey = BuildConfig.MOONPAY_PUBLIC_KEY, privateKey = BuildConfig.MOONPAY_PRIVATE_KEY)
             )
         )
     }

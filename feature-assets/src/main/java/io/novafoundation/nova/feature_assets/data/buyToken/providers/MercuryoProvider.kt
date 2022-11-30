@@ -22,6 +22,7 @@ class MercuryoProvider(
 
     override val name: String = "Mercuryo"
     override val icon: Int = R.drawable.ic_mercuryo
+    override val priority: Int = 0
 
     override fun createIntegrator(chainAsset: Chain.Asset, address: String): ExternalProvider.Integrator {
         return MercuryoIntegrator(host, widgetId, chainAsset, address, secret)
