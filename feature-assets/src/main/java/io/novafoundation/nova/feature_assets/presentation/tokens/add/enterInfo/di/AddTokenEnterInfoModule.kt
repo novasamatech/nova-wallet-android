@@ -9,10 +9,12 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_assets.domain.tokens.add.AddTokensInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoViewModel
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class AddTokenEnterInfoModule {
@@ -30,12 +32,16 @@ class AddTokenEnterInfoModule {
         interactor: AddTokensInteractor,
         resourceManager: ResourceManager,
         payload: AddTokenEnterInfoPayload,
+        validationExecutor: ValidationExecutor,
+        chainRegistry: ChainRegistry
     ): ViewModel {
         return AddTokenEnterInfoViewModel(
             router = router,
             interactor = interactor,
             resourceManager = resourceManager,
-            payload = payload
+            payload = payload,
+            validationExecutor = validationExecutor,
+            chainRegistry = chainRegistry,
         )
     }
 }

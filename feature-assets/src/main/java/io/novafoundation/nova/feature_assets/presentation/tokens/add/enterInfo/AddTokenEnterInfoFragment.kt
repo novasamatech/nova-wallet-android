@@ -10,6 +10,7 @@ import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.scrollOnFocusTo
@@ -17,6 +18,7 @@ import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
+import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoAddressInput
 import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoContainer
 import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoDecimalsInput
@@ -25,10 +27,8 @@ import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnte
 import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoScrollArea
 import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoSymbolInput
 import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoToolbar
-import javax.inject.Inject
 
-class AddTokenEnterInfoFragment :
-    BaseFragment<AddTokenEnterInfoViewModel>() {
+class AddTokenEnterInfoFragment : BaseFragment<AddTokenEnterInfoViewModel>() {
 
     companion object {
 
@@ -78,6 +78,7 @@ class AddTokenEnterInfoFragment :
     }
 
     override fun subscribe(viewModel: AddTokenEnterInfoViewModel) {
+        observeValidations(viewModel)
         val scope = viewLifecycleOwner.lifecycleScope
 
         addTokenEnterInfoAddressInput.bindTo(viewModel.contractAddressInput, scope)

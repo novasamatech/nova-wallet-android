@@ -5,4 +5,4 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class AddTokenEnterInfoPayload(val chainId: ChainId): Parcelable
+class AddTokenEnterInfoPayload(val chainId: ChainId) : Parcelable

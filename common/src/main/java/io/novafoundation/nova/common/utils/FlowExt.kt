@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.isModifiable
 import io.novafoundation.nova.common.utils.input.modifyInput
 import io.novafoundation.nova.common.utils.input.valueOrNull
+import io.novafoundation.nova.common.view.InsertableInputField
 import io.novafoundation.nova.common.view.input.seekbar.Seekbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -164,6 +165,10 @@ fun <T : Identifiable, R> Flow<List<T>>.transformLatestDiffed(transform: suspend
 fun <T> singleReplaySharedFlow() = MutableSharedFlow<T>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
 fun <T> Flow<T>.inBackground() = flowOn(Dispatchers.Default)
+
+fun InsertableInputField.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
+    content.bindTo(flow, scope)
+}
 
 fun EditText.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
     scope.launch {

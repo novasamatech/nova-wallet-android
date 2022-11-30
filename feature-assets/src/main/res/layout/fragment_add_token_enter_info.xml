@@ -10,7 +10,7 @@
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/addTokenEnterInfoToolbar"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         app:layout_constraintEnd_toEndOf="parent"
@@ -18,9 +18,9 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
+        android:id="@+id/addTokenEnterInfoScrollArea"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:id="@+id/addTokenEnterInfoScrollArea"
         android:layout_weight="1">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -53,7 +53,7 @@
                 app:layout_constraintStart_toStartOf="@+id/addTokenEnterInfoTitle"
                 app:layout_constraintTop_toBottomOf="@+id/addTokenEnterInfoTitle" />
 
-            <io.novafoundation.nova.common.view.input.TextInputView
+            <io.novafoundation.nova.common.view.InsertableInputField
                 android:id="@+id/addTokenEnterInfoAddressInput"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -61,6 +61,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 android:hint="@string/assets_add_token_enter_info_address_hint"
+                android:minHeight="48dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/addTokenEnterInfoAddressLabel" />
@@ -84,6 +85,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:hint="@string/assets_add_token_enter_info_symbol_hint"
+                android:maxLength="11"
                 app:layout_constraintEnd_toStartOf="@+id/guideline"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -107,8 +109,10 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
+                android:digits="0123456789"
                 android:hint="@string/assets_add_token_enter_info_decimals_hint"
                 android:inputType="numberDecimal"
+                android:maxLength="2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/guideline"
                 app:layout_constraintTop_toBottomOf="@+id/addTokenEnterInfoSymbolLabel" />
@@ -128,7 +132,7 @@
                 app:layout_constraintStart_toStartOf="@+id/addTokenEnterInfoSymbolInput"
                 app:layout_constraintTop_toBottomOf="@+id/addTokenEnterInfoSymbolInput" />
 
-            <io.novafoundation.nova.common.view.input.TextInputView
+            <io.novafoundation.nova.common.view.InsertableInputField
                 android:id="@+id/addTokenEnterInfoPriceInput"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -136,9 +140,11 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 android:hint="@string/assets_add_token_enter_info_price_hint"
+                android:minHeight="48dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/addTokenEnterInfoPriceLabel" />
+
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline"
@@ -151,9 +157,9 @@
     </ScrollView>
 
     <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/addTokenEnterInfoPriceConfirm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:id="@+id/addTokenEnterInfoPriceConfirm"
         tools:text="@string/assets_add_token" />
 </LinearLayout>

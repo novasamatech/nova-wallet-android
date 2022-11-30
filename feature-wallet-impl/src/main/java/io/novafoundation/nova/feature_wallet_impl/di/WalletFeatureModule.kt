@@ -233,6 +233,7 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideChainAssetRepository(
-        chainAssetDao: ChainAssetDao
-    ): ChainAssetRepository = RealChainAssetRepository(chainAssetDao)
+        chainAssetDao: ChainAssetDao,
+        gson: Gson
+    ): ChainAssetRepository = RealChainAssetRepository(chainAssetDao, gson)
 }

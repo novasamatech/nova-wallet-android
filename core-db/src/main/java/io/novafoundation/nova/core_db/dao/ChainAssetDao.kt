@@ -23,6 +23,12 @@ abstract class ChainAssetDao {
         deleteChainAssets(diff.removed)
     }
 
+    @Query("SELECT * FROM chain_assets WHERE id = :id AND chainId = :chainId")
+    abstract suspend fun getAsset(id: Int, chainId: String): ChainAssetLocal?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertAsset(asset: ChainAssetLocal)
+
     @Query("SELECT * FROM chain_assets WHERE source = :source")
     abstract suspend fun getAssetsBySource(source: AssetSourceLocal): List<ChainAssetLocal>
 

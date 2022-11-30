@@ -2,25 +2,37 @@ package io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Disabled
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Enabled
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Loading
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.tokens.add.AddTokensInteractor
+import io.novafoundation.nova.feature_assets.domain.tokens.add.CustomErc20Token
+import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.AddEvmTokenPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class AddTokenEnterInfoViewModel(
     private val router: AssetsRouter,
     private val interactor: AddTokensInteractor,
     private val resourceManager: ResourceManager,
     private val payload: AddTokenEnterInfoPayload,
-) : BaseViewModel() {
+    private val validationExecutor: ValidationExecutor,
+    private val chainRegistry: ChainRegistry,
+) : BaseViewModel(), Validatable by validationExecutor {
+
+    val chain = flowOf { chainRegistry.getChain(payload.chainId) }
 
     val contractAddressInput = MutableStateFlow("")
     val symbolInput = MutableStateFlow("")
@@ -39,16 +51,16 @@ class AddTokenEnterInfoViewModel(
             addingInProgress -> Loading
             contractAddress.isEmpty() -> Disabled(resourceManager.getString(R.string.asset_add_token_enter_contract_address))
             symbol.isEmpty() -> Disabled(resourceManager.getString(R.string.asset_add_token_enter_symbol))
-            decimals.isEmpty() -> Disabled(resourceManager.getString(R.string.asset_add_token_enter_decimals))
+            decimals.toIntOrNull() == null -> Disabled(resourceManager.getString(R.string.asset_add_token_enter_decimals))
             else -> Enabled(resourceManager.getString(R.string.assets_add_token))
         }
     }
 
     init {
-        autoFillFieldsBasedOnContractAddress()
+        autocompleteFieldsBasedOnContractAddress()
     }
 
-    private fun autoFillFieldsBasedOnContractAddress() {
+    private fun autocompleteFieldsBasedOnContractAddress() {
         contractAddressInput
             .mapLatest { contractAddress ->
                 interactor.retrieveContractMetadata(payload.chainId, contractAddress)
@@ -65,6 +77,33 @@ class AddTokenEnterInfoViewModel(
     }
 
     fun confirmClicked() {
-        TODO("Not yet implemented")
+        launch {
+            val customToken = CustomErc20Token(
+                contractAddressInput.first(),
+                decimalsInput.first().toInt(),
+                symbolInput.first(),
+                priceLinkInput.first(),
+                payload.chainId
+            )
+
+            val payload = AddEvmTokenPayload(
+                customToken,
+                chain = chain.first(),
+            )
+
+            validationExecutor.requireValid(
+                validationSystem = interactor.getValidationSystem(),
+                payload = payload,
+                validationFailureTransformer = { mapAddEvmTokensValidationFailureToUI(resourceManager, it) }
+            ) {
+                performAddToken(it.customErc20Token)
+            }
+        }
+    }
+
+    private fun performAddToken(customErc20Token: CustomErc20Token) {
+        launch {
+            interactor.addCustomErc20Token(customErc20Token)
+        }
     }
 }
