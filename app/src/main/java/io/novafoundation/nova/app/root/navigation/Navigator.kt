@@ -427,6 +427,10 @@ class Navigator(
         navController?.navigate(R.id.action_addTokenSelectChainFragment_to_addTokenEnterInfoFragment, args)
     }
 
+    override fun finishAddTokenFlow() {
+        navController?.navigate(R.id.finish_add_token_flow)
+    }
+
     override fun openNfts() {
         navController?.navigate(R.id.action_mainFragment_to_nfts_nav_graph)
     }

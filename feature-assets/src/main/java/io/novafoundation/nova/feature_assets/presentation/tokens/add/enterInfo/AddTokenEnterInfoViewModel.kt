@@ -104,6 +104,7 @@ class AddTokenEnterInfoViewModel(
     private fun performAddToken(customErc20Token: CustomErc20Token) {
         launch {
             interactor.addCustomErc20Token(customErc20Token)
+            router.finishAddTokenFlow()
         }
     }
 }

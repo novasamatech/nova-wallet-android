@@ -45,4 +45,6 @@ interface AssetsRouter {
     fun openAddTokenEnterInfo(payload: AddTokenEnterInfoPayload)
 
     fun openNfts()
+
+    fun finishAddTokenFlow()
 }
