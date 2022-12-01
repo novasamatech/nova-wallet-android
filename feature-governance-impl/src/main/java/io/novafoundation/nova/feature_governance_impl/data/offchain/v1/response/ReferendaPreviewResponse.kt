@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.data.offchain.remote.model.response
+package io.novafoundation.nova.feature_governance_impl.data.offchain.v1.response
 
 import com.google.gson.annotations.SerializedName
 import java.math.BigInteger

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.data.offchain.remote.model.request
+package io.novafoundation.nova.feature_governance_impl.data.offchain.v1.request
 
 class ReferendumPreviewRequest() {
     val query = """
