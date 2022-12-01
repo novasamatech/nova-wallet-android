@@ -2,13 +2,14 @@ package io.novafoundation.nova.core_db.migrations
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 
 /**
  * Due to previous migration of chain & meta account tables by means of rename-create-insert-delete strategy
  * foreign keys to these tables got renamed and now points to wrong table which causes crashes for subset of users
  * This migration recreates (lets hope) all affected tables
  */
-val FixBrokenForeignKeys_28_29 = object : Migration(28, 29) {
+val FixBrokenForeignKeys_28_29 = object : Migration(31, 32) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         // foreign key to ChainLocal
@@ -50,8 +51,10 @@ val FixBrokenForeignKeys_28_29 = object : Migration(28, 29) {
             `precision` INTEGER NOT NULL,
             `icon` TEXT,
             `type` TEXT,
+            `source` TEXT NOT NULL DEFAULT '${ChainAssetLocal.SOURCE_DEFAULT}',
             `buyProviders` TEXT,
             `typeExtras` TEXT,
+            `enabled` INTEGER NOT NULL DEFAULT ${ChainAssetLocal.ENABLED_DEFAULT},
             PRIMARY KEY(`chainId`,`id`),
             FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
             )
