@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.di.modules
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_assets.domain.tokens.add.AddTokensInteractor
 import io.novafoundation.nova.feature_assets.domain.tokens.add.CoinGeckoLinkParser
@@ -18,8 +19,9 @@ class AddTokenModule {
         chainRegistry: ChainRegistry,
         erc20Standard: Erc20Standard,
         chainAssetRepository: ChainAssetRepository,
-        coinGeckoLinkParser: CoinGeckoLinkParser
+        coinGeckoLinkParser: CoinGeckoLinkParser,
+        ethereumAddressFormat: EthereumAddressFormat
     ): AddTokensInteractor {
-        return RealAddTokensInteractor(chainRegistry, erc20Standard, chainAssetRepository, coinGeckoLinkParser)
+        return RealAddTokensInteractor(chainRegistry, erc20Standard, chainAssetRepository, coinGeckoLinkParser, ethereumAddressFormat)
     }
 }

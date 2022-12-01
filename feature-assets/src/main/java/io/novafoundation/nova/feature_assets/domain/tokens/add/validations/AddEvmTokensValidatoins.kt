@@ -1,11 +1,14 @@
 package io.novafoundation.nova.feature_assets.domain.tokens.add.validations
 
+import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_assets.domain.tokens.add.CustomErc20Token
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validEvmAddress
 import io.novafoundation.nova.feature_wallet_api.domain.validation.evmAssetNotExist
+import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 typealias AddEvmTokenValidationSystem = ValidationSystem<AddEvmTokenPayload, AddEvmTokensValidationFailure>
@@ -17,9 +20,16 @@ sealed interface AddEvmTokensValidationFailure {
     object AssetExist : AddEvmTokensValidationFailure
 }
 
-fun AddEvmTokenValidationSystemBuilder.validEvmAddress() = validEvmAddress(
-    address = { it.customErc20Token.contract },
+fun AddEvmTokenValidationSystemBuilder.validEvmAddress(
+    ethereumAddressFormat: EthereumAddressFormat,
+    erc20Standard: Erc20Standard,
+    chainRegistry: ChainRegistry,
+) = validEvmAddress(
+    ethereumAddressFormat = ethereumAddressFormat,
+    erc20Standard = erc20Standard,
+    chainRegistry = chainRegistry,
     chain = { it.chain },
+    address = { it.customErc20Token.contract },
     error = { AddEvmTokensValidationFailure.InvalidContractAddress }
 )
 

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.domain.tokens.add
 
+import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_assets.domain.tokens.add.mappers.mapCustomTokenToChainAsset
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.AddEvmTokenValidationSystem
@@ -36,6 +37,7 @@ class RealAddTokensInteractor(
     private val erc20Standard: Erc20Standard,
     private val chainAssetRepository: ChainAssetRepository,
     private val coinGeckoLinkParser: CoinGeckoLinkParser,
+    private val ethereumAddressFormat: EthereumAddressFormat,
 ) : AddTokensInteractor {
 
     override fun availableChainsToAddTokenFlow(): Flow<List<Chain>> {
@@ -67,7 +69,7 @@ class RealAddTokensInteractor(
 
     override fun getValidationSystem(): AddEvmTokenValidationSystem {
         return ValidationSystem {
-            validEvmAddress()
+            validEvmAddress(ethereumAddressFormat, erc20Standard, chainRegistry)
             evmAssetNotExist(chainAssetRepository)
         }
     }

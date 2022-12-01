@@ -43,6 +43,15 @@ private fun mapAssetSourceFromLocal(source: AssetSourceLocal): Chain.Asset.Sourc
     return when (source) {
         AssetSourceLocal.DEFAULT -> Chain.Asset.Source.DEFAULT
         AssetSourceLocal.ERC20 -> Chain.Asset.Source.ERC20
+        AssetSourceLocal.MANUAL -> Chain.Asset.Source.MANUAL
+    }
+}
+
+private fun mapAssetSourceToLocal(source: Chain.Asset.Source): AssetSourceLocal {
+    return when (source) {
+        Chain.Asset.Source.DEFAULT -> AssetSourceLocal.DEFAULT
+        Chain.Asset.Source.ERC20 -> AssetSourceLocal.ERC20
+        Chain.Asset.Source.MANUAL -> AssetSourceLocal.MANUAL
     }
 }
 
@@ -135,11 +144,11 @@ fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal {
         priceId = asset.priceId,
         staking = mapStakingTypeToLocal(asset.staking),
         type = type,
-        source = AssetSourceLocal.DEFAULT,
+        source = mapAssetSourceToLocal(asset.source),
         buyProviders = gson.toJson(asset.buyProviders),
         typeExtras = gson.toJson(typeExtras),
         icon = asset.iconUrl,
-        enabled = true
+        enabled = asset.enabled
     )
 }
 

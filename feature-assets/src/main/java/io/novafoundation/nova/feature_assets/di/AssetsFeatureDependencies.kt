@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
@@ -134,6 +135,8 @@ interface AssetsFeatureDependencies {
     fun amountChooserFactory(): AmountChooserMixin.Factory
 
     fun walletConstants(): WalletConstants
+
+    fun ethereumAddressFormat(): EthereumAddressFormat
 
     val assetsSourceRegistry: AssetSourceRegistry
 

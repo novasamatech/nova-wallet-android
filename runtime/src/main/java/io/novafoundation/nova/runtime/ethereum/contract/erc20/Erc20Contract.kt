@@ -82,4 +82,13 @@ private class Erc20QueriesImpl(
 
         return executeCallSingleValueReturn(function, Uint8::getValue).await()
     }
+
+    override suspend fun totalSupply(): BigInteger {
+        val outputParams = listOf(
+            object : TypeReference<Uint256>() {}
+        )
+        val function = Function("totalSupply", emptyList(), outputParams)
+
+        return executeCallSingleValueReturn(function, Uint256::getValue).await()
+    }
 }

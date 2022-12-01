@@ -37,4 +37,6 @@ interface Erc20Queries {
     suspend fun symbol(): String
 
     suspend fun decimals(): BigInteger
+
+    suspend fun totalSupply(): BigInteger
 }
