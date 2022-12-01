@@ -3,12 +3,12 @@ package io.novafoundation.nova.feature_assets.domain.tokens.add
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.AddEvmTokenValidationSystem
+import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.evmAssetNotExist
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validCoinGeckoLink
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validEvmAddress
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validTokenDecimals
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
-import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ethereum.contract.base.querySingle
@@ -43,9 +43,9 @@ class RealAddTokensInteractor(
     private val chainAssetRepository: ChainAssetRepository,
     private val coinGeckoLinkParser: CoinGeckoLinkParser,
     private val ethereumAddressFormat: EthereumAddressFormat,
-    private val coingeckoApi: CoingeckoApi,
     private val currencyRepository: CurrencyRepository,
-    private val walletRepository: WalletRepository
+    private val walletRepository: WalletRepository,
+    private val coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory
 ) : AddTokensInteractor {
 
     override fun availableChainsToAddTokenFlow(): Flow<List<Chain>> {
@@ -97,7 +97,7 @@ class RealAddTokensInteractor(
             evmAssetNotExist(chainAssetRepository)
             validEvmAddress(ethereumAddressFormat, erc20Standard, chainRegistry)
             validTokenDecimals()
-            validCoinGeckoLink(coingeckoApi, coinGeckoLinkParser)
+            validCoinGeckoLink(coinGeckoLinkValidationFactory)
         }
     }
 

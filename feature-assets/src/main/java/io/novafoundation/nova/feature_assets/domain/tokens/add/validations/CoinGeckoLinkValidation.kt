@@ -11,6 +11,25 @@ import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_assets.domain.tokens.add.CoinGeckoLinkParser
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 
+class CoinGeckoLinkValidationFactory(
+    private val coinGeckoApi: CoingeckoApi,
+    private val coinGeckoLinkParser: CoinGeckoLinkParser,
+) {
+    fun <P, E> create(
+        optional: Boolean,
+        link: (P) -> String?,
+        error: (P) -> E,
+    ): CoinGeckoLinkValidation<P, E> {
+        return CoinGeckoLinkValidation(
+            coinGeckoApi,
+            coinGeckoLinkParser,
+            optional,
+            link,
+            error,
+        )
+    }
+}
+
 class CoinGeckoLinkValidation<P, E>(
     private val coinGeckoApi: CoingeckoApi,
     private val coinGeckoLinkParser: CoinGeckoLinkParser,
@@ -37,17 +56,14 @@ class CoinGeckoLinkValidation<P, E>(
 }
 
 fun <P, E> ValidationSystemBuilder<P, E>.validCoinGeckoLink(
-    coinGeckoApi: CoingeckoApi,
-    coinGeckoLinkParser: CoinGeckoLinkParser,
+    coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory,
     optional: Boolean,
     link: (P) -> String?,
     error: (P) -> E,
 ) = validate(
-    CoinGeckoLinkValidation(
-        coinGeckoApi = coinGeckoApi,
-        coinGeckoLinkParser = coinGeckoLinkParser,
-        optional = optional,
-        link = link,
-        error = error
+    coinGeckoLinkValidationFactory.create(
+        optional,
+        link,
+        error,
     )
 )

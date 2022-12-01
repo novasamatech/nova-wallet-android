@@ -109,9 +109,14 @@ class AddTokenEnterInfoViewModel(
 
     private fun performAddToken(customErc20Token: CustomErc20Token) {
         launch {
-            interactor.addCustomTokenAndSync(customErc20Token)
-            addingInProgressFlow.value = false
-            router.finishAddTokenFlow()
+            runCatching {
+                interactor.addCustomTokenAndSync(customErc20Token)
+            }.onSuccess {
+                addingInProgressFlow.value = false
+                router.finishAddTokenFlow()
+            }.onFailure {
+                showError(it)
+            }
         }
     }
 }

@@ -3,9 +3,7 @@ package io.novafoundation.nova.feature_assets.domain.tokens.add.validations
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
-import io.novafoundation.nova.feature_assets.domain.tokens.add.CoinGeckoLinkParser
 import io.novafoundation.nova.feature_assets.domain.tokens.add.CustomErc20Token
-import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validEvmAddress
 import io.novafoundation.nova.feature_wallet_api.domain.validation.evmAssetNotExist
@@ -54,11 +52,9 @@ fun AddEvmTokenValidationSystemBuilder.validTokenDecimals() = validTokenDecimals
 )
 
 fun AddEvmTokenValidationSystemBuilder.validCoinGeckoLink(
-    coinGeckoApi: CoingeckoApi,
-    coinGeckoLinkParser: CoinGeckoLinkParser
+    coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory
 ) = validCoinGeckoLink(
-    coinGeckoApi = coinGeckoApi,
-    coinGeckoLinkParser = coinGeckoLinkParser,
+    coinGeckoLinkValidationFactory = coinGeckoLinkValidationFactory,
     optional = true,
     link = { it.customErc20Token.priceLink },
     error = { AddEvmTokensValidationFailure.InvalidCoinGeckoLink }
