@@ -19,7 +19,7 @@ class IconButton @JvmOverloads constructor(
     init {
         updatePadding(top = 6.dp, bottom = 6.dp, start = 12.dp, end = 12.dp)
 
-        setImageTintRes(R.color.text_secondary)
+        setImageTintRes(R.color.chip_icon)
 
         background = addRipple(getRoundedCornerDrawable(R.color.button_background_secondary))
 
