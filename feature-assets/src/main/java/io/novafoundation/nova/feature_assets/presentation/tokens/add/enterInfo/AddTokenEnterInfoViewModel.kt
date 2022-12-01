@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Loading
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.tokens.add.AddTokensInteractor
 import io.novafoundation.nova.feature_assets.domain.tokens.add.CustomErc20Token
@@ -98,6 +99,7 @@ class AddTokenEnterInfoViewModel(
             validationExecutor.requireValid(
                 validationSystem = interactor.getValidationSystem(),
                 payload = payload,
+                progressConsumer = addingInProgressFlow.progressConsumer(),
                 validationFailureTransformer = { mapAddEvmTokensValidationFailureToUI(resourceManager, it) }
             ) {
                 performAddToken(it.customErc20Token)
@@ -107,7 +109,8 @@ class AddTokenEnterInfoViewModel(
 
     private fun performAddToken(customErc20Token: CustomErc20Token) {
         launch {
-            interactor.addCustomErc20Token(customErc20Token)
+            interactor.addCustomTokenAndSync(customErc20Token)
+            addingInProgressFlow.value = false
             router.finishAddTokenFlow()
         }
     }

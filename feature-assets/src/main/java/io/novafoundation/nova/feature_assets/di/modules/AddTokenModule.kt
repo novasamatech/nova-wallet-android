@@ -7,8 +7,10 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_assets.domain.tokens.add.AddTokensInteractor
 import io.novafoundation.nova.feature_assets.domain.tokens.add.CoinGeckoLinkParser
 import io.novafoundation.nova.feature_assets.domain.tokens.add.RealAddTokensInteractor
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -22,7 +24,9 @@ class AddTokenModule {
         chainAssetRepository: ChainAssetRepository,
         coinGeckoLinkParser: CoinGeckoLinkParser,
         ethereumAddressFormat: EthereumAddressFormat,
-        coingeckoApi: CoingeckoApi
+        coingeckoApi: CoingeckoApi,
+        currencyRepository: CurrencyRepository,
+        walletRepository: WalletRepository,
     ): AddTokensInteractor {
         return RealAddTokensInteractor(
             chainRegistry,
@@ -30,7 +34,9 @@ class AddTokenModule {
             chainAssetRepository,
             coinGeckoLinkParser,
             ethereumAddressFormat,
-            coingeckoApi
+            coingeckoApi,
+            currencyRepository,
+            walletRepository
         )
     }
 }

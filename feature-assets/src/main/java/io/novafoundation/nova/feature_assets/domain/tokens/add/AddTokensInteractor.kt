@@ -7,8 +7,10 @@ import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.evmAs
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validCoinGeckoLink
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validEvmAddress
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validTokenDecimals
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ethereum.contract.base.querySingle
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Queries
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
@@ -30,7 +32,7 @@ interface AddTokensInteractor {
         contractAddress: String
     ): Erc20ContractMetadata?
 
-    suspend fun addCustomErc20Token(customErc20Token: CustomErc20Token): Result<*>
+    suspend fun addCustomTokenAndSync(customErc20Token: CustomErc20Token): Result<*>
 
     fun getValidationSystem(): AddEvmTokenValidationSystem
 }
@@ -41,7 +43,9 @@ class RealAddTokensInteractor(
     private val chainAssetRepository: ChainAssetRepository,
     private val coinGeckoLinkParser: CoinGeckoLinkParser,
     private val ethereumAddressFormat: EthereumAddressFormat,
-    private val coingeckoApi: CoingeckoApi
+    private val coingeckoApi: CoingeckoApi,
+    private val currencyRepository: CurrencyRepository,
+    private val walletRepository: WalletRepository
 ) : AddTokensInteractor {
 
     override fun availableChainsToAddTokenFlow(): Flow<List<Chain>> {
@@ -65,7 +69,7 @@ class RealAddTokensInteractor(
         }.getOrNull()
     }
 
-    override suspend fun addCustomErc20Token(customErc20Token: CustomErc20Token): Result<*> = runCatching {
+    override suspend fun addCustomTokenAndSync(customErc20Token: CustomErc20Token): Result<*> = runCatching {
         val priceId = coinGeckoLinkParser.parse(customErc20Token.priceLink).getOrNull()?.priceId
 
         val asset = Chain.Asset(
@@ -84,6 +88,8 @@ class RealAddTokensInteractor(
         )
 
         chainAssetRepository.insertCustomAsset(asset)
+
+        syncTokenPrice(asset)
     }
 
     override fun getValidationSystem(): AddEvmTokenValidationSystem {
@@ -107,4 +113,9 @@ class RealAddTokensInteractor(
     }
 
     private suspend fun <R> executeOrNull(action: suspend () -> R): R? = runCatching { action() }.getOrNull()
+
+    private suspend fun syncTokenPrice(asset: Chain.Asset) {
+        val currency = currencyRepository.getSelectedCurrency()
+        walletRepository.syncAssetRates(asset, currency)
+    }
 }

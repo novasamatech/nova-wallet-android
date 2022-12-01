@@ -68,6 +68,8 @@ class AddTokenEnterInfoFragment : BaseFragment<AddTokenEnterInfoViewModel>() {
         addTokenEnterInfoPriceConfirm.setOnClickListener {
             viewModel.confirmClicked()
         }
+
+        addTokenEnterInfoPriceConfirm.prepareForProgress(viewLifecycleOwner)
     }
 
     override fun inject() {

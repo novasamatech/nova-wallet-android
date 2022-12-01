@@ -19,6 +19,7 @@ interface WalletRepository {
     suspend fun getSupportedAssets(metaId: Long): List<Asset>
 
     suspend fun syncAssetsRates(currency: Currency)
+    suspend fun syncAssetRates(asset: Chain.Asset, currency: Currency)
 
     fun assetFlow(
         accountId: AccountId,

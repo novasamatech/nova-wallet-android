@@ -109,6 +109,18 @@ class WalletRepositoryImpl(
         }
     }
 
+    override suspend fun syncAssetRates(asset: Chain.Asset, currency: Currency) {
+        val priceId = asset.priceId ?: return
+
+        val priceStats = getAssetPriceCoingecko(setOf(priceId), currency.coingeckoId)
+
+        val updatedTokens = priceStats.map { (_, tokenStats) ->
+            TokenLocal(asset.symbol, tokenStats.price, currency.id, tokenStats.rateChange)
+        }
+
+        assetCache.insertTokens(updatedTokens)
+    }
+
     override fun assetFlow(accountId: AccountId, chainAsset: Chain.Asset): Flow<Asset> {
         return flow {
             val metaAccount = accountRepository.findMetaAccountOrThrow(accountId)

@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.utils.asQueryParam
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
-import io.novafoundation.nova.common.validation.isFalseOrError
 import io.novafoundation.nova.common.validation.isTrueOrError
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validationError
