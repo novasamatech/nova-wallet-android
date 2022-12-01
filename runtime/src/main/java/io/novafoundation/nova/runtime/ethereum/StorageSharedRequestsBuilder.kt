@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.map
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.Response
 import org.web3j.protocol.websocket.events.LogNotification
+import java.util.concurrent.CompletableFuture
 import kotlin.coroutines.CoroutineContext
 
 class StorageSharedRequestsBuilder(
@@ -43,7 +44,7 @@ class StorageSharedRequestsBuilder(
             .map { StorageChange(it.block, it.key, it.value) }
     }
 
-    override fun <S, T : Response<*>> ethBatchRequestAsync(batchId: String, request: Request<S, T>): Deferred<T> {
+    override fun <S, T : Response<*>> ethBatchRequestAsync(batchId: String, request: Request<S, T>): CompletableFuture<T> {
         return ethereumProxy.batchRequest(batchId, request)
     }
 

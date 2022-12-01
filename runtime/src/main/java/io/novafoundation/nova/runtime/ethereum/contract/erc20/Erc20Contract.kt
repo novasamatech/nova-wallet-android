@@ -62,7 +62,7 @@ private class Erc20QueriesImpl(
             ),
         )
 
-        return executeCallSingleValueReturn(function, Uint256::getValue)
+        return executeCallSingleValueReturnAsync(function, Uint256::getValue)
     }
 
     override suspend fun symbol(): String {
@@ -71,7 +71,7 @@ private class Erc20QueriesImpl(
         )
         val function = Function("symbol", emptyList(), outputParams)
 
-        return executeCallSingleValueReturn(function, Utf8String::getValue).await()
+        return executeCallSingleValueReturnSuspend(function, Utf8String::getValue)
     }
 
     override suspend fun decimals(): BigInteger {
@@ -80,7 +80,7 @@ private class Erc20QueriesImpl(
         )
         val function = Function("decimals", emptyList(), outputParams)
 
-        return executeCallSingleValueReturn(function, Uint8::getValue).await()
+        return executeCallSingleValueReturnSuspend(function, Uint8::getValue)
     }
 
     override suspend fun totalSupply(): BigInteger {
@@ -89,6 +89,6 @@ private class Erc20QueriesImpl(
         )
         val function = Function("totalSupply", emptyList(), outputParams)
 
-        return executeCallSingleValueReturn(function, Uint256::getValue).await()
+        return executeCallSingleValueReturnSuspend(function, Uint256::getValue)
     }
 }

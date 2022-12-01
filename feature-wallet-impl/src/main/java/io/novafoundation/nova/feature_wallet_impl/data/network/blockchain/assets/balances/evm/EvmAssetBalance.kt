@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evm
 
-import io.novafoundation.nova.runtime.ethereum.contract.base.queryBatched
-import io.novafoundation.nova.runtime.ethereum.contract.base.querySingle
-import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Queries
-import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
 import io.novafoundation.nova.core.updater.EthereumSharedRequestsBuilder
@@ -14,6 +10,10 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.b
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.ethereum.contract.base.queryBatched
+import io.novafoundation.nova.runtime.ethereum.contract.base.querySingle
+import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Queries
+import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.requireErc20
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
