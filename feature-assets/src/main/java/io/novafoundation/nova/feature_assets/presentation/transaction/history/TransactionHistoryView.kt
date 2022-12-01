@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.history
 
-import android.animation.ArgbEvaluator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -42,6 +41,8 @@ private const val PULLER_VISIBILITY_OFFSET = 0.9
 
 private const val OFFSET_KEY = "OFFSET"
 private const val SUPER_STATE = "SUPER_STATE"
+
+private const val OFFSET_BACKGROUND_CHANGE_THRESHOLD = 0.2
 
 class TransferHistorySheet @JvmOverloads constructor(
     context: Context,
@@ -249,9 +250,9 @@ class TransferHistorySheet @JvmOverloads constructor(
     }
 
     private fun updateBackgroundAlpha() {
-        val argbEvaluator = ArgbEvaluator()
-        val resultColor = argbEvaluator.evaluate(lastOffset, collapsedBackgroundColor, expandedBackgroundColor)
-        backgroundTintList = ColorStateList.valueOf(resultColor as Int)
+        val background = if (lastOffset > OFFSET_BACKGROUND_CHANGE_THRESHOLD) expandedBackgroundColor else collapsedBackgroundColor
+
+        backgroundTintList = ColorStateList.valueOf(background)
     }
 
     private val parentView: View
