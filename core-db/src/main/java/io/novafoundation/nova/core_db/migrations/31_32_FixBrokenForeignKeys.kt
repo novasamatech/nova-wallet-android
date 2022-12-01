@@ -9,7 +9,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
  * foreign keys to these tables got renamed and now points to wrong table which causes crashes for subset of users
  * This migration recreates (lets hope) all affected tables
  */
-val FixBrokenForeignKeys_28_29 = object : Migration(31, 32) {
+val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         // foreign key to ChainLocal
