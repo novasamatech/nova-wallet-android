@@ -51,6 +51,7 @@ import io.novafoundation.nova.core_db.migrations.ChangeAsset_3_4
 import io.novafoundation.nova.core_db.migrations.ChangeChainNodes_20_21
 import io.novafoundation.nova.core_db.migrations.ChangeDAppAuthorization_10_11
 import io.novafoundation.nova.core_db.migrations.ChangeTokens_19_20
+import io.novafoundation.nova.core_db.migrations.FixBrokenForeignKeys_28_29
 import io.novafoundation.nova.core_db.migrations.FixMigrationConflicts_13_14
 import io.novafoundation.nova.core_db.migrations.GovernanceFlagToEnum_26_27
 import io.novafoundation.nova.core_db.migrations.NullableSubstrateAccountId_21_22
@@ -84,7 +85,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 28,
+    version = 29,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -146,7 +147,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(NullableSubstrateAccountId_21_22, AddLocks_22_23, AddContributions_23_24)
                     .addMigrations(AddGovernanceFlagToChains_24_25, AddGovernanceDapps_25_26, GovernanceFlagToEnum_26_27)
                     .addMigrations(AddGovernanceExternalApiToChain_27_28)
-                    .fallbackToDestructiveMigration()
+                    .addMigrations(FixBrokenForeignKeys_28_29)
                     .build()
             }
             return instance!!
