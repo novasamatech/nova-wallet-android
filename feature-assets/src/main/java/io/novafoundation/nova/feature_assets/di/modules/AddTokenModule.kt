@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_assets.domain.tokens.add.AddTokensInteractor
 import io.novafoundation.nova.feature_assets.domain.tokens.add.CoinGeckoLinkParser
 import io.novafoundation.nova.feature_assets.domain.tokens.add.RealAddTokensInteractor
+import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -20,8 +21,16 @@ class AddTokenModule {
         erc20Standard: Erc20Standard,
         chainAssetRepository: ChainAssetRepository,
         coinGeckoLinkParser: CoinGeckoLinkParser,
-        ethereumAddressFormat: EthereumAddressFormat
+        ethereumAddressFormat: EthereumAddressFormat,
+        coingeckoApi: CoingeckoApi
     ): AddTokensInteractor {
-        return RealAddTokensInteractor(chainRegistry, erc20Standard, chainAssetRepository, coinGeckoLinkParser, ethereumAddressFormat)
+        return RealAddTokensInteractor(
+            chainRegistry,
+            erc20Standard,
+            chainAssetRepository,
+            coinGeckoLinkParser,
+            ethereumAddressFormat,
+            coingeckoApi
+        )
     }
 }

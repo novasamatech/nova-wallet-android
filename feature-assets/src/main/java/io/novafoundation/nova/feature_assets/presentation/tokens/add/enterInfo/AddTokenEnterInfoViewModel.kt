@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -39,19 +40,22 @@ class AddTokenEnterInfoViewModel(
     val decimalsInput = MutableStateFlow("")
     val priceLinkInput = MutableStateFlow("")
 
+    private val intDecimals = decimalsInput
+        .map { it.toIntOrNull() }
+
     private val addingInProgressFlow = MutableStateFlow(false)
 
     val continueButtonState = combine(
         contractAddressInput,
         symbolInput,
-        decimalsInput,
+        intDecimals,
         addingInProgressFlow
     ) { contractAddress, symbol, decimals, addingInProgress ->
         when {
             addingInProgress -> Loading
             contractAddress.isEmpty() -> Disabled(resourceManager.getString(R.string.asset_add_token_enter_contract_address))
             symbol.isEmpty() -> Disabled(resourceManager.getString(R.string.asset_add_token_enter_symbol))
-            decimals.toIntOrNull() == null -> Disabled(resourceManager.getString(R.string.asset_add_token_enter_decimals))
+            decimals == null -> Disabled(resourceManager.getString(R.string.asset_add_token_enter_decimals))
             else -> Enabled(resourceManager.getString(R.string.assets_add_token))
         }
     }
@@ -80,7 +84,7 @@ class AddTokenEnterInfoViewModel(
         launch {
             val customToken = CustomErc20Token(
                 contractAddressInput.first(),
-                decimalsInput.first().toInt(),
+                intDecimals.first()!!,
                 symbolInput.first(),
                 priceLinkInput.first(),
                 payload.chainId

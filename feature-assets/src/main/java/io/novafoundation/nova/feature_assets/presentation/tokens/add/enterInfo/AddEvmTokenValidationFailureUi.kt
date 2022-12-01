@@ -14,9 +14,17 @@ fun mapAddEvmTokensValidationFailureToUI(
             resourceManager.getString(R.string.asset_add_evm_token_already_exist_title) to
                 resourceManager.getString(R.string.asset_add_evm_token_already_exist_message)
         }
-        AddEvmTokensValidationFailure.InvalidContractAddress -> {
+        AddEvmTokensValidationFailure.InvalidTokenContractAddress -> {
             resourceManager.getString(R.string.asset_add_evm_token_invalid_contract_address_title) to
                 resourceManager.getString(R.string.asset_add_evm_token_invalid_contract_address_message)
+        }
+        AddEvmTokensValidationFailure.InvalidDecimals -> {
+            resourceManager.getString(R.string.asset_add_evm_token_invalid_decimals_title) to
+                resourceManager.getString(R.string.asset_add_evm_token_invalid_decimals_message)
+        }
+        AddEvmTokensValidationFailure.InvalidCoinGeckoLink -> {
+            resourceManager.getString(R.string.asset_add_evm_token_invalid_coin_gecko_link_title) to
+                resourceManager.getString(R.string.asset_add_evm_token_invalid_coin_gecko_link_message)
         }
     }
 }

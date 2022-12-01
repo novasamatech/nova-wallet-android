@@ -2,16 +2,19 @@ package io.novafoundation.nova.feature_assets.domain.tokens.add
 
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.validation.ValidationSystem
-import io.novafoundation.nova.feature_assets.domain.tokens.add.mappers.mapCustomTokenToChainAsset
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.AddEvmTokenValidationSystem
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.evmAssetNotExist
+import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validCoinGeckoLink
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validEvmAddress
+import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validTokenDecimals
+import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.runtime.ethereum.contract.base.querySingle
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Queries
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.ext.defaultComparator
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.chainAssetIdOfErc20Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.ethereumApi
@@ -38,6 +41,7 @@ class RealAddTokensInteractor(
     private val chainAssetRepository: ChainAssetRepository,
     private val coinGeckoLinkParser: CoinGeckoLinkParser,
     private val ethereumAddressFormat: EthereumAddressFormat,
+    private val coingeckoApi: CoingeckoApi
 ) : AddTokensInteractor {
 
     override fun availableChainsToAddTokenFlow(): Flow<List<Chain>> {
@@ -62,15 +66,32 @@ class RealAddTokensInteractor(
     }
 
     override suspend fun addCustomErc20Token(customErc20Token: CustomErc20Token): Result<*> = runCatching {
-        val asset = mapCustomTokenToChainAsset(customErc20Token, coinGeckoLinkParser)
+        val priceId = coinGeckoLinkParser.parse(customErc20Token.priceLink).getOrNull()?.priceId
+
+        val asset = Chain.Asset(
+            iconUrl = null,
+            id = chainAssetIdOfErc20Token(customErc20Token.contract),
+            priceId = priceId,
+            chainId = customErc20Token.chainId,
+            symbol = customErc20Token.symbol,
+            precision = customErc20Token.decimals,
+            buyProviders = emptyMap(),
+            staking = Chain.Asset.StakingType.UNSUPPORTED,
+            type = Chain.Asset.Type.Evm(customErc20Token.contract),
+            source = Chain.Asset.Source.MANUAL,
+            name = customErc20Token.symbol,
+            enabled = true
+        )
 
         chainAssetRepository.insertCustomAsset(asset)
     }
 
     override fun getValidationSystem(): AddEvmTokenValidationSystem {
         return ValidationSystem {
-            validEvmAddress(ethereumAddressFormat, erc20Standard, chainRegistry)
             evmAssetNotExist(chainAssetRepository)
+            validEvmAddress(ethereumAddressFormat, erc20Standard, chainRegistry)
+            validTokenDecimals()
+            validCoinGeckoLink(coingeckoApi, coinGeckoLinkParser)
         }
     }
 

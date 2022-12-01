@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.coingecko
+package io.novafoundation.nova.feature_wallet_api.data.network.coingecko
 
 import retrofit2.http.GET
 import retrofit2.http.Query
