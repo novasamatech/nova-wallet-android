@@ -24,8 +24,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:hint="@string/assets_search_hint"
-        app:icon="@drawable/ic_search" />
+        android:hint="@string/assets_search_hint" />
 
     <io.novafoundation.nova.common.view.PlaceholderView
         android:id="@+id/manageTokensPlaceholder"
