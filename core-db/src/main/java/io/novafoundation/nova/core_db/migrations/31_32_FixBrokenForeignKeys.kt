@@ -58,14 +58,14 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
             PRIMARY KEY(`chainId`,`id`),
             FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
             )
-        """.trimIndent()
+            """.trimIndent()
         )
 
         database.execSQL(
             """
             INSERT INTO chain_assets
             SELECT * FROM chain_assets_old
-        """.trimIndent()
+            """.trimIndent()
         )
 
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_chain_assets_chainId` ON `chain_assets` (`chainId`)")
@@ -92,14 +92,14 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
             PRIMARY KEY(`assetId`,`chainId`,`metaId`),
             FOREIGN KEY(`assetId`,`chainId`) REFERENCES `chain_assets`(`id`, `chainId`) ON UPDATE NO ACTION ON DELETE CASCADE 
             )
-        """.trimIndent()
+            """.trimIndent()
         )
 
         database.execSQL(
             """
             INSERT INTO assets
             SELECT * FROM assets_old
-        """.trimIndent()
+            """.trimIndent()
         )
 
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_assets_metaId` ON `assets` (`metaId`)")
@@ -125,14 +125,14 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
             `chainId`),
              FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
             )
-        """.trimIndent()
+            """.trimIndent()
         )
 
         database.execSQL(
             """
             INSERT INTO chain_accounts
             SELECT * FROM chain_accounts_old
-        """.trimIndent()
+            """.trimIndent()
         )
 
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_chain_accounts_chainId` ON `chain_accounts` (`chainId`)")
@@ -156,14 +156,14 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
             PRIMARY KEY(`chainId`),
             FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE
              )
-        """.trimIndent()
+            """.trimIndent()
         )
 
         database.execSQL(
             """
             INSERT INTO chain_runtimes
             SELECT * FROM chain_runtimes_old
-        """.trimIndent()
+            """.trimIndent()
         )
 
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_chain_runtimes_chainId` ON `chain_runtimes` (`chainId`)")
@@ -187,14 +187,14 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
             PRIMARY KEY(`chainId`, `name`),
             FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
             )
-        """.trimIndent()
+            """.trimIndent()
         )
 
         database.execSQL(
             """
             INSERT INTO chain_explorers
             SELECT * FROM chain_explorers_old
-        """.trimIndent()
+            """.trimIndent()
         )
 
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_chain_explorers_chainId` ON `chain_explorers` (`chainId`)")
@@ -217,14 +217,14 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
             PRIMARY KEY(`chainId`, `url`),
             FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
             )
-        """.trimIndent()
+            """.trimIndent()
         )
 
         database.execSQL(
             """
             INSERT INTO chain_nodes
             SELECT * FROM chain_nodes_old
-        """.trimIndent()
+            """.trimIndent()
         )
 
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_chain_nodes_chainId` ON `chain_nodes` (`chainId`)")
@@ -248,14 +248,14 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
             FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE ,
             FOREIGN KEY(`assetId`, `chainId`) REFERENCES `chain_assets`(`id`, `chainId`) ON UPDATE NO ACTION ON DELETE CASCADE 
             )
-        """.trimIndent()
+            """.trimIndent()
         )
 
         database.execSQL(
             """
             INSERT INTO locks
             SELECT * FROM locks_old
-        """.trimIndent()
+            """.trimIndent()
         )
 
         database.execSQL("DROP TABLE locks_old")
