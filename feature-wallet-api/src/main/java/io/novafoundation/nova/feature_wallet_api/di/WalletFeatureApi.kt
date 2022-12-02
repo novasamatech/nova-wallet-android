@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_api.di
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
@@ -15,6 +16,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 
 interface WalletFeatureApi {
 
@@ -35,6 +37,8 @@ interface WalletFeatureApi {
 
     fun provideAmountChooserFactory(): AmountChooserMixin.Factory
 
+    fun coingeckoApi(): CoingeckoApi
+
     val phishingValidationFactory: PhishingValidationFactory
 
     val crossChainTransfersRepository: CrossChainTransfersRepository
@@ -46,4 +50,6 @@ interface WalletFeatureApi {
     val transactionHistoryRepository: TransactionHistoryRepository
 
     val chainAssetRepository: ChainAssetRepository
+
+    val erc20Standard: Erc20Standard
 }

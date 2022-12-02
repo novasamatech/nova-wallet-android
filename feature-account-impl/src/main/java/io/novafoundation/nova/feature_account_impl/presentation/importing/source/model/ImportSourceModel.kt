@@ -140,7 +140,7 @@ class JsonImportSource(
     }
 
     fun pasteClicked() {
-        clipboardManager.getFromClipboard()?.let(this::jsonReceived)
+        clipboardManager.getTextOrNull()?.let(this::jsonReceived)
     }
 
     private fun jsonReceived(newJson: String) {

@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_assets.di.modules.ManageTokensCommonModule
 import io.novafoundation.nova.feature_assets.di.modules.SendModule
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
+import io.novafoundation.nova.feature_assets.domain.tokens.add.CoinGeckoLinkParser
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
@@ -108,4 +109,10 @@ class AssetsFeatureModule {
     fun provideHistoryFiltersProviderFactory(
         computationalCache: ComputationalCache
     ) = HistoryFiltersProviderFactory(computationalCache)
+
+    @Provides
+    @FeatureScope
+    fun provideCoinGeckoLinkParser(): CoinGeckoLinkParser {
+        return CoinGeckoLinkParser()
+    }
 }

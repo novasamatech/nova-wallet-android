@@ -10,7 +10,9 @@ import kotlinx.coroutines.Deferred
 import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.Function
+import org.web3j.abi.datatypes.Utf8String
 import org.web3j.abi.datatypes.generated.Uint256
+import org.web3j.abi.datatypes.generated.Uint8
 import org.web3j.protocol.core.DefaultBlockParameter
 import java.math.BigInteger
 
@@ -60,6 +62,33 @@ private class Erc20QueriesImpl(
             ),
         )
 
-        return executeCallSingleValueReturn(function, Uint256::getValue)
+        return executeCallSingleValueReturnAsync(function, Uint256::getValue)
+    }
+
+    override suspend fun symbol(): String {
+        val outputParams = listOf(
+            object : TypeReference<Utf8String>() {}
+        )
+        val function = Function("symbol", emptyList(), outputParams)
+
+        return executeCallSingleValueReturnSuspend(function, Utf8String::getValue)
+    }
+
+    override suspend fun decimals(): BigInteger {
+        val outputParams = listOf(
+            object : TypeReference<Uint8>() {}
+        )
+        val function = Function("decimals", emptyList(), outputParams)
+
+        return executeCallSingleValueReturnSuspend(function, Uint8::getValue)
+    }
+
+    override suspend fun totalSupply(): BigInteger {
+        val outputParams = listOf(
+            object : TypeReference<Uint256>() {}
+        )
+        val function = Function("totalSupply", emptyList(), outputParams)
+
+        return executeCallSingleValueReturnSuspend(function, Uint256::getValue)
     }
 }

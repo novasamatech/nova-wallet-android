@@ -21,8 +21,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapAssetLocalToAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
-import io.novafoundation.nova.feature_wallet_impl.data.network.coingecko.CoingeckoApi
-import io.novafoundation.nova.feature_wallet_impl.data.network.coingecko.CoingeckoApi.Companion.getRecentRateFieldName
+import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi.Companion.getRecentRateFieldName
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.commissionAsset
@@ -107,6 +107,18 @@ class WalletRepositoryImpl(
 
             assetCache.insertTokens(updatedTokens)
         }
+    }
+
+    override suspend fun syncAssetRates(asset: Chain.Asset, currency: Currency) {
+        val priceId = asset.priceId ?: return
+
+        val priceStats = getAssetPriceCoingecko(setOf(priceId), currency.coingeckoId)
+
+        val updatedTokens = priceStats.map { (_, tokenStats) ->
+            TokenLocal(asset.symbol, tokenStats.price, currency.id, tokenStats.rateChange)
+        }
+
+        assetCache.insertTokens(updatedTokens)
     }
 
     override fun assetFlow(accountId: AccountId, chainAsset: Chain.Asset): Flow<Asset> {

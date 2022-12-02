@@ -1,5 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="asset_add_evm_token_already_exist_title">This token already exist</string>
+    <string name="asset_add_evm_token_already_exist_message">The entered contract address is present in Nova as a MOVR token.</string>
+
+    <string name="asset_add_evm_token_invalid_contract_address_title">Invalid contract address</string>
+    <string name="asset_add_evm_token_invalid_contract_address_message">The entered contract address is not ERC-20 contract.</string>
+
+    <string name="asset_add_evm_token_invalid_decimals_title">Invalid decimals value</string>
+    <string name="asset_add_evm_token_invalid_decimals_message">Decimals must be at least 0, and not over 36.</string>
+
+    <string name="asset_add_evm_token_invalid_coin_gecko_link_title">Invalid CoinGecko link</string>
+    <string name="asset_add_evm_token_invalid_coin_gecko_link_message">Please make sure supplied url has the following form: www.coingecko.com/en/coins/tether.</string>
+
+    <string name="asset_add_token_enter_contract_address">Enter contract address</string>
+    <string name="asset_add_token_enter_symbol">Enter symbol</string>
+    <string name="asset_add_token_enter_decimals">Enter decimals</string>
+    <string name="assets_add_token">Add token</string>
+
+    <string name="assets_add_token_enter_info_title">Enter ERC-20 token details</string>
+
+    <string name="assets_add_token_enter_info_address_label">Contract address</string>
+    <string name="assets_add_token_enter_info_address_hint">0x...</string>
+
+    <string name="assets_add_token_enter_info_symbol_label">Symbol</string>
+    <string name="assets_add_token_enter_info_symbol_hint">USDT</string>
+
+    <string name="assets_add_token_enter_info_decimals_label">Decimals</string>
+    <string name="assets_add_token_enter_info_decimals_hint">18</string>
+
+    <string name="assets_add_token_enter_info_price_label">Coingecko link for price info (Optional) </string>
+    <string name="assets_add_token_enter_info_price_hint">www.coingecko.com/en/coins/tether</string>
+
     <string name="assets_add_token_select_chain_title">Select network to add ERC-20 token</string>
 
     <string name="common_disabled">Disabled</string>

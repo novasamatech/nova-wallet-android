@@ -1,9 +1,9 @@
 package io.novafoundation.nova.runtime.ethereum.contract.base
 
 import io.novafoundation.nova.runtime.ethereum.contract.base.caller.ContractCaller
-import kotlinx.coroutines.CoroutineScope
+import io.novafoundation.nova.runtime.ethereum.contract.base.caller.ethCallSuspend
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
+import kotlinx.coroutines.future.asDeferred
 import org.web3j.abi.FunctionEncoder
 import org.web3j.abi.FunctionReturnDecoder
 import org.web3j.abi.datatypes.Function
@@ -13,7 +13,6 @@ import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.protocol.core.methods.response.EthCall
 import org.web3j.tx.TransactionManager
 import org.web3j.tx.exceptions.ContractCallException
-import kotlin.coroutines.coroutineContext
 
 open class CallableContract(
     protected val contractAddress: String,
@@ -22,24 +21,44 @@ open class CallableContract(
 ) {
 
     @Suppress("UNCHECKED_CAST")
-    protected suspend fun <T : Type<*>?, R> executeCallSingleValueReturn(
+    protected fun <T : Type<*>?, R> executeCallSingleValueReturnAsync(
+        function: Function,
+        extractResult: (T) -> R,
+    ): Deferred<R> {
+        val tx = createTx(function)
+
+        return contractCaller.ethCall(tx, defaultBlockParameter).thenApply { ethCall ->
+            processEthCallResponse(ethCall, function, extractResult)
+        }.asDeferred()
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    protected suspend fun <T : Type<*>?, R> executeCallSingleValueReturnSuspend(
+        function: Function,
+        extractResult: (T) -> R,
+    ): R {
+        val tx = createTx(function)
+        val ethCall = contractCaller.ethCallSuspend(tx, defaultBlockParameter)
+
+        return processEthCallResponse(ethCall, function, extractResult)
+    }
+
+    private fun <R, T : Type<*>?> processEthCallResponse(
+        ethCall: EthCall,
         function: Function,
         extractResult: (T) -> R
-    ): Deferred<R> {
+    ): R {
+        assertCallNotReverted(ethCall)
+
+        val args = FunctionReturnDecoder.decode(ethCall.value, function.outputParameters)
+        val type = args.first() as T
+
+        return extractResult(type)
+    }
+
+    private fun createTx(function: Function): Transaction {
         val encodedFunction = FunctionEncoder.encode(function)
-        val tx = Transaction.createEthCallTransaction(null, contractAddress, encodedFunction)
-
-        val ethCallDeferred = contractCaller.ethCall(tx, defaultBlockParameter)
-
-        return CoroutineScope(coroutineContext).async {
-            val ethCall = ethCallDeferred.await()
-            assertCallNotReverted(ethCall)
-
-            val args = FunctionReturnDecoder.decode(ethCall.value, function.outputParameters)
-            val type = args.first() as T
-
-            extractResult(type)
-        }
+        return Transaction.createEthCallTransaction(null, contractAddress, encodedFunction)
     }
 
     private fun assertCallNotReverted(ethCall: EthCall) {

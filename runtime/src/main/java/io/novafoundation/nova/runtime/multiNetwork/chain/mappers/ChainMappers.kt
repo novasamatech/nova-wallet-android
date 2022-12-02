@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.fromJsonOrNull
 import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
+import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
@@ -42,6 +43,15 @@ private fun mapAssetSourceFromLocal(source: AssetSourceLocal): Chain.Asset.Sourc
     return when (source) {
         AssetSourceLocal.DEFAULT -> Chain.Asset.Source.DEFAULT
         AssetSourceLocal.ERC20 -> Chain.Asset.Source.ERC20
+        AssetSourceLocal.MANUAL -> Chain.Asset.Source.MANUAL
+    }
+}
+
+private fun mapAssetSourceToLocal(source: Chain.Asset.Source): AssetSourceLocal {
+    return when (source) {
+        Chain.Asset.Source.DEFAULT -> AssetSourceLocal.DEFAULT
+        Chain.Asset.Source.ERC20 -> AssetSourceLocal.ERC20
+        Chain.Asset.Source.MANUAL -> AssetSourceLocal.MANUAL
     }
 }
 
@@ -120,6 +130,26 @@ fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any
     )
 
     Chain.Asset.Type.Unsupported -> ASSET_UNSUPPORTED to null
+}
+
+fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal {
+    val (type, typeExtras) = mapChainAssetTypeToRaw(asset.type)
+
+    return ChainAssetLocal(
+        id = asset.id,
+        symbol = asset.symbol,
+        precision = asset.precision,
+        chainId = asset.chainId,
+        name = asset.name,
+        priceId = asset.priceId,
+        staking = mapStakingTypeToLocal(asset.staking),
+        type = type,
+        source = mapAssetSourceToLocal(asset.source),
+        buyProviders = gson.toJson(asset.buyProviders),
+        typeExtras = gson.toJson(typeExtras),
+        icon = asset.iconUrl,
+        enabled = asset.enabled
+    )
 }
 
 fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {

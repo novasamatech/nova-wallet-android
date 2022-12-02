@@ -7,9 +7,7 @@ import io.novafoundation.nova.core.ethereum.log.Topic
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService.ResponseListener
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -24,6 +22,7 @@ import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.Response
 import org.web3j.protocol.websocket.events.LogNotification
 import java.util.UUID
+import java.util.concurrent.CompletableFuture
 
 typealias SubscriptionId = String
 typealias BatchId = String
@@ -132,7 +131,7 @@ class EthereumRequestsAggregator private constructor(
             return collector.inner.map { it.getOrThrow() }
         }
 
-        fun <S, T : Response<*>> batchRequest(batchId: BatchId, request: Request<S, T>): Deferred<T> {
+        fun <S, T : Response<*>> batchRequest(batchId: BatchId, request: Request<S, T>): CompletableFuture<T> {
             val batches = ensureBatches()
             val batch = batches.getOrPut(batchId, ::PendingBatchRequestBuilder)
 
@@ -141,7 +140,7 @@ class EthereumRequestsAggregator private constructor(
             batch.requests += request
             batch.callbacks[request.id.toInt()] = callback
 
-            return callback.deferred
+            return callback.future
         }
 
         fun build(): EthereumRequestsAggregator {
@@ -216,14 +215,14 @@ private class PendingBatchRequestBuilder(
 
 private class BatchCallback<R> : ResponseListener<R> {
 
-    val deferred = CompletableDeferred<R>()
+    val future = CompletableFuture<R>()
 
     override fun onError(throwable: Throwable) {
-        deferred.completeExceptionally(throwable)
+        future.completeExceptionally(throwable)
     }
 
     override fun onNext(response: R) {
-        deferred.complete(response)
+        future.complete(response)
     }
 }
 

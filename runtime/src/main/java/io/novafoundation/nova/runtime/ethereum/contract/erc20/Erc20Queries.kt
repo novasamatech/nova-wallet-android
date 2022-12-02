@@ -33,4 +33,10 @@ interface Erc20Queries {
     }
 
     suspend fun balanceOfAsync(account: String): Deferred<BigInteger>
+
+    suspend fun symbol(): String
+
+    suspend fun decimals(): BigInteger
+
+    suspend fun totalSupply(): BigInteger
 }

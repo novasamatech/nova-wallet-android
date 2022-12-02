@@ -119,6 +119,16 @@ fun Chain.isValidAddress(address: String): Boolean {
     }.getOrDefault(false)
 }
 
+fun Chain.isValidEvmAddress(address: String): Boolean {
+    return runCatching {
+        if (isEthereumBased) {
+            address.asEthereumAddress().isValid()
+        } else {
+            false
+        }
+    }.getOrDefault(false)
+}
+
 val Chain.isParachain
     get() = parentId != null
 
