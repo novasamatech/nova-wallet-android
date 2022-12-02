@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:background="@color/secondary_screen_background">
+    tools:background="@color/bottom_sheet_background">
 
     <View
         android:id="@+id/view"

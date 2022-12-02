@@ -17,8 +17,8 @@ import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import kotlinx.android.synthetic.main.view_insertable_input_field.view.actionInputFieldAction
 import kotlinx.android.synthetic.main.view_insertable_input_field.view.actionInputField
+import kotlinx.android.synthetic.main.view_insertable_input_field.view.actionInputFieldAction
 import kotlinx.android.synthetic.main.view_insertable_input_field.view.actionInputFieldClear
 
 class InsertableInputField @JvmOverloads constructor(
@@ -77,7 +77,7 @@ class InsertableInputField @JvmOverloads constructor(
         content.setText(clipboard)
     }
 
-    private fun Context.buttonBackground() = addRipple(getRoundedCornerDrawable(R.color.white_8, cornerSizeInDp = 10))
+    private fun Context.buttonBackground() = addRipple(getRoundedCornerDrawable(R.color.button_background_secondary, cornerSizeInDp = 10))
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.ActionInputField) {
         val hint = it.getString(R.styleable.ActionInputField_android_hint)
