@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:gravity="center_vertical"
     tools:orientation="horizontal"
     tools:parentTag="android.widget.LinearLayout">
@@ -23,8 +23,8 @@
         android:paddingEnd="12dp"
         android:paddingBottom="14dp"
         android:singleLine="true"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white_32" />
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/hint_text" />
 
     <TextView
         android:id="@+id/actionInputFieldAction"
@@ -38,9 +38,9 @@
         android:paddingRight="12dp"
         android:paddingBottom="8dp"
         android:text="@string/common_paste"
-        android:textColor="@color/accentBlue"
+        android:textColor="@color/button_text"
         android:visibility="gone"
-        tools:background="@color/white_8"
+        tools:background="@color/container_border"
         tools:visibility="visible" />
 
     <FrameLayout
@@ -59,7 +59,7 @@
             android:layout_height="16dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_close_circle"
-            app:tint="@color/white_64"
+            app:tint="@color/icon_secondary"
             tools:visibility="visible" />
 
     </FrameLayout>

@@ -7,8 +7,7 @@
     android:gravity="center_vertical"
     android:background="@drawable/bg_primary_list_item"
     android:orientation="horizontal"
-    tools:background="@color/black">
-
+    tools:background="@color/secondary_screen_background">
 
     <ImageView
         android:id="@+id/itemSelectChainIcon"
@@ -17,7 +16,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="14dp"
         android:layout_marginBottom="14dp"
-        tools:src="@color/accentBlue" />
+        tools:src="@color/actions_color" />
 
     <TextView
         android:id="@+id/itemSelectChainName"
@@ -27,7 +26,7 @@
         android:layout_marginStart="12dp"
         android:layout_marginEnd="8dp"
         android:layout_weight="1"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         tools:text="Bifrost Kusama" />
 
     <ImageView
@@ -35,6 +34,6 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:src="@drawable/ic_chevron_right"
-        app:tint="@color/white_32" />
+        app:tint="@color/icon_secondary" />
 
 </LinearLayout>

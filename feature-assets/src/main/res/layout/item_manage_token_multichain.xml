@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_primary_list_item"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <ImageView
         android:id="@+id/itemManageTokenMultichainIcon"
-        style="@style/Widget.Nova.AssetIcon.Light"
+        style="@style/Widget.Nova.AssetIcon.OnColor"
         android:layout_marginStart="12dp"
         app:layout_constraintBottom_toBottomOf="@+id/itemManageTokenMultichainNetworks"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,7 +25,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="24dp"
         android:singleLine="true"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toStartOf="@+id/itemManageTokensEdit"
         app:layout_constraintHorizontal_bias="0"
@@ -41,7 +41,7 @@
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="8dp"
         android:singleLine="true"
-        android:textColor="@color/white_48"
+        android:textColor="@color/text_secondary"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/itemManageTokensEdit"
@@ -60,7 +60,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/itemManageTokenMultichainEnabled"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white_48" />
+        app:tint="@color/icon_secondary" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/itemManageTokenMultichainEnabled"

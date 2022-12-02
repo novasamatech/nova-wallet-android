@@ -11,7 +11,7 @@
 
     <ImageView
         android:id="@+id/itemAssetImage"
-        style="@style/Widget.Nova.AssetIcon.Dark"
+        style="@style/Widget.Nova.AssetIcon.Primary"
         android:layout_marginStart="12dp"
         android:background="@drawable/bg_token_container"
         android:padding="6dp"
