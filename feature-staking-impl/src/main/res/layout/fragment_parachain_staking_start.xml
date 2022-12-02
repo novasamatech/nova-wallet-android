@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:background="@color/black"
+    android:background="@color/secondary_screen_background"
     android:orientation="vertical">
 
     <io.novafoundation.nova.common.view.Toolbar
@@ -34,7 +34,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:text="@string/staking_parachain_collator"
-                android:textColor="@color/white_64" />
+                android:textColor="@color/text_secondary" />
 
             <io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.view.SelectCollatorView
                 android:id="@+id/startParachainStakingCollator"

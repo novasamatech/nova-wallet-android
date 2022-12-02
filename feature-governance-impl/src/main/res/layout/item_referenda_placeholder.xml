@@ -23,6 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
+            android:textColor="@color/text_primary"
             android:text="@string/crowdloan_active_section" />
 
         <TextView
@@ -34,7 +35,7 @@
             android:background="@drawable/bg_voting_status_chip"
             android:includeFontPadding="false"
             android:minHeight="22dp"
-            android:textColor="@color/white_80"
+            android:textColor="@color/chip_text"
             android:paddingHorizontal="8dp"
             android:paddingVertical="2dp"
             android:text="0"

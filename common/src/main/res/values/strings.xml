@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <!--<string name="dapp_main_welcome_title">Welcome\nto DApp portal</string>-->
+    <string name="dapp_main_welcome_title">Welcome to Nova Browser</string>
+
+    <!--<string name="dapp_main_welcome_subtitle">Connect to the Polkadot &amp; Kusama\necosystem web applications using\naccounts in Nova Wallet</string>-->
+    <string name="dapp_main_welcome_subtitle">Browse the web using your accounts from Nova Wallet</string>
+
     <string name="asset_add_evm_token_already_exist_title">This token already exist</string>
     <string name="asset_add_evm_token_already_exist_message">The entered contract address is present in Nova as a MOVR token.</string>
 
@@ -835,8 +841,6 @@
     <string name="crowdloan_your_contributions">Your contributions</string>
     <string name="crownloans_raised_format" formatted="false">Raised: %s of %s</string>
     <string name="dapp_dapps">DApps</string>
-    <string name="dapp_main_welcome_subtitle">Connect to the Polkadot &amp; Kusama\necosystem web applications using\naccounts in Nova Wallet</string>
-    <string name="dapp_main_welcome_title">Welcome\nto DApp portal</string>
     <string name="ecdsa_selection_subtitle">(BTC/ETH compatible)</string>
     <string name="ecdsa_selection_title">ECDSA</string>
     <string name="ed25519_selection_subtitle">ed25519 (alternative)</string>

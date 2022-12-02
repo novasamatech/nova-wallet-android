@@ -2,8 +2,10 @@ package io.novafoundation.nova.feature_governance_impl.di.modules
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.PolkassemblyV2Api
 import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2OffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2PreImageRepository
@@ -38,7 +40,11 @@ class GovernanceV2Module {
 
     @Provides
     @FeatureScope
-    fun provideOffChainInfoRepository() = Gov2OffChainReferendaInfoRepository()
+    fun providePolkassemblyApi(apiCreator: NetworkApiCreator) = apiCreator.create(PolkassemblyV2Api::class.java)
+
+    @Provides
+    @FeatureScope
+    fun provideOffChainInfoRepository(polkassemblyV2Api: PolkassemblyV2Api) = Gov2OffChainReferendaInfoRepository(polkassemblyV2Api)
 
     @Provides
     @FeatureScope

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/black_48"
+    tools:background="@color/block_background"
     tools:orientation="vertical">
 
     <com.facebook.shimmer.ShimmerFrameLayout
@@ -34,7 +34,7 @@
                 android:paddingEnd="12dp"
                 android:paddingBottom="9dp"
                 android:text="@string/common_all"
-                android:textColor="@color/white" />
+                android:textColor="@color/text_primary" />
 
             <View style="@style/Widget.Nova.DappCategory.Shimmering" />
 

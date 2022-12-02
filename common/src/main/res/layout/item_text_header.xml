@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/textHeader"
     style="@style/TextAppearance.NovaFoundation.SemiBold.Caps"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="16dp"
-    android:id="@+id/textHeader"
-    android:textColor="@color/white_64"
-    tools:background="@color/black"
+    android:textColor="@color/text_secondary"
+    tools:background="@color/secondary_screen_background"
     tools:text="@tools:sample/lorem[2]">
 
 </TextView>

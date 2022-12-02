@@ -32,7 +32,7 @@ class TotalGovernanceLocksHeaderAdapter : RecyclerView.Adapter<TotalGovernanceLo
 
     inner class HeaderHolder(view: View) : RecyclerView.ViewHolder(view) {
         init {
-            view.background = view.context.getRoundedCornerDrawable(R.color.white_8)
+            view.background = view.context.getRoundedCornerDrawable(R.color.block_background)
         }
 
         fun bind(amount: AmountModel?) {

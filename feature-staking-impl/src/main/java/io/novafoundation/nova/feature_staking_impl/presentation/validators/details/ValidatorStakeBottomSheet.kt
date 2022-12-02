@@ -52,8 +52,6 @@ class ValidatorStakeBottomSheet(
             view.layoutParams = ViewGroup.MarginLayoutParams(MATCH_PARENT, WRAP_CONTENT).also { params ->
                 params.updateMarginsRelative(start = 16.dp, end = 16.dp)
             }
-
-            view.setDividerColor(R.color.white_8)
         }
     }
 }

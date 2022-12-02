@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/selectSendToolbar"
@@ -32,6 +32,7 @@
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="8dp"
             android:includeFontPadding="false"
+            android:textColor="@color/text_primary"
             tools:text="Send KSM from" />
 
         <io.novafoundation.nova.feature_account_api.view.ChainChipView
@@ -49,6 +50,7 @@
             android:layout_marginBottom="8dp"
             android:includeFontPadding="false"
             android:text="@string/wallet_send_tokens_to"
+            android:textColor="@color/text_primary"
             android:visibility="gone"
             app:layout_wrapBefore="true" />
 
@@ -77,7 +79,7 @@
             android:layout_marginBottom="4dp"
             android:includeFontPadding="false"
             android:text="@string/wallet_recipient"
-            android:textColor="@color/white_64" />
+            android:textColor="@color/text_secondary" />
 
         <LinearLayout
             android:id="@+id/selectWallet"
@@ -95,8 +97,8 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="5dp"
                 app:srcCompat="@drawable/ic_users"
-                app:tint="@color/accentBlue"
-                tools:tint="@color/accentBlue" />
+                app:tint="@color/icon_accent"
+                tools:tint="@color/icon_accent" />
 
             <TextView
                 style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -106,7 +108,7 @@
                 android:gravity="center"
                 android:includeFontPadding="false"
                 android:text="@string/assets_select_send_your_wallets"
-                android:textColor="@color/accentBlue" />
+                android:textColor="@color/button_text_accent" />
 
             <ImageView
                 android:layout_width="16dp"
@@ -115,8 +117,8 @@
                 android:layout_marginEnd="5dp"
                 android:scaleType="centerInside"
                 app:srcCompat="@drawable/ic_chevron_down"
-                app:tint="@color/accentBlue"
-                tools:tint="@color/accentBlue" />
+                app:tint="@color/icon_accent"
+                tools:tint="@color/icon_accent" />
 
         </LinearLayout>
 

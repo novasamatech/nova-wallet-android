@@ -5,16 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:parentTag="android.widget.LinearLayout">
 
     <TextView
-        style="@style/TextAppearance.NovaFoundation.Body1"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:textColor="@color/black1"
-        android:text="@string/account_import_mnemonic_subtitle" />
+        android:text="@string/account_import_mnemonic_subtitle"
+        android:textColor="@color/text_secondary" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/importMnemonicContentContainer"
@@ -32,7 +32,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:text="@string/recovery_passphrase"
-            android:textColor="@color/colorHint"
+            android:textColor="@color/text_secondary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -47,7 +47,7 @@
             android:inputType="textMultiLine|textVisiblePassword"
             android:minLines="5"
             android:padding="0dp"
-            android:textColor="@color/white"
+            android:textColor="@color/text_primary"
             android:textCursorDrawable="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/importMnemonicTitle"
@@ -61,8 +61,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:textColor="@color/black1"
-        android:text="@string/account_import_mnemonic_hint" />
+        android:text="@string/account_import_mnemonic_hint"
+        android:textColor="@color/text_secondary" />
 
     <io.novafoundation.nova.common.view.InputField
         android:id="@+id/importMnemonicUsernameInput"
@@ -74,13 +74,12 @@
 
     <TextView
         android:id="@+id/importMnemnonicUsernameHint"
-        style="@style/TextAppearance.NovaFoundation.Body2"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
         android:layout_weight="1"
         android:text="@string/wallet_nickname_create_caption_v2_2_0"
-        android:textColor="@color/black1" />
-
+        android:textColor="@color/text_secondary" />
 
 </merge>

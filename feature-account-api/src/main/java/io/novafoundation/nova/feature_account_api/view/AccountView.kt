@@ -49,7 +49,7 @@ class AccountView @JvmOverloads constructor(
 
     fun setShowBackground(shouldShow: Boolean) {
         background = if (shouldShow) {
-            getRoundedCornerDrawable(R.color.white_8, cornerSizeDp = 12).withRipple()
+            getRoundedCornerDrawable(R.color.block_background, cornerSizeDp = 12).withRippleMask(getRippleMask(cornerSizeDp = 12))
         } else {
             null
         }

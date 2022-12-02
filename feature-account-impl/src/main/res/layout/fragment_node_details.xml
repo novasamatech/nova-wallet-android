@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/novaToolbar"
@@ -55,10 +55,11 @@
             android:clickable="true"
             android:focusable="true"
             android:padding="@dimen/x1"
-            android:src="@drawable/ic_copy"
+            android:src="@drawable/ic_copy_outline"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/icon_primary" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

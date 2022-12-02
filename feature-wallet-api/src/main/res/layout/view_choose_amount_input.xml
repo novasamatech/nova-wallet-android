@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/white_8"
+    tools:background="@color/divider"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
 
@@ -15,11 +15,12 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/bg_icon_round_black"
+        android:background="@drawable/bg_token_container"
         android:padding="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/icon_primary"
         tools:src="@drawable/ic_token_ksm" />
 
     <TextView
@@ -29,11 +30,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:includeFontPadding="false"
+        android:textColor="@color/text_primary"
         app:layout_constraintBottom_toBottomOf="@+id/chooseAmountInputImage"
         app:layout_constraintStart_toEndOf="@id/chooseAmountInputImage"
         app:layout_constraintTop_toTopOf="@+id/chooseAmountInputImage"
         tools:text="KSM" />
-
 
     <EditText
         android:id="@+id/chooseAmountInputField"
@@ -48,8 +49,8 @@
         android:hint="0"
         android:inputType="numberDecimal"
         android:paddingBottom="26dp"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white_32"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/hint_text"
         android:textCursorDrawable="@null"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -65,7 +66,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="9dp"
         android:singleLine="true"
-        android:textColor="@color/white_64"
+        android:textColor="@color/text_secondary"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/chooseAmountInputField"

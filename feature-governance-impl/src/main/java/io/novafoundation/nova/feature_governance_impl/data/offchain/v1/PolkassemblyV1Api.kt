@@ -1,0 +1,25 @@
+package io.novafoundation.nova.feature_governance_impl.data.offchain.v1
+
+import io.novafoundation.nova.common.data.network.subquery.SubQueryResponse
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v1.request.ReferendumDetailsRequest
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v1.request.ReferendumPreviewRequest
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v1.response.ReferendaPreviewResponse
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v1.response.ReferendumDetailsResponse
+import retrofit2.http.Body
+import retrofit2.http.POST
+import retrofit2.http.Url
+
+interface PolkassemblyV1Api {
+
+    @POST
+    suspend fun getReferendumPreviews(
+        @Url url: String,
+        @Body body: ReferendumPreviewRequest
+    ): SubQueryResponse<ReferendaPreviewResponse>
+
+    @POST
+    suspend fun getReferendumDetails(
+        @Url url: String,
+        @Body body: ReferendumDetailsRequest
+    ): SubQueryResponse<ReferendumDetailsResponse>
+}

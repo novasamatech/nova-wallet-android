@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
+    android:background="@color/secondary_screen_background"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
@@ -22,6 +22,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:textColor="@color/text_primary"
         android:text="@string/wallet_filters_header" />
 
     <io.novafoundation.nova.common.view.Switch
@@ -65,6 +66,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
+        android:textColor="@color/text_primary"
         android:text="@string/common_filter_sort_header" />
 
     <RadioGroup

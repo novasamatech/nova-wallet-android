@@ -31,7 +31,7 @@ class SearchView @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_search, this)
 
-        background = getRoundedCornerDrawable(fillColorRes = R.color.white_8)
+        background = getRoundedCornerDrawable(fillColorRes = R.color.input_background, cornerSizeDp = 10)
 
         orientation = HORIZONTAL
 
@@ -50,7 +50,7 @@ class SearchView @JvmOverloads constructor(
     }
 
     fun setIcon(@DrawableRes icon: Int?) {
-        searchContent.setDrawableStart(icon, widthInDp = 16, paddingInDp = 6, tint = R.color.white_32)
+        searchContent.setDrawableStart(icon, widthInDp = 16, paddingInDp = 6, tint = R.color.icon_secondary)
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.SearchView) {

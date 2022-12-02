@@ -44,7 +44,7 @@ class ChainAccountActionsSheet(
 
     private fun maybeShowExport() {
         accountAddress()?.let {
-            item(R.drawable.ic_share_arrow_white_24, R.string.account_export, showArrow = true) {
+            item(R.drawable.ic_share_outline, R.string.account_export, showArrow = true) {
                 onExport.invoke(payload.chain)
             }
         }

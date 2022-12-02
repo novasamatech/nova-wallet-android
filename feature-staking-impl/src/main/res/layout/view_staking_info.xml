@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:orientation="vertical"
     tools:parentTag="android.widget.LinearLayout">
 
@@ -18,7 +18,7 @@
             android:layout_width="72dp"
             android:layout_height="12dp"
             android:layout_gravity="center"
-            android:background="@drawable/bg_shimmering_light" />
+            android:background="@drawable/bg_shimmering" />
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
@@ -29,7 +29,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:singleLine="true"
-        android:textColor="@color/green"
+        android:textColor="@color/text_positive"
         android:visibility="gone"
         tools:text="22.12%" />
 
@@ -41,7 +41,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="4dp"
         android:singleLine="true"
-        android:textColor="@color/gray1"
+        android:textColor="@color/text_secondary"
         tools:text="Monthly" />
 
 </merge>

@@ -115,7 +115,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     }
 
     override fun removeSplashBackground() {
-        window.setBackgroundDrawableResource(R.color.black)
+        window.setBackgroundDrawableResource(R.color.secondary_screen_background)
     }
 
     override fun changeLanguage() {

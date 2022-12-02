@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/blurColor"
+    tools:background="@color/block_background"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <TextView
@@ -15,7 +15,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="15dp"
         android:text="@string/common_balance"
-        android:textColor="@color/white"
+        android:textColor="@color/text_primary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -36,7 +36,7 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginTop="8dp"
-        android:background="@color/white_24"
+        android:background="@color/divider"
         app:layout_constraintEnd_toEndOf="@id/stakingBalanceBonded"
         app:layout_constraintStart_toStartOf="@id/stakingBalanceBonded"
         app:layout_constraintTop_toBottomOf="@id/stakingBalanceBonded" />
@@ -58,7 +58,7 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginTop="8dp"
-        android:background="@color/white_24"
+        android:background="@color/divider"
         app:layout_constraintEnd_toEndOf="@id/stakingBalanceUnbonding"
         app:layout_constraintStart_toStartOf="@id/stakingBalanceUnbonding"
         app:layout_constraintTop_toBottomOf="@id/stakingBalanceUnbonding" />

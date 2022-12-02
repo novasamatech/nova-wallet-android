@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:parentTag="android.widget.LinearLayout">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,7 +23,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:text="@string/recovery_raw_seed"
-            android:textColor="@color/colorHint"
+            android:textColor="@color/text_secondary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -35,7 +35,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:text="@string/account_seed_hex_symbols"
-            android:textColor="@color/black2"
+            android:textColor="@color/text_secondary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -49,11 +49,11 @@
             android:background="@null"
             android:gravity="top"
             android:hint="@string/account_import_seed_hint"
-            android:textColorHint="@color/black3"
             android:inputType="textMultiLine|textVisiblePassword"
             android:minLines="5"
             android:padding="0dp"
-            android:textColor="@color/white"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/hint_text"
             android:textCursorDrawable="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -72,11 +72,11 @@
 
     <TextView
         android:id="@+id/importSeedUsernameHint"
-        style="@style/TextAppearance.NovaFoundation.Body2"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
         android:layout_weight="1"
         android:text="@string/wallet_nickname_create_caption_v2_2_0"
-        android:textColor="@color/black1" />
+        android:textColor="@color/text_secondary" />
 </merge>

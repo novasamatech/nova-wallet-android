@@ -73,7 +73,6 @@
     <declare-styleable name="TableCellView">
         <attr name="title" />
         <attr name="dividerVisible" />
-        <attr name="dividerColor" format="color" />
         <attr name="primaryValueIcon" format="reference|color" />
         <attr name="primaryValueStyle" format="enum">
             <enum name="text" value="0" />
@@ -94,6 +93,7 @@
         <attr name="inProgress" format="boolean" />
         <attr name="android:text" />
         <attr name="icon" />
+        <attr name="iconTint" />
         <attr name="actionIcon" />
         <attr name="dividerVisible" />
         <attr name="android:textAppearance" format="reference" />
@@ -107,8 +107,8 @@
             <enum name="primaryTransparent" value="1" />
             <enum name="secondary" value="2" />
             <enum name="secondaryTransparent" value="3" />
-            <enum name="primaryGreen" value="4" />
-            <enum name="primaryRed" value="5" />
+            <enum name="primaryPositive" value="4" />
+            <enum name="primaryNegative" value="5" />
         </attr>
 
         <attr name="size" format="enum">
@@ -202,5 +202,10 @@
 
     <declare-styleable name="TotalAmountView">
         <attr name="title" />
+    </declare-styleable>
+
+    <declare-styleable name="BannerView">
+        <attr name="android:src" format="reference" />
+        <attr name="bannerBackground" format="reference|color" />
     </declare-styleable>
 </resources>

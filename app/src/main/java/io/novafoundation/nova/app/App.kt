@@ -13,7 +13,8 @@ import javax.inject.Inject
 
 open class App : Application(), FeatureContainer {
 
-    @Inject lateinit var featureHolderManager: FeatureHolderManager
+    @Inject
+    lateinit var featureHolderManager: FeatureHolderManager
 
     private lateinit var appComponent: AppComponent
 
