@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.b
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
-import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanTransactionsApi
+import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanAccountTransfer
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.feeUsed
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -21,7 +21,7 @@ private const val FIRST_PAGE_INDEX = 1
 private const val SECOND_PAGE_INDEX = 2
 
 class EvmAssetHistory(
-    private val etherscanApi: EtherscanTransactionsApi
+    private val etherscanApi: EtherscanApi,
 ) : AssetHistory {
 
     override suspend fun fetchOperationsForBalanceChange(
@@ -111,6 +111,7 @@ class EvmAssetHistory(
             accountAddress = accountAddress,
             pageNumber = page,
             pageSize = pageSize,
+            chainId = chain.id
         )
 
         val operations = response.result.map { mapRemoteTransferToOperation(it, chainAsset, accountAddress) }

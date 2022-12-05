@@ -8,7 +8,7 @@ import retrofit2.http.Headers
 import retrofit2.http.Query
 import retrofit2.http.Url
 
-interface EtherscanTransactionsApi {
+interface RetrofitEtherscanTransactionsApi {
 
     @GET
     @Headers(UserAgent.NOVA)
@@ -18,6 +18,7 @@ interface EtherscanTransactionsApi {
         @Query("address") accountAddress: String,
         @Query("page") pageNumber: Int,
         @Query("offset") pageSize: Int,
+        @Query("apikey") apiKey: String?,
         @Query("module") module: String = "account",
         @Query("action") action: String = "tokentx"
     ): EtherscanResponse<List<EtherscanAccountTransfer>>
