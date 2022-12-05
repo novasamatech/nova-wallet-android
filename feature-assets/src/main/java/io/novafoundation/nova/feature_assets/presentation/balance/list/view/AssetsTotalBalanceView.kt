@@ -31,11 +31,9 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
         gravity = Gravity.CENTER_HORIZONTAL
         setPadding(0, 20.dp, 0, 20.dp)
 
-        viewAssetsTotalBalanceLocked.background = addRipple(
-            getRoundedCornerDrawable(
-                fillColorRes = R.color.white_16,
-                cornerSizeDp = 6
-            )
+        viewAssetsTotalBalanceLocked.background = getRoundedCornerDrawable(
+            fillColorRes = R.color.chips_background,
+            cornerSizeDp = 8
         )
 
         setBackgroundClickable(false)
@@ -52,7 +50,7 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
 
         if (totalBalance.isBreakdownAbailable) {
             viewAssetsTotalBalanceLocked.text = totalBalance.lockedBalanceFiat
-            viewAssetsTotalBalanceTitle.setDrawableEnd(R.drawable.ic_info_16, paddingInDp = 4)
+            viewAssetsTotalBalanceTitle.setDrawableEnd(R.drawable.ic_info_cicrle_filled_16, paddingInDp = 4)
         } else {
             viewAssetsTotalBalanceTitle.setDrawableEnd(null)
         }
@@ -60,9 +58,9 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
 
     fun setBackgroundClickable(isClickable: Boolean) {
         background = if (isClickable) {
-            addRipple(getRoundedCornerDrawable(R.color.black_48))
+            addRipple(getRoundedCornerDrawable(R.color.block_background))
         } else {
-            getRoundedCornerDrawable(R.color.black_48)
+            getRoundedCornerDrawable(R.color.block_background)
         }
     }
 }

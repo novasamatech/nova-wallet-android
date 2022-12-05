@@ -22,12 +22,12 @@ class ChipLabelView @JvmOverloads constructor(
 ) : AppCompatTextView(ContextThemeWrapper(context, R.style.Widget_Nova_ChipLabel), attrs, defStyleAttr) {
 
     init {
-        background = context.getRoundedCornerDrawable(R.color.white_24, cornerSizeInDp = 8)
+        background = context.getRoundedCornerDrawable(R.color.chips_background, cornerSizeInDp = 8)
         gravity = Gravity.CENTER_VERTICAL
     }
 
     fun setModel(model: ChipLabelModel) {
-        setDrawableStart(model.iconRes, widthInDp = 16, paddingInDp = 6, tint = R.color.white_80)
+        setDrawableStart(model.iconRes, widthInDp = 16, paddingInDp = 6, tint = R.color.icon_secondary)
         text = model.title
     }
 }

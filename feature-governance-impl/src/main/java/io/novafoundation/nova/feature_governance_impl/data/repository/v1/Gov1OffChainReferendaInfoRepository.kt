@@ -6,15 +6,15 @@ import io.novafoundation.nova.feature_governance_api.data.network.offchain.model
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.OffChainReferendumPreview
 import io.novafoundation.nova.feature_governance_api.data.repository.OffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline
-import io.novafoundation.nova.feature_governance_impl.data.offchain.remote.PolkassemblyApi
-import io.novafoundation.nova.feature_governance_impl.data.offchain.remote.model.request.ReferendumDetailsRequest
-import io.novafoundation.nova.feature_governance_impl.data.offchain.remote.model.request.ReferendumPreviewRequest
-import io.novafoundation.nova.feature_governance_impl.data.offchain.remote.model.response.ReferendaPreviewResponse
-import io.novafoundation.nova.feature_governance_impl.data.offchain.remote.model.response.ReferendumDetailsResponse
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v1.PolkassemblyV1Api
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v1.request.ReferendumDetailsRequest
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v1.request.ReferendumPreviewRequest
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v1.response.ReferendaPreviewResponse
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v1.response.ReferendumDetailsResponse
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class Gov1OffChainReferendaInfoRepository(
-    private val polkassemblyApi: PolkassemblyApi
+    private val polkassemblyApi: PolkassemblyV1Api
 ) : OffChainReferendaInfoRepository {
 
     override suspend fun referendumPreviews(chain: Chain): List<OffChainReferendumPreview> {
@@ -40,7 +40,7 @@ class Gov1OffChainReferendaInfoRepository(
             if (governanceExternalApi?.type == Chain.ExternalApi.Section.Type.POLKASSEMBLY) {
                 val request = ReferendumDetailsRequest(referendumId.value)
                 val response = polkassemblyApi.getReferendumDetails(governanceExternalApi.url, request)
-                val referendumDetails = response.data.posts.getOrNull(0)
+                val referendumDetails = response.data.posts.firstOrNull()
                 return referendumDetails?.let(::mapPolkassemblyPostToDetails)
             }
         } catch (e: Exception) {

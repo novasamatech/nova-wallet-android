@@ -29,8 +29,8 @@ class DotsProgressView @JvmOverloads constructor(
         val itemSize = context.resources.getDimensionPixelSize(R.dimen.dot_progress_view_dot_size_default)
         val itemMargin = context.resources.getDimensionPixelOffset(R.dimen.dot_progress_view_dot_margin_default)
 
-        emptyDrawable = ContextCompat.getDrawable(context, R.drawable.ic_pincode_indicator_empty)!!
-        filledDrawable = ContextCompat.getDrawable(context, R.drawable.ic_pincode_indicator_filled)!!
+        emptyDrawable = ContextCompat.getDrawable(context, R.drawable.ic_pincode_indicator_inactive)!!
+        filledDrawable = ContextCompat.getDrawable(context, R.drawable.ic_pincode_indicator_active)!!
 
         circles = arrayOfNulls(MAX_PROGRESS)
 

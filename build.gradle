@@ -1,16 +1,16 @@
 buildscript {
     ext {
         // App version
-        versionName = '4.0.3'
-        versionCode = 47
+        versionName = '4.1.0'
+        versionCode = 48
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
 
         // SDK and tools
-        compileSdkVersion = 31
+        compileSdkVersion = 33
         minSdkVersion = 24
-        targetSdkVersion = 31
+        targetSdkVersion = 33
 
         kotlinVersion = '1.7.10'
 
@@ -201,6 +201,7 @@ allprojects {
         maven { url "https://nexus.iroha.tech/repository/maven-soramitsu/" }
         mavenCentral()
         mavenLocal()
+        flatDir { dirs "$rootDir/common/libs" }
     }
 }
 

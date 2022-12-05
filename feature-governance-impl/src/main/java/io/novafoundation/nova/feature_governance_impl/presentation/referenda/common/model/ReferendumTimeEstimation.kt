@@ -19,7 +19,8 @@ sealed class ReferendumTimeEstimation {
 
     data class TextStyle(
         @DrawableRes val iconRes: Int,
-        @ColorRes val colorRes: Int
+        @ColorRes val textColorRes: Int,
+        @ColorRes val iconColorRes: Int
     ) {
 
         companion object
@@ -74,13 +75,13 @@ fun TextView.setReferendumTimeEstimation(maybeTimeEstimation: ReferendumTimeEsti
 }
 
 private fun TextView.setReferendumTextStyle(textStyle: ReferendumTimeEstimation.TextStyle, iconGravity: Int) {
-    setTextColorRes(textStyle.colorRes)
+    setTextColorRes(textStyle.textColorRes)
     when (iconGravity) {
         Gravity.START -> {
-            setDrawableStart(textStyle.iconRes, widthInDp = 16, paddingInDp = 4, tint = textStyle.colorRes)
+            setDrawableStart(textStyle.iconRes, widthInDp = 16, paddingInDp = 4, tint = textStyle.iconColorRes)
         }
         Gravity.END -> {
-            setDrawableEnd(textStyle.iconRes, widthInDp = 16, paddingInDp = 4, tint = textStyle.colorRes)
+            setDrawableEnd(textStyle.iconRes, widthInDp = 16, paddingInDp = 4, tint = textStyle.iconColorRes)
         }
     }
 }

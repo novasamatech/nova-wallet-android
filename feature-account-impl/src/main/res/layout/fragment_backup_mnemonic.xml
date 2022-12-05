@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
+    android:background="@color/secondary_screen_background"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
@@ -16,23 +16,24 @@
         app:iconRight="@drawable/ic_options" />
 
     <TextView
-        style="@style/TextAppearance.NovaFoundation.Header2"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/account_backup_mnemonic_title" />
+        android:text="@string/account_backup_mnemonic_title"
+        android:textColor="@color/text_primary" />
 
     <TextView
-        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:text="@string/account_create_details_v2_2_0"
-        android:textColor="@color/black1" />
+        android:textColor="@color/text_secondary" />
 
     <io.novafoundation.nova.common.view.LabeledTextView
         android:id="@+id/backupMnemonicPhrase"
@@ -42,11 +43,10 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="16dp"
         android:singleLine="false"
-        app:messageStyle="@style/Widget.Nova.Text.Mnemonic"
         app:enabled="false"
         app:label="@string/recovery_passphrase"
+        app:messageStyle="@style/Widget.Nova.Text.Mnemonic"
         tools:message="@tools:sample/lorem[12]" />
-
 
     <TextView
         style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
@@ -56,7 +56,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:text="@string/account_backup_secret_caption"
-        android:textColor="@color/black1" />
+        android:textColor="@color/text_secondary" />
 
     <Space
         android:layout_width="match_parent"

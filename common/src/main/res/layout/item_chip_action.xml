@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemChipAction"
     style="@style/Widget.Nova.Action.Secondary"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginEnd="8dp"
-    android:id="@+id/itemChipAction"
-    tools:text="Action">
-</TextView>
+    android:textColor="@color/button_text"
+    tools:text="Action" />

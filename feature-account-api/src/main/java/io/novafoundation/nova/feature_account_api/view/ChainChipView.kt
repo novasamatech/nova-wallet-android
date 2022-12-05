@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.FrameLayout
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.getAccentColorRes
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
@@ -34,7 +33,7 @@ class ChainChipView @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_chain_chip, this)
 
-        itemAssetGroupLabel.background = context.getRoundedCornerDrawable(R.color.white_16, cornerSizeInDp = 8)
+        itemAssetGroupLabel.background = context.getRoundedCornerDrawable(R.color.chips_background, cornerSizeInDp = 8)
     }
 
     fun setModel(chainChipModel: ChainChipModel) {
@@ -46,12 +45,10 @@ class ChainChipView @JvmOverloads constructor(
         itemAssetGroupLabel.isEnabled = changeable
 
         if (changeable) {
-            val accentColorRes = context.getAccentColorRes()
-
-            itemAssetGroupLabel.setTextColorRes(accentColorRes)
-            itemAssetGroupLabel.setDrawableEnd(R.drawable.ic_chevron_down, widthInDp = 16, paddingInDp = 4, tint = accentColorRes)
+            itemAssetGroupLabel.setTextColorRes(R.color.button_text_accent)
+            itemAssetGroupLabel.setDrawableEnd(R.drawable.ic_chevron_down, widthInDp = 16, paddingInDp = 4, tint = R.color.icon_accent)
         } else {
-            itemAssetGroupLabel.setTextColorRes(R.color.white)
+            itemAssetGroupLabel.setTextColorRes(R.color.text_primary)
             itemAssetGroupLabel.setDrawableEnd(null)
         }
     }

@@ -12,7 +12,7 @@ import coil.load
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.setTextOrHide
-import io.novafoundation.nova.common.view.shape.getBlurDrawable
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
 import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAmountInput
 import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAssetBalance
@@ -47,10 +47,10 @@ class AmountView @JvmOverloads constructor(
         amountInput.isEnabled = enabled
         amountInput.inputType = if (enabled) InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL else InputType.TYPE_NULL
     }
-
+/*
     override fun childDrawableStateChanged(child: View?) {
         refreshDrawableState()
-    }
+    }*/
 
     // Make this view be aware of amountInput state changes (i.e. state_focused)
     override fun onCreateDrawableState(extraSpace: Int): IntArray {
@@ -65,12 +65,10 @@ class AmountView @JvmOverloads constructor(
 
     private fun setBackground() {
         background = context.getCornersStateDrawable(
-            focusedDrawable = context.getBlurDrawable(
-                strokeColorRes = R.color.white
+            focusedDrawable = context.getBlockDrawable(
+                strokeColorRes = R.color.active_border
             ),
-            idleDrawable = context.getBlurDrawable(
-                strokeColorRes = R.color.white_40
-            )
+            idleDrawable = context.getBlockDrawable()
         )
     }
 

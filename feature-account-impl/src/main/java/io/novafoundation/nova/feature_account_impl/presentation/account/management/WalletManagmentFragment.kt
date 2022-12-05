@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.fragment_accounts.accountsList
 import kotlinx.android.synthetic.main.fragment_accounts.addAccount
 
 class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel>(), AccountsAdapter.AccountItemHandler {
+
     private lateinit var adapter: AccountsAdapter
 
     override fun onCreateView(

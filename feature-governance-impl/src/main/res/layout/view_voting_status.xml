@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingVertical="16dp"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:parentTag="android.widget.LinearLayout">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,6 +22,7 @@
             android:layout_gravity="center_vertical"
             android:includeFontPadding="false"
             android:text="@string/voting_status"
+            android:textColor="@color/text_secondary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -35,6 +36,7 @@
             android:gravity="end"
             android:includeFontPadding="false"
             android:maxLines="2"
+            android:textColor="@color/text_secondary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/votingStatusTitle"
             app:layout_constraintTop_toTopOf="parent"
@@ -50,7 +52,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
         android:textAllCaps="true"
-        android:textColor="@color/multicolor_green_100"
+        android:textColor="@color/text_positive"
         tools:text="PASSING" />
 
     <io.novafoundation.nova.feature_governance_impl.presentation.view.VotingThresholdView

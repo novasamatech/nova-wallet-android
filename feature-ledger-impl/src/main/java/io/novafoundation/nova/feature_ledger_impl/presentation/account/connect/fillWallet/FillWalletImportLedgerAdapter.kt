@@ -91,7 +91,7 @@ class FillWalletViewHolder(
             accountIcon.makeVisible()
             accountAddress.makeVisible()
             action.setImageResource(R.drawable.ic_checkmark_circle_16)
-            action.setImageTintRes(R.color.green)
+            action.setImageTintRes(R.color.icon_positive)
 
             accountIcon.setImageDrawable(item.filledAddressModel.image)
             accountAddress.text = item.filledAddressModel.nameOrAddress

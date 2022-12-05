@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/black"
+    tools:background="@color/secondary_screen_background"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <ImageView
@@ -20,19 +20,19 @@
 
     <TextView
         android:id="@+id/goNextTitle"
-        android:layout_marginTop="14dp"
-        android:layout_marginBottom="14dp"
         style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginStart="12dp"
+        android:layout_marginTop="14dp"
         android:layout_marginEnd="16dp"
-        app:layout_goneMarginStart="16dp"
-        android:textColor="@color/white"
+        android:layout_marginBottom="14dp"
+        android:textColor="@color/text_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imageView"
         app:layout_constraintStart_toEndOf="@id/goNextIcon"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginStart="16dp"
         tools:text="Learn Karura's crowdloan" />
 
     <TextView
@@ -41,6 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
+        android:textColor="@color/text_secondary"
         android:visibility="gone"
         app:layout_constraintBaseline_toBaselineOf="@id/goNextTitle"
         app:layout_constraintBottom_toBottomOf="@+id/goNextTitle"
@@ -55,20 +56,20 @@
         android:src="@drawable/ic_chevron_right"
         app:layout_constraintBottom_toBottomOf="@+id/goNextTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/goNextTitle" />
+        app:layout_constraintTop_toTopOf="@+id/goNextTitle"
+        app:tint="@color/icon_primary" />
 
     <ProgressBar
         android:id="@+id/goNextProgress"
+        style="@style/Widget.Nova.ProgressBar.Indeterminate"
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:layout_marginEnd="16dp"
         android:indeterminate="true"
-        android:indeterminateTint="@color/white"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/goNextTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/goNextTitle" />
-
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/badgeBarrier"
@@ -83,7 +84,7 @@
         android:layout_height="1dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@color/dividerGray"
+        android:background="@color/divider"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

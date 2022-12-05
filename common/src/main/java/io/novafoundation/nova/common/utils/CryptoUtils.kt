@@ -6,6 +6,7 @@ import org.bouncycastle.jcajce.provider.digest.SHA256
 import java.security.MessageDigest
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
+import org.bouncycastle.jcajce.provider.digest.SHA512
 
 fun String.hmacSHA256(secret: String): ByteArray {
     val chiper: Mac = Mac.getInstance("HmacSHA256")
@@ -21,6 +22,11 @@ fun ByteArray.substrateAccountId(): ByteArray {
     } else {
         this
     }
+}
+
+fun ByteArray.sha512(): ByteArray {
+    val digits = SHA512.Digest()
+    return digits.digest(this)
 }
 
 fun ByteArray.sha256(): ByteArray {

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/rewardDetailToolbar"
@@ -36,7 +36,7 @@
                 android:background="@drawable/bg_icon_round_white"
                 android:padding="11dp"
                 android:src="@drawable/ic_staking_filled"
-                app:tint="@color/white_64" />
+                app:tint="@color/icon_secondary" />
 
             <TextView
                 android:id="@+id/rewardDetailAmount"
@@ -44,6 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textColor="@color/text_primary"
                 tools:text="-4 KSM" />
 
             <TextView
@@ -55,9 +56,9 @@
                 android:gravity="center_vertical"
                 tools:drawablePadding="4dp"
                 tools:drawableStart="@drawable/ic_checkmark_circle_16"
-                tools:drawableTint="@color/green"
+                tools:drawableTint="@color/icon_positive"
                 tools:text="completed"
-                tools:textColor="@color/green" />
+                tools:textColor="@color/text_positive" />
 
             <io.novafoundation.nova.common.view.TableView
                 android:layout_width="match_parent"
@@ -70,8 +71,8 @@
                     android:id="@+id/rewardDetailValidator"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueIcon="@drawable/ic_info_16"
-                    app:primaryValueIconTint="@color/white_64"
+                    app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                    app:primaryValueIconTint="@color/icon_secondary"
                     app:title="@string/staking_reward_details_validator" />
 
                 <io.novafoundation.nova.common.view.TableCellView
@@ -100,8 +101,8 @@
                     android:id="@+id/rewardDetailEvent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueIcon="@drawable/ic_info_16"
-                    app:primaryValueIconTint="@color/white_64"
+                    app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                    app:primaryValueIconTint="@color/icon_secondary"
                     app:title="@string/common_event" />
 
                 <io.novafoundation.nova.common.view.TableCellView

@@ -4,15 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/black">
-
+    tools:background="@color/bottom_sheet_background">
 
     <ImageView
         android:id="@+id/confirmAuthorizeNovaIcon"
         style="@style/Widget.Nova.Icon.Big"
         android:layout_marginTop="20dp"
         android:padding="16dp"
-        android:src="@drawable/ic_nova_wallet"
+        android:src="@drawable/ic_nova_logo"
         app:layout_constraintEnd_toStartOf="@+id/confirmAuthorizeNovaArrow"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -31,7 +30,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/confirmAuthorizeNovaIcon"
         app:layout_constraintTop_toTopOf="@+id/confirmAuthorizeNovaIcon"
-        app:tint="@color/white_32" />
+        app:tint="@color/icon_secondary" />
 
     <ImageView
         android:id="@+id/confirmAuthorizeDappIcon"
@@ -51,6 +50,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="16dp"
+        android:textColor="@color/text_primary"
         android:gravity="center_horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,7 +67,7 @@
         android:layout_marginEnd="16dp"
         android:gravity="center_horizontal"
         android:text="@string/dapp_confirm_authorize_subtitle"
-        android:textColor="@color/black1"
+        android:textColor="@color/text_secondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/confirmAuthorizeDappTitle" />

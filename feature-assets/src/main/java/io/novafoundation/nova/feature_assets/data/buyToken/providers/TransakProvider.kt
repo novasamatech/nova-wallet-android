@@ -19,6 +19,7 @@ class TransakProvider(
     override val id = "transak"
     override val name = "Transak"
     override val icon: Int = R.drawable.ic_transak
+    override val priority: Int = 1
 
     override fun createIntegrator(chainAsset: Chain.Asset, address: String): ExternalProvider.Integrator {
         val network = chainAsset.buyProviders.getValue(id)[NETWORK_KEY] as? String

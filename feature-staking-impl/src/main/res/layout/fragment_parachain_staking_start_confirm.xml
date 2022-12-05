@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/confirmStartParachainStakingToolbar"
@@ -60,7 +60,7 @@
                         android:layout_width="match_parent"
                         android:id="@+id/confirmStartParachainStakingCollator"
                         android:layout_height="wrap_content"
-                        app:primaryValueIcon="@drawable/ic_info_16"
+                        app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
                         app:title="@string/staking_parachain_collator" />
                 </io.novafoundation.nova.common.view.TableView>
 

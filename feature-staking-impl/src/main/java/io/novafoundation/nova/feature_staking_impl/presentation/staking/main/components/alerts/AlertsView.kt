@@ -7,7 +7,7 @@ import android.widget.LinearLayout
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.view.shape.getBlurDrawable
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.synthetic.main.view_alerts.view.alertShimmer
 import kotlinx.android.synthetic.main.view_alerts.view.alertsRecycler
@@ -26,7 +26,7 @@ class AlertsView @JvmOverloads constructor(
         orientation = VERTICAL
 
         with(context) {
-            background = getBlurDrawable()
+            background = getBlockDrawable()
         }
 
         alertsRecycler.adapter = alertsAdapter

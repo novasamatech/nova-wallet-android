@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/startImportParitySignerToolbar"
@@ -32,7 +32,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/account_parity_signer_import_start_title" />
+                android:text="@string/account_parity_signer_import_start_title"
+                android:textColor="@color/text_primary" />
 
             <io.novafoundation.nova.common.view.NovaConnectView
                 android:layout_width="wrap_content"
@@ -66,9 +67,9 @@
                 android:layout_marginTop="12dp"
                 android:drawablePadding="6dp"
                 android:text="@string/account_parity_signer_import_start_select_top"
-                android:textColor="@color/green"
+                android:textColor="@color/text_positive"
                 app:drawableStartCompat="@drawable/ic_checkmark_circle_16"
-                app:drawableTint="@color/green" />
+                app:drawableTint="@color/icon_positive" />
 
             <ImageView
                 android:id="@+id/startImportParitySignerSelectTopImage"

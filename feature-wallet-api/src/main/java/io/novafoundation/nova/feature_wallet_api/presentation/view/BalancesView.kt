@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.TableCellView
-import io.novafoundation.nova.common.view.shape.getBlurDrawable
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
@@ -39,7 +39,7 @@ abstract class BalancesView @JvmOverloads constructor(
             applyAttributes(it)
         }
 
-        background = context.getBlurDrawable()
+        background = context.getBlockDrawable()
     }
 
     private fun applyAttributes(attributes: AttributeSet) = context.useAttributes(attributes, R.styleable.BalancesView) {
@@ -51,10 +51,8 @@ abstract class BalancesView @JvmOverloads constructor(
         val item = TableCellView(context).apply {
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
 
-            setDividerColor(R.color.white_24)
-
-            valueSecondary.setTextColorRes(R.color.white_64)
-            title.setTextColorRes(R.color.white_64)
+            valueSecondary.setTextColorRes(R.color.text_secondary)
+            title.setTextColorRes(R.color.text_secondary)
 
             setTitle(titleRes)
         }

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/black">
+    tools:background="@color/secondary_screen_background">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,18 +12,18 @@
         android:orientation="vertical">
 
         <io.novafoundation.nova.common.view.Toolbar
-            android:layout_width="match_parent"
             android:id="@+id/nftDetailsToolbar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:dividerVisible="false" />
 
         <ProgressBar
             android:id="@+id/nftDetailsProgress"
-            android:layout_marginTop="16dp"
-            android:layout_gravity="center_horizontal"
+            style="@style/Widget.Nova.ProgressBar.Indeterminate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:indeterminateTint="@color/white" />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp" />
 
         <ImageView
             android:id="@+id/nftDetailsMedia"
@@ -40,6 +40,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="16dp"
+            android:textColor="@color/text_primary"
             tools:text="Honeybird" />
 
         <io.novafoundation.nova.feature_nft_impl.presentation.nft.common.NftIssuanceView
@@ -59,6 +60,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="24dp"
+            android:textColor="@color/text_secondary"
             tools:text="Wayne: Hello sir, what's your name and what brings you to Pastel Beach Mall?" />
 
         <io.novafoundation.nova.feature_wallet_api.presentation.view.PriceSectionView
@@ -66,43 +68,43 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginBottom="12dp"
-            android:layout_marginEnd="16dp" />
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="12dp" />
 
         <io.novafoundation.nova.common.view.TableView
+            android:id="@+id/nftDetailsTable"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:id="@+id/nftDetailsTable"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="24dp">
 
             <io.novafoundation.nova.common.view.TableCellView
-                android:layout_width="match_parent"
                 android:id="@+id/nftDetailsCollection"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:title="@string/nft_collection" />
 
             <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/nftDetailsOnwer"
-                app:primaryValueIcon="@drawable/ic_info_16"
-                app:primaryValueIconTint="@color/white_64"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                app:primaryValueIconTint="@color/icon_secondary"
                 app:title="@string/nft_owned_by" />
 
             <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/nftDetailsCreator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryValueIcon="@drawable/ic_info_16"
-                app:primaryValueIconTint="@color/white_64"
-                android:id="@+id/nftDetailsCreator"
+                app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                app:primaryValueIconTint="@color/icon_secondary"
                 app:title="@string/nft_created_by" />
 
             <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/nftDetailsChain"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/nftDetailsChain"
                 app:title="@string/common_network" />
         </io.novafoundation.nova.common.view.TableView>
     </LinearLayout>

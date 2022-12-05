@@ -11,8 +11,8 @@
     <ImageView
         android:layout_width="16dp"
         android:layout_height="16dp"
-        android:src="@drawable/ic_info_16"
-        app:tint="?attr/colorAccent" />
+        android:src="@drawable/ic_info_cicrle_filled_16"
+        app:tint="@color/icon_accent" />
 
     <TextView
         android:layout_width="0dp"
@@ -20,12 +20,12 @@
         android:layout_marginStart="4dp"
         android:layout_weight="1"
         android:id="@+id/viewLinkText"
-        android:textColor="?attr/colorAccent"
+        android:textColor="@color/button_text_accent"
         tools:text="@tools:sample/lorem[5]" />
 
     <ImageView
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:src="@drawable/ic_chevron_right"
-        app:tint="?attr/colorAccent" />
+        app:tint="@color/icon_accent" />
 </merge>
