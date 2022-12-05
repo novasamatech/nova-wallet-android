@@ -18,7 +18,7 @@ typealias AddEvmTokenValidationSystemBuilder = ValidationSystemBuilder<AddEvmTok
 sealed interface AddEvmTokensValidationFailure {
     object InvalidTokenContractAddress : AddEvmTokensValidationFailure
 
-    class AssetExist(val alreadyExistingSymbol: String): AddEvmTokensValidationFailure
+    class AssetExist(val alreadyExistingSymbol: String) : AddEvmTokensValidationFailure
 
     object InvalidDecimals : AddEvmTokensValidationFailure
 
