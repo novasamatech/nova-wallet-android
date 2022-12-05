@@ -160,7 +160,6 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddGovernanceExternalApiToChain_27_28)
                     .addMigrations(AddSourceToLocalAsset_28_29, AddTransferApisTable_29_30, AddEnabledColumnToChainAssets_30_31)
                     .addMigrations(FixBrokenForeignKeys_31_32, AddVersioningToGovernanceDapps_32_33)
-                    .fallbackToDestructiveMigration()
                     .build()
             }
             return instance!!
