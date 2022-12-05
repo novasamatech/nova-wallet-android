@@ -4,10 +4,12 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v1.PolkassemblyV1Api
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.Gov1OffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1ConvictionVotingRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1DAppsRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1OnChainReferendaRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1PreImageRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2PreImageRepository
@@ -57,16 +59,24 @@ class GovernanceV1Module {
 
     @Provides
     @FeatureScope
+    fun provideDappsRepository(governanceDAppsDao: GovernanceDAppsDao): GovV1DAppsRepository {
+        return GovV1DAppsRepository(governanceDAppsDao)
+    }
+
+    @Provides
+    @FeatureScope
     @GovernanceV1
     fun provideGovernanceSource(
         referendaRepository: GovV1OnChainReferendaRepository,
         convictionVotingRepository: GovV1ConvictionVotingRepository,
         offChainInfoRepository: Gov1OffChainReferendaInfoRepository,
-        preImageRepository: GovV1PreImageRepository
+        preImageRepository: GovV1PreImageRepository,
+        governanceV1DAppsRepository: GovV1DAppsRepository
     ): GovernanceSource = StaticGovernanceSource(
         referenda = referendaRepository,
         convictionVoting = convictionVotingRepository,
         offChainInfo = offChainInfoRepository,
-        preImageRepository = preImageRepository
+        preImageRepository = preImageRepository,
+        dappsRepository = governanceV1DAppsRepository
     )
 }
