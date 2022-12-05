@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         app:homeButtonIcon="@drawable/ic_close"
-        app:textRight="@string/common_add"
+        app:textRight="@string/manage_assets_add_token"
         app:titleText="@string/assets_manage_tokens_title" />
 
     <io.novafoundation.nova.common.view.SearchView
