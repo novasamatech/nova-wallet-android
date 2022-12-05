@@ -45,6 +45,7 @@ import io.novafoundation.nova.core_db.migrations.AddLocks_22_23
 import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
+import io.novafoundation.nova.core_db.migrations.AddVersioningToGovernanceDapps_28_29
 import io.novafoundation.nova.core_db.migrations.AssetTypes_2_3
 import io.novafoundation.nova.core_db.migrations.BetterChainDiffing_8_9
 import io.novafoundation.nova.core_db.migrations.ChangeAsset_3_4
@@ -84,7 +85,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 28,
+    version = 29,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -145,7 +146,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddCurrencies_18_19, ChangeTokens_19_20, ChangeChainNodes_20_21)
                     .addMigrations(NullableSubstrateAccountId_21_22, AddLocks_22_23, AddContributions_23_24)
                     .addMigrations(AddGovernanceFlagToChains_24_25, AddGovernanceDapps_25_26, GovernanceFlagToEnum_26_27)
-                    .addMigrations(AddGovernanceExternalApiToChain_27_28)
+                    .addMigrations(AddGovernanceExternalApiToChain_27_28, AddVersioningToGovernanceDapps_28_29)
                     .fallbackToDestructiveMigration()
                     .build()
             }
