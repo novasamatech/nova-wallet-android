@@ -6,7 +6,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_impl.data.dapps.GovernanceDAppsSyncService
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 
 class GovernanceDAppsInteractor(
@@ -18,8 +17,8 @@ class GovernanceDAppsInteractor(
         governanceDAppsSyncService.syncDapps()
     }
 
-    fun observeReferendumDapps(chainId: ChainId, referendumId: ReferendumId, option: SupportedGovernanceOption) = flowOfAll {
+    fun observeReferendumDapps(referendumId: ReferendumId, option: SupportedGovernanceOption) = flowOfAll {
         val govSource = governanceSourceRegistry.sourceFor(option)
-        govSource.dappsRepository.observeReferendumDApps(chainId, referendumId)
+        govSource.dappsRepository.observeReferendumDApps(option.assetWithChain.chain.id, referendumId)
     }
 }

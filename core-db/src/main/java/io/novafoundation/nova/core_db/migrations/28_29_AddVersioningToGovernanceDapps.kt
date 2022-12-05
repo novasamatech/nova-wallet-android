@@ -3,7 +3,7 @@ package io.novafoundation.nova.core_db.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-val AddVersioningToGovernanceDapps_28_29 = object : Migration(28, 29) {
+val AddVersioningToGovernanceDapps_32_33 = object : Migration(32, 33) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE `governance_dapps`")
