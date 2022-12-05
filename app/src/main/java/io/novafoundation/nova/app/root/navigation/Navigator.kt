@@ -40,6 +40,10 @@ import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragmen
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
+import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoFragment
+import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
+import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.RewardDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer.TransferDetailFragment
@@ -403,6 +407,28 @@ class Navigator(
 
     override fun openAssetSearch() {
         navController?.navigate(R.id.action_mainFragment_to_assetSearchFragment)
+    }
+
+    override fun openManageTokens() {
+        navController?.navigate(R.id.action_mainFragment_to_manageTokensGraph)
+    }
+
+    override fun openManageChainTokens(payload: ManageChainTokensPayload) {
+        val args = ManageChainTokensFragment.getBundle(payload)
+        navController?.navigate(R.id.action_manageTokensFragment_to_manageChainTokensFragment, args)
+    }
+
+    override fun openAddTokenSelectChain() {
+        navController?.navigate(R.id.action_manageTokensFragment_to_addTokenSelectChainFragment)
+    }
+
+    override fun openAddTokenEnterInfo(payload: AddTokenEnterInfoPayload) {
+        val args = AddTokenEnterInfoFragment.getBundle(payload)
+        navController?.navigate(R.id.action_addTokenSelectChainFragment_to_addTokenEnterInfoFragment, args)
+    }
+
+    override fun finishAddTokenFlow() {
+        navController?.navigate(R.id.finish_add_token_flow)
     }
 
     override fun openNfts() {

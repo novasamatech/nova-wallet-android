@@ -7,7 +7,8 @@ class GovernanceChainDappsRemote(
 
 class GovernanceDappRemote(
     val title: String,
-    val url: String,
+    val urlV1: String?,
+    val urlV2: String?,
     val icon: String,
     val details: String
 )

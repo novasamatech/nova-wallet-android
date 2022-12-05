@@ -1,12 +1,21 @@
 package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
+
+sealed class BalanceSyncUpdate {
+
+    class CauseFetchable(val blockHash: BlockHash) : BalanceSyncUpdate()
+
+    class CauseFetched(val cause: TransferExtrinsic) : BalanceSyncUpdate()
+
+    object NoCause : BalanceSyncUpdate()
+}
 
 interface AssetBalance {
 
@@ -15,7 +24,7 @@ interface AssetBalance {
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        subscriptionBuilder: SubscriptionBuilder
+        subscriptionBuilder: SharedRequestsBuilder
     ): Flow<*>
 
     suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean
@@ -39,6 +48,6 @@ interface AssetBalance {
         chainAsset: Chain.Asset,
         metaAccount: MetaAccount,
         accountId: AccountId,
-        subscriptionBuilder: SubscriptionBuilder
-    ): Flow<BlockHash?>
+        subscriptionBuilder: SharedRequestsBuilder
+    ): Flow<BalanceSyncUpdate>
 }

@@ -1,13 +1,13 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.orml
 
-import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.common.utils.tokens
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.bindBalanceLocks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks
 import io.novafoundation.nova.runtime.ext.ormlCurrencyId
@@ -36,7 +36,7 @@ class OrmlAssetBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        subscriptionBuilder: SubscriptionBuilder
+        subscriptionBuilder: SharedRequestsBuilder
     ): Flow<*> {
         val runtime = chainRegistry.getRuntime(chain.id)
         val storage = runtime.metadata.tokens().storage("Locks")
@@ -74,8 +74,8 @@ class OrmlAssetBalance(
         chainAsset: Chain.Asset,
         metaAccount: MetaAccount,
         accountId: AccountId,
-        subscriptionBuilder: SubscriptionBuilder
-    ): Flow<BlockHash?> {
+        subscriptionBuilder: SharedRequestsBuilder
+    ): Flow<BalanceSyncUpdate> {
         val runtime = chainRegistry.getRuntime(chain.id)
 
         return subscriptionBuilder.subscribe(runtime.ormlBalanceKey(accountId, chainAsset))
@@ -84,7 +84,11 @@ class OrmlAssetBalance(
 
                 val assetChanged = updateAssetBalance(metaAccount.id, chainAsset, ormlAccountData)
 
-                it.block.takeIf { assetChanged }
+                if (assetChanged) {
+                    BalanceSyncUpdate.CauseFetchable(it.block)
+                } else {
+                    BalanceSyncUpdate.NoCause
+                }
             }
     }
 

@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_wallet_impl.data.repository
 
-import io.novafoundation.nova.common.data.model.CursorPage
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.coingecko.PriceInfo
 import io.novafoundation.nova.common.utils.asQueryParam
-import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.model.AssetAndChainId
@@ -18,28 +16,20 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapAssetLocalToAsset
-import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapNodeToOperation
-import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapOperationLocalToOperation
-import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapOperationToOperationLocalDb
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
-import io.novafoundation.nova.feature_wallet_impl.data.network.coingecko.CoingeckoApi
-import io.novafoundation.nova.feature_wallet_impl.data.network.coingecko.CoingeckoApi.Companion.getRecentRateFieldName
-import io.novafoundation.nova.feature_wallet_impl.data.network.model.request.SubqueryHistoryRequest
+import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi.Companion.getRecentRateFieldName
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
-import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
-import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.commissionAsset
-import io.novafoundation.nova.runtime.ext.historySupported
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
@@ -50,20 +40,17 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
 class WalletRepositoryImpl(
     private val substrateSource: SubstrateRemoteSource,
     private val operationDao: OperationDao,
-    private val walletOperationsApi: SubQueryOperationsApi,
     private val httpExceptionHandler: HttpExceptionHandler,
     private val phishingApi: PhishingApi,
     private val accountRepository: AccountRepository,
     private val assetCache: AssetCache,
     private val phishingAddressDao: PhishingAddressDao,
-    private val cursorStorage: TransferCursorStorage,
     private val coingeckoApi: CoingeckoApi,
     private val chainRegistry: ChainRegistry,
 ) : WalletRepository {
@@ -122,6 +109,18 @@ class WalletRepositoryImpl(
         }
     }
 
+    override suspend fun syncAssetRates(asset: Chain.Asset, currency: Currency) {
+        val priceId = asset.priceId ?: return
+
+        val priceStats = getAssetPriceCoingecko(setOf(priceId), currency.coingeckoId)
+
+        val updatedTokens = priceStats.map { (_, tokenStats) ->
+            TokenLocal(asset.symbol, tokenStats.price, currency.id, tokenStats.rateChange)
+        }
+
+        assetCache.insertTokens(updatedTokens)
+    }
+
     override fun assetFlow(accountId: AccountId, chainAsset: Chain.Asset): Flow<Asset> {
         return flow {
             val metaAccount = accountRepository.findMetaAccountOrThrow(accountId)
@@ -147,77 +146,6 @@ class WalletRepositoryImpl(
         return assetLocal?.let { mapAssetLocalToAsset(it, chainAsset) }
     }
 
-    override suspend fun syncOperationsFirstPage(
-        pageSize: Int,
-        filters: Set<TransactionFilter>,
-        accountId: AccountId,
-        chain: Chain,
-        chainAsset: Chain.Asset,
-    ) {
-        val accountAddress = chain.addressOf(accountId)
-        val page = getOperations(pageSize, cursor = null, filters, accountId, chain, chainAsset)
-
-        val elements = page.map { mapOperationToOperationLocalDb(it, chainAsset, OperationLocal.Source.SUBQUERY) }
-
-        cursorStorage.saveCursor(chain.id, chainAsset.id, accountId, page.nextCursor)
-        operationDao.insertFromSubquery(accountAddress, chain.id, chainAsset.id, elements)
-    }
-
-    override suspend fun getOperations(
-        pageSize: Int,
-        cursor: String?,
-        filters: Set<TransactionFilter>,
-        accountId: AccountId,
-        chain: Chain,
-        chainAsset: Chain.Asset,
-    ): CursorPage<Operation> {
-        return withContext(Dispatchers.Default) {
-            if (!chain.historySupported) {
-                return@withContext CursorPage(nextCursor = null, items = emptyList())
-            }
-
-            val request = SubqueryHistoryRequest(
-                accountAddress = chain.addressOf(accountId),
-                pageSize = pageSize,
-                cursor = cursor,
-                filters = filters,
-                assetType = chainAsset.type
-            )
-            val response = walletOperationsApi.getOperationsHistory(
-                url = chain.externalApi!!.history!!.url,
-                request
-            ).data.query
-
-            val pageInfo = response.historyElements.pageInfo
-
-            val operations = response.historyElements.nodes.map { mapNodeToOperation(it, chainAsset) }
-
-            CursorPage(pageInfo.endCursor, operations)
-        }
-    }
-
-    override fun operationsFirstPageFlow(
-        accountId: AccountId,
-        chain: Chain,
-        chainAsset: Chain.Asset,
-    ): Flow<CursorPage<Operation>> {
-        val accountAddress = chain.addressOf(accountId)
-
-        return operationDao.observe(accountAddress, chain.id, chainAsset.id)
-            .mapList {
-                mapOperationLocalToOperation(it, chainAsset)
-            }
-            .mapLatest { operations ->
-                val cursor = if (chain.historySupported) {
-                    cursorStorage.awaitCursor(chain.id, chainAsset.id, accountId)
-                } else {
-                    null
-                }
-
-                CursorPage(cursor, operations)
-            }
-    }
-
     override suspend fun getContacts(
         accountId: AccountId,
         chain: Chain,
@@ -239,6 +167,10 @@ class WalletRepositoryImpl(
         )
 
         operationDao.insert(operation)
+    }
+
+    override suspend fun clearAssets(fullAssetIds: List<FullChainAssetId>) {
+        assetCache.clearAssets(fullAssetIds)
     }
 
     // TODO adapt for ethereum chains

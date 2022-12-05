@@ -23,11 +23,8 @@ import io.novafoundation.nova.feature_account_api.domain.model.AuthType
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
-import io.novafoundation.nova.feature_account_impl.data.mappers.mapChainAccountToAccount
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountLocalToMetaAccount
-import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountToAccount
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountWithBalanceFromLocal
-import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeLocalToNode
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -40,7 +37,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -75,36 +71,9 @@ class AccountDataSourceImpl(
     private val selectedMetaAccountLocal = metaAccountDao.selectedMetaAccountInfoFlow()
         .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
 
-    private val selectedMetaAccountFlow = combine(
-        chainRegistry.chainsById,
-        selectedMetaAccountLocal.filterNotNull(),
-        ::mapMetaAccountLocalToMetaAccount
-    )
-        .inBackground()
-        .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
-
-    private val selectedNodeFlow = nodeDao.activeNodeFlow()
-        .map { it?.let(::mapNodeLocalToNode) }
-        .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
-
-    /**
-     * Fast lookup table for accessing account based on accountId
-     */
-    override val selectedAccountMapping = selectedMetaAccountFlow.map { metaAccount ->
-        val mapping = metaAccount.chainAccounts.mapValuesTo(mutableMapOf<String, Account?>()) { (_, chainAccount) ->
-            mapChainAccountToAccount(metaAccount, chainAccount)
-        }
-
-        val chains = chainRegistry.chainsById.first()
-
-        chains.forEach { (chainId, chain) ->
-            if (chainId !in mapping) {
-                mapping[chainId] = mapMetaAccountToAccount(chain, metaAccount)
-            }
-        }
-
-        mapping
-    }
+    private val selectedMetaAccountFlow = selectedMetaAccountLocal
+        .filterNotNull()
+        .map(::mapMetaAccountLocalToMetaAccount)
         .inBackground()
         .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
 
@@ -136,17 +105,12 @@ class AccountDataSourceImpl(
         nodeDao.switchActiveNode(node.id)
     }
 
-    override suspend fun getSelectedNode(): Node? = selectedNodeFlow.first()
+    override suspend fun getSelectedNode(): Node? = null
 
     override suspend fun anyAccountSelected(): Boolean = selectedMetaAccountLocal.first() != null
 
     override suspend fun saveSelectedAccount(account: Account) = withContext(Dispatchers.Default) {
         // TODO remove compatibility stub
-    }
-
-    override fun selectedNodeFlow(): Flow<Node> {
-        return selectedNodeFlow
-            .filterNotNull()
     }
 
     override suspend fun getSelectedMetaAccount(): MetaAccount {
@@ -156,9 +120,8 @@ class AccountDataSourceImpl(
     override fun selectedMetaAccountFlow(): Flow<MetaAccount> = selectedMetaAccountFlow
 
     override suspend fun findMetaAccount(accountId: ByteArray): MetaAccount? {
-        return metaAccountDao.getMetaAccountInfo(accountId)?.let {
-            mapMetaAccountLocalToMetaAccount(chainRegistry.chainsById.first(), it)
-        }
+        return metaAccountDao.getMetaAccountInfo(accountId)
+            ?.let(::mapMetaAccountLocalToMetaAccount)
     }
 
     override suspend fun accountNameFor(accountId: AccountId): String? {
@@ -166,20 +129,12 @@ class AccountDataSourceImpl(
     }
 
     override suspend fun allMetaAccounts(): List<MetaAccount> {
-        val chainsById = chainRegistry.chainsById.first()
-
-        return metaAccountDao.getJoinedMetaAccountsInfo().map {
-            mapMetaAccountLocalToMetaAccount(chainsById, it)
-        }
+        return metaAccountDao.getJoinedMetaAccountsInfo().map(::mapMetaAccountLocalToMetaAccount)
     }
 
     override fun allMetaAccountsFlow(): Flow<List<MetaAccount>> {
         return metaAccountDao.getJoinedMetaAccountsInfoFlow().map { accountsLocal ->
-            val chainsById = chainRegistry.chainsById.first()
-
-            accountsLocal.map {
-                mapMetaAccountLocalToMetaAccount(chainsById, it)
-            }
+            accountsLocal.map(::mapMetaAccountLocalToMetaAccount)
         }
     }
 
@@ -216,7 +171,7 @@ class AccountDataSourceImpl(
     override suspend fun getMetaAccount(metaId: Long): MetaAccount {
         val joinedMetaAccountInfo = metaAccountDao.getJoinedMetaAccountInfo(metaId)
 
-        return mapMetaAccountLocalToMetaAccount(chainRegistry.chainsById.first(), joinedMetaAccountInfo)
+        return mapMetaAccountLocalToMetaAccount(joinedMetaAccountInfo)
     }
 
     override suspend fun updateMetaAccountName(metaId: Long, newName: String) {

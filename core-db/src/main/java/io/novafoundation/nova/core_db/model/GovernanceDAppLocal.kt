@@ -7,7 +7,8 @@ import io.novafoundation.nova.common.utils.Identifiable
 data class GovernanceDAppLocal(
     val chainId: String,
     val name: String,
-    val referendumUrl: String,
+    val referendumUrlV1: String?,
+    val referendumUrlV2: String?,
     val iconUrl: String,
     val details: String,
 ) : Identifiable {

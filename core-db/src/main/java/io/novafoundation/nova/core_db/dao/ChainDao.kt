@@ -13,6 +13,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
+import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import kotlinx.coroutines.flow.Flow
 
@@ -24,22 +25,26 @@ abstract class ChainDao {
         chainDiff: CollectionDiffer.Diff<ChainLocal>,
         assetsDiff: CollectionDiffer.Diff<ChainAssetLocal>,
         nodesDiff: CollectionDiffer.Diff<ChainNodeLocal>,
-        explorersDiff: CollectionDiffer.Diff<ChainExplorerLocal>
+        explorersDiff: CollectionDiffer.Diff<ChainExplorerLocal>,
+        transferApisDiff: CollectionDiffer.Diff<ChainTransferHistoryApiLocal>
     ) {
         deleteChains(chainDiff.removed)
         deleteChainAssets(assetsDiff.removed)
         deleteChainNodes(nodesDiff.removed)
         deleteChainExplorers(explorersDiff.removed)
+        deleteTransferApis(transferApisDiff.removed)
 
         addChains(chainDiff.added)
         addChainAssets(assetsDiff.added)
         addChainNodes(nodesDiff.added)
         addChainExplorers(explorersDiff.added)
+        addTransferApis(transferApisDiff.added)
 
         updateChains(chainDiff.updated)
         updateChainAssets(assetsDiff.updated)
         updateChainNodes(nodesDiff.updated)
         updateChainExplorers(explorersDiff.updated)
+        updateTransferApis(transferApisDiff.updated)
     }
 
     // ------ Delete --------
@@ -55,6 +60,9 @@ abstract class ChainDao {
     @Delete
     protected abstract suspend fun deleteChainExplorers(explorers: List<ChainExplorerLocal>)
 
+    @Delete
+    protected abstract suspend fun deleteTransferApis(apis: List<ChainTransferHistoryApiLocal>)
+
     // ------ Add --------
     @Insert(onConflict = OnConflictStrategy.ABORT)
     protected abstract suspend fun addChains(chains: List<ChainLocal>)
@@ -67,6 +75,9 @@ abstract class ChainDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     protected abstract suspend fun addChainExplorers(explorers: List<ChainExplorerLocal>)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    protected abstract suspend fun addTransferApis(apis: List<ChainTransferHistoryApiLocal>)
 
     // ------ Update -----
 
@@ -81,6 +92,11 @@ abstract class ChainDao {
 
     @Update
     protected abstract suspend fun updateChainExplorers(explorers: List<ChainExplorerLocal>)
+
+    @Update
+    protected abstract suspend fun updateTransferApis(apis: List<ChainTransferHistoryApiLocal>)
+
+    // ------- Queries ------
 
     @Query("SELECT * FROM chains")
     @Transaction

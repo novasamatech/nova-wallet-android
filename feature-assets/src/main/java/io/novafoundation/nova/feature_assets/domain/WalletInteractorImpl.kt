@@ -1,10 +1,12 @@
 package io.novafoundation.nova.feature_assets.domain
 
-import io.novafoundation.nova.common.data.model.CursorPage
+import io.novafoundation.nova.common.data.model.DataPage
+import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.common.utils.applyFilters
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
@@ -12,6 +14,7 @@ import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByN
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
@@ -36,7 +39,8 @@ class WalletInteractorImpl(
     private val accountRepository: AccountRepository,
     private val assetFiltersRepository: AssetFiltersRepository,
     private val chainRegistry: ChainRegistry,
-    private val nftRepository: NftRepository
+    private val nftRepository: NftRepository,
+    private val transactionHistoryRepository: TransactionHistoryRepository,
 ) : WalletInteractor {
 
     override fun filterAssets(assetsFlow: Flow<List<Asset>>): Flow<List<Asset>> {
@@ -82,7 +86,7 @@ class WalletInteractorImpl(
                 val (chain, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
                 val accountId = metaAccount.accountIdIn(chain)!!
 
-                walletRepository.operationsFirstPageFlow(accountId, chain, chainAsset).withIndex().map { (index, cursorPage) ->
+                transactionHistoryRepository.operationsFirstPageFlow(accountId, chain, chainAsset).withIndex().map { (index, cursorPage) ->
                     OperationsPageChange(cursorPage, accountChanged = index == 0)
                 }
             }
@@ -99,7 +103,7 @@ class WalletInteractorImpl(
             val (chain, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
             val accountId = metaAccount.accountIdIn(chain)!!
 
-            walletRepository.syncOperationsFirstPage(pageSize, filters, accountId, chain, chainAsset)
+            transactionHistoryRepository.syncOperationsFirstPage(pageSize, filters, accountId, chain, chainAsset)
         }
     }
 
@@ -107,21 +111,21 @@ class WalletInteractorImpl(
         chainId: ChainId,
         chainAssetId: Int,
         pageSize: Int,
-        cursor: String?,
+        pageOffset: PageOffset.Loadable,
         filters: Set<TransactionFilter>,
-    ): Result<CursorPage<Operation>> {
+    ): Result<DataPage<Operation>> {
         return runCatching {
             val metaAccount = accountRepository.getSelectedMetaAccount()
             val (chain, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
-            val accountId = metaAccount.accountIdIn(chain)!!
+            val accountId = metaAccount.requireAccountIdIn(chain)
 
-            walletRepository.getOperations(
-                pageSize,
-                cursor,
-                filters,
-                accountId,
-                chain,
-                chainAsset
+            transactionHistoryRepository.getOperations(
+                pageSize = pageSize,
+                pageOffset = pageOffset,
+                filters = filters,
+                accountId = accountId,
+                chain = chain,
+                chainAsset = chainAsset
             )
         }
     }

@@ -11,16 +11,14 @@
 
     <ImageView
         android:id="@+id/itemAssetImage"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        style="@style/Widget.Nova.AssetIcon.Primary"
         android:layout_marginStart="12dp"
         android:background="@drawable/bg_token_container"
         android:padding="6dp"
         app:layout_constraintBottom_toBottomOf="@+id/itemAssetRate"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/itemAssetToken"
-        app:tint="@color/icon_primary"
-        tools:src="@drawable/ic_token_ksm" />
+        tools:src="@drawable/ic_nova" />
 
     <TextView
         android:id="@+id/itemAssetToken"

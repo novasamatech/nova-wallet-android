@@ -22,7 +22,8 @@ fun Gson.parseArbitraryObject(src: String): Map<String, Any?>? {
     return fromJson(src, typeToken.type)
 }
 
-inline fun <reified T> Gson.fromParsedHierarchy(src: Any?): T = fromJson(toJsonTree(src), T::class.java)
+fun <T> Gson.fromParsedHierarchy(src: Any?, clazz: Class<T>): T = fromJson(toJsonTree(src), clazz)
+inline fun <reified T> Gson.fromParsedHierarchy(src: Any?): T = fromParsedHierarchy(src, T::class.java)
 
 inline fun <reified T> Gson.fromJson(src: String): T = fromJson(src, object : TypeToken<T>() {}.type)
 

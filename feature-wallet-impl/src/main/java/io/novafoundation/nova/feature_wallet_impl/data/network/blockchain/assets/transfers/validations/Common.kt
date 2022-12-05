@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.WillRemoveAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeInUsedAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.sendingAmountInCommissionAsset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.AmountProducer
@@ -74,6 +75,13 @@ fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOrig
     }
 )
 
+fun AssetTransfersValidationSystemBuilder.sufficientBalanceInUsedAsset() = sufficientBalance(
+    amount = { it.transfer.amount },
+    available = { it.originUsedAsset.transferable },
+    error = { _, _ -> AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset },
+    fee = { it.originFeeInUsedAsset }
+)
+
 private suspend fun AssetSourceRegistry.existentialDepositForUsedAsset(transfer: AssetTransfer): BigDecimal {
     return existentialDeposit(transfer.originChain, transfer.originChainAsset)
 }
@@ -88,5 +96,6 @@ private fun Chain.Asset.existentialDepositError(amount: BigDecimal): WillRemoveA
     Chain.Asset.Type.Native -> WillRemoveAccount.WillBurnDust
     is Chain.Asset.Type.Orml -> WillRemoveAccount.WillBurnDust
     is Chain.Asset.Type.Statemine -> WillRemoveAccount.WillTransferDust(amount)
+    is Chain.Asset.Type.Evm -> WillRemoveAccount.WillBurnDust
     Chain.Asset.Type.Unsupported -> throw IllegalArgumentException("Unsupported")
 }

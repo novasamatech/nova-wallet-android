@@ -14,6 +14,8 @@ typealias BuyProviderArguments = Map<String, Any?>
 
 data class FullChainAssetId(val chainId: ChainId, val assetId: ChainAssetId)
 
+fun FullChainAssetId.toPair() = chainId to assetId
+
 data class Chain(
     val id: ChainId,
     val name: String,
@@ -56,8 +58,14 @@ data class Chain(
         val buyProviders: Map<BuyProviderId, BuyProviderArguments>,
         val staking: StakingType,
         val type: Type,
+        val source: Source,
         val name: String,
+        val enabled: Boolean,
     ) : Identifiable {
+
+        enum class Source {
+            DEFAULT, ERC20, MANUAL
+        }
 
         sealed class Type {
             object Native : Type()
@@ -72,6 +80,10 @@ data class Chain(
                 val currencyIdType: String,
                 val existentialDeposit: BigInteger,
                 val transfersEnabled: Boolean,
+            ) : Type()
+
+            data class Evm(
+                val contractAddress: String
             ) : Type()
 
             object Unsupported : Type()
@@ -109,13 +121,24 @@ data class Chain(
 
     data class ExternalApi(
         val staking: Section?,
-        val history: Section?,
+        val history: List<TransferHistoryApi>,
         val crowdloans: Section?,
         val governance: Section?
     ) {
         data class Section(val type: Type, val url: String) {
             enum class Type {
-                SUBQUERY, GITHUB, UNKNOWN, POLKASSEMBLY
+                SUBQUERY, GITHUB, UNKNOWN, POLKASSEMBLY, ETHERSCAN
+            }
+        }
+
+        data class TransferHistoryApi(
+            val assetType: AssetType,
+            val apiType: Section.Type,
+            val url: String
+        ) {
+
+            enum class AssetType {
+                SUBSTRATE, EVM, UNSUPPORTED
             }
         }
     }

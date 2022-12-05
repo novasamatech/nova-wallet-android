@@ -10,8 +10,6 @@ import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.app.root.presentation.main.MainViewModel
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @Module(
     includes = [
@@ -24,10 +22,9 @@ class MainFragmentModule {
     @IntoMap
     @ViewModelKey(MainViewModel::class)
     fun provideViewModel(
-        externalRequirementsFlow: MutableStateFlow<ChainConnection.ExternalRequirement>,
         interactor: RootInteractor
     ): ViewModel {
-        return MainViewModel(interactor, externalRequirementsFlow)
+        return MainViewModel(interactor)
     }
 
     @Provides

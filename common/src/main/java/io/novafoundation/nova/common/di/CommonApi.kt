@@ -5,6 +5,7 @@ import android.content.Context
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
@@ -106,6 +107,8 @@ interface CommonApi {
     fun customDialogDisplayer(): CustomDialogDisplayer.Presentation
 
     fun appVersionsProvider(): AppVersionProvider
+
+    fun ethereumAddressFormat(): EthereumAddressFormat
 
     val systemCallExecutor: SystemCallExecutor
 

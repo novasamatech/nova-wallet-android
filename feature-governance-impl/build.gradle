@@ -14,7 +14,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "GOVERNANCE_DAPPS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/governance/dapps_dev.json\""
+        buildConfigField "String", "GOVERNANCE_DAPPS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/governance/v2/dapps_dev.json\""
     }
 
     buildTypes {
@@ -22,7 +22,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            buildConfigField "String", "GOVERNANCE_DAPPS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/governance/dapps.json\""
+            buildConfigField "String", "GOVERNANCE_DAPPS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/governance/v2/dapps.json\""
         }
     }
 
@@ -62,6 +62,8 @@ dependencies {
     implementation coroutinesDep
     implementation coroutinesAndroidDep
     implementation lifeCycleKtxDep
+
+    implementation project(":core-db")
 
     implementation viewModelKtxDep
 

@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
+import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -33,14 +34,14 @@ private fun Chain.Asset.formatPlanksSigned(planks: BigInteger, negative: Boolean
     return sign + withoutSign
 }
 
-private val Operation.Type.Transfer.isIncome
-    get() = myAddress == receiver
+private fun Operation.Type.Transfer.isIncome(chain: Chain): Boolean {
+    return chain.accountIdOf(myAddress).contentEquals(chain.accountIdOf(receiver))
+}
 
-private val Operation.Type.Transfer.displayAddress
-    get() = if (isIncome) sender else receiver
+private fun Operation.Type.Transfer.displayAddress(isIncome: Boolean) = if (isIncome) sender else receiver
 
-private fun formatAmount(chainAsset: Chain.Asset, transfer: Operation.Type.Transfer): String {
-    return chainAsset.formatPlanksSigned(transfer.amount, negative = !transfer.isIncome)
+private fun formatAmount(chainAsset: Chain.Asset, isIncome: Boolean, transfer: Operation.Type.Transfer): String {
+    return chainAsset.formatPlanksSigned(transfer.amount, negative = !isIncome)
 }
 
 private fun formatAmount(chainAsset: Chain.Asset, reward: Operation.Type.Reward): String {
@@ -67,7 +68,7 @@ private fun Operation.Type.Extrinsic.formattedCall() = call.camelCaseToCapitaliz
 private fun Operation.Type.Extrinsic.formattedModule() = module.camelCaseToCapitalizedWords()
 
 @DrawableRes
-private fun Operation.Type.Transfer.transferDirectionIcon(): Int {
+private fun transferDirectionIcon(isIncome: Boolean): Int {
     return if (isIncome) R.drawable.ic_arrow_down else R.drawable.ic_arrow_up
 }
 
@@ -98,20 +99,22 @@ suspend fun mapOperationToOperationModel(
             }
 
             is Operation.Type.Transfer -> {
+                val isIncome = operationType.isIncome(chain)
+
                 val amountColor = when {
                     operationType.status == Operation.Status.FAILED -> R.color.text_secondary
-                    operationType.isIncome -> R.color.text_positive
+                    isIncome -> R.color.text_positive
                     else -> R.color.text_primary
                 }
 
                 OperationModel(
                     id = id,
                     formattedTime = formattedTime,
-                    amount = formatAmount(chainAsset, operationType),
+                    amount = formatAmount(chainAsset, isIncome, operationType),
                     amountColorRes = amountColor,
-                    header = nameIdentifier.nameOrAddress(operationType.displayAddress),
+                    header = nameIdentifier.nameOrAddress(operationType.displayAddress(isIncome)),
                     statusAppearance = statusAppearance,
-                    operationIcon = resourceManager.getDrawable(operationType.transferDirectionIcon()).asIcon(),
+                    operationIcon = resourceManager.getDrawable(transferDirectionIcon(isIncome)).asIcon(),
                     subHeader = resourceManager.getString(R.string.transfer_title),
                 )
             }
@@ -147,19 +150,21 @@ suspend fun mapOperationToParcel(
                 val feeFormatted = operationType.fee?.formatPlanks(chain.commissionAsset)
                     ?: resourceManager.getString(R.string.common_unknown)
 
+                val isIncome = operationType.isIncome(chain)
+
                 OperationParcelizeModel.Transfer(
                     chainId = operation.chainAsset.chainId,
                     assetId = operation.chainAsset.id,
                     time = time,
                     address = address,
                     hash = operationType.hash,
-                    amount = formatAmount(operation.chainAsset, operationType),
+                    amount = formatAmount(operation.chainAsset, isIncome, operationType),
                     receiver = operationType.receiver,
                     sender = operationType.sender,
                     fee = feeFormatted,
-                    isIncome = operationType.isIncome,
+                    isIncome = isIncome,
                     statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus),
-                    transferDirectionIcon = operationType.transferDirectionIcon()
+                    transferDirectionIcon = transferDirectionIcon(isIncome)
                 )
             }
 

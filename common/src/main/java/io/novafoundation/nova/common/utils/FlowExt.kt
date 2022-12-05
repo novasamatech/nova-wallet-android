@@ -11,9 +11,11 @@ import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.isModifiable
 import io.novafoundation.nova.common.utils.input.modifyInput
 import io.novafoundation.nova.common.utils.input.valueOrNull
+import io.novafoundation.nova.common.view.InsertableInputField
 import io.novafoundation.nova.common.view.input.seekbar.Seekbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -21,6 +23,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -33,6 +36,7 @@ import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 
 inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = map { list ->
     list.map { item -> mapper(item) }
@@ -54,6 +58,12 @@ suspend fun <T> Flow<LoadingState<T>>.firstOnLoad(): T = transform {
         }
     }
 }.first()
+
+fun <T> List<Flow<T>>.mergeIfMultiple(): Flow<T> = when (size) {
+    0 -> emptyFlow()
+    1 -> first()
+    else -> merge()
+}
 
 fun <T1, T2> combineToPair(flow1: Flow<T1>, flow2: Flow<T2>): Flow<Pair<T1, T2>> = combine(flow1, flow2, ::Pair)
 
@@ -110,18 +120,9 @@ fun <T> Flow<T>.asLiveData(scope: CoroutineScope): LiveData<T> {
     return liveData
 }
 
-data class ListDiff<T>(
-    val removed: List<T>,
-    val addedOrModified: List<T>,
-    val all: List<T>
-)
-
-fun <T> Flow<List<T>>.diffed(): Flow<ListDiff<T>> {
+fun <T : Identifiable> Flow<List<T>>.diffed(): Flow<CollectionDiffer.Diff<T>> {
     return zipWithPrevious().map { (previous, new) ->
-        val addedOrModified = new - previous.orEmpty()
-        val removed = previous.orEmpty() - new
-
-        ListDiff(removed = removed, addedOrModified = addedOrModified, all = new)
+        CollectionDiffer.findDiff(newItems = new, oldItems = previous.orEmpty(), forceUseNewItems = false)
     }
 }
 
@@ -135,9 +136,39 @@ fun <T> Flow<T>.zipWithPrevious(): Flow<Pair<T?, T>> = flow {
     }
 }
 
+private fun <K> MutableMap<K, CoroutineScope>.removeAndCancel(key: K) {
+    remove(key)?.also(CoroutineScope::cancel)
+}
+
+fun <T : Identifiable, R> Flow<List<T>>.transformLatestDiffed(transform: suspend FlowCollector<R>.(value: T) -> Unit): Flow<R> = flow {
+    val parentScope = CoroutineScope(coroutineContext)
+    val itemScopes = mutableMapOf<String, CoroutineScope>()
+
+    diffed().onEach { diff ->
+        diff.removed.forEach { removedItem ->
+            itemScopes.removeAndCancel(removedItem.identifier)
+        }
+
+        diff.newOrUpdated.forEach { newOrUpdatedItem ->
+            itemScopes.removeAndCancel(newOrUpdatedItem.identifier)
+
+            val chainScope = parentScope.childScope(supervised = false)
+            itemScopes[newOrUpdatedItem.identifier] = chainScope
+
+            chainScope.launch {
+                transform(this@flow, newOrUpdatedItem)
+            }
+        }
+    }.launchIn(parentScope)
+}
+
 fun <T> singleReplaySharedFlow() = MutableSharedFlow<T>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
 fun <T> Flow<T>.inBackground() = flowOn(Dispatchers.Default)
+
+fun InsertableInputField.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
+    content.bindTo(flow, scope)
+}
 
 fun EditText.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
     scope.launch {
