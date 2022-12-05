@@ -13,6 +13,8 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine.StatemineAssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.statemine.StatemineAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.statemine.StatemineAssetTransfers
+import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
+import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -57,7 +59,9 @@ class StatemineAssetsModule {
     fun provideHistory(
         chainRegistry: ChainRegistry,
         eventsRepository: EventsRepository,
-    ) = StatemineAssetHistory(chainRegistry, eventsRepository)
+        subQueryOperationsApi: SubQueryOperationsApi,
+        cursorStorage: TransferCursorStorage
+    ) = StatemineAssetHistory(chainRegistry, eventsRepository, subQueryOperationsApi, cursorStorage)
 
     @Provides
     @StatemineAssets

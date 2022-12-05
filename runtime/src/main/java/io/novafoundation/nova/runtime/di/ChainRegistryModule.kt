@@ -6,8 +6,11 @@ import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.asset.EvmAssetsSyncService
+import io.novafoundation.nova.runtime.multiNetwork.asset.remote.AssetFetcher
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
@@ -37,9 +40,22 @@ class ChainRegistryModule {
     @ApplicationScope
     fun provideChainSyncService(
         dao: ChainDao,
+        chainAssetDao: ChainAssetDao,
         chainFetcher: ChainFetcher,
         gson: Gson
     ) = ChainSyncService(dao, chainFetcher, gson)
+
+    @Provides
+    @ApplicationScope
+    fun provideAssetFetcher(apiCreator: NetworkApiCreator) = apiCreator.create(AssetFetcher::class.java)
+
+    @Provides
+    @ApplicationScope
+    fun provideAssetSyncService(
+        dao: ChainAssetDao,
+        assetFetcher: AssetFetcher,
+        gson: Gson
+    ) = EvmAssetsSyncService(dao, assetFetcher, gson)
 
     @Provides
     @ApplicationScope
@@ -121,7 +137,7 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
-    fun provideExternalRequirementsFlow() = MutableStateFlow(ChainConnection.ExternalRequirement.FORBIDDEN)
+    fun provideExternalRequirementsFlow() = MutableStateFlow(ChainConnection.ExternalRequirement.ALLOWED)
 
     @Provides
     @ApplicationScope
@@ -131,6 +147,7 @@ class ChainRegistryModule {
         runtimeSubscriptionPool: RuntimeSubscriptionPool,
         chainDao: ChainDao,
         chainSyncService: ChainSyncService,
+        evmAssetsSyncService: EvmAssetsSyncService,
         baseTypeSynchronizer: BaseTypeSynchronizer,
         runtimeSyncService: RuntimeSyncService,
         gson: Gson
@@ -140,6 +157,7 @@ class ChainRegistryModule {
         runtimeSubscriptionPool,
         chainDao,
         chainSyncService,
+        evmAssetsSyncService,
         baseTypeSynchronizer,
         runtimeSyncService,
         gson

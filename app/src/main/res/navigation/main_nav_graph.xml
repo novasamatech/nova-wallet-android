@@ -335,6 +335,14 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
+            android:id="@+id/action_mainFragment_to_manageTokensGraph"
+            app:destination="@id/manage_tokens_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
             android:id="@+id/action_mainFragment_to_yieldBoostGraph"
             app:destination="@id/staking_parachain_yield_boost"
             app:enterAnim="@anim/fragment_open_enter"
@@ -1051,6 +1059,8 @@
             app:popExitAnim="@anim/fragment_close_exit"
             app:popUpTo="@id/mainFragment" />
     </fragment>
+
+    <include app:graph="@navigation/manage_tokens_graph" />
 
     <include app:graph="@navigation/sign_parity_signer_graph" />
 

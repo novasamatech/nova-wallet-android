@@ -12,6 +12,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.CachingAddressIconGenerator
 import io.novafoundation.nova.common.address.StatelessAddressIconGenerator
+import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.FileProviderImpl
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
@@ -232,4 +233,8 @@ class CommonModule {
     fun providePermissionAskerFactory(
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ) = PermissionsAskerFactory(actionAwaitableMixinFactory)
+
+    @Provides
+    @ApplicationScope
+    fun provideEthereumAddressFormat() = EthereumAddressFormat()
 }

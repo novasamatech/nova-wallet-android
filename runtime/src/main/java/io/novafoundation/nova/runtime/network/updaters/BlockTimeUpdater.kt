@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.common.utils.timestamp
 import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.core.updater.GlobalScopeUpdater
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -47,7 +47,7 @@ class BlockTimeUpdater(
 
     override val requiredModules: List<String> = emptyList()
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
         val chainId = chainIdHolder.chainId()
         val runtime = chainRegistry.getRuntime(chainId)
         val storage = runtime.metadata.system().storage("Number")

@@ -112,7 +112,7 @@ class AddressInputMixinProvider(
     override fun pasteClicked() {
         launch {
             inputFlow.value = withContext(Dispatchers.IO) {
-                clipboardManager.getFromClipboard().orEmpty()
+                clipboardManager.getTextOrNull().orEmpty()
             }
         }
     }

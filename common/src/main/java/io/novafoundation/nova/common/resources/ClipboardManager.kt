@@ -2,7 +2,6 @@ package io.novafoundation.nova.common.resources
 
 import android.content.ClipData
 import android.content.ClipDescription.MIMETYPE_TEXT_PLAIN
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -14,12 +13,11 @@ class ClipboardManager(
     private val clipboardManager: NativeClipboardManager
 ) {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun observePrimaryClip(): Flow<String?> = callbackFlow {
-        send(getFromClipboard())
+        send(getTextOrNull())
 
         val listener = NativeClipboardManager.OnPrimaryClipChangedListener {
-            trySend(getFromClipboard())
+            trySend(getTextOrNull())
         }
 
         clipboardManager.addPrimaryClipChangedListener(listener)
@@ -29,7 +27,7 @@ class ClipboardManager(
         }
     }
 
-    fun getFromClipboard(): String? {
+    fun getTextOrNull(): String? {
         return with(clipboardManager) {
             if (!hasPrimaryClip()) {
                 null
@@ -39,6 +37,18 @@ class ClipboardManager(
                 val item: ClipData.Item = primaryClip!!.getItemAt(0)
 
                 item.text.toString()
+            }
+        }
+    }
+
+    fun getAny(): String? {
+        return with(clipboardManager) {
+            if (hasPrimaryClip()) {
+                val item: ClipData.Item = primaryClip!!.getItemAt(0)
+
+                item.text.toString()
+            } else {
+                null
             }
         }
     }

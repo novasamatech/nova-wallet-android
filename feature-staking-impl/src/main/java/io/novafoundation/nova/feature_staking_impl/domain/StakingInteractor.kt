@@ -249,9 +249,10 @@ class StakingInteractor(
     }
 
     suspend fun getSelectedAccountProjection(): StakingAccount = withContext(Dispatchers.Default) {
-        val account = accountRepository.getSelectedAccount(stakingSharedState.chainId())
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        val selectedChain = stakingSharedState.chain()
 
-        mapAccountToStakingAccount(account)
+        mapAccountToStakingAccount(selectedChain, metaAccount)!!
     }
 
     suspend fun getRewardDestination(accountStakingState: StakingState.Stash): RewardDestination = withContext(Dispatchers.Default) {

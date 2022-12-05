@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.ext
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.emptyEthereumAccountId
 import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -23,7 +24,6 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toHexUntyped
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.addressPrefix
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAddress
-import java.math.BigInteger
 
 val Chain.typesUsage: TypesUsage
     get() = when {
@@ -43,6 +43,12 @@ val Chain.commissionAsset
 
 val Chain.Asset.isUtilityAsset: Boolean
     get() = id == 0
+
+private const val MOONBEAM_XC_PREFIX = "xc"
+
+fun Chain.Asset.unifiedSymbol(): String {
+    return symbol.removePrefix(MOONBEAM_XC_PREFIX)
+}
 
 val Chain.genesisHash: String
     get() = id
@@ -72,7 +78,7 @@ fun Chain.accountIdOrNull(address: String): ByteArray? {
 }
 
 fun Chain.emptyAccountId() = if (isEthereumBased) {
-    ByteArray(20)
+    emptyEthereumAccountId()
 } else {
     ByteArray(32)
 }
@@ -101,13 +107,6 @@ fun Chain.multiAddressOf(accountId: ByteArray): MultiAddress {
     }
 }
 
-val Chain.historySupported: Boolean
-    get() {
-        val historyType = externalApi?.history?.type ?: return false
-
-        return historyType != Chain.ExternalApi.Section.Type.UNKNOWN
-    }
-
 fun Chain.isValidAddress(address: String): Boolean {
     return runCatching {
         if (isEthereumBased) {
@@ -116,6 +115,16 @@ fun Chain.isValidAddress(address: String): Boolean {
             address.toAccountId() // verify supplied address can be converted to account id
 
             address.addressPrefix() == addressPrefix.toShort()
+        }
+    }.getOrDefault(false)
+}
+
+fun Chain.isValidEvmAddress(address: String): Boolean {
+    return runCatching {
+        if (isEthereumBased) {
+            address.asEthereumAddress().isValid()
+        } else {
+            false
         }
     }.getOrDefault(false)
 }
@@ -186,6 +195,12 @@ fun Chain.Asset.requireOrml(): Type.Orml {
     return type
 }
 
+fun Chain.Asset.requireErc20(): Type.Evm {
+    require(type is Type.Evm)
+
+    return type
+}
+
 fun Chain.Asset.ormlCurrencyId(runtime: RuntimeSnapshot): Any? {
     val ormlType = requireOrml()
 
@@ -198,13 +213,7 @@ fun Chain.Asset.ormlCurrencyId(runtime: RuntimeSnapshot): Any? {
 val Chain.Asset.fullId: FullChainAssetId
     get() = FullChainAssetId(chainId, id)
 
-fun Chain.findAssetByStatemineId(statemineAssetId: BigInteger): Chain.Asset? {
-    return assets.find {
-        if (it.type !is Type.Statemine) return@find false
-
-        it.type.id == statemineAssetId
-    }
-}
+fun Chain.enabledAssets(): List<Chain.Asset> = assets.filter { it.enabled }
 
 fun Chain.findAssetByOrmlCurrencyId(runtime: RuntimeSnapshot, currencyId: Any?): Chain.Asset? {
     return assets.find { asset ->

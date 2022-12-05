@@ -63,6 +63,8 @@ dependencies {
     implementation coroutinesAndroidDep
     implementation lifeCycleKtxDep
 
+    implementation project(":core-db")
+
     implementation viewModelKtxDep
 
     implementation shimmerDep

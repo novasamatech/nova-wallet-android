@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import io.novafoundation.nova.core_db.converters.AssetSourceConverter
 import io.novafoundation.nova.core_db.converters.CryptoTypeConverters
 import io.novafoundation.nova.core_db.converters.CurrencyConverters
 import io.novafoundation.nova.core_db.converters.LongMathConverters
@@ -12,9 +13,11 @@ import io.novafoundation.nova.core_db.converters.MetaAccountTypeConverters
 import io.novafoundation.nova.core_db.converters.NetworkTypeConverters
 import io.novafoundation.nova.core_db.converters.NftTypeConverters
 import io.novafoundation.nova.core_db.converters.OperationConverters
+import io.novafoundation.nova.core_db.converters.TransferHistoryApiConverters
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
+import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.core_db.dao.CurrencyDao
@@ -37,6 +40,7 @@ import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
 import io.novafoundation.nova.core_db.migrations.AddContributions_23_24
 import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
+import io.novafoundation.nova.core_db.migrations.AddEnabledColumnToChainAssets_30_31
 import io.novafoundation.nova.core_db.migrations.AddFavouriteDApps_9_10
 import io.novafoundation.nova.core_db.migrations.AddGovernanceDapps_25_26
 import io.novafoundation.nova.core_db.migrations.AddGovernanceExternalApiToChain_27_28
@@ -45,6 +49,8 @@ import io.novafoundation.nova.core_db.migrations.AddLocks_22_23
 import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
+import io.novafoundation.nova.core_db.migrations.AddSourceToLocalAsset_28_29
+import io.novafoundation.nova.core_db.migrations.AddTransferApisTable_29_30
 import io.novafoundation.nova.core_db.migrations.AddVersioningToGovernanceDapps_28_29
 import io.novafoundation.nova.core_db.migrations.AssetTypes_2_3
 import io.novafoundation.nova.core_db.migrations.BetterChainDiffing_8_9
@@ -52,6 +58,7 @@ import io.novafoundation.nova.core_db.migrations.ChangeAsset_3_4
 import io.novafoundation.nova.core_db.migrations.ChangeChainNodes_20_21
 import io.novafoundation.nova.core_db.migrations.ChangeDAppAuthorization_10_11
 import io.novafoundation.nova.core_db.migrations.ChangeTokens_19_20
+import io.novafoundation.nova.core_db.migrations.FixBrokenForeignKeys_31_32
 import io.novafoundation.nova.core_db.migrations.FixMigrationConflicts_13_14
 import io.novafoundation.nova.core_db.migrations.GovernanceFlagToEnum_26_27
 import io.novafoundation.nova.core_db.migrations.NullableSubstrateAccountId_21_22
@@ -82,10 +89,11 @@ import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
+import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 29,
+    version = 33,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -101,6 +109,7 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         ChainAssetLocal::class,
         ChainRuntimeInfoLocal::class,
         ChainExplorerLocal::class,
+        ChainTransferHistoryApiLocal::class,
         MetaAccountLocal::class,
         ChainAccountLocal::class,
         DappAuthorizationLocal::class,
@@ -121,6 +130,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
     NftTypeConverters::class,
     MetaAccountTypeConverters::class,
     CurrencyConverters::class,
+    AssetSourceConverter::class,
+    TransferHistoryApiConverters::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -147,6 +158,9 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(NullableSubstrateAccountId_21_22, AddLocks_22_23, AddContributions_23_24)
                     .addMigrations(AddGovernanceFlagToChains_24_25, AddGovernanceDapps_25_26, GovernanceFlagToEnum_26_27)
                     .addMigrations(AddGovernanceExternalApiToChain_27_28, AddVersioningToGovernanceDapps_28_29)
+                    .addMigrations(AddGovernanceExternalApiToChain_27_28)
+                    .addMigrations(AddSourceToLocalAsset_28_29, AddTransferApisTable_29_30, AddEnabledColumnToChainAssets_30_31)
+                    .addMigrations(FixBrokenForeignKeys_31_32)
                     .fallbackToDestructiveMigration()
                     .build()
             }
@@ -173,6 +187,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun stakingTotalRewardDao(): StakingTotalRewardDao
 
     abstract fun chainDao(): ChainDao
+
+    abstract fun chainAssetDao(): ChainAssetDao
 
     abstract fun metaAccountDao(): MetaAccountDao
 

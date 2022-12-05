@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility.NativeAssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.utility.NativeAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.utility.NativeAssetTransfers
+import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
+import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import javax.inject.Qualifier
@@ -47,7 +49,9 @@ class NativeAssetsModule {
     fun provideHistory(
         chainRegistry: ChainRegistry,
         eventsRepository: EventsRepository,
-    ) = NativeAssetHistory(chainRegistry, eventsRepository)
+        subQueryOperationsApi: SubQueryOperationsApi,
+        cursorStorage: TransferCursorStorage
+    ) = NativeAssetHistory(chainRegistry, eventsRepository, subQueryOperationsApi, cursorStorage)
 
     @Provides
     @NativeAsset

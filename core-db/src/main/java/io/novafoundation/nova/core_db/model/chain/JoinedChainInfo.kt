@@ -14,7 +14,10 @@ class JoinedChainInfo(
     val assets: List<ChainAssetLocal>,
 
     @Relation(parentColumn = "id", entityColumn = "chainId", entity = ChainExplorerLocal::class)
-    val explorers: List<ChainExplorerLocal>
+    val explorers: List<ChainExplorerLocal>,
+
+    @Relation(parentColumn = "id", entityColumn = "chainId", entity = ChainTransferHistoryApiLocal::class)
+    val transferHistoryApis: List<ChainTransferHistoryApiLocal>
 ) {
 
     fun getSortedNodes(): List<ChainNodeLocal> {

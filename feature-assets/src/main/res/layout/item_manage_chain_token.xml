@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    tools:background="@color/bottom_sheet_background">
+
+
+    <ImageView
+        android:id="@+id/itemManageChainTokenChainIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="14dp"
+        tools:src="@color/android_system_accent" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="0dp"
+        android:id="@+id/itemManageChainTokenChainName"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp"
+        android:layout_weight="1"
+        android:textColor="@color/text_primary"
+        tools:text="Bifrost Kusama" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/itemManageChainTokenEnabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp" />
+
+</LinearLayout>

@@ -3,7 +3,9 @@ package io.novafoundation.nova.core_db.model.chain
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Ignore
 import androidx.room.Index
+import io.novafoundation.nova.common.utils.Identifiable
 
 @Entity(
     tableName = "chain_nodes",
@@ -20,10 +22,14 @@ import androidx.room.Index
         Index(value = ["chainId"])
     ]
 )
-class ChainNodeLocal(
+data class ChainNodeLocal(
     val chainId: String,
     val url: String,
     val name: String,
     @ColumnInfo(defaultValue = "0")
     val orderId: Int,
-)
+) : Identifiable {
+
+    @Ignore
+    override val identifier: String = "$chainId:$url"
+}

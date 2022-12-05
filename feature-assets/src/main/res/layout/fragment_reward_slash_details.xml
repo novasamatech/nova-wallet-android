@@ -33,7 +33,7 @@
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/bg_icon_round_white"
+                android:background="@drawable/bg_icon_container_on_color"
                 android:padding="11dp"
                 android:src="@drawable/ic_staking_filled"
                 app:tint="@color/icon_secondary" />

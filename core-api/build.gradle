@@ -25,4 +25,6 @@ android {
 dependencies {
     implementation coroutinesDep
     implementation fearlessLibDep
+
+    api web3jDep
 }

@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.Tot
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAssetPlaceholder
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAvatar
+import kotlinx.android.synthetic.main.item_asset_header.view.balanceListFilters
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListManage
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListNfts
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListSearch
@@ -23,8 +24,9 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
     interface Handler {
         fun totalBalanceClicked()
 
-        fun manageClicked()
         fun searchClicked()
+        fun filtersClicked()
+        fun manageClicked()
 
         fun avatarClicked()
 
@@ -112,6 +114,7 @@ class HeaderHolder(
             balanceListAvatar.setOnClickListener { handler.avatarClicked() }
             balanceListNfts.setOnClickListener { handler.goToNftsClicked() }
             balanceListSearch.setOnClickListener { handler.searchClicked() }
+            balanceListFilters.setOnClickListener { handler.filtersClicked() }
         }
     }
 

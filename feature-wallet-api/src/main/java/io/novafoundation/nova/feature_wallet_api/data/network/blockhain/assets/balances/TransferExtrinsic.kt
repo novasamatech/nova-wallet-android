@@ -5,7 +5,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicS
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
 
-class TransferExtrinsic(
+data class TransferExtrinsic(
     val senderId: ByteArray,
     val recipientId: ByteArray,
     val amountInPlanks: BigInteger,
