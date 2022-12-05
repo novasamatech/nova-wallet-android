@@ -9,7 +9,7 @@
     <string name="manage_assets_add_token">Add token</string>
 
     <string name="asset_add_evm_token_already_exist_title">This token already exist</string>
-    <string name="asset_add_evm_token_already_exist_message">The entered contract address is present in Nova as a MOVR token.</string>
+    <string name="asset_add_evm_token_already_exist_message">The entered contract address is present in Nova as a %s token.</string>
 
     <string name="asset_add_evm_token_invalid_contract_address_title">Invalid contract address</string>
     <string name="asset_add_evm_token_invalid_contract_address_message">The entered contract address is not ERC-20 contract.</string>

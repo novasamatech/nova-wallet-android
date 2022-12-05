@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.domain.interfaces
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 
 interface ChainAssetRepository {
@@ -10,5 +9,5 @@ interface ChainAssetRepository {
 
     suspend fun insertCustomAsset(chainAsset: Chain.Asset)
 
-    suspend fun hasAsset(chain: Chain, assetId: ChainAssetId): Boolean
+    suspend fun getAssetSymbol(id: FullChainAssetId): String?
 }
