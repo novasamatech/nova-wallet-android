@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evm.EvmAssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.evm.EvmAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.evm.EvmAssetTransfers
-import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanApi
+import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanTransactionsApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanApiKeys
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.RealEtherscanTransactionsApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.RetrofitEtherscanTransactionsApi
@@ -59,12 +59,12 @@ class EvmAssetsModule {
     fun provideEtherscanTransactionsApi(
         retrofitEtherscanTransactionsApi: RetrofitEtherscanTransactionsApi,
         etherscanApiKeys: EtherscanApiKeys,
-    ): EtherscanApi = RealEtherscanTransactionsApi(retrofitEtherscanTransactionsApi, etherscanApiKeys)
+    ): EtherscanTransactionsApi = RealEtherscanTransactionsApi(retrofitEtherscanTransactionsApi, etherscanApiKeys)
 
     @Provides
     @FeatureScope
     fun provideHistory(
-        etherscanTransactionsApi: EtherscanApi
+        etherscanTransactionsApi: EtherscanTransactionsApi
     ) = EvmAssetHistory(etherscanTransactionsApi)
 
     @Provides

@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.E
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanResponse
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
-interface EtherscanApi {
+interface EtherscanTransactionsApi {
 
     suspend fun getOperationsHistory(
         chainId: ChainId,
@@ -19,7 +19,7 @@ interface EtherscanApi {
 class RealEtherscanTransactionsApi(
     private val retrofitApi: RetrofitEtherscanTransactionsApi,
     private val apiKeys: EtherscanApiKeys
-): EtherscanApi {
+) : EtherscanTransactionsApi {
 
     override suspend fun getOperationsHistory(
         chainId: ChainId,

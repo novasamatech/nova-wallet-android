@@ -10,12 +10,14 @@ class EtherscanApiKeys(private val keys: Map<ChainId, String>) {
     companion object {
 
         fun default(): EtherscanApiKeys {
-            return EtherscanApiKeys(mapOf(
-                Chain.Geneses.MOONBEAM to BuildConfig.EHTERSCAN_API_KEY_MOONBEAM,
-                Chain.Geneses.MOONRIVER to BuildConfig.EHTERSCAN_API_KEY_MOONRIVER
-            ))
+            return EtherscanApiKeys(
+                mapOf(
+                    Chain.Geneses.MOONBEAM to BuildConfig.EHTERSCAN_API_KEY_MOONBEAM,
+                    Chain.Geneses.MOONRIVER to BuildConfig.EHTERSCAN_API_KEY_MOONRIVER
+                )
+            )
         }
     }
-    
+
     fun keyFor(chainId: ChainId): String? = keys[chainId]
 }
