@@ -230,7 +230,7 @@ fun SignatureWrapper.asHexString() = signature.toHexString(withPrefix = true)
 fun String.ethereumAddressToAccountId() = asEthereumAddress().toAccountId().value
 fun AccountId.ethereumAccountIdToAddress(withChecksum: Boolean = true) = asEthereumAccountId().toAddress(withChecksum).value
 
-fun emptyEthereumAccountId() = ByteArray(20)
+fun emptyEthereumAccountId() = ByteArray(20) { 1 }
 fun emptyEthereumAddress() = emptyEthereumAccountId().ethereumAccountIdToAddress(withChecksum = false)
 
 val SignerPayloadExtrinsic.chainId: String
