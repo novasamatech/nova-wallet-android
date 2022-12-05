@@ -6,6 +6,8 @@
     <!--<string name="dapp_main_welcome_subtitle">Connect to the Polkadot &amp; Kusama\necosystem web applications using\naccounts in Nova Wallet</string>-->
     <string name="dapp_main_welcome_subtitle">Browse the web using your accounts from Nova Wallet</string>
 
+    <string name="manage_assets_add_token">Add token</string>
+
     <string name="asset_add_evm_token_already_exist_title">This token already exist</string>
     <string name="asset_add_evm_token_already_exist_message">The entered contract address is present in Nova as a MOVR token.</string>
 
