@@ -21,7 +21,7 @@ private const val FIRST_PAGE_INDEX = 1
 private const val SECOND_PAGE_INDEX = 2
 
 class EvmAssetHistory(
-    private val etherscanApi: EtherscanTransactionsApi
+    private val etherscanTransactionsApi: EtherscanTransactionsApi,
 ) : AssetHistory {
 
     override suspend fun fetchOperationsForBalanceChange(
@@ -105,12 +105,13 @@ class EvmAssetHistory(
         val erc20Config = chainAsset.requireErc20()
         val accountAddress = chain.addressOf(accountId)
 
-        val response = etherscanApi.getOperationsHistory(
+        val response = etherscanTransactionsApi.getOperationsHistory(
             baseUrl = apiUrl,
             contractAddress = erc20Config.contractAddress,
             accountAddress = accountAddress,
             pageNumber = page,
             pageSize = pageSize,
+            chainId = chain.id
         )
 
         val operations = response.result.map { mapRemoteTransferToOperation(it, chainAsset, accountAddress) }

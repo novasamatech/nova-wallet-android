@@ -1,24 +1,43 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.etherscan
 
-import io.novafoundation.nova.common.data.network.UserAgent
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanAccountTransfer
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanResponse
-import retrofit2.http.GET
-import retrofit2.http.Headers
-import retrofit2.http.Query
-import retrofit2.http.Url
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 interface EtherscanTransactionsApi {
 
-    @GET
-    @Headers(UserAgent.NOVA)
     suspend fun getOperationsHistory(
-        @Url baseUrl: String,
-        @Query("contractaddress") contractAddress: String,
-        @Query("address") accountAddress: String,
-        @Query("page") pageNumber: Int,
-        @Query("offset") pageSize: Int,
-        @Query("module") module: String = "account",
-        @Query("action") action: String = "tokentx"
+        chainId: ChainId,
+        baseUrl: String,
+        contractAddress: String,
+        accountAddress: String,
+        pageNumber: Int,
+        pageSize: Int
     ): EtherscanResponse<List<EtherscanAccountTransfer>>
+}
+
+class RealEtherscanTransactionsApi(
+    private val retrofitApi: RetrofitEtherscanTransactionsApi,
+    private val apiKeys: EtherscanApiKeys
+) : EtherscanTransactionsApi {
+
+    override suspend fun getOperationsHistory(
+        chainId: ChainId,
+        baseUrl: String,
+        contractAddress: String,
+        accountAddress: String,
+        pageNumber: Int,
+        pageSize: Int
+    ): EtherscanResponse<List<EtherscanAccountTransfer>> {
+        val apiKey = apiKeys.keyFor(chainId)
+
+        return retrofitApi.getOperationsHistory(
+            baseUrl = baseUrl,
+            contractAddress = contractAddress,
+            accountAddress = accountAddress,
+            pageNumber = pageNumber,
+            pageSize = pageSize,
+            apiKey = apiKey
+        )
+    }
 }
