@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="assets_filter_title">Filter tokens</string>
+    
     <!--<string name="dapp_main_welcome_title">Welcome\nto DApp portal</string>-->
     <string name="dapp_main_welcome_title">Welcome to Nova Browser</string>
 

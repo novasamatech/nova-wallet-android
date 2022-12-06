@@ -313,7 +313,7 @@ inline fun <T> flowOfAll(crossinline producer: suspend () -> Flow<T>): Flow<T> =
     emitAll(producer())
 }
 
-fun <T> List<Flow<T>>.accumulate(): Flow<List<T>> {
+fun <T> Collection<Flow<T>>.accumulate(): Flow<List<T>> {
     return accumulate(*this.toTypedArray())
 }
 
