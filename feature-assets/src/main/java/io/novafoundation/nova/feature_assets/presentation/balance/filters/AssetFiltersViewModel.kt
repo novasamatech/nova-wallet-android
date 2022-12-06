@@ -1,16 +1,15 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.filters
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.utils.accumulate
 import io.novafoundation.nova.common.utils.checkEnabled
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_assets.domain.assets.filters.AssetFilter
 import io.novafoundation.nova.feature_assets.domain.assets.filters.AssetFiltersInteractor
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class AssetFiltersViewModel(
@@ -24,8 +23,8 @@ class AssetFiltersViewModel(
     val filtersEnabledMap = createFilterEnabledMap()
 
     init {
-        filtersEnabledMap.applyOnChange()
         applyInitialState()
+        filtersEnabledMap.applyOnChange()
     }
 
     private fun applyInitialState() = launch {
@@ -39,10 +38,14 @@ class AssetFiltersViewModel(
     private fun createFilterEnabledMap() = interactor.allFilters.associateWith { MutableStateFlow(false) }
 
     private fun Map<AssetFilter, MutableStateFlow<Boolean>>.applyOnChange() {
-        this.values.accumulate()
-            .onEach {
+        var isFirstEmmition = true
+        combine(this.values) {
+            if (isFirstEmmition) {
+                isFirstEmmition = false
+            } else {
                 applyChanges()
             }
+        }
             .launchIn(this@AssetFiltersViewModel)
     }
 
