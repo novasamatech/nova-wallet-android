@@ -313,6 +313,10 @@ inline fun <T> flowOfAll(crossinline producer: suspend () -> Flow<T>): Flow<T> =
     emitAll(producer())
 }
 
+inline fun <reified T> combineIdentity(flows: Iterable<Flow<T>>): Flow<List<T>> {
+    return combine(flows) { it.toList() }
+}
+
 fun <T> Collection<Flow<T>>.accumulate(): Flow<List<T>> {
     return accumulate(*this.toTypedArray())
 }
