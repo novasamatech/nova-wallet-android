@@ -15,8 +15,9 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.mapCont
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.toPair
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.u32
@@ -32,6 +33,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.withContext
+import java.math.BigInteger
 
 private const val CONTRIBUTIONS_CHILD_SUFFIX = "crowdloan"
 
@@ -153,5 +155,10 @@ class RealContributionsRepository(
                 sourceId = contribution.sourceId,
             )
         }
+    }
+
+    override suspend fun clearAllContributionsFor(assetIds: List<FullChainAssetId>) = withContext(Dispatchers.IO) {
+        val localIds = assetIds.map(FullChainAssetId::toPair)
+        contributionDao.deleteContributionsByAssetIds(localIds)
     }
 }
