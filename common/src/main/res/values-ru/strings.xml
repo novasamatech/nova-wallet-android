@@ -150,6 +150,7 @@
     <string name="assets_balance_details_locks_phrelect">Выборы</string>
     <string name="assets_balance_details_locks_staking">Стейкинг</string>
     <string name="assets_balance_details_locks_vesting">Вестинг</string>
+    <string name="assets_filter_title">Фильтр токенов</string>
     <string name="assets_manage_tokens_all_networks">Все сети</string>
     <string name="assets_manage_tokens_partial_networks" formatted="false">%s (и еще %s)</string>
     <string name="assets_manage_tokens_title">Управление токенами</string>
