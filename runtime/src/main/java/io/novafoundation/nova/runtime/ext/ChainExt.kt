@@ -50,6 +50,9 @@ fun Chain.Asset.unifiedSymbol(): String {
     return symbol.removePrefix(MOONBEAM_XC_PREFIX)
 }
 
+val Chain.Asset.disabled: Boolean
+    get() = !enabled
+
 val Chain.genesisHash: String
     get() = id
 

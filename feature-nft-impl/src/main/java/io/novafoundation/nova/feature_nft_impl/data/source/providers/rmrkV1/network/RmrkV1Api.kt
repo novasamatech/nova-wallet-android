@@ -9,14 +9,14 @@ import retrofit2.http.Url
 interface RmrkV1Api {
 
     companion object {
-        const val BASE_URL = "https://singular.rmrk.app/api/rmrk1/"
+        const val BASE_URL = "https://singular.rmrk-api.xyz/api/"
     }
 
-    @GET("account/{address}")
+    @GET("account-rmrk1/{address}")
     @Headers(CacheControl.NO_CACHE)
     suspend fun getNfts(@Path("address") address: String): List<RmrkV1NftRemote>
 
-    @GET("collection/{collectionId}")
+    @GET("https://singular.rmrk.app/api/rmrk1/collection/{collectionId}")
     suspend fun getCollection(@Path("collectionId") collectionId: String): List<RmrkV1CollectionRemote>
 
     @GET

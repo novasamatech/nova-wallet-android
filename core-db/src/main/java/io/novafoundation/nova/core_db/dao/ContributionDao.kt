@@ -28,17 +28,24 @@ abstract class ContributionDao {
     abstract fun observeContributions(metaId: Long): Flow<List<ContributionLocal>>
 
     @Query("SELECT * FROM contributions WHERE metaId = :metaId AND chainId = :chainId AND assetId = :assetId AND sourceId = :sourceId")
-    abstract fun getContributions(metaId: Long, chainId: String, assetId: Int, sourceId: String): List<ContributionLocal>
+    abstract suspend fun getContributions(metaId: Long, chainId: String, assetId: Int, sourceId: String): List<ContributionLocal>
 
-    @Query("DELETE FROM contributions WHERE metaId = :metaId AND chainId = :chainId AND assetId = :assetId AND sourceId = :sourceId")
-    abstract fun deleteBySourceId(metaId: Long, chainId: String, assetId: Int, sourceId: String)
+    @Query("DELETE FROM contributions WHERE chainId = :chainId AND assetId = :assetId")
+    protected abstract suspend fun deleteContributions(chainId: String, assetId: Int)
 
     @Delete
-    protected abstract suspend fun deleteContributions(currencies: List<ContributionLocal>)
+    protected abstract suspend fun deleteContributions(contributions: List<ContributionLocal>)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    protected abstract suspend fun updateContributions(currencies: List<ContributionLocal>)
+    protected abstract suspend fun updateContributions(contributions: List<ContributionLocal>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    protected abstract suspend fun insertContributions(currencies: List<ContributionLocal>)
+    protected abstract suspend fun insertContributions(contributions: List<ContributionLocal>)
+
+    @Transaction
+    open suspend fun deleteContributionsByAssetIds(fullAssetIds: List<FullAssetIdLocal>) {
+        fullAssetIds.forEach { (chainId, assetId) ->
+            deleteContributions(chainId, assetId)
+        }
+    }
 }
