@@ -127,7 +127,7 @@
     <string name="accounts_add_wallet">Добавить кошелёк</string>
     <string name="accounts_change_chain_account">Изменить аккаунт %s</string>
     <string name="accounts_change_chain_secrets">Изменить аккаунт</string>
-    <string name="asset_add_evm_token_already_exist_message">Введенный адрес контракта уже добавлен в Nova как токен %s .</string>
+    <string name="asset_add_evm_token_already_exist_message">Введенный адрес контракта уже добавлен в Nova как токен %s.</string>
     <string name="asset_add_evm_token_already_exist_title">Этот токен уже добавлен</string>
     <string name="asset_add_evm_token_invalid_coin_gecko_link_message">Пожалуйста, убедитесь, что введенный URL-адрес имеет следующую форму: www.coingecko.com/en/coins/tether.</string>
     <string name="asset_add_evm_token_invalid_coin_gecko_link_title">Недействительная ссылка на CoinGecko</string>
@@ -140,7 +140,7 @@
     <string name="asset_add_token_enter_symbol">Введите символ</string>
     <string name="assets_add_token">Добавить токен</string>
     <string name="assets_add_token_enter_info_address_label">Адрес контракта</string>
-    <string name="assets_add_token_enter_info_decimals_label">Числа десятичных знаков токена</string>
+    <string name="assets_add_token_enter_info_decimals_label">Число десятичных знаков токена</string>
     <string name="assets_add_token_enter_info_price_label">Ссылка Coingecko для курса валют (необязательно)</string>
     <string name="assets_add_token_enter_info_symbol_label">Символ</string>
     <string name="assets_add_token_enter_info_title">Введите данные ERC-20 токена</string>
