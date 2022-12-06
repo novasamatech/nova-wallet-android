@@ -98,8 +98,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                app:layout_constraintHorizontal_bias="0"
                 android:text="@string/assets_add_token_enter_info_decimals_label"
                 android:textColor="@color/text_secondary"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintEnd_toEndOf="@+id/addTokenEnterInfoAddressInput"
                 app:layout_constraintStart_toStartOf="@+id/addTokenEnterInfoDecimalsInput"
                 app:layout_constraintTop_toBottomOf="@+id/addTokenEnterInfoAddressInput" />
 

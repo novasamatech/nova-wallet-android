@@ -1018,9 +1018,9 @@
 
     <include app:graph="@navigation/staking_parachain_unbond" />
 
-    <fragment
+    <dialog
         android:id="@+id/assetFiltersFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.balance.filters.AssetFiltersFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.balance.filters.AssetFiltersBottomSheetFragment"
         android:label="AssetFiltersFragment" />
 
     <fragment
