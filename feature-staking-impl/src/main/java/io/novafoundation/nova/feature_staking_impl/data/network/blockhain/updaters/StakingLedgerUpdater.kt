@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedger
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.StakingUpdater
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
+import io.novafoundation.nova.runtime.ext.disabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -58,6 +59,8 @@ class StakingLedgerUpdater(
 
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
         val (chain, chainAsset) = stakingSharedState.assetWithChain.first()
+        if (chainAsset.disabled) return emptyFlow()
+
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val currentAccountId = scope.getAccount().accountIdIn(chain) ?: return emptyFlow()

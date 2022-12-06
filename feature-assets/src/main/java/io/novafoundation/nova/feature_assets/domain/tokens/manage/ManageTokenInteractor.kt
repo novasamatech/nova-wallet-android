@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.domain.tokens.manage
 
 import io.novafoundation.nova.feature_assets.domain.common.searchTokens
+import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ext.defaultComparator
@@ -29,6 +30,7 @@ class RealManageTokenInteractor(
     private val chainRegistry: ChainRegistry,
     private val walletRepository: WalletRepository,
     private val chainAssetRepository: ChainAssetRepository,
+    private val contributionsRepository: ContributionsRepository,
 ) : ManageTokenInteractor {
 
     override fun multiChainTokensFlow(
@@ -61,6 +63,7 @@ class RealManageTokenInteractor(
 
         if (!enabled) {
             walletRepository.clearAssets(assetIds)
+            contributionsRepository.clearAllContributionsFor(assetIds)
         }
     }
 
