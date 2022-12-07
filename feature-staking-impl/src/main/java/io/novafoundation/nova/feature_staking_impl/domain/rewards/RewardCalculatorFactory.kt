@@ -65,7 +65,7 @@ class RewardCalculatorFactory(
     private fun Chain.Asset.createRewardCalculator(validators: List<RewardCalculationTarget>, totalIssuance: BigInteger): RewardCalculator {
         return when (staking) {
             RELAYCHAIN, RELAYCHAIN_AURA -> RewardCurveInflationRewardCalculator(validators, totalIssuance)
-            ALEPH_ZERO -> AlephZeroRewardCalculator(validators, totalIssuance, chainAsset = this)
+            ALEPH_ZERO -> AlephZeroRewardCalculator(validators, chainAsset = this)
             UNSUPPORTED, PARACHAIN, TURING -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
         }
     }
