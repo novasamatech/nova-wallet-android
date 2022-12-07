@@ -42,7 +42,7 @@ fun AlephZeroRewardCalculator(
     validators: List<RewardCalculationTarget>,
     chainAsset: Chain.Asset
 ): RewardCalculator {
-    // https://github.com/Cardinal-Cryptography/aleph-node/blob/830088fdbdd7cce72d5eff9642c9961762c9e251/primitives/src/lib.rs#L75
+    // https://github.com/Cardinal-Cryptography/aleph-node/blob/5acf27dc475767134aeb29b0681768ab93435101/primitives/src/lib.rs#L228
     val yearlyTotalMint = 30_000_000
     val yearlyStakingMint = yearlyTotalMint * 0.9 // 10% goes to treasury
 
