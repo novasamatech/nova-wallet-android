@@ -2,10 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.common.utils.argument
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.common.utils.requireActualType
-import io.novafoundation.nova.common.utils.xTokens
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -33,10 +30,8 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.validAddress
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.canPayCrossChainFee
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
-import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
-import jp.co.soramitsu.fearless_utils.runtime.metadata.call
 import java.math.BigInteger
 
 class RealCrossChainTransactor(
@@ -111,24 +106,16 @@ class RealCrossChainTransactor(
             arguments = mapOf(
                 "asset" to VersionedMultiAsset.V1(multiAsset).toEncodableInstance(),
                 "dest" to fullDestinationLocation.versioned().toEncodableInstance(),
-                "dest_weight" to runtime.prepareDestWeightForEncoding(requiredDestWeight)
+
+                // depending on the version of the pallet, only one of weights arguments going to be encoded
+                "dest_weight" to destWeightEncodable(requiredDestWeight),
+                "dest_weight_limit" to destWeightLimitEncodable(requiredDestWeight)
             )
         )
     }
 
-    private fun RuntimeSnapshot.prepareDestWeightForEncoding(weight: Weight): Any {
-        val destWeightArgumentType = metadata
-            .xTokens()
-            .call("transfer_multiasset")
-            .argument("dest_weight")
-            .requireActualType()
-
-
-        return when(destWeightArgumentType) {
-            is DictEnum -> DictEnum.Entry("Limited", weight)
-            else -> weight
-        }
-    }
+    private fun destWeightEncodable(weight: Weight): Any = weight
+    private fun destWeightLimitEncodable(weight: Weight): Any = DictEnum.Entry("Limited", weight)
 
     private suspend fun ExtrinsicBuilder.xcmPalletReserveTransfer(
         configuration: CrossChainTransferConfiguration,
