@@ -46,7 +46,6 @@ private fun calculateSimplePercentage(days: Int, dailyPercentage: Double): Doubl
     return dailyPercentage * days
 }
 
-
 suspend fun RewardCalculator.calculateMaxPeriodReturns(
     days: Int,
 ) = calculateMaxReturns(
