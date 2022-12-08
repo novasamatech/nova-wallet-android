@@ -36,7 +36,6 @@ fun ValidationSystem.Companion.parachainStakingStart(
     enoughStakeable()
 }
 
-
 private fun StartParachainStakingValidationSystemBuilder.enoughToPayFees() {
     sufficientBalance(
         fee = { it.fee },

@@ -9,7 +9,7 @@ sealed class StartParachainStakingValidationFailure {
 
     object NotEnoughBalanceToPayFees : StartParachainStakingValidationFailure()
 
-    object NotEnoughStakeableBalance: StartParachainStakingValidationFailure()
+    object NotEnoughStakeableBalance : StartParachainStakingValidationFailure()
 
     object PendingRevoke : StartParachainStakingValidationFailure()
 
