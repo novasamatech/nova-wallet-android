@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
 import kotlinx.android.synthetic.main.view_search.view.searchClear
 import kotlinx.android.synthetic.main.view_search.view.searchContent
+import kotlinx.android.synthetic.main.view_search.view.searchIcon
 
 class SearchView @JvmOverloads constructor(
     context: Context,
@@ -50,7 +51,7 @@ class SearchView @JvmOverloads constructor(
     }
 
     fun setIcon(@DrawableRes icon: Int?) {
-        searchContent.setDrawableStart(icon, widthInDp = 16, paddingInDp = 6, tint = R.color.icon_secondary)
+        icon?.let { searchIcon.setImageResource(icon) }
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.SearchView) {
