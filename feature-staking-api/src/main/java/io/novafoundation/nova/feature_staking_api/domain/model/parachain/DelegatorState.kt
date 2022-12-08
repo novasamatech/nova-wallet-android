@@ -2,11 +2,14 @@ package io.novafoundation.nova.feature_staking_api.domain.model.parachain
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
 import io.novafoundation.nova.common.utils.castOrNull
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import java.math.BigDecimal
 import java.math.BigInteger
 
 sealed class DelegatorState(
@@ -25,6 +28,17 @@ sealed class DelegatorState(
 
     class None(chain: Chain, chainAsset: Chain.Asset) : DelegatorState(chain, chainAsset)
 }
+
+fun DelegatorState.stakeablePlanks(freeBalance: BigInteger): BigInteger {
+    return (freeBalance - totalBonded).coerceAtLeast(BigInteger.ZERO)
+}
+
+fun DelegatorState.stakeableAmount(freeBalance: BigInteger): BigDecimal {
+    return chainAsset.amountFromPlanks(stakeablePlanks(freeBalance))
+}
+
+private val DelegatorState.totalBonded: BigInteger
+    get() = asDelegator()?.total.orZero()
 
 val DelegatorState.Delegator.activeBonded: BigInteger
     get() = total - lessTotal

@@ -33,7 +33,7 @@ interface AmountChooserMixin : CoroutineScope {
             assetFlow: Flow<Asset>,
             availableBalanceFlow: Flow<BigInteger>,
             @StringRes balanceLabel: Int?,
-        ): AmountChooserProvider
+        ): Presentation
 
         fun create(
             scope: CoroutineScope,
