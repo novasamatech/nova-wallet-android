@@ -51,6 +51,7 @@ android {
             initWith buildTypes.release
             matchingFallbacks = ['release']
             signingConfig signingConfigs.debug
+            profileable true
 
             versionNameSuffix '-releaseTest'
             applicationIdSuffix '.releaseTest'

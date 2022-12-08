@@ -83,23 +83,27 @@ class ConfirmStakingViewModel(
         .inBackground()
         .share()
 
-    private val controllerAddressFlow = flowOf {
-        when (payload) {
-            is Payload.Full -> payload.currentAccountAddress
-            else -> stashFlow.first().controllerAddress
-        }
+    private val stashAddressFlow = flowOf {
+        currentAddressForFullFlowOr(StakingState.Stash::stashAddress)
     }
-        .inBackground()
-        .share()
+        .shareInBackground()
+
+    private val controllerAddressFlow = flowOf {
+        currentAddressForFullFlowOr(StakingState.Stash::controllerAddress)
+    }
+        .shareInBackground()
 
     private val controllerAssetFlow = controllerAddressFlow
-        .flatMapLatest { interactor.assetFlow(it) }
-        .inBackground()
-        .share()
+        .flatMapLatest(interactor::assetFlow)
+        .shareInBackground()
+
+    private val stashAssetFlow = stashAddressFlow
+        .flatMapLatest(interactor::assetFlow)
+        .shareInBackground()
 
     val title = flowOf {
         when (payload) {
-            is Payload.ExistingStash, is Payload.Full -> resourceManager.getString(R.string.staking_start_title)
+            is Payload.Full -> resourceManager.getString(R.string.staking_start_title)
             is Payload.Validators -> resourceManager.getString(R.string.staking_change_validators)
         }
     }
@@ -134,7 +138,6 @@ class ConfirmStakingViewModel(
     val rewardDestinationFlow = flowOf {
         val rewardDestination = when (payload) {
             is Payload.Full -> payload.rewardDestination
-            is Payload.ExistingStash -> interactor.getRewardDestination(stashFlow.first())
             else -> null
         }
 
@@ -214,10 +217,9 @@ class ConfirmStakingViewModel(
         launch {
             val payload = SetupStakingPayload(
                 maxFee = fee,
-                controllerAddress = controllerAddressFlow.first(),
                 bondAmount = bondPayload?.amount,
-                asset = controllerAssetFlow.first(),
-                isAlreadyNominating = payload !is Payload.Full // not full flow => already nominating
+                stashAsset = stashAssetFlow.first(),
+                controllerAsset = controllerAssetFlow.first()
             )
 
             validationExecutor.requireValid(
@@ -226,14 +228,14 @@ class ConfirmStakingViewModel(
                 validationFailureTransformer = { stakingValidationFailure(payload, it, resourceManager) },
                 progressConsumer = _showNextProgress.progressConsumer()
             ) {
-                sendTransaction(payload)
+                sendTransaction()
             }
         }
     }
 
-    private fun sendTransaction(setupStakingPayload: SetupStakingPayload) = launch {
+    private fun sendTransaction() = launch {
         val setupResult = setupStakingInteractor.setupStaking(
-            controllerAddress = setupStakingPayload.controllerAddress,
+            controllerAddress = controllerAddressFlow.first(),
             validatorAccountIds = prepareNominations(),
             bondPayload = bondPayload
         )
@@ -267,5 +269,12 @@ class ConfirmStakingViewModel(
             accountName = name,
             background = AddressIconGenerator.BACKGROUND_TRANSPARENT
         )
+    }
+
+    private suspend inline fun currentAddressForFullFlowOr(address: (StakingState.Stash) -> String): String {
+        return when (payload) {
+            is Payload.Full -> payload.currentAccountAddress
+            else -> address(stashFlow.first())
+        }
     }
 }
