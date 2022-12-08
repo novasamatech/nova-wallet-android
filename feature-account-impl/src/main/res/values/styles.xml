@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="Widget.Nova.Button.PinCodeNumberButton" parent="Widget.AppCompat.Button">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">32sp</item>
@@ -26,7 +27,7 @@
         <item name="android:textColor">@color/text_secondary</item>
     </style>
 
-    <style name="Widget.Nova.Text.Mnemonic" parent="TextAppearance.AppCompat.Body1">
+    <style name="Widget.Nova.Text.Mnemonic" parent="TextAppearance.NovaFoundation.Regular.SubHeadline">
         <item name="lineHeight">22sp</item>
     </style>
 </resources>

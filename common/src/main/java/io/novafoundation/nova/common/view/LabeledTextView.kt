@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getDrawableCompat
+import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.addRipple
@@ -55,10 +56,11 @@ class LabeledTextView @JvmOverloads constructor(
             val message = typedArray.getString(R.styleable.LabeledTextView_message)
             message?.let(::setMessage)
 
-            val messageStyle = typedArray.getResourceId(R.styleable.LabeledTextView_messageStyle, 0)
-            if (messageStyle != 0) {
-                labeledTextText.setTextAppearance(messageStyle)
-            }
+            val messageStyle = typedArray.getResourceIdOrNull(R.styleable.LabeledTextView_messageStyle)
+            messageStyle?.let(labeledTextText::setTextAppearance)
+
+            val labelStyle = typedArray.getResourceIdOrNull(R.styleable.LabeledTextView_labelStyle)
+            labelStyle?.let(labeledTextLabel::setTextAppearance)
 
             val textIcon = typedArray.getDrawable(R.styleable.LabeledTextView_textIcon)
             textIcon?.let(::setTextIcon)

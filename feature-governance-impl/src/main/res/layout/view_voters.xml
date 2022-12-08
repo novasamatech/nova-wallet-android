@@ -40,7 +40,7 @@
         android:layout_marginEnd="8dp"
         android:gravity="center_vertical"
         android:includeFontPadding="false"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/votersViewVotesInfo"
         app:layout_constraintTop_toTopOf="parent"

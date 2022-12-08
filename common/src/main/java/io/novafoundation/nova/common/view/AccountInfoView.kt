@@ -4,11 +4,16 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.ColorInt
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.res.getColorOrThrow
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.getColorOrNull
+import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setImageTint
 import kotlinx.android.synthetic.main.view_account_info.view.accountAction
 import kotlinx.android.synthetic.main.view_account_info.view.accountAddressText
 import kotlinx.android.synthetic.main.view_account_info.view.accountIcon
@@ -38,6 +43,9 @@ class AccountInfoView @JvmOverloads constructor(
             val actionIcon = typedArray.getDrawable(R.styleable.AccountInfoView_accountActionIcon)
             actionIcon?.let(::setActionIcon)
 
+            val actionIconTint = typedArray.getColorOrNull(R.styleable.AccountInfoView_accountActionIconTint)
+            setActionIconTint(actionIconTint)
+
             val textVisible = typedArray.getBoolean(R.styleable.AccountInfoView_textVisible, true)
             accountAddressText.visibility = if (textVisible) View.VISIBLE else View.GONE
 
@@ -47,6 +55,10 @@ class AccountInfoView @JvmOverloads constructor(
 
     fun setActionIcon(icon: Drawable) {
         accountAction.setImageDrawable(icon)
+    }
+
+    fun setActionIconTint(@ColorInt color: Int?) {
+        accountAction.setImageTint(color)
     }
 
     fun setActionListener(clickListener: (View) -> Unit) {
