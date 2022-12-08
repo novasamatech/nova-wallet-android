@@ -32,6 +32,8 @@ fun ValidationSystem.Companion.parachainStakingStart(
     )
 
     enoughToPayFees()
+
+    enoughStakeable()
 }
 
 
