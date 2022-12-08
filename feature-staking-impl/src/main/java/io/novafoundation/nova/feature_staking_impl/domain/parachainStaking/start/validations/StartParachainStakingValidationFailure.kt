@@ -9,6 +9,8 @@ sealed class StartParachainStakingValidationFailure {
 
     object NotEnoughBalanceToPayFees : StartParachainStakingValidationFailure()
 
+    object NotEnoughStakeableBalance: StartParachainStakingValidationFailure()
+
     object PendingRevoke : StartParachainStakingValidationFailure()
 
     object CollatorIsNotActive : StartParachainStakingValidationFailure()

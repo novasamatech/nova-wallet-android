@@ -147,13 +147,14 @@ class ConfirmStartParachainStakingViewModel(
         feeLoaderMixin.setFee(payload.fee)
     }
 
-    private fun sendTransactionIfValid() = requireFee { fee ->
+    private fun sendTransactionIfValid() = requireFee { _ ->
         launch {
             val payload = StartParachainStakingValidationPayload(
                 amount = payload.amount,
                 fee = payload.fee,
                 collator = collator(),
-                asset = assetFlow.first()
+                asset = assetFlow.first(),
+                delegatorState = delegatorStateFlow.first(),
             )
 
             validationExecutor.requireValid(
