@@ -36,19 +36,7 @@ class ClipboardManager(
             } else {
                 val item: ClipData.Item = primaryClip!!.getItemAt(0)
 
-                item.text.toString()
-            }
-        }
-    }
-
-    fun getAny(): String? {
-        return with(clipboardManager) {
-            if (hasPrimaryClip()) {
-                val item: ClipData.Item = primaryClip!!.getItemAt(0)
-
-                item.text.toString()
-            } else {
-                null
+                item.text?.toString()
             }
         }
     }
