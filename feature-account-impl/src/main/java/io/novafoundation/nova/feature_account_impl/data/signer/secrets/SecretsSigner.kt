@@ -5,6 +5,8 @@ import io.novafoundation.nova.common.data.secrets.v2.getChainAccountKeypair
 import io.novafoundation.nova.common.data.secrets.v2.getMetaAccountKeypair
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionFor
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import jp.co.soramitsu.fearless_utils.encrypt.MultiChainEncryption
 import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -14,17 +16,19 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtr
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 
 class SecretsSignerFactory(
-    private val secretStoreV2: SecretStoreV2
+    private val secretStoreV2: SecretStoreV2,
+    private val chainRegistry: ChainRegistry,
 ) {
 
     fun create(metaAccount: MetaAccount): SecretsSigner {
-        return SecretsSigner(metaAccount, secretStoreV2)
+        return SecretsSigner(metaAccount, secretStoreV2, chainRegistry)
     }
 }
 
 class SecretsSigner(
     private val metaAccount: MetaAccount,
-    private val secretStoreV2: SecretStoreV2
+    private val secretStoreV2: SecretStoreV2,
+    private val chainRegistry: ChainRegistry,
 ) : Signer {
 
     override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignatureWrapper {
@@ -40,7 +44,8 @@ class SecretsSigner(
     }
 
     private suspend fun createDelegate(accountId: AccountId): KeyPairSigner {
-        val multiChainEncryption = metaAccount.multiChainEncryptionFor(accountId)!!
+        val chainsById = chainRegistry.chainsById()
+        val multiChainEncryption = metaAccount.multiChainEncryptionFor(accountId, chainsById)!!
 
         val keypair = secretStoreV2.getKeypair(
             metaAccount = metaAccount,

@@ -28,7 +28,8 @@ class GovernanceDAppsSyncService(
                 GovernanceDAppLocal(
                     chainWithDapp.chainId,
                     it.title,
-                    it.url,
+                    it.urlV1,
+                    it.urlV2,
                     it.icon,
                     it.details
                 )

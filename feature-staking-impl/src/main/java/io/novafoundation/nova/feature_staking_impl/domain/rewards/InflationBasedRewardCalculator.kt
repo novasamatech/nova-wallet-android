@@ -2,11 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.domain.rewards
 
 import io.novafoundation.nova.common.utils.median
 import io.novafoundation.nova.common.utils.sumByBigInteger
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
-import kotlin.math.pow
 
 private val IGNORED_COMMISSION_THRESHOLD = 1.toBigDecimal()
 
@@ -41,7 +38,7 @@ abstract class InflationBasedRewardCalculator(
         calculateExpectedAPY(averageValidatorRewardPercentage).toBigDecimal()
     }
 
-    private val maxAPY by lazy {
+    override val maxAPY by lazy {
         apyByValidator.values.maxOrNull() ?: 0.0
     }
 
@@ -68,43 +65,5 @@ abstract class InflationBasedRewardCalculator(
 
     override fun getApyFor(targetIdHex: String): BigDecimal {
         return apyByValidator[targetIdHex]?.toBigDecimal() ?: expectedAPY
-    }
-
-    override suspend fun calculateReturns(
-        amount: BigDecimal,
-        days: Int,
-        isCompound: Boolean,
-    ) = withContext(Dispatchers.Default) {
-        val dailyPercentage = (maxAPY + 1).pow(1.0 / DAYS_IN_YEAR) - 1
-
-        calculateReward(amount.toDouble(), days, dailyPercentage, isCompound)
-    }
-
-    private fun calculateReward(
-        amount: Double,
-        days: Int,
-        dailyPercentage: Double,
-        isCompound: Boolean
-    ): PeriodReturns {
-        val gainPercentage = if (isCompound) {
-            calculateCompoundPercentage(days, dailyPercentage)
-        } else {
-            calculateSimplePercentage(days, dailyPercentage)
-        }
-
-        val gainAmount = gainPercentage * amount
-
-        return PeriodReturns(
-            gainAmount = gainAmount.toBigDecimal(),
-            gainFraction = gainPercentage.toBigDecimal()
-        )
-    }
-
-    private fun calculateCompoundPercentage(days: Int, dailyPercentage: Double): Double {
-        return (1 + dailyPercentage).pow(days) - 1
-    }
-
-    private fun calculateSimplePercentage(days: Int, dailyPercentage: Double): Double {
-        return dailyPercentage * days
     }
 }

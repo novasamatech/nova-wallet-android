@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.GlobalScopeUpdater
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.historicalEras
@@ -39,7 +39,7 @@ class HistoricalUpdateMediator(
 
     override val requiredModules: List<String> = listOf(Modules.STAKING)
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
         val chainId = stakingSharedState.chainId()
         val runtime = chainRegistry.getRuntime(chainId)
 

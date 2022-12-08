@@ -11,22 +11,27 @@ import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.encrypt.junction.BIP32JunctionDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.mnemonic.Mnemonic
 import jp.co.soramitsu.fearless_utils.encrypt.seed.SeedFactory
+import jp.co.soramitsu.fearless_utils.extensions.asEthereumAccountId
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
+import jp.co.soramitsu.fearless_utils.extensions.toAddress
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.SignedExtras
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.skipAliases
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.genesisHash
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
 import jp.co.soramitsu.fearless_utils.runtime.metadata.fullName
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Constant
+import jp.co.soramitsu.fearless_utils.runtime.metadata.module.FunctionArgument
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.MetadataFunction
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
@@ -60,6 +65,9 @@ fun ByteArray.toAddress(networkType: Node.NetworkType) = toAddress(networkType.r
 fun String.isValidSS58Address() = runCatching { toAccountId() }.isSuccess
 
 fun String.removeHexPrefix() = removePrefix("0x")
+
+fun MetadataFunction.argument(name: String): FunctionArgument = arguments.first { it.name == name }
+fun FunctionArgument.requireActualType() = type?.skipAliases()!!
 
 fun Short.toByteArray(byteOrder: ByteOrder = ByteOrder.BIG_ENDIAN): ByteArray {
     val buffer = ByteBuffer.allocate(2)
@@ -191,6 +199,8 @@ fun RuntimeMetadata.treasury() = module(Modules.TREASURY)
 
 fun RuntimeMetadata.preImage() = module(Modules.PREIMAGE)
 
+fun RuntimeMetadata.xTokens() = module(Modules.X_TOKENS)
+
 fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
     return options.first(::hasModule)
 }
@@ -225,6 +235,10 @@ fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))
 fun SignatureWrapper.asHexString() = signature.toHexString(withPrefix = true)
 
 fun String.ethereumAddressToAccountId() = asEthereumAddress().toAccountId().value
+fun AccountId.ethereumAccountIdToAddress(withChecksum: Boolean = true) = asEthereumAccountId().toAddress(withChecksum).value
+
+fun emptyEthereumAccountId() = ByteArray(20) { 1 }
+fun emptyEthereumAddress() = emptyEthereumAccountId().ethereumAccountIdToAddress(withChecksum = false)
 
 val SignerPayloadExtrinsic.chainId: String
     get() = genesisHash.toHexString()

@@ -149,7 +149,8 @@ class ReferendumDetailsViewModel(
 
     val referendumDApps = flowOfAll {
         val chainId = selectedAssetSharedState.chainId()
-        governanceDAppsInteractor.observeReferendumDapps(chainId, payload.toReferendumId())
+        val selectedGovernanceOption = selectedAssetSharedState.selectedOption()
+        governanceDAppsInteractor.observeReferendumDapps(payload.toReferendumId(), selectedGovernanceOption)
     }
         .mapList(::mapGovernanceDAppToUi)
         .shareInBackground()

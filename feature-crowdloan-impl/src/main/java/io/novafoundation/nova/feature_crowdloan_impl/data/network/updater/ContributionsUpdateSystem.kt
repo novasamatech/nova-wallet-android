@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.data.network.updater
 
 import android.util.Log
-import io.novafoundation.nova.common.data.network.StorageSubscriptionBuilder
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core.updater.Updater
@@ -9,10 +8,11 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdateSystemFactory
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdaterFactory
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.awaitSocket
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -58,8 +58,8 @@ class ContributionsUpdateSystem(
 
     private fun run(chain: Chain, metaAccount: MetaAccount): Flow<Updater.SideEffect> {
         return flow {
-            val socket = chainRegistry.getSocket(chain.id)
-            val subscriptionBuilder = StorageSubscriptionBuilder.create(socket)
+            val socket = chainRegistry.awaitSocket(chain.id)
+            val subscriptionBuilder = StorageSharedRequestsBuilder.create(socket)
             val invalidationScope = assetBalanceScopeFactory.create(chain.utilityAsset, metaAccount)
             val updater = contributionsUpdaterFactory.create(chain, invalidationScope)
 

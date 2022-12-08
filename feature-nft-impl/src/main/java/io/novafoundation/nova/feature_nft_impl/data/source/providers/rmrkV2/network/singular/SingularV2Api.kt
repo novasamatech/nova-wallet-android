@@ -9,15 +9,15 @@ import retrofit2.http.Url
 interface SingularV2Api {
 
     companion object {
-        const val BASE_URL = "https://singular.app/api/rmrk2/"
+        const val BASE_URL = "https://singular.rmrk-api.xyz/api/"
     }
-
-    @GET("collection/{collectionId}")
-    suspend fun getCollection(@Path("collectionId") collectionId: String): List<SingularV2CollectionRemote>
 
     @GET("account/{accountAddress}")
     @Headers(CacheControl.NO_CACHE)
     suspend fun getAccountNfts(@Path("accountAddress") accountAddress: String): List<SingularV2NftRemote>
+
+    @GET("https://singular.app/api/rmrk2/collection/{collectionId}")
+    suspend fun getCollection(@Path("collectionId") collectionId: String): List<SingularV2CollectionRemote>
 
     @GET
     suspend fun getIpfsMetadata(@Url url: String): SingularV2CollectionMetadata

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.domain
 
-import io.novafoundation.nova.common.data.model.CursorPage
+import io.novafoundation.nova.common.data.model.DataPage
+import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
@@ -41,9 +42,9 @@ interface WalletInteractor {
         chainId: ChainId,
         chainAssetId: Int,
         pageSize: Int,
-        cursor: String?,
+        pageOffset: PageOffset.Loadable,
         filters: Set<TransactionFilter>
-    ): Result<CursorPage<Operation>>
+    ): Result<DataPage<Operation>>
 
     suspend fun groupAssets(
         assets: List<Asset>,

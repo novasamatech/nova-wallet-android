@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.Pari
 import io.novafoundation.nova.feature_account_impl.data.signer.secrets.SecretsSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.watchOnly.WatchOnlySigner
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
 @Module
@@ -27,7 +28,7 @@ class SignersModule {
 
     @Provides
     @FeatureScope
-    fun provideSecretsSignerFactory(secretStoreV2: SecretStoreV2) = SecretsSignerFactory(secretStoreV2)
+    fun provideSecretsSignerFactory(secretStoreV2: SecretStoreV2, chainRegistry: ChainRegistry) = SecretsSignerFactory(secretStoreV2, chainRegistry)
 
     @Provides
     @FeatureScope

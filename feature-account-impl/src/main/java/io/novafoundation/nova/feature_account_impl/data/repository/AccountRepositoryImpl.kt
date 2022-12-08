@@ -40,7 +40,6 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
@@ -97,10 +96,6 @@ class AccountRepositoryImpl(
                 selectNode(defaultNode)
             }
         }
-    }
-
-    override suspend fun getSelectedAccount(chainId: String): Account {
-        return accountDataSource.selectedAccountMapping.first().getValue(chainId)!!
     }
 
     override suspend fun getSelectedMetaAccount(): MetaAccount {

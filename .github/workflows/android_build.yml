@@ -35,6 +35,10 @@ on:
         required: true
       MOONPAY_TEST_SECRET:
         required: true
+      EHTERSCAN_API_KEY_MOONBEAM:
+        required: true
+      EHTERSCAN_API_KEY_MOONRIVER:
+        required: true
       # Special secrets for signing:
       CI_MARKET_KEYSTORE_PASS:
         required: false
@@ -66,6 +70,8 @@ env:
   MOONPAY_TEST_SECRET: ${{ secrets.MOONPAY_TEST_SECRET }}
   MERCURYO_PRODUCTION_SECRET: ${{ secrets.MERCURYO_PRODUCTION_SECRET }}
   MERCURYO_TEST_SECRET: ${{ secrets.MERCURYO_TEST_SECRET }}
+  EHTERSCAN_API_KEY_MOONBEAM: ${{ secrets.EHTERSCAN_API_KEY_MOONBEAM }}
+  EHTERSCAN_API_KEY_MOONRIVER: ${{ secrets.EHTERSCAN_API_KEY_MOONRIVER }}
 
   CI_MARKET_KEYSTORE_PASS: ${{ secrets.CI_MARKET_KEYSTORE_PASS }}
   CI_MARKET_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_ALIAS }}

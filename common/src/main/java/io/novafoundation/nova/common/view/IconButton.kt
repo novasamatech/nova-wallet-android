@@ -30,6 +30,13 @@ class IconButton @JvmOverloads constructor(
         setImageDrawable(icon)
     }
 
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val height = MeasureSpec.makeMeasureSpec(32.dp, MeasureSpec.EXACTLY)
+        val width = MeasureSpec.makeMeasureSpec(44.dp, MeasureSpec.EXACTLY)
+
+        super.onMeasure(width, height)
+    }
+
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.IconButton) { typedArray ->
         val icon = typedArray.getDrawable(R.styleable.IconButton_android_src)
         icon?.let(::setIcon)

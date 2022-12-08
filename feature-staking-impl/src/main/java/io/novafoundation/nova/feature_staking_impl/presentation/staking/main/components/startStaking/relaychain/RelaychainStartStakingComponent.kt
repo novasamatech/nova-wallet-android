@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.calculateMaxPeriodReturns
-import io.novafoundation.nova.feature_staking_impl.domain.rewards.maxCompoundAPY
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -88,7 +87,7 @@ private class RelaychainStartStakingComponent(
         val rewardCalculator = rewardCalculator()
 
         val payload = StakingRewardEstimationBottomSheet.Payload(
-            max = rewardCalculator.maxCompoundAPY().formatFractionAsPercentage(),
+            max = rewardCalculator.maxAPY.toBigDecimal().formatFractionAsPercentage(),
             average = rewardCalculator.expectedAPY.formatFractionAsPercentage(),
             returnsTypeFormat = R.string.staking_apy,
             title = resourceManager.getString(R.string.staking_reward_info_title_restake)

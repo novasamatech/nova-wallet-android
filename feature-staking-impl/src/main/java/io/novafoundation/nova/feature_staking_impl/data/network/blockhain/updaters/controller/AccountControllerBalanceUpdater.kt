@@ -2,13 +2,14 @@ package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updat
 
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.system
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.scope.AccountStakingScope
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.bindAccountInfoOrDefault
 import io.novafoundation.nova.feature_wallet_api.data.cache.updateAsset
+import io.novafoundation.nova.runtime.ext.disabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.state.chainAndAsset
@@ -29,8 +30,10 @@ class AccountControllerBalanceUpdater(
 
     override val requiredModules: List<String> = listOf(Modules.SYSTEM, Modules.STAKING)
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
         val (chain, chainAsset) = sharedState.chainAndAsset()
+        if (chainAsset.disabled) return emptyFlow()
+
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val accountStaking = scope.getAccountStaking()

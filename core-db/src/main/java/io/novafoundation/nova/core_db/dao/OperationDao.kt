@@ -50,13 +50,13 @@ abstract class OperationDao {
     ): List<String>
 
     @Transaction
-    open suspend fun insertFromSubquery(
+    open suspend fun insertFromRemote(
         accountAddress: String,
         chainId: String,
         chainAssetId: Int,
         operations: List<OperationLocal>
     ) {
-        clearBySource(accountAddress, chainId, chainAssetId, OperationLocal.Source.SUBQUERY)
+        clearBySource(accountAddress, chainId, chainAssetId, OperationLocal.Source.REMOTE)
 
         val operationsWithHashes = operations.mapNotNullTo(mutableSetOf(), OperationLocal::hash)
 

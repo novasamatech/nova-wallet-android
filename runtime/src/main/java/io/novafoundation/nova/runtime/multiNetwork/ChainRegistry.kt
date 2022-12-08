@@ -5,10 +5,15 @@ import io.novafoundation.nova.common.utils.diffed
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.removeHexPrefix
+import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core_db.dao.ChainDao
+import io.novafoundation.nova.runtime.ethereum.Web3Api
+import io.novafoundation.nova.runtime.ethereum.WebSocketWeb3jService
+import io.novafoundation.nova.runtime.multiNetwork.asset.EvmAssetsSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
-import io.novafoundation.nova.runtime.multiNetwork.chain.mapChainLocalToChain
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainLocalToChain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionPool
@@ -17,6 +22,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSubscriptionPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSyncService
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.BaseTypeSynchronizer
+import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
@@ -37,12 +43,21 @@ data class ChainWithAsset(
     val asset: Chain.Asset
 )
 
+@JvmInline
+value class ChainsById(val value: Map<ChainId, Chain>) : Map<ChainId, Chain> by value {
+
+    override operator fun get(key: ChainId): Chain? {
+        return value[key.removeHexPrefix()]
+    }
+}
+
 class ChainRegistry(
     private val runtimeProviderPool: RuntimeProviderPool,
     private val connectionPool: ConnectionPool,
     private val runtimeSubscriptionPool: RuntimeSubscriptionPool,
     private val chainDao: ChainDao,
     private val chainSyncService: ChainSyncService,
+    private val evmAssetsSyncService: EvmAssetsSyncService,
     private val baseTypeSynchronizer: BaseTypeSynchronizer,
     private val runtimeSyncService: RuntimeSyncService,
     private val gson: Gson
@@ -51,8 +66,8 @@ class ChainRegistry(
     val currentChains = chainDao.joinChainInfoFlow()
         .mapList { mapChainLocalToChain(it, gson) }
         .diffed()
-        .map { (removed, addedOrModified, all) ->
-            removed.forEach {
+        .map { diff ->
+            diff.removed.forEach {
                 val chainId = it.id
 
                 runtimeProviderPool.removeRuntimeProvider(chainId)
@@ -61,7 +76,7 @@ class ChainRegistry(
                 connectionPool.removeConnection(chainId)
             }
 
-            addedOrModified.forEach { chain ->
+            diff.newOrUpdated.forEach { chain ->
                 val connection = connectionPool.setupConnection(chain)
 
                 runtimeProviderPool.setupRuntimeProvider(chain)
@@ -70,7 +85,7 @@ class ChainRegistry(
                 runtimeProviderPool.setupRuntimeProvider(chain)
             }
 
-            all
+            diff.all
         }
         .filter { it.isNotEmpty() }
         .distinctUntilChanged()
@@ -82,7 +97,10 @@ class ChainRegistry(
         .shareIn(this, SharingStarted.Eagerly, replay = 1)
 
     init {
-        launch { chainSyncService.syncUp() }
+        launch {
+            chainSyncService.syncUp()
+            evmAssetsSyncService.syncUp()
+        }
 
         baseTypeSynchronizer.sync()
     }
@@ -127,7 +145,25 @@ suspend fun ChainRegistry.getRuntime(chainId: String) = getRuntimeProvider(chain
 
 fun ChainRegistry.getSocket(chainId: String) = getConnection(chainId).socketService
 
+suspend fun ChainRegistry.awaitChains() {
+    chainsById.first()
+}
+
+suspend fun ChainRegistry.awaitSocket(chainId: String): SocketService {
+    awaitChains()
+
+    return getSocket(chainId)
+}
+
+suspend fun ChainRegistry.chainsById(): ChainsById = ChainsById(chainsById.first())
+
 fun ChainRegistry.getService(chainId: String) = ChainService(
     runtimeProvider = getRuntimeProvider(chainId),
     connection = getConnection(chainId)
 )
+
+suspend fun ChainRegistry.ethereumApi(chainId: String): Web3Api {
+    val socket = awaitSocket(chainId)
+
+    return Web3Api(WebSocketWeb3jService(socket))
+}

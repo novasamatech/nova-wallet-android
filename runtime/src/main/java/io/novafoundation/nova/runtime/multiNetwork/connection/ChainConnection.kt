@@ -48,7 +48,7 @@ class ChainConnection internal constructor(
 ) : CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
     enum class ExternalRequirement {
-        ALLOWED, STOPPED, FORBIDDEN
+        ALLOWED, STOPPED
     }
 
     val state = socketService.networkStateFlow()

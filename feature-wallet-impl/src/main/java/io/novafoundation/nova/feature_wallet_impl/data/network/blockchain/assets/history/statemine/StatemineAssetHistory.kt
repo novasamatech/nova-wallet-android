@@ -5,8 +5,10 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.oneOf
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.filterOwn
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.SubstrateAssetHistory
+import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
+import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.ext.palletNameOrDefault
 import io.novafoundation.nova.runtime.ext.requireStatemine
@@ -24,7 +26,9 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 class StatemineAssetHistory(
     private val chainRegistry: ChainRegistry,
     private val eventsRepository: EventsRepository,
-) : AssetHistory {
+    walletOperationsApi: SubQueryOperationsApi,
+    cursorStorage: TransferCursorStorage,
+) : SubstrateAssetHistory(walletOperationsApi, cursorStorage) {
 
     override suspend fun fetchOperationsForBalanceChange(
         chain: Chain,

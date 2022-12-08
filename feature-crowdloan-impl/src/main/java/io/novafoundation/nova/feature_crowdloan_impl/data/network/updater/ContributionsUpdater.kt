@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_crowdloan_impl.data.network.updater
 
 import io.novafoundation.nova.common.utils.CollectionDiffer
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.UpdateScope
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.ContributionDao
@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.Contrib
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.mapContributionToLocal
+import io.novafoundation.nova.runtime.ext.disabled
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
@@ -48,7 +49,10 @@ class ContributionsUpdater(
 
     override val requiredModules: List<String> = emptyList()
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
+        val crowdloanToken = chain.utilityAsset
+        if (crowdloanToken.disabled) return emptyFlow()
+
         return scope.invalidationFlow().flatMapLatest {
             val metaAccount = accountScope.getAccount()
             val accountId = metaAccount.accountIdIn(chain) ?: return@flatMapLatest emptyFlow()

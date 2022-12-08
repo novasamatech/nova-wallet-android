@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
@@ -32,6 +33,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserProvider
+import io.novafoundation.nova.feature_account_impl.data.ethereum.transaction.RealEvmTransactionService
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicService
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
@@ -312,4 +314,16 @@ class AccountFeatureModule {
     fun provideIdentityRepository(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
     ): OnChainIdentityRepository = RealOnChainIdentityRepository(remoteStorageSource)
+
+    @Provides
+    @FeatureScope
+    fun provideEvmTransactionService(
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+        signerProvider: SignerProvider
+    ): EvmTransactionService = RealEvmTransactionService(
+        accountRepository = accountRepository,
+        chainRegistry = chainRegistry,
+        signerProvider = signerProvider
+    )
 }

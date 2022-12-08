@@ -15,16 +15,20 @@ import io.novafoundation.nova.feature_assets.data.buyToken.providers.RampProvide
 import io.novafoundation.nova.feature_assets.data.buyToken.providers.TransakProvider
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.PreferencesAssetFiltersRepository
+import io.novafoundation.nova.feature_assets.di.modules.AddTokenModule
+import io.novafoundation.nova.feature_assets.di.modules.ManageTokensCommonModule
 import io.novafoundation.nova.feature_assets.di.modules.SendModule
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
+import io.novafoundation.nova.feature_assets.domain.tokens.add.CoinGeckoLinkParser
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
-@Module(includes = [SendModule::class])
+@Module(includes = [SendModule::class, ManageTokensCommonModule::class, AddTokenModule::class])
 class AssetsFeatureModule {
 
     @Provides
@@ -41,12 +45,14 @@ class AssetsFeatureModule {
         assetFiltersRepository: AssetFiltersRepository,
         chainRegistry: ChainRegistry,
         nftRepository: NftRepository,
+        transactionHistoryRepository: TransactionHistoryRepository,
     ): WalletInteractor = WalletInteractorImpl(
-        walletRepository,
-        accountRepository,
-        assetFiltersRepository,
-        chainRegistry,
-        nftRepository,
+        walletRepository = walletRepository,
+        accountRepository = accountRepository,
+        assetFiltersRepository = assetFiltersRepository,
+        chainRegistry = chainRegistry,
+        nftRepository = nftRepository,
+        transactionHistoryRepository = transactionHistoryRepository
     )
 
     @Provides
@@ -114,4 +120,10 @@ class AssetsFeatureModule {
     fun provideHistoryFiltersProviderFactory(
         computationalCache: ComputationalCache
     ) = HistoryFiltersProviderFactory(computationalCache)
+
+    @Provides
+    @FeatureScope
+    fun provideCoinGeckoLinkParser(): CoinGeckoLinkParser {
+        return CoinGeckoLinkParser()
+    }
 }

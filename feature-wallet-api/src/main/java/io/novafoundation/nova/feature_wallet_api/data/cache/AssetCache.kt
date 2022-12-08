@@ -7,6 +7,8 @@ import io.novafoundation.nova.core_db.model.AssetLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.toPair
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -56,6 +58,11 @@ class AssetCache(
         applicableMetaAccount?.let {
             updateAsset(it.id, chainAsset, builder)
         } ?: false
+    }
+
+    suspend fun clearAssets(assetIds: List<FullChainAssetId>) = withContext(Dispatchers.IO) {
+        val localAssetIds = assetIds.map { it.toPair() }
+        assetDao.clearAssets(localAssetIds)
     }
 
     suspend fun insertTokens(tokens: List<TokenLocal>) = tokenDao.insertTokens(tokens)

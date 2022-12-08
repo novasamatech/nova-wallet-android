@@ -13,6 +13,8 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.orml.OrmlAssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.orml.OrmlAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.orml.OrmlAssetTransfers
+import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
+import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
@@ -49,7 +51,9 @@ class OrmlAssetsModule {
     fun provideHistory(
         chainRegistry: ChainRegistry,
         eventsRepository: EventsRepository,
-    ) = OrmlAssetHistory(chainRegistry, eventsRepository)
+        subQueryOperationsApi: SubQueryOperationsApi,
+        cursorStorage: TransferCursorStorage
+    ) = OrmlAssetHistory(chainRegistry, eventsRepository, subQueryOperationsApi, cursorStorage)
 
     @Provides
     @OrmlAssets

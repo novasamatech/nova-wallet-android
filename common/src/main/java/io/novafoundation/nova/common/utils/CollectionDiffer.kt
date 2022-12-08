@@ -13,7 +13,8 @@ object CollectionDiffer {
     data class Diff<T>(
         val added: List<T>,
         val updated: List<T>,
-        val removed: List<T>
+        val removed: List<T>,
+        val all: List<T>
     ) {
         val newOrUpdated by lazy { updated + added }
     }
@@ -41,12 +42,13 @@ object CollectionDiffer {
 
         val removed = oldItems.filter { it.identifier !in newKeys }
 
-        return Diff(added = added, updated = updated, removed = removed)
+        return Diff(added = added, updated = updated, removed = removed, all = newItems)
     }
 }
 
 fun <T, R> CollectionDiffer.Diff<T>.map(mapper: (T) -> R) = CollectionDiffer.Diff(
     added = added.map(mapper),
     updated = updated.map(mapper),
-    removed = removed.map(mapper)
+    removed = removed.map(mapper),
+    all = all.map(mapper)
 )

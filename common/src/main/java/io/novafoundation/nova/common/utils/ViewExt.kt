@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.utils
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.TypedArray
@@ -204,6 +205,10 @@ fun View.setVisible(visible: Boolean, falseState: Int = View.GONE) {
 fun View.hideSoftKeyboard() {
     val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
+}
+
+fun Activity.hideSoftKeyboard() {
+    currentFocus?.hideSoftKeyboard()
 }
 
 fun View.showSoftKeyboard() {

@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updat
 import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.core.model.StorageChange
 import io.novafoundation.nova.core.storage.StorageCache
-import io.novafoundation.nova.core.updater.SubscriptionBuilder
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedger
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.StakingUpdater
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
+import io.novafoundation.nova.runtime.ext.disabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -56,8 +57,10 @@ class StakingLedgerUpdater(
     override val scope: AccountUpdateScope,
 ) : StakingUpdater {
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SubscriptionBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
         val (chain, chainAsset) = stakingSharedState.assetWithChain.first()
+        if (chainAsset.disabled) return emptyFlow()
+
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val currentAccountId = scope.getAccount().accountIdIn(chain) ?: return emptyFlow()
