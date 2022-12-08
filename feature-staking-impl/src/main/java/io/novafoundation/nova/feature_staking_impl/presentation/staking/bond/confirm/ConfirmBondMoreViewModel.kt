@@ -56,10 +56,10 @@ class ConfirmBondMoreViewModel(
         hintsRes = listOf(R.string.staking_hint_reward_bond_more_v2_2_0)
     )
 
-    private val assetFlow = interactor.assetFlow(payload.stashAddress)
+    private val stashAssetFlow = interactor.assetFlow(payload.stashAddress)
         .shareInBackground()
 
-    val amountModelFlow = assetFlow.map { asset ->
+    val amountModelFlow = stashAssetFlow.map { asset ->
         mapAmountToAmountModel(payload.amount, asset)
     }
         .shareInBackground()
@@ -67,7 +67,7 @@ class ConfirmBondMoreViewModel(
     val walletUiFlow = walletUiUseCase.selectedWalletUiFlow()
         .shareInBackground()
 
-    val feeStatusFlow = assetFlow.map { asset ->
+    val feeStatusFlow = stashAssetFlow.map { asset ->
         val feeModel = mapFeeToFeeModel(payload.fee, asset.token)
 
         FeeStatus.Loaded(feeModel)
@@ -96,7 +96,7 @@ class ConfirmBondMoreViewModel(
             stashAddress = payload.stashAddress,
             fee = payload.fee,
             amount = payload.amount,
-            chainAsset = assetFlow.first().token.configuration
+            stashAsset = stashAssetFlow.first()
         )
 
         validationExecutor.requireValid(
@@ -110,7 +110,7 @@ class ConfirmBondMoreViewModel(
     }
 
     private fun sendTransaction() = launch {
-        val token = assetFlow.first().token
+        val token = stashAssetFlow.first().token
         val amountInPlanks = token.planksFromAmount(payload.amount)
 
         val result = bondMoreInteractor.bondMore(payload.stashAddress, amountInPlanks)
