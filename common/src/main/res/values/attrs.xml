@@ -50,10 +50,12 @@
         <attr name="android:singleLine" />
 
         <attr name="messageStyle" format="reference" />
+        <attr name="labelStyle" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="AccountInfoView">
         <attr name="accountActionIcon" format="reference|color" />
+        <attr name="accountActionIconTint" format="color" />
         <attr name="textVisible" format="boolean" />
     </declare-styleable>
 
