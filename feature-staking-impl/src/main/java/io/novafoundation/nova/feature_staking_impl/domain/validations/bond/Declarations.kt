@@ -3,8 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.domain.validations.bond
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_staking_impl.domain.common.stakeable
-import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughToPayFeesValidation
-import io.novafoundation.nova.feature_wallet_api.domain.validation.PositiveAmountValidation
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 

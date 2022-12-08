@@ -12,6 +12,5 @@ class BondMoreValidationsModule {
 
     @Provides
     @FeatureScope
-    fun provideBondMoreValidationSystem(
-    ): BondMoreValidationSystem = ValidationSystem.bondMore()
+    fun provideBondMoreValidationSystem(): BondMoreValidationSystem = ValidationSystem.bondMore()
 }
