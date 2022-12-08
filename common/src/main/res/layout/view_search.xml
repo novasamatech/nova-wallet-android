@@ -9,6 +9,7 @@
     tools:parentTag="android.widget.LinearLayout">
 
     <ImageView
+        android:id="@+id/searchIcon"
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:layout_gravity="center_vertical"
