@@ -64,7 +64,11 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
         database.execSQL(
             """
             INSERT INTO chain_assets
-            SELECT * FROM chain_assets_old
+            SELECT 
+                id, chainId, name, symbol, priceId,
+                staking, precision, icon, type, source,
+                buyProviders, typeExtras, enabled
+            FROM chain_assets_old
             """.trimIndent()
         )
 
@@ -98,7 +102,11 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
         database.execSQL(
             """
             INSERT INTO assets
-            SELECT * FROM assets_old
+            SELECT 
+                assetId, chainId, metaId,
+                freeInPlanks, frozenInPlanks, reservedInPlanks,
+                bondedInPlanks, redeemableInPlanks, unbondingInPlanks
+            FROM assets_old
             """.trimIndent()
         )
 
@@ -121,9 +129,9 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
             `chainId` TEXT NOT NULL,
             `publicKey` BLOB,
             `accountId` BLOB NOT NULL,
-            `cryptoType` TEXT, PRIMARY KEY(`metaId`,
-            `chainId`),
-             FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
+            `cryptoType` TEXT,
+            PRIMARY KEY(`metaId`, `chainId`),
+            FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
             )
             """.trimIndent()
         )
@@ -131,7 +139,8 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
         database.execSQL(
             """
             INSERT INTO chain_accounts
-            SELECT * FROM chain_accounts_old
+            SELECT metaId, chainId, publicKey, accountId, cryptoType
+            FROM chain_accounts_old
             """.trimIndent()
         )
 
@@ -162,7 +171,7 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
         database.execSQL(
             """
             INSERT INTO chain_runtimes
-            SELECT * FROM chain_runtimes_old
+            SELECT chainId, syncedVersion, remoteVersion FROM chain_runtimes_old
             """.trimIndent()
         )
 
@@ -193,7 +202,7 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
         database.execSQL(
             """
             INSERT INTO chain_explorers
-            SELECT * FROM chain_explorers_old
+            SELECT chainId, name, extrinsic, account, event FROM chain_explorers_old
             """.trimIndent()
         )
 
@@ -223,7 +232,7 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
         database.execSQL(
             """
             INSERT INTO chain_nodes
-            SELECT * FROM chain_nodes_old
+            SELECT chainId, url, name, orderId FROM chain_nodes_old
             """.trimIndent()
         )
 
@@ -254,7 +263,7 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
         database.execSQL(
             """
             INSERT INTO locks
-            SELECT * FROM locks_old
+            SELECT metaId, chainId, assetId, type, amount FROM locks_old
             """.trimIndent()
         )
 

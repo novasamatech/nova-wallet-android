@@ -135,7 +135,6 @@
 
     <declare-styleable name="SearchView">
         <attr name="android:hint" />
-        <attr name="icon" />
     </declare-styleable>
 
     <declare-styleable name="Switch">

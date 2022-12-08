@@ -5,16 +5,13 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
-import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
-import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.onTextChanged
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
 import kotlinx.android.synthetic.main.view_search.view.searchClear
 import kotlinx.android.synthetic.main.view_search.view.searchContent
-import kotlinx.android.synthetic.main.view_search.view.searchIcon
 
 class SearchView @JvmOverloads constructor(
     context: Context,
@@ -49,15 +46,8 @@ class SearchView @JvmOverloads constructor(
         content.hint = hint
     }
 
-    fun setIcon(@DrawableRes icon: Int?) {
-        icon?.let { searchIcon.setImageResource(icon) }
-    }
-
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.SearchView) {
         val hint = it.getString(R.styleable.SearchView_android_hint)
         setHint(hint)
-
-        val icon = it.getResourceIdOrNull(R.styleable.SearchView_icon)
-        setIcon(icon)
     }
 }
