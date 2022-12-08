@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.onTextChanged
-import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
 import kotlinx.android.synthetic.main.view_search.view.searchClear
