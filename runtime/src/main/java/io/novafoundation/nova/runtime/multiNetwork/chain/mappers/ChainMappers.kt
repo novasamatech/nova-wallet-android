@@ -207,13 +207,16 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
         )
     }
 
-    val externalApi = chainLocal.chain.externalApi?.let { externalApi ->
+    val externalApiLocal = chainLocal.chain.externalApi
+    val externalApi = if (externalApiLocal != null || historyApis.isNotEmpty()) {
         Chain.ExternalApi(
-            staking = mapSectionLocalToSection(externalApi.staking),
+            staking = mapSectionLocalToSection(externalApiLocal?.staking),
             history = historyApis,
-            crowdloans = mapSectionLocalToSection(externalApi.crowdloans),
-            governance = mapSectionLocalToSection(externalApi.governance)
+            crowdloans = mapSectionLocalToSection(externalApiLocal?.crowdloans),
+            governance = mapSectionLocalToSection(externalApiLocal?.governance)
         )
+    } else {
+        null
     }
 
     val additional = chainLocal.chain.additional?.let { raw ->
