@@ -34,6 +34,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
+import io.novafoundation.nova.runtime.repository.getActiveIssuance
 import jp.co.soramitsu.fearless_utils.extensions.tryFindNonNull
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
@@ -88,7 +89,7 @@ class RealReferendumDetailsInteractor(
         val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
         val offChainInfo = governanceSource.offChainInfo.referendumDetails(referendumId, chain)
-        val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
+        val electorate = totalIssuanceRepository.getActiveIssuance(chain.id)
 
         return combine(
             governanceSource.referenda.onChainReferendumFlow(chain.id, referendumId),
@@ -108,7 +109,7 @@ class RealReferendumDetailsInteractor(
                 referendum = onChainReferendum,
                 tracksById = tracksById,
                 currentBlockNumber = currentBlockNumber,
-                totalIssuance = totalIssuance
+                electorate = electorate
             )
 
             val currentStatus = referendaConstructor.constructReferendumStatus(
