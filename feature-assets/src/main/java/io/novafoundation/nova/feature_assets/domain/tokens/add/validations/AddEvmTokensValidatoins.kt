@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_assets.domain.tokens.add.CustomErc20Token
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.evmAssetNotExist
-import io.novafoundation.nova.feature_wallet_api.domain.validation.validEvmAddress
+import io.novafoundation.nova.feature_wallet_api.domain.validation.validErc20Contract
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validTokenDecimals
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -16,7 +16,7 @@ typealias AddEvmTokenValidationSystem = ValidationSystem<AddEvmTokenPayload, Add
 typealias AddEvmTokenValidationSystemBuilder = ValidationSystemBuilder<AddEvmTokenPayload, AddEvmTokensValidationFailure>
 
 sealed interface AddEvmTokensValidationFailure {
-    object InvalidTokenContractAddress : AddEvmTokensValidationFailure
+    class InvalidTokenContractAddress(val chainName: String) : AddEvmTokensValidationFailure
 
     class AssetExist(val alreadyExistingSymbol: String) : AddEvmTokensValidationFailure
 
@@ -25,17 +25,17 @@ sealed interface AddEvmTokensValidationFailure {
     object InvalidCoinGeckoLink : AddEvmTokensValidationFailure
 }
 
-fun AddEvmTokenValidationSystemBuilder.validEvmAddress(
+fun AddEvmTokenValidationSystemBuilder.validErc20Contract(
     ethereumAddressFormat: EthereumAddressFormat,
     erc20Standard: Erc20Standard,
     chainRegistry: ChainRegistry,
-) = validEvmAddress(
+) = validErc20Contract(
     ethereumAddressFormat = ethereumAddressFormat,
     erc20Standard = erc20Standard,
     chainRegistry = chainRegistry,
     chain = { it.chain },
     address = { it.customErc20Token.contract },
-    error = { AddEvmTokensValidationFailure.InvalidTokenContractAddress }
+    error = { AddEvmTokensValidationFailure.InvalidTokenContractAddress(it.chain.name) }
 )
 
 fun AddEvmTokenValidationSystemBuilder.evmAssetNotExist(chainAssetRepository: ChainAssetRepository) = evmAssetNotExist(
@@ -43,7 +43,7 @@ fun AddEvmTokenValidationSystemBuilder.evmAssetNotExist(chainAssetRepository: Ch
     chain = { it.chain },
     address = { it.customErc20Token.contract },
     assetNotExistError = AddEvmTokensValidationFailure::AssetExist,
-    addressMappingError = { AddEvmTokensValidationFailure.InvalidTokenContractAddress }
+    addressMappingError = { AddEvmTokensValidationFailure.InvalidTokenContractAddress(it.chain.name) }
 )
 
 fun AddEvmTokenValidationSystemBuilder.validTokenDecimals() = validTokenDecimals(
