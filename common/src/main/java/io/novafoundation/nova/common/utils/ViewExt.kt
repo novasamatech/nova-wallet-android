@@ -25,6 +25,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
 import androidx.annotation.StyleableRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.getColorOrThrow
 import androidx.core.widget.TextViewCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -315,6 +316,8 @@ inline fun Context.useAttributes(
 }
 
 fun TypedArray.getResourceIdOrNull(@StyleableRes index: Int) = getResourceId(index, 0).takeIf { it != 0 }
+
+fun TypedArray.getColorOrNull(@StyleableRes index: Int) = runCatching { getColorOrThrow(index) }.getOrNull()
 
 fun View.applyBarMargin() = applyInsetter {
     type(statusBars = true) {

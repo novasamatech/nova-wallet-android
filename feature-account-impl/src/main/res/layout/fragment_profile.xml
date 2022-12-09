@@ -43,7 +43,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:accountActionIcon="@drawable/ic_info_24"
+            app:accountActionIcon="@drawable/ic_chevron_right"
+            app:accountActionIconTint="@color/icon_secondary"
             app:textVisible="false" />
 
         <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsGroupHeaderView

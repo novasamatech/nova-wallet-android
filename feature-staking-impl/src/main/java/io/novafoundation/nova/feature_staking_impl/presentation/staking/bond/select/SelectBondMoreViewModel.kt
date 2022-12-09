@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.common.stakeable
 import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.bond.BondMoreValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.bond.BondMoreValidationSystem
@@ -63,8 +64,8 @@ class SelectBondMoreViewModel(
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        balanceField = Asset::transferable,
-        balanceLabel = R.string.wallet_balance_transferable
+        balanceField = Asset::stakeable,
+        balanceLabel = R.string.wallet_balance_available
     )
 
     val hintsMixin = hintsMixinFactory.create(
@@ -114,7 +115,7 @@ class SelectBondMoreViewModel(
                 stashAddress = stashAddress(),
                 fee = fee,
                 amount = amountChooserMixin.amount.first(),
-                chainAsset = assetFlow.first().token.configuration
+                stashAsset = assetFlow.first()
             )
 
             validationExecutor.requireValid(

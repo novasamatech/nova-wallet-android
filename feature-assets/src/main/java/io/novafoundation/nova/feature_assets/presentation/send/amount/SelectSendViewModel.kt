@@ -43,9 +43,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireO
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.asset
-import java.math.BigDecimal
-import java.math.BigInteger
-import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -58,6 +55,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.math.BigDecimal
+import java.math.BigInteger
 
 class SelectSendViewModel(
     private val interactor: WalletInteractor,
@@ -236,7 +235,6 @@ class SelectSendViewModel(
         sendInteractor.syncCrossChainConfig()
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun setupFees() {
         originFeeMixin.setupFee { transfer -> sendInteractor.getOriginFee(transfer) }
         crossChainFeeMixin.setupFee { transfer -> sendInteractor.getCrossChainFee(transfer) }
@@ -248,9 +246,10 @@ class SelectSendViewModel(
         connectWith(
             inputSource1 = amountChooserMixin.backPressuredAmount,
             inputSource2 = destinationChain,
+            inputSource3 = addressInputMixin.inputFlow,
             scope = viewModelScope,
-            feeConstructor = { amount, destinationChain ->
-                val transfer = buildTransfer(destinationChain, amount, addressInputMixin.inputFlow.first())
+            feeConstructor = { amount, destinationChain, addressInput ->
+                val transfer = buildTransfer(destinationChain, amount, addressInput)
 
                 feeConstructor(transfer)
             }

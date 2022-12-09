@@ -4,7 +4,11 @@ import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationFailure
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationFailure.CollatorIsNotActive
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationFailure.NotEnoughBalanceToPayFees
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationFailure.NotEnoughStakeableBalance
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationFailure.NotPositiveAmount
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationFailure.PendingRevoke
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationFailure.TooLowStake
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 
@@ -16,6 +20,10 @@ fun startParachainStakingValidationFailure(
         NotEnoughBalanceToPayFees -> {
             resourceManager.getString(R.string.common_not_enough_funds_title) to
                 resourceManager.getString(R.string.common_not_enough_funds_message)
+        }
+        NotEnoughStakeableBalance -> {
+            resourceManager.getString(R.string.common_not_enough_funds_title) to
+                resourceManager.getString(R.string.choose_amount_error_too_big)
         }
         is TooLowStake -> {
             val formattedMinStake = mapAmountToAmountModel(failure.minimumStake, failure.asset).token
@@ -37,15 +45,15 @@ fun startParachainStakingValidationFailure(
                 }
             }
         }
-        StartParachainStakingValidationFailure.NotPositiveAmount -> {
+        NotPositiveAmount -> {
             resourceManager.getString(R.string.common_amount_low) to
                 resourceManager.getString(R.string.common_zero_amount_error)
         }
-        StartParachainStakingValidationFailure.CollatorIsNotActive -> {
+        CollatorIsNotActive -> {
             resourceManager.getString(R.string.parachain_staking_cannot_stake_with_collator) to
                 resourceManager.getString(R.string.parachain_staking_not_active_collator_message)
         }
-        StartParachainStakingValidationFailure.PendingRevoke -> {
+        PendingRevoke -> {
             resourceManager.getString(R.string.parachain_staking_collator_cannot_bond_more) to
                 resourceManager.getString(R.string.parachain_staking_pending_revoke_message)
         }

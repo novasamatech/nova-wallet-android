@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
+import io.novafoundation.nova.common.utils.argument
+import io.novafoundation.nova.common.utils.requireActualType
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
@@ -11,7 +13,6 @@ import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.Type
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.NumberType
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.skipAliases
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.call
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
@@ -32,10 +33,11 @@ fun ExtrinsicBuilder.xcmExecute(
 
 private fun RuntimeSnapshot.prepareWeightForEncoding(weight: Weight): Any {
     val moduleName = metadata.xcmPalletName()
-    val call = metadata.module(moduleName).call("execute")
 
-    val weightArgument = call.arguments.first { it.name == "max_weight" }
-    val weightArgumentType = weightArgument.type?.skipAliases()!!
+    val weightArgumentType = metadata.module(moduleName)
+        .call("execute")
+        .argument("max_weight")
+        .requireActualType()
 
     return when {
         weightArgumentType.isWeightV1() -> weight
