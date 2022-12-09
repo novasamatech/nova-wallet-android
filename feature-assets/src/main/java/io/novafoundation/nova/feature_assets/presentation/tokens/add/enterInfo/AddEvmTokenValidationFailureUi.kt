@@ -14,9 +14,9 @@ fun mapAddEvmTokensValidationFailureToUI(
             resourceManager.getString(R.string.asset_add_evm_token_already_exist_title) to
                 resourceManager.getString(R.string.asset_add_evm_token_already_exist_message, failure.alreadyExistingSymbol)
         }
-        AddEvmTokensValidationFailure.InvalidTokenContractAddress -> {
+        is AddEvmTokensValidationFailure.InvalidTokenContractAddress -> {
             resourceManager.getString(R.string.asset_add_evm_token_invalid_contract_address_title) to
-                resourceManager.getString(R.string.asset_add_evm_token_invalid_contract_address_message)
+                resourceManager.getString(R.string.asset_add_evm_token_invalid_contract_address_message, failure.chainName)
         }
         AddEvmTokensValidationFailure.InvalidDecimals -> {
             resourceManager.getString(R.string.asset_add_evm_token_invalid_decimals_title) to
