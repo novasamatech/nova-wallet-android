@@ -131,7 +131,7 @@
     <string name="asset_add_evm_token_already_exist_title">Этот токен уже добавлен</string>
     <string name="asset_add_evm_token_invalid_coin_gecko_link_message">Пожалуйста, убедитесь, что введенный URL-адрес имеет следующую форму: www.coingecko.com/en/coins/tether.</string>
     <string name="asset_add_evm_token_invalid_coin_gecko_link_title">Недействительная ссылка на CoinGecko</string>
-    <string name="asset_add_evm_token_invalid_contract_address_message">Введенный адрес контракта не является контрактом ERC-20.</string>
+    <string name="asset_add_evm_token_invalid_contract_address_message">Введенный адрес контракта не является %s ERC-20 контрактом.</string>
     <string name="asset_add_evm_token_invalid_contract_address_title">Неверный адрес контракта</string>
     <string name="asset_add_evm_token_invalid_decimals_message">Число десятичных знаков должно быть не менее 0 и не более 36.</string>
     <string name="asset_add_evm_token_invalid_decimals_title">Недопустимое число десятичных знаков</string>
@@ -157,7 +157,7 @@
     <string name="assets_receive_ledger_not_supported_message" formatted="false">Не переводите %s на Ledger аккаунт так как Ledger не поддерживает переводы %s, таким образом ассет будет недоступен для перевода на этом аккаунте</string>
     <string name="assets_receive_ledger_not_supported_title">Ledger не поддерживает этот токен</string>
     <string name="assets_search_hint">Поиск по названию сети или токена</string>
-    <string name="assets_search_placeholder">Не найдено сетей или токенов с\nуказаным именем</string>
+    <string name="assets_search_placeholder">Токены с указанным именем\nне найдены</string>
     <string name="assets_select_send_your_wallets">Ваши кошельки</string>
     <string name="buy_completed">Покупка совершена! Ожидайте до 60 минут. Вы можете отслеживать статус по электронной почте.</string>
     <string name="choose_amount_asset">Токен</string>
