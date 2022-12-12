@@ -9,8 +9,8 @@ import io.novafoundation.nova.common.utils.formatting.formatDateTime
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
-import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
+import io.novafoundation.nova.feature_account_api.view.showOptionalAddress
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
@@ -97,8 +97,8 @@ class TransferDetailFragment : BaseFragment<TransactionDetailViewModel>() {
             }
         }
 
-        viewModel.senderAddressModelLiveData.observe(transactionDetailFrom::showAddress)
-        viewModel.recipientAddressModelFlow.observe(transactionDetailTo::showAddress)
+        viewModel.senderAddressModelLiveData.observe(transactionDetailFrom::showOptionalAddress)
+        viewModel.recipientAddressModelFlow.observe(transactionDetailTo::showOptionalAddress)
 
         viewModel.chainUi.observe(transactionDetailNetwork::showChain)
     }

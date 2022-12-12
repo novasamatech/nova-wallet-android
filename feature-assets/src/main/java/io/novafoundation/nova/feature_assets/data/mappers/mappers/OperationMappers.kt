@@ -34,8 +34,14 @@ private fun Chain.Asset.formatPlanksSigned(planks: BigInteger, negative: Boolean
     return sign + withoutSign
 }
 
-private fun Operation.Type.Transfer.isIncome(chain: Chain): Boolean {
-    return chain.accountIdOf(myAddress).contentEquals(chain.accountIdOf(receiver))
+private fun Operation.Type.Transfer.isIncome(chain: Chain): Boolean = kotlin.runCatching {
+    val myAccountId = chain.accountIdOf(myAddress)
+    val receiverAccountId = chain.accountIdOf(receiver)
+
+    myAccountId.contentEquals(receiverAccountId)
+}.getOrElse {
+    // conversion of an address to account id failed. Try less robust direct comparison
+    myAddress.lowercase() == receiver.lowercase()
 }
 
 private fun Operation.Type.Transfer.displayAddress(isIncome: Boolean) = if (isIncome) sender else receiver

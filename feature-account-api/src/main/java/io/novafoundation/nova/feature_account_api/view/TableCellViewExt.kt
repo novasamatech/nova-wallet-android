@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_api.view
 
 import io.novafoundation.nova.common.address.AddressModel
+import io.novafoundation.nova.common.address.OptionalAddressModel
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.TableCellView
@@ -9,6 +10,12 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 
 fun TableCellView.showAddress(addressModel: AddressModel) {
     setImage(addressModel.image)
+
+    showValue(addressModel.nameOrAddress)
+}
+
+fun TableCellView.showOptionalAddress(addressModel: OptionalAddressModel) {
+    addressModel.image?.let(::setImage)
 
     showValue(addressModel.nameOrAddress)
 }
