@@ -78,7 +78,7 @@ class MainFragment : BaseFragment<MainViewModel>() {
             backCallback.isEnabled = !isAtHomeTab(destination)
         }
 
-        // startBlur()
+        startBlur()
     }
 
     override fun inject() {
@@ -107,7 +107,7 @@ class MainFragment : BaseFragment<MainViewModel>() {
             .radius(radiusInPx)
             .captureFrom(bottomNavHost)
             .toTarget(bottomNavigationView)
-            .onException { bottomNavigationView.setBackgroundColorRes(R.color.solid_navigation_background) }
+            .catchException { bottomNavigationView.setBackgroundColorRes(R.color.solid_navigation_background) }
             .build()
             .start()
     }
