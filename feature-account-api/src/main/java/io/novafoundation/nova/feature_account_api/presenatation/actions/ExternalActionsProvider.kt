@@ -54,7 +54,7 @@ class ExternalActionsProvider(
         val icon = when (type) {
             is ExternalActions.Type.Address -> type.address?.let { address ->
                 addressIconGenerator.createOptionalAccountAddressIcon(chain, address)
-            } ?:  resourceManager.getDrawable(R.drawable.ic_identicon_placeholder)
+            } ?: resourceManager.getDrawable(R.drawable.ic_identicon_placeholder)
 
             else -> null
         }
