@@ -113,9 +113,7 @@ private fun bindAccountVote(decoded: Any?): AccountVote {
             )
         }
 
-        "Split" -> AccountVote.Split
-
-        else -> incompatible()
+        else -> AccountVote.Unsupported
     }
 }
 
