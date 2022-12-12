@@ -1,7 +1,6 @@
 package io.novafoundation.nova.common.resources
 
 import android.content.ClipData
-import android.content.ClipDescription.MIMETYPE_TEXT_PLAIN
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -31,24 +30,10 @@ class ClipboardManager(
         return with(clipboardManager) {
             if (!hasPrimaryClip()) {
                 null
-            } else if (!primaryClipDescription!!.hasMimeType(MIMETYPE_TEXT_PLAIN)) {
-                null
             } else {
                 val item: ClipData.Item = primaryClip!!.getItemAt(0)
 
-                item.text.toString()
-            }
-        }
-    }
-
-    fun getAny(): String? {
-        return with(clipboardManager) {
-            if (hasPrimaryClip()) {
-                val item: ClipData.Item = primaryClip!!.getItemAt(0)
-
-                item.text.toString()
-            } else {
-                null
+                item.text?.toString()
             }
         }
     }

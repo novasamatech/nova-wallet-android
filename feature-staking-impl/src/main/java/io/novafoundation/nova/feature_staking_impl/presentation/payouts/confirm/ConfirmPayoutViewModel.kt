@@ -100,13 +100,13 @@ class ConfirmPayoutViewModel(
 
     private fun sendTransactionIfValid() = feeLoaderMixin.requireFee(this) { fee ->
         launch {
-            val tokenType = assetFlow.first().token.configuration
+            val asset = assetFlow.first()
             val accountAddress = stakingStateFlow.first().accountAddress
-            val amount = tokenType.amountFromPlanks(payload.totalRewardInPlanks)
+            val amount = asset.token.configuration.amountFromPlanks(payload.totalRewardInPlanks)
 
             val payoutStakersPayloads = payouts.map { MakePayoutPayload.PayoutStakersPayload(it.era, it.validatorAddress) }
 
-            val makePayoutPayload = MakePayoutPayload(accountAddress, fee, amount, tokenType, payoutStakersPayloads)
+            val makePayoutPayload = MakePayoutPayload(accountAddress, fee, amount, asset, payoutStakersPayloads)
 
             validationExecutor.requireValid(
                 validationSystem = validationSystem,

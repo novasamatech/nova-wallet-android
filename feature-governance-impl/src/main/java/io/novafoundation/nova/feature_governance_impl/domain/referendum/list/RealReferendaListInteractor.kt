@@ -38,6 +38,7 @@ import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
+import io.novafoundation.nova.runtime.repository.getActiveIssuance
 import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.hash.isPositive
@@ -84,7 +85,7 @@ class RealReferendaListInteractor(
             val onChainReferenda = governanceSource.referenda.getAllOnChainReferenda(chain.id)
             val offChainInfo = governanceSource.offChainInfo.referendumPreviews(chain)
                 .associateBy(OffChainReferendumPreview::referendumId)
-            val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
+            val electorate = totalIssuanceRepository.getActiveIssuance(chain.id)
             val voting = voterAccountId?.let { governanceSource.convictionVoting.votingFor(voterAccountId, chain.id) }.orEmpty()
 
             val referenda = governanceSource.constructReferendumPreviews(
@@ -94,7 +95,7 @@ class RealReferendaListInteractor(
                 tracksById = tracksById,
                 currentBlockNumber = currentBlockNumber,
                 offChainInfo = offChainInfo,
-                totalIssuance = totalIssuance
+                electorate = electorate
             )
             val sortedReferenda = sortReferendaPreviews(referenda)
 
@@ -146,7 +147,7 @@ class RealReferendaListInteractor(
         tracksById: Map<TrackId, TrackInfo>,
         currentBlockNumber: BlockNumber,
         offChainInfo: Map<ReferendumId, OffChainReferendumPreview>,
-        totalIssuance: BigInteger
+        electorate: BigInteger
     ): List<ReferendumPreview> {
         val userVotes = voting.flattenCastingVotes()
         val proposals = constructReferendaProposals(onChainReferenda, selectedGovernanceOption.assetWithChain.chain)
@@ -158,7 +159,7 @@ class RealReferendaListInteractor(
                     referendum = it,
                     tracksById = tracksById,
                     currentBlockNumber = currentBlockNumber,
-                    totalIssuance = totalIssuance
+                    electorate = electorate
                 )
             }
         )

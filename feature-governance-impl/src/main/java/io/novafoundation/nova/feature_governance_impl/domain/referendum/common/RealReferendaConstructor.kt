@@ -42,7 +42,7 @@ interface ReferendaConstructor {
         referendum: OnChainReferendum,
         tracksById: Map<TrackId, TrackInfo>,
         currentBlockNumber: BlockNumber,
-        totalIssuance: Balance,
+        electorate: Balance,
     ): ReferendumVoting?
 
     suspend fun constructReferendaStatuses(
@@ -84,7 +84,7 @@ class RealReferendaConstructor(
         referendum: OnChainReferendum,
         tracksById: Map<TrackId, TrackInfo>,
         currentBlockNumber: BlockNumber,
-        totalIssuance: Balance,
+        electorate: Balance,
     ): ReferendumVoting? {
         val status = referendum.status
 
@@ -103,14 +103,14 @@ class RealReferendaConstructor(
 
         return ReferendumVoting(
             support = ReferendumVoting.Support(
-                threshold = status.threshold.supportThreshold(status.tally, totalIssuance, elapsedSinceDecidingFraction),
+                threshold = status.threshold.supportThreshold(status.tally, electorate, elapsedSinceDecidingFraction),
                 turnout = status.tally.support,
-                electorate = totalIssuance
+                electorate = electorate
             ),
             approval = ReferendumVoting.Approval(
                 ayeVotes = status.tally.ayeVotes(),
                 nayVotes = status.tally.nayVotes(),
-                threshold = status.threshold.ayesFractionThreshold(status.tally, totalIssuance, elapsedSinceDecidingFraction)
+                threshold = status.threshold.ayesFractionThreshold(status.tally, electorate, elapsedSinceDecidingFraction)
             )
         )
     }

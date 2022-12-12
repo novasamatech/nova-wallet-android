@@ -34,8 +34,7 @@ class StartParachainStakingFlowModule {
     @FeatureScope
     fun provideNoPendingRevokeValidationFactory(
         delegatorStateRepository: DelegatorStateRepository,
-        delegatorStateUseCase: DelegatorStateUseCase,
-    ) = NoPendingRevokeValidationFactory(delegatorStateRepository, delegatorStateUseCase)
+    ) = NoPendingRevokeValidationFactory(delegatorStateRepository)
 
     @Provides
     @FeatureScope

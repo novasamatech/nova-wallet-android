@@ -58,7 +58,7 @@ class InsertableInputField @JvmOverloads constructor(
     }
 
     private fun updateButtonsVisibility(text: CharSequence?) {
-        val clipboardValue = clipboardManager?.getAny()
+        val clipboardValue = clipboardManager?.getTextOrNull()
         val clipboardIsNotEmpty = !TextUtils.isEmpty(clipboardValue)
         val textIsEmpty = TextUtils.isEmpty(text)
 
@@ -73,7 +73,7 @@ class InsertableInputField @JvmOverloads constructor(
     }
 
     private fun paste() {
-        val clipboard = clipboardManager?.getAny()
+        val clipboard = clipboardManager?.getTextOrNull()
         content.setText(clipboard)
     }
 

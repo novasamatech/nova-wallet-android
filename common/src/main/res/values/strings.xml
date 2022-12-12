@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="assets_search_placeholder">No tokens with\nentered name were found</string>
+
+    <string name="asset_add_evm_token_invalid_contract_address_message">The entered contract address is not a %s ERC-20 contract.</string>
+
     <string name="assets_filter_title">Filter tokens</string>
 
     <string name="dapp_main_welcome_title">Welcome to Nova Browser</string>
@@ -13,7 +17,6 @@
     <string name="asset_add_evm_token_already_exist_message">The entered contract address is present in Nova as a %s token.</string>
 
     <string name="asset_add_evm_token_invalid_contract_address_title">Invalid contract address</string>
-    <string name="asset_add_evm_token_invalid_contract_address_message">The entered contract address is not ERC-20 contract.</string>
 
     <string name="asset_add_evm_token_invalid_decimals_title">Invalid decimals value</string>
     <string name="asset_add_evm_token_invalid_decimals_message">Decimals must be at least 0, and not over 36.</string>
@@ -408,7 +411,6 @@
     <string name="wallet_tokens">Tokens</string>
 
     <string name="assets_search_hint">Search by network or token</string>
-    <string name="assets_search_placeholder">No networks or tokens with\nentered name were found</string>
 
     <string name="crowdloan_contributions_returns_in">Returns in %s</string>
     <string name="crowdloan_contributions_to_be_returned">To be returned by parachain</string>

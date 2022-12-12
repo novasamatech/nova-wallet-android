@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapRewardDestinationModelToRewardDestination
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.common.stakeable
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.setup.SetupStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingPayload
@@ -65,8 +66,8 @@ class SetupStakingViewModel(
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        balanceField = Asset::transferable,
-        balanceLabel = R.string.wallet_balance_transferable
+        balanceField = Asset::stakeable,
+        balanceLabel = R.string.wallet_balance_available
     )
 
     val title = assetFlow.map { resourceManager.getString(R.string.staking_stake_format, it.token.configuration.symbol) }
@@ -110,10 +111,9 @@ class SetupStakingViewModel(
 
             val payload = SetupStakingPayload(
                 bondAmount = amount,
-                controllerAddress = currentAccountAddress,
                 maxFee = fee,
-                asset = assetFlow.first(),
-                isAlreadyNominating = false // on setup staking screen => not nominator
+                stashAsset = assetFlow.first(),
+                controllerAsset = assetFlow.first(),
             )
 
             validationExecutor.requireValid(

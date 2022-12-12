@@ -30,8 +30,8 @@ sealed class AccountVote {
         val balance: Balance
     ) : AccountVote()
 
-    // do not yet care split votes
-    object Split : AccountVote()
+    // TODO split & split abstain votes
+    object Unsupported : AccountVote()
 }
 
 data class PriorLock(
@@ -66,8 +66,8 @@ fun AyeVote(amount: Balance, conviction: Conviction) = AccountVote.Standard(
 
 fun AccountVote.votes(chainAsset: Chain.Asset): VotesAmount? {
     return when (this) {
-        // TODO handle split votes
-        AccountVote.Split -> null
+        AccountVote.Unsupported -> null
+
         is AccountVote.Standard -> {
             val amount = chainAsset.amountFromPlanks(balance)
             val total = vote.conviction.votesFor(amount)
@@ -83,7 +83,7 @@ fun AccountVote.votes(chainAsset: Chain.Asset): VotesAmount? {
 
 fun AccountVote.amount(): Balance {
     return when (this) {
-        AccountVote.Split -> Balance.ZERO // TODO not yet supported
+        AccountVote.Unsupported -> Balance.ZERO // TODO not yet supported
         is AccountVote.Standard -> balance
     }
 }
@@ -94,7 +94,7 @@ fun AccountVote.isAye(): Boolean? {
 
 fun AccountVote.voteType(): VoteType? {
     return when (this) {
-        AccountVote.Split -> null
+        AccountVote.Unsupported -> null
 
         is AccountVote.Standard -> if (vote.aye) {
             VoteType.AYE
@@ -125,7 +125,7 @@ fun Voting.totalLock(): Balance {
 
 fun AccountVote.completedReferendumLockDuration(referendumOutcome: VoteType, lockPeriod: BlockNumber): BlockNumber {
     return when (this) {
-        AccountVote.Split -> BlockNumber.ZERO
+        AccountVote.Unsupported -> BlockNumber.ZERO
 
         is AccountVote.Standard -> {
             val approved = referendumOutcome == VoteType.AYE
@@ -142,7 +142,7 @@ fun AccountVote.completedReferendumLockDuration(referendumOutcome: VoteType, loc
 
 fun AccountVote.maxLockDuration(lockPeriod: BlockNumber): BlockNumber {
     return when (this) {
-        AccountVote.Split -> BigInteger.ZERO
+        AccountVote.Unsupported -> BigInteger.ZERO
         is AccountVote.Standard -> vote.conviction.lockDuration(lockPeriod)
     }
 }

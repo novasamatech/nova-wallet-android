@@ -7,12 +7,8 @@ import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.R
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
-import io.novafoundation.nova.runtime.state.chain
 import java.math.BigDecimal
 
 interface NotEnoughToPayFeesError {
@@ -70,18 +66,4 @@ fun handleNotEnoughFeeError(error: NotEnoughToPayFeesError, resourceManager: Res
     val message = resourceManager.getString(R.string.common_cannot_pay_network_fee_message, fee, availableToPayFees)
 
     return title to message
-}
-
-fun <P> EnoughToPayFeesValidation.Companion.assetBalanceProducer(
-    walletRepository: WalletRepository,
-    stakingSharedState: SingleAssetSharedState,
-    originAddressExtractor: (P) -> String,
-    chainAssetExtractor: (P) -> Chain.Asset,
-): AmountProducer<P> = { payload ->
-    val chain = stakingSharedState.chain()
-    val accountId = chain.accountIdOf(originAddressExtractor(payload))
-
-    val asset = walletRepository.getAsset(accountId, chainAssetExtractor(payload))!!
-
-    asset.transferable
 }

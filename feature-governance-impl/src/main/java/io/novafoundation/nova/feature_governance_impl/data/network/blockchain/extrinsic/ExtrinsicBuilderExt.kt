@@ -90,7 +90,7 @@ fun ExtrinsicBuilder.democracyRemoveVote(
 
 private fun AccountVote.prepareForEncoding(): Any {
     return when (this) {
-        AccountVote.Split -> NotImplementedError("Split voting not yet supported")
+        AccountVote.Unsupported -> error("Not yet supported")
 
         is AccountVote.Standard -> DictEnum.Entry(
             name = "Standard",

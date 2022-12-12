@@ -12,8 +12,6 @@ sealed class SetupStakingProcess {
 
         fun fullFlow() = Stash
 
-        fun existingStashFlow() = Validators(Validators.Payload.ExistingStash)
-
         fun changeValidatorsFlow() = Validators(Validators.Payload.Validators)
     }
 
@@ -40,8 +38,6 @@ sealed class SetupStakingProcess {
                 val controllerAddress: String
             ) : Payload()
 
-            object ExistingStash : Payload()
-
             object Validators : Payload()
         }
 
@@ -54,7 +50,6 @@ sealed class SetupStakingProcess {
             val payload = with(payload) {
                 when (this) {
                     is Payload.Full -> ReadyToSubmit.Payload.Full(amount, rewardDestination, controllerAddress, validators, selectionMethod)
-                    is Payload.ExistingStash -> ReadyToSubmit.Payload.ExistingStash(validators, selectionMethod)
                     is Payload.Validators -> ReadyToSubmit.Payload.Validators(validators, selectionMethod)
                 }
             }
@@ -92,19 +87,6 @@ sealed class SetupStakingProcess {
                 }
             }
 
-            class ExistingStash(
-                validators: List<Validator>,
-                selectionMethod: SelectionMethod
-            ) : Payload(validators, selectionMethod) {
-
-                override fun changeValidators(
-                    newValidators: List<Validator>,
-                    selectionMethod: SelectionMethod
-                ): Payload {
-                    return ExistingStash(newValidators, selectionMethod)
-                }
-            }
-
             class Validators(
                 validators: List<Validator>,
                 selectionMethod: SelectionMethod
@@ -130,7 +112,6 @@ sealed class SetupStakingProcess {
             val payload = with(payload) {
                 when (this) {
                     is Payload.Full -> Validators.Payload.Full(amount, rewardDestination, currentAccountAddress)
-                    is Payload.ExistingStash -> Validators.Payload.ExistingStash
                     is Payload.Validators -> Validators.Payload.Validators
                 }
             }

@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.stakeablePlanks
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
@@ -38,7 +39,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.connectWith
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.startParachainStakingValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -84,15 +84,19 @@ class StartParachainStakingViewModel(
     private val assetFlow = assetUseCase.currentAssetFlow()
         .share()
 
+    private val currentDelegatorStateFlow = delegatorStateUseCase.currentDelegatorStateFlow()
+        .shareInBackground()
+
+    private val stakeableAmount = combine(assetFlow, currentDelegatorStateFlow) { asset, currentDelegator ->
+        currentDelegator.stakeablePlanks(asset.freeInPlanks)
+    }
+
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        balanceField = Asset::transferable,
-        balanceLabel = R.string.wallet_balance_transferable
+        availableBalanceFlow = stakeableAmount,
+        balanceLabel = R.string.wallet_balance_available
     )
-
-    private val currentDelegatorStateFlow = delegatorStateUseCase.currentDelegatorStateFlow()
-        .shareInBackground()
 
     private val isStakeMore = currentDelegatorStateFlow.map { it is DelegatorState.Delegator }
 
@@ -265,7 +269,8 @@ class StartParachainStakingViewModel(
                 amount = amount,
                 fee = fee,
                 asset = assetFlow.first(),
-                collator = collator
+                collator = collator,
+                delegatorState = currentDelegatorStateFlow.first(),
             )
 
             validationExecutor.requireValid(

@@ -129,3 +129,26 @@ fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
         .inBackground()
         .launchIn(scope)
 }
+
+fun <I1, I2, I3> FeeLoaderMixin.Presentation.connectWith(
+    inputSource1: Flow<I1>,
+    inputSource2: Flow<I2>,
+    inputSource3: Flow<I3>,
+    scope: CoroutineScope,
+    feeConstructor: suspend Token.(input1: I1, input2: I2, input3: I3) -> BigInteger?,
+    onRetryCancelled: () -> Unit = {}
+) {
+    combine(
+        inputSource1,
+        inputSource2,
+        inputSource3,
+    ) { input1, input2, input3 ->
+        loadFee(
+            coroutineScope = scope,
+            feeConstructor = { feeConstructor(it, input1, input2, input3) },
+            onRetryCancelled = onRetryCancelled
+        )
+    }
+        .inBackground()
+        .launchIn(scope)
+}

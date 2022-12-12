@@ -44,7 +44,7 @@ class EvmTokenContractValidation<P, E>(
     }
 }
 
-fun <P, E> ValidationSystemBuilder<P, E>.validEvmAddress(
+fun <P, E> ValidationSystemBuilder<P, E>.validErc20Contract(
     ethereumAddressFormat: EthereumAddressFormat,
     erc20Standard: Erc20Standard,
     chainRegistry: ChainRegistry,

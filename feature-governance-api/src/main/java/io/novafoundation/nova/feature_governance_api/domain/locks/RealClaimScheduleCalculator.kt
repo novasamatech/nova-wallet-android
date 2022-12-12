@@ -58,8 +58,16 @@ class RealClaimScheduleCalculator(
         return trackLocks.values.maxOrNull().orZero()
     }
 
+    @Suppress("IfThenToElvis")
     override fun maxConvictionEndOf(vote: AccountVote, referendumId: ReferendumId): BlockNumber {
-        return referenda.getValue(referendumId).maxConvictionEnd(vote)
+        val referendum = referenda[referendumId]
+
+        return if (referendum != null) {
+            referendum.maxConvictionEnd(vote)
+        } else {
+            // referendum is not in the map, which means it is cancelled and votes can be unlocked immediately
+            currentBlockNumber
+        }
     }
 
     /**
