@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.AddressModel
+import io.novafoundation.nova.common.address.OptionalAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createOptionalAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -53,8 +53,8 @@ class TransactionDetailViewModel(
         router.back()
     }
 
-    private suspend fun getIcon(address: String): AddressModel {
-        return addressIconGenerator.createAddressModel(
+    private suspend fun getIcon(address: String): OptionalAddressModel {
+        return addressIconGenerator.createOptionalAddressModel(
             chain = chain(),
             address = address,
             sizeInDp = AddressIconGenerator.SIZE_BIG,

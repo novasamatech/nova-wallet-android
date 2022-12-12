@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createOptionalAccountAddressIcon
 import io.novafoundation.nova.runtime.ext.accountUrlOf
 import io.novafoundation.nova.runtime.ext.eventUrlOf
 import io.novafoundation.nova.runtime.ext.extrinsicUrlOf
@@ -52,11 +52,10 @@ class ExternalActionsProvider(
 
         // only show icon for address as for now
         val icon = when (type) {
-            is ExternalActions.Type.Address -> if (type.address != null) {
-                addressIconGenerator.createAccountAddressModel(chain, type.address, name = null).image
-            } else {
-                resourceManager.getDrawable(R.drawable.ic_identicon_placeholder)
-            }
+            is ExternalActions.Type.Address -> type.address?.let { address ->
+                addressIconGenerator.createOptionalAccountAddressIcon(chain, address)
+            } ?: resourceManager.getDrawable(R.drawable.ic_identicon_placeholder)
+
             else -> null
         }
 
