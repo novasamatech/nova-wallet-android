@@ -92,7 +92,7 @@ class StatemineAssetBalance(
             .map {
                 val decoded = assetDetailsStorage.decodeValue(it.value, runtime)
 
-                bindAssetDetails(decoded).isFrozen
+                bindAssetDetails(decoded).status.transfersFrozen
             }
 
         return combine(
