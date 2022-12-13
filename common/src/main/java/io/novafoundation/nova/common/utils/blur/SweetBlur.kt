@@ -4,18 +4,18 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.view.View
-import androidx.core.graphics.toRect
-import com.google.android.renderscript.Toolkit
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.view.ViewTreeObserver
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.annotation.ColorInt
 import androidx.core.graphics.times
+import androidx.core.graphics.toRect
+import com.google.android.renderscript.Toolkit
 import kotlin.math.roundToInt
 
 class SweetBlur(
@@ -50,7 +50,7 @@ class SweetBlur(
 
         fun blurColor(@ColorInt blurColor: Int) = apply { this.blurColor = blurColor }
 
-        fun onException(action: (Exception) -> Unit) = apply { onException = action }
+        fun catchException(action: (Exception) -> Unit) = apply { onException = action }
 
         fun build(): SweetBlur {
             return SweetBlur(
@@ -95,7 +95,6 @@ class SweetBlur(
         }
     }
 
-    // Попробовать написать класс, который будет вычислять возможности устройства и применять бэкграунд попроще, если устройство слабое
     fun start() {
         if (!started) {
             captureFromView.post {
@@ -121,7 +120,7 @@ class SweetBlur(
             makeBlurBackground()
         } catch (e: Exception) {
             stop()
-            onException?.invoke(e)
+            onException?.invoke(e) ?: throw e
         }
     }
 
@@ -175,12 +174,11 @@ class SweetBlur(
     private fun bitmapFromCaptureView(): Bitmap {
         val viewClip = getViewClip()
         val targetBitmap = getTargetSizeBitmap(viewClip)
-        val canvas = Canvas(targetBitmap)
+        val canvas = SweetBlurCanvas(targetBitmap)
         val matrix = Matrix()
         matrix.setTranslate(0f, -viewClip.top * downscaleFactor)
         matrix.preScale(downscaleFactor, downscaleFactor)
         canvas.setMatrix(matrix)
-
         captureFromView.draw(canvas)
         return targetBitmap
     }
