@@ -72,7 +72,7 @@ class GovV2OnChainReferendaRepository(
 ) : OnChainReferendaRepository {
 
     override suspend fun electorate(chainId: ChainId): Balance {
-       return totalIssuanceRepository.getActiveIssuance(chainId)
+        return totalIssuanceRepository.getActiveIssuance(chainId)
     }
 
     override suspend fun undecidingTimeout(chainId: ChainId): BlockNumber {
