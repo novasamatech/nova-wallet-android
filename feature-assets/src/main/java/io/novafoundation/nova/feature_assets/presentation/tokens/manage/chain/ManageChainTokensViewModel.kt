@@ -39,7 +39,8 @@ class ManageChainTokensViewModel(
         return multiChainToken.instances.map {
             ChainTokenInstanceModel(
                 chainUi = mapChainToUi(it.chain),
-                enabled = it.isEnabled
+                enabled = it.isEnabled,
+                changeable = !it.isLastEnabled
             )
         }
     }

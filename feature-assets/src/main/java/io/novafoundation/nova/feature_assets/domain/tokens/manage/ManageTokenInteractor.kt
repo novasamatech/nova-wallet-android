@@ -14,7 +14,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 interface ManageTokenInteractor {
@@ -32,6 +35,8 @@ class RealManageTokenInteractor(
     private val chainAssetRepository: ChainAssetRepository,
     private val contributionsRepository: ContributionsRepository,
 ) : ManageTokenInteractor {
+
+    private val changeTokensMutex = Mutex(false)
 
     override fun multiChainTokensFlow(
         queryFlow: Flow<String>
@@ -59,12 +64,25 @@ class RealManageTokenInteractor(
     }
 
     override suspend fun updateEnabledState(enabled: Boolean, assetIds: List<FullChainAssetId>) = withContext(Dispatchers.IO) {
-        chainAssetRepository.setAssetsEnabled(enabled, assetIds)
+        changeTokensMutex.withLock {
+            if (!enabled && canNotDisableAssets(assetIds)) {
+                return@withLock
+            }
 
-        if (!enabled) {
-            walletRepository.clearAssets(assetIds)
-            contributionsRepository.clearAllContributionsFor(assetIds)
+            chainAssetRepository.setAssetsEnabled(enabled, assetIds)
+
+            if (!enabled) {
+                walletRepository.clearAssets(assetIds)
+                contributionsRepository.clearAllContributionsFor(assetIds)
+            }
         }
+    }
+
+    private suspend fun canNotDisableAssets(assetIds: List<FullChainAssetId>): Boolean {
+        val assets = chainAssetRepository.getAllAssets()
+        val enabledAssets = assets.filter { it.enabled }
+        val enabledAssetIds = enabledAssets.map { FullChainAssetId(it.chainId, it.id) }
+        return assetIds.containsAll(enabledAssetIds)
     }
 
     private fun constructMultiChainTokens(chains: List<Chain>): List<MultiChainToken> {
@@ -73,19 +91,28 @@ class RealManageTokenInteractor(
             chain.assets.map { asset -> ChainWithAsset(chain, asset) }
         }
 
+        val enabledAssets = assetsWithChains.filter { it.asset.enabled }
+            .map { FullChainAssetId(it.chain.id, it.asset.id) }
+
         return assetsWithChains.groupBy { (_, asset) -> asset.unifiedSymbol() }
             .map { (symbol, chainsWithAssets) ->
                 val (_, firstAsset) = chainsWithAssets.first()
+                val tokenAssets = chainsWithAssets.filter { it.asset.enabled }
+                    .map { FullChainAssetId(it.chain.id, it.asset.id) }
+                val isLastTokenEnabled = tokenAssets.containsAll(enabledAssets)
+                val isLastAssetEnabled = isLastTokenEnabled && tokenAssets.size == 1
 
                 MultiChainToken(
                     id = symbol,
                     symbol = symbol,
                     icon = firstAsset.iconUrl,
+                    isLastEnabled = isLastTokenEnabled,
                     instances = chainsWithAssets.map { (chain, asset) ->
                         MultiChainToken.ChainTokenInstance(
                             chain = chain,
                             chainAssetId = asset.id,
-                            isEnabled = asset.enabled
+                            isEnabled = asset.enabled,
+                            isLastEnabled = asset.enabled && isLastAssetEnabled
                         )
                     }
                 )

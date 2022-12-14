@@ -8,13 +8,15 @@ class MultiChainToken(
     val id: String,
     val symbol: String,
     val icon: String?,
-    val instances: List<ChainTokenInstance>,
+    val isLastEnabled: Boolean,
+    val instances: List<ChainTokenInstance>
 ) {
 
     class ChainTokenInstance(
         val chain: Chain,
         val chainAssetId: ChainAssetId,
-        val isEnabled: Boolean
+        val isEnabled: Boolean,
+        val isLastEnabled: Boolean
     )
 }
 

@@ -7,7 +7,8 @@ import io.novafoundation.nova.feature_assets.domain.tokens.manage.MultiChainToke
 
 data class MultiChainTokenModel(
     val header: HeaderModel,
-    val enabled: Boolean
+    val enabled: Boolean,
+    val changeable: Boolean
 ) {
 
     class HeaderModel(

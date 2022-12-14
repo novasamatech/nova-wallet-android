@@ -60,7 +60,8 @@ class ManageTokensViewModel(
     private fun mapMultiChainTokenToUi(multiChainToken: MultiChainToken): MultiChainTokenModel {
         return MultiChainTokenModel(
             header = commonUiMapper.mapHeaderToUi(multiChainToken),
-            enabled = multiChainToken.isEnabled()
+            enabled = multiChainToken.isEnabled(),
+            changeable = !multiChainToken.isLastEnabled
         )
     }
 }
