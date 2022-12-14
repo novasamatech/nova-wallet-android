@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_governance_impl.data.source.StaticGovernan
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 import javax.inject.Qualifier
@@ -31,8 +32,9 @@ class GovernanceV1Module {
     @FeatureScope
     fun provideOnChainReferendaRepository(
         @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource,
-        chainRegistry: ChainRegistry
-    ) = GovV1OnChainReferendaRepository(storageSource, chainRegistry)
+        chainRegistry: ChainRegistry,
+        totalIssuanceRepository: TotalIssuanceRepository,
+    ) = GovV1OnChainReferendaRepository(storageSource, chainRegistry, totalIssuanceRepository)
 
     @Provides
     @FeatureScope

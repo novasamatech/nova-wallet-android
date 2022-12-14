@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.extensions.pad
 import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
@@ -55,7 +56,12 @@ private enum class SchedulerVersion {
 class GovV1OnChainReferendaRepository(
     private val remoteStorageSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
+    private val totalIssuanceRepository: TotalIssuanceRepository,
 ) : OnChainReferendaRepository {
+
+    override suspend fun electorate(chainId: ChainId): Balance {
+       return totalIssuanceRepository.getTotalIssuance(chainId)
+    }
 
     override suspend fun undecidingTimeout(chainId: ChainId): BlockNumber {
         // we do not support `in queue` status for gov v1 yet
