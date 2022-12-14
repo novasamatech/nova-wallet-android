@@ -16,9 +16,7 @@ typealias FullAssetIdLocal = Pair<String, Int>
 abstract class ChainAssetDao {
 
     @Transaction
-    open suspend fun updateAssetsBySource(newAssets: List<ChainAssetLocal>, source: AssetSourceLocal) {
-        val oldAssets = getAssetsBySource(source)
-        val diff = CollectionDiffer.findDiff(newAssets, oldAssets, forceUseNewItems = false)
+    open suspend fun updateAssets(diff: CollectionDiffer.Diff<ChainAssetLocal>) {
         insertAssets(diff.newOrUpdated)
         deleteChainAssets(diff.removed)
     }

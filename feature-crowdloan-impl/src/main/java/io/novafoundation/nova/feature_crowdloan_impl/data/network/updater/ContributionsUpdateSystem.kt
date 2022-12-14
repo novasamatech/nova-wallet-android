@@ -17,10 +17,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 
 class RealContributionsUpdateSystemFactory(
@@ -49,10 +49,11 @@ class ContributionsUpdateSystem(
 
     override fun start(): Flow<Updater.SideEffect> {
         return accountUpdateScope.invalidationFlow().flatMapLatest { metaAccount ->
-            chainRegistry.currentChains.first()
-                .filter { it.hasCrowdloans }
-                .map { chain -> run(chain, metaAccount) }
-                .merge()
+            chainRegistry.currentChains.flatMapLatest {
+                it.filter { it.hasCrowdloans }
+                    .map { chain -> run(chain, metaAccount) }
+                    .merge()
+            }
         }.flowOn(Dispatchers.Default)
     }
 

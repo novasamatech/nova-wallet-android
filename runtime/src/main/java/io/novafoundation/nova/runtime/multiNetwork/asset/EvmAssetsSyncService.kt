@@ -1,8 +1,10 @@
 package io.novafoundation.nova.runtime.multiNetwork.asset
 
 import com.google.gson.Gson
+import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.common.utils.retryUntilDone
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
+import io.novafoundation.nova.core_db.ext.isSameAsset
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.runtime.multiNetwork.asset.remote.AssetFetcher
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapEVMAssetRemoteToLocalAssets
@@ -20,8 +22,14 @@ class EvmAssetsSyncService(
     }
 
     private suspend fun syncEVMAssets() {
-        val assets = retryUntilDone { chainFetcher.getEVMAssets() }
+        val oldAssets = dao.getAssetsBySource(AssetSourceLocal.ERC20)
+        val newAssets = retryUntilDone { chainFetcher.getEVMAssets() }
             .flatMap { mapEVMAssetRemoteToLocalAssets(it, gson) }
-        dao.updateAssetsBySource(assets, AssetSourceLocal.ERC20)
+            .map { new ->
+                val old = oldAssets.firstOrNull { old -> old.isSameAsset(new) }
+                new.copy(enabled = old?.enabled ?: true)
+            }
+        val diff = CollectionDiffer.findDiff(newAssets, oldAssets, forceUseNewItems = false)
+        dao.updateAssets(diff)
     }
 }
