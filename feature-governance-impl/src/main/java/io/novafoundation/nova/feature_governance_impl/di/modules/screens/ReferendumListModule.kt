@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.Rea
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.RealReferendaSortingProvider
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 
 @Module
 class ReferendumListModule {
@@ -26,13 +25,11 @@ class ReferendumListModule {
     fun provideReferendaListInteractor(
         chainStateRepository: ChainStateRepository,
         governanceSourceRegistry: GovernanceSourceRegistry,
-        totalIssuanceRepository: TotalIssuanceRepository,
         referendaConstructor: ReferendaConstructor,
         referendaSortingProvider: ReferendaSortingProvider,
     ): ReferendaListInteractor = RealReferendaListInteractor(
         chainStateRepository = chainStateRepository,
         governanceSourceRegistry = governanceSourceRegistry,
-        totalIssuanceRepository = totalIssuanceRepository,
         referendaConstructor = referendaConstructor,
         referendaSortingProvider = referendaSortingProvider,
     )

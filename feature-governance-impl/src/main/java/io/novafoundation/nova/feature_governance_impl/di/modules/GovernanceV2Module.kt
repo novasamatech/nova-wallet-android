@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_governance_impl.data.repository.v2.GovV2On
 import io.novafoundation.nova.feature_governance_impl.data.source.StaticGovernanceSource
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 import javax.inject.Qualifier
@@ -30,8 +31,9 @@ class GovernanceV2Module {
     @FeatureScope
     fun provideOnChainReferendaRepository(
         @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource,
-        chainRegistry: ChainRegistry
-    ) = GovV2OnChainReferendaRepository(storageSource, chainRegistry)
+        chainRegistry: ChainRegistry,
+        totalIssuanceRepository: TotalIssuanceRepository
+    ) = GovV2OnChainReferendaRepository(storageSource, chainRegistry, totalIssuanceRepository)
 
     @Provides
     @FeatureScope

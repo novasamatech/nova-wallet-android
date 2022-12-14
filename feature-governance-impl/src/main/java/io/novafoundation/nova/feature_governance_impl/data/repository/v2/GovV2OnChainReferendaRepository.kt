@@ -43,9 +43,12 @@ import io.novafoundation.nova.feature_governance_api.data.thresold.gov2.curve.Re
 import io.novafoundation.nova.feature_governance_api.data.thresold.gov2.curve.SteppedDecreasingCurve
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.bindProposal
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.bindTally
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
+import io.novafoundation.nova.runtime.repository.getActiveIssuance
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
@@ -65,7 +68,12 @@ private const val ASSEMBLY_ID = "assembly"
 class GovV2OnChainReferendaRepository(
     private val remoteStorageSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
+    private val totalIssuanceRepository: TotalIssuanceRepository,
 ) : OnChainReferendaRepository {
+
+    override suspend fun electorate(chainId: ChainId): Balance {
+        return totalIssuanceRepository.getActiveIssuance(chainId)
+    }
 
     override suspend fun undecidingTimeout(chainId: ChainId): BlockNumber {
         val runtime = chainRegistry.getRuntime(chainId)
