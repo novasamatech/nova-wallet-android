@@ -47,7 +47,7 @@ class CoinGeckoLinkValidation<P, E>(
             val link = link(value)!!
             val coinGeckoContent = coinGeckoLinkParser.parse(link).getOrThrow()
             val priceId = coinGeckoContent.priceId
-            val result = coinGeckoApi.getAssetPrice(setOf(priceId).asQueryParam(), priceId, false)
+            val result = coinGeckoApi.getAssetPrice(setOf(priceId).asQueryParam(), "usd", false)
             result.isNotEmpty().isTrueOrError { error(value) }
         } catch (e: Exception) {
             validationError(error(value))
