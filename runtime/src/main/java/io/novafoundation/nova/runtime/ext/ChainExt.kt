@@ -221,6 +221,8 @@ val Chain.Asset.fullId: FullChainAssetId
 
 fun Chain.enabledAssets(): List<Chain.Asset> = assets.filter { it.enabled }
 
+fun Chain.disabledAssets(): List<Chain.Asset> = assets.filterNot { it.enabled }
+
 fun Chain.findAssetByOrmlCurrencyId(runtime: RuntimeSnapshot, currencyId: Any?): Chain.Asset? {
     return assets.find { asset ->
         if (asset.type !is Type.Orml) return@find false

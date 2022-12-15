@@ -162,25 +162,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
         )
     }
 
-    val assets = chainLocal.assets.map {
-        val typeExtrasParsed = it.typeExtras?.let(gson::parseArbitraryObject)
-        val buyProviders = it.buyProviders?.let<String, Map<BuyProviderId, BuyProviderArguments>?>(gson::fromJsonOrNull).orEmpty()
-
-        Chain.Asset(
-            iconUrl = it.icon,
-            id = it.id,
-            symbol = it.symbol,
-            precision = it.precision,
-            name = it.name,
-            chainId = it.chainId,
-            priceId = it.priceId,
-            buyProviders = buyProviders,
-            staking = mapStakingTypeFromLocal(it.staking),
-            type = mapChainAssetTypeFromRaw(it.type, typeExtrasParsed),
-            source = mapAssetSourceFromLocal(it.source),
-            enabled = it.enabled
-        )
-    }
+    val assets = chainLocal.assets.map { mapChainAssetLocalToAsset(it, gson) }
 
     val explorers = chainLocal.explorers.map {
         Chain.Explorer(
@@ -242,6 +224,26 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             additional = additional
         )
     }
+}
+
+fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson): Chain.Asset {
+    val typeExtrasParsed = local.typeExtras?.let(gson::parseArbitraryObject)
+    val buyProviders = local.buyProviders?.let<String, Map<BuyProviderId, BuyProviderArguments>?>(gson::fromJsonOrNull).orEmpty()
+
+    return Chain.Asset(
+        iconUrl = local.icon,
+        id = local.id,
+        symbol = local.symbol,
+        precision = local.precision,
+        name = local.name,
+        chainId = local.chainId,
+        priceId = local.priceId,
+        buyProviders = buyProviders,
+        staking = mapStakingTypeFromLocal(local.staking),
+        type = mapChainAssetTypeFromRaw(local.type, typeExtrasParsed),
+        source = mapAssetSourceFromLocal(local.source),
+        enabled = local.enabled
+    )
 }
 
 private fun mapGovernanceListFromLocal(governanceLocal: String) = governanceLocal.split(",").mapNotNull {

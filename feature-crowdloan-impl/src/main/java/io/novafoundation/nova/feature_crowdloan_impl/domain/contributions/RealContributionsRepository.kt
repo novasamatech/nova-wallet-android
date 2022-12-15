@@ -15,8 +15,6 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.mapCont
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.toPair
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
@@ -155,10 +153,5 @@ class RealContributionsRepository(
                 sourceId = contribution.sourceId,
             )
         }
-    }
-
-    override suspend fun clearAllContributionsFor(assetIds: List<FullChainAssetId>) = withContext(Dispatchers.IO) {
-        val localIds = assetIds.map(FullChainAssetId::toPair)
-        contributionDao.deleteContributionsByAssetIds(localIds)
     }
 }

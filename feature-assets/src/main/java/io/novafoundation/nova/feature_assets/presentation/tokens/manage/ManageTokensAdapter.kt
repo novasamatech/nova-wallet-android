@@ -64,8 +64,13 @@ class ManageTokensViewHolder(
 ) : BaseViewHolder(containerView) {
 
     init {
-        containerView.setOnClickListener {
-            itemHandler.editClocked(bindingAdapterPosition)
+        with(containerView) {
+            setOnClickListener {
+                itemHandler.editClocked(bindingAdapterPosition)
+            }
+            itemManageTokenMultichainEnabled.setOnClickListener {
+                itemHandler.enableSwitched(bindingAdapterPosition)
+            }
         }
     }
 
@@ -83,11 +88,8 @@ class ManageTokensViewHolder(
     }
 
     fun bindEnabled(item: MultiChainTokenModel) = with(containerView) {
-        itemManageTokenMultichainEnabled.setOnCheckedChangeListener(null)
         itemManageTokenMultichainEnabled.isChecked = item.enabled
-        itemManageTokenMultichainEnabled.setOnCheckedChangeListener { _, _ ->
-            itemHandler.enableSwitched(bindingAdapterPosition)
-        }
+        itemManageTokenMultichainEnabled.isEnabled = item.switchable
 
         val contentColorRes = if (item.enabled) R.color.text_primary else R.color.text_secondary
         itemManageTokenMultichainIcon.setImageTintRes(contentColorRes)

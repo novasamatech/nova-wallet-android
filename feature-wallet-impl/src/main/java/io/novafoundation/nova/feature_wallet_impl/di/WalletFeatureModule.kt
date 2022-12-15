@@ -151,10 +151,12 @@ class WalletFeatureModule {
         operationDao: OperationDao,
         assetSourceRegistry: AssetSourceRegistry,
         accountUpdateScope: AccountUpdateScope,
+        walletRepository: WalletRepository
     ) = PaymentUpdaterFactory(
         operationDao,
         assetSourceRegistry,
-        accountUpdateScope
+        accountUpdateScope,
+        walletRepository
     )
 
     @Provides

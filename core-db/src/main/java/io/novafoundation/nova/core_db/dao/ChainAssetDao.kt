@@ -16,9 +16,7 @@ typealias FullAssetIdLocal = Pair<String, Int>
 abstract class ChainAssetDao {
 
     @Transaction
-    open suspend fun updateAssetsBySource(newAssets: List<ChainAssetLocal>, source: AssetSourceLocal) {
-        val oldAssets = getAssetsBySource(source)
-        val diff = CollectionDiffer.findDiff(newAssets, oldAssets, forceUseNewItems = false)
+    open suspend fun updateAssets(diff: CollectionDiffer.Diff<ChainAssetLocal>) {
         insertAssets(diff.newOrUpdated)
         deleteChainAssets(diff.removed)
     }
@@ -37,6 +35,9 @@ abstract class ChainAssetDao {
 
     @Query("UPDATE chain_assets SET enabled = :enabled WHERE chainId = :chainId AND id = :assetId")
     protected abstract suspend fun setAssetEnabled(enabled: Boolean, chainId: String, assetId: Int)
+
+    @Query("SELECT * FROM chain_assets WHERE enabled=1")
+    abstract suspend fun getEnabledAssets(): List<ChainAssetLocal>
 
     @Transaction
     open suspend fun setAssetsEnabled(enabled: Boolean, fullAssetIds: List<FullAssetIdLocal>) {
