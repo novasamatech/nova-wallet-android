@@ -82,7 +82,7 @@ abstract class SubstrateAssetHistory(
     ): DataPage<Operation> {
         val cursor = when (pageOffset) {
             is PageOffset.Loadable.Cursor -> pageOffset.value
-            PageOffset.Loadable.FistPage -> null
+            PageOffset.Loadable.FirstPage -> null
             else -> error("SubQuery requires cursor pagination")
         }
 
