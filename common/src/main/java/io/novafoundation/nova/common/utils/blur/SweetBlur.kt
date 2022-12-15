@@ -15,6 +15,11 @@ import androidx.annotation.ColorInt
 import androidx.core.graphics.times
 import androidx.core.graphics.toRect
 import com.google.android.renderscript.Toolkit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
 
 class SweetBlur(
@@ -25,7 +30,7 @@ class SweetBlur(
     private val blurColor: Int?,
     private val onException: ((Exception) -> Unit)?,
     fakeRadius: Int,
-) : ViewTreeObserver.OnDrawListener {
+) : ViewTreeObserver.OnDrawListener, CoroutineScope {
 
     class ViewBackgroundBuilder {
 
@@ -63,6 +68,9 @@ class SweetBlur(
             )
         }
     }
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main
 
     var started: Boolean = false
     val radius: Int
@@ -115,10 +123,19 @@ class SweetBlur(
 
     private fun makeBlurBackground() {
         val capturedBitmap = captureBitmap()
-        val blurBitmap = blurBitmap(capturedBitmap)
-        val cutSpaceBlur = applyCutSpace(blurBitmap)
-        val bitmapDrawable = createBlurDrawable(cutSpaceBlur)
-        targetView.background = bitmapDrawable
+        launch {
+            try {
+                val bitmapDrawable = withContext(Dispatchers.Default) {
+                    val blurBitmap = blurBitmap(capturedBitmap)
+                    val cutSpaceBlur = applyCutSpace(blurBitmap)
+                    createBlurDrawable(cutSpaceBlur)
+                }
+                targetView.background = bitmapDrawable
+            } catch (e: Exception) {
+                stop()
+                onException?.invoke(e) ?: throw e
+            }
+        }
     }
 
     private fun applyCutSpace(bitmap: Bitmap): Bitmap {
