@@ -8,7 +8,6 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Build
 
-// TODO To make drawing faster we can check region of drawing and abort drawing if it is outside blur
 class SweetBlurCanvas(bitmap: Bitmap) : Canvas(bitmap) {
     override fun drawBitmap(bitmap: Bitmap, src: Rect?, dst: RectF, paint: Paint?) {
         super.drawBitmap(makeSoftwareIfHardware(bitmap), src, dst, paint)
