@@ -10,7 +10,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
-import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteAssetsToLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteAssetToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteChainToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteExplorersToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteNodesToLocal
@@ -321,7 +321,7 @@ class ChainSyncServiceTest {
 
     private fun createLocalCopy(remote: ChainRemote): JoinedChainInfo {
         val domain = mapRemoteChainToLocal(remote, gson)
-        val assets = mapRemoteAssetsToLocal(remote, gson)
+        val assets = remote.assets.map { mapRemoteAssetToLocal(remote, it, gson, true) }
         val nodes = mapRemoteNodesToLocal(remote)
         val explorers = mapRemoteExplorersToLocal(remote)
         val transferHistoryApis = mapRemoteTransferApisToLocal(remote)
