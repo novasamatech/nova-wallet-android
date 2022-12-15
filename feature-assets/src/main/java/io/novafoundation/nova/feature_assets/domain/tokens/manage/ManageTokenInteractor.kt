@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.domain.tokens.manage
 
+import io.novafoundation.nova.common.utils.isSubsetOf
 import io.novafoundation.nova.feature_assets.domain.common.searchTokens
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
@@ -98,7 +99,7 @@ class RealManageTokenInteractor(
                 val (_, firstAsset) = chainsWithAssets.first()
                 val tokenAssets = chainsWithAssets.filter { it.asset.enabled }
                     .map { it.asset.fullId }
-                val isLastTokenEnabled = tokenAssets.containsAll(enabledAssets)
+                val isLastTokenEnabled = enabledAssets.isSubsetOf(tokenAssets)
                 val isLastAssetEnabled = isLastTokenEnabled && tokenAssets.size == 1
 
                 MultiChainToken(
