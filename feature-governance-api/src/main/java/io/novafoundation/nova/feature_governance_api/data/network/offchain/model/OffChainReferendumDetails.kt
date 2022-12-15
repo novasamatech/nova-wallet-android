@@ -6,5 +6,6 @@ class OffChainReferendumDetails(
     val title: String?,
     val description: String,
     val proposerName: String?,
+    val proposerAddress: String?,
     val pastTimeline: List<ReferendumTimeline.Entry>?
 )

@@ -67,10 +67,11 @@ class Gov1OffChainReferendaInfoRepository(
             }
 
         return OffChainReferendumDetails(
-            post.title,
-            post.content,
-            post.author.username,
-            timeline
+            title = post.title,
+            description = post.content,
+            proposerName = null, // author of the post on PA might not be equal to on-chain submitter so we want to be safe here
+            proposerAddress = post.onchainLink?.proposerAddress,
+            pastTimeline = timeline
         )
     }
 

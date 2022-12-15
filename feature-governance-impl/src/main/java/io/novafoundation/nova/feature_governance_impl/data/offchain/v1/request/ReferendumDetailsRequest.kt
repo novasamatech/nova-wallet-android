@@ -14,7 +14,7 @@ class ReferendumDetailsRequest(id: BigInteger) {
                     username
                 }
                 onchain_link {
-                    onchain_referendum{
+                    onchain_referendum {
                         referendumStatus {
                             blockNumber {
                                 startDateTime
@@ -23,6 +23,7 @@ class ReferendumDetailsRequest(id: BigInteger) {
                             status
                         }
                     }
+                    proposer_address
                 }
             }
         }
