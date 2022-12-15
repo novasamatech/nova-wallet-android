@@ -46,7 +46,8 @@ private class RealParachainStakingRewardsComponent(
     private val resourceManager: ResourceManager,
     private val parentScope: CoroutineScope,
     private val assetFlow: Flow<Asset>,
-) : ParachainStakingRewardsComponent, CoroutineScope by parentScope,
+) : ParachainStakingRewardsComponent,
+    CoroutineScope by parentScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(parentScope) {
 
     private val rewardCalculator by lazyAsync {

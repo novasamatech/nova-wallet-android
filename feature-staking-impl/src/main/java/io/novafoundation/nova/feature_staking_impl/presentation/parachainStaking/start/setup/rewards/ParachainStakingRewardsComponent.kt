@@ -24,7 +24,7 @@ interface ParachainStakingRewardsComponent : StatefullComponent<State, Nothing, 
 
         class CollatorIdUpdated(val newCollatorId: AccountId?) : Action()
 
-        class AmountUpdated(val amount: BigDecimal): Action()
+        class AmountUpdated(val amount: BigDecimal) : Action()
     }
 }
 
