@@ -68,9 +68,10 @@ class PaymentUpdater(
             deleteAssetIfExist(chain.disabledAssets())
         }
 
-        val assetSyncs = mutableListOf<Flow<*>>()
-        assetSyncs.addAll(enabledAssetsSync)
-        assetSyncs.add(removeAssetsSync)
+        val assetSyncs = buildList {
+            addAll(enabledAssetsSync)
+            add(removeAssetsSync)
+        }
 
         val chainSyncingFlow = assetSyncs.mergeIfMultiple()
 
