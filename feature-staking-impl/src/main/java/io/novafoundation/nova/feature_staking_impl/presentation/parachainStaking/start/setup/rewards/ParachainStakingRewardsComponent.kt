@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards
 
-import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponent.Action
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponent.State
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
@@ -14,10 +13,7 @@ import java.math.BigDecimal
 
 interface ParachainStakingRewardsComponent : StatefullComponent<State, Nothing, Action>, CoroutineScope {
 
-    class State(
-        val rewardsConfiguration: RewardsConfiguration,
-        val rewardEstimation: RewardEstimation
-    )
+    class State(val rewardEstimation: RewardEstimation)
 
     data class RewardsConfiguration(
         val collator: AccountId?,
@@ -26,25 +22,21 @@ interface ParachainStakingRewardsComponent : StatefullComponent<State, Nothing, 
 
     sealed class Action {
 
-        class ConfigurationUpdated(val newConfiguration: RewardsConfiguration) : Action()
+        class CollatorIdUpdated(val newCollatorId: AccountId?) : Action()
+
+        class AmountUpdated(val amount: BigDecimal): Action()
     }
 }
 
 @JvmName("connectWithAmount")
 infix fun ParachainStakingRewardsComponent.connectWith(amountFlow: Flow<BigDecimal>) {
     amountFlow.onEach { newAmount ->
-        val rewardsConfiguration = state.firstNotNull().rewardsConfiguration
-        val newConfiguration = rewardsConfiguration.copy(amount = newAmount)
-
-        onAction(Action.ConfigurationUpdated(newConfiguration))
+        onAction(Action.AmountUpdated(newAmount))
     }.launchIn(this)
 }
 
 infix fun ParachainStakingRewardsComponent.connectWith(selectedCollatorIdFlow: Flow<AccountId?>) {
     selectedCollatorIdFlow.onEach { newCollatorId ->
-        val rewardsConfiguration = state.firstNotNull().rewardsConfiguration
-        val newConfiguration = rewardsConfiguration.copy(collator = newCollatorId)
-
-        onAction(Action.ConfigurationUpdated(newConfiguration))
+        onAction(Action.CollatorIdUpdated(newCollatorId))
     }.launchIn(this)
 }
