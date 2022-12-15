@@ -71,7 +71,7 @@ class ManageChainTokensViewHolder(
     fun bindEnabled(item: ChainTokenInstanceModel) {
         with(containerView.itemManageChainTokenEnabled) {
             isChecked = item.enabled
-            isEnabled = item.changeable
+            isEnabled = item.switchable
         }
 
         with(containerView) {

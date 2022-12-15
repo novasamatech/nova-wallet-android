@@ -5,5 +5,5 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 data class ChainTokenInstanceModel(
     val chainUi: ChainUi,
     val enabled: Boolean,
-    val changeable: Boolean,
+    val switchable: Boolean,
 )

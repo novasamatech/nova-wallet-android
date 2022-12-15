@@ -11,5 +11,5 @@ interface ChainAssetRepository {
 
     suspend fun getAssetSymbol(id: FullChainAssetId): String?
 
-    suspend fun getAllAssets(): List<Chain.Asset>
+    suspend fun getEnabledAssets(): List<Chain.Asset>
 }

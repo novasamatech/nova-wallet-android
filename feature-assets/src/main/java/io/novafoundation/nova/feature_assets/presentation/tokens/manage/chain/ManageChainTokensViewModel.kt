@@ -40,7 +40,7 @@ class ManageChainTokensViewModel(
             ChainTokenInstanceModel(
                 chainUi = mapChainToUi(it.chain),
                 enabled = it.isEnabled,
-                changeable = !it.isLastEnabled
+                switchable = it.isSwitchable
             )
         }
     }

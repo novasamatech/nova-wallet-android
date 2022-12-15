@@ -61,7 +61,7 @@ class ManageTokensViewModel(
         return MultiChainTokenModel(
             header = commonUiMapper.mapHeaderToUi(multiChainToken),
             enabled = multiChainToken.isEnabled(),
-            changeable = !multiChainToken.isLastEnabled
+            switchable = multiChainToken.isSwitchable
         )
     }
 }

@@ -30,7 +30,7 @@ class RealChainAssetRepository(
         return existingAsset?.symbol
     }
 
-    override suspend fun getAllAssets(): List<Chain.Asset> {
-        return chainAssetDao.getAllAssets().map { mapChainAssetLocalToAsset(it, gson) }
+    override suspend fun getEnabledAssets(): List<Chain.Asset> {
+        return chainAssetDao.getEnabledAssets().map { mapChainAssetLocalToAsset(it, gson) }
     }
 }

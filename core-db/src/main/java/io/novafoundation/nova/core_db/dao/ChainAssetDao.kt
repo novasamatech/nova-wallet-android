@@ -38,8 +38,8 @@ abstract class ChainAssetDao {
     @Query("UPDATE chain_assets SET enabled = :enabled WHERE chainId = :chainId AND id = :assetId")
     protected abstract suspend fun setAssetEnabled(enabled: Boolean, chainId: String, assetId: Int)
 
-    @Query("SELECT * FROM chain_assets")
-    abstract suspend fun getAllAssets(): List<ChainAssetLocal>
+    @Query("SELECT * FROM chain_assets WHERE enabled=1")
+    abstract suspend fun getEnabledAssets(): List<ChainAssetLocal>
 
     @Transaction
     open suspend fun setAssetsEnabled(enabled: Boolean, fullAssetIds: List<FullAssetIdLocal>) {
