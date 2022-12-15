@@ -22,7 +22,7 @@ sealed class PageOffset {
 
         data class PageNumber(val page: Int) : Loadable()
 
-        object FistPage : Loadable()
+        object FirstPage : Loadable()
     }
 
     object FullData : PageOffset()
