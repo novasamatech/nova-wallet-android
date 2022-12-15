@@ -31,7 +31,7 @@ abstract class ContributionDao {
     abstract suspend fun getContributions(metaId: Long, chainId: String, assetId: Int, sourceId: String): List<ContributionLocal>
 
     @Query("DELETE FROM contributions WHERE chainId = :chainId AND assetId = :assetId")
-    protected abstract suspend fun deleteContributions(chainId: String, assetId: Int)
+    abstract suspend fun deleteContributions(chainId: String, assetId: Int)
 
     @Delete
     protected abstract suspend fun deleteContributions(contributions: List<ContributionLocal>)
@@ -41,11 +41,4 @@ abstract class ContributionDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     protected abstract suspend fun insertContributions(contributions: List<ContributionLocal>)
-
-    @Transaction
-    open suspend fun deleteContributionsByAssetIds(fullAssetIds: List<FullAssetIdLocal>) {
-        fullAssetIds.forEach { (chainId, assetId) ->
-            deleteContributions(chainId, assetId)
-        }
-    }
 }

@@ -71,11 +71,6 @@ class RealManageTokenInteractor(
             }
 
             chainAssetRepository.setAssetsEnabled(enabled, assetIds)
-
-            if (!enabled) {
-                walletRepository.clearAssets(assetIds)
-                contributionsRepository.clearAllContributionsFor(assetIds)
-            }
         }
     }
 
