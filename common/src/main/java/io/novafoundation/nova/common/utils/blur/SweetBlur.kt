@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.utils.blur
 
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.Matrix
 import android.graphics.PorterDuff
@@ -176,6 +177,7 @@ class SweetBlur(
     private fun captureBitmap(): Bitmap {
         val viewClip = getViewClip()
         val targetBitmap = getTargetSizeBitmap(viewClip)
+        targetBitmap.eraseColor(Color.BLACK)
         val canvas = SweetBlurCanvas(targetBitmap)
         canvas.clipRect(0f, 0f, viewClip.width() * downscaleFactor, viewClip.height() * downscaleFactor)
         val matrix = Matrix()
