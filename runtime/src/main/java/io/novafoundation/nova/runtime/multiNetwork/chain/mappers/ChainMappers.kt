@@ -15,7 +15,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderArgume
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
-fun mapSectionTypeToSectionTypeLocal(sectionType: Chain.ExternalApi.Section.Type): String = sectionType.name
+private typealias PolkassemblyParameters = Chain.ExternalApi.GovernanceSection.Parameters.PolkassemblyParameters
+
 private fun mapSectionTypeLocalToSectionType(sectionType: String): Chain.ExternalApi.Section.Type = enumValueOf(sectionType)
 
 fun mapStakingTypeToLocal(stakingType: Chain.Asset.StakingType): String = stakingType.name
@@ -60,6 +61,28 @@ private fun mapSectionLocalToSection(sectionLocal: ChainLocal.ExternalApi.Sectio
         type = mapSectionTypeLocalToSectionType(sectionLocal.type),
         url = sectionLocal.url
     )
+}
+
+private fun mapGovernanceSectionLocalToSection(sectionLocal: ChainLocal.ExternalApi.GovernanceSection?, gson: Gson) = sectionLocal?.let {
+    Chain.ExternalApi.GovernanceSection(
+        type = mapSectionTypeLocalToSectionType(sectionLocal.type),
+        url = sectionLocal.url,
+        parameters = mapGovernanceSectionParametersFromLocal(sectionLocal, gson)
+    )
+}
+
+private fun mapGovernanceSectionParametersFromLocal(
+    sectionLocal: ChainLocal.ExternalApi.GovernanceSection?,
+    gson: Gson
+): Chain.ExternalApi.GovernanceSection.Parameters? {
+    val parameters = sectionLocal?.parameters ?: return null
+
+    return when (sectionLocal.type) {
+        Chain.ExternalApi.Section.Type.POLKASSEMBLY.toString() -> gson.fromJsonOrNull<PolkassemblyParameters>(
+            parameters
+        )
+        else -> null
+    }
 }
 
 private const val ASSET_NATIVE = "native"
@@ -195,7 +218,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             staking = mapSectionLocalToSection(externalApiLocal?.staking),
             history = historyApis,
             crowdloans = mapSectionLocalToSection(externalApiLocal?.crowdloans),
-            governance = mapSectionLocalToSection(externalApiLocal?.governance)
+            governance = mapGovernanceSectionLocalToSection(externalApiLocal?.governance, gson)
         )
     } else {
         null

@@ -123,11 +123,17 @@ data class Chain(
         val staking: Section?,
         val history: List<TransferHistoryApi>,
         val crowdloans: Section?,
-        val governance: Section?
+        val governance: GovernanceSection?
     ) {
         data class Section(val type: Type, val url: String) {
             enum class Type {
                 SUBQUERY, GITHUB, UNKNOWN, POLKASSEMBLY, ETHERSCAN
+            }
+        }
+
+        data class GovernanceSection(val type: Section.Type, val url: String, val parameters: Parameters?) {
+            sealed interface Parameters {
+                data class PolkassemblyParameters(val network: String) : Parameters
             }
         }
 
