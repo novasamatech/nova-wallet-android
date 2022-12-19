@@ -15,8 +15,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderArgume
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
-private typealias PolkassemblyParameters = Chain.ExternalApi.GovernanceSection.Parameters.PolkassemblyParameters
-
 private fun mapSectionTypeLocalToSectionType(sectionType: String): Chain.ExternalApi.Section.Type = enumValueOf(sectionType)
 
 fun mapStakingTypeToLocal(stakingType: Chain.Asset.StakingType): String = stakingType.name
@@ -78,7 +76,7 @@ private fun mapGovernanceSectionParametersFromLocal(
     val parameters = sectionLocal?.parameters ?: return null
 
     return when (sectionLocal.type) {
-        Chain.ExternalApi.Section.Type.POLKASSEMBLY.toString() -> gson.fromJsonOrNull<PolkassemblyParameters>(
+        Chain.ExternalApi.Section.Type.POLKASSEMBLY.toString() -> gson.fromJsonOrNull<Chain.ExternalApi.GovernanceSection.Parameters.Polkassembly>(
             parameters
         )
         else -> null

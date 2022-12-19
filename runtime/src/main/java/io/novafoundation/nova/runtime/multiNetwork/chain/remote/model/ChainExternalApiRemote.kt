@@ -9,7 +9,7 @@ data class ChainExternalApiRemote(
 
     class Section(val type: String, val url: String)
 
-    class GovernanceSection(val type: String, val url: String, val parameters: Any?)
+    class GovernanceSection(val type: String, val url: String, val parameters: Map<String, Any?>)
 
     data class TransferApi(
         val type: String,

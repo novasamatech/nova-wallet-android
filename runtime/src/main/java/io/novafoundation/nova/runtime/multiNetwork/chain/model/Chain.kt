@@ -133,7 +133,7 @@ data class Chain(
 
         data class GovernanceSection(val type: Section.Type, val url: String, val parameters: Parameters?) {
             sealed interface Parameters {
-                data class PolkassemblyParameters(val network: String) : Parameters
+                data class Polkassembly(val network: String) : Parameters
             }
         }
 

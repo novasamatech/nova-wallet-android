@@ -42,7 +42,7 @@ val Chain.commissionAsset
     get() = utilityAsset
 
 val Chain.ExternalApi.GovernanceSection.polkassemblyParameters
-    get() = parameters as? Chain.ExternalApi.GovernanceSection.Parameters.PolkassemblyParameters
+    get() = parameters as? Chain.ExternalApi.GovernanceSection.Parameters.Polkassembly
 
 val Chain.Asset.isUtilityAsset: Boolean
     get() = id == 0
