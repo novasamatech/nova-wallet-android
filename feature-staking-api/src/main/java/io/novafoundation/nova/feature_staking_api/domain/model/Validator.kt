@@ -24,4 +24,14 @@ class Validator(
         val apy: BigDecimal,
         val isOversubscribed: Boolean
     )
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is Validator) return false
+
+        return address == other.address
+    }
+
+    override fun hashCode(): Int {
+        return address.hashCode()
+    }
 }
