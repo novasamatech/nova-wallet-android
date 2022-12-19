@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
@@ -46,9 +45,7 @@ private class RealParachainStakingRewardsComponent(
     private val resourceManager: ResourceManager,
     private val parentScope: CoroutineScope,
     private val assetFlow: Flow<Asset>,
-) : ParachainStakingRewardsComponent,
-    CoroutineScope by parentScope,
-    WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(parentScope) {
+) : ParachainStakingRewardsComponent, CoroutineScope by parentScope {
 
     private val rewardCalculator by lazyAsync {
         rewardCalculatorFactory.create(singleAssetSharedState.chainAsset())
@@ -67,6 +64,7 @@ private class RealParachainStakingRewardsComponent(
 
         assetFlow.map { asset ->
             State(
+                rewardsConfiguration = it,
                 rewardEstimation = mapPeriodReturnsToRewardEstimation(
                     periodReturns = returns,
                     token = asset.token,
@@ -75,17 +73,14 @@ private class RealParachainStakingRewardsComponent(
                 )
             )
         }
-    }.shareInBackground()
+    }
 
     override fun onAction(action: Action) {
         when (action) {
-            is Action.AmountUpdated -> mutateConfiguration { it.copy(amount = action.amount) }
-            is Action.CollatorIdUpdated -> mutateConfiguration { it.copy(collator = action.newCollatorId) }
+            is Action.ConfigurationUpdated -> {
+                rewardConfiguration.value = action.newConfiguration
+            }
         }
-    }
-
-    private fun mutateConfiguration(mutation: (RewardsConfiguration) -> RewardsConfiguration) {
-        rewardConfiguration.value = mutation(rewardConfiguration.value)
     }
 
     private fun initialConfiguration(): RewardsConfiguration {
