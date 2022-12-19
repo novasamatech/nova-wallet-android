@@ -17,6 +17,8 @@ private const val CROWDLOAN_OPTION = "crowdloans"
 private const val TESTNET_OPTION = "testnet"
 private const val CHAIN_ADDITIONAL_TIP = "defaultTip"
 
+fun mapSectionTypeToSectionTypeLocal(sectionType: Chain.ExternalApi.Section.Type): String = sectionType.name
+
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
     gson: Gson
@@ -32,7 +34,7 @@ fun mapRemoteChainToLocal(
         ChainLocal.ExternalApi(
             staking = mapSectionRemoteToLocal(externalApi.staking),
             crowdloans = mapSectionRemoteToLocal(externalApi.crowdloans),
-            governance = mapSectionRemoteToLocal(externalApi.governance)
+            governance = mapGovernanceSectionRemoteToLocal(externalApi.governance, gson)
         )
     }
 
@@ -145,6 +147,14 @@ private fun mapSectionRemoteToLocal(sectionRemote: ChainExternalApiRemote.Sectio
     ChainLocal.ExternalApi.Section(
         type = mapSectionTypeRemoteToLocal(sectionRemote.type),
         url = sectionRemote.url
+    )
+}
+
+private fun mapGovernanceSectionRemoteToLocal(sectionRemote: ChainExternalApiRemote.GovernanceSection?, gson: Gson) = sectionRemote?.let {
+    ChainLocal.ExternalApi.GovernanceSection(
+        type = mapSectionTypeRemoteToLocal(sectionRemote.type),
+        url = sectionRemote.url,
+        parameters = gson.toJson(sectionRemote.parameters)
     )
 }
 
