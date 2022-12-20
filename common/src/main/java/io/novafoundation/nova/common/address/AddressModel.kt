@@ -9,3 +9,11 @@ class AddressModel(
 ) {
     val nameOrAddress = name ?: address
 }
+
+class OptionalAddressModel(
+    val address: String,
+    val image: Drawable?,
+    val name: String? = null
+) {
+    val nameOrAddress = name ?: address
+}

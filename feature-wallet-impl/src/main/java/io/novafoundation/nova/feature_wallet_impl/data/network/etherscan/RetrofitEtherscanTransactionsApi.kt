@@ -20,6 +20,7 @@ interface RetrofitEtherscanTransactionsApi {
         @Query("offset") pageSize: Int,
         @Query("apikey") apiKey: String?,
         @Query("module") module: String = "account",
-        @Query("action") action: String = "tokentx"
+        @Query("action") action: String = "tokentx",
+        @Query("sort") sort: String = "desc"
     ): EtherscanResponse<List<EtherscanAccountTransfer>>
 }

@@ -17,7 +17,8 @@ class ReferendumDetailsResponse(
     class Author(val username: String)
 
     class OnChainLink(
-        @SerializedName("onchain_referendum") val onchainReferendum: List<OnChainReferendum>?
+        @SerializedName("onchain_referendum") val onchainReferendum: List<OnChainReferendum>?,
+        @SerializedName("proposer_address") val proposerAddress: String,
     )
 
     class OnChainReferendum(

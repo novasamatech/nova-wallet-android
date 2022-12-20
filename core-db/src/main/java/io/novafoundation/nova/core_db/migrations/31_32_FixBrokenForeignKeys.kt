@@ -54,7 +54,7 @@ val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
             `source` TEXT NOT NULL DEFAULT '${ChainAssetLocal.SOURCE_DEFAULT}',
             `buyProviders` TEXT,
             `typeExtras` TEXT,
-            `enabled` INTEGER NOT NULL DEFAULT ${ChainAssetLocal.ENABLED_DEFAULT},
+            `enabled` INTEGER NOT NULL DEFAULT ${ChainAssetLocal.ENABLED_DEFAULT_STR},
             PRIMARY KEY(`chainId`,`id`),
             FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
             )

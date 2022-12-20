@@ -56,20 +56,22 @@ class ManageChainTokensViewHolder(
     private val imageLoader: ImageLoader,
 ) : BaseViewHolder(containerView) {
 
+    init {
+        with(containerView) {
+            itemManageChainTokenEnabled.setOnClickListener { itemHandler.enableSwitched(bindingAdapterPosition) }
+        }
+    }
+
     fun bind(item: ChainTokenInstanceModel) = with(containerView) {
         bindEnabled(item)
-
         itemManageChainTokenChainIcon.loadChainIcon(item.chainUi.icon, imageLoader)
         itemManageChainTokenChainName.text = item.chainUi.name
     }
 
     fun bindEnabled(item: ChainTokenInstanceModel) {
         with(containerView.itemManageChainTokenEnabled) {
-            setOnCheckedChangeListener(null)
             isChecked = item.enabled
-            setOnCheckedChangeListener { _, _ ->
-                itemHandler.enableSwitched(bindingAdapterPosition)
-            }
+            isEnabled = item.switchable
         }
 
         with(containerView) {

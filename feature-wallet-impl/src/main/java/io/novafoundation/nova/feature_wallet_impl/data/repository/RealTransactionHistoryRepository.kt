@@ -35,7 +35,7 @@ class RealTransactionHistoryRepository(
         val historySource = historySourceFor(chainAsset)
         val accountAddress = chain.addressOf(accountId)
 
-        val dataPage = historySource.getOperations(pageSize, PageOffset.Loadable.FistPage, filters, accountId, chain, chainAsset)
+        val dataPage = historySource.getOperations(pageSize, PageOffset.Loadable.FirstPage, filters, accountId, chain, chainAsset)
         historySource.additionalFirstPageSync(chain, chainAsset, accountId, dataPage)
 
         val localOperations = dataPage.map { mapOperationToOperationLocalDb(it, chainAsset, OperationLocal.Source.REMOTE) }

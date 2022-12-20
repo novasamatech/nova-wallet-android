@@ -8,6 +8,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainAssetRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExternalApiRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
 
@@ -71,24 +72,27 @@ fun mapGovernanceRemoteOptionsToLocal(remoteOptions: Set<String>): String {
     return mapGovernanceListToLocal(domainGovernanceTypes)
 }
 
-fun mapRemoteAssetsToLocal(chainRemote: ChainRemote, gson: Gson): List<ChainAssetLocal> {
-    return chainRemote.assets.map {
-        ChainAssetLocal(
-            id = it.assetId,
-            symbol = it.symbol,
-            precision = it.precision,
-            chainId = chainRemote.chainId,
-            name = it.name ?: chainRemote.name,
-            priceId = it.priceId,
-            staking = mapRemoteStakingTypeToLocal(it.staking),
-            type = it.type,
-            source = AssetSourceLocal.DEFAULT,
-            buyProviders = gson.toJson(it.buyProviders),
-            typeExtras = gson.toJson(it.typeExtras),
-            icon = it.icon,
-            enabled = true
-        )
-    }
+fun mapRemoteAssetToLocal(
+    chainRemote: ChainRemote,
+    assetRemote: ChainAssetRemote,
+    gson: Gson,
+    isEnabled: Boolean
+): ChainAssetLocal {
+    return ChainAssetLocal(
+        id = assetRemote.assetId,
+        symbol = assetRemote.symbol,
+        precision = assetRemote.precision,
+        chainId = chainRemote.chainId,
+        name = assetRemote.name ?: chainRemote.name,
+        priceId = assetRemote.priceId,
+        staking = mapRemoteStakingTypeToLocal(assetRemote.staking),
+        type = assetRemote.type,
+        source = AssetSourceLocal.DEFAULT,
+        buyProviders = gson.toJson(assetRemote.buyProviders),
+        typeExtras = gson.toJson(assetRemote.typeExtras),
+        icon = assetRemote.icon,
+        enabled = isEnabled
+    )
 }
 
 fun mapRemoteNodesToLocal(chainRemote: ChainRemote): List<ChainNodeLocal> {

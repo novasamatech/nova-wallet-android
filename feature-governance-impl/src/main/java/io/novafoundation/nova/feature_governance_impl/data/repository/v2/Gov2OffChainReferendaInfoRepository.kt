@@ -56,6 +56,7 @@ class Gov2OffChainReferendaInfoRepository(
         return OffChainReferendumDetails(
             title = post.title,
             description = post.content,
+            proposerAddress = null,
             proposerName = post.author.username,
             pastTimeline = timeline
         )

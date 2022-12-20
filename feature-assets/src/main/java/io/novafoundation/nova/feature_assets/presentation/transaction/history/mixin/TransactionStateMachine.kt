@@ -92,7 +92,7 @@ object TransactionStateMachine {
                     !canUseCache(state.allAvailableFilters, state.usedFilters) -> {
                         if (action.accountChanged) {
                             // trigger cold load for new account when not able to use cache
-                            sideEffectListener(SideEffect.LoadPage(nextPageOffset = PageOffset.Loadable.FistPage, filters = state.usedFilters))
+                            sideEffectListener(SideEffect.LoadPage(nextPageOffset = PageOffset.Loadable.FirstPage, filters = state.usedFilters))
 
                             State.EmptyProgress(
                                 allAvailableFilters = state.allAvailableFilters,
@@ -214,7 +214,7 @@ object TransactionStateMachine {
                 if (canUseCache(state.allAvailableFilters, newFilters)) {
                     sideEffectListener(SideEffect.TriggerCache)
                 } else {
-                    sideEffectListener(SideEffect.LoadPage(nextPageOffset = PageOffset.Loadable.FistPage, filters = newFilters))
+                    sideEffectListener(SideEffect.LoadPage(nextPageOffset = PageOffset.Loadable.FirstPage, filters = newFilters))
                 }
 
                 State.EmptyProgress(

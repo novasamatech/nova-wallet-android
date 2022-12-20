@@ -39,5 +39,5 @@ class AddressDisplayUseCase(
 }
 
 suspend operator fun AddressDisplayUseCase.invoke(chain: Chain, address: String): String? {
-    return invoke(chain.accountIdOf(address))
+    return runCatching { invoke(chain.accountIdOf(address)) }.getOrNull()
 }

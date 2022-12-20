@@ -98,7 +98,7 @@ class EvmAssetHistory(
         apiUrl: String
     ): DataPage<Operation> {
         val page = when (pageOffset) {
-            PageOffset.Loadable.FistPage -> FIRST_PAGE_INDEX
+            PageOffset.Loadable.FirstPage -> FIRST_PAGE_INDEX
             is PageOffset.Loadable.PageNumber -> pageOffset.page
             else -> error("Etherscan requires page number pagination")
         }

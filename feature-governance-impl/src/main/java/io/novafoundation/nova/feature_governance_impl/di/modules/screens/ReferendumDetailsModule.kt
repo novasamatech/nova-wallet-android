@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.treasury.TreasurySpendParser
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 
 @Module
 class ReferendumDetailsModule {
@@ -39,7 +38,6 @@ class ReferendumDetailsModule {
         callParsers: Set<@JvmSuppressWildcards ReferendumCallParser>,
         governanceSourceRegistry: GovernanceSourceRegistry,
         chainStateRepository: ChainStateRepository,
-        totalIssuanceRepository: TotalIssuanceRepository,
         referendaConstructor: ReferendaConstructor,
         preImageSizer: PreImageSizer,
         @ExtrinsicSerialization callFormatter: Gson,
@@ -47,7 +45,6 @@ class ReferendumDetailsModule {
         preImageParsers = callParsers,
         governanceSourceRegistry = governanceSourceRegistry,
         chainStateRepository = chainStateRepository,
-        totalIssuanceRepository = totalIssuanceRepository,
         referendaConstructor = referendaConstructor,
         preImageSizer = preImageSizer,
         callFormatter = callFormatter

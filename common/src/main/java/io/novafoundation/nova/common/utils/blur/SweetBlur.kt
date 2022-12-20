@@ -1,21 +1,26 @@
 package io.novafoundation.nova.common.utils.blur
 
 import android.graphics.Bitmap
-import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.ColorFilter
 import android.graphics.Matrix
-import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.view.View
-import androidx.core.graphics.toRect
-import com.google.android.renderscript.Toolkit
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.view.ViewTreeObserver
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.annotation.ColorInt
 import androidx.core.graphics.times
+import androidx.core.graphics.toRect
+import com.google.android.renderscript.Toolkit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
 
 class SweetBlur(
@@ -26,7 +31,7 @@ class SweetBlur(
     private val blurColor: Int?,
     private val onException: ((Exception) -> Unit)?,
     fakeRadius: Int,
-) : ViewTreeObserver.OnDrawListener {
+) : ViewTreeObserver.OnDrawListener, CoroutineScope {
 
     class ViewBackgroundBuilder {
 
@@ -50,7 +55,7 @@ class SweetBlur(
 
         fun blurColor(@ColorInt blurColor: Int) = apply { this.blurColor = blurColor }
 
-        fun onException(action: (Exception) -> Unit) = apply { onException = action }
+        fun catchException(action: (Exception) -> Unit) = apply { onException = action }
 
         fun build(): SweetBlur {
             return SweetBlur(
@@ -65,12 +70,13 @@ class SweetBlur(
         }
     }
 
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main
+
     var started: Boolean = false
-
     val radius: Int
-    val downscaleFactor: Float
-
-    val paint: Paint?
+    private val downscaleFactor: Float
+    private val bitmapColorFilter: ColorFilter?
 
     init {
         val boundedFakeRadius = minOf(maxOf(fakeRadius, 1), 250)
@@ -84,33 +90,24 @@ class SweetBlur(
         downscaleFactor = 1f / compression
         radius = trueRadius.roundToInt()
 
-        paint = if (blurColor != null) {
-            Paint().apply {
-                flags = Paint.FILTER_BITMAP_FLAG or Paint.ANTI_ALIAS_FLAG
-                val filter = PorterDuffColorFilter(blurColor, PorterDuff.Mode.SRC_ATOP)
-                colorFilter = filter
-            }
-        } else {
-            null
-        }
+        bitmapColorFilter = if (blurColor == null) null else PorterDuffColorFilter(blurColor, PorterDuff.Mode.SRC_ATOP)
     }
 
-    // Попробовать написать класс, который будет вычислять возможности устройства и применять бэкграунд попроще, если устройство слабое
     fun start() {
         if (!started) {
+            started = true
             captureFromView.post {
                 captureFromView.viewTreeObserver.addOnDrawListener(this)
             }
-            started = true
         }
     }
 
     fun stop() {
         if (started) {
+            started = false
             captureFromView.post {
                 captureFromView.viewTreeObserver.removeOnDrawListener(this)
             }
-            started = false
         }
     }
 
@@ -118,35 +115,40 @@ class SweetBlur(
         if (!started) return
 
         try {
-            makeBlurBackground()
+            targetView.post { makeBlurBackground() }
         } catch (e: Exception) {
             stop()
-            onException?.invoke(e)
+            onException?.invoke(e) ?: throw e
         }
     }
 
     private fun makeBlurBackground() {
-        val bitmap = captureBitmap()
-        var blur = blurBitmap(bitmap)
-
-        if (cutSpace != null) {
-            val blurRect = blur.rect()
-                .inset(cutSpace * downscaleFactor)
-            blur = createBitmap(
-                blur,
-                blurRect
-            )
+        val capturedBitmap = captureBitmap()
+        launch {
+            try {
+                val bitmapDrawable = withContext(Dispatchers.Default) {
+                    val blurBitmap = blurBitmap(capturedBitmap)
+                    val cutSpaceBlur = applyCutSpace(blurBitmap)
+                    createBlurDrawable(cutSpaceBlur)
+                }
+                targetView.background = bitmapDrawable
+            } catch (e: Exception) {
+                stop()
+                onException?.invoke(e) ?: throw e
+            }
         }
-
-        targetView.background = BitmapDrawable(targetView.context.resources, blur)
     }
 
-    private fun captureBitmap(): Bitmap {
-        val capturedBitmap = bitmapFromCaptureView()
-        return if (paint != null) {
-            colorizeBitmap(capturedBitmap, paint)
+    private fun applyCutSpace(bitmap: Bitmap): Bitmap {
+        return if (cutSpace != null) {
+            val blurRect = bitmap.rect()
+                .inset(cutSpace * downscaleFactor)
+            return createBitmap(
+                bitmap,
+                blurRect
+            )
         } else {
-            capturedBitmap
+            bitmap
         }
     }
 
@@ -168,28 +170,22 @@ class SweetBlur(
         )
     }
 
-    private fun blurBitmap(src: Bitmap): Bitmap {
+    fun blurBitmap(src: Bitmap): Bitmap {
         return Toolkit.blur(src, radius)
     }
 
-    private fun bitmapFromCaptureView(): Bitmap {
+    private fun captureBitmap(): Bitmap {
         val viewClip = getViewClip()
         val targetBitmap = getTargetSizeBitmap(viewClip)
-        val canvas = Canvas(targetBitmap)
+        targetBitmap.eraseColor(Color.BLACK)
+        val canvas = SweetBlurCanvas(targetBitmap)
+        canvas.clipRect(0f, 0f, viewClip.width() * downscaleFactor, viewClip.height() * downscaleFactor)
         val matrix = Matrix()
         matrix.setTranslate(0f, -viewClip.top * downscaleFactor)
         matrix.preScale(downscaleFactor, downscaleFactor)
         canvas.setMatrix(matrix)
-
         captureFromView.draw(canvas)
         return targetBitmap
-    }
-
-    private fun colorizeBitmap(bitmap: Bitmap, paint: Paint): Bitmap {
-        val result = bitmap.copy(Bitmap.Config.ARGB_8888, true)
-        val canvas = Canvas(result)
-        canvas.drawBitmap(bitmap, Matrix(), paint)
-        return result
     }
 
     private fun createBitmap(source: Bitmap, clipF: RectF): Bitmap {
@@ -226,5 +222,11 @@ class SweetBlur(
             right.toFloat(),
             bottom.toFloat()
         )
+    }
+
+    private fun createBlurDrawable(bitmap: Bitmap): BitmapDrawable {
+        return BitmapDrawable(targetView.context.resources, bitmap).apply {
+            colorFilter = bitmapColorFilter
+        }
     }
 }
