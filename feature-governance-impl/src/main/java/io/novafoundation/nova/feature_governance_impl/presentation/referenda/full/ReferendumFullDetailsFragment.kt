@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.CopierBottomSheet
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
@@ -99,6 +100,8 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
             } else {
                 referendumFullDetailsProposal.makeVisible()
                 referendumFullDetailsProposal.showAddress(addressAndAmount.addressModel)
+
+                referendumFullDetailsDeposit.setVisible(addressAndAmount.amountModel != null)
                 addressAndAmount.amountModel?.let { referendumFullDetailsDeposit.showAmount(it) }
             }
         }
