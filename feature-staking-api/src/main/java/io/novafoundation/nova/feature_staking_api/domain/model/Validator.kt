@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_api.domain.model
 
+import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -15,7 +16,7 @@ class Validator(
     val prefs: ValidatorPrefs?,
     val electedInfo: ElectedInfo?,
     val identity: OnChainIdentity?,
-) {
+) : Identifiable {
 
     class ElectedInfo(
         val totalStake: BigInteger,
@@ -25,13 +26,5 @@ class Validator(
         val isOversubscribed: Boolean
     )
 
-    override fun equals(other: Any?): Boolean {
-        if (other !is Validator) return false
-
-        return address == other.address
-    }
-
-    override fun hashCode(): Int {
-        return address.hashCode()
-    }
+    override val identifier: String = address
 }
