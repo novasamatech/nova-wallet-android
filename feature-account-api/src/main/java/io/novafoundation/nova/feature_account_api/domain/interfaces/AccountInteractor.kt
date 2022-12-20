@@ -12,6 +12,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface AccountInteractor {
 
+    suspend fun getMetaAccounts(): List<MetaAccount>
+
+    suspend fun isAccountSelected(): Boolean
+
     suspend fun generateMnemonic(): Mnemonic
 
     fun getCryptoTypes(): List<CryptoType>

@@ -155,13 +155,8 @@ class AccountHolder(view: View) : GroupedListHolder(view) {
                 itemAccountArrow.visibility = View.INVISIBLE
 
                 itemAccountDelete.visibility = View.VISIBLE
-                if (accountModel.isSelected) {
-                    itemAccountDelete.setImageResource(R.drawable.ic_checkmark)
-                    itemAccountDelete.setOnClickListener(null)
-                } else {
-                    itemAccountDelete.setOnClickListener { handler.deleteClicked(accountModel) }
-                    itemAccountDelete.setImageResource(R.drawable.ic_delete_symbol)
-                }
+                itemAccountDelete.setOnClickListener { handler.deleteClicked(accountModel) }
+                itemAccountDelete.setImageResource(R.drawable.ic_delete_symbol)
 
                 itemAccountCheck.visibility = View.GONE
 

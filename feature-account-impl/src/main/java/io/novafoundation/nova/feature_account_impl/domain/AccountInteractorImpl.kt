@@ -23,6 +23,13 @@ class AccountInteractorImpl(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
 ) : AccountInteractor {
+    override suspend fun getMetaAccounts(): List<MetaAccount> {
+        return accountRepository.allMetaAccounts()
+    }
+
+    override suspend fun isAccountSelected(): Boolean {
+        return accountRepository.isAccountSelected()
+    }
 
     override suspend fun generateMnemonic(): Mnemonic {
         return accountRepository.generateMnemonic()
