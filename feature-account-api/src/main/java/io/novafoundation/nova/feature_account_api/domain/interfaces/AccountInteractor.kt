@@ -14,8 +14,6 @@ interface AccountInteractor {
 
     suspend fun getMetaAccounts(): List<MetaAccount>
 
-    suspend fun isAccountSelected(): Boolean
-
     suspend fun generateMnemonic(): Mnemonic
 
     fun getCryptoTypes(): List<CryptoType>
@@ -38,7 +36,7 @@ interface AccountInteractor {
 
     suspend fun selectMetaAccount(metaId: Long)
 
-    suspend fun deleteAccount(metaId: Long)
+    suspend fun deleteAccount(metaId: Long): Boolean
 
     suspend fun updateMetaAccountPositions(idsInNewOrder: List<Long>)
 

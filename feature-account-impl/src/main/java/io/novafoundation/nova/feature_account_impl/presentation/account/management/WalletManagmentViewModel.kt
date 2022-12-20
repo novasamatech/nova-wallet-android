@@ -53,19 +53,10 @@ class WalletManagmentViewModel(
         val deleteConfirmed = confirmAccountDeletion.awaitAction()
 
         if (deleteConfirmed) {
-            accountInteractor.deleteAccount(account.id)
-            if (!accountInteractor.isAccountSelected()) {
-                selectFirstMetaAccountOrNavigate()
+            val isAllMetaAccountsWasDeleted = accountInteractor.deleteAccount(account.id)
+            if (isAllMetaAccountsWasDeleted) {
+                accountRouter.openWelcomeScreen()
             }
-        }
-    }
-
-    private suspend fun selectFirstMetaAccountOrNavigate() {
-        val metaAccounts = accountInteractor.getMetaAccounts()
-        if (metaAccounts.isEmpty()) {
-            accountRouter.openWelcomeScreen()
-        } else {
-            accountInteractor.selectMetaAccount(metaAccounts[0].id)
         }
     }
 
