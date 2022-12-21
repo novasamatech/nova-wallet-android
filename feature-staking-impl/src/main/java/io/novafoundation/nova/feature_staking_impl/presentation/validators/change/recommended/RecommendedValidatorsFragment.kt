@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
@@ -42,6 +44,7 @@ class RecommendedValidatorsFragment : BaseFragment<RecommendedValidatorsViewMode
         recommendedValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
+        recommendedValidatorsNext.prepareForProgress(viewLifecycleOwner)
         recommendedValidatorsNext.setOnClickListener {
             viewModel.nextClicked()
         }
@@ -58,6 +61,7 @@ class RecommendedValidatorsFragment : BaseFragment<RecommendedValidatorsViewMode
     }
 
     override fun subscribe(viewModel: RecommendedValidatorsViewModel) {
+        observeValidations(viewModel)
         viewModel.recommendedValidatorModels.observe {
             adapter.submitList(it)
 
@@ -66,6 +70,8 @@ class RecommendedValidatorsFragment : BaseFragment<RecommendedValidatorsViewMode
         }
 
         viewModel.selectedTitle.observe(recommendedValidatorsAccounts::setText)
+
+        viewModel.continueButtonState.observe(recommendedValidatorsNext::setState)
     }
 
     override fun stakeTargetInfoClicked(validatorModel: ValidatorModel) {

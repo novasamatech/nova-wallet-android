@@ -6,9 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.view.ButtonState
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
@@ -51,6 +53,8 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
         reviewCustomValidatorsToolbar.setRightActionClickListener {
             viewModel.isInEditMode.toggle()
         }
+
+        reviewCustomValidatorsNext.prepareForProgress(viewLifecycleOwner)
     }
 
     override fun inject() {
@@ -64,6 +68,7 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
     }
 
     override fun subscribe(viewModel: ReviewCustomValidatorsViewModel) {
+        observeValidations(viewModel)
         viewModel.selectedValidatorModels.observe(adapter::submitList)
 
         viewModel.selectionStateFlow.observe {
@@ -81,6 +86,8 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
 
             reviewCustomValidatorsToolbar.setTextRight(getString(rightActionRes))
         }
+
+        viewModel.continueButtonState.observe(reviewCustomValidatorsNext::setState)
     }
 
     override fun stakeTargetInfoClicked(validatorModel: ValidatorModel) {

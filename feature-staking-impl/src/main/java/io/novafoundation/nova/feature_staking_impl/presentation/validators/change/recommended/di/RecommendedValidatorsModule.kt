@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
@@ -34,7 +35,8 @@ class RecommendedValidatorsModule {
         router: StakingRouter,
         setupStakingSharedState: SetupStakingSharedState,
         tokenUseCase: TokenUseCase,
-        selectedAssetState: StakingSharedState
+        selectedAssetState: StakingSharedState,
+        validationExecutor: ValidationExecutor
     ): ViewModel {
         return RecommendedValidatorsViewModel(
             router,
@@ -45,7 +47,8 @@ class RecommendedValidatorsModule {
             resourceManager,
             setupStakingSharedState,
             tokenUseCase,
-            selectedAssetState
+            selectedAssetState,
+            validationExecutor
         )
     }
 
