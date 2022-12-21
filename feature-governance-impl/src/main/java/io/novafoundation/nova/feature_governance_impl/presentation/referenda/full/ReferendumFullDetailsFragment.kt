@@ -9,6 +9,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.CopierBottomSheet
+import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
@@ -18,6 +19,7 @@ import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.model.AddressAndAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmountOrHide
 import kotlinx.android.synthetic.main.fragment_referendum_full_details.referendumFullDetailsApproveThreshold
@@ -94,7 +96,22 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
     override fun subscribe(viewModel: ReferendumFullDetailsViewModel) {
         setupExternalActions(viewModel)
 
-        viewModel.proposerModel.observe { addressAndAmount ->
+        viewModel.proposerModel.observe { state ->
+            updateProposerState(state)
+        }
+
+        viewModel.beneficiaryModel.observe { state ->
+            updateBeneficiaryState(state)
+        }
+
+        viewModel.turnoutAmount.observe(referendumFullDetailsTurnout::showAmountOrHide)
+
+        viewModel.electorateAmount.observe(referendumFullDetailsElectorate::showAmountOrHide)
+    }
+
+    private fun updateProposerState(state: LoadingState<AddressAndAmountModel?>) {
+        if (state is LoadingState.Loaded) {
+            val addressAndAmount = state.data
             if (addressAndAmount == null) {
                 referendumFullDetailsProposalContainer.makeGone()
             } else {
@@ -104,9 +121,16 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
                 referendumFullDetailsDeposit.setVisible(addressAndAmount.amountModel != null)
                 addressAndAmount.amountModel?.let { referendumFullDetailsDeposit.showAmount(it) }
             }
+        } else {
+            referendumFullDetailsProposal.showProgress()
+            referendumFullDetailsDeposit.showProgress()
         }
+    }
 
-        viewModel.beneficiaryModel.observe { addressAndAmount ->
+    private fun updateBeneficiaryState(state: LoadingState<AddressAndAmountModel?>) {
+        if (state is LoadingState.Loaded) {
+            val addressAndAmount = state.data
+
             if (addressAndAmount == null) {
                 referendumFullDetailsBeneficiaryContainer.makeGone()
             } else {
@@ -114,11 +138,10 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
                 referendumFullDetailsBeneficiary.showAddress(addressAndAmount.addressModel)
                 addressAndAmount.amountModel?.let { referendumFullDetailsRequestedAmount.showAmount(it) }
             }
+        } else {
+            referendumFullDetailsBeneficiary.showProgress()
+            referendumFullDetailsRequestedAmount.showProgress()
         }
-
-        viewModel.turnoutAmount.observe(referendumFullDetailsTurnout::showAmountOrHide)
-
-        viewModel.electorateAmount.observe(referendumFullDetailsElectorate::showAmountOrHide)
     }
 
     private fun showCopyingBottomSheet(value: String) {
