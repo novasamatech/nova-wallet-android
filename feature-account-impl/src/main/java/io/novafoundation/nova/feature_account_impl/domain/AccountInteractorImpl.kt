@@ -23,6 +23,9 @@ class AccountInteractorImpl(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
 ) : AccountInteractor {
+    override suspend fun getMetaAccounts(): List<MetaAccount> {
+        return accountRepository.allMetaAccounts()
+    }
 
     override suspend fun generateMnemonic(): Mnemonic {
         return accountRepository.generateMnemonic()
@@ -74,8 +77,20 @@ class AccountInteractorImpl(
         accountRepository.selectMetaAccount(metaId)
     }
 
+    /**
+     * return true if all accounts was deleted
+     */
     override suspend fun deleteAccount(metaId: Long) = withContext(Dispatchers.Default) {
         accountRepository.deleteAccount(metaId)
+        if (!accountRepository.isAccountSelected()) {
+            val metaAccounts = getMetaAccounts()
+            if (metaAccounts.isNotEmpty()) {
+                accountRepository.selectMetaAccount(metaAccounts.first().id)
+            }
+            metaAccounts.isEmpty()
+        } else {
+            false
+        }
     }
 
     override suspend fun updateMetaAccountPositions(idsInNewOrder: List<Long>) = with(Dispatchers.Default) {

@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.navigation.SecureRouter
 
 interface SplashRouter : SecureRouter {
 
-    fun openAddFirstAccount()
+    fun openWelcomeScreen()
 
     fun openCreatePincode()
 

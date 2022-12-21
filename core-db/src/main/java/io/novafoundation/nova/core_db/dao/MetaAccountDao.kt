@@ -121,6 +121,9 @@ interface MetaAccountDao {
     @Query("SELECT COALESCE(MAX(position), 0)  + 1 FROM meta_accounts")
     suspend fun nextAccountPosition(): Int
 
+    @Query("SELECT * FROM meta_accounts WHERE isSelected = 1")
+    suspend fun selectedMetaAccount(): RelationJoinedMetaAccountInfo?
+
     @Transaction
     suspend fun insertMetaAndChainAccounts(
         metaAccount: MetaAccountLocal,

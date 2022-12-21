@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sig
 
 interface AccountRouter : SecureRouter, ReturnableRouter {
 
+    fun openWelcomeScreen()
+
     fun openMain()
 
     fun openCreatePincode()
