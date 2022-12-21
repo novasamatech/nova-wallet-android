@@ -11,6 +11,9 @@ import io.novafoundation.nova.runtime.multiNetwork.asset.remote.model.EVMInstanc
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.chainAssetIdOfErc20Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapEVMAssetRemoteToLocalAssets
 import io.novafoundation.nova.test_shared.argThat
+import io.novafoundation.nova.test_shared.emptyDiff
+import io.novafoundation.nova.test_shared.insertsElement
+import io.novafoundation.nova.test_shared.removesElement
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -109,6 +112,35 @@ class EvmAssetSyncServiceTest {
         }
     }
 
+    @Test
+    fun `should not overwrite enabled state`() {
+        runBlocking {
+            localReturns(LOCAL_ASSETS.map { it.copy(enabled = false) })
+            remoteReturns(listOf(REMOTE_ASSET))
+
+            evmAssetSyncService.syncUp()
+
+            verify(dao).updateAssets(
+                emptyDiff(),
+            )
+        }
+    }
+
+    @Test
+    fun `should not modify manual assets`() {
+        runBlocking {
+            localReturns(LOCAL_ASSETS)
+            localReturnsManual()
+            remoteReturns(listOf(REMOTE_ASSET))
+
+            evmAssetSyncService.syncUp()
+
+            verify(dao).updateAssets(
+                emptyDiff(),
+            )
+        }
+    }
+
     private suspend fun remoteReturns(assets: List<EVMAssetRemote>) {
         `when`(assetFetcher.getEVMAssets()).thenReturn(assets)
     }
@@ -117,23 +149,15 @@ class EvmAssetSyncServiceTest {
         `when`(dao.getAssetsBySource(AssetSourceLocal.ERC20)).thenReturn(assets)
     }
 
-    private fun insertAsset(chainId: String, id: Int) = insertsElement<ChainAssetLocal> { it.chainId == chainId && it.id == id }
-
-    private fun <T> insertsElement(elementCheck: (T) -> Boolean) = argThat<CollectionDiffer.Diff<T>> {
-        it.removed.isEmpty() && elementCheck(it.newOrUpdated.single())
+    private suspend fun localReturnsManual() {
+        `when`(dao.getAssetsBySource(AssetSourceLocal.MANUAL)).thenReturn(emptyList())
     }
+
+    private fun insertAsset(chainId: String, id: Int) = insertsElement<ChainAssetLocal> { it.chainId == chainId && it.id == id }
 
     private fun removeAsset(chainId: String, id: Int) = removesElement<ChainAssetLocal> { it.chainId == chainId && it.id == id }
 
-    private fun <T> removesElement(elementCheck: (T) -> Boolean) = argThat<CollectionDiffer.Diff<T>> {
-        it.newOrUpdated.isEmpty() && elementCheck(it.removed.single())
-    }
-
     private fun createLocalCopy(remote: EVMAssetRemote): List<ChainAssetLocal> {
         return mapEVMAssetRemoteToLocalAssets(remote, gson)
-    }
-
-    private fun <T> emptyDiff() = argThat<CollectionDiffer.Diff<T>> {
-        it.newOrUpdated.isEmpty() && it.removed.isEmpty()
     }
 }
