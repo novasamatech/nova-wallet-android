@@ -1,7 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.asset
 
 import com.google.gson.Gson
-import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
@@ -10,7 +9,6 @@ import io.novafoundation.nova.runtime.multiNetwork.asset.remote.model.EVMAssetRe
 import io.novafoundation.nova.runtime.multiNetwork.asset.remote.model.EVMInstanceRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.chainAssetIdOfErc20Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapEVMAssetRemoteToLocalAssets
-import io.novafoundation.nova.test_shared.argThat
 import io.novafoundation.nova.test_shared.emptyDiff
 import io.novafoundation.nova.test_shared.insertsElement
 import io.novafoundation.nova.test_shared.removesElement
@@ -20,6 +18,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.lenient
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 
@@ -61,7 +60,7 @@ class EvmAssetSyncServiceTest {
     @Test
     fun `should insert new asset`() {
         runBlocking {
-            localReturns(emptyList())
+            localReturnsERC20(emptyList())
             remoteReturns(listOf(REMOTE_ASSET))
 
             evmAssetSyncService.syncUp()
@@ -75,7 +74,7 @@ class EvmAssetSyncServiceTest {
     @Test
     fun `should not insert the same asset`() {
         runBlocking {
-            localReturns(LOCAL_ASSETS)
+            localReturnsERC20(LOCAL_ASSETS)
             remoteReturns(listOf(REMOTE_ASSET))
 
             evmAssetSyncService.syncUp()
@@ -87,7 +86,7 @@ class EvmAssetSyncServiceTest {
     @Test
     fun `should update assets's own params`() {
         runBlocking {
-            localReturns(LOCAL_ASSETS)
+            localReturnsERC20(LOCAL_ASSETS)
             remoteReturns(listOf(REMOTE_ASSET.copy(name = "new name")))
 
             evmAssetSyncService.syncUp()
@@ -101,7 +100,7 @@ class EvmAssetSyncServiceTest {
     @Test
     fun `should remove asset`() {
         runBlocking {
-            localReturns(LOCAL_ASSETS)
+            localReturnsERC20(LOCAL_ASSETS)
             remoteReturns(emptyList())
 
             evmAssetSyncService.syncUp()
@@ -115,7 +114,7 @@ class EvmAssetSyncServiceTest {
     @Test
     fun `should not overwrite enabled state`() {
         runBlocking {
-            localReturns(LOCAL_ASSETS.map { it.copy(enabled = false) })
+            localReturnsERC20(LOCAL_ASSETS.map { it.copy(enabled = false) })
             remoteReturns(listOf(REMOTE_ASSET))
 
             evmAssetSyncService.syncUp()
@@ -129,8 +128,8 @@ class EvmAssetSyncServiceTest {
     @Test
     fun `should not modify manual assets`() {
         runBlocking {
-            localReturns(LOCAL_ASSETS)
-            localReturnsManual()
+            localReturnsERC20(LOCAL_ASSETS)
+            localReturnsManual(emptyList())
             remoteReturns(listOf(REMOTE_ASSET))
 
             evmAssetSyncService.syncUp()
@@ -145,12 +144,12 @@ class EvmAssetSyncServiceTest {
         `when`(assetFetcher.getEVMAssets()).thenReturn(assets)
     }
 
-    private suspend fun localReturns(assets: List<ChainAssetLocal>) {
+    private suspend fun localReturnsERC20(assets: List<ChainAssetLocal>) {
         `when`(dao.getAssetsBySource(AssetSourceLocal.ERC20)).thenReturn(assets)
     }
 
-    private suspend fun localReturnsManual() {
-        `when`(dao.getAssetsBySource(AssetSourceLocal.MANUAL)).thenReturn(emptyList())
+    private suspend fun localReturnsManual(assets: List<ChainAssetLocal>) {
+        lenient().`when`(dao.getAssetsBySource(AssetSourceLocal.MANUAL)).thenReturn(assets)
     }
 
     private fun insertAsset(chainId: String, id: Int) = insertsElement<ChainAssetLocal> { it.chainId == chainId && it.id == id }
