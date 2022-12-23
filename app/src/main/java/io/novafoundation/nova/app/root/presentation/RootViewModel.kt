@@ -79,6 +79,10 @@ class RootViewModel(
         }
     }
 
+    fun returnToCheckPinCode() {
+        rootRouter.openPinCodeAccessRecovery()
+    }
+
     fun externalUrlOpened(uri: String) {
         if (interactor.isBuyProviderRedirectLink(uri)) {
             showMessage(resourceManager.getString(R.string.buy_completed))
