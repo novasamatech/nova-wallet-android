@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.Configuration
 import io.novafoundation.nova.app.di.app.AppComponent
 import io.novafoundation.nova.app.di.deps.FeatureHolderManager
+import io.novafoundation.nova.app.root.presentation.thumbnailhiding.RecentAppsThumbnailHidingLifecycleTracker
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.resources.ContextManager
@@ -42,6 +43,8 @@ open class App : Application(), FeatureContainer {
             .build()
 
         appComponent.inject(this)
+
+        registerActivityLifecycleCallbacks(RecentAppsThumbnailHidingLifecycleTracker())
     }
 
     override fun <T> getFeature(key: Class<*>): T {

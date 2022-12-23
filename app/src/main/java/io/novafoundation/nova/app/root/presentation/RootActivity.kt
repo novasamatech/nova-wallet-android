@@ -1,13 +1,16 @@
 package io.novafoundation.nova.app.root.presentation
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.view.isGone
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
+import io.novafoundation.nova.app.root.presentation.thumbnailhiding.RecentAppsThumbnailHidingListener
 import io.novafoundation.nova.common.base.BaseActivity
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.resources.ContextManager
@@ -17,10 +20,11 @@ import io.novafoundation.nova.common.utils.showToast
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.splash.presentation.SplashBackgroundHolder
-import kotlinx.android.synthetic.main.activity_root.rootNetworkBar
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.activity_root.mainView
+import kotlinx.android.synthetic.main.activity_root.rootNetworkBar
 
-class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
+class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder, RecentAppsThumbnailHidingListener {
 
     @Inject
     lateinit var navigationHolder: NavigationHolder
@@ -44,6 +48,15 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
         removeSplashBackground()
 
         viewModel.restoredAfterConfigChange()
+    }
+
+    override fun onRecentAppsTriggered(activity: Activity, inRecentAppsMode: Boolean) {
+        mainView.isGone = inRecentAppsMode
+        if (inRecentAppsMode) {
+            window.setBackgroundDrawableResource(R.drawable.bg_splash)
+        } else {
+            removeSplashBackground()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -89,15 +102,17 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     override fun initViews() {
     }
 
+    override fun onPause() {
+        super.onPause()
+    }
+
     override fun onStop() {
         super.onStop()
-
         viewModel.noticeInBackground()
     }
 
     override fun onStart() {
         super.onStart()
-
         viewModel.noticeInForeground()
     }
 
