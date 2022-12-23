@@ -102,10 +102,6 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder, Rece
     override fun initViews() {
     }
 
-    override fun onPause() {
-        super.onPause()
-    }
-
     override fun onStop() {
         super.onStop()
         viewModel.noticeInBackground()
