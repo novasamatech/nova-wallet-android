@@ -22,6 +22,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExter
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainNodeRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
 import io.novafoundation.nova.test_shared.argThat
+import io.novafoundation.nova.test_shared.emptyDiff
+import io.novafoundation.nova.test_shared.insertsElement
+import io.novafoundation.nova.test_shared.removesElement
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -305,19 +308,11 @@ class ChainSyncServiceTest {
     private fun insertsExplorerByName(name: String) = insertsElement<ChainExplorerLocal> { it.name == name }
     private fun insertsTransferApiByUrl(url: String) = insertsElement<ChainTransferHistoryApiLocal> { it.url == url }
 
-    private fun <T> insertsElement(elementCheck: (T) -> Boolean) = argThat<CollectionDiffer.Diff<T>> {
-        it.removed.isEmpty() && elementCheck(it.newOrUpdated.single())
-    }
-
     private fun removesChainWithId(id: String) = removesElement<ChainLocal> { it.id == id }
     private fun removesAssetWithId(id: Int) = removesElement<ChainAssetLocal> { it.id == id }
     private fun removesNodeWithUrl(url: String) = removesElement<ChainNodeLocal> { it.url == url }
     private fun removesExplorerByName(name: String) = removesElement<ChainExplorerLocal> { it.name == name }
     private fun removesTransferApiByUrl(url: String) = removesElement<ChainTransferHistoryApiLocal> { it.url == url }
-
-    private fun <T> removesElement(elementCheck: (T) -> Boolean) = argThat<CollectionDiffer.Diff<T>> {
-        it.newOrUpdated.isEmpty() && elementCheck(it.removed.single())
-    }
 
     private fun createLocalCopy(remote: ChainRemote): JoinedChainInfo {
         val domain = mapRemoteChainToLocal(remote, gson)
@@ -333,9 +328,5 @@ class ChainSyncServiceTest {
             explorers = explorers,
             transferHistoryApis = transferHistoryApis
         )
-    }
-
-    private fun <T> emptyDiff() = argThat<CollectionDiffer.Diff<T>> {
-        it.newOrUpdated.isEmpty() && it.removed.isEmpty()
     }
 }
