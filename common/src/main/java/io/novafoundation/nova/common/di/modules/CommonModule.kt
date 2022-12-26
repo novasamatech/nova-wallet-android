@@ -43,6 +43,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.ResourceManagerImpl
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
@@ -89,6 +90,12 @@ class CommonModule {
     @ApplicationScope
     fun providePreferences(sharedPreferences: SharedPreferences): Preferences {
         return PreferencesImpl(sharedPreferences)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideBackgroundAccessObserver(preferences: Preferences): BackgroundAccessObserver {
+        return BackgroundAccessObserver(preferences)
     }
 
     @Provides

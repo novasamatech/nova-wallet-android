@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -48,7 +49,7 @@ interface RootDependencies {
 
     fun chainRegistry(): ChainRegistry
 
-    fun preferences(): Preferences
+    fun backgroundAccessObserver(): BackgroundAccessObserver
 
     val systemCallExecutor: SystemCallExecutor
 

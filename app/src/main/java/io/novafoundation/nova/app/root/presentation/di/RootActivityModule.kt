@@ -28,11 +28,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class RootActivityModule {
 
     @Provides
-    fun provideBackgroundAccessObserver(preferences: Preferences): BackgroundAccessObserver {
-        return BackgroundAccessObserver(preferences)
-    }
-
-    @Provides
     @IntoMap
     @ViewModelKey(RootViewModel::class)
     fun provideViewModel(
