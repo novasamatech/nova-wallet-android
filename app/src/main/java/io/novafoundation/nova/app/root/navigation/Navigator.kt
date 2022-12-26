@@ -439,7 +439,6 @@ class Navigator(
     }
 
     override fun openPinCodeAccessRecovery() {
-        // to achieve smooth animation
         val action = PinCodeAction.Check(NavComponentDelayedNavigation(R.id.action_open_main), ToolbarConfiguration())
         val bundle = PincodeFragment.getPinCodeBundle(action)
         navController?.navigate(R.id.action_pin_code_access_recovery, bundle)
