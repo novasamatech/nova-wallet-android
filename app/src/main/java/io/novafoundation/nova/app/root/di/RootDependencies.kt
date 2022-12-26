@@ -1,6 +1,7 @@
 package io.novafoundation.nova.app.root.di
 
 import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -46,6 +47,8 @@ interface RootDependencies {
     fun stakingRepository(): StakingRepository
 
     fun chainRegistry(): ChainRegistry
+
+    fun preferences(): Preferences
 
     val systemCallExecutor: SystemCallExecutor
 

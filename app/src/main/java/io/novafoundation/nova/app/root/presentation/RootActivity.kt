@@ -2,8 +2,6 @@ package io.novafoundation.nova.app.root.presentation
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.SystemClock
-import android.widget.Toast
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import io.novafoundation.nova.app.R
@@ -118,22 +116,6 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
     override fun removeSplashBackground() {
         window.setBackgroundDrawableResource(R.color.secondary_screen_background)
-    }
-
-    var time: Long = -1
-
-    override fun onPause() {
-        time = SystemClock.elapsedRealtime()
-        super.onPause()
-    }
-
-    override fun onResume() {
-        val newTime = SystemClock.elapsedRealtime()
-        super.onResume()
-        if (time >= 0 && newTime - time > 30000) {
-            viewModel.returnToCheckPinCode()
-            Toast.makeText(this, "Open pin code view", Toast.LENGTH_LONG).show()
-        }
     }
 
     override fun changeLanguage() {
