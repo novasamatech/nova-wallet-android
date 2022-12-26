@@ -26,7 +26,7 @@ class RootViewModel(
     private val networkStateMixin: NetworkStateMixin,
     private val contributionsInteractor: ContributionsInteractor,
     private val backgroundAccessObserver: BackgroundAccessObserver
-) : BaseViewModel(), NetworkStateUi by networkStateMixin, BackgroundAccessObserver.Callback {
+) : BaseViewModel(), NetworkStateUi by networkStateMixin {
 
     private var willBeClearedForLanguageChange = false
 
@@ -38,7 +38,9 @@ class RootViewModel(
             .onEach { handleUpdatesSideEffect(it) }
             .launchIn(this)
 
-        backgroundAccessObserver.subscribe(this)
+        backgroundAccessObserver.eventFlow
+            .onEach { rootRouter.nonCancellableVerify() }
+            .launchIn(this)
 
         syncCurrencies()
 
@@ -85,9 +87,5 @@ class RootViewModel(
         if (interactor.isBuyProviderRedirectLink(uri)) {
             showMessage(resourceManager.getString(R.string.buy_completed))
         }
-    }
-
-    override fun onRequestAccess() {
-        rootRouter.openPinCodeAccessRecovery()
     }
 }

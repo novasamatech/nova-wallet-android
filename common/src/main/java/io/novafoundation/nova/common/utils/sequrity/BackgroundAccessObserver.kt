@@ -6,11 +6,17 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import io.novafoundation.nova.common.data.storage.Preferences
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 class BackgroundAccessObserver(
     private val preferences: Preferences,
     private val accessTimeInBackground: Long = DEFAULT_ACCESS_TIME
-) : DefaultLifecycleObserver {
+) : DefaultLifecycleObserver, CoroutineScope {
 
     companion object {
         val DEFAULT_ACCESS_TIME = TimeUnit.MINUTES.toMillis(5L)
@@ -18,22 +24,22 @@ class BackgroundAccessObserver(
         private const val PREFS_ON_PAUSE_TIME = "ON_PAUSE_TIME"
     }
 
+    enum class EventType {
+        REQUEST_ACCESS
+    }
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main
+
+    private val _requestAccessFlow = MutableSharedFlow<EventType>()
+
+    val eventFlow: Flow<EventType> = _requestAccessFlow
+
     var subscribed = false
     val subscribers: ArrayList<Callback> = arrayListOf()
 
-    fun subscribe(callback: Callback) {
-        subscribers.add(callback)
-        if (!subscribed) {
-            subscribed = true
-            ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        }
-    }
-
-    fun unsubscribe(callback: Callback) {
-        subscribers.remove(callback)
-        if (subscribed && subscribers.isEmpty()) {
-            ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
-        }
+    init {
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -55,10 +61,8 @@ class BackgroundAccessObserver(
     }
 
     private fun notifyEveryone() {
-        subscribers.forEach { it.onRequestAccess() }
-    }
-
-    interface Callback {
-        fun onRequestAccess()
+        launch {
+            _requestAccessFlow.emit(EventType.REQUEST_ACCESS)
+        }
     }
 }

@@ -438,7 +438,7 @@ class Navigator(
         navController?.navigate(R.id.action_mainFragment_to_nfts_nav_graph)
     }
 
-    override fun openPinCodeAccessRecovery() {
+    override fun nonCancellableVerify() {
         val action = PinCodeAction.Check(NavComponentDelayedNavigation(R.id.action_open_main), ToolbarConfiguration())
         val bundle = PincodeFragment.getPinCodeBundle(action)
         navController?.navigate(R.id.action_pin_code_access_recovery, bundle)

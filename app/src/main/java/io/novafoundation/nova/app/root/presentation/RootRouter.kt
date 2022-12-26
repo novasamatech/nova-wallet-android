@@ -4,5 +4,5 @@ interface RootRouter {
 
     fun returnToWallet()
 
-    fun openPinCodeAccessRecovery()
+    fun nonCancellableVerify()
 }
