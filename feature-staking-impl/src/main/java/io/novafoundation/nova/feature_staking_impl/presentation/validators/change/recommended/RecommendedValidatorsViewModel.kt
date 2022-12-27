@@ -40,7 +40,7 @@ class RecommendedValidatorsViewModel(
     private val resourceManager: ResourceManager,
     private val sharedStateSetup: SetupStakingSharedState,
     private val tokenUseCase: TokenUseCase,
-    private val selectedAssetState: SingleAssetSharedState,
+    private val selectedAssetState: SingleAssetSharedState
 ) : BaseViewModel() {
 
     private val recommendedSettings by lazyAsync {
@@ -79,8 +79,7 @@ class RecommendedValidatorsViewModel(
 
     fun nextClicked() {
         viewModelScope.launch {
-            val validators = recommendedValidators.first()
-            sharedStateSetup.setRecommendedValidators(validators)
+            sharedStateSetup.setRecommendedValidators(recommendedValidators.first())
             router.openConfirmStaking()
         }
     }
