@@ -2,15 +2,15 @@ package io.novafoundation.nova.feature_governance_impl.data.repository.v2
 
 import io.novafoundation.nova.common.utils.formatting.parseDateISO_8601
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
-import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.OffChainReferendumDetails
-import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.OffChainReferendumPreview
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumDetails
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumPreview
 import io.novafoundation.nova.feature_governance_api.data.repository.OffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline
-import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.PolkassemblyV2Api
-import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.request.ReferendumDetailsV2Request
-import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.request.ReferendumPreviewV2Request
-import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.response.ReferendaPreviewV2Response
-import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.response.ReferendumDetailsV2Response
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.PolkassemblyV2Api
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.request.ReferendumDetailsV2Request
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.request.ReferendumPreviewV2Request
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.response.ReferendaPreviewV2Response
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.response.ReferendumDetailsV2Response
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class Gov2OffChainReferendaInfoRepository(
