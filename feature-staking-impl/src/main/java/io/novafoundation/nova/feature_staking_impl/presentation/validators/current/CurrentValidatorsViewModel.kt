@@ -3,16 +3,19 @@ package io.novafoundation.nova.feature_staking_impl.presentation.validators.curr
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.list.toValueList
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.toHexAccountId
 import io.novafoundation.nova.common.utils.withLoading
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidator
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.ChangeStackingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validators.current.CurrentValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
@@ -22,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.currentSt
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.SelectedStakeTargetStatusModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.formatValidatorApy
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsWithStakeFlagParcelModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.mapAddEvmTokensValidationFailureToUI
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
@@ -50,11 +54,16 @@ class CurrentValidatorsViewModel(
     private val currentValidatorsInteractor: CurrentValidatorsInteractor,
     private val setupStakingSharedState: SetupStakingSharedState,
     private val selectedAssetState: SingleAssetSharedState,
+    private val validationExecutor: ValidationExecutor,
     tokenUseCase: TokenUseCase,
-) : CurrentStakeTargetsViewModel() {
+) : CurrentStakeTargetsViewModel(), Validatable by validationExecutor {
 
-    private val groupedCurrentValidatorsFlow = stakingInteractor.selectedAccountStakingStateFlow()
+    private val stashFlow = stakingInteractor.selectedAccountStakingStateFlow()
         .filterIsInstance<StakingState.Stash>()
+        .inBackground()
+        .share()
+
+    private val groupedCurrentValidatorsFlow = stashFlow
         .flatMapLatest(currentValidatorsInteractor::nominatedValidatorsFlow)
         .inBackground()
         .share()
@@ -99,16 +108,16 @@ class CurrentValidatorsViewModel(
 
     override fun changeClicked() {
         launch {
-            val currentState = setupStakingSharedState.get<SetupStakingProcess.Initial>()
+            val accountSettings = stashFlow.first()
+            val payload = ChangeStackingValidationPayload(accountSettings.controllerAddress)
 
-            val currentValidators = flattenCurrentValidators.first().map(NominatedValidator::validator)
-
-            val newState = currentState.changeValidatorsFlow()
-                .next(currentValidators, SetupStakingProcess.ReadyToSubmit.SelectionMethod.CUSTOM)
-
-            setupStakingSharedState.set(newState)
-
-            router.openStartChangeValidators()
+            validationExecutor.requireValid(
+                validationSystem = stakingInteractor.getValidationSystem(),
+                payload = payload,
+                validationFailureTransformer = { mapAddEvmTokensValidationFailureToUI(resourceManager, it) }
+            ) {
+                openStartChangeValidators()
+            }
         }
     }
 
@@ -125,6 +134,17 @@ class CurrentValidatorsViewModel(
             }
 
             router.openValidatorDetails(payload)
+        }
+    }
+
+    private fun openStartChangeValidators() {
+        launch {
+            val currentState = setupStakingSharedState.get<SetupStakingProcess.Initial>()
+            val currentValidators = flattenCurrentValidators.first().map(NominatedValidator::validator)
+            val newState = currentState.changeValidatorsFlow()
+                .next(currentValidators, SetupStakingProcess.ReadyToSubmit.SelectionMethod.CUSTOM)
+            setupStakingSharedState.set(newState)
+            router.openStartChangeValidators()
         }
     }
 

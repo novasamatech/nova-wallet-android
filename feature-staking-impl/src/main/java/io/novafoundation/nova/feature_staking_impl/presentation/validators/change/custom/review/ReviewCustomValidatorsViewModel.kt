@@ -1,19 +1,14 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review
 
-import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.ChangeStackingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
@@ -21,7 +16,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValid
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.model.ValidatorsSelectionState
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.mapAddEvmTokensValidationFailureToUI
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setCustomValidators
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
@@ -42,9 +36,8 @@ class ReviewCustomValidatorsViewModel(
     private val resourceManager: ResourceManager,
     private val sharedStateSetup: SetupStakingSharedState,
     private val selectedAssetState: SingleAssetSharedState,
-    private val validationExecutor: ValidationExecutor,
     tokenUseCase: TokenUseCase
-) : BaseViewModel(), Validatable by validationExecutor {
+) : BaseViewModel() {
 
     private val confirmSetupState = sharedStateSetup.setupStakingProcess
         .filterIsInstance<SetupStakingProcess.ReadyToSubmit>()
@@ -132,18 +125,6 @@ class ReviewCustomValidatorsViewModel(
     }
 
     fun nextClicked() {
-        viewModelScope.launch {
-            val accountSettings = stashFlow.first()
-            val payload = ChangeStackingValidationPayload(accountSettings.controllerAddress)
-
-            validationExecutor.requireValid(
-                validationSystem = interactor.getValidationSystem(),
-                payload = payload,
-                progressConsumer = validationProgress.progressConsumer(),
-                validationFailureTransformer = { mapAddEvmTokensValidationFailureToUI(resourceManager, it) }
-            ) {
-                router.openConfirmStaking()
-            }
-        }
+        router.openConfirmStaking()
     }
 }

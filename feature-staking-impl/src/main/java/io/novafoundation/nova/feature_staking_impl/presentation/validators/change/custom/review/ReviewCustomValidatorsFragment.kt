@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.view.ButtonState
@@ -68,7 +67,6 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
     }
 
     override fun subscribe(viewModel: ReviewCustomValidatorsViewModel) {
-        observeValidations(viewModel)
         viewModel.selectedValidatorModels.observe(adapter::submitList)
 
         viewModel.selectionStateFlow.observe {

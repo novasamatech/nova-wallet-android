@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -61,7 +60,6 @@ class RecommendedValidatorsFragment : BaseFragment<RecommendedValidatorsViewMode
     }
 
     override fun subscribe(viewModel: RecommendedValidatorsViewModel) {
-        observeValidations(viewModel)
         viewModel.recommendedValidatorModels.observe {
             adapter.submitList(it)
 
