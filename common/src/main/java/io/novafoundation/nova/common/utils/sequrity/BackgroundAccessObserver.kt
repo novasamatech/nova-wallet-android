@@ -35,9 +35,6 @@ class BackgroundAccessObserver(
 
     val eventFlow: Flow<EventType> = _requestAccessFlow
 
-    var subscribed = false
-    val subscribers: ArrayList<Callback> = arrayListOf()
-
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
