@@ -31,13 +31,16 @@ class GovernanceV2Module {
     @Provides
     @FeatureScope
     fun provideOnChainReferendaRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource, chainRegistry: ChainRegistry, totalIssuanceRepository: TotalIssuanceRepository
+        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource,
+        chainRegistry: ChainRegistry,
+        totalIssuanceRepository: TotalIssuanceRepository
     ) = GovV2OnChainReferendaRepository(storageSource, chainRegistry, totalIssuanceRepository)
 
     @Provides
     @FeatureScope
     fun provideConvictionVotingRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource, chainRegistry: ChainRegistry
+        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource,
+        chainRegistry: ChainRegistry
     ) = GovV2ConvictionVotingRepository(storageSource, chainRegistry)
 
     @Provides
