@@ -39,7 +39,7 @@ class RealDelegateListInteractor(
     private val identityRepository: OnChainIdentityRepository,
 ) : DelegateListInteractor {
 
-    override suspend fun getDelegates(sorting: DelegateSorting, filtering: DelegateFiltering): Result<List<DelegatePreview>> = withContext(Dispatchers.IO) {
+    override suspend fun getDelegates(sorting: DelegateSorting, filtering: DelegateFiltering): Result<List<DelegatePreview>> = withContext(Dispatchers.Default) {
         runCatching {
             getDelegatesInternal(sorting, filtering)
         }
