@@ -112,7 +112,7 @@ class CurrentValidatorsViewModel(
             val payload = ChangeStackingValidationPayload(accountSettings.controllerAddress)
 
             validationExecutor.requireValid(
-                validationSystem = stakingInteractor.getValidationSystem(),
+                validationSystem = currentValidatorsInteractor.getValidationSystem(),
                 payload = payload,
                 validationFailureTransformer = { mapAddEvmTokensValidationFailureToUI(resourceManager, it) }
             ) {

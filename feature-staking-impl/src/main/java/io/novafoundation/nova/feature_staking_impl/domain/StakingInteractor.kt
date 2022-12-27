@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.domain
 
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.sumByBigInteger
-import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -33,8 +32,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.StakingPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.model.StashNoneStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
-import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.ChangeStackingValidationSystem
-import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.controllerAccountAccess
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -326,12 +323,6 @@ class StakingInteractor(
 
             acc
         }.size
-    }
-
-    fun getValidationSystem(): ChangeStackingValidationSystem {
-        return ValidationSystem {
-            controllerAccountAccess(accountRepository, stakingSharedState)
-        }
     }
 
     private fun totalStake(exposures: Collection<Exposure>): BigInteger {

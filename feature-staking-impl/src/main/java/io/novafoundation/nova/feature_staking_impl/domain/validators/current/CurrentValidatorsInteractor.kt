@@ -2,17 +2,21 @@ package io.novafoundation.nova.feature_staking_impl.domain.validators.current
 
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.emptyGroupedList
+import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.getActiveElectedValidatorsExposures
 import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
 import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidator
 import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidator.Status
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
+import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.ChangeStackingValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.controllerAccountAccess
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorSource
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.flow.Flow
@@ -24,7 +28,8 @@ class CurrentValidatorsInteractor(
     private val stakingRepository: StakingRepository,
     private val stakingConstantsRepository: StakingConstantsRepository,
     private val validatorProvider: ValidatorProvider,
-    private val selectedAssetSharedState: SingleAssetSharedState,
+    private val stakingSharedState: StakingSharedState,
+    private val accountRepository: AccountRepository,
 ) {
 
     suspend fun nominatedValidatorsFlow(
@@ -34,7 +39,7 @@ class CurrentValidatorsInteractor(
             return flowOf(emptyGroupedList())
         }
 
-        val (chain, chainAsset) = selectedAssetSharedState.chainAndAsset()
+        val (chain, chainAsset) = stakingSharedState.chainAndAsset()
         val chainId = chain.id
 
         return stakingRepository.observeActiveEraIndex(chainId).map { activeEra ->
@@ -101,6 +106,12 @@ class CurrentValidatorsInteractor(
                 }
             }
                 .toSortedMap(Status.Group.COMPARATOR)
+        }
+    }
+
+    fun getValidationSystem(): ChangeStackingValidationSystem {
+        return ValidationSystem {
+            controllerAccountAccess(accountRepository, stakingSharedState)
         }
     }
 
