@@ -52,8 +52,6 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
         reviewCustomValidatorsToolbar.setRightActionClickListener {
             viewModel.isInEditMode.toggle()
         }
-
-        reviewCustomValidatorsNext.prepareForProgress(viewLifecycleOwner)
     }
 
     override fun inject() {
@@ -84,8 +82,6 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
 
             reviewCustomValidatorsToolbar.setTextRight(getString(rightActionRes))
         }
-
-        viewModel.continueButtonState.observe(reviewCustomValidatorsNext::setState)
     }
 
     override fun stakeTargetInfoClicked(validatorModel: ValidatorModel) {

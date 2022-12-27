@@ -2,11 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.presentation.validators.chan
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -41,11 +39,6 @@ class ReviewCustomValidatorsViewModel(
 
     private val confirmSetupState = sharedStateSetup.setupStakingProcess
         .filterIsInstance<SetupStakingProcess.ReadyToSubmit>()
-        .share()
-
-    private val stashFlow = interactor.selectedAccountStakingStateFlow()
-        .filterIsInstance<StakingState.Stash>()
-        .inBackground()
         .share()
 
     private val selectedValidators = confirmSetupState
@@ -88,15 +81,6 @@ class ReviewCustomValidatorsViewModel(
     }
         .inBackground()
         .share()
-
-    private val validationProgress = MutableStateFlow(false)
-
-    val continueButtonState = this.validationProgress.map {
-        when {
-            it -> DescriptiveButtonState.Loading
-            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
-        }
-    }.share()
 
     val isInEditMode = MutableStateFlow(false)
 

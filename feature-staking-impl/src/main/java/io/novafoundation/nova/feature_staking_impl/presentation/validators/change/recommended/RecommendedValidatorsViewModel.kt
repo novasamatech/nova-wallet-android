@@ -3,13 +3,11 @@ package io.novafoundation.nova.feature_staking_impl.presentation.validators.chan
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
-import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
@@ -28,8 +26,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -47,11 +43,6 @@ class RecommendedValidatorsViewModel(
     private val selectedAssetState: SingleAssetSharedState,
 ) : BaseViewModel() {
 
-    private val stashFlow = interactor.selectedAccountStakingStateFlow()
-        .filterIsInstance<StakingState.Stash>()
-        .inBackground()
-        .share()
-
     private val recommendedSettings by lazyAsync {
         recommendationSettingsProviderFactory.create(scope = viewModelScope).defaultSettings()
     }
@@ -62,15 +53,6 @@ class RecommendedValidatorsViewModel(
 
         emit(validators)
     }.inBackground().share()
-
-    private val validationProgress = MutableStateFlow(false)
-
-    val continueButtonState = this.validationProgress.map {
-        when {
-            it -> DescriptiveButtonState.Loading
-            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
-        }
-    }.share()
 
     val recommendedValidatorModels = recommendedValidators.map {
         convertToModels(it, tokenUseCase.currentToken())
