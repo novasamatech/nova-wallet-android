@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -24,6 +25,7 @@ class RootViewModel(
     private val resourceManager: ResourceManager,
     private val networkStateMixin: NetworkStateMixin,
     private val contributionsInteractor: ContributionsInteractor,
+    private val backgroundAccessObserver: BackgroundAccessObserver
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin {
 
     private var willBeClearedForLanguageChange = false
@@ -34,6 +36,10 @@ class RootViewModel(
 
         interactor.runBalancesUpdate()
             .onEach { handleUpdatesSideEffect(it) }
+            .launchIn(this)
+
+        backgroundAccessObserver.eventFlow
+            .onEach { rootRouter.nonCancellableVerify() }
             .launchIn(this)
 
         syncCurrencies()
@@ -54,8 +60,6 @@ class RootViewModel(
             interactor.updatePhishingAddresses()
         }
     }
-
-    fun jsonFileOpened(content: String?) {}
 
     fun noticeInBackground() {
         if (!willBeClearedForLanguageChange) {

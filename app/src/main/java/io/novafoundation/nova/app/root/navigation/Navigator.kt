@@ -438,6 +438,12 @@ class Navigator(
         navController?.navigate(R.id.action_mainFragment_to_nfts_nav_graph)
     }
 
+    override fun nonCancellableVerify() {
+        val action = PinCodeAction.Check(NavComponentDelayedNavigation(R.id.action_open_main), ToolbarConfiguration())
+        val bundle = PincodeFragment.getPinCodeBundle(action)
+        navController?.navigate(R.id.action_pin_code_access_recovery, bundle)
+    }
+
     override fun returnToWallet() {
         // to achieve smooth animation
         postToUiThread {
@@ -517,7 +523,7 @@ class Navigator(
     override fun openChangePinCode() {
         val action = PinCodeAction.Change
         val bundle = PincodeFragment.getPinCodeBundle(action)
-        navController?.navigate(R.id.action_mainFragment_to_pinCodeFragment, bundle)
+        navController?.navigate(R.id.action_change_pin_code, bundle)
     }
 
     override fun openScanImportParitySigner() {
