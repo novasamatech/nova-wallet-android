@@ -8,6 +8,7 @@ import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.PolkassemblyV2Api
 import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
+import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2DelegationsRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2OffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2PreImageRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.GovV2ConvictionVotingRepository
@@ -30,16 +31,13 @@ class GovernanceV2Module {
     @Provides
     @FeatureScope
     fun provideOnChainReferendaRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource,
-        chainRegistry: ChainRegistry,
-        totalIssuanceRepository: TotalIssuanceRepository
+        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource, chainRegistry: ChainRegistry, totalIssuanceRepository: TotalIssuanceRepository
     ) = GovV2OnChainReferendaRepository(storageSource, chainRegistry, totalIssuanceRepository)
 
     @Provides
     @FeatureScope
     fun provideConvictionVotingRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource,
-        chainRegistry: ChainRegistry
+        @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource, chainRegistry: ChainRegistry
     ) = GovV2ConvictionVotingRepository(storageSource, chainRegistry)
 
     @Provides
@@ -65,18 +63,24 @@ class GovernanceV2Module {
 
     @Provides
     @FeatureScope
+    fun provideDelegationsRepository() = Gov2DelegationsRepository()
+
+    @Provides
+    @FeatureScope
     @GovernanceV2
     fun provideGovernanceSource(
         referendaRepository: GovV2OnChainReferendaRepository,
         convictionVotingRepository: GovV2ConvictionVotingRepository,
         offChainInfoRepository: Gov2OffChainReferendaInfoRepository,
         preImageRepository: Gov2PreImageRepository,
-        governanceV2DappsRepository: GovV2DAppsRepository
+        governanceV2DappsRepository: GovV2DAppsRepository,
+        delegationsRepository: Gov2DelegationsRepository,
     ): GovernanceSource = StaticGovernanceSource(
         referenda = referendaRepository,
         convictionVoting = convictionVotingRepository,
         offChainInfo = offChainInfoRepository,
         preImageRepository = preImageRepository,
-        dappsRepository = governanceV2DappsRepository
+        dappsRepository = governanceV2DappsRepository,
+        delegationsRepository = delegationsRepository,
     )
 }
