@@ -51,14 +51,14 @@ class ChainSyncService(
         val assetDiff = CollectionDiffer.findDiff(newAssets, oldAssets, forceUseNewItems = false)
         val nodesDiff = CollectionDiffer.findDiff(newNodes, oldNodes, forceUseNewItems = false)
         val explorersDiff = CollectionDiffer.findDiff(newExplorers, oldExplorers, forceUseNewItems = false)
-        val transferApisDiff = CollectionDiffer.findDiff(newExternalApis, oldExternalApis, forceUseNewItems = false)
+        val externalApisDiff = CollectionDiffer.findDiff(newExternalApis, oldExternalApis, forceUseNewItems = false)
 
         chainDao.applyDiff(
             chainDiff = chainsDiff,
             assetsDiff = assetDiff,
             nodesDiff = nodesDiff,
             explorersDiff = explorersDiff,
-            transferApisDiff = transferApisDiff
+            externalApisDiff = externalApisDiff
         )
     }
 }

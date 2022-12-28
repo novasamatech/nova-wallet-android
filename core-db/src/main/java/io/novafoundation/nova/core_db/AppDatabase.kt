@@ -95,7 +95,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 34,
+    version = 35,
     entities = [
         AccountLocal::class,
         NodeLocal::class,

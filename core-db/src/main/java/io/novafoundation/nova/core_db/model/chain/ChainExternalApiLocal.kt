@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.utils.Identifiable
 
 @Entity(
     tableName = "chain_external_apis",
-    primaryKeys = ["chainId", "url"],
+    primaryKeys = ["chainId", "url", "apiType"],
     foreignKeys = [
         ForeignKey(
             entity = ChainLocal::class,
@@ -40,5 +40,5 @@ data class ChainExternalApiLocal(
     }
 
     @Ignore
-    override val identifier: String = "$chainId:$url"
+    override val identifier: String = "$chainId:$url:$apiType"
 }

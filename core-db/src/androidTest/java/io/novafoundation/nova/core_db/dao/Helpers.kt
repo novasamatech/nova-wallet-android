@@ -84,7 +84,7 @@ suspend fun ChainDao.addChains(chains: List<JoinedChainInfo>) {
         assetsDiff = addedDiff(chains.flatMap(JoinedChainInfo::assets)),
         nodesDiff = addedDiff(chains.flatMap(JoinedChainInfo::nodes)),
         explorersDiff = addedDiff(chains.flatMap(JoinedChainInfo::explorers)),
-        transferApisDiff = addedDiff(chains.flatMap(JoinedChainInfo::externalApis))
+        externalApisDiff = addedDiff(chains.flatMap(JoinedChainInfo::externalApis))
     )
 }
 
@@ -96,7 +96,7 @@ suspend fun ChainDao.removeChain(joinedChainInfo: JoinedChainInfo) {
         assetsDiff = removedDiff(joinedChainInfo.assets),
         nodesDiff = removedDiff(joinedChainInfo.nodes),
         explorersDiff = removedDiff(joinedChainInfo.explorers),
-        transferApisDiff = removedDiff(joinedChainInfo.externalApis)
+        externalApisDiff = removedDiff(joinedChainInfo.externalApis)
     )
 }
 
@@ -106,7 +106,7 @@ suspend fun ChainDao.updateChain(joinedChainInfo: JoinedChainInfo) {
         assetsDiff = updatedDiff(joinedChainInfo.assets),
         nodesDiff = updatedDiff(joinedChainInfo.nodes),
         explorersDiff = updatedDiff(joinedChainInfo.explorers),
-        transferApisDiff = updatedDiff(joinedChainInfo.externalApis)
+        externalApisDiff = updatedDiff(joinedChainInfo.externalApis)
     )
 }
 

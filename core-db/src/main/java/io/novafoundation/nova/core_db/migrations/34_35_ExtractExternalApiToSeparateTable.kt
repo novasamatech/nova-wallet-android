@@ -6,14 +6,34 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 val ExtractExternalApiToSeparateTable_34_35 = object : Migration(34, 35) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
-        recreateChains(database)
+        removeExternalApisColumnsFromChains(database)
+
+        migrateExternalApisTable(database)
 
         // recreating chainId causes broken foreign keys to appear on some devices
         // so we run this migration again to fix it
         FixBrokenForeignKeys_31_32.migrate(database)
     }
 
-    private fun recreateChains(database: SupportSQLiteDatabase) {
+    private fun migrateExternalApisTable(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE chain_transfer_history_apis")
+
+        database.execSQL("""
+            CREATE TABLE IF NOT EXISTS `chain_external_apis` (
+            `chainId` TEXT NOT NULL,
+            `sourceType` TEXT NOT NULL,
+            `apiType` TEXT NOT NULL,
+            `parameters` TEXT,
+            `url` TEXT NOT NULL,
+            PRIMARY KEY(`chainId`, `url`, `apiType`),
+            FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE
+            )
+        """.trimIndent())
+
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_chain_external_apis_chainId` ON `chain_external_apis` (`chainId`)")
+    }
+
+    private fun removeExternalApisColumnsFromChains(database: SupportSQLiteDatabase) {
         database.execSQL("ALTER TABLE chains RENAME TO chains_old")
 
         database.execSQL(

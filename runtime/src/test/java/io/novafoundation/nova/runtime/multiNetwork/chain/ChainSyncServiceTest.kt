@@ -121,7 +121,7 @@ class ChainSyncServiceTest {
                 assetsDiff = insertsAssetWithId(assetId),
                 nodesDiff = insertsNodeWithUrl(nodeUrl),
                 explorersDiff = insertsExplorerByName(explorerName),
-                transferApisDiff = insertsTransferApiByUrl(transferApiUrl)
+                externalApisDiff = insertsTransferApiByUrl(transferApiUrl)
             )
         }
     }
@@ -151,7 +151,7 @@ class ChainSyncServiceTest {
                 assetsDiff = emptyDiff(),
                 nodesDiff = emptyDiff(),
                 explorersDiff = emptyDiff(),
-                transferApisDiff = emptyDiff()
+                externalApisDiff = emptyDiff()
             )
         }
     }
@@ -178,7 +178,7 @@ class ChainSyncServiceTest {
                 assetsDiff = insertsAssetWithId(assetId),
                 nodesDiff = emptyDiff(),
                 explorersDiff = emptyDiff(),
-                transferApisDiff = emptyDiff()
+                externalApisDiff = emptyDiff()
             )
         }
     }
@@ -205,7 +205,7 @@ class ChainSyncServiceTest {
                 assetsDiff = emptyDiff(),
                 nodesDiff = insertsNodeWithUrl(nodeUrl),
                 explorersDiff = emptyDiff(),
-                transferApisDiff = emptyDiff()
+                externalApisDiff = emptyDiff()
             )
         }
     }
@@ -232,7 +232,7 @@ class ChainSyncServiceTest {
                 assetsDiff = emptyDiff(),
                 nodesDiff = emptyDiff(),
                 explorersDiff = insertsExplorerByName(explorerName),
-                transferApisDiff = emptyDiff()
+                externalApisDiff = emptyDiff()
             )
         }
     }
@@ -265,7 +265,7 @@ class ChainSyncServiceTest {
                 assetsDiff = emptyDiff(),
                 nodesDiff = emptyDiff(),
                 explorersDiff = emptyDiff(),
-                transferApisDiff = insertsTransferApiByUrl(anotherUrl)
+                externalApisDiff = insertsTransferApiByUrl(anotherUrl)
             )
         }
     }
@@ -284,7 +284,7 @@ class ChainSyncServiceTest {
                 assetsDiff = removesAssetWithId(assetId),
                 nodesDiff = removesNodeWithUrl(nodeUrl),
                 explorersDiff = removesExplorerByName(explorerName),
-                transferApisDiff = removesTransferApiByUrl(transferApiUrl)
+                externalApisDiff = removesTransferApiByUrl(transferApiUrl)
             )
         }
     }
