@@ -24,3 +24,7 @@ interface NamedFilter<T> : Filter<T> {
 fun <T> List<T>.applyFilters(filters: List<Filter<T>>): List<T> {
     return filter { item -> filters.all { filter -> filter.shouldInclude(item) } }
 }
+
+fun <T> List<T>.applyFilter(filter: Filter<in T>): List<T> {
+    return filter { item -> filter.shouldInclude(item) }
+}

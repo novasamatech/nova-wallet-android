@@ -2,8 +2,8 @@ package io.novafoundation.nova.feature_governance_impl.data.repository.v1
 
 import io.novafoundation.nova.common.utils.formatting.parseDateISO_8601
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
-import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.OffChainReferendumDetails
-import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.OffChainReferendumPreview
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumDetails
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumPreview
 import io.novafoundation.nova.feature_governance_api.data.repository.OffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v1.PolkassemblyV1Api

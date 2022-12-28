@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v1.PolkassemblyV1Api
+import io.novafoundation.nova.feature_governance_impl.data.repository.UnsupportedDelegationsRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.Gov1OffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v1.GovV1DAppsRepository
@@ -79,6 +80,7 @@ class GovernanceV1Module {
         convictionVoting = convictionVotingRepository,
         offChainInfo = offChainInfoRepository,
         preImageRepository = preImageRepository,
-        dappsRepository = governanceV1DAppsRepository
+        dappsRepository = governanceV1DAppsRepository,
+        delegationsRepository = UnsupportedDelegationsRepository()
     )
 }
