@@ -20,10 +20,6 @@ import kotlin.time.Duration.Companion.seconds
 private const val FIRST_PAGE_INDEX = 1
 private const val SECOND_PAGE_INDEX = 2
 
-private enum class AssetType {
-    SUBSTRATE, EVM, UNSUPPORTED
-}
-
 class EvmAssetHistory(
     private val etherscanTransactionsApi: EtherscanTransactionsApi,
 ) : AssetHistory {
