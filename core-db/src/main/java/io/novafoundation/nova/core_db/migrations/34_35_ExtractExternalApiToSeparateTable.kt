@@ -18,7 +18,8 @@ val ExtractExternalApiToSeparateTable_34_35 = object : Migration(34, 35) {
     private fun migrateExternalApisTable(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE chain_transfer_history_apis")
 
-        database.execSQL("""
+        database.execSQL(
+            """
             CREATE TABLE IF NOT EXISTS `chain_external_apis` (
             `chainId` TEXT NOT NULL,
             `sourceType` TEXT NOT NULL,
@@ -28,7 +29,8 @@ val ExtractExternalApiToSeparateTable_34_35 = object : Migration(34, 35) {
             PRIMARY KEY(`chainId`, `url`, `apiType`),
             FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE
             )
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_chain_external_apis_chainId` ON `chain_external_apis` (`chainId`)")
     }
