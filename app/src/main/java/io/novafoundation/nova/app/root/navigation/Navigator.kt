@@ -7,6 +7,7 @@ import androidx.navigation.NavOptions
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.navigation.DelayedNavigation
+import io.novafoundation.nova.common.utils.getParcelableCompat
 import io.novafoundation.nova.common.utils.postToUiThread
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
@@ -89,6 +90,9 @@ import kotlinx.coroutines.flow.Flow
 @Parcelize
 class NavComponentDelayedNavigation(val globalActionId: Int, val extras: Bundle? = null) : DelayedNavigation
 
+@Parcelize
+object BackDelayedNavigation : DelayedNavigation
+
 class Navigator(
     private val navigationHolder: NavigationHolder,
 ) :
@@ -125,17 +129,22 @@ class Navigator(
     }
 
     override fun openAfterPinCode(delayedNavigation: DelayedNavigation) {
-        require(delayedNavigation is NavComponentDelayedNavigation)
+        when (delayedNavigation) {
+            is NavComponentDelayedNavigation -> {
+                val navOptions = NavOptions.Builder()
+                    .setPopUpTo(R.id.pincodeFragment, true)
+                    .setEnterAnim(R.anim.fragment_open_enter)
+                    .setExitAnim(R.anim.fragment_open_exit)
+                    .setPopEnterAnim(R.anim.fragment_close_enter)
+                    .setPopExitAnim(R.anim.fragment_close_exit)
+                    .build()
 
-        val navOptions = NavOptions.Builder()
-            .setPopUpTo(R.id.pincodeFragment, true)
-            .setEnterAnim(R.anim.fragment_open_enter)
-            .setExitAnim(R.anim.fragment_open_exit)
-            .setPopEnterAnim(R.anim.fragment_close_enter)
-            .setPopExitAnim(R.anim.fragment_close_exit)
-            .build()
-
-        navController?.navigate(delayedNavigation.globalActionId, delayedNavigation.extras, navOptions)
+                navController?.navigate(delayedNavigation.globalActionId, delayedNavigation.extras, navOptions)
+            }
+            is BackDelayedNavigation -> {
+                navController?.popBackStack()
+            }
+        }
     }
 
     override fun openCreatePincode() {
@@ -439,9 +448,19 @@ class Navigator(
     }
 
     override fun nonCancellableVerify() {
-        val action = PinCodeAction.Check(NavComponentDelayedNavigation(R.id.action_open_main), ToolbarConfiguration())
+        val currentDestination = navController?.currentDestination
+
+        val action = PinCodeAction.Check(BackDelayedNavigation, ToolbarConfiguration())
         val bundle = PincodeFragment.getPinCodeBundle(action)
-        navController?.navigate(R.id.action_pin_code_access_recovery, bundle)
+        if (currentDestination?.id == R.id.pincodeFragment) {
+            val currentBackStackEntry = navController!!.currentBackStackEntry
+            val arguments = currentBackStackEntry!!.arguments!!.getParcelableCompat<PinCodeAction>(PincodeFragment.KEY_PINCODE_ACTION)
+            if (arguments is PinCodeAction.Change) {
+                navController?.navigate(R.id.action_pin_code_access_recovery, bundle)
+            }
+        } else {
+            navController?.navigate(R.id.action_pin_code_access_recovery, bundle)
+        }
     }
 
     override fun returnToWallet() {

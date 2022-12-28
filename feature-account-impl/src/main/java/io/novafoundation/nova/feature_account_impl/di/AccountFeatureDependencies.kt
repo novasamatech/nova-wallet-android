@@ -19,6 +19,7 @@ import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
@@ -89,6 +90,8 @@ interface AccountFeatureDependencies {
     fun rpcCalls(): RpcCalls
 
     fun imageLoader(): ImageLoader
+
+    fun backgroundAccessObserver(): BackgroundAccessObserver
 
     fun appVersionProvider(): AppVersionProvider
 

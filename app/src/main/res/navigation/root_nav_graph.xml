@@ -27,6 +27,14 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
+    <action
+        android:id="@+id/action_pin_code_access_recovery"
+        app:destination="@id/pincodeFragment"
+        app:enterAnim="@anim/fragment_close_enter"
+        app:exitAnim="@anim/fragment_close_exit"
+        app:popEnterAnim="@anim/fragment_open_enter"
+        app:popExitAnim="@anim/fragment_open_exit" />
+
     <fragment
         android:id="@+id/splashFragment"
         android:name="io.novafoundation.nova.splash.presentation.SplashFragment"

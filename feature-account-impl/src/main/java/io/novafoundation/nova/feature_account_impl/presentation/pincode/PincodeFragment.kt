@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -22,7 +21,7 @@ import javax.inject.Inject
 class PincodeFragment : BaseFragment<PinCodeViewModel>() {
 
     companion object {
-        private const val KEY_PINCODE_ACTION = "pincode_action"
+        const val KEY_PINCODE_ACTION = "pincode_action"
 
         fun getPinCodeBundle(pinCodeAction: PinCodeAction): Bundle {
             return Bundle().apply {
@@ -31,13 +30,8 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
         }
     }
 
-    @Inject lateinit var fingerprintWrapper: FingerprintWrapper
-
-    private val backCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            viewModel.backPressed()
-        }
-    }
+    @Inject
+    lateinit var fingerprintWrapper: FingerprintWrapper
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_pincode, container, false)
@@ -53,8 +47,6 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
     }
 
     override fun initViews() {
-        requireActivity().onBackPressedDispatcher.addCallback(this, backCallback)
-
         toolbar.setHomeButtonListener { viewModel.backPressed() }
 
         viewModel.fingerprintScannerAvailable(fingerprintWrapper.isAuthReady())
@@ -62,6 +54,14 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
         with(pinCodeNumbers) {
             pinCodeEnteredListener = { viewModel.pinCodeEntered(it) }
             fingerprintClickListener = { fingerprintWrapper.toggleScanner() }
+        }
+
+        onBackPressed {
+            if (viewModel.isBackRoutingBlocked) {
+                requireActivity().finish()
+            } else {
+                viewModel.backPressed()
+            }
         }
 
         pinCodeNumbers.bindProgressView(pincodeProgress)
