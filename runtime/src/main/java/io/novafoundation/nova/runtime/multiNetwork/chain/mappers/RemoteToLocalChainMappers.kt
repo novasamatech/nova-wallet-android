@@ -126,7 +126,7 @@ fun mapExternalApisToLocal(chainRemote: ChainRemote): List<ChainExternalApiLocal
     }.orEmpty()
 }
 
-private fun mapApiTypeRemoteToLocal(apiType: String): ApiType = when(apiType) {
+private fun mapApiTypeRemoteToLocal(apiType: String): ApiType = when (apiType) {
     "history" -> ApiType.TRANSFERS
     "staking" -> ApiType.STAKING
     "crowdloans" -> ApiType.CROWDLOANS
@@ -137,9 +137,9 @@ private fun mapApiTypeRemoteToLocal(apiType: String): ApiType = when(apiType) {
 private fun mapSourceTypeRemoteToLocal(sourceType: String): SourceType = when (sourceType) {
     "subquery" -> SourceType.SUBQUERY
     "github" -> SourceType.GITHUB
-    "polkassembly" ->  SourceType.POLKASSEMBLY
+    "polkassembly" -> SourceType.POLKASSEMBLY
     "etherscan" -> SourceType.ETHERSCAN
-    else ->  SourceType.UNKNOWN
+    else -> SourceType.UNKNOWN
 }
 
 private fun mapRemoteStakingTypeToLocal(stakingString: String?): String {

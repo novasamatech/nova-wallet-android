@@ -124,18 +124,18 @@ data class Chain(
 
             class Substrate(url: String) : Transfers(url)
 
-            class Evm(url: String): Transfers(url)
+            class Evm(url: String) : Transfers(url)
         }
 
-        class Crowdloans(url: String): ExternalApi(url)
+        class Crowdloans(url: String) : ExternalApi(url)
 
-        class Staking(url: String): ExternalApi(url)
+        class Staking(url: String) : ExternalApi(url)
 
-        class GovernanceReferenda(url: String, val source: Source.Polkassembly): ExternalApi(url) {
+        class GovernanceReferenda(url: String, val source: Source.Polkassembly) : ExternalApi(url) {
 
             sealed class Source {
 
-                class Polkassembly(val network: String?): Source()
+                class Polkassembly(val network: String?) : Source()
             }
         }
     }
