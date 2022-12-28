@@ -124,6 +124,10 @@ fun <T> List<T>.cycle(): Sequence<T> {
     return generateSequence { this[i++ % this.size] }
 }
 
+inline fun <reified R> List<*>.findIsInstanceOrNull(): R? {
+    return find { it is R } as? R
+}
+
 inline fun <T> CoroutineScope.lazyAsync(context: CoroutineContext = EmptyCoroutineContext, crossinline producer: suspend () -> T) = lazy {
     async(context) { producer() }
 }

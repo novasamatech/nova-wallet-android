@@ -7,7 +7,7 @@ import androidx.room.Index
 import io.novafoundation.nova.common.utils.Identifiable
 
 @Entity(
-    tableName = "chain_transfer_history_apis",
+    tableName = "chain_external_apis",
     primaryKeys = ["chainId", "url"],
     foreignKeys = [
         ForeignKey(
@@ -21,19 +21,22 @@ import io.novafoundation.nova.common.utils.Identifiable
         Index(value = ["chainId"])
     ]
 )
-data class ChainTransferHistoryApiLocal(
+data class ChainExternalApiLocal(
     val chainId: String,
-    val assetType: AssetType,
+    val sourceType: SourceType,
     val apiType: ApiType,
+    val parameters: String?,
     val url: String
 ) : Identifiable {
 
-    enum class AssetType {
-        SUBSTRATE, EVM, UNSUPPORTED
+    enum class SourceType {
+        SUBQUERY, GITHUB, POLKASSEMBLY, ETHERSCAN,
+        UNKNOWN
     }
 
     enum class ApiType {
-        SUBQUERY, GITHUB, UNKNOWN, POLKASSEMBLY, ETHERSCAN
+        TRANSFERS, STAKING, CROWDLOANS, GOVERNANCE_REFERENDA,
+        UNKNOWN
     }
 
     @Ignore

@@ -13,7 +13,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
-import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import kotlinx.coroutines.flow.Flow
 
@@ -26,7 +26,7 @@ abstract class ChainDao {
         assetsDiff: CollectionDiffer.Diff<ChainAssetLocal>,
         nodesDiff: CollectionDiffer.Diff<ChainNodeLocal>,
         explorersDiff: CollectionDiffer.Diff<ChainExplorerLocal>,
-        transferApisDiff: CollectionDiffer.Diff<ChainTransferHistoryApiLocal>
+        transferApisDiff: CollectionDiffer.Diff<ChainExternalApiLocal>
     ) {
         deleteChains(chainDiff.removed)
         deleteChainAssets(assetsDiff.removed)
@@ -61,7 +61,7 @@ abstract class ChainDao {
     protected abstract suspend fun deleteChainExplorers(explorers: List<ChainExplorerLocal>)
 
     @Delete
-    protected abstract suspend fun deleteTransferApis(apis: List<ChainTransferHistoryApiLocal>)
+    protected abstract suspend fun deleteTransferApis(apis: List<ChainExternalApiLocal>)
 
     // ------ Add --------
     @Insert(onConflict = OnConflictStrategy.ABORT)
@@ -77,7 +77,7 @@ abstract class ChainDao {
     protected abstract suspend fun addChainExplorers(explorers: List<ChainExplorerLocal>)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    protected abstract suspend fun addTransferApis(apis: List<ChainTransferHistoryApiLocal>)
+    protected abstract suspend fun addTransferApis(apis: List<ChainExternalApiLocal>)
 
     // ------ Update -----
 
@@ -94,7 +94,7 @@ abstract class ChainDao {
     protected abstract suspend fun updateChainExplorers(explorers: List<ChainExplorerLocal>)
 
     @Update
-    protected abstract suspend fun updateTransferApis(apis: List<ChainTransferHistoryApiLocal>)
+    protected abstract suspend fun updateTransferApis(apis: List<ChainExternalApiLocal>)
 
     // ------- Queries ------
 

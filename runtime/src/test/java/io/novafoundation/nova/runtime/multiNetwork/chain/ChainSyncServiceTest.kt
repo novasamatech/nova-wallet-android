@@ -1,27 +1,25 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain
 
 import com.google.gson.Gson
-import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
-import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapExternalApisToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteAssetToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteChainToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteExplorersToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteNodesToLocal
-import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteTransferApisToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainAssetRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExplorerRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExternalApiRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainNodeRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
-import io.novafoundation.nova.test_shared.argThat
 import io.novafoundation.nova.test_shared.emptyDiff
 import io.novafoundation.nova.test_shared.insertsElement
 import io.novafoundation.nova.test_shared.removesElement
@@ -70,17 +68,14 @@ class ChainSyncServiceTest {
         types = null,
         options = emptySet(),
         parentId = null,
-        externalApi = ChainExternalApiRemote(
-            staking = null,
-            history = listOf(
-                ChainExternalApiRemote.TransferApi(
-                    type = "subquery",
-                    assetType = "substrate",
-                    url = transferApiUrl
+        externalApi = mapOf(
+            "history" to listOf(
+                ChainExternalApiRemote(
+                    sourceType = "subquery",
+                    url = transferApiUrl,
+                    parameters = null // substrate history
                 )
-            ),
-            crowdloans = null,
-            governance = null
+            )
         ),
         explorers = listOf(
             ChainExplorerRemote(
@@ -247,14 +242,14 @@ class ChainSyncServiceTest {
         runBlocking {
             localReturns(listOf(LOCAL_CHAIN))
 
-            val currentHistoryApi = REMOTE_CHAIN.externalApi!!.history.first()
+            val currentHistoryApi = REMOTE_CHAIN.externalApi!!.getValue("history").first()
             val anotherUrl = "another url"
 
             remoteReturns(
                 listOf(
                     REMOTE_CHAIN.copy(
-                        externalApi = REMOTE_CHAIN.externalApi!!.copy(
-                            history = listOf(
+                        externalApi = mapOf(
+                            "history" to listOf(
                                 currentHistoryApi,
                                 currentHistoryApi.copy(url = anotherUrl)
                             )
@@ -306,27 +301,27 @@ class ChainSyncServiceTest {
     private fun insertsAssetWithId(id: Int) = insertsElement<ChainAssetLocal> { it.id == id }
     private fun insertsNodeWithUrl(url: String) = insertsElement<ChainNodeLocal> { it.url == url }
     private fun insertsExplorerByName(name: String) = insertsElement<ChainExplorerLocal> { it.name == name }
-    private fun insertsTransferApiByUrl(url: String) = insertsElement<ChainTransferHistoryApiLocal> { it.url == url }
+    private fun insertsTransferApiByUrl(url: String) = insertsElement<ChainExternalApiLocal> { it.url == url }
 
     private fun removesChainWithId(id: String) = removesElement<ChainLocal> { it.id == id }
     private fun removesAssetWithId(id: Int) = removesElement<ChainAssetLocal> { it.id == id }
     private fun removesNodeWithUrl(url: String) = removesElement<ChainNodeLocal> { it.url == url }
     private fun removesExplorerByName(name: String) = removesElement<ChainExplorerLocal> { it.name == name }
-    private fun removesTransferApiByUrl(url: String) = removesElement<ChainTransferHistoryApiLocal> { it.url == url }
+    private fun removesTransferApiByUrl(url: String) = removesElement<ChainExternalApiLocal> { it.url == url }
 
     private fun createLocalCopy(remote: ChainRemote): JoinedChainInfo {
         val domain = mapRemoteChainToLocal(remote, gson)
         val assets = remote.assets.map { mapRemoteAssetToLocal(remote, it, gson, true) }
         val nodes = mapRemoteNodesToLocal(remote)
         val explorers = mapRemoteExplorersToLocal(remote)
-        val transferHistoryApis = mapRemoteTransferApisToLocal(remote)
+        val transferHistoryApis = mapExternalApisToLocal(remote)
 
         return JoinedChainInfo(
             chain = domain,
             nodes = nodes,
             assets = assets,
             explorers = explorers,
-            transferHistoryApis = transferHistoryApis
+            externalApis = transferHistoryApis
         )
     }
 }
