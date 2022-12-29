@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentit
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.OffChainDelegateMetadata
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.OffChainDelegateStats
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateAccountType
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateFiltering
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegatePreview
@@ -14,10 +15,8 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateStats
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegateComparator
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
-import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
-import io.novafoundation.nova.runtime.state.selectedOption
 import io.novafoundation.nova.runtime.util.blockInPast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,7 +25,6 @@ import kotlin.time.Duration.Companion.days
 private val RECENT_VOTES_PERIOD = 30.days
 
 class RealDelegateListInteractor(
-    private val governanceSharedState: GovernanceSharedState,
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val chainStateRepository: ChainStateRepository,
     private val identityRepository: OnChainIdentityRepository,
@@ -34,17 +32,21 @@ class RealDelegateListInteractor(
 
     override suspend fun getDelegates(
         sorting: DelegateSorting,
-        filtering: DelegateFiltering
+        filtering: DelegateFiltering,
+        governanceOption: SupportedGovernanceOption,
     ): Result<List<DelegatePreview>> = withContext(Dispatchers.Default) {
         runCatching {
-            getDelegatesInternal(sorting, filtering)
+            getDelegatesInternal(sorting, filtering, governanceOption)
         }
     }
 
-    private suspend fun getDelegatesInternal(sorting: DelegateSorting, filtering: DelegateFiltering): List<DelegatePreview> {
-        val selectedGovernanceOption = governanceSharedState.selectedOption()
-        val chain = selectedGovernanceOption.assetWithChain.chain
-        val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
+    private suspend fun getDelegatesInternal(
+        sorting: DelegateSorting,
+        filtering: DelegateFiltering,
+        governanceOption: SupportedGovernanceOption,
+    ): List<DelegatePreview> {
+        val chain = governanceOption.assetWithChain.chain
+        val governanceSource = governanceSourceRegistry.sourceFor(governanceOption)
         val delegationsRepository = governanceSource.delegationsRepository
 
         val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.id)

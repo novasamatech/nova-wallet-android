@@ -139,7 +139,7 @@ data class Chain(
             }
         }
 
-        class GovernanceDelegations(url: String): ExternalApi(url)
+        class GovernanceDelegations(url: String) : ExternalApi(url)
     }
 
     enum class Governance {

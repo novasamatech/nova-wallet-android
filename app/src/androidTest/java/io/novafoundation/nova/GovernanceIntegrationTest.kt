@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateFiltering
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateSorting
 import io.novafoundation.nova.feature_governance_impl.data.RealGovernanceAdditionalState
-import io.novafoundation.nova.runtime.ext.Geneses
+import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import java.math.BigInteger
@@ -103,7 +104,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
         val referendaByGroup = referendaListInteractor.referendaListStateFlow(accountId, selectedGovernance).first()
         val referenda = referendaByGroup.groupedReferenda.values.flatten()
 
-        Log.d(this@GovernanceIntegrationTest.LOG_TAG,referenda.joinToString("\n"))
+        Log.d(this@GovernanceIntegrationTest.LOG_TAG, referenda.joinToString("\n"))
 
         childScope.cancel()
     }
@@ -161,7 +162,12 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
             .inBackground()
             .launchIn(childScope)
 
-        val delegates = interactor.getDelegates(DelegateSorting.DELEGATIONS, DelegateFiltering.ALL_ACCOUNTS)
+        val chain = kusama()
+        val delegates = interactor.getDelegates(
+            sorting = DelegateSorting.DELEGATIONS,
+            filtering = DelegateFiltering.ALL_ACCOUNTS,
+            governanceOption = supportedGovernanceOption(chain, Chain.Governance.V2)
+        )
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, delegates.toString())
 
         childScope.cancel()
@@ -184,5 +190,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
         .filterNotNull()
         .first()
 
-    private suspend fun kusama(): Chain = chainRegistry.getChain(Chain.Geneses.KUSAMA)
+    private suspend fun kusama(): Chain = chainRegistry.currentChains.mapNotNull { chains ->
+        chains.find { it.externalApi<Chain.ExternalApi.GovernanceDelegations>() != null }
+    }.first()
 }
