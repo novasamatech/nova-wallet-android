@@ -107,7 +107,7 @@ class AccountDataSourceImpl(
 
     override suspend fun getSelectedNode(): Node? = null
 
-    override suspend fun anyAccountSelected(): Boolean = selectedMetaAccountLocal.first() != null
+    override suspend fun anyAccountSelected(): Boolean = metaAccountDao.selectedMetaAccount() != null
 
     override suspend fun saveSelectedAccount(account: Account) = withContext(Dispatchers.Default) {
         // TODO remove compatibility stub

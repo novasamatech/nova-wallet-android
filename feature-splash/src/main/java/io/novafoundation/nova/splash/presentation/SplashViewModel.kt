@@ -24,7 +24,7 @@ class SplashViewModel(
                     router.openCreatePincode()
                 }
             } else {
-                router.openAddFirstAccount()
+                router.openWelcomeScreen()
             }
         }
     }

@@ -4,6 +4,9 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.SetItem
+import io.novafoundation.nova.common.utils.asSetItem
+import io.novafoundation.nova.common.utils.asSetItems
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
@@ -83,7 +86,7 @@ class SelectCustomValidatorsViewModel(
         .inBackground()
         .share()
 
-    private val selectedValidators = MutableStateFlow(emptySet<Validator>())
+    private val selectedValidators = MutableStateFlow(emptySet<SetItem<Validator>>())
 
     private val maxSelectedValidatorsFlow = flowOf {
         interactor.maxValidatorsPerNominator()
@@ -164,7 +167,7 @@ class SelectCustomValidatorsViewModel(
 
     fun validatorClicked(validatorModel: ValidatorModel) {
         mutateSelected {
-            it.toggle(validatorModel.stakeTarget)
+            it.toggle(validatorModel.stakeTarget.asSetItem())
         }
     }
 
@@ -179,7 +182,8 @@ class SelectCustomValidatorsViewModel(
     }
 
     private fun updateSetupStakingState() {
-        setupStakingSharedState.setCustomValidators(selectedValidators.value.toList())
+        val validatorList = selectedValidators.value.map { it.value }
+        setupStakingSharedState.setCustomValidators(validatorList)
     }
 
     fun clearFilters() {
@@ -201,7 +205,7 @@ class SelectCustomValidatorsViewModel(
         mutateSelected { selected ->
             val recommended = recommendator().recommendations(recommendationSettingsProvider().defaultSettings())
 
-            val missingFromRecommended = recommended.toSet() - selected
+            val missingFromRecommended = recommended.asSetItems() - selected
             val neededToFill = maxSelectedValidatorsFlow.first() - selected.size
 
             selected + missingFromRecommended.take(neededToFill).toSet()
@@ -211,14 +215,14 @@ class SelectCustomValidatorsViewModel(
     private fun observeExternalSelectionChanges() {
         setupStakingSharedState.setupStakingProcess
             .filterIsInstance<SetupStakingProcess.ReadyToSubmit>()
-            .onEach { selectedValidators.value = it.payload.validators.toSet() }
+            .onEach { selectedValidators.value = it.payload.validators.asSetItems() }
             .launchIn(viewModelScope)
     }
 
     private suspend fun convertToModels(
         chain: Chain,
         validators: List<Validator>,
-        selectedValidators: Set<Validator>,
+        selectedValidators: Set<SetItem<Validator>>,
         token: Token,
     ): List<ValidatorModel> {
         return validators.map { validator ->
@@ -227,7 +231,7 @@ class SelectCustomValidatorsViewModel(
                 validator = validator,
                 iconGenerator = addressIconGenerator,
                 token = token,
-                isChecked = validator in selectedValidators,
+                isChecked = validator.asSetItem() in selectedValidators,
                 sorting = recommendationSettingsFlow.first().sorting
             )
         }
@@ -235,7 +239,7 @@ class SelectCustomValidatorsViewModel(
 
     private suspend fun recommendator() = validatorRecommendator.await()
 
-    private fun mutateSelected(mutation: suspend (Set<Validator>) -> Set<Validator>) {
+    private fun mutateSelected(mutation: suspend (Set<SetItem<Validator>>) -> Set<SetItem<Validator>>) {
         launch {
             selectedValidators.value = mutation(selectedValidators.value)
         }

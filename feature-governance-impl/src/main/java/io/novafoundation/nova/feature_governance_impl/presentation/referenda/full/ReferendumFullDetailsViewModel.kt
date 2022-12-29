@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.fu
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createIdentityAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumProposer
@@ -42,10 +43,12 @@ class ReferendumFullDetailsViewModel(
 
     val proposerModel = payloadFlow
         .map { createProposerAddressModel(it.proposer, it.deposit) }
+        .withLoading()
         .shareInBackground()
 
     val beneficiaryModel = payloadFlow
         .map { createBeneficiaryAddressModel(it.referendumCall) }
+        .withLoading()
         .shareInBackground()
 
     val hasPreimage = payload.preImage != null

@@ -103,8 +103,11 @@ class Navigator(
     private val navController: NavController?
         get() = navigationHolder.navController
 
-    override fun openAddFirstAccount() {
-        navController?.navigate(R.id.action_splash_to_onboarding, WelcomeFragment.bundle(false))
+    override fun openWelcomeScreen() {
+        when (navController?.currentDestination?.id) {
+            R.id.accountsFragment -> navController?.navigate(R.id.action_walletManagment_to_welcome, WelcomeFragment.bundle(false))
+            R.id.splashFragment -> navController?.navigate(R.id.action_splash_to_onboarding, WelcomeFragment.bundle(false))
+        }
     }
 
     override fun openInitialCheckPincode() {
