@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.response
+package io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response
 
 import com.google.gson.annotations.SerializedName
 import io.novafoundation.nova.common.data.network.subquery.SubQueryNodes

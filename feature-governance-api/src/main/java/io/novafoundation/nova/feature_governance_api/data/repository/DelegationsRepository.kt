@@ -12,5 +12,5 @@ interface DelegationsRepository {
         chain: Chain
     ): List<OffChainDelegateStats>
 
-    suspend fun getOffChainDelegatesMetadata(): List<OffChainDelegateMetadata>
+    suspend fun getOffChainDelegatesMetadata(chain: Chain): List<OffChainDelegateMetadata>
 }
