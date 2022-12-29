@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateSorting
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateStats
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegateComparator
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
@@ -21,14 +22,6 @@ import io.novafoundation.nova.runtime.util.blockInPast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.days
-
-interface DelegateListInteractor {
-
-    suspend fun getDelegates(
-        sorting: DelegateSorting,
-        filtering: DelegateFiltering,
-    ): Result<List<DelegatePreview>>
-}
 
 private val RECENT_VOTES_PERIOD = 30.days
 
@@ -50,19 +43,19 @@ class RealDelegateListInteractor(
 
     private suspend fun getDelegatesInternal(sorting: DelegateSorting, filtering: DelegateFiltering): List<DelegatePreview> {
         val selectedGovernanceOption = governanceSharedState.selectedOption()
-        val chainId = selectedGovernanceOption.assetWithChain.chain.id
+        val chain = selectedGovernanceOption.assetWithChain.chain
         val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
         val delegationsRepository = governanceSource.delegationsRepository
 
-        val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chainId)
+        val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.id)
         val recentVotesBlockThreshold = blockDurationEstimator.blockInPast(RECENT_VOTES_PERIOD)
 
-        val delegatesStats = delegationsRepository.getOffChainDelegatesStats(recentVotesBlockThreshold)
+        val delegatesStats = delegationsRepository.getOffChainDelegatesStats(recentVotesBlockThreshold, chain)
         val delegateAccountIds = delegatesStats.map(OffChainDelegateStats::accountId)
 
         val delegateMetadatasByAccountId = delegationsRepository.getOffChainDelegatesMetadata().associateBy { AccountIdKey(it.accountId) }
 
-        val identities = identityRepository.getIdentitiesFromIds(delegateAccountIds, chainId)
+        val identities = identityRepository.getIdentitiesFromIds(delegateAccountIds, chain.id)
 
         val delegates = delegatesStats.map { delegateStats ->
             val metadata = delegateMetadatasByAccountId[delegateStats.accountId]

@@ -9,7 +9,10 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateFiltering
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateSorting
 import io.novafoundation.nova.feature_governance_impl.data.RealGovernanceAdditionalState
+import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -147,6 +150,23 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, referendumVoters.toString())
     }
 
+    @Test
+    fun shouldFetchDelegatesList() = runBlocking<Unit> {
+        val childScope = childScope()
+
+        val interactor = governanceApi.delegationListInteractor
+        val updateSystem = governanceApi.governanceUpdateSystem
+
+        updateSystem.start()
+            .inBackground()
+            .launchIn(childScope)
+
+        val delegates = interactor.getDelegates(DelegateSorting.DELEGATIONS, DelegateFiltering.ALL_ACCOUNTS)
+        Log.d(this@GovernanceIntegrationTest.LOG_TAG, delegates.toString())
+
+        childScope.cancel()
+    }
+
     private suspend fun source(supportedGovernance: SupportedGovernanceOption) = governanceApi.governanceSourceRegistry.sourceFor(supportedGovernance)
 
     private fun supportedGovernanceOption(chain: Chain, governance: Chain.Governance) =
@@ -163,4 +183,6 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
     }
         .filterNotNull()
         .first()
+
+    private suspend fun kusama(): Chain = chainRegistry.getChain(Chain.Geneses.KUSAMA)
 }

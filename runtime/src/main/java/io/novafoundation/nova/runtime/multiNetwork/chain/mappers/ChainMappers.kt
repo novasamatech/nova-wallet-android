@@ -178,6 +178,10 @@ private fun mapExternalApiLocalToExternalApi(externalApiLocal: ChainExternalApiL
 
         ApiType.GOVERNANCE_REFERENDA -> mapGovernanceReferendaApiFromLocal(externalApiLocal, gson)
 
+        ApiType.GOVERNANCE_DELEGATIONS -> externalApiLocal.ensureSourceType(SourceType.SUBQUERY) {
+            ExternalApi.GovernanceDelegations(externalApiLocal.url)
+        }
+
         ApiType.UNKNOWN -> null
     }
 }.getOrNull()

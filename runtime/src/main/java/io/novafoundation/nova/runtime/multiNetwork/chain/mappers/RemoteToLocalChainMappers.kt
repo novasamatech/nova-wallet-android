@@ -131,6 +131,7 @@ private fun mapApiTypeRemoteToLocal(apiType: String): ApiType = when (apiType) {
     "staking" -> ApiType.STAKING
     "crowdloans" -> ApiType.CROWDLOANS
     "governance" -> ApiType.GOVERNANCE_REFERENDA
+    "governance-delegations" -> ApiType.GOVERNANCE_DELEGATIONS
     else -> ApiType.UNKNOWN
 }
 
