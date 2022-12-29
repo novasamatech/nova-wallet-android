@@ -24,5 +24,5 @@ suspend fun DelegateMetadataApi.getDelegatesMetadata(chain: Chain): List<Delegat
 private fun fileNameFor(chain: Chain): String {
     val withoutExtension = chain.name.lowercase()
 
-    return "${withoutExtension}.json"
+    return "$withoutExtension.json"
 }
