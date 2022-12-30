@@ -7,6 +7,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -19,6 +20,7 @@ class DAppFeatureHolder @Inject constructor(
     private val router: DAppRouter,
     private val signCommunicator: DAppSignCommunicator,
     private val searchCommunicator: DAppSearchCommunicator,
+    private val optionsCommunicator: DAppOptionsCommunicator,
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -32,6 +34,6 @@ class DAppFeatureHolder @Inject constructor(
             .build()
 
         return DaggerDAppFeatureComponent.factory()
-            .create(router, signCommunicator, searchCommunicator, dApp)
+            .create(router, signCommunicator, searchCommunicator, optionsCommunicator, dApp)
     }
 }

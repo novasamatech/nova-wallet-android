@@ -11,7 +11,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.themed
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
@@ -21,17 +20,17 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.isSecure
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.AcknowledgePhishingBottomSheet
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.ConfirmAuthorizeBottomSheet
-import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.setDesktopMode
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.uninjectWeb3
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBar
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBarGroup
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserBack
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserClose
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserFavourite
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserMore
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserForward
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserProgress
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserRefresh
@@ -90,7 +89,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
         dappBrowserForward.setOnClickListener { forwardClicked() }
         dappBrowserRefresh.setOnClickListener { refreshClicked() }
 
-        dappBrowserFavourite.setOnClickListener { viewModel.onFavouriteClicked() }
+        dappBrowserMore.setOnClickListener { moreClicked() }
     }
 
     override fun onDestroyView() {
@@ -119,15 +118,19 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
 
     @Suppress("UNCHECKED_CAST")
     override fun subscribe(viewModel: DAppBrowserViewModel) {
-        setupRemoveFavouritesConfirmation(viewModel.removeFromFavouritesConfirmation)
+        val webViewClient = web3WebViewClientFactory.create(dappBrowserWebView, viewModel.extensionsStore, viewModel::onPageChanged)
 
         dappBrowserWebView.injectWeb3(
-            web3ClientFactory = web3WebViewClientFactory,
-            extensionsStore = viewModel.extensionsStore,
             progressBar = dappBrowserProgress,
-            onPageChanged = viewModel::onPageChanged,
-            fileChooser = fileChooser
+            fileChooser = fileChooser,
+            webViewClient = webViewClient
         )
+
+        viewModel.desktopModeChangedModel.observe {
+            webViewClient.desktopMode = it.desktopModeEnabled
+            dappBrowserWebView.setDesktopMode(it.desktopModeEnabled)
+            dappBrowserWebView.loadUrl(it.url)
+        }
 
         viewModel.showConfirmationSheet.observeEvent {
             when (it.action) {
@@ -153,11 +156,6 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
         viewModel.currentPageAnalyzed.observe {
             dappBrowserAddressBar.setAddress(it.display)
             dappBrowserAddressBar.showSecureIcon(it.isSecure)
-
-            val favouriteIcon = if (it.isFavourite) R.drawable.ic_favorite_heart_filled else R.drawable.ic_favorite_heart_outline
-            val favoriteIconTint = if (it.isFavourite) R.color.icon_favorite else R.color.icon_primary
-            dappBrowserFavourite.setImageResource(favouriteIcon)
-            dappBrowserFavourite.setImageTintRes(favoriteIconTint)
 
             updateButtonsState()
         }
@@ -210,6 +208,10 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(backCallback!!)
+    }
+
+    private fun moreClicked() {
+        viewModel.onMoreClicked()
     }
 
     private fun detachBackCallback() {

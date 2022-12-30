@@ -6,4 +6,5 @@ data class DappModel(
     val iconUrl: String?,
     val isFavourite: Boolean,
     val url: String,
+    val desktopOnly: Boolean
 )

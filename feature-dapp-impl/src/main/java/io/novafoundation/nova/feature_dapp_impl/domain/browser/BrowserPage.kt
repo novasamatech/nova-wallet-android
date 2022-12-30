@@ -12,6 +12,7 @@ class BrowserPageAnalyzed(
     val url: String,
     val synchronizedWithBrowser: Boolean,
     val isFavourite: Boolean,
+    val desktopOnly: Boolean,
     val security: Security
 ) {
 

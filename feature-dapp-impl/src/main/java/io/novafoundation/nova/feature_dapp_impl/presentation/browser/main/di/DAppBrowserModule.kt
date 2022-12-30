@@ -11,11 +11,13 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRepository
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserViewModel
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
@@ -29,9 +31,11 @@ class DAppBrowserModule {
     fun provideInteractor(
         phishingSitesRepository: PhishingSitesRepository,
         favouritesDAppRepository: FavouritesDAppRepository,
+        dAppMetadataRepository: DAppMetadataRepository
     ) = DappBrowserInteractor(
         phishingSitesRepository = phishingSitesRepository,
-        favouritesDAppRepository = favouritesDAppRepository
+        favouritesDAppRepository = favouritesDAppRepository,
+        dAppMetadataRepository = dAppMetadataRepository
     )
 
     @Provides
@@ -54,8 +58,8 @@ class DAppBrowserModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         signRequester: DAppSignCommunicator,
         searchRequester: DAppSearchCommunicator,
+        dAppOptionsCommunicator: DAppOptionsCommunicator,
         initialUrl: String,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         extensionStoreFactory: ExtensionStoreFactory,
     ): ViewModel {
         return DAppBrowserViewModel(
@@ -64,8 +68,8 @@ class DAppBrowserModule {
             selectedAccountUseCase = selectedAccountUseCase,
             signRequester = signRequester,
             dAppSearchRequester = searchRequester,
+            dAppOptionsRequester = dAppOptionsCommunicator,
             initialUrl = initialUrl,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             extensionStoreFactory = extensionStoreFactory
         )
     }

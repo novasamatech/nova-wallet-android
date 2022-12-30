@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="dapp_options_title">Page settings</string>
+    <string name="dapp_options_add_to_favorite">Add to Favorites</string>
+    <string name="dapp_options_remove_from_favorite">Remove from Favorites</string>
+    <string name="dapp_options_desktop_mode">Desktop mode</string>
+
     <string name="assets_search_placeholder">No tokens with\nentered name were found</string>
 
     <string name="asset_add_evm_token_invalid_contract_address_message">The entered contract address is not a %s ERC-20 contract.</string>

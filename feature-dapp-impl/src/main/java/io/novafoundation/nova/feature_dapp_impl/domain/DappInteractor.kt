@@ -40,6 +40,10 @@ class DappInteractor(
         joinAll(metadataSyncing, phishingSitesSyncing)
     }
 
+    suspend fun removeDAppFromFavourites(dAppUrl: String) {
+        favouritesDAppRepository.removeFavourite(dAppUrl)
+    }
+
     suspend fun toggleDAppFavouritesState(dApp: DApp) = withContext(Dispatchers.Default) {
         if (dApp.isFavourite) {
             favouritesDAppRepository.removeFavourite(dApp.url)

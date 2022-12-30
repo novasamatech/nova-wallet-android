@@ -5,7 +5,8 @@ class DappMetadata(
     val iconLink: String,
     val url: String,
     val baseUrl: String,
-    val categories: Set<DappCategory>
+    val categories: Set<DappCategory>,
+    val desktopOnly: Boolean
 )
 
 data class DappCategory(
