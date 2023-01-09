@@ -12,7 +12,7 @@ class UnsupportedDelegationsRepository : DelegationsRepository {
         return emptyList()
     }
 
-    override suspend fun getOffChainDelegatesMetadata(): List<OffChainDelegateMetadata> {
+    override suspend fun getOffChainDelegatesMetadata(chain: Chain): List<OffChainDelegateMetadata> {
         return emptyList()
     }
 }

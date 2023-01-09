@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.list
 
+import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.get
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.applyFilter
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.OffChainDelegateMetadata
@@ -55,7 +57,11 @@ class RealDelegateListInteractor(
         val delegatesStats = delegationsRepository.getOffChainDelegatesStats(recentVotesBlockThreshold, chain)
         val delegateAccountIds = delegatesStats.map(OffChainDelegateStats::accountId)
 
-        val delegateMetadatasByAccountId = delegationsRepository.getOffChainDelegatesMetadata().associateBy { AccountIdKey(it.accountId) }
+        val delegateMetadatas = runCatching { delegationsRepository.getOffChainDelegatesMetadata(chain) }
+            .onFailure { Log.e(LOG_TAG, "Failed to fetch delegate metadatas", it) }
+            .getOrDefault(emptyList())
+
+        val delegateMetadatasByAccountId = delegateMetadatas.associateBy { AccountIdKey(it.accountId) }
 
         val identities = identityRepository.getIdentitiesFromIds(delegateAccountIds, chain.id)
 
