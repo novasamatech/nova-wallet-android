@@ -31,7 +31,6 @@ open class TableView @JvmOverloads constructor(
     val titleView: TextView
 
     private val childHorizontalPadding = 16.dpF(context)
-    private val pathWidth = 1.dpF(context)
     private val dividerPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val dividerPath = Path()
 

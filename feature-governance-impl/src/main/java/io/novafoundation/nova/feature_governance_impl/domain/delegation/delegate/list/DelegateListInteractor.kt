@@ -98,7 +98,8 @@ class RealDelegateListInteractor(
         return DelegatePreview.Metadata(
             shortDescription = metadata.shortDescription,
             accountType = mapAccountTypeToDomain(metadata.isOrganization),
-            profileImageUrl = metadata.profileImageUrl
+            iconUrl = metadata.profileImageUrl,
+            name = metadata.name
         )
     }
 

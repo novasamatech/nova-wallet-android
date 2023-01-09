@@ -8,4 +8,5 @@ class OffChainDelegateMetadata(
     val longDescription: String,
     val profileImageUrl: String?,
     val isOrganization: Boolean,
+    val name: String,
 )

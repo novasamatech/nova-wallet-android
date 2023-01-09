@@ -62,6 +62,8 @@ class GovernanceNavigator(
         commonNavigator.openAccountDetails(id)
     }
 
+    override fun openAddDelegation() = performNavigation(R.id.action_mainFragment_to_delegation)
+
     override fun openDAppBrowser(initialUrl: String) = performNavigation(
         actionId = R.id.action_referendumDetailsFragment_to_DAppBrowserGraph,
         args = DAppBrowserFragment.getBundle(initialUrl)

@@ -7,12 +7,13 @@ data class DelegatePreview(
     override val accountId: AccountId,
     override val stats: DelegateStats,
     override val metadata: Metadata?,
-    val onChainIdentity: OnChainIdentity?
+    override val onChainIdentity: OnChainIdentity?
 ) : Delegate {
 
     data class Metadata(
         val shortDescription: String,
-        val profileImageUrl: String?,
-        override val accountType: DelegateAccountType
+        override val iconUrl: String?,
+        override val accountType: DelegateAccountType,
+        override val name: String?
     ) : Delegate.Metadata
 }

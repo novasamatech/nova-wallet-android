@@ -92,4 +92,8 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
     override fun onClickGovernanceLocks() {
         viewModel.governanceLocksClicked()
     }
+
+    override fun onClickDelegations() {
+        viewModel.delegationsClicked()
+    }
 }

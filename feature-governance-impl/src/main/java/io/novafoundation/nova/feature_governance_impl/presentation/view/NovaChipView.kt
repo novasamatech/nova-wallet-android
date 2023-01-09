@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
 import androidx.core.content.res.getDimensionOrThrow
 import androidx.core.view.isVisible
@@ -17,6 +18,8 @@ import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIcon
+import io.novafoundation.nova.common.utils.letOrHide
+import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.feature_governance_impl.R
@@ -80,8 +83,7 @@ class NovaChipView @JvmOverloads constructor(
         }
 
         val backgroundTintColor = typedArray.getResourceId(R.styleable.NovaChipView_backgroundColor, R.color.chips_background)
-        background = getRoundedCornerDrawable(backgroundTintColor, cornerSizeDp = 8)
-            .withRippleMask(getRippleMask(cornerSizeDp = 8))
+        setChipBackground(backgroundTintColor)
 
         val textAppearanceId = typedArray.getResourceIdOrNull(R.styleable.NovaChipView_chipTextAppearance)
         textAppearanceId?.let(chipText::setTextAppearance)
@@ -147,6 +149,17 @@ class NovaChipView @JvmOverloads constructor(
         useIcon(drawable != null)
     }
 
+    fun setIcon(@DrawableRes drawableRes: Int) {
+        chipIcon.setImageResource(drawableRes)
+        useIcon(true)
+    }
+
+    fun setStyle(@ColorRes backgroundColorRes: Int, @ColorRes textColorRes: Int, @ColorRes iconColorRes: Int) {
+        setChipBackground(backgroundColorRes)
+        chipText.setTextColorRes(textColorRes)
+        chipIcon.setImageTintRes(iconColorRes)
+    }
+
     fun setText(text: String?) {
         chipText.text = text
     }
@@ -161,7 +174,14 @@ class NovaChipView @JvmOverloads constructor(
         chipIcon.clear()
     }
 
+    private fun setChipBackground(backgroundTintColor: Int) {
+        background = getRoundedCornerDrawable(backgroundTintColor, cornerSizeDp = 8)
+            .withRippleMask(getRippleMask(cornerSizeDp = 8))
+    }
+
     private fun refreshSize() {
         setSize(size)
     }
 }
+
+fun NovaChipView.setTextOrHide(text: String?) = letOrHide(text, ::setText)

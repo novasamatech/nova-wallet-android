@@ -40,4 +40,9 @@
         <attr name="chipTextAppearance" format="reference" />
         <attr name="backgroundColor" format="color" />
     </declare-styleable>
+
+    <declare-styleable name="GovernanceLocksView">
+        <attr name="governanceLocksView_label" format="string" />
+        <attr name="governanceLocksView_icon" format="color|reference" />
+    </declare-styleable>
 </resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/delegation_nav_graph"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/delegateListFragment">
+
+
+    <fragment
+        tools:layout="@layout/fragment_delegate_list"
+        android:id="@+id/delegateListFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.DelegateListFragment"
+        android:label="DelegateListFragment" />
+</navigation>

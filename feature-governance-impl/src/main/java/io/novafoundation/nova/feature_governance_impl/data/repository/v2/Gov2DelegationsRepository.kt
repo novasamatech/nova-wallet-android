@@ -48,7 +48,8 @@ class Gov2DelegationsRepository(
                 shortDescription = it.shortDescription,
                 longDescription = it.longDescription,
                 profileImageUrl = it.image,
-                isOrganization = it.isOrganization
+                isOrganization = it.isOrganization,
+                name = it.name
             )
         }
     }
