@@ -7,7 +7,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 /**
  * Due to previous migration of chain & meta account tables by means of rename-create-insert-delete strategy
  * foreign keys to these tables got renamed and now points to wrong table which causes crashes for subset of users
- * This migration recreates (lets hope) all affected tables
+ * This migration recreates all affected tables
  */
 val FixBrokenForeignKeys_31_32 = object : Migration(31, 32) {
 

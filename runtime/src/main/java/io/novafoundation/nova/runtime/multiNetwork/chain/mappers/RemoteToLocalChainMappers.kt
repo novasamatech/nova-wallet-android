@@ -4,20 +4,19 @@ import com.google.gson.Gson
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.ApiType
+import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.SourceType
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
-import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainAssetRemote
-import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExternalApiRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
 
 private const val ETHEREUM_OPTION = "ethereumBased"
 private const val CROWDLOAN_OPTION = "crowdloans"
 private const val TESTNET_OPTION = "testnet"
 private const val CHAIN_ADDITIONAL_TIP = "defaultTip"
-
-fun mapSectionTypeToSectionTypeLocal(sectionType: Chain.ExternalApi.Section.Type): String = sectionType.name
 
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
@@ -27,14 +26,6 @@ fun mapRemoteChainToLocal(
         ChainLocal.TypesConfig(
             url = it.url,
             overridesCommon = it.overridesCommon
-        )
-    }
-
-    val externalApi = chainRemote.externalApi?.let { externalApi ->
-        ChainLocal.ExternalApi(
-            staking = mapSectionRemoteToLocal(externalApi.staking),
-            crowdloans = mapSectionRemoteToLocal(externalApi.crowdloans),
-            governance = mapGovernanceSectionRemoteToLocal(externalApi.governance, gson)
         )
     }
 
@@ -54,7 +45,6 @@ fun mapRemoteChainToLocal(
             types = types,
             icon = icon,
             prefix = addressPrefix,
-            externalApi = externalApi,
             isEthereumBased = ETHEREUM_OPTION in optionsOrEmpty,
             isTestNet = TESTNET_OPTION in optionsOrEmpty,
             hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty,
@@ -122,68 +112,34 @@ fun mapRemoteExplorersToLocal(chainRemote: ChainRemote): List<ChainExplorerLocal
     return explorers.orEmpty()
 }
 
-fun mapRemoteTransferApisToLocal(chainRemote: ChainRemote): List<ChainTransferHistoryApiLocal> {
-    val explorers = chainRemote.externalApi?.history.orEmpty().map {
-        ChainTransferHistoryApiLocal(
-            chainId = chainRemote.chainId,
-            assetType = mapTransferApiAssetTypeToLocal(it.assetType),
-            apiType = mapTransferHistoryApiTypeRemoteToLocal(it.type),
-            url = it.url
-        )
-    }
-
-    return explorers
+fun mapExternalApisToLocal(chainRemote: ChainRemote): List<ChainExternalApiLocal> {
+    return chainRemote.externalApi?.flatMap { (apiType, apis) ->
+        apis.map { api ->
+            ChainExternalApiLocal(
+                chainId = chainRemote.chainId,
+                sourceType = mapSourceTypeRemoteToLocal(api.sourceType),
+                apiType = mapApiTypeRemoteToLocal(apiType),
+                parameters = api.parameters,
+                url = api.url
+            )
+        }
+    }.orEmpty()
 }
 
-private fun mapTransferApiAssetTypeToLocal(type: String?): ChainTransferHistoryApiLocal.AssetType {
-    return when (type) {
-        null, "substrate" -> ChainTransferHistoryApiLocal.AssetType.SUBSTRATE
-        "evm" -> ChainTransferHistoryApiLocal.AssetType.EVM
-        else -> ChainTransferHistoryApiLocal.AssetType.UNSUPPORTED
-    }
+private fun mapApiTypeRemoteToLocal(apiType: String): ApiType = when (apiType) {
+    "history" -> ApiType.TRANSFERS
+    "staking" -> ApiType.STAKING
+    "crowdloans" -> ApiType.CROWDLOANS
+    "governance" -> ApiType.GOVERNANCE_REFERENDA
+    else -> ApiType.UNKNOWN
 }
 
-private fun mapSectionRemoteToLocal(sectionRemote: ChainExternalApiRemote.Section?) = sectionRemote?.let {
-    ChainLocal.ExternalApi.Section(
-        type = mapSectionTypeRemoteToLocal(sectionRemote.type),
-        url = sectionRemote.url
-    )
-}
-
-private fun mapGovernanceSectionRemoteToLocal(sectionRemote: ChainExternalApiRemote.GovernanceSection?, gson: Gson) = sectionRemote?.let {
-    ChainLocal.ExternalApi.GovernanceSection(
-        type = mapSectionTypeRemoteToLocal(sectionRemote.type),
-        url = sectionRemote.url,
-        parameters = gson.toJson(sectionRemote.parameters)
-    )
-}
-
-private fun mapSectionTypeRemoteToLocal(section: String): String {
-    val sectionType = mapSectionTypeRemoteToSectionType(section)
-    return mapSectionTypeToSectionTypeLocal(sectionType)
-}
-
-private fun mapTransferHistoryApiTypeRemoteToLocal(type: String): ChainTransferHistoryApiLocal.ApiType {
-    val sectionType = mapSectionTypeRemoteToSectionType(type)
-    return mapApiSectionTypeTypeToTransferHistoryApiLocal(sectionType)
-}
-
-private fun mapApiSectionTypeTypeToTransferHistoryApiLocal(type: Chain.ExternalApi.Section.Type): ChainTransferHistoryApiLocal.ApiType {
-    return when (type) {
-        Chain.ExternalApi.Section.Type.SUBQUERY -> ChainTransferHistoryApiLocal.ApiType.SUBQUERY
-        Chain.ExternalApi.Section.Type.GITHUB -> ChainTransferHistoryApiLocal.ApiType.GITHUB
-        Chain.ExternalApi.Section.Type.UNKNOWN -> ChainTransferHistoryApiLocal.ApiType.UNKNOWN
-        Chain.ExternalApi.Section.Type.POLKASSEMBLY -> ChainTransferHistoryApiLocal.ApiType.POLKASSEMBLY
-        Chain.ExternalApi.Section.Type.ETHERSCAN -> ChainTransferHistoryApiLocal.ApiType.ETHERSCAN
-    }
-}
-
-private fun mapSectionTypeRemoteToSectionType(section: String) = when (section) {
-    "subquery" -> Chain.ExternalApi.Section.Type.SUBQUERY
-    "github" -> Chain.ExternalApi.Section.Type.GITHUB
-    "polkassembly" -> Chain.ExternalApi.Section.Type.POLKASSEMBLY
-    "etherscan" -> Chain.ExternalApi.Section.Type.ETHERSCAN
-    else -> Chain.ExternalApi.Section.Type.UNKNOWN
+private fun mapSourceTypeRemoteToLocal(sourceType: String): SourceType = when (sourceType) {
+    "subquery" -> SourceType.SUBQUERY
+    "github" -> SourceType.GITHUB
+    "polkassembly" -> SourceType.POLKASSEMBLY
+    "etherscan" -> SourceType.ETHERSCAN
+    else -> SourceType.UNKNOWN
 }
 
 private fun mapRemoteStakingTypeToLocal(stakingString: String?): String {

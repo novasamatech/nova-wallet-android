@@ -8,12 +8,12 @@ import androidx.room.TypeConverters
 import io.novafoundation.nova.core_db.converters.AssetSourceConverter
 import io.novafoundation.nova.core_db.converters.CryptoTypeConverters
 import io.novafoundation.nova.core_db.converters.CurrencyConverters
+import io.novafoundation.nova.core_db.converters.ExternalApiConverters
 import io.novafoundation.nova.core_db.converters.LongMathConverters
 import io.novafoundation.nova.core_db.converters.MetaAccountTypeConverters
 import io.novafoundation.nova.core_db.converters.NetworkTypeConverters
 import io.novafoundation.nova.core_db.converters.NftTypeConverters
 import io.novafoundation.nova.core_db.converters.OperationConverters
-import io.novafoundation.nova.core_db.converters.TransferHistoryApiConverters
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
@@ -59,6 +59,7 @@ import io.novafoundation.nova.core_db.migrations.ChangeAsset_3_4
 import io.novafoundation.nova.core_db.migrations.ChangeChainNodes_20_21
 import io.novafoundation.nova.core_db.migrations.ChangeDAppAuthorization_10_11
 import io.novafoundation.nova.core_db.migrations.ChangeTokens_19_20
+import io.novafoundation.nova.core_db.migrations.ExtractExternalApiToSeparateTable_34_35
 import io.novafoundation.nova.core_db.migrations.FixBrokenForeignKeys_31_32
 import io.novafoundation.nova.core_db.migrations.FixMigrationConflicts_13_14
 import io.novafoundation.nova.core_db.migrations.GovernanceFlagToEnum_26_27
@@ -87,14 +88,14 @@ import io.novafoundation.nova.core_db.model.TotalRewardLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
-import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 34,
+    version = 35,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -110,7 +111,7 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         ChainAssetLocal::class,
         ChainRuntimeInfoLocal::class,
         ChainExplorerLocal::class,
-        ChainTransferHistoryApiLocal::class,
+        ChainExternalApiLocal::class,
         MetaAccountLocal::class,
         ChainAccountLocal::class,
         DappAuthorizationLocal::class,
@@ -132,7 +133,7 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
     MetaAccountTypeConverters::class,
     CurrencyConverters::class,
     AssetSourceConverter::class,
-    TransferHistoryApiConverters::class
+    ExternalApiConverters::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -161,7 +162,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddGovernanceExternalApiToChain_27_28)
                     .addMigrations(AddSourceToLocalAsset_28_29, AddTransferApisTable_29_30, AddEnabledColumnToChainAssets_30_31)
                     .addMigrations(FixBrokenForeignKeys_31_32, AddVersioningToGovernanceDapps_32_33)
-                    .addMigrations(AddGovernanceNetworkToExternalApi_33_34)
+                    .addMigrations(AddGovernanceNetworkToExternalApi_33_34, ExtractExternalApiToSeparateTable_34_35)
                     .build()
             }
             return instance!!

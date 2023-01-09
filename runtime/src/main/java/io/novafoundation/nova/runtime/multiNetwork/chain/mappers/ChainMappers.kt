@@ -8,36 +8,17 @@ import io.novafoundation.nova.common.utils.fromJsonOrNull
 import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
-import io.novafoundation.nova.core_db.model.chain.ChainLocal
-import io.novafoundation.nova.core_db.model.chain.ChainTransferHistoryApiLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.ApiType
+import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.SourceType
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderArguments
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi.GovernanceSection.Parameters.Polkassembly
-
-private fun mapSectionTypeLocalToSectionType(sectionType: String): Chain.ExternalApi.Section.Type = enumValueOf(sectionType)
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi
 
 fun mapStakingTypeToLocal(stakingType: Chain.Asset.StakingType): String = stakingType.name
 private fun mapStakingTypeFromLocal(stakingTypeLocal: String): Chain.Asset.StakingType = enumValueOf(stakingTypeLocal)
-
-private fun mapTransferApiAssetTypeFromLocal(localType: ChainTransferHistoryApiLocal.AssetType): Chain.ExternalApi.TransferHistoryApi.AssetType {
-    return when (localType) {
-        ChainTransferHistoryApiLocal.AssetType.SUBSTRATE -> Chain.ExternalApi.TransferHistoryApi.AssetType.SUBSTRATE
-        ChainTransferHistoryApiLocal.AssetType.EVM -> Chain.ExternalApi.TransferHistoryApi.AssetType.EVM
-        ChainTransferHistoryApiLocal.AssetType.UNSUPPORTED -> Chain.ExternalApi.TransferHistoryApi.AssetType.UNSUPPORTED
-    }
-}
-
-private fun mapTransferApiTypeFromLocal(localType: ChainTransferHistoryApiLocal.ApiType): Chain.ExternalApi.Section.Type {
-    return when (localType) {
-        ChainTransferHistoryApiLocal.ApiType.SUBQUERY -> Chain.ExternalApi.Section.Type.SUBQUERY
-        ChainTransferHistoryApiLocal.ApiType.GITHUB -> Chain.ExternalApi.Section.Type.GITHUB
-        ChainTransferHistoryApiLocal.ApiType.POLKASSEMBLY -> Chain.ExternalApi.Section.Type.POLKASSEMBLY
-        ChainTransferHistoryApiLocal.ApiType.ETHERSCAN -> Chain.ExternalApi.Section.Type.ETHERSCAN
-        ChainTransferHistoryApiLocal.ApiType.UNKNOWN -> Chain.ExternalApi.Section.Type.UNKNOWN
-    }
-}
 
 private fun mapAssetSourceFromLocal(source: AssetSourceLocal): Chain.Asset.Source {
     return when (source) {
@@ -52,35 +33,6 @@ private fun mapAssetSourceToLocal(source: Chain.Asset.Source): AssetSourceLocal 
         Chain.Asset.Source.DEFAULT -> AssetSourceLocal.DEFAULT
         Chain.Asset.Source.ERC20 -> AssetSourceLocal.ERC20
         Chain.Asset.Source.MANUAL -> AssetSourceLocal.MANUAL
-    }
-}
-
-private fun mapSectionLocalToSection(sectionLocal: ChainLocal.ExternalApi.Section?) = sectionLocal?.let {
-    Chain.ExternalApi.Section(
-        type = mapSectionTypeLocalToSectionType(sectionLocal.type),
-        url = sectionLocal.url
-    )
-}
-
-private fun mapGovernanceSectionLocalToSection(sectionLocal: ChainLocal.ExternalApi.GovernanceSection?, gson: Gson) = sectionLocal?.let {
-    Chain.ExternalApi.GovernanceSection(
-        type = mapSectionTypeLocalToSectionType(sectionLocal.type),
-        url = sectionLocal.url,
-        parameters = mapGovernanceSectionParametersFromLocal(sectionLocal, gson)
-    )
-}
-
-private fun mapGovernanceSectionParametersFromLocal(
-    sectionLocal: ChainLocal.ExternalApi.GovernanceSection?,
-    gson: Gson
-): Chain.ExternalApi.GovernanceSection.Parameters? {
-    val parameters = sectionLocal?.parameters ?: return null
-
-    return when (sectionLocal.type) {
-        Chain.ExternalApi.Section.Type.POLKASSEMBLY.toString() -> gson.fromJsonOrNull<Polkassembly>(
-            parameters
-        )
-        else -> null
     }
 }
 
@@ -174,6 +126,62 @@ fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal {
     )
 }
 
+private fun <T> ChainExternalApiLocal.ensureSourceType(
+    type: SourceType,
+    action: ChainExternalApiLocal.() -> T
+): T? {
+    return if (sourceType == type) {
+        action()
+    } else {
+        null
+    }
+}
+
+private inline fun <reified T> ChainExternalApiLocal.parsedParameters(gson: Gson): T? {
+    return parameters?.let { gson.fromJson<T>(it) }
+}
+
+private class TransferParameters(val assetType: String?)
+
+private fun mapTransferApiFromLocal(local: ChainExternalApiLocal, gson: Gson): ExternalApi.Transfers? {
+    val parameters = local.parsedParameters<TransferParameters>(gson)
+
+    return when (parameters?.assetType) {
+        null, "substrate" -> ExternalApi.Transfers.Substrate(local.url)
+        "evm" -> ExternalApi.Transfers.Evm(local.url)
+        else -> null
+    }
+}
+
+private class GovernanceReferendaParameters(val network: String?)
+
+private fun mapGovernanceReferendaApiFromLocal(local: ChainExternalApiLocal, gson: Gson): ExternalApi.GovernanceReferenda? {
+    return local.ensureSourceType(SourceType.POLKASSEMBLY) {
+        val parameters = local.parsedParameters<GovernanceReferendaParameters>(gson)
+        val source = ExternalApi.GovernanceReferenda.Source.Polkassembly(parameters?.network)
+
+        ExternalApi.GovernanceReferenda(local.url, source)
+    }
+}
+
+private fun mapExternalApiLocalToExternalApi(externalApiLocal: ChainExternalApiLocal, gson: Gson): ExternalApi? = runCatching {
+    when (externalApiLocal.apiType) {
+        ApiType.STAKING -> externalApiLocal.ensureSourceType(SourceType.SUBQUERY) {
+            ExternalApi.Staking(externalApiLocal.url)
+        }
+
+        ApiType.CROWDLOANS -> externalApiLocal.ensureSourceType(SourceType.GITHUB) {
+            ExternalApi.Crowdloans(externalApiLocal.url)
+        }
+
+        ApiType.TRANSFERS -> mapTransferApiFromLocal(externalApiLocal, gson)
+
+        ApiType.GOVERNANCE_REFERENDA -> mapGovernanceReferendaApiFromLocal(externalApiLocal, gson)
+
+        ApiType.UNKNOWN -> null
+    }
+}.getOrNull()
+
 fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
     val nodes = chainLocal.getSortedNodes().map {
         Chain.Node(
@@ -203,24 +211,8 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
         )
     }
 
-    val historyApis = chainLocal.transferHistoryApis.map {
-        Chain.ExternalApi.TransferHistoryApi(
-            assetType = mapTransferApiAssetTypeFromLocal(it.assetType),
-            apiType = mapTransferApiTypeFromLocal(it.apiType),
-            url = it.url
-        )
-    }
-
-    val externalApiLocal = chainLocal.chain.externalApi
-    val externalApi = if (externalApiLocal != null || historyApis.isNotEmpty()) {
-        Chain.ExternalApi(
-            staking = mapSectionLocalToSection(externalApiLocal?.staking),
-            history = historyApis,
-            crowdloans = mapSectionLocalToSection(externalApiLocal?.crowdloans),
-            governance = mapGovernanceSectionLocalToSection(externalApiLocal?.governance, gson)
-        )
-    } else {
-        null
+    val externalApis = chainLocal.externalApis.mapNotNull {
+        mapExternalApiLocalToExternalApi(it, gson)
     }
 
     val additional = chainLocal.chain.additional?.let { raw ->
@@ -237,7 +229,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             nodes = nodes,
             explorers = explorers,
             icon = icon,
-            externalApi = externalApi,
+            externalApis = externalApis,
             addressPrefix = prefix,
             isEthereumBased = isEthereumBased,
             isTestNet = isTestNet,

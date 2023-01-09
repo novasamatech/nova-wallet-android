@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendu
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.request.ReferendumPreviewV2Request
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.response.ReferendaPreviewV2Response
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.response.ReferendumDetailsV2Response
+import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class Gov2OffChainReferendaInfoRepository(
@@ -19,7 +20,8 @@ class Gov2OffChainReferendaInfoRepository(
 
     override suspend fun referendumPreviews(chain: Chain): List<OffChainReferendumPreview> {
         return runCatching {
-            val url = chain.requirePolkassemblyApiUrl()
+            val url = chain.polkassemblyUrlOrNull() ?: return emptyList()
+
             val request = ReferendumPreviewV2Request()
             val response = polkassemblyApi.getReferendumPreviews(url, request)
 
@@ -29,7 +31,8 @@ class Gov2OffChainReferendaInfoRepository(
 
     override suspend fun referendumDetails(referendumId: ReferendumId, chain: Chain): OffChainReferendumDetails? {
         return runCatching {
-            val url = chain.requirePolkassemblyApiUrl()
+            val url = chain.polkassemblyUrlOrNull() ?: return null
+
             val request = ReferendumDetailsV2Request(referendumId.value)
             val response = polkassemblyApi.getReferendumDetails(url, request)
             val referendumDetails = response.data.posts.firstOrNull()
@@ -81,10 +84,7 @@ class Gov2OffChainReferendaInfoRepository(
         }
     }
 
-    private fun Chain.requirePolkassemblyApiUrl(): String {
-        val governanceExternalApi = externalApi!!.governance!!
-        require(governanceExternalApi.type == Chain.ExternalApi.Section.Type.POLKASSEMBLY)
-
-        return governanceExternalApi.url
+    private fun Chain.polkassemblyUrlOrNull(): String? {
+        return externalApi<Chain.ExternalApi.GovernanceReferenda>()?.url
     }
 }
