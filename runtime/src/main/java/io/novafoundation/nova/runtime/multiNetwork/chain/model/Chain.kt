@@ -138,6 +138,8 @@ data class Chain(
                 class Polkassembly(val network: String?) : Source()
             }
         }
+
+        class GovernanceDelegations(url: String) : ExternalApi(url)
     }
 
     enum class Governance {

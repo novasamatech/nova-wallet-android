@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
@@ -103,4 +104,6 @@ interface GovernanceFeatureDependencies {
 
     @Named(REMOTE_STORAGE_SOURCE)
     fun remoteStorageDataSource(): StorageDataSource
+
+    val onChainIdentityRepository: OnChainIdentityRepository
 }

@@ -5,3 +5,5 @@ class SubQueryResponse<T>(
 )
 
 class SubQueryNodes<T>(val nodes: List<T>)
+
+class SubQueryTotalCount(val totalCount: Int)
