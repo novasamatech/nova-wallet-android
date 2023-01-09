@@ -32,6 +32,10 @@
         <attr name="chipIcon" format="reference" />
         <attr name="chipIconSize" format="dimension" />
         <attr name="android:text" />
+        <attr name="chipSize" format="enum">
+            <enum name="normal" value="0" />
+            <enum name="small" value="1" />
+        </attr>
         <attr name="android:textColor" />
         <attr name="chipTextAppearance" format="reference" />
         <attr name="backgroundColor" format="color" />
