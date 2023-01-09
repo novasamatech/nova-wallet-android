@@ -43,7 +43,7 @@ class RealDelegateMappers(
             )
 
             DelegateAccountType.ORGANIZATION -> DelegateTypeModel(
-                text = resourceManager.getString(R.string.delegation_delegate_type_individual),
+                text = resourceManager.getString(R.string.delegation_delegate_type_organization),
                 iconRes = R.drawable.ic_organization,
                 iconColorRes = R.color.organization_chip_icon,
                 textColorRes = R.color.organization_chip_icon,
