@@ -72,7 +72,7 @@ dependencies {
     implementation gsonDep
 
     implementation daggerDep
-    implementation 'androidx.webkit:webkit:1.5.0'
+
     kapt daggerKapt
 
     implementation lifecycleDep

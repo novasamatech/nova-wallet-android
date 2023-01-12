@@ -33,12 +33,6 @@ fun WebView.changeUserAgentByDesktopMode(desktopMode: Boolean) {
     val defaultUserAgent = WebSettings.getDefaultUserAgent(context)
     val userAgent = if (desktopMode) {
         "Mozilla/5.0 (X11; CrOS x86_64 10066.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
-        /*try {
-            val androidString: String = defaultUserAgent.substring(defaultUserAgent.indexOf("("), defaultUserAgent.indexOf(")") + 1)
-            defaultUserAgent.replace(androidString, "(X11; Linux x86_64)")
-        } catch (e: Exception) {
-            "Mozilla/5.0 (X11; CrOS x86_64 10066.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
-        }*/
     } else {
         defaultUserAgent
     }

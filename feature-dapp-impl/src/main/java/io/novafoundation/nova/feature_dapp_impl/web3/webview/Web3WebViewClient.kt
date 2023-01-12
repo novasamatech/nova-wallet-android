@@ -53,19 +53,11 @@ class Web3WebViewClient(
         injectors.forEach { it.initialInject(webView, extensionStore) }
     }
 
-    override fun onLoadResource(view: WebView, url: String) {
-        super.onLoadResource(view, url)
-    }
-
     override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
         tryInject(view, url)
         if (desktopMode) {
             setDesktopViewport(view)
         }
-    }
-
-    override fun onPageFinished(view: WebView, url: String) {
-        super.onPageFinished(view, url)
     }
 
     override fun onPageCommitVisible(view: WebView, url: String) {

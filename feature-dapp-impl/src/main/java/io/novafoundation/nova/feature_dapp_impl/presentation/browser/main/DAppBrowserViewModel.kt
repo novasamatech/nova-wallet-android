@@ -89,12 +89,13 @@ class DAppBrowserViewModel(
 
     val extensionsStore = extensionStoreFactory.create(hostApi = this, coroutineScope = this)
 
-    private val _userChangeDesktopModeEvent = MutableStateFlow(false)
+    private val isDesktopModeEnabledFlow = MutableStateFlow(false)
 
     val desktopModeChangedModel = currentPageAnalyzed
-        .zipWithPrevious().map { currentPage ->
+        .zipWithPrevious()
+        .map { currentPage ->
             val hostSettings = interactor.getHostSettings(currentPage.second.url)
-            val isDesktopModeEnabled = hostSettings?.isDesktopModeEnabled ?: _userChangeDesktopModeEvent.first()
+            val isDesktopModeEnabled = hostSettings?.isDesktopModeEnabled ?: isDesktopModeEnabledFlow.first()
             DesktopModeChangedEvent(isDesktopModeEnabled, currentPage.second.url)
         }
         .distinctUntilChanged()
@@ -182,7 +183,7 @@ class DAppBrowserViewModel(
             val newDesktopMode = !desktopModeChangedEvent.desktopModeEnabled
             val settings = BrowserHostSettings(Urls.normalizeUrl(desktopModeChangedEvent.url), newDesktopMode)
             interactor.saveHostSettings(settings)
-            _userChangeDesktopModeEvent.value = newDesktopMode
+            isDesktopModeEnabledFlow.value = newDesktopMode
             _browserCommandEvent.postValue(BrowserCommand.ChangeDesktopMode(newDesktopMode).event())
         }
     }

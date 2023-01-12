@@ -19,7 +19,7 @@ internal fun buildUrlToDappMapping(
     return buildMap {
         val fromFavourites = favourites.associateBy(
             keySelector = { it.url },
-            valueTransform = { favouriteToDApp(it) }
+            valueTransform = ::favouriteToDApp
         )
         putAll(fromFavourites)
 

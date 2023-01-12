@@ -27,7 +27,6 @@ class DappBrowserInteractor(
     @Suppress("BlockingMethodInNonBlockingContext")
     suspend fun observeBrowserPageFor(browserPage: BrowserPage): Flow<BrowserPageAnalyzed> {
         return favouritesDAppRepository.observeIsFavourite(browserPage.url).map { isFavourite ->
-            val desktopMode = getHostSettings(browserPage.url)
             runCatching {
                 val security = when {
                     phishingSitesRepository.isPhishing(browserPage.url) -> BrowserPageAnalyzed.Security.DANGEROUS
