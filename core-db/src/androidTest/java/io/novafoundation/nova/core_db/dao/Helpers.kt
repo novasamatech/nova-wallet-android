@@ -3,14 +3,13 @@ package io.novafoundation.nova.core_db.dao
 import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core_db.model.CurrencyLocal
-import io.novafoundation.nova.core_db.model.TokenLocal
+import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
-import java.math.BigDecimal
 
 fun createTestChain(
     id: String,
@@ -30,7 +29,7 @@ fun createTestChain(
         }
     }
 
-    return JoinedChainInfo(chain, nodes, assets, explorers = emptyList())
+    return JoinedChainInfo(chain, nodes, assets, explorers = emptyList(), transferHistoryApis = emptyList())
 }
 
 fun chainOf(
@@ -47,7 +46,8 @@ fun chainOf(
     isEthereumBased = false,
     externalApi = null,
     hasCrowdloans = false,
-    additional = ""
+    additional = "",
+    governance = "governance"
 )
 
 fun ChainLocal.nodeOf(
@@ -73,7 +73,9 @@ fun ChainLocal.assetOf(
     icon = "test",
     type = "test",
     buyProviders = "test",
-    typeExtras = null
+    typeExtras = null,
+    enabled = true,
+    source = AssetSourceLocal.DEFAULT
 )
 
 suspend fun ChainDao.addChains(chains: List<JoinedChainInfo>) {
@@ -81,7 +83,8 @@ suspend fun ChainDao.addChains(chains: List<JoinedChainInfo>) {
         chainDiff = addedDiff(chains.map(JoinedChainInfo::chain)),
         assetsDiff = addedDiff(chains.flatMap(JoinedChainInfo::assets)),
         nodesDiff = addedDiff(chains.flatMap(JoinedChainInfo::nodes)),
-        explorersDiff = addedDiff(chains.flatMap(JoinedChainInfo::explorers))
+        explorersDiff = addedDiff(chains.flatMap(JoinedChainInfo::explorers)),
+        transferApisDiff = addedDiff(chains.flatMap(JoinedChainInfo::transferHistoryApis))
     )
 }
 
@@ -92,7 +95,8 @@ suspend fun ChainDao.removeChain(joinedChainInfo: JoinedChainInfo) {
         chainDiff = removedDiff(joinedChainInfo.chain),
         assetsDiff = removedDiff(joinedChainInfo.assets),
         nodesDiff = removedDiff(joinedChainInfo.nodes),
-        explorersDiff = removedDiff(joinedChainInfo.explorers)
+        explorersDiff = removedDiff(joinedChainInfo.explorers),
+        transferApisDiff = removedDiff(joinedChainInfo.transferHistoryApis)
     )
 }
 
@@ -101,20 +105,23 @@ suspend fun ChainDao.updateChain(joinedChainInfo: JoinedChainInfo) {
         chainDiff = updatedDiff(joinedChainInfo.chain),
         assetsDiff = updatedDiff(joinedChainInfo.assets),
         nodesDiff = updatedDiff(joinedChainInfo.nodes),
-        explorersDiff = updatedDiff(joinedChainInfo.explorers)
+        explorersDiff = updatedDiff(joinedChainInfo.explorers),
+        transferApisDiff = updatedDiff(joinedChainInfo.transferHistoryApis)
     )
 }
 
 fun <T> addedDiff(elements: List<T>) = CollectionDiffer.Diff(
     added = elements,
     updated = emptyList(),
-    removed = emptyList()
+    removed = emptyList(),
+    all = elements
 )
 
 fun <T> updatedDiff(elements: List<T>) = CollectionDiffer.Diff(
     added = emptyList(),
     updated = elements,
-    removed = emptyList()
+    removed = emptyList(),
+    all = elements
 )
 
 fun <T> updatedDiff(element: T) = updatedDiff(listOf(element))
@@ -126,10 +133,11 @@ fun <T> removedDiff(element: T) = removedDiff(listOf(element))
 fun <T> removedDiff(elements: List<T>) = CollectionDiffer.Diff(
     added = emptyList(),
     updated = emptyList(),
-    removed = elements
+    removed = elements,
+    all = elements
 )
 
-fun <T> emptyDiff() = CollectionDiffer.Diff<T>(emptyList(), emptyList(), emptyList())
+fun <T> emptyDiff() = CollectionDiffer.Diff<T>(emptyList(), emptyList(), emptyList(), emptyList())
 
 fun testMetaAccount(name: String = "Test") = MetaAccountLocal(
     substratePublicKey = byteArrayOf(),

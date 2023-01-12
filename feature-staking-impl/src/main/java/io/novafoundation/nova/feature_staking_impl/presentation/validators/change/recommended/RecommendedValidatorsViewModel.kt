@@ -80,7 +80,6 @@ class RecommendedValidatorsViewModel(
     fun nextClicked() {
         viewModelScope.launch {
             sharedStateSetup.setRecommendedValidators(recommendedValidators.first())
-
             router.openConfirmStaking()
         }
     }

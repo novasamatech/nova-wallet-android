@@ -64,6 +64,16 @@
         app:popUpTo="@id/main_nav_graph" />
 
     <action
+        android:id="@+id/action_pin_code_access_recovery"
+        app:destination="@id/pincodeFragment"
+        app:enterAnim="@anim/fragment_close_enter"
+        app:exitAnim="@anim/fragment_close_exit"
+        app:launchSingleTop="true"
+        app:popEnterAnim="@anim/fragment_open_enter"
+        app:popExitAnim="@anim/fragment_open_exit"
+        app:popUpTo="@id/main_nav_graph" />
+
+    <action
         android:id="@+id/finish_export_flow"
         app:enterAnim="@anim/fragment_close_enter"
         app:exitAnim="@anim/fragment_close_exit"
@@ -175,7 +185,7 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            android:id="@+id/action_mainFragment_to_pinCodeFragment"
+            android:id="@+id/action_change_pin_code"
             app:destination="@id/pincodeFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
