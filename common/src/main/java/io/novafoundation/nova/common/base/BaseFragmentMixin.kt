@@ -52,14 +52,6 @@ interface BaseFragmentMixin<T : BaseViewModel> : WithContextExtensions {
         }
     }
 
-    fun buildErrorDialog(title: String, errorMessage: String?): AlertDialog {
-        return BaseAlertDialogBuilder(ContextThemeWrapper(fragment.requireContext(), R.style.WhiteOverlay))
-            .setTitle(title)
-            .setMessage(errorMessage)
-            .setPositiveButton(R.string.common_ok) { _, _ -> }
-            .create()
-    }
-
     fun showMessage(text: String) {
         Toast.makeText(fragment.requireContext(), text, Toast.LENGTH_SHORT)
             .show()
