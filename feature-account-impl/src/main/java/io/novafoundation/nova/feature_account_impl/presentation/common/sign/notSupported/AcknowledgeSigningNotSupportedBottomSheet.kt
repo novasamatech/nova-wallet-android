@@ -17,9 +17,6 @@ class AcknowledgeSigningNotSupportedBottomSheet(
 ),
     DialogExtensions {
 
-    override val dialogInterface: DialogInterface
-        get() = this
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

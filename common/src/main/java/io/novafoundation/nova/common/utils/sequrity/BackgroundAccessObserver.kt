@@ -10,12 +10,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 class BackgroundAccessObserver(
     private val preferences: Preferences,
-    private val accessTimeInBackground: Long = DEFAULT_ACCESS_TIME
+    private val accessTimeInBackground: Long = 1L//DEFAULT_ACCESS_TIME
 ) : DefaultLifecycleObserver, CoroutineScope {
 
     companion object {
@@ -31,19 +32,20 @@ class BackgroundAccessObserver(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 
-    private val _requestAccessFlow = MutableStateFlow(State.NOTHING)
+    private val _stateFlow = MutableStateFlow(State.NOTHING)
 
-    val stateFlow: Flow<State> = _requestAccessFlow
+    val requestAccessFlow: Flow<State> = _stateFlow
+        .filter { it == State.REQUEST_ACCESS }
 
     val currentState: State
-        get() = _requestAccessFlow.value
+        get() = _stateFlow.value
 
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
 
     fun onAccessed() {
-        _requestAccessFlow.value = State.NOTHING
+        _stateFlow.value = State.NOTHING
         preferences.removeField(PREFS_ON_PAUSE_TIME)
     }
 
@@ -67,10 +69,10 @@ class BackgroundAccessObserver(
 
     private fun notifyEveryone() {
         launch {
-            if (_requestAccessFlow.value == State.REQUEST_ACCESS) {
-                _requestAccessFlow.emit(State.REQUEST_ACCESS)
+            if (_stateFlow.value == State.REQUEST_ACCESS) {
+                _stateFlow.emit(State.REQUEST_ACCESS)
             } else {
-                _requestAccessFlow.value = State.REQUEST_ACCESS
+                _stateFlow.value = State.REQUEST_ACCESS
             }
         }
     }

@@ -8,6 +8,7 @@ import androidx.annotation.LayoutRes
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.novafoundation.nova.common.utils.DialogExtensions
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation
 import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmDAppActionAllow
@@ -17,10 +18,7 @@ import kotlinx.android.synthetic.main.bottom_sheet_confirm_dapp_action.confirmIn
 abstract class ConfirmDAppActionBottomSheet<A : DappPendingConfirmation.Action>(
     context: Context,
     protected val confirmation: DappPendingConfirmation<A>,
-) : BottomSheetDialog(context, R.style.BottomSheetDialog), DialogExtensions {
-
-    final override val dialogInterface: DialogInterface
-        get() = this
+) : BaseBottomSheet(context), DialogExtensions {
 
     @get:LayoutRes
     abstract val contentLayoutRes: Int

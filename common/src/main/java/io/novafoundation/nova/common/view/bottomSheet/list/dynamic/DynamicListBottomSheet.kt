@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.DialogExtensions
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetContent
 import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetHeader
 import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetItemContainer
@@ -34,12 +35,9 @@ class ReferentialEqualityDiffCallBack<T> : DiffUtil.ItemCallback<T>() {
 }
 
 abstract class BaseDynamicListBottomSheet(context: Context) :
-    BottomSheetDialog(context, R.style.BottomSheetDialog),
+    BaseBottomSheet(context, R.style.BottomSheetDialog),
     WithContextExtensions by WithContextExtensions(context),
     DialogExtensions {
-
-    override val dialogInterface: DialogInterface
-        get() = this
 
     protected val container: LinearLayout
         get() = dynamicListSheetItemContainer

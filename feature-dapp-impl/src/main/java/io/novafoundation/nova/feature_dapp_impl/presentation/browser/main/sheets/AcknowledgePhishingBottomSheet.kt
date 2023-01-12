@@ -14,11 +14,7 @@ class AcknowledgePhishingBottomSheet(
 ) : ActionNotAllowedBottomSheet(
     context = context,
     onSuccess = { confirmation.onConfirm() }
-),
-    DialogExtensions {
-
-    override val dialogInterface: DialogInterface
-        get() = this
+) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

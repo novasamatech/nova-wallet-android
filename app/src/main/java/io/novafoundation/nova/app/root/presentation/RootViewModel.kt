@@ -40,8 +40,7 @@ class RootViewModel(
             .onEach { handleUpdatesSideEffect(it) }
             .launchIn(this)
 
-        backgroundAccessObserver.stateFlow
-            .filter { it == REQUEST_ACCESS }
+        backgroundAccessObserver.requestAccessFlow
             .onEach { verifyUserIfNeed() }
             .launchIn(this)
 
