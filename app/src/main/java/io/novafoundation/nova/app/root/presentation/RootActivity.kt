@@ -1,7 +1,10 @@
 package io.novafoundation.nova.app.root.presentation
 
 import android.content.Intent
+import android.content.pm.ActivityInfo.WindowLayout
 import android.os.Bundle
+import android.view.Window
+import android.view.WindowManager
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import io.novafoundation.nova.app.R

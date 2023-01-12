@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.switchmaterial.SwitchMaterial
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemSheetSwitcher"
+    style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:drawableStart="@drawable/ic_desktop"
+    android:drawablePadding="12dp"
+    android:drawableTint="@color/icon_primary"
+    android:minHeight="52dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:text="@string/dapp_options_desktop_mode"
+    android:textColor="@color/text_primary" />

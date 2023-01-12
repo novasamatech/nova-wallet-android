@@ -15,13 +15,11 @@ internal fun buildUrlToDappMapping(
     favourites: List<FavouriteDApp>
 ): Map<String, DApp> {
     val favouritesUrls: Set<String> = favourites.mapToSet { it.url }
-    val desktopOnlyUrls: Set<String> = dAppMetadatas.filter { it.desktopOnly }
-        .mapToSet { it.url }
 
     return buildMap {
         val fromFavourites = favourites.associateBy(
             keySelector = { it.url },
-            valueTransform = { favouriteToDApp(it, it.url in desktopOnlyUrls) }
+            valueTransform = { favouriteToDApp(it) }
         )
         putAll(fromFavourites)
 
@@ -34,14 +32,13 @@ internal fun buildUrlToDappMapping(
     }
 }
 
-private fun favouriteToDApp(favouriteDApp: FavouriteDApp, isDesktopOnly: Boolean): DApp {
+private fun favouriteToDApp(favouriteDApp: FavouriteDApp): DApp {
     return DApp(
         name = favouriteDApp.label,
         description = favouriteDApp.url,
         iconLink = favouriteDApp.icon,
         url = favouriteDApp.url,
-        isFavourite = true,
-        desktopOnly = isDesktopOnly
+        isFavourite = true
     )
 }
 
@@ -51,7 +48,6 @@ private fun dAppMetadataToDApp(metadata: DappMetadata, isFavourite: Boolean): DA
         description = mapDappCategoriesToDescription(metadata.categories),
         iconLink = metadata.iconLink,
         url = metadata.url,
-        isFavourite = isFavourite,
-        desktopOnly = metadata.desktopOnly
+        isFavourite = isFavourite
     )
 }

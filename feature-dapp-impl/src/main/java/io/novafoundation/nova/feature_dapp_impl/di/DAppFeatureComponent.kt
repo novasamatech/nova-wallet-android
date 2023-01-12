@@ -13,8 +13,6 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.di.
 import io.novafoundation.nova.feature_dapp_impl.presentation.authorizedDApps.di.AuthorizedDAppsComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.extrinsicDetails.di.DAppExtrinsicDetailsComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.di.DAppBrowserComponent
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsCommunicator
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.di.DAppOptionsComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.di.DAppSignComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.di.MainDAppComponent
@@ -50,8 +48,6 @@ interface DAppFeatureComponent : DAppFeatureApi {
 
     fun authorizedDAppsComponentFactory(): AuthorizedDAppsComponent.Factory
 
-    fun dappOptionsComponentFactory(): DAppOptionsComponent.Factory
-
     @Component.Factory
     interface Factory {
 
@@ -59,7 +55,6 @@ interface DAppFeatureComponent : DAppFeatureApi {
             @BindsInstance router: DAppRouter,
             @BindsInstance signCommunicator: DAppSignCommunicator,
             @BindsInstance searchCommunicator: DAppSearchCommunicator,
-            @BindsInstance dAppOptionsCommunicator: DAppOptionsCommunicator,
             deps: DAppFeatureDependencies
         ): DAppFeatureComponent
     }

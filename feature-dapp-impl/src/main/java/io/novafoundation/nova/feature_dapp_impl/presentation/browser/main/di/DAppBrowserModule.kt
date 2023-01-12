@@ -10,14 +10,16 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
+import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserHostSettingsRepository
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRepository
+import io.novafoundation.nova.feature_dapp_impl.data.repository.RealBrowserHostSettingsRepository
+import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserViewModel
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
@@ -28,14 +30,20 @@ class DAppBrowserModule {
 
     @Provides
     @ScreenScope
+    fun provideBrowserHostSettingsRepository(
+        browserHostSettingsDao: BrowserHostSettingsDao
+    ): BrowserHostSettingsRepository = RealBrowserHostSettingsRepository(browserHostSettingsDao)
+
+    @Provides
+    @ScreenScope
     fun provideInteractor(
         phishingSitesRepository: PhishingSitesRepository,
         favouritesDAppRepository: FavouritesDAppRepository,
-        dAppMetadataRepository: DAppMetadataRepository
+        browserHostSettingsRepository: BrowserHostSettingsRepository
     ) = DappBrowserInteractor(
         phishingSitesRepository = phishingSitesRepository,
         favouritesDAppRepository = favouritesDAppRepository,
-        dAppMetadataRepository = dAppMetadataRepository
+        browserHostSettingsRepository = browserHostSettingsRepository
     )
 
     @Provides
@@ -58,19 +66,21 @@ class DAppBrowserModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         signRequester: DAppSignCommunicator,
         searchRequester: DAppSearchCommunicator,
-        dAppOptionsCommunicator: DAppOptionsCommunicator,
         initialUrl: String,
         extensionStoreFactory: ExtensionStoreFactory,
+        dAppInteractor: DappInteractor,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
         return DAppBrowserViewModel(
             router = router,
             interactor = interactor,
+            dAppInteractor = dAppInteractor,
             selectedAccountUseCase = selectedAccountUseCase,
             signRequester = signRequester,
             dAppSearchRequester = searchRequester,
-            dAppOptionsRequester = dAppOptionsCommunicator,
             initialUrl = initialUrl,
-            extensionStoreFactory = extensionStoreFactory
+            extensionStoreFactory = extensionStoreFactory,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory
         )
     }
 }

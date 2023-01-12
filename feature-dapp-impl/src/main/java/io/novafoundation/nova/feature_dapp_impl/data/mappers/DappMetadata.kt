@@ -24,7 +24,6 @@ fun mapDAppMetadataResponseToDAppMetadatas(
             url = it.url,
             baseUrl = Urls.normalizeUrl(it.url),
             categories = it.categories.mapNotNullTo(mutableSetOf(), categories::get),
-            desktopOnly = it.desktopOnly ?: false
         )
     }
 }
@@ -38,7 +37,6 @@ fun mapDappToDappModel(dApp: DApp) = with(dApp) {
         iconUrl = iconLink,
         url = url,
         isFavourite = isFavourite,
-        desktopOnly = desktopOnly
     )
 }
 
@@ -49,6 +47,5 @@ fun mapDappModelToDApp(dApp: DappModel) = with(dApp) {
         iconLink = iconUrl,
         url = url,
         isFavourite = isFavourite,
-        desktopOnly = desktopOnly
     )
 }

@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.BuildConfig
 fun WebView.injectWeb3(
     progressBar: ProgressBar,
     fileChooser: WebViewFileChooser,
-    webViewClient: Web3WebViewClient
+    web3Client: Web3WebViewClient
 ) {
     settings.javaScriptEnabled = true
     settings.cacheMode = WebSettings.LOAD_DEFAULT
@@ -21,24 +21,24 @@ fun WebView.injectWeb3(
     settings.domStorageEnabled = true
     settings.javaScriptCanOpenWindowsAutomatically = true
 
-    webViewClient.initialInject()
-    this.webViewClient = webViewClient
+    web3Client.initialInject()
+    this.webViewClient = web3Client
     webChromeClient = Web3ChromeClient(fileChooser, progressBar)
 
     WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
     settings.userAgentString = modifyUserAgent(settings.userAgentString)
-    reload()
 }
 
-fun WebView.setDesktopMode(desktopMode: Boolean) {
+fun WebView.changeUserAgentByDesktopMode(desktopMode: Boolean) {
     val defaultUserAgent = WebSettings.getDefaultUserAgent(context)
     val userAgent = if (desktopMode) {
-        try {
+        "Mozilla/5.0 (X11; CrOS x86_64 10066.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+        /*try {
             val androidString: String = defaultUserAgent.substring(defaultUserAgent.indexOf("("), defaultUserAgent.indexOf(")") + 1)
-            defaultUserAgent.replace(androidString, "X11; Linux x86_64")
+            defaultUserAgent.replace(androidString, "(X11; Linux x86_64)")
         } catch (e: Exception) {
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
-        }
+            "Mozilla/5.0 (X11; CrOS x86_64 10066.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+        }*/
     } else {
         defaultUserAgent
     }
@@ -49,7 +49,6 @@ fun WebView.setDesktopMode(desktopMode: Boolean) {
 fun WebView.uninjectWeb3() {
     settings.javaScriptEnabled = false
 
-    webChromeClient = null
     webChromeClient = null
 }
 

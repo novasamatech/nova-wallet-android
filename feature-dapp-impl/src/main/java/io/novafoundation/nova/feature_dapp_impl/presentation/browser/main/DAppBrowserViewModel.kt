@@ -3,23 +3,27 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.event
-import io.novafoundation.nova.common.utils.filterWithPrevious
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
-import io.novafoundation.nova.common.utils.toggle
+import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_dapp_api.data.model.BrowserHostSettings
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsCommunicator
+import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.awaitConfirmation
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.RemoveFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session.Authorization.State
@@ -31,12 +35,12 @@ import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxReq
 import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,12 +57,15 @@ class DAppBrowserViewModel(
     private val router: DAppRouter,
     private val signRequester: DAppSignRequester,
     private val extensionStoreFactory: ExtensionStoreFactory,
+    private val dAppInteractor: DappInteractor,
     private val interactor: DappBrowserInteractor,
     private val dAppSearchRequester: DAppSearchRequester,
-    private val dAppOptionsRequester: DAppOptionsRequester,
     private val initialUrl: String,
-    private val selectedAccountUseCase: SelectedAccountUseCase
+    private val selectedAccountUseCase: SelectedAccountUseCase,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 ) : BaseViewModel(), Web3StateMachineHost {
+
+    val removeFromFavouritesConfirmation = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
 
     private val _showConfirmationDialog = MutableLiveData<Event<DappPendingConfirmation<*>>>()
     val showConfirmationSheet = _showConfirmationDialog
@@ -74,18 +81,23 @@ class DAppBrowserViewModel(
 
     override val externalEvents = singleReplaySharedFlow<ExternalEvent>()
 
-    private val _browserNavigationCommandEvent = MutableLiveData<Event<BrowserNavigationCommand>>()
-    val browserNavigationCommandEvent: LiveData<Event<BrowserNavigationCommand>> = _browserNavigationCommandEvent
+    private val _browserCommandEvent = MutableLiveData<Event<BrowserCommand>>()
+    val browserCommandEvent: LiveData<Event<BrowserCommand>> = _browserCommandEvent
+
+    private val _openBrowserOptionsEvent = MutableLiveData<Event<DAppOptionsPayload>>()
+    val openBrowserOptionsEvent: LiveData<Event<DAppOptionsPayload>> = _openBrowserOptionsEvent
 
     val extensionsStore = extensionStoreFactory.create(hostApi = this, coroutineScope = this)
 
-    private val _userOptionDesktopMode = MutableStateFlow(false)
+    private val _userChangeDesktopModeEvent = MutableStateFlow(false)
 
-    val desktopModeChangedModel = combine(_userOptionDesktopMode, currentPageAnalyzed) { userDesktopMode, currentPage ->
-        val isDesktopModeEnabled = userDesktopMode || currentPage.desktopOnly
-        DesktopModeChangedEvent(isDesktopModeEnabled, currentPage.url)
-    }
-        .filterWithPrevious { old, new -> old?.desktopModeEnabled != new.desktopModeEnabled }
+    val desktopModeChangedModel = currentPageAnalyzed
+        .zipWithPrevious().map { currentPage ->
+            val hostSettings = interactor.getHostSettings(currentPage.second.url)
+            val isDesktopModeEnabled = hostSettings?.isDesktopModeEnabled ?: _userChangeDesktopModeEvent.first()
+            DesktopModeChangedEvent(isDesktopModeEnabled, currentPage.second.url)
+        }
+        .distinctUntilChanged()
         .shareInBackground()
 
     init {
@@ -94,8 +106,6 @@ class DAppBrowserViewModel(
             .launchIn(this)
 
         watchDangerousWebsites()
-
-        listenOptionsChange()
 
         forceLoad(initialUrl)
     }
@@ -120,7 +130,7 @@ class DAppBrowserViewModel(
     }
 
     override fun reloadPage() {
-        _browserNavigationCommandEvent.postValue(BrowserNavigationCommand.Reload.event())
+        _browserCommandEvent.postValue(BrowserCommand.Reload.event())
     }
 
     fun onPageChanged(url: String, title: String?) {
@@ -144,18 +154,37 @@ class DAppBrowserViewModel(
     fun onMoreClicked() {
         launch {
             val payload = getCurrentPageOptionsPayload()
-            dAppOptionsRequester.openRequest(payload)
+            _openBrowserOptionsEvent.value = Event(payload)
         }
     }
 
-    private fun listenOptionsChange() {
-        dAppOptionsRequester.responseFlow
-            .onEach {
-                when (it) {
-                    DAppOptionsCommunicator.Response.DesktopModeClick -> _userOptionDesktopMode.toggle()
-                }
+    fun onFavoriteClick(optionsPayload: DAppOptionsPayload) {
+        launch {
+            if (optionsPayload.isFavorite) {
+                removeFromFavouritesConfirmation.awaitAction(optionsPayload.currentPageTitle)
+
+                dAppInteractor.removeDAppFromFavourites(optionsPayload.url)
+            } else {
+                val payload = AddToFavouritesPayload(
+                    url = optionsPayload.url,
+                    label = optionsPayload.currentPageTitle,
+                    iconLink = null
+                )
+
+                router.openAddToFavourites(payload)
             }
-            .launchIn(this)
+        }
+    }
+
+    fun onDesktopClick() {
+        launch {
+            val desktopModeChangedEvent = desktopModeChangedModel.first()
+            val newDesktopMode = !desktopModeChangedEvent.desktopModeEnabled
+            val settings = BrowserHostSettings(Urls.normalizeUrl(desktopModeChangedEvent.url), newDesktopMode)
+            interactor.saveHostSettings(settings)
+            _userChangeDesktopModeEvent.value = newDesktopMode
+            _browserCommandEvent.postValue(BrowserCommand.ChangeDesktopMode(newDesktopMode).event())
+        }
     }
 
     private fun watchDangerousWebsites() {
@@ -173,7 +202,7 @@ class DAppBrowserViewModel(
     }
 
     private fun forceLoad(url: String) {
-        _browserNavigationCommandEvent.value = BrowserNavigationCommand.OpenUrl(url).event()
+        _browserCommandEvent.value = BrowserCommand.OpenUrl(url).event()
 
         updateCurrentPage(url, title = null, synchronizedWithBrowser = false)
     }
@@ -186,7 +215,6 @@ class DAppBrowserViewModel(
             currentPageTitle,
             isCurrentPageFavorite,
             isDesktopModeEnabled = desktopModeChangedModel.first().desktopModeEnabled,
-            isDesktopModeOnly = currentPageAnalyzed.first().desktopOnly,
             url = page.url
         )
     }

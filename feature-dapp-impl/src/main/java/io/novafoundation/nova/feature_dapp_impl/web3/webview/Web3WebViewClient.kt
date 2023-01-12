@@ -2,17 +2,13 @@ package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
 import android.graphics.Bitmap
 import android.net.Uri
-import android.view.KeyEvent
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionsStore
-import okhttp3.internal.userAgent
 
 interface Web3Injector {
 
@@ -44,22 +40,39 @@ class Web3WebViewClient(
 ) : WebViewClient() {
 
     var desktopMode: Boolean = false
+        set(value) {
+            if (value) {
+                setDesktopViewport(webView)
+            }
+            desktopModeChanged = field != value
+            field = value
+        }
+    var desktopModeChanged = false
 
     fun initialInject() {
         injectors.forEach { it.initialInject(webView, extensionStore) }
     }
 
+    override fun onLoadResource(view: WebView, url: String) {
+        super.onLoadResource(view, url)
+    }
 
     override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-        tryInject(webView, url)
+        tryInject(view, url)
         if (desktopMode) {
-            val density = webView.context.resources.displayMetrics.density
-            val deviceWidth = view.measuredWidth
-            val scale = (deviceWidth / density) / 1100
-            view.evaluateJavascript(
-                "document.querySelector('meta[name=\"viewport\"]').setAttribute('content', 'width=1100px, initial-scale=$scale');",
-                null
-            )
+            setDesktopViewport(view)
+        }
+    }
+
+    override fun onPageFinished(view: WebView, url: String) {
+        super.onPageFinished(view, url)
+    }
+
+    override fun onPageCommitVisible(view: WebView, url: String) {
+        super.onPageCommitVisible(view, url)
+        if (desktopModeChanged) {
+            webView.changeUserAgentByDesktopMode(desktopMode)
+            desktopModeChanged = false
         }
     }
 
@@ -68,6 +81,16 @@ class Web3WebViewClient(
     }
 
     private fun tryInject(view: WebView, url: String) = injectors.forEach { it.injectForPage(view, url, extensionStore) }
+
+    private fun setDesktopViewport(webView: WebView) {
+        val density = webView.context.resources.displayMetrics.density
+        val deviceWidth = webView.measuredWidth
+        val scale = (deviceWidth / density) / 1100
+        webView.evaluateJavascript(
+            "document.querySelector('meta[name=\"viewport\"]').setAttribute('content', 'width=device-width, initial-scale=$scale');",
+            null
+        )
+    }
 }
 
 private const val MAX_PROGRESS = 100

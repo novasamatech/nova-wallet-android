@@ -17,7 +17,5 @@ interface DAppRouter {
 
     fun openAuthorizedDApps()
 
-    fun openDAppOptions(payload: DAppOptionsPayload)
-
     fun back()
 }

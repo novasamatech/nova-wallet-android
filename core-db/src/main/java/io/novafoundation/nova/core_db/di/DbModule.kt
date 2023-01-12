@@ -8,6 +8,7 @@ import io.novafoundation.nova.core_db.AppDatabase
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
+import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
@@ -155,5 +156,11 @@ class DbModule {
     @ApplicationScope
     fun provideGovernanceDAppDao(appDatabase: AppDatabase): GovernanceDAppsDao {
         return appDatabase.governanceDAppsDao()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideBrowserHostSettingsDao(appDatabase: AppDatabase): BrowserHostSettingsDao {
+        return appDatabase.browserHostSettingsDao()
     }
 }

@@ -20,24 +20,27 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.isSecure
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.AcknowledgePhishingBottomSheet
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.ConfirmAuthorizeBottomSheet
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.OptionsBottomSheetDialog
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClient
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.setDesktopMode
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.uninjectWeb3
+import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBar
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBarGroup
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserBack
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserClose
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserMore
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserForward
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserMore
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserProgress
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserRefresh
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebView
-import javax.inject.Inject
 
-class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
+class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomSheetDialog.Callback {
 
     companion object {
 
@@ -57,6 +60,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
 
     @Inject
     lateinit var fileChooser: WebViewFileChooser
+
+    private var webViewClient: Web3WebViewClient? = null
 
     var backCallback: OnBackPressedCallback? = null
 
@@ -118,18 +123,17 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
 
     @Suppress("UNCHECKED_CAST")
     override fun subscribe(viewModel: DAppBrowserViewModel) {
-        val webViewClient = web3WebViewClientFactory.create(dappBrowserWebView, viewModel.extensionsStore, viewModel::onPageChanged)
+        setupRemoveFavouritesConfirmation(viewModel.removeFromFavouritesConfirmation)
 
+        webViewClient = web3WebViewClientFactory.create(dappBrowserWebView, viewModel.extensionsStore, viewModel::onPageChanged)
         dappBrowserWebView.injectWeb3(
             progressBar = dappBrowserProgress,
             fileChooser = fileChooser,
-            webViewClient = webViewClient
+            web3Client = webViewClient!!
         )
 
         viewModel.desktopModeChangedModel.observe {
-            webViewClient.desktopMode = it.desktopModeEnabled
-            dappBrowserWebView.setDesktopMode(it.desktopModeEnabled)
-            dappBrowserWebView.loadUrl(it.url)
+            webViewClient?.desktopMode = it.desktopModeEnabled
         }
 
         viewModel.showConfirmationSheet.observeEvent {
@@ -145,12 +149,21 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
             }
         }
 
-        viewModel.browserNavigationCommandEvent.observeEvent {
+        viewModel.browserCommandEvent.observeEvent {
             when (it) {
-                BrowserNavigationCommand.GoBack -> backClicked()
-                is BrowserNavigationCommand.OpenUrl -> dappBrowserWebView.loadUrl(it.url)
-                BrowserNavigationCommand.Reload -> dappBrowserWebView.reload()
+                BrowserCommand.Reload -> dappBrowserWebView.reload()
+                BrowserCommand.GoBack -> backClicked()
+                is BrowserCommand.OpenUrl -> dappBrowserWebView.loadUrl(it.url)
+                is BrowserCommand.ChangeDesktopMode -> {
+                    webViewClient?.desktopMode = it.enabled
+                    dappBrowserWebView.reload()
+                }
             }
+        }
+
+        viewModel.openBrowserOptionsEvent.observeEvent {
+            val optionsBottomSheet = OptionsBottomSheetDialog(requireContext(), this, it)
+            optionsBottomSheet.show()
         }
 
         viewModel.currentPageAnalyzed.observe {
@@ -217,5 +230,13 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
     private fun detachBackCallback() {
         backCallback?.remove()
         backCallback = null
+    }
+
+    override fun onFavoriteClick(payload: DAppOptionsPayload) {
+        viewModel.onFavoriteClick(payload)
+    }
+
+    override fun onDesktopModeClick() {
+        viewModel.onDesktopClick()
     }
 }

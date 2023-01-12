@@ -28,8 +28,12 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            android:id="@+id/action_DAppBrowserFragment_to_dappOptionsFragment"
-            app:destination="@id/dappOptionsFragment" />
+            android:id="@+id/action_DAppBrowserFragment_to_addToFavouritesFragment"
+            app:destination="@id/addToFavouritesFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -49,22 +53,6 @@
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.extrinsicDetails.DappExtrinsicDetailsFragment"
         android:label="ExtrinsicDetailsFragment"
         tools:layout="@layout/fragment_dapp_extrinsic_details" />
-
-    <dialog
-        android:id="@+id/dappOptionsFragment"
-        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsBottomSheet"
-        android:label="DAppOptionsBottomSheet"
-        tools:layout="@layout/fragment_dapps_options">
-
-        <action
-            android:id="@+id/action_DAppOptionsFragment_to_addToFavouritesFragment"
-            app:destination="@id/addToFavouritesFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-    </dialog>
 
     <fragment
         android:id="@+id/dappSearchFragment"

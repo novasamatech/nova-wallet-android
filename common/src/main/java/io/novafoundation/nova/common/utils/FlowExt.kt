@@ -306,12 +306,6 @@ fun MutableStateFlow<Boolean>.toggle() {
     value = !value
 }
 
-inline fun <T> Flow<T>.filterWithPrevious(crossinline predicate: suspend (old: T?, new: T) -> Boolean): Flow<T> {
-    return this.zipWithPrevious()
-        .filter { oldAndNew -> predicate(oldAndNew.first, oldAndNew.second) }
-        .map { it.second }
-}
-
 fun <T> flowOf(producer: suspend () -> T) = flow {
     emit(producer())
 }

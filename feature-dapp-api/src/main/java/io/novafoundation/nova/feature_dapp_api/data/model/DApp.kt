@@ -5,6 +5,5 @@ class DApp(
     val description: String,
     val iconLink: String?,
     val url: String,
-    val isFavourite: Boolean,
-    val desktopOnly: Boolean
+    val isFavourite: Boolean
 )
