@@ -21,4 +21,3 @@ fun BaseFragmentMixin<*>.setupRemoveFavouritesConfirmation(awaitableMixin: Confi
         }
     }
 }
-

@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl
 
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
 
 interface DAppRouter {
 

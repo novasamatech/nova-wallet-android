@@ -28,7 +28,6 @@ class RealDAppMetadataRepository(
         val dappMetadatas = mapDAppMetadataResponseToDAppMetadatas(response)
         syncHostSettings(response.dapps)
         dappMetadatasFlow.emit(dappMetadatas)
-
     }
 
     override suspend fun getDAppMetadata(baseUrl: String): DappMetadata? {

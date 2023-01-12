@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.Add
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.extrinsicDetails.DappExtrinsicDetailsFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DappSearchFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
 

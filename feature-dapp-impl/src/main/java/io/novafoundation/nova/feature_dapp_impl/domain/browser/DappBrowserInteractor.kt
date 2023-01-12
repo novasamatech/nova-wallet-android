@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.isSecure
 import io.novafoundation.nova.feature_dapp_api.data.model.BrowserHostSettings
 import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserHostSettingsRepository
-import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRepository
 import kotlinx.coroutines.flow.Flow
