@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported
 
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import io.novafoundation.nova.common.utils.DialogExtensions
 import io.novafoundation.nova.common.view.bottomSheet.ActionNotAllowedBottomSheet

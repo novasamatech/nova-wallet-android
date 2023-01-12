@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets
 
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
-import io.novafoundation.nova.common.utils.DialogExtensions
 import io.novafoundation.nova.common.view.bottomSheet.ActionNotAllowedBottomSheet
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation

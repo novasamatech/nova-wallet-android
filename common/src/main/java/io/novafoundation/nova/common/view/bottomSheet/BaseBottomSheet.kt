@@ -15,8 +15,10 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlin.coroutines.CoroutineContext
 
-abstract class BaseBottomSheet(context: Context, style: Int = R.style.BottomSheetDialog) : BottomSheetDialog(context, style),
-    DialogExtensions, CoroutineScope {
+abstract class BaseBottomSheet(context: Context, style: Int = R.style.BottomSheetDialog) :
+    BottomSheetDialog(context, style),
+    DialogExtensions,
+    CoroutineScope {
 
     private val backgroundAccessObserver: BackgroundAccessObserver
 
