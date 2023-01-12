@@ -2,12 +2,10 @@ package io.novafoundation.nova.common.base
 
 import android.content.Context
 import android.os.Bundle
-import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,7 +15,6 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.view.dialog.BaseAlertDialogBuilder
 import io.novafoundation.nova.common.view.dialog.dialog
 import kotlinx.coroutines.flow.Flow
 
