@@ -26,26 +26,20 @@ fun WebView.injectWeb3(
     webChromeClient = Web3ChromeClient(fileChooser, progressBar)
 
     WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
-    settings.userAgentString = modifyUserAgent(settings.userAgentString)
 }
 
 fun WebView.changeUserAgentByDesktopMode(desktopMode: Boolean) {
     val defaultUserAgent = WebSettings.getDefaultUserAgent(context)
-    val userAgent = if (desktopMode) {
+
+    settings.userAgentString = if (desktopMode) {
         "Mozilla/5.0 (X11; CrOS x86_64 10066.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
     } else {
         defaultUserAgent
     }
-
-    settings.userAgentString = modifyUserAgent(userAgent)
 }
 
 fun WebView.uninjectWeb3() {
     settings.javaScriptEnabled = false
 
     webChromeClient = null
-}
-
-private fun modifyUserAgent(userAgent: String): String {
-    return "$userAgent NovaWallet(Platform=Android)"
 }
