@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.view.dialog
 import android.content.Context
 import android.view.ContextThemeWrapper
 import androidx.annotation.StringRes
+import androidx.annotation.StyleRes
 import androidx.appcompat.app.AlertDialog
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.themed
@@ -13,9 +14,10 @@ typealias DialogDecorator = AlertDialog.Builder.() -> Unit
 
 inline fun dialog(
     context: Context,
+    @StyleRes style: Int = R.style.WhiteOverlay,
     decorator: DialogDecorator
 ) {
-    val builder = AlertDialog.Builder(ContextThemeWrapper(context, R.style.WhiteOverlay))
+    val builder = AlertDialog.Builder(ContextThemeWrapper(context, style))
         .setCancelable(false)
 
     builder.decorator()

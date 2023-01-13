@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="common_enable">Enable</string>
+    <string name="settings_safe_mode_confirmation_title">Safe mode</string>
+    <string name="settings_safe_mode_confirmation_message">Screen recording and screenshots will not be available. The minimized app will display splash screen instead of the content</string>
+
+    <string name="profile_settings_safe_mode_title">Safe mode</string>
+
     <string name="stacking_no_access_to_controller_account_title">No access to controller account</string>
     <string name="stacking_no_access_to_controller_account_message">Add your controller account in device.</string>
 

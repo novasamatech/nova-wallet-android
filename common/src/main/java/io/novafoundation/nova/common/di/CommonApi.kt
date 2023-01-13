@@ -28,6 +28,7 @@ import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
@@ -112,6 +113,8 @@ interface CommonApi {
     fun appVersionsProvider(): AppVersionProvider
 
     fun ethereumAddressFormat(): EthereumAddressFormat
+
+    fun safeModeService(): SafeModeService
 
     val systemCallExecutor: SystemCallExecutor
 

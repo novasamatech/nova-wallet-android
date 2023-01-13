@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -37,7 +38,8 @@ class RootActivityModule {
         networkStateMixin: NetworkStateMixin,
         externalRequirementsFlow: MutableStateFlow<ChainConnection.ExternalRequirement>,
         contributionsInteractor: ContributionsInteractor,
-        backgroundAccessObserver: BackgroundAccessObserver
+        backgroundAccessObserver: BackgroundAccessObserver,
+        safeModeService: SafeModeService
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -47,7 +49,8 @@ class RootActivityModule {
             resourceManager,
             networkStateMixin,
             contributionsInteractor,
-            backgroundAccessObserver
+            backgroundAccessObserver,
+            safeModeService
         )
     }
 
