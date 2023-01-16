@@ -8,6 +8,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.ExtendedLoadingState
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -15,6 +16,7 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import kotlinx.android.synthetic.main.fragment_delegate_list.delegateListList
 import kotlinx.android.synthetic.main.fragment_delegate_list.delegateListProgress
+import kotlinx.android.synthetic.main.fragment_delegate_list.delegateListToolbar
 import javax.inject.Inject
 
 class DelegateListFragment : BaseFragment<DelegateListViewModel>(), DelegateListAdapter.Handler {
@@ -36,6 +38,9 @@ class DelegateListFragment : BaseFragment<DelegateListViewModel>(), DelegateList
         delegateListList.itemAnimator = null
         delegateListList.setHasFixedSize(true)
         delegateListList.adapter = delegateListAdapter
+
+        delegateListToolbar.applyStatusBarInsets()
+        delegateListToolbar.setHomeButtonListener { viewModel.backClicked() }
     }
 
     override fun inject() {

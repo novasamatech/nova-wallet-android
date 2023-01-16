@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateSorting
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.model.DelegateListModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +22,7 @@ class DelegateListViewModel(
     private val interactor: DelegateListInteractor,
     private val governanceSharedState: GovernanceSharedState,
     private val delegateMappers: DelegateMappers,
+    private val router: GovernanceRouter
 ) : BaseViewModel() {
 
     private val sorting = MutableStateFlow(DelegateSorting.DELEGATIONS)
@@ -53,5 +55,9 @@ class DelegateListViewModel(
         val delegate = delegateModels.first().dataOrNull?.getOrNull(position) ?: return@launch
 
         showMessage("TODO - clicked ${delegate.name}")
+    }
+
+    fun backClicked() {
+       router.back()
     }
 }

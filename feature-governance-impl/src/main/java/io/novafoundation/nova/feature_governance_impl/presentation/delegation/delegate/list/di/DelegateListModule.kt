@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.DelegateListViewModel
 
@@ -22,12 +23,14 @@ class DelegateListModule {
     fun provideViewModel(
         delegateMappers: DelegateMappers,
         governanceSharedState: GovernanceSharedState,
-        interactor: DelegateListInteractor
+        interactor: DelegateListInteractor,
+        router: GovernanceRouter
     ): ViewModel {
         return DelegateListViewModel(
             interactor = interactor,
             governanceSharedState = governanceSharedState,
-            delegateMappers = delegateMappers
+            delegateMappers = delegateMappers,
+            router = router
         )
     }
 
