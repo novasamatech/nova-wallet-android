@@ -9,8 +9,10 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -30,7 +32,9 @@ class SettingsModule {
         resourceManager: ResourceManager,
         appVersionProvider: AppVersionProvider,
         selectedAccountUseCase: SelectedAccountUseCase,
-        currencyInteractor: CurrencyInteractor
+        currencyInteractor: CurrencyInteractor,
+        safeModeService: SafeModeService,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     ): ViewModel {
         return SettingsViewModel(
             accountInteractor,
@@ -39,7 +43,9 @@ class SettingsModule {
             resourceManager,
             appVersionProvider,
             selectedAccountUseCase,
-            currencyInteractor
+            currencyInteractor,
+            safeModeService,
+            actionAwaitableMixinFactory
         )
     }
 
