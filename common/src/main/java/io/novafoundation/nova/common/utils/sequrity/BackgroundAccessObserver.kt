@@ -16,7 +16,7 @@ import kotlin.coroutines.CoroutineContext
 
 class BackgroundAccessObserver(
     private val preferences: Preferences,
-    private val accessTimeInBackground: Long = DEFAULT_ACCESS_TIME
+    private val accessTimeInBackground: Long = 1L // DEFAULT_ACCESS_TIME
 ) : DefaultLifecycleObserver, CoroutineScope {
 
     companion object {
@@ -36,9 +36,6 @@ class BackgroundAccessObserver(
 
     val requestAccessFlow: Flow<State> = _stateFlow
         .filter { it == State.REQUEST_ACCESS }
-
-    val currentState: State
-        get() = _stateFlow.value
 
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)

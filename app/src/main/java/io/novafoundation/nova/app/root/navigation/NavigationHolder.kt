@@ -15,6 +15,10 @@ class NavigationHolder(val contextManager: ContextManager) {
     fun detach() {
         navController = null
     }
+
+    fun finishApp() {
+        contextManager.getActivity()?.finish()
+    }
 }
 
 fun NavigationHolder.executeBack() {

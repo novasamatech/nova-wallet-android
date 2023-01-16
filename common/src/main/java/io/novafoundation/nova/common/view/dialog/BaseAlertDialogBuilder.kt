@@ -7,15 +7,13 @@ import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlin.coroutines.CoroutineContext
 
-class BaseAlertDialogBuilder(context: Context) : AlertDialog.Builder(context), CoroutineScope {
-
-    private val job = SupervisorJob()
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
+class BaseAlertDialogBuilder(context: Context) :
+    AlertDialog.Builder(context),
+    CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.Main) {
 
     private val backgroundAccessObserver: BackgroundAccessObserver
 
@@ -26,14 +24,10 @@ class BaseAlertDialogBuilder(context: Context) : AlertDialog.Builder(context), C
     override fun create(): AlertDialog {
         val dialog = super.create()
         backgroundAccessObserver.requestAccessFlow
-            .onEach {
-                if (it == BackgroundAccessObserver.State.REQUEST_ACCESS) {
-                    dialog.dismiss()
-                }
-            }
+            .onEach { dialog.dismiss() }
             .launchIn(this)
         dialog.dismiss()
-        dialog.setOnDismissListener { job.cancel() }
+        dialog.setOnDismissListener { coroutineContext.cancel() }
         return dialog
     }
 }

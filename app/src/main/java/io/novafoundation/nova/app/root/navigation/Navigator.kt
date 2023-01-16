@@ -95,8 +95,7 @@ object BackDelayedNavigation : DelayedNavigation
 
 class Navigator(
     private val navigationHolder: NavigationHolder,
-) :
-    SplashRouter,
+) : SplashRouter,
     OnboardingRouter,
     AccountRouter,
     AssetsRouter,
@@ -450,7 +449,7 @@ class Navigator(
     override fun nonCancellableVerify() {
         val currentDestination = navController?.currentDestination
 
-        val action = PinCodeAction.Check(BackDelayedNavigation, ToolbarConfiguration())
+        val action = PinCodeAction.RecoveryAuthorisation(BackDelayedNavigation, ToolbarConfiguration())
         val bundle = PincodeFragment.getPinCodeBundle(action)
         if (currentDestination?.id == R.id.pincodeFragment) {
             val currentBackStackEntry = navController!!.currentBackStackEntry
@@ -575,6 +574,10 @@ class Navigator(
         val bundle = AddChainAccountSelectLedgerFragment.getBundle(payload)
 
         navController?.navigate(R.id.action_accountDetailsFragment_to_addLedgerAccountGraph, bundle)
+    }
+
+    override fun finishApp() {
+        navigationHolder.finishApp()
     }
 
     override fun openCreateWatchWallet() {

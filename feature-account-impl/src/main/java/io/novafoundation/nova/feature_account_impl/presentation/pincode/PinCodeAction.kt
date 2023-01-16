@@ -11,14 +11,23 @@ class ToolbarConfiguration(@StringRes val titleRes: Int? = null, val backVisible
 
 sealed class PinCodeAction(open val toolbarConfiguration: ToolbarConfiguration) : Parcelable {
 
-    @Parcelize class Create(val delayedNavigation: DelayedNavigation) :
+    @Parcelize
+    class Create(val delayedNavigation: DelayedNavigation) :
         PinCodeAction(ToolbarConfiguration(R.string.pincode_title_create, false))
 
-    @Parcelize class Check(
+    @Parcelize
+    open class Check(
         val delayedNavigation: DelayedNavigation,
         override val toolbarConfiguration: ToolbarConfiguration
     ) : PinCodeAction(toolbarConfiguration)
 
-    @Parcelize object Change :
+    @Parcelize
+    class RecoveryAuthorisation(
+        val delayedNavigation: DelayedNavigation,
+        override val toolbarConfiguration: ToolbarConfiguration
+    ) : PinCodeAction(toolbarConfiguration)
+
+    @Parcelize
+    object Change :
         PinCodeAction(ToolbarConfiguration(R.string.profile_pincode_change_title, true))
 }

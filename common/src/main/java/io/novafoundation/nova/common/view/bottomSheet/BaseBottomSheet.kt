@@ -9,23 +9,17 @@ import io.novafoundation.nova.common.utils.DialogExtensions
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlin.coroutines.CoroutineContext
 
 abstract class BaseBottomSheet(context: Context, style: Int = R.style.BottomSheetDialog) :
     BottomSheetDialog(context, style),
     DialogExtensions,
-    CoroutineScope {
+    CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.Main) {
 
     private val backgroundAccessObserver: BackgroundAccessObserver
-
-    private var job: Job = SupervisorJob()
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
 
     final override val dialogInterface: DialogInterface
         get() = this
@@ -40,7 +34,7 @@ abstract class BaseBottomSheet(context: Context, style: Int = R.style.BottomShee
     }
 
     override fun dismiss() {
-        job.cancel()
+        coroutineContext.cancel()
         super.dismiss()
     }
 }

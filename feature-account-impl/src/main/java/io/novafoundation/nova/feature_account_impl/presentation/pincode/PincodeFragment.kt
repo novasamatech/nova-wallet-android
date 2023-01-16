@@ -58,7 +58,7 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
 
         onBackPressed {
             if (viewModel.isBackRoutingBlocked) {
-                requireActivity().finish()
+                viewModel.finishApp()
             } else {
                 viewModel.backPressed()
             }
