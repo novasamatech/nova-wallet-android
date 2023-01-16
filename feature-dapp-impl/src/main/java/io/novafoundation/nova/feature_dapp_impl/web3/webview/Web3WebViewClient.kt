@@ -58,10 +58,6 @@ class Web3WebViewClient(
         if (desktopMode) {
             setDesktopViewport(view)
         }
-    }
-
-    override fun onPageCommitVisible(view: WebView, url: String) {
-        super.onPageCommitVisible(view, url)
         if (desktopModeChanged) {
             webView.changeUserAgentByDesktopMode(desktopMode)
             desktopModeChanged = false
