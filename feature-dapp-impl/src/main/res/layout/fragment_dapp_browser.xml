@@ -87,13 +87,14 @@
             app:tint="@color/actions_color" />
 
         <ImageView
-            android:id="@+id/dappBrowserFavourite"
+            android:id="@+id/dappBrowserMore"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:paddingTop="11dp"
             android:paddingBottom="11dp"
-            android:src="@drawable/ic_favorite_heart_outline" />
+            android:src="@drawable/ic_more_horizontal"
+            app:tint="@color/actions_color" />
 
     </LinearLayout>
 </LinearLayout>
