@@ -47,7 +47,7 @@ class Web3WebViewClient(
             desktopModeChanged = field != value
             field = value
         }
-    var desktopModeChanged = false
+    private var desktopModeChanged = false
 
     fun initialInject() {
         injectors.forEach { it.initialInject(webView, extensionStore) }

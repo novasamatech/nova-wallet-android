@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
-import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_api.data.model.BrowserHostSettings
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
@@ -92,11 +91,10 @@ class DAppBrowserViewModel(
     private val isDesktopModeEnabledFlow = MutableStateFlow(false)
 
     val desktopModeChangedModel = currentPageAnalyzed
-        .zipWithPrevious()
         .map { currentPage ->
-            val hostSettings = interactor.getHostSettings(currentPage.second.url)
+            val hostSettings = interactor.getHostSettings(currentPage.url)
             val isDesktopModeEnabled = hostSettings?.isDesktopModeEnabled ?: isDesktopModeEnabledFlow.first()
-            DesktopModeChangedEvent(isDesktopModeEnabled, currentPage.second.url)
+            DesktopModeChangedEvent(isDesktopModeEnabled, currentPage.url)
         }
         .distinctUntilChanged()
         .shareInBackground()
