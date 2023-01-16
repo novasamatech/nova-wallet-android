@@ -20,7 +20,9 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.util.blockInPast
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.days
 
@@ -42,7 +44,8 @@ class RealDelegateListInteractor(
         }
     }
 
-    private suspend fun getDelegatesInternal(
+    @Suppress("SuspendFunctionOnCoroutineScope")
+    private suspend fun CoroutineScope.getDelegatesInternal(
         sorting: DelegateSorting,
         filtering: DelegateFiltering,
         governanceOption: SupportedGovernanceOption,
@@ -54,18 +57,20 @@ class RealDelegateListInteractor(
         val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.id)
         val recentVotesBlockThreshold = blockDurationEstimator.blockInPast(RECENT_VOTES_PERIOD)
 
-        val delegatesStats = delegationsRepository.getOffChainDelegatesStats(recentVotesBlockThreshold, chain)
-        val delegateAccountIds = delegatesStats.map(OffChainDelegateStats::accountId)
+        val delegatesStatsDeferred = async { delegationsRepository.getOffChainDelegatesStats(recentVotesBlockThreshold, chain) }
 
-        val delegateMetadatas = runCatching { delegationsRepository.getOffChainDelegatesMetadata(chain) }
-            .onFailure { Log.e(LOG_TAG, "Failed to fetch delegate metadatas", it) }
-            .getOrDefault(emptyList())
+        val delegateMetadatasDeferred = async {
+            runCatching { delegationsRepository.getOffChainDelegatesMetadata(chain) }
+                .onFailure { Log.e(LOG_TAG, "Failed to fetch delegate metadatas", it) }
+                .getOrDefault(emptyList())
+        }
 
-        val delegateMetadatasByAccountId = delegateMetadatas.associateBy { AccountIdKey(it.accountId) }
+        val delegateAccountIds = delegatesStatsDeferred.await().map(OffChainDelegateStats::accountId)
+        val delegateMetadatasByAccountId = delegateMetadatasDeferred.await().associateBy { AccountIdKey(it.accountId) }
 
         val identities = identityRepository.getIdentitiesFromIds(delegateAccountIds, chain.id)
 
-        val delegates = delegatesStats.map { delegateStats ->
+        val delegates = delegatesStatsDeferred.await().map { delegateStats ->
             val metadata = delegateMetadatasByAccountId[delegateStats.accountId]
             val identity = identities[delegateStats.accountId]
 
