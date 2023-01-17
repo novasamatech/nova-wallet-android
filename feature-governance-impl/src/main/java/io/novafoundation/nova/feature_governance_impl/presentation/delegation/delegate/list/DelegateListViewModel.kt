@@ -36,7 +36,7 @@ class DelegateListViewModel(
         coroutineScope = viewModelScope,
         displayOf = ::sortingDisplay,
         initial = DelegateSorting.DELEGATIONS,
-        selectorTitleRes = R.string.common_filter_sort_header
+        selectorTitleRes = R.string.common_sort_by
     )
 
     val filteringMixin = listChooserMixinFactory.createFromEnum(
