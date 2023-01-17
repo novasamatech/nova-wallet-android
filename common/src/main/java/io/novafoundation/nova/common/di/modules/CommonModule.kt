@@ -41,6 +41,8 @@ import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.OSAppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.ResourceManagerImpl
+import io.novafoundation.nova.common.sequrity.RealSafeModeService
+import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
@@ -244,4 +246,13 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideEthereumAddressFormat() = EthereumAddressFormat()
+
+    @Provides
+    @ApplicationScope
+    fun provideSafeModeService(
+        contextManager: ContextManager,
+        preferences: Preferences
+    ): SafeModeService {
+        return RealSafeModeService(contextManager, preferences)
+    }
 }

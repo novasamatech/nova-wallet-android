@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
@@ -25,7 +26,8 @@ class RootViewModel(
     private val resourceManager: ResourceManager,
     private val networkStateMixin: NetworkStateMixin,
     private val contributionsInteractor: ContributionsInteractor,
-    private val backgroundAccessObserver: BackgroundAccessObserver
+    private val backgroundAccessObserver: BackgroundAccessObserver,
+    private val safeModeService: SafeModeService
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin {
 
     private var willBeClearedForLanguageChange = false
@@ -97,5 +99,9 @@ class RootViewModel(
                 backgroundAccessObserver.onAccessed()
             }
         }
+    }
+
+    fun applySafeModeIfEnabled() {
+        safeModeService.applySafeModeIfEnabled()
     }
 }

@@ -11,7 +11,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.themed
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
@@ -21,24 +20,27 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.isSecure
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.AcknowledgePhishingBottomSheet
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.ConfirmAuthorizeBottomSheet
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.OptionsBottomSheetDialog
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClient
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.uninjectWeb3
+import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBar
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBarGroup
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserBack
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserClose
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserFavourite
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserForward
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserMore
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserProgress
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserRefresh
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebView
-import javax.inject.Inject
 
-class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
+class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomSheetDialog.Callback {
 
     companion object {
 
@@ -58,6 +60,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
 
     @Inject
     lateinit var fileChooser: WebViewFileChooser
+
+    private var webViewClient: Web3WebViewClient? = null
 
     var backCallback: OnBackPressedCallback? = null
 
@@ -90,7 +94,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
         dappBrowserForward.setOnClickListener { forwardClicked() }
         dappBrowserRefresh.setOnClickListener { refreshClicked() }
 
-        dappBrowserFavourite.setOnClickListener { viewModel.onFavouriteClicked() }
+        dappBrowserMore.setOnClickListener { moreClicked() }
     }
 
     override fun onDestroyView() {
@@ -121,13 +125,16 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
     override fun subscribe(viewModel: DAppBrowserViewModel) {
         setupRemoveFavouritesConfirmation(viewModel.removeFromFavouritesConfirmation)
 
+        webViewClient = web3WebViewClientFactory.create(dappBrowserWebView, viewModel.extensionsStore, viewModel::onPageChanged)
         dappBrowserWebView.injectWeb3(
-            web3ClientFactory = web3WebViewClientFactory,
-            extensionsStore = viewModel.extensionsStore,
             progressBar = dappBrowserProgress,
-            onPageChanged = viewModel::onPageChanged,
-            fileChooser = fileChooser
+            fileChooser = fileChooser,
+            web3Client = webViewClient!!
         )
+
+        viewModel.desktopModeChangedModel.observe {
+            webViewClient?.desktopMode = it.desktopModeEnabled
+        }
 
         viewModel.showConfirmationSheet.observeEvent {
             when (it.action) {
@@ -142,22 +149,26 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
             }
         }
 
-        viewModel.browserNavigationCommandEvent.observeEvent {
+        viewModel.browserCommandEvent.observeEvent {
             when (it) {
-                BrowserNavigationCommand.GoBack -> backClicked()
-                is BrowserNavigationCommand.OpenUrl -> dappBrowserWebView.loadUrl(it.url)
-                BrowserNavigationCommand.Reload -> dappBrowserWebView.reload()
+                BrowserCommand.Reload -> dappBrowserWebView.reload()
+                BrowserCommand.GoBack -> backClicked()
+                is BrowserCommand.OpenUrl -> dappBrowserWebView.loadUrl(it.url)
+                is BrowserCommand.ChangeDesktopMode -> {
+                    webViewClient?.desktopMode = it.enabled
+                    dappBrowserWebView.reload()
+                }
             }
+        }
+
+        viewModel.openBrowserOptionsEvent.observeEvent {
+            val optionsBottomSheet = OptionsBottomSheetDialog(requireContext(), this, it)
+            optionsBottomSheet.show()
         }
 
         viewModel.currentPageAnalyzed.observe {
             dappBrowserAddressBar.setAddress(it.display)
             dappBrowserAddressBar.showSecureIcon(it.isSecure)
-
-            val favouriteIcon = if (it.isFavourite) R.drawable.ic_favorite_heart_filled else R.drawable.ic_favorite_heart_outline
-            val favoriteIconTint = if (it.isFavourite) R.color.icon_favorite else R.color.icon_primary
-            dappBrowserFavourite.setImageResource(favouriteIcon)
-            dappBrowserFavourite.setImageTintRes(favoriteIconTint)
 
             updateButtonsState()
         }
@@ -212,8 +223,20 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>() {
         requireActivity().onBackPressedDispatcher.addCallback(backCallback!!)
     }
 
+    private fun moreClicked() {
+        viewModel.onMoreClicked()
+    }
+
     private fun detachBackCallback() {
         backCallback?.remove()
         backCallback = null
+    }
+
+    override fun onFavoriteClick(payload: DAppOptionsPayload) {
+        viewModel.onFavoriteClick(payload)
+    }
+
+    override fun onDesktopModeClick() {
+        viewModel.onDesktopClick()
     }
 }

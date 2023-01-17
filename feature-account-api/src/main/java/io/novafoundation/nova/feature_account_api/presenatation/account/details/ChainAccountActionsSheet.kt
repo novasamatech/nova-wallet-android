@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.castOrNull
-import io.novafoundation.nova.common.view.bottomSheet.list.fixed.item
+import io.novafoundation.nova.common.view.bottomSheet.list.fixed.textItem
 import io.novafoundation.nova.feature_account_api.presenatation.actions.CopyCallback
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActionsSheet
@@ -44,7 +44,7 @@ class ChainAccountActionsSheet(
 
     private fun maybeShowExport() {
         accountAddress()?.let {
-            item(R.drawable.ic_share_outline, R.string.account_export, showArrow = true) {
+            textItem(R.drawable.ic_share_outline, R.string.account_export, showArrow = true) {
                 onExport.invoke(payload.chain)
             }
         }
@@ -61,7 +61,7 @@ class ChainAccountActionsSheet(
     }
 
     private fun changeAccountItem(@StringRes labelRes: Int) {
-        item(R.drawable.ic_staking_operations, labelRes, showArrow = true) {
+        textItem(R.drawable.ic_staking_operations, labelRes, showArrow = true) {
             onChange.invoke(payload.chain)
         }
     }

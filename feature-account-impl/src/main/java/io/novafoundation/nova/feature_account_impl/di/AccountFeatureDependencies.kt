@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
@@ -96,6 +97,8 @@ interface AccountFeatureDependencies {
     fun appVersionProvider(): AppVersionProvider
 
     fun validationExecutor(): ValidationExecutor
+
+    fun safeModeService(): SafeModeService
 
     val systemCallExecutor: SystemCallExecutor
 

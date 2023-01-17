@@ -53,7 +53,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
 
 val ERA_OFFSET = 1.toBigInteger()
 
@@ -314,7 +313,6 @@ class StakingInteractor(
         return stashIdHex in exposures.keys
     }
 
-    @OptIn(ExperimentalTime::class)
     private suspend fun activeNominators(chainId: ChainId, exposures: Collection<Exposure>): Int {
         val activeNominatorsPerValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 

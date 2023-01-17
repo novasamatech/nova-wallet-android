@@ -22,6 +22,7 @@ import androidx.navigation.NavigatorProvider;
 import androidx.navigation.fragment.FragmentNavigator;
 
 import java.util.ArrayDeque;
+import java.util.List;
 import java.util.Map;
 
 import io.novafoundation.nova.app.R;
@@ -45,7 +46,7 @@ public class AddFragmentNavigator extends Navigator<AddFragmentNavigator.Destina
     private ArrayDeque<Integer> mBackStack = new ArrayDeque<>();
 
     public AddFragmentNavigator(@NonNull Context context, @NonNull FragmentManager manager,
-                             int containerId) {
+                                int containerId) {
         mContext = context;
         mFragmentManager = manager;
         mContainerId = containerId;
@@ -89,14 +90,13 @@ public class AddFragmentNavigator extends Navigator<AddFragmentNavigator.Destina
     /**
      * Instantiates the Fragment via the FragmentManager's
      * {@link androidx.fragment.app.FragmentFactory}.
-     *
      * Note that this method is <strong>not</strong> responsible for calling
      * {@link Fragment#setArguments(Bundle)} on the returned Fragment instance.
      *
-     * @param context Context providing the correct {@link ClassLoader}
+     * @param context         Context providing the correct {@link ClassLoader}
      * @param fragmentManager FragmentManager the Fragment will be added to
-     * @param className The Fragment to instantiate
-     * @param args The Fragment's arguments, if any
+     * @param className       The Fragment to instantiate
+     * @param args            The Fragment's arguments, if any
      * @return A new fragment instance.
      * @deprecated Set a custom {@link androidx.fragment.app.FragmentFactory} via
      * {@link FragmentManager#setFragmentFactory(androidx.fragment.app.FragmentFactory)} to control
@@ -156,9 +156,14 @@ public class AddFragmentNavigator extends Navigator<AddFragmentNavigator.Destina
         }
 
         if (destination.shouldUseAdd) {
-            ft.hide(mFragmentManager.getFragments().get(mFragmentManager.getFragments().size() - 1));
+            List<Fragment> fragments = mFragmentManager.getFragments();
+            for (Fragment fragment : fragments) {
+                if (fragment.isHidden()) continue;
+
+                ft.hide(fragment);
+            }
             ft.add(mContainerId, frag);
-        } else  {
+        } else {
             ft.replace(mContainerId, frag);
         }
         ft.setPrimaryNavigationFragment(frag);
@@ -306,6 +311,7 @@ public class AddFragmentNavigator extends Navigator<AddFragmentNavigator.Destina
 
         /**
          * Set the Fragment class name associated with this destination
+         *
          * @param className The class name of the Fragment to show when you navigate to this
          *                  destination
          * @return this {@link androidx.navigation.fragment.FragmentNavigator.Destination}
