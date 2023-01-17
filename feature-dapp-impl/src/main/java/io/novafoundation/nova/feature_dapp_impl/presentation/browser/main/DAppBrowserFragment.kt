@@ -85,7 +85,6 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         dappBrowserClose.setOnClickListener { viewModel.closeClicked() }
 
         dappBrowserBack.setOnClickListener { backClicked() }
-        attachBackCallback()
 
         dappBrowserAddressBar.setOnClickListener {
             viewModel.openSearch()
@@ -100,10 +99,19 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     override fun onDestroyView() {
         super.onDestroyView()
 
-        detachBackCallback()
         dappBrowserWebView.uninjectWeb3()
 
         webViewHolder.release()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        detachBackCallback()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        attachBackCallback()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -214,13 +222,14 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     }
 
     private fun attachBackCallback() {
-        backCallback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                backClicked()
+        if (backCallback == null) {
+            backCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    backClicked()
+                }
             }
+            requireActivity().onBackPressedDispatcher.addCallback(backCallback!!)
         }
-
-        requireActivity().onBackPressedDispatcher.addCallback(backCallback!!)
     }
 
     private fun moreClicked() {
