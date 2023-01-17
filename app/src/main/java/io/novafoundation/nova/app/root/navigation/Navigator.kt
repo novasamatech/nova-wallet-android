@@ -449,7 +449,7 @@ class Navigator(
     override fun nonCancellableVerify() {
         val currentDestination = navController?.currentDestination
 
-        val action = PinCodeAction.RecoveryAuthorisation(BackDelayedNavigation, ToolbarConfiguration())
+        val action = PinCodeAction.CheckAfterInactivity(BackDelayedNavigation, ToolbarConfiguration())
         val bundle = PincodeFragment.getPinCodeBundle(action)
         if (currentDestination?.id == R.id.pincodeFragment) {
             val currentBackStackEntry = navController!!.currentBackStackEntry

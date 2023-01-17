@@ -22,7 +22,7 @@ sealed class PinCodeAction(open val toolbarConfiguration: ToolbarConfiguration) 
     ) : PinCodeAction(toolbarConfiguration)
 
     @Parcelize
-    class RecoveryAuthorisation(
+    class CheckAfterInactivity(
         val delayedNavigation: DelayedNavigation,
         override val toolbarConfiguration: ToolbarConfiguration
     ) : PinCodeAction(toolbarConfiguration)

@@ -53,14 +53,14 @@ class PinCodeViewModel(
     private var currentState: ScreenState? = null
 
     val isBackRoutingBlocked: Boolean
-        get() = pinCodeAction is PinCodeAction.RecoveryAuthorisation
+        get() = pinCodeAction is PinCodeAction.CheckAfterInactivity
 
     fun startAuth() {
         when (pinCodeAction) {
             is PinCodeAction.Create -> {
                 currentState = ScreenState.Creating
             }
-            is PinCodeAction.RecoveryAuthorisation,
+            is PinCodeAction.CheckAfterInactivity,
             is PinCodeAction.Check -> {
                 currentState = ScreenState.Checking
                 _showFingerPrintEvent.value = Event(Unit)
@@ -170,7 +170,7 @@ class PinCodeViewModel(
             is PinCodeAction.Check -> {
                 router.openAfterPinCode(pinCodeAction.delayedNavigation)
             }
-            is PinCodeAction.RecoveryAuthorisation -> {
+            is PinCodeAction.CheckAfterInactivity -> {
                 backgroundAccessObserver.onAccessed()
                 router.openAfterPinCode(pinCodeAction.delayedNavigation)
             }
