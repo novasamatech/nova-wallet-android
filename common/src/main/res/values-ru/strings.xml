@@ -214,6 +214,7 @@
     <string name="common_done">Готово</string>
     <string name="common_edit">Редактировать</string>
     <string name="common_email_chooser_title">Выберите приложение для работы с почтой</string>
+    <string name="common_enable">Включить</string>
     <string name="common_enter_amount">Введите сумму...</string>
     <string name="common_error_general_title">Ошибка</string>
     <string name="common_event">Событие</string>
@@ -401,6 +402,10 @@
     <string name="dapp_list_placeholder">Список DApps появится здесь</string>
     <string name="dapp_main_welcome_subtitle">Просматривайте веб-страницы, используя ваши аккаунты из Nova Wallet</string>
     <string name="dapp_main_welcome_title">Добро пожаловать в Nova Browser</string>
+    <string name="dapp_options_add_to_favorite">Добавить в избранное</string>
+    <string name="dapp_options_desktop_mode">Версия для ПК</string>
+    <string name="dapp_options_remove_from_favorite">Убрать из Избранного</string>
+    <string name="dapp_options_title">Параметры страницы</string>
     <string name="dapp_phishing_go_back">Хорошо, уходим отсюда</string>
     <string name="dapp_phishing_subtitle">Nova Wallet считает, что этот веб-сайт может поставить под угрозу безопасность ваших учетных записей и ваших токенов.</string>
     <string name="dapp_phishing_title">Обнаружен фишинг</string>
@@ -509,6 +514,7 @@
     <string name="profile_accounts_title_2_0">Кошельки</string>
     <string name="profile_language_title">Язык</string>
     <string name="profile_pincode_change_title">Изменить PIN-код</string>
+    <string name="profile_settings_safe_mode_title">Безопасный режим</string>
     <string name="profile_settings_title">Настройки</string>
     <string name="recover_json_hint">Вставьте json строку или загрузите файл…</string>
     <string name="recover_json_upload">Загрузите файл</string>
@@ -621,12 +627,16 @@
     <string name="settings_email">Написать разработчикам</string>
     <string name="settings_general">Основные</string>
     <string name="settings_preferences">Предпочтения</string>
+    <string name="settings_safe_mode_confirmation_message">Запись экрана и скриншоты будут недоступны. Свернутое приложение будет отображать экран-заставку вместо содержимого</string>
+    <string name="settings_safe_mode_confirmation_title">Безопасный режим</string>
     <string name="settings_security">Безопасность</string>
     <string name="settings_support">Поддержка и обратная связь</string>
     <string name="settings_twitter">Twitter</string>
     <string name="settings_youtube">Youtube</string>
     <string name="sr25519_selection_subtitle">sr25519 (рекомендованный)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
+    <string name="stacking_no_access_to_controller_account_message">Добавьте учетную запись контроллера в устройство.</string>
+    <string name="stacking_no_access_to_controller_account_title">Нет доступа к учетной записи контроллера</string>
     <string name="staking_about">О стейкинге</string>
     <string name="staking_account_is_used_as_controller">Выбранный аккаунт уже используется в качестве контроллера.</string>
     <string name="staking_active_delegators">Активные делегаторы</string>
