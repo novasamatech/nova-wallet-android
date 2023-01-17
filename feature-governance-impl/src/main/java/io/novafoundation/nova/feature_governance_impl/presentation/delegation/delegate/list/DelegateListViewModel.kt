@@ -81,11 +81,11 @@ class DelegateListViewModel(
     }
 
     fun backClicked() {
-       router.back()
+        router.back()
     }
 
     private suspend fun sortingDisplay(sorting: DelegateSorting): String {
-        return when(sorting) {
+        return when (sorting) {
             DelegateSorting.DELEGATIONS -> resourceManager.getString(R.string.delegation_delegations)
             DelegateSorting.DELEGATED_VOTES -> resourceManager.getString(R.string.delegation_delegated_votes)
             DelegateSorting.VOTING_ACTIVITY -> delegateMappers.formattedRecentVotesPeriod()
@@ -93,7 +93,7 @@ class DelegateListViewModel(
     }
 
     private fun filteringDisplay(filtering: DelegateFiltering): String {
-        val resourceId = when(filtering) {
+        val resourceId = when (filtering) {
             DelegateFiltering.ALL_ACCOUNTS -> R.string.delegation_delegate_filter_all
             DelegateFiltering.ORGANIZATIONS -> R.string.delegation_delegate_filter_organizations
             DelegateFiltering.INDIVIDUALS -> R.string.delegation_delegate_filter_individuals

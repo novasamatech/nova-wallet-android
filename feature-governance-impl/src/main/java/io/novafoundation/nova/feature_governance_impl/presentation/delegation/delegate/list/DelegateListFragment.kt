@@ -62,7 +62,7 @@ class DelegateListFragment : BaseFragment<DelegateListViewModel>(), DelegateList
         setupListChooserMixin(viewModel.filteringMixin, delegateListFilters)
 
         viewModel.delegateModels.observe {
-            when(it) {
+            when (it) {
                 is ExtendedLoadingState.Error -> { }
                 is ExtendedLoadingState.Loaded -> {
                     delegateListList.makeVisible()

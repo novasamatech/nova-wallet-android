@@ -36,7 +36,7 @@ import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateType
 class DelegateListAdapter(
     private val imageLoader: ImageLoader,
     private val handler: Handler
-): BaseListAdapter<DelegateListModel, DelegateViewHolder>(DelegateDiffCallback()) {
+) : BaseListAdapter<DelegateListModel, DelegateViewHolder>(DelegateDiffCallback()) {
 
     interface Handler {
 

@@ -24,7 +24,6 @@ interface ListChooserMixin<T> {
 
     class Model<T>(val value: T, val display: String)
 
-
     val chooseNewOption: ListChooserAwaitable<Model<T>>
 
     val selectedOption: Flow<Model<T>>
@@ -34,7 +33,6 @@ interface ListChooserMixin<T> {
 
 val <T> ListChooserMixin<T>.selectedValue: Flow<T>
     get() = selectedOption.map { it.value }
-
 
 inline fun <reified E : Enum<E>> ListChooserMixin.Factory.createFromEnum(
     coroutineScope: CoroutineScope,
