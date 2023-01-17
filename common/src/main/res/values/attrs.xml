@@ -209,4 +209,9 @@
         <attr name="android:src" format="reference" />
         <attr name="bannerBackground" format="reference|color" />
     </declare-styleable>
+
+    <declare-styleable name="ListChooserView">
+        <attr name="listChooserView_label" format="string" />
+        <attr name="listChooserView_value" format="string" />
+    </declare-styleable>
 </resources>

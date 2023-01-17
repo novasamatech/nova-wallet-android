@@ -46,6 +46,8 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
+import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
+import io.novafoundation.nova.common.view.input.chooser.RealListChooserMixinFactory
 import jp.co.soramitsu.fearless_utils.encrypt.Signer
 import jp.co.soramitsu.fearless_utils.icon.IconGenerator
 import java.security.SecureRandom
@@ -237,4 +239,10 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideEthereumAddressFormat() = EthereumAddressFormat()
+
+    @Provides
+    @ApplicationScope
+    fun provideListChooserMixinFactory(
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+    ): ListChooserMixin.Factory = RealListChooserMixinFactory(actionAwaitableMixinFactory)
 }

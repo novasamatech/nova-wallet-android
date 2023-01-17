@@ -11,11 +11,15 @@ import io.novafoundation.nova.common.presentation.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
+import io.novafoundation.nova.common.view.input.chooser.setupListChooserMixin
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
+import kotlinx.android.synthetic.main.fragment_delegate_list.delegateListFilters
 import kotlinx.android.synthetic.main.fragment_delegate_list.delegateListList
 import kotlinx.android.synthetic.main.fragment_delegate_list.delegateListProgress
+import kotlinx.android.synthetic.main.fragment_delegate_list.delegateListSorting
 import kotlinx.android.synthetic.main.fragment_delegate_list.delegateListToolbar
 import javax.inject.Inject
 
@@ -54,6 +58,9 @@ class DelegateListFragment : BaseFragment<DelegateListViewModel>(), DelegateList
     }
 
     override fun subscribe(viewModel: DelegateListViewModel) {
+        setupListChooserMixin(viewModel.sortingMixin, delegateListSorting)
+        setupListChooserMixin(viewModel.filteringMixin, delegateListFilters)
+
         viewModel.delegateModels.observe {
             when(it) {
                 is ExtendedLoadingState.Error -> { }
@@ -61,7 +68,7 @@ class DelegateListFragment : BaseFragment<DelegateListViewModel>(), DelegateList
                     delegateListList.makeVisible()
                     delegateListProgress.makeGone()
 
-                    delegateListAdapter.submitList(it.data)
+                    delegateListAdapter.submitListPreservingViewPoint(it.data, delegateListList)
                 }
                 ExtendedLoadingState.Loading -> {
                     delegateListList.makeGone()
@@ -74,6 +81,4 @@ class DelegateListFragment : BaseFragment<DelegateListViewModel>(), DelegateList
     override fun itemClicked(position: Int) {
         viewModel.delegateClicked(position)
     }
-
-
 }

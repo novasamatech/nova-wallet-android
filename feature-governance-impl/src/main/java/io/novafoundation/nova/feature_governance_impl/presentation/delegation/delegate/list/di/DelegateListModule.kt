@@ -8,6 +8,8 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
@@ -24,12 +26,16 @@ class DelegateListModule {
         delegateMappers: DelegateMappers,
         governanceSharedState: GovernanceSharedState,
         interactor: DelegateListInteractor,
+        listChooserMixinFactory: ListChooserMixin.Factory,
+        resourceManager: ResourceManager,
         router: GovernanceRouter
     ): ViewModel {
         return DelegateListViewModel(
             interactor = interactor,
             governanceSharedState = governanceSharedState,
             delegateMappers = delegateMappers,
+            listChooserMixinFactory = listChooserMixinFactory,
+            resourceManager = resourceManager,
             router = router
         )
     }

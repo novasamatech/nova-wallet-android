@@ -57,6 +57,7 @@
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
+        app:layout_constraintHorizontal_bias="0"
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateStats
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegateComparator
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.util.blockInPast
@@ -24,9 +25,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import kotlin.time.Duration.Companion.days
-
-private val RECENT_VOTES_PERIOD = 30.days
 
 class RealDelegateListInteractor(
     private val governanceSourceRegistry: GovernanceSourceRegistry,
@@ -92,7 +90,6 @@ class RealDelegateListInteractor(
             delegationsCount = stats.delegationsCount,
             recentVotes = DelegateStats.RecentVotes(
                 numberOfVotes = stats.recentVotes,
-                period = RECENT_VOTES_PERIOD
             )
         )
     }
