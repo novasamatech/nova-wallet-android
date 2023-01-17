@@ -17,7 +17,7 @@ inline fun dialog(
     @StyleRes style: Int = R.style.WhiteOverlay,
     decorator: DialogDecorator
 ) {
-    val builder = AlertDialog.Builder(ContextThemeWrapper(context, style))
+    val builder = BaseAlertDialogBuilder(ContextThemeWrapper(context, style))
         .setCancelable(false)
 
     builder.decorator()

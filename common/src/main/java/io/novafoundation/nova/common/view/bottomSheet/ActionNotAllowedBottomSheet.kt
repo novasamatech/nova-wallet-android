@@ -6,7 +6,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.core.view.setPadding
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.view.PrimaryButton
@@ -18,7 +17,7 @@ import kotlinx.android.synthetic.main.bottom_sheet_action_not_allowed.actionNotA
 open class ActionNotAllowedBottomSheet(
     context: Context,
     private val onSuccess: () -> Unit,
-) : BottomSheetDialog(context, R.style.BottomSheetDialog), WithContextExtensions by WithContextExtensions(context) {
+) : BaseBottomSheet(context, R.style.BottomSheetDialog), WithContextExtensions by WithContextExtensions(context) {
 
     val image: ImageView
         get() = actionNotAllowedImage

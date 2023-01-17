@@ -40,8 +40,8 @@ class RootViewModel(
             .onEach { handleUpdatesSideEffect(it) }
             .launchIn(this)
 
-        backgroundAccessObserver.eventFlow
-            .onEach { rootRouter.nonCancellableVerify() }
+        backgroundAccessObserver.requestAccessFlow
+            .onEach { verifyUserIfNeed() }
             .launchIn(this)
 
         syncCurrencies()
@@ -88,6 +88,16 @@ class RootViewModel(
     fun externalUrlOpened(uri: String) {
         if (interactor.isBuyProviderRedirectLink(uri)) {
             showMessage(resourceManager.getString(R.string.buy_completed))
+        }
+    }
+
+    private fun verifyUserIfNeed() {
+        launch {
+            if (interactor.isAccountSelected() && interactor.isPinCodeSet()) {
+                rootRouter.nonCancellableVerify()
+            } else {
+                backgroundAccessObserver.onAccessed()
+            }
         }
     }
 

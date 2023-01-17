@@ -59,7 +59,7 @@ interface CommonApi {
 
     fun providePreferences(): Preferences
 
-    fun provideBackgroundAccessObserver(): BackgroundAccessObserver
+    fun backgroundAccessObserver(): BackgroundAccessObserver
 
     fun provideEncryptedPreferences(): EncryptedPreferences
 
