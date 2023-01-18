@@ -5,6 +5,7 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import coil.ImageLoader
 import coil.load
+import coil.request.ImageRequest
 
 sealed class Icon {
 
@@ -15,11 +16,11 @@ sealed class Icon {
     class FromDrawableRes(@DrawableRes val res: Int) : Icon()
 }
 
-fun ImageView.setIcon(icon: Icon, imageLoader: ImageLoader) {
+fun ImageView.setIcon(icon: Icon, imageLoader: ImageLoader, builder: ImageRequest.Builder.() -> Unit = {}) {
     when (icon) {
-        is Icon.FromDrawable -> setImageDrawable(icon.data)
-        is Icon.FromLink -> load(icon.data, imageLoader)
-        is Icon.FromDrawableRes -> setImageResource(icon.res)
+        is Icon.FromDrawable -> load(icon.data, imageLoader, builder)
+        is Icon.FromLink -> load(icon.data, imageLoader, builder)
+        is Icon.FromDrawableRes -> load(icon.res, imageLoader, builder)
     }
 }
 

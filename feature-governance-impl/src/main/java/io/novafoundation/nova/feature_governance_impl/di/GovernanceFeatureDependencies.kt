@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -106,4 +107,6 @@ interface GovernanceFeatureDependencies {
     fun remoteStorageDataSource(): StorageDataSource
 
     val onChainIdentityRepository: OnChainIdentityRepository
+
+    val listChooserMixinFactory: ListChooserMixin.Factory
 }

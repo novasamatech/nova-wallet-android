@@ -5,8 +5,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingStart="6dp"
-    android:paddingEnd="8dp"
     tools:background="@color/chips_background"
     tools:parentTag="android.widget.LinearLayout">
 
@@ -15,8 +13,8 @@
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginVertical="3dp"
-        android:layout_marginEnd="6dp"
+        tools:layout_marginVertical="3dp"
+        tools:layout_marginEnd="6dp"
         android:gravity="center_vertical"
         app:tint="@color/chip_icon"
         tools:src="@drawable/ic_info_cicrle_filled_16" />
@@ -27,8 +25,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginVertical="4.5dp"
-        android:layout_marginEnd="8dp"
+        tools:layout_marginVertical="4.5dp"
+        tools:layout_marginEnd="8dp"
         android:includeFontPadding="false"
         android:textAllCaps="true"
         android:textColor="@color/chip_text"

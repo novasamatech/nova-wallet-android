@@ -9,14 +9,15 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.di.DelegateListComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.di.ReferendumDescriptionComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.di.ReferendumDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.di.ReferendumFullDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.di.ReferendaListComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.di.ConfirmReferendumVoteComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.di.SetupVoteReferendumComponent
-import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.di.ConfirmGovernanceUnlockComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.di.ReferendumVotersComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.di.ConfirmGovernanceUnlockComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.di.GovernanceLocksOverviewComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -49,6 +50,8 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
     fun confirmGovernanceUnlockFactory(): ConfirmGovernanceUnlockComponent.Factory
 
     fun governanceLocksOverviewFactory(): GovernanceLocksOverviewComponent.Factory
+
+    fun delegateListFactory(): DelegateListComponent.Factory
 
     @Component.Factory
     interface Factory {

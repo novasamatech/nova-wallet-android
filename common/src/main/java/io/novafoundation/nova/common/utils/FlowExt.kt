@@ -6,6 +6,7 @@ import android.widget.RadioGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.presentation.ExtendedLoadingState
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.isModifiable
@@ -102,11 +103,21 @@ inline fun <T, R> Flow<T?>.mapNullable(crossinline mapper: suspend (T) -> R): Fl
  */
 fun <T, R> Flow<T>.withLoadingSingle(sourceSupplier: suspend (T) -> R): Flow<LoadingState<R>> {
     return transformLatest { item ->
-        emit(LoadingState.Loading<R>())
+        emit(LoadingState.Loading())
 
         val newSource = LoadingState.Loaded(sourceSupplier(item))
 
         emit(newSource)
+    }
+}
+
+fun <T, R> Flow<T>.withLoadingResult(source: suspend (T) -> Result<R>): Flow<ExtendedLoadingState<R>> {
+    return transformLatest { item ->
+        emit(ExtendedLoadingState.Loading)
+
+        source(item)
+            .onSuccess { emit(ExtendedLoadingState.Loaded(it)) }
+            .onFailure { emit(ExtendedLoadingState.Error(it)) }
     }
 }
 

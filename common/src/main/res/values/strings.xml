@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="common_sort_by">Sort by</string>
+
+    <string name="delegation_delegate_filter_all">All accounts</string>
+    <string name="delegation_delegate_filter_organizations">Organizations</string>
+    <string name="delegation_delegate_filter_individuals">Individuals</string>
+
+    <string name="delegation_add_delegation">Add delegation</string>
+
+    <string name="delegation_delegate_type_organization">Organization</string>
+    <string name="delegation_delegate_type_individual">Individual</string>
+
+    <string name="delegation_delegations">Delegations</string>
+    <string name="delegation_delegated_votes">Delegated votes</string>
+    <string name="delegation_recent_votes_format">Voted last %s</string>
 
     <string name="assets_search_placeholder">No tokens with\nentered name were found</string>
 

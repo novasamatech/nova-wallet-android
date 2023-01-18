@@ -6,10 +6,13 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.letOrHide
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorModel
+import kotlinx.android.synthetic.main.item_referenda_header.view.governanceLocksDelegations
 import kotlinx.android.synthetic.main.item_referenda_header.view.governanceLocksHeader
+import kotlinx.android.synthetic.main.item_referenda_header.view.governanceLocksLocked
 import kotlinx.android.synthetic.main.item_referenda_header.view.referendaAssetHeader
 
 class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Handler) : RecyclerView.Adapter<HeaderHolder>() {
@@ -18,6 +21,8 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
         fun onClickAssetSelector()
 
         fun onClickGovernanceLocks()
+
+        fun onClickDelegations()
     }
 
     private var assetModel: AssetSelectorModel? = null
@@ -66,8 +71,14 @@ private enum class Payload {
 class HeaderHolder(private val imageLoader: ImageLoader, view: View, handler: ReferendaListHeaderAdapter.Handler) : RecyclerView.ViewHolder(view) {
 
     init {
-        view.referendaAssetHeader.setOnClickListener { handler.onClickAssetSelector() }
-        view.governanceLocksHeader.setOnClickListener { handler.onClickGovernanceLocks() }
+        with(view) {
+            referendaAssetHeader.setOnClickListener { handler.onClickAssetSelector() }
+
+            governanceLocksHeader.background = context.getBlockDrawable()
+
+            governanceLocksLocked.setOnClickListener { handler.onClickGovernanceLocks() }
+            governanceLocksDelegations.setOnClickListener { handler.onClickDelegations() }
+        }
     }
 
     fun bind(assetModel: AssetSelectorModel?, locksModel: GovernanceLocksModel?) {
@@ -80,8 +91,8 @@ class HeaderHolder(private val imageLoader: ImageLoader, view: View, handler: Re
     }
 
     fun bindLocks(locksModel: GovernanceLocksModel?) {
-        itemView.governanceLocksHeader.letOrHide(locksModel) {
-            itemView.governanceLocksHeader.setModel(it)
+        itemView.governanceLocksLocked.letOrHide(locksModel) {
+            itemView.governanceLocksLocked.setModel(it)
         }
     }
 }

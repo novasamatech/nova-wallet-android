@@ -164,4 +164,8 @@ class ReferendaListViewModel(
     fun governanceLocksClicked() {
         governanceRouter.openGovernanceLocksOverview()
     }
+
+    fun delegationsClicked() {
+        governanceRouter.openAddDelegation()
+    }
 }

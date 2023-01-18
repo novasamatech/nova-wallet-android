@@ -5,7 +5,8 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 class OffChainDelegateMetadata(
     val accountId: AccountId,
     val shortDescription: String,
-    val longDescription: String,
+    val longDescription: String?,
     val profileImageUrl: String?,
     val isOrganization: Boolean,
+    val name: String,
 )

@@ -5,6 +5,6 @@ class DelegateMetadataRemote(
     val name: String,
     val image: String,
     val shortDescription: String,
-    val longDescription: String,
+    val longDescription: String?,
     val isOrganization: Boolean
 )
