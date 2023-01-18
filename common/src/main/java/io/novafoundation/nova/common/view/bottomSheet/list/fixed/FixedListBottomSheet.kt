@@ -19,6 +19,7 @@ import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetItemContainer
 import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetTitle
 import kotlinx.android.synthetic.main.item_sheet_iconic_label.view.itemExternalActionContent
+import kotlinx.android.synthetic.main.item_sheet_switcher.view.itemSheetSwitcher
 
 typealias ViewGetter<V> = FixedListBottomSheet.() -> V
 
@@ -91,8 +92,8 @@ abstract class FixedListBottomSheet(
     }
 }
 
-fun FixedListBottomSheet.item(
-    @DrawableRes icon: Int,
+fun FixedListBottomSheet.textItem(
+    @DrawableRes iconRes: Int,
     title: String,
     showArrow: Boolean = false,
     onClick: (View) -> Unit,
@@ -103,7 +104,7 @@ fun FixedListBottomSheet.item(
         val paddingInDp = 12
 
         view.itemExternalActionContent.setDrawableStart(
-            drawableRes = icon,
+            drawableRes = iconRes,
             widthInDp = 24,
             tint = R.color.icon_primary,
             paddingInDp = 12
@@ -122,11 +123,32 @@ fun FixedListBottomSheet.item(
     }
 }
 
-fun FixedListBottomSheet.item(
-    @DrawableRes icon: Int,
+fun FixedListBottomSheet.textItem(
+    @DrawableRes iconRes: Int,
     @StringRes titleRes: Int,
     showArrow: Boolean = false,
     onClick: (View) -> Unit
 ) {
-    item(icon, context.getString(titleRes), showArrow, onClick)
+    textItem(iconRes, context.getString(titleRes), showArrow, onClick)
+}
+
+fun FixedListBottomSheet.switcherItem(
+    @DrawableRes iconRes: Int,
+    @StringRes titleRes: Int,
+    initialState: Boolean,
+    onClick: (View) -> Unit
+) {
+    item(R.layout.item_sheet_switcher) { view ->
+        view.itemSheetSwitcher.setText(titleRes)
+        view.itemSheetSwitcher.isChecked = initialState
+
+        view.itemSheetSwitcher.setDrawableStart(
+            drawableRes = iconRes,
+            widthInDp = 24,
+            tint = R.color.icon_primary,
+            paddingInDp = 12
+        )
+
+        view.setDismissingClickListener(onClick)
+    }
 }

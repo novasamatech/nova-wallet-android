@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="common_enable">Enable</string>
+    <string name="settings_safe_mode_confirmation_title">Safe mode</string>
+    <string name="settings_safe_mode_confirmation_message">Screen recording and screenshots will not be available. The minimized app will display splash screen instead of the content</string>
+
+    <string name="profile_settings_safe_mode_title">Safe mode</string>
+
+    <string name="stacking_no_access_to_controller_account_title">No access to controller account</string>
+    <string name="stacking_no_access_to_controller_account_message">Add your controller account in device.</string>
+
+    <string name="dapp_options_title">Page settings</string>
+    <string name="dapp_options_add_to_favorite">Add to Favorites</string>
+    <string name="dapp_options_remove_from_favorite">Remove from Favorites</string>
+    <string name="dapp_options_desktop_mode">Desktop mode</string>
+
     <string name="assets_search_placeholder">No tokens with\nentered name were found</string>
 
     <string name="asset_add_evm_token_invalid_contract_address_message">The entered contract address is not a %s ERC-20 contract.</string>

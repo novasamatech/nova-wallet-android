@@ -34,7 +34,7 @@ class ReviewCustomValidatorsViewModel(
     private val resourceManager: ResourceManager,
     private val sharedStateSetup: SetupStakingSharedState,
     private val selectedAssetState: SingleAssetSharedState,
-    tokenUseCase: TokenUseCase,
+    tokenUseCase: TokenUseCase
 ) : BaseViewModel() {
 
     private val confirmSetupState = sharedStateSetup.setupStakingProcess

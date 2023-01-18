@@ -9,7 +9,8 @@ class DappMetadataRemote(
     val name: String,
     val icon: String,
     val url: String,
-    val categories: List<String>
+    val categories: List<String>,
+    val desktopOnly: Boolean?
 )
 
 class DappCategoryRemote(

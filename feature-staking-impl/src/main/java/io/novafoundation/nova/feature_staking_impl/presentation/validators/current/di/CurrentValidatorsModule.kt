@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validators.current.CurrentValidatorsInteractor
@@ -33,6 +34,7 @@ class CurrentValidatorsModule {
         router: StakingRouter,
         selectedAssetState: StakingSharedState,
         tokenUseCase: TokenUseCase,
+        validationExecutor: ValidationExecutor
     ): ViewModel {
         return CurrentValidatorsViewModel(
             router = router,
@@ -42,7 +44,8 @@ class CurrentValidatorsModule {
             currentValidatorsInteractor = currentValidatorsInteractor,
             setupStakingSharedState = setupStakingSharedState,
             selectedAssetState = selectedAssetState,
-            tokenUseCase = tokenUseCase
+            tokenUseCase = tokenUseCase,
+            validationExecutor = validationExecutor
         )
     }
 

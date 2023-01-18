@@ -6,14 +6,18 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_dapp_api.data.model.BrowserHostSettings
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignRequester
@@ -29,11 +33,13 @@ import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.AuthorizeDAp
 import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxResponse
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -44,16 +50,21 @@ enum class ConfirmationState {
     ALLOWED, REJECTED, CANCELLED
 }
 
+data class DesktopModeChangedEvent(val desktopModeEnabled: Boolean, val url: String)
+
 class DAppBrowserViewModel(
     private val router: DAppRouter,
     private val signRequester: DAppSignRequester,
     private val extensionStoreFactory: ExtensionStoreFactory,
+    private val dAppInteractor: DappInteractor,
     private val interactor: DappBrowserInteractor,
     private val dAppSearchRequester: DAppSearchRequester,
     private val initialUrl: String,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 ) : BaseViewModel(), Web3StateMachineHost {
+
+    val removeFromFavouritesConfirmation = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
 
     private val _showConfirmationDialog = MutableLiveData<Event<DappPendingConfirmation<*>>>()
     val showConfirmationSheet = _showConfirmationDialog
@@ -69,12 +80,24 @@ class DAppBrowserViewModel(
 
     override val externalEvents = singleReplaySharedFlow<ExternalEvent>()
 
-    private val _browserNavigationCommandEvent = MutableLiveData<Event<BrowserNavigationCommand>>()
-    val browserNavigationCommandEvent: LiveData<Event<BrowserNavigationCommand>> = _browserNavigationCommandEvent
+    private val _browserCommandEvent = MutableLiveData<Event<BrowserCommand>>()
+    val browserCommandEvent: LiveData<Event<BrowserCommand>> = _browserCommandEvent
 
-    val removeFromFavouritesConfirmation = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
+    private val _openBrowserOptionsEvent = MutableLiveData<Event<DAppOptionsPayload>>()
+    val openBrowserOptionsEvent: LiveData<Event<DAppOptionsPayload>> = _openBrowserOptionsEvent
 
     val extensionsStore = extensionStoreFactory.create(hostApi = this, coroutineScope = this)
+
+    private val isDesktopModeEnabledFlow = MutableStateFlow(false)
+
+    val desktopModeChangedModel = currentPageAnalyzed
+        .map { currentPage ->
+            val hostSettings = interactor.getHostSettings(currentPage.url)
+            val isDesktopModeEnabled = hostSettings?.isDesktopModeEnabled ?: isDesktopModeEnabledFlow.first()
+            DesktopModeChangedEvent(isDesktopModeEnabled, currentPage.url)
+        }
+        .distinctUntilChanged()
+        .shareInBackground()
 
     init {
         dAppSearchRequester.responseFlow
@@ -106,7 +129,7 @@ class DAppBrowserViewModel(
     }
 
     override fun reloadPage() {
-        _browserNavigationCommandEvent.postValue(BrowserNavigationCommand.Reload.event())
+        _browserCommandEvent.postValue(BrowserCommand.Reload.event())
     }
 
     fun onPageChanged(url: String, title: String?) {
@@ -127,22 +150,39 @@ class DAppBrowserViewModel(
         dAppSearchRequester.openRequest(SearchPayload(initialUrl = currentPage.url))
     }
 
-    fun onFavouriteClicked() = launch {
-        val page = currentPageAnalyzed.first()
+    fun onMoreClicked() {
+        launch {
+            val payload = getCurrentPageOptionsPayload()
+            _openBrowserOptionsEvent.value = Event(payload)
+        }
+    }
 
-        if (page.isFavourite) {
-            val dAppTitle = page.title ?: page.display
-            removeFromFavouritesConfirmation.awaitAction(dAppTitle)
+    fun onFavoriteClick(optionsPayload: DAppOptionsPayload) {
+        launch {
+            if (optionsPayload.isFavorite) {
+                removeFromFavouritesConfirmation.awaitAction(optionsPayload.currentPageTitle)
 
-            interactor.removeDAppFromFavourites(page.url)
-        } else {
-            val payload = AddToFavouritesPayload(
-                url = page.url,
-                label = page.title,
-                iconLink = null
-            )
+                dAppInteractor.removeDAppFromFavourites(optionsPayload.url)
+            } else {
+                val payload = AddToFavouritesPayload(
+                    url = optionsPayload.url,
+                    label = optionsPayload.currentPageTitle,
+                    iconLink = null
+                )
 
-            router.openAddToFavourites(payload)
+                router.openAddToFavourites(payload)
+            }
+        }
+    }
+
+    fun onDesktopClick() {
+        launch {
+            val desktopModeChangedEvent = desktopModeChangedModel.first()
+            val newDesktopMode = !desktopModeChangedEvent.desktopModeEnabled
+            val settings = BrowserHostSettings(Urls.normalizeUrl(desktopModeChangedEvent.url), newDesktopMode)
+            interactor.saveHostSettings(settings)
+            isDesktopModeEnabledFlow.value = newDesktopMode
+            _browserCommandEvent.postValue(BrowserCommand.ChangeDesktopMode(newDesktopMode).event())
         }
     }
 
@@ -161,9 +201,21 @@ class DAppBrowserViewModel(
     }
 
     private fun forceLoad(url: String) {
-        _browserNavigationCommandEvent.value = BrowserNavigationCommand.OpenUrl(url).event()
+        _browserCommandEvent.value = BrowserCommand.OpenUrl(url).event()
 
         updateCurrentPage(url, title = null, synchronizedWithBrowser = false)
+    }
+
+    private suspend fun getCurrentPageOptionsPayload(): DAppOptionsPayload {
+        val page = currentPageAnalyzed.first()
+        val currentPageTitle = page.title ?: page.display
+        val isCurrentPageFavorite = page.isFavourite
+        return DAppOptionsPayload(
+            currentPageTitle,
+            isCurrentPageFavorite,
+            isDesktopModeEnabled = desktopModeChangedModel.first().desktopModeEnabled,
+            url = page.url
+        )
     }
 
     private suspend fun awaitConfirmation(action: DappPendingConfirmation.Action) = suspendCoroutine<ConfirmationState> {

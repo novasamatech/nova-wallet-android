@@ -5,5 +5,5 @@ data class DappModel(
     val description: String,
     val iconUrl: String?,
     val isFavourite: Boolean,
-    val url: String,
+    val url: String
 )

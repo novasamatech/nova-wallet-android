@@ -175,7 +175,7 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            android:id="@+id/action_mainFragment_to_pinCodeFragment"
+            android:id="@+id/action_change_pin_code"
             app:destination="@id/pincodeFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"

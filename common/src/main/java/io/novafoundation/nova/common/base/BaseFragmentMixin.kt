@@ -2,12 +2,10 @@ package io.novafoundation.nova.common.base
 
 import android.content.Context
 import android.os.Bundle
-import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,6 +15,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.view.dialog.dialog
 import kotlinx.coroutines.flow.Flow
 
 interface BaseFragmentMixin<T : BaseViewModel> : WithContextExtensions {
@@ -35,20 +34,19 @@ interface BaseFragmentMixin<T : BaseViewModel> : WithContextExtensions {
     fun subscribe(viewModel: T)
 
     fun showError(errorMessage: String) {
-        buildErrorDialog(fragment.getString(R.string.common_error_general_title), errorMessage)
-            .show()
+        dialog(fragment.requireContext()) {
+            setTitle(fragment.getString(R.string.common_error_general_title))
+            setMessage(errorMessage)
+            setPositiveButton(R.string.common_ok) { _, _ -> }
+        }
     }
 
     fun showErrorWithTitle(title: String, errorMessage: String?) {
-        buildErrorDialog(title, errorMessage).show()
-    }
-
-    fun buildErrorDialog(title: String, errorMessage: String?): AlertDialog {
-        return AlertDialog.Builder(ContextThemeWrapper(fragment.requireContext(), R.style.WhiteOverlay))
-            .setTitle(title)
-            .setMessage(errorMessage)
-            .setPositiveButton(R.string.common_ok) { _, _ -> }
-            .create()
+        dialog(fragment.requireContext()) {
+            setTitle(title)
+            setMessage(errorMessage)
+            setPositiveButton(R.string.common_ok) { _, _ -> }
+        }
     }
 
     fun showMessage(text: String) {

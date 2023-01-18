@@ -7,6 +7,8 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -24,6 +26,8 @@ class RootViewModel(
     private val resourceManager: ResourceManager,
     private val networkStateMixin: NetworkStateMixin,
     private val contributionsInteractor: ContributionsInteractor,
+    private val backgroundAccessObserver: BackgroundAccessObserver,
+    private val safeModeService: SafeModeService
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin {
 
     private var willBeClearedForLanguageChange = false
@@ -34,6 +38,10 @@ class RootViewModel(
 
         interactor.runBalancesUpdate()
             .onEach { handleUpdatesSideEffect(it) }
+            .launchIn(this)
+
+        backgroundAccessObserver.requestAccessFlow
+            .onEach { verifyUserIfNeed() }
             .launchIn(this)
 
         syncCurrencies()
@@ -54,8 +62,6 @@ class RootViewModel(
             interactor.updatePhishingAddresses()
         }
     }
-
-    fun jsonFileOpened(content: String?) {}
 
     fun noticeInBackground() {
         if (!willBeClearedForLanguageChange) {
@@ -83,5 +89,19 @@ class RootViewModel(
         if (interactor.isBuyProviderRedirectLink(uri)) {
             showMessage(resourceManager.getString(R.string.buy_completed))
         }
+    }
+
+    private fun verifyUserIfNeed() {
+        launch {
+            if (interactor.isAccountSelected() && interactor.isPinCodeSet()) {
+                rootRouter.nonCancellableVerify()
+            } else {
+                backgroundAccessObserver.onAccessed()
+            }
+        }
+    }
+
+    fun applySafeModeIfEnabled() {
+        safeModeService.applySafeModeIfEnabled()
     }
 }
