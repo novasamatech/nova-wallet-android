@@ -1,0 +1,25 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml:2:1-78
+INJECTED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml:2:1-78
+INJECTED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml:2:1-78
+	package
+		ADDED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml:2:11-76
+		INJECTED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml:2:1-78
+uses-sdk
+INJECTED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml
+INJECTED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml
+INJECTED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml
+INJECTED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml
+		ADDED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml
+		ADDED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\AndroidManifest.xml
