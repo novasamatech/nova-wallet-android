@@ -7,6 +7,7 @@ import android.view.Gravity
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatTextView
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 
@@ -23,6 +24,7 @@ class ChipLabelView @JvmOverloads constructor(
 
     init {
         background = context.getRoundedCornerDrawable(R.color.chips_background, cornerSizeInDp = 8)
+        minHeight = 22.dp(context)
         gravity = Gravity.CENTER_VERTICAL
     }
 

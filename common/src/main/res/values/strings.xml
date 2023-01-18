@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="common_later">Later</string>
+    <string name="update_notification_title">What’s New</string>
+    <string name="update_notification_install_btn">Install the updates</string>
+
     <string name="stacking_no_access_to_controller_account_title">No access to controller account</string>
     <string name="stacking_no_access_to_controller_account_message">Add your controller account in device.</string>
 
