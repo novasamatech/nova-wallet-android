@@ -41,11 +41,11 @@ class ListChooserBottomSheet<T>(
     }
 
     override fun holderCreator(): HolderCreator<Model<T>> = { parentView ->
-        ViewHolder(parentView.inflateChild(R.layout.item_list_chooser))
+        ListChooserViewHolder(parentView.inflateChild(R.layout.item_list_chooser))
     }
 }
 
-private class ViewHolder<T>(containerView: View) : DynamicListSheetAdapter.Holder<Model<T>>(containerView) {
+private class ListChooserViewHolder<T>(containerView: View) : DynamicListSheetAdapter.Holder<Model<T>>(containerView) {
 
     override fun bind(
         item: Model<T>,
