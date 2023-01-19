@@ -189,6 +189,9 @@ dependencies {
 
     implementation project(':feature-vote')
 
+    implementation project(':feature-versions-api')
+    implementation project(':feature-versions-impl')
+
     implementation kotlinDep
 
     implementation androidDep

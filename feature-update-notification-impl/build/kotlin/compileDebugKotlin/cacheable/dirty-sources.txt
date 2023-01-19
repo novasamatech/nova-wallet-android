@@ -1,4 +1,0 @@
-C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\java\io\novafoundation\nova\feature_update_notification_impl\presentation\update\UpdateNotificationViewModel.kt
-C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\java\io\novafoundation\nova\feature_update_notification_impl\presentation\update\UpdateNotificationsAdapter.kt
-C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\java\io\novafoundation\nova\feature_update_notification_impl\presentation\update\UpdateNotificationFragment.kt
-C:\Users\spect\GitHub\nova-wallet-android\feature-update-notification-impl\src\main\java\io\novafoundation\nova\feature_update_notification_impl\presentation\update\UpdateNotificationModel.kt

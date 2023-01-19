@@ -22,6 +22,6 @@ include ':feature-currency-impl'
 include ':feature-governance-api'
 include ':feature-governance-impl'
 include ':feature-vote'
-include ':feature-update-notification-impl'
-include ':feature-update-notification-api'
+include ':feature-versions-impl'
+include ':feature-versions-api'
 
