@@ -3,7 +3,7 @@ package io.novafoundation.nova.core_db.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-val ExtractExternalApiToSeparateTable_34_35 = object : Migration(34, 35) {
+val ExtractExternalApiToSeparateTable_35_36 = object : Migration(35, 36) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         removeExternalApisColumnsFromChains(database)
