@@ -27,13 +27,13 @@ interface DelegationsRepository {
     suspend fun getDelegateMetadata(chain: Chain, delegate: AccountId): DelegateMetadata?
 }
 
-suspend fun DelegationsRepository.getDelegatesMetadataOrEmpty(chain: Chain) : List<DelegateMetadata> {
+suspend fun DelegationsRepository.getDelegatesMetadataOrEmpty(chain: Chain): List<DelegateMetadata> {
     return runCatching { getDelegatesMetadata(chain) }
         .onFailure { Log.e(LOG_TAG, "Failed to fetch delegate metadatas", it) }
         .getOrDefault(emptyList())
 }
 
-suspend fun DelegationsRepository.getDelegateMetadataOrNull(chain: Chain, delegate: AccountId) : DelegateMetadata? {
+suspend fun DelegationsRepository.getDelegateMetadataOrNull(chain: Chain, delegate: AccountId): DelegateMetadata? {
     return runCatching { getDelegateMetadata(chain, delegate) }
         .onFailure { Log.e(LOG_TAG, "Failed to fetch delegate metadata", it) }
         .getOrNull()
