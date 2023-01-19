@@ -7,7 +7,9 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.details.RealDelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.list.RealDelegateListInteractor
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.RealDelegateMappers
@@ -23,6 +25,18 @@ class DelegateModule {
         chainStateRepository: ChainStateRepository,
         identityRepository: OnChainIdentityRepository
     ): DelegateListInteractor = RealDelegateListInteractor(
+        governanceSourceRegistry = governanceSourceRegistry,
+        chainStateRepository = chainStateRepository,
+        identityRepository = identityRepository
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideDelegateDetailsInteractor(
+        governanceSourceRegistry: GovernanceSourceRegistry,
+        chainStateRepository: ChainStateRepository,
+        identityRepository: OnChainIdentityRepository
+    ): DelegateDetailsInteractor = RealDelegateDetailsInteractor(
         governanceSourceRegistry = governanceSourceRegistry,
         chainStateRepository = chainStateRepository,
         identityRepository = identityRepository

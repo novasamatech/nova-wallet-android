@@ -10,10 +10,10 @@ import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.common.view.input.chooser.createFromEnum
 import io.novafoundation.nova.common.view.input.chooser.selectedValue
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateFiltering
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegatePreview
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateSorting
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateFiltering
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateSorting
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter

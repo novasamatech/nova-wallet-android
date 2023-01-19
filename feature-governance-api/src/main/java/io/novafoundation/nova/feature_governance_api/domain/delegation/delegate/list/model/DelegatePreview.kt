@@ -1,11 +1,14 @@
-package io.novafoundation.nova.feature_governance_api.domain.delegation.delegate
+package io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model
 
 import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.Delegate
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateAccountType
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 data class DelegatePreview(
     override val accountId: AccountId,
-    override val stats: DelegateStats,
+    val stats: Stats,
     override val metadata: Metadata?,
     override val onChainIdentity: OnChainIdentity?
 ) : Delegate {
@@ -16,4 +19,6 @@ data class DelegatePreview(
         override val accountType: DelegateAccountType,
         override val name: String?
     ) : Delegate.Metadata
+
+    data class Stats(val delegationsCount: Int, val delegatedVotes: Balance, val recentVotes: Int)
 }

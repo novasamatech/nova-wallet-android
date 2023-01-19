@@ -1,23 +1,21 @@
 package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.list
 
-import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.get
-import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.applyFilter
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
-import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.OffChainDelegateMetadata
-import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.OffChainDelegateStats
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateStats
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateMetadata
+import io.novafoundation.nova.feature_governance_api.data.repository.getDelegatesMetadataOrEmpty
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateAccountType
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateFiltering
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegatePreview
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateSorting
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateStats
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegateComparator
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateFiltering
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateSorting
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.delegateComparator
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.mapAccountTypeToDomain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.util.blockInPast
@@ -55,15 +53,10 @@ class RealDelegateListInteractor(
         val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.id)
         val recentVotesBlockThreshold = blockDurationEstimator.blockInPast(RECENT_VOTES_PERIOD)
 
-        val delegatesStatsDeferred = async { delegationsRepository.getOffChainDelegatesStats(recentVotesBlockThreshold, chain) }
+        val delegatesStatsDeferred = async { delegationsRepository.getDelegatesStats(recentVotesBlockThreshold, chain) }
+        val delegateMetadatasDeferred = async { delegationsRepository.getDelegatesMetadataOrEmpty(chain) }
 
-        val delegateMetadatasDeferred = async {
-            runCatching { delegationsRepository.getOffChainDelegatesMetadata(chain) }
-                .onFailure { Log.e(LOG_TAG, "Failed to fetch delegate metadatas", it) }
-                .getOrDefault(emptyList())
-        }
-
-        val delegateAccountIds = delegatesStatsDeferred.await().map(OffChainDelegateStats::accountId)
+        val delegateAccountIds = delegatesStatsDeferred.await().map(DelegateStats::accountId)
         val delegateMetadatasByAccountId = delegateMetadatasDeferred.await().associateBy { AccountIdKey(it.accountId) }
 
         val identities = identityRepository.getIdentitiesFromIds(delegateAccountIds, chain.id)
@@ -84,17 +77,15 @@ class RealDelegateListInteractor(
             .sortedWith(sorting.delegateComparator())
     }
 
-    private fun mapStatsToDomain(stats: OffChainDelegateStats): DelegateStats {
-        return DelegateStats(
+    private fun mapStatsToDomain(stats: DelegateStats): DelegatePreview.Stats {
+        return DelegatePreview.Stats(
             delegatedVotes = stats.delegatedVotes,
             delegationsCount = stats.delegationsCount,
-            recentVotes = DelegateStats.RecentVotes(
-                numberOfVotes = stats.recentVotes,
-            )
+            recentVotes = stats.recentVotes
         )
     }
 
-    private fun mapMetadataToDomain(metadata: OffChainDelegateMetadata?): DelegatePreview.Metadata? {
+    private fun mapMetadataToDomain(metadata: DelegateMetadata?): DelegatePreview.Metadata? {
         if (metadata == null) return null
 
         return DelegatePreview.Metadata(
@@ -103,9 +94,5 @@ class RealDelegateListInteractor(
             iconUrl = metadata.profileImageUrl,
             name = metadata.name
         )
-    }
-
-    private fun mapAccountTypeToDomain(isOrganization: Boolean): DelegateAccountType {
-        return if (isOrganization) DelegateAccountType.ORGANIZATION else DelegateAccountType.INDIVIDUAL
     }
 }

@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.Delegate
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateAccountType
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateStats
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateStatsModel
@@ -24,7 +24,7 @@ interface DelegateMappers {
 
     suspend fun formatDelegateName(delegate: Delegate, chain: Chain): String
 
-    suspend fun formatDelegationStats(stats: DelegateStats, chainAsset: Chain.Asset): DelegateStatsModel
+    suspend fun formatDelegationStats(stats: DelegatePreview.Stats, chainAsset: Chain.Asset): DelegateStatsModel
 
     suspend fun formattedRecentVotesPeriod(): String
 }
@@ -85,13 +85,13 @@ class RealDelegateMappers(
         }
     }
 
-    override suspend fun formatDelegationStats(stats: DelegateStats, chainAsset: Chain.Asset): DelegateStatsModel {
+    override suspend fun formatDelegationStats(stats: DelegatePreview.Stats, chainAsset: Chain.Asset): DelegateStatsModel {
         return DelegateStatsModel(
             delegations = stats.delegationsCount.format(),
             delegatedVotes = chainAsset.amountFromPlanks(stats.delegatedVotes).format(),
             recentVotes = DelegateStatsModel.RecentVotes(
                 label = formattedRecentVotesPeriod(),
-                value = stats.recentVotes.numberOfVotes.format()
+                value = stats.recentVotes.format()
             )
         )
     }

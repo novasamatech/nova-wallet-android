@@ -1,18 +1,28 @@
 package io.novafoundation.nova.feature_governance_impl.data.repository
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
-import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.OffChainDelegateMetadata
-import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.OffChainDelegateStats
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateDetailedStats
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateMetadata
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateStats
 import io.novafoundation.nova.feature_governance_api.data.repository.DelegationsRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class UnsupportedDelegationsRepository : DelegationsRepository {
 
-    override suspend fun getOffChainDelegatesStats(recentVotesBlockThreshold: BlockNumber, chain: Chain): List<OffChainDelegateStats> {
+    override suspend fun getDelegatesStats(recentVotesBlockThreshold: BlockNumber, chain: Chain): List<DelegateStats> {
         return emptyList()
     }
 
-    override suspend fun getOffChainDelegatesMetadata(chain: Chain): List<OffChainDelegateMetadata> {
+    override suspend fun getDetailedDelegateStats(delegateAddress: String, recentVotesBlockThreshold: BlockNumber, chain: Chain): DelegateDetailedStats? {
+        return null
+    }
+
+    override suspend fun getDelegatesMetadata(chain: Chain): List<DelegateMetadata> {
         return emptyList()
+    }
+
+    override suspend fun getDelegateMetadata(chain: Chain, delegate: AccountId): DelegateMetadata? {
+        return null
     }
 }
