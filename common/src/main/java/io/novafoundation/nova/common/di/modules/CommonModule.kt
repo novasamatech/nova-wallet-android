@@ -41,8 +41,11 @@ import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.OSAppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.ResourceManagerImpl
+import io.novafoundation.nova.common.sequrity.RealSafeModeService
+import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
@@ -91,6 +94,12 @@ class CommonModule {
     @ApplicationScope
     fun providePreferences(sharedPreferences: SharedPreferences): Preferences {
         return PreferencesImpl(sharedPreferences)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideBackgroundAccessObserver(preferences: Preferences): BackgroundAccessObserver {
+        return BackgroundAccessObserver(preferences)
     }
 
     @Provides
@@ -245,4 +254,13 @@ class CommonModule {
     fun provideListChooserMixinFactory(
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ListChooserMixin.Factory = RealListChooserMixinFactory(actionAwaitableMixinFactory)
+
+    @Provides
+    @ApplicationScope
+    fun provideSafeModeService(
+        contextManager: ContextManager,
+        preferences: Preferences
+    ): SafeModeService {
+        return RealSafeModeService(contextManager, preferences)
+    }
 }

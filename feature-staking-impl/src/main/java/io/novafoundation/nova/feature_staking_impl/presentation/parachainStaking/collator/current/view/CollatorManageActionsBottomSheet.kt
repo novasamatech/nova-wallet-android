@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 import android.content.Context
 import android.os.Bundle
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
-import io.novafoundation.nova.common.view.bottomSheet.list.fixed.item
+import io.novafoundation.nova.common.view.bottomSheet.list.fixed.textItem
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.model.ManageCollatorsAction
 
@@ -25,7 +25,7 @@ class CollatorManageActionsBottomSheet(
 
     private fun item(
         action: ManageCollatorsAction,
-    ) = item(action.iconRes, action.titleRes) {
+    ) = textItem(action.iconRes, action.titleRes) {
         itemSelected(action)
     }
 }

@@ -459,6 +459,11 @@
         <item name="android:textColor">@color/text_primary</item>
     </style>
 
+    <style name="AccentPositiveAlertDialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="buttonBarPositiveButtonStyle">@style/AccentDialogPositiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AccentDialogPositiveButtonStyle</item>
+    </style>
+
     <style name="AccentAlertDialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
         <item name="buttonBarPositiveButtonStyle">@style/AccentDialogPositiveButtonStyle</item>
         <item name="buttonBarNegativeButtonStyle">@style/AccentDialogNegativeButtonStyle</item>

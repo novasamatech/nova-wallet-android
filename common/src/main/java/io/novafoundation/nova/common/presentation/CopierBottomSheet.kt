@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
-import io.novafoundation.nova.common.view.bottomSheet.list.fixed.item
+import io.novafoundation.nova.common.view.bottomSheet.list.fixed.textItem
 import kotlinx.android.synthetic.main.bottom_sheeet_copier.copierContainer
 import kotlinx.android.synthetic.main.bottom_sheeet_copier.copierValue
 
@@ -45,7 +45,7 @@ class CopierBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTitle(value)
-        item(R.drawable.ic_copy_outline, buttonName, false) {
+        textItem(R.drawable.ic_copy_outline, buttonName, false) {
             clipboardManager.addToClipboard(value)
             Toast.makeText(context, onClipboardMessage, Toast.LENGTH_LONG)
                 .show()

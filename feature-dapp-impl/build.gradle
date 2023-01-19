@@ -72,6 +72,7 @@ dependencies {
     implementation gsonDep
 
     implementation daggerDep
+
     kapt daggerKapt
 
     implementation lifecycleDep

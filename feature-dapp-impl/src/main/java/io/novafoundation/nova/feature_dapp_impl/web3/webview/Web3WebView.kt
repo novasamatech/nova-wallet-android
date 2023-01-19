@@ -5,15 +5,12 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.ProgressBar
 import io.novafoundation.nova.common.BuildConfig
-import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionsStore
 
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.injectWeb3(
-    web3ClientFactory: Web3WebViewClientFactory,
-    extensionsStore: ExtensionsStore,
     progressBar: ProgressBar,
-    onPageChanged: OnPageChangedListener,
     fileChooser: WebViewFileChooser,
+    web3Client: Web3WebViewClient
 ) {
     settings.javaScriptEnabled = true
     settings.cacheMode = WebSettings.LOAD_DEFAULT
@@ -24,20 +21,25 @@ fun WebView.injectWeb3(
     settings.domStorageEnabled = true
     settings.javaScriptCanOpenWindowsAutomatically = true
 
-    val web3Client = web3ClientFactory.create(this, extensionsStore, onPageChanged)
     web3Client.initialInject()
-
-    webViewClient = web3Client
+    this.webViewClient = web3Client
     webChromeClient = Web3ChromeClient(fileChooser, progressBar)
 
     WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
+}
 
-    settings.userAgentString = settings.userAgentString + "NovaWallet(Platform=Android)"
+fun WebView.changeUserAgentByDesktopMode(desktopMode: Boolean) {
+    val defaultUserAgent = WebSettings.getDefaultUserAgent(context)
+
+    settings.userAgentString = if (desktopMode) {
+        "Mozilla/5.0 (X11; CrOS x86_64 10066.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+    } else {
+        defaultUserAgent
+    }
 }
 
 fun WebView.uninjectWeb3() {
     settings.javaScriptEnabled = false
 
-    webChromeClient = null
     webChromeClient = null
 }

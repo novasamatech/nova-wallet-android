@@ -17,6 +17,7 @@ import io.novafoundation.nova.core_db.converters.OperationConverters
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
+import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
@@ -35,6 +36,7 @@ import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.migrations.AddAdditionalFieldToChains_12_13
+import io.novafoundation.nova.core_db.migrations.AddBrowserHostSettings_34_35
 import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
 import io.novafoundation.nova.core_db.migrations.AddContributions_23_24
@@ -72,6 +74,7 @@ import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.core_db.model.AssetLocal
 import io.novafoundation.nova.core_db.model.BalanceLockLocal
+import io.novafoundation.nova.core_db.model.BrowserHostSettingsLocal
 import io.novafoundation.nova.core_db.model.ContributionLocal
 import io.novafoundation.nova.core_db.model.CurrencyLocal
 import io.novafoundation.nova.core_db.model.DappAuthorizationLocal
@@ -121,7 +124,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         CurrencyLocal::class,
         BalanceLockLocal::class,
         ContributionLocal::class,
-        GovernanceDAppLocal::class
+        GovernanceDAppLocal::class,
+        BrowserHostSettingsLocal::class
     ],
 )
 @TypeConverters(
@@ -162,7 +166,8 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddGovernanceExternalApiToChain_27_28)
                     .addMigrations(AddSourceToLocalAsset_28_29, AddTransferApisTable_29_30, AddEnabledColumnToChainAssets_30_31)
                     .addMigrations(FixBrokenForeignKeys_31_32, AddVersioningToGovernanceDapps_32_33)
-                    .addMigrations(AddGovernanceNetworkToExternalApi_33_34, ExtractExternalApiToSeparateTable_34_35)
+                    .addMigrations(AddGovernanceNetworkToExternalApi_33_34, AddBrowserHostSettings_34_35)
+                    .addMigrations(ExtractExternalApiToSeparateTable_34_35)
                     .build()
             }
             return instance!!
@@ -208,4 +213,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun contributionDao(): ContributionDao
 
     abstract fun governanceDAppsDao(): GovernanceDAppsDao
+
+    abstract fun browserHostSettingsDao(): BrowserHostSettingsDao
 }
