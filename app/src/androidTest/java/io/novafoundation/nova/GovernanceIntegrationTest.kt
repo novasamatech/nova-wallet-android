@@ -177,6 +177,27 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, delegate.toString())
     }
 
+    @Test
+    fun should() = runTest {
+        val interactor = governanceApi.newDelegationChooseTrackInteractor
+        val updateSystem = governanceApi.governanceUpdateSystem
+
+        updateSystem.start()
+            .inBackground()
+            .launchIn(this)
+
+        val trackData = interactor.observeChooseTrackData().first()
+
+        Log.d(this@GovernanceIntegrationTest.LOG_TAG,
+            """
+                Available: ${trackData.trackPartition.available.size}
+                Already voted: ${trackData.trackPartition.alreadyVoted.size}
+                Already delegated: ${trackData.trackPartition.alreadyDelegated.size}
+                Presets: ${trackData.presets}
+            """.trimIndent()
+        )
+    }
+
     private suspend fun source(supportedGovernance: SupportedGovernanceOption) = governanceApi.governanceSourceRegistry.sourceFor(supportedGovernance)
 
     private fun supportedGovernanceOption(chain: Chain, governance: Chain.Governance) =
