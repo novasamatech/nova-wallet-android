@@ -3,7 +3,7 @@
 
     <string name="common_enable">Enable</string>
     <string name="settings_safe_mode_confirmation_title">Safe mode</string>
-    <string name="settings_safe_mode_confirmation_message">Screen recording and screenshots will not be available. The minimized app will display splash screen instead of the content</string>
+    <string name="settings_safe_mode_confirmation_message">Screen recording and screenshots will not be available. The minimized app will not display the content</string>
 
     <string name="profile_settings_safe_mode_title">Safe mode</string>
 
