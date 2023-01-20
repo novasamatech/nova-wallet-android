@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.utils.formatting
 import android.content.Context
 import android.text.format.DateUtils
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.daysFromMillis
 import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.isNonNegative
@@ -15,7 +16,8 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
-const val DATE_ISO_8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+const val DATE_ISO_8601_FULL = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+const val DATE_ISO_8601_NO_MS = "yyyy-MM-dd'T'HH:mm:ss'Z'"
 
 private const val DECIMAL_PATTERN_BASE = "###,###."
 
@@ -26,7 +28,8 @@ private const val FULL_PRECISION = 5
 const val ABBREVIATED_PRECISION = 2
 
 private val dateTimeFormat = SimpleDateFormat.getDateTimeInstance()
-private val dateTimeFormatISO_8601 by lazy { SimpleDateFormat(DATE_ISO_8601, Locale.getDefault()) }
+private val dateTimeFormatISO_8601 by lazy { SimpleDateFormat(DATE_ISO_8601_FULL, Locale.getDefault()) }
+private val dateTimeFormatISO_8601_NoMs by lazy { SimpleDateFormat(DATE_ISO_8601_NO_MS, Locale.getDefault()) }
 
 private val defaultAbbreviationFormatter = FixedPrecisionFormatter(ABBREVIATED_PRECISION)
 private val defaultFullFormatter = FixedPrecisionFormatter(FULL_PRECISION)
@@ -91,6 +94,20 @@ fun BigDecimal.formatFractionAsPercentage(): String {
     return fractionToPercentage().formatAsPercentage()
 }
 
+fun Date.formatDaysSinceEpoch(resourceManager: ResourceManager): String {
+    val currentDays = System.currentTimeMillis().daysFromMillis()
+    val diff = currentDays - time.daysFromMillis()
+
+    if (diff < 0) throw IllegalArgumentException("Past date should be less than current")
+    return when (diff) {
+        0L -> resourceManager.getString(R.string.today)
+        1L -> resourceManager.getString(R.string.yesterday)
+        else -> {
+            resourceManager.formatDate(time)
+        }
+    }
+}
+
 fun Long.formatDaysSinceEpoch(context: Context): String? {
     val currentDays = System.currentTimeMillis().daysFromMillis()
     val diff = currentDays - this
@@ -111,6 +128,10 @@ fun Long.formatDateTime() = dateTimeFormat.format(Date(this))
 
 fun parseDateISO_8601(value: String): Date? {
     return runCatching { dateTimeFormatISO_8601.parse(value) }.getOrNull()
+}
+
+fun parseDateISO_8601_NoMs(value: String): Date? {
+    return runCatching { dateTimeFormatISO_8601_NoMs.parse(value) }.getOrNull()
 }
 
 fun decimalFormatterFor(pattern: String): DecimalFormat {

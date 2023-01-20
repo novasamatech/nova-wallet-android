@@ -8,15 +8,16 @@ class RealUpdateNotificationsInteractor(
     private val versionService: VersionService
 ) : UpdateNotificationsInteractor {
 
-    override suspend fun hasUpdateNotifications(): Boolean {
-        return versionService.hasNewVersions()
+    override suspend fun hasImportantUpdates(): Boolean {
+        return versionService.hasImportantUpdates()
     }
 
     override suspend fun getUpdateNotifications(): List<UpdateNotification> {
         return versionService.getNewVersions()
+            .sortedWith { o1, o2 -> o2.version.compareTo(o1.version) }
     }
 
-    override fun hideNotificationsForCurrentVersion() {
-        versionService.saveVersionCheckpoint()
+    override fun skipNewUpdates() {
+        versionService.skipCurrentUpdates()
     }
 }

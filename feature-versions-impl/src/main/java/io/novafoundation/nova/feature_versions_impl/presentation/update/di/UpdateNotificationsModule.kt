@@ -8,6 +8,8 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.navigation.DelayedNavigation
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_versions_api.presentation.VersionsRouter
 import io.novafoundation.nova.feature_versions_impl.presentation.update.UpdateNotificationViewModel
@@ -20,9 +22,11 @@ class UpdateNotificationsModule {
     @ViewModelKey(UpdateNotificationViewModel::class)
     fun provideViewModel(
         router: VersionsRouter,
-        interactor: UpdateNotificationsInteractor
+        interactor: UpdateNotificationsInteractor,
+        nextNavigation: DelayedNavigation,
+        resourceManager: ResourceManager
     ): ViewModel {
-        return UpdateNotificationViewModel(router, interactor)
+        return UpdateNotificationViewModel(router, interactor, nextNavigation, resourceManager)
     }
 
     @Provides

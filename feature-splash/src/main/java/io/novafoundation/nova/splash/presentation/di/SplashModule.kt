@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.splash.SplashRouter
 import io.novafoundation.nova.splash.presentation.SplashViewModel
 
@@ -23,7 +24,11 @@ class SplashModule {
     @Provides
     @IntoMap
     @ViewModelKey(SplashViewModel::class)
-    fun provideSignInViewModel(accountRepository: AccountRepository, router: SplashRouter): ViewModel {
-        return SplashViewModel(router, accountRepository)
+    fun provideSignInViewModel(
+        accountRepository: AccountRepository,
+        router: SplashRouter,
+        updateNotificationsInteractor: UpdateNotificationsInteractor
+    ): ViewModel {
+        return SplashViewModel(router, accountRepository, updateNotificationsInteractor)
     }
 }

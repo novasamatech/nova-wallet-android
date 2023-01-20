@@ -1,7 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<io.novafoundation.nova.common.view.AlertView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/itemUpdateNotificationAlert"
+<io.novafoundation.nova.common.view.BannerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemUpdateNotificationBanner"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginTop="12dp" />
+    android:layout_marginTop="12dp"
+    android:src="@drawable/advertisement_calendar"
+    tools:bannerBackground="@drawable/ic_banner_gray_gradient">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="64dp"
+        android:layout_marginBottom="36dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/itemUpdateNotificationAlertTitle"
+            style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:textColor="@color/text_primary"
+            tools:text="@string/update_notifications_critical_update_alert_titile" />
+
+        <TextView
+            android:id="@+id/itemUpdateNotificationAlertSubtitle"
+            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/update_notifications_critical_update_alert_subtitile"
+            tools:textColor="@color/text_secondary" />
+
+    </LinearLayout>
+
+
+</io.novafoundation.nova.common.view.BannerView>

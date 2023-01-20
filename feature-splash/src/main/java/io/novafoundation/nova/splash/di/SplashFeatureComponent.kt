@@ -5,6 +5,7 @@ import dagger.Component
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.splash.SplashRouter
 import io.novafoundation.nova.splash.presentation.di.SplashComponent
 
@@ -35,7 +36,8 @@ interface SplashFeatureComponent : SplashFeatureApi {
     @Component(
         dependencies = [
             CommonApi::class,
-            AccountFeatureApi::class
+            AccountFeatureApi::class,
+            VersionsFeatureApi::class
         ]
     )
     interface SplashFeatureDependenciesComponent : SplashFeatureDependencies

@@ -3,12 +3,14 @@ package io.novafoundation.nova.splash.presentation
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.splash.SplashRouter
 import kotlinx.coroutines.launch
 
 class SplashViewModel(
     private val router: SplashRouter,
-    private val repository: AccountRepository
+    private val repository: AccountRepository,
+    private val updateNotificationsInteractor: UpdateNotificationsInteractor
 ) : BaseViewModel() {
 
     init {
@@ -18,14 +20,26 @@ class SplashViewModel(
     private fun openInitialDestination() {
         viewModelScope.launch {
             if (repository.isAccountSelected()) {
-                if (repository.isCodeSet()) {
-                    router.openInitialCheckPincode()
-                } else {
-                    router.openCreatePincode()
-                }
+                openPinCode()
             } else {
-                router.openWelcomeScreen()
+                openWelcomeScreen()
             }
+        }
+    }
+
+    private suspend fun openPinCode() {
+        if (repository.isCodeSet()) {
+            router.openInitialCheckPincode()
+        } else {
+            router.openCreatePincode()
+        }
+    }
+
+    private suspend fun openWelcomeScreen() {
+        if (updateNotificationsInteractor.hasImportantUpdates()) {
+            router.openUpdateNotificationsFromSplash()
+        } else {
+            router.openWelcomeScreen()
         }
     }
 }

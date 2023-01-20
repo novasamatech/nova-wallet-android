@@ -4,8 +4,11 @@ import android.content.Context
 import coil.ImageLoader
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.resources.ResourceManager
 
 interface VersionsFeatureDependencies {
+
+    fun resourceManager(): ResourceManager
 
     fun networkApiCreator(): NetworkApiCreator
 

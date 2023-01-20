@@ -6,28 +6,60 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.navigation.DelayedNavigation
+import io.novafoundation.nova.common.utils.getTopSystemBarInset
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_versions_impl.R
 import io.novafoundation.nova.feature_versions_impl.di.VersionsFeatureComponent
+import kotlinx.android.synthetic.main.fragment_update_notifications.updatesApply
+import kotlinx.android.synthetic.main.fragment_update_notifications.updatesList
+import kotlinx.android.synthetic.main.fragment_update_notifications.updatesToolbar
 
-class UpdateNotificationFragment : BaseFragment<UpdateNotificationViewModel>() {
+class UpdateNotificationFragment : BaseFragment<UpdateNotificationViewModel>(), UpdateNotificationsAdapter.SeeAllClickedListener {
+
+    companion object {
+        private const val EXTRA_NEXT_NAVIGATION = "EXTRA_NEXT_NAVIGATION"
+
+        fun getBundle(nextNavigation: DelayedNavigation): Bundle {
+            return Bundle().apply {
+                putParcelable(EXTRA_NEXT_NAVIGATION, nextNavigation)
+            }
+        }
+    }
+
+    private val adapter = UpdateNotificationsAdapter(this)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_update_notifications, container, false)
     }
 
     override fun initViews() {
+        updatesToolbar.setOnApplyWindowInsetsListener { v, insets ->
+            v.setPadding(0, insets.getTopSystemBarInset(), 0, 0)
+            insets
+        }
 
+        updatesList.adapter = adapter
+        val decoration = UpdateNotificationsItemDecoration(requireContext())
+        updatesList.addItemDecoration(decoration)
+        updatesToolbar.setRightActionClickListener { viewModel.skipClicked() }
+        updatesApply.setOnClickListener { viewModel.installUpdateClicked() }
     }
 
     override fun inject() {
         FeatureUtils.getFeature<VersionsFeatureComponent>(this, VersionsFeatureApi::class.java)
             .updateNotificationsFragmentComponentFactory()
-            .create(this)
+            .create(this, argument(EXTRA_NEXT_NAVIGATION))
             .inject(this)
     }
 
     override fun subscribe(viewModel: UpdateNotificationViewModel) {
+        viewModel.notificationModels.observe {
+            adapter.submitList(it)
+        }
+    }
 
+    override fun onSeeAllClicked() {
+        viewModel.showAllNotifications()
     }
 }

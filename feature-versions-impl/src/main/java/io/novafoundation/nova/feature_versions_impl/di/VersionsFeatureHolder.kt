@@ -13,11 +13,11 @@ class VersionsFeatureHolder @Inject constructor(
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
-        val dependencies = DaggerUpdateNotificationsFeatureComponent_StakingFeatureDependenciesComponent.builder()
+        val dependencies = DaggerVersionsFeatureComponent_StakingFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
             .build()
 
-        return DaggerUpdateNotificationsFeatureComponent.factory()
+        return DaggerVersionsFeatureComponent.factory()
             .create(
                 router = router,
                 deps = dependencies

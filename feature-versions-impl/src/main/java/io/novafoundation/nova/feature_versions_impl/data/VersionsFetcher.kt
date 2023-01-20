@@ -10,5 +10,5 @@ interface VersionsFetcher {
     suspend fun getVersions(): List<VersionResponse>
 
     @GET(BuildConfig.NOTIFICATION_DETAILS_URL + "{version}.md")
-    suspend fun getVersionDetails(@Path("version") version: String): String
+    suspend fun getChangelog(@Path("version") version: String): String
 }

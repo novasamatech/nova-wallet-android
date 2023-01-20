@@ -82,6 +82,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.c
 import io.novafoundation.nova.feature_staking_impl.presentation.story.StoryFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
+import io.novafoundation.nova.feature_versions_impl.presentation.update.UpdateNotificationFragment
 import io.novafoundation.nova.splash.SplashRouter
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.Flow
@@ -114,6 +115,11 @@ class Navigator(
         val action = PinCodeAction.Check(NavComponentDelayedNavigation(R.id.action_open_main), ToolbarConfiguration())
         val bundle = PincodeFragment.getPinCodeBundle(action)
         navController?.navigate(R.id.action_splash_to_pin, bundle)
+    }
+
+    override fun openUpdateNotificationsFromSplash() {
+        val delayedNavigation = NavComponentDelayedNavigation(R.id.action_update_notifications_to_onboarding)
+        navController?.navigate(R.id.action_open_update_notifications, UpdateNotificationFragment.getBundle(delayedNavigation))
     }
 
     override fun openCreateAccount() {

@@ -2,23 +2,23 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nfts_nav_graph"
+    android:id="@+id/versions_nav_graph"
     app:startDestination="@id/updateNotificationsFragment">
-
 
     <fragment
         android:id="@+id/updateNotificationsFragment"
-        android:name="io.novafoundation.nova.feature_nft_impl.presentation.nft.list.NftListFragment"
-        android:label="NftListFragment"
-        tools:layout="@layout/fragment_nft_list">
+        android:name="io.novafoundation.nova.feature_versions_impl.presentation.update.UpdateNotificationFragment"
+        android:label="UpdateNotificationsFragment"
+        tools:layout="@layout/fragment_update_notifications">
 
         <action
-            android:id="@+id/action_nftListFragment_to_nftDetailsFragment"
-            app:destination="@id/nftDetailsFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
+            android:id="@+id/action_update_notifications_to_onboarding"
+            app:destination="@id/onboarding_nav_graph"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/root_nav_graph"
+            app:popUpToInclusive="true" />
+
     </fragment>
 
 </navigation>

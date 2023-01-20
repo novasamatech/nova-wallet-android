@@ -1,2 +1,0 @@
-package io.novafoundation.nova.feature_update_notification_impl.data
-
