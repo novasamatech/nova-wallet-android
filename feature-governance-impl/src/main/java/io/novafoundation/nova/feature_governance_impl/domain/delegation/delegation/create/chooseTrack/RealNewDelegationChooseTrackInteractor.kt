@@ -50,7 +50,6 @@ class RealNewDelegationChooseTrackInteractor(
         val allTracks = governanceSource.referenda.getTracks(chain.id)
         val userAccountId = accountRepository.requireIdOfSelectedMetaAccountIn(chain)
 
-
         return chainStateRepository.currentBlockNumberFlow(chain.id).map {
             val userVotings = governanceSource.convictionVoting.votingFor(userAccountId, chain.id)
             val tracksByAvailability = allTracks.groupBy { userVotings.availabilityOf(it.id) }
@@ -88,7 +87,7 @@ class RealNewDelegationChooseTrackInteractor(
     }
 
     private fun mapTrackCategoryToPresetType(trackCategory: TrackCategory): TrackPreset.Type? {
-        return when(trackCategory) {
+        return when (trackCategory) {
             TrackCategory.TREASURY -> TrackPreset.Type.TREASURY
             TrackCategory.GOVERNANCE -> TrackPreset.Type.GOVERNANCE
             TrackCategory.FELLOWSHIP -> TrackPreset.Type.FELLOWSHIP
