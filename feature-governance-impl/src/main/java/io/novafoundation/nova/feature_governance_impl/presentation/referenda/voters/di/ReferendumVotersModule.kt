@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ReferendumVotersInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersViewModel
@@ -30,7 +29,6 @@ class ReferendumVotersModule {
         governanceSharedState: GovernanceSharedState,
         externalAction: ExternalActions.Presentation,
         addressIconGenerator: AddressIconGenerator,
-        identityProviderFactory: GovernanceIdentityProviderFactory,
         referendumVotersInteractor: ReferendumVotersInteractor,
         resourceManager: ResourceManager
     ): ViewModel {
@@ -40,7 +38,6 @@ class ReferendumVotersModule {
             governanceSharedState,
             externalAction,
             addressIconGenerator,
-            identityProviderFactory,
             referendumVotersInteractor,
             resourceManager
         )
