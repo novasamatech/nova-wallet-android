@@ -118,7 +118,14 @@ class Navigator(
     }
 
     override fun openUpdateNotificationsFromSplash() {
-        val delayedNavigation = NavComponentDelayedNavigation(R.id.action_update_notifications_to_onboarding)
+        val delayedNavigation = NavComponentDelayedNavigation(
+            R.id.action_update_notifications_to_onboarding,
+            WelcomeFragment.bundle(false)
+        )
+        navController?.navigate(R.id.action_open_update_notifications, UpdateNotificationFragment.getBundle(delayedNavigation))
+    }
+
+    override fun openUpdateNotificationsFromPinCode(delayedNavigation: DelayedNavigation) {
         navController?.navigate(R.id.action_open_update_notifications, UpdateNotificationFragment.getBundle(delayedNavigation))
     }
 

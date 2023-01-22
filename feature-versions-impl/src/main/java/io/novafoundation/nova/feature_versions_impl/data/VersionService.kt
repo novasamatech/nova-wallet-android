@@ -61,11 +61,16 @@ class VersionService(
 
     private suspend fun syncAndGetVersions(): Map<Version, VersionResponse> {
         if (versions.isEmpty()) {
-            versions = versionsFetcher.getVersions()
-                .associateBy { it.version.toVersion() }
+            versions = runCatching { fetchVersions() }
+                .getOrElse { emptyMap() }
         }
 
         return versions
+    }
+
+    private suspend fun fetchVersions(): Map<Version, VersionResponse> {
+        return versionsFetcher.getVersions()
+            .associateBy { it.version.toVersion() }
     }
 
     @Suppress("DEPRECATION")

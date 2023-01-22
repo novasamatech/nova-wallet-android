@@ -19,7 +19,7 @@ class VersionsNavigator(
         require(nextNavigation is NavComponentDelayedNavigation)
 
         val navOptions = NavOptions.Builder()
-            .setPopUpTo(R.id.updateNotificationsFragment, true)
+            .setPopUpTo(R.id.versions_nav_graph, true)
             .setEnterAnim(R.anim.fragment_open_enter)
             .setExitAnim(R.anim.fragment_open_exit)
             .setPopEnterAnim(R.anim.fragment_close_enter)

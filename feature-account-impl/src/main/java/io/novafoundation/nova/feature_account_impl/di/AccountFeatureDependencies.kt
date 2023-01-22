@@ -27,6 +27,7 @@ import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
@@ -93,6 +94,8 @@ interface AccountFeatureDependencies {
     fun appVersionProvider(): AppVersionProvider
 
     fun validationExecutor(): ValidationExecutor
+
+    fun updateNotificationsInteractor(): UpdateNotificationsInteractor
 
     val systemCallExecutor: SystemCallExecutor
 

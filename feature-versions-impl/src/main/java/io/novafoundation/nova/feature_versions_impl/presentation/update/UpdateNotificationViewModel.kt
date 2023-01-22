@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.navigation.DelayedNavigation
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.formatDaysSinceEpoch
+import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_versions_api.domain.Severity
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotification
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
@@ -37,7 +38,7 @@ class UpdateNotificationViewModel(
                 add(SeeAllButtonModel())
             }
         }
-    }
+    }.withLoading()
 
     fun skipClicked() {
         interactor.skipNewUpdates()
@@ -105,13 +106,13 @@ class UpdateNotificationViewModel(
     private fun getBannerOrNull(notifications: List<UpdateNotification>): UpdateNotificationBannerModel? {
         if (hasCriticalUpdates(notifications)) {
             return UpdateNotificationBannerModel(
-                R.drawable.advertisement_calendar,
+                R.drawable.advertisement_calendar, // TODO: another image
                 resourceManager.getString(R.string.update_notifications_critical_update_alert_titile),
                 resourceManager.getString(R.string.update_notifications_critical_update_alert_subtitile)
             )
         } else if (hasMajorUpdates(notifications)) {
             return UpdateNotificationBannerModel(
-                R.drawable.advertisement_calendar,
+                R.drawable.advertisement_calendar, // TODO: another image
                 resourceManager.getString(R.string.update_notifications_major_update_alert_titile),
                 resourceManager.getString(R.string.update_notifications_major_update_alert_subtitile)
             )

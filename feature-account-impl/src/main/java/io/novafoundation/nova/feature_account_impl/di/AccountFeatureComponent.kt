@@ -40,6 +40,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.settings.di.Sett
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.di.ChangeWatchAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create.di.CreateWatchWalletComponent
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
+import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
@@ -122,6 +123,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
             RuntimeApi::class,
             CurrencyFeatureApi::class,
             DbApi::class,
+            VersionsFeatureApi::class
         ]
     )
     interface AccountFeatureDependenciesComponent : AccountFeatureDependencies

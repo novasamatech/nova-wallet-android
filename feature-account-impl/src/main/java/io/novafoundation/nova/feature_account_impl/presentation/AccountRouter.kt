@@ -74,4 +74,6 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun finishParitySignerFlow()
 
     fun openAddLedgerChainAccountFlow(payload: AddAccountPayload.ChainAccount)
+
+    fun openUpdateNotificationsFromPinCode(delayedNavigation: DelayedNavigation)
 }

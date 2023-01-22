@@ -47,10 +47,8 @@ class UpdateNotificationsItemDecoration(
     }
 
     private fun RecyclerView.shouldApplyDecoration(parent: RecyclerView, index: Int, view: View): Boolean {
-        if (index == parent.layoutManager!!.itemCount - 1)
-            return false
-
-        val viewHolder = getChildViewHolder(view)
-        return viewHolder !is UpdateNotificationBannerHolder
+        val thisViewHolder = getChildViewHolder(view)
+        val nextViewHolder = getChildAt(index + 1)?.let { getChildViewHolder(it) }
+        return thisViewHolder is UpdateNotificationHolder && nextViewHolder is UpdateNotificationHolder
     }
 }

@@ -4,13 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.navigation.DelayedNavigation
+import io.novafoundation.nova.common.presentation.LoadingState
+import io.novafoundation.nova.common.presentation.SearchState
 import io.novafoundation.nova.common.utils.getTopSystemBarInset
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_versions_impl.R
 import io.novafoundation.nova.feature_versions_impl.di.VersionsFeatureComponent
+import kotlinx.android.synthetic.main.fragment_update_notifications.updateNotificationsProgress
 import kotlinx.android.synthetic.main.fragment_update_notifications.updatesApply
 import kotlinx.android.synthetic.main.fragment_update_notifications.updatesList
 import kotlinx.android.synthetic.main.fragment_update_notifications.updatesToolbar
@@ -55,7 +60,11 @@ class UpdateNotificationFragment : BaseFragment<UpdateNotificationViewModel>(), 
 
     override fun subscribe(viewModel: UpdateNotificationViewModel) {
         viewModel.notificationModels.observe {
-            adapter.submitList(it)
+            updateNotificationsProgress.isVisible = it is LoadingState.Loading
+            updatesList.isGone = it is LoadingState.Loading
+            if (it is LoadingState.Loaded) {
+                adapter.submitList(it.data)
+            }
         }
     }
 
