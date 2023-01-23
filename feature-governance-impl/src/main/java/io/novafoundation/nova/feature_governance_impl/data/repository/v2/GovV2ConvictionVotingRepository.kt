@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingRemoveVote
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingUnlock
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingVote
-import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.DelegationsSubqueryApi
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.bindVoting
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.votersFor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance

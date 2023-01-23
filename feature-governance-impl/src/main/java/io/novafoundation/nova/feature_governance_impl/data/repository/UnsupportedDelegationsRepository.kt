@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_governance_api.data.repository.Delegations
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
-class UnsupportedDelegationsRepository: DelegationsRepository {
+class UnsupportedDelegationsRepository : DelegationsRepository {
 
     override suspend fun isDelegationSupported(): Boolean {
         return false
@@ -42,6 +42,6 @@ class UnsupportedDelegationsRepository: DelegationsRepository {
     }
 
     override suspend fun directHistoricalVotesOf(user: AccountId, chain: Chain): Map<ReferendumId, UserVote.Direct>? {
-       return null
+        return null
     }
 }

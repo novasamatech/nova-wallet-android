@@ -32,9 +32,9 @@ data class ReferendumPreview(
 
 sealed class ReferendumVote(val vote: AccountVote) {
 
-    class User(vote: AccountVote): ReferendumVote(vote)
+    class User(vote: AccountVote) : ReferendumVote(vote)
 
-    class Account(val who: AccountId, val whoIdentity: Identity?, vote: AccountVote): ReferendumVote(vote)
+    class Account(val who: AccountId, val whoIdentity: Identity?, vote: AccountVote) : ReferendumVote(vote)
 }
 
 sealed class ReferendumProposal {

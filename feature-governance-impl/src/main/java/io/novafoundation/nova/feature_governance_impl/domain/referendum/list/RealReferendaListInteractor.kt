@@ -64,7 +64,6 @@ private class IntermediateData(
     val referenda: GroupedList<ReferendumGroup, ReferendumPreview>,
 )
 
-
 class RealReferendaListInteractor(
     private val chainStateRepository: ChainStateRepository,
     private val governanceSourceRegistry: GovernanceSourceRegistry,
