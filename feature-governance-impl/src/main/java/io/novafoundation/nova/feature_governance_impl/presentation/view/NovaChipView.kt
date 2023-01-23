@@ -38,14 +38,16 @@ class NovaChipView @JvmOverloads constructor(
     enum class Size(
         val iconVerticalMargin: Float,
         val iconHorizontalMargin: Float,
-        val textVerticalMargin: Float,
+        val textTopMargin: Float,
+        val textBottomMargin: Float,
         val textHorizontalMargin: Float,
         @StyleRes val textAppearanceRes: Int
     ) {
         NORMAL(
             iconVerticalMargin = 3.0f,
             iconHorizontalMargin = 6.0f,
-            textVerticalMargin = 4.5f,
+            textTopMargin = 4.5f,
+            textBottomMargin = 4.5f,
             textHorizontalMargin = 8.0f,
             textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Caps1
         ),
@@ -53,9 +55,19 @@ class NovaChipView @JvmOverloads constructor(
         SMALL(
             iconVerticalMargin = 1.5f,
             iconHorizontalMargin = 4.0f,
-            textVerticalMargin = 1.5f,
+            textTopMargin = 1.5f,
+            textBottomMargin = 1.5f,
             textHorizontalMargin = 6.0f,
             textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Caps2
+        ),
+
+        SUM(
+            iconVerticalMargin = 0f,
+            iconHorizontalMargin = 0f,
+            textTopMargin = 1.5f,
+            textBottomMargin = 2.5f,
+            textHorizontalMargin = 6.0f,
+            textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Footnote
         )
     }
 
@@ -118,10 +130,11 @@ class NovaChipView @JvmOverloads constructor(
         }
 
         chipText.updateLayoutParams<MarginLayoutParams> {
-            val vertical = size.textVerticalMargin.dp
+            val top = size.textTopMargin.dp
+            val bottom = size.textBottomMargin.dp
             val end = size.textHorizontalMargin.dp
 
-            setMargins(0, vertical, end, vertical)
+            setMargins(0, top, end, bottom)
         }
 
         chipText.setTextAppearance(size.textAppearanceRes)

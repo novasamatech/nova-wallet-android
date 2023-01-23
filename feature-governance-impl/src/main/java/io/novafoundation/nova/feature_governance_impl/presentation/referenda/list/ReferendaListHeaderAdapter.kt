@@ -2,10 +2,13 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.li
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.letOrHide
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksModel
@@ -27,13 +30,14 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
 
     private var assetModel: AssetSelectorModel? = null
     private var locksModel: GovernanceLocksModel? = null
+    private var delegationsModel: GovernanceLocksModel? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
         return HeaderHolder(imageLoader, parent.inflateChild(R.layout.item_referenda_header), handler)
     }
 
     override fun onBindViewHolder(holder: HeaderHolder, position: Int) {
-        holder.bind(assetModel, locksModel)
+        holder.bind(assetModel, locksModel, delegationsModel)
     }
 
     override fun onBindViewHolder(holder: HeaderHolder, position: Int, payloads: MutableList<Any>) {
@@ -44,6 +48,7 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
                 when (it) {
                     Payload.ASSET -> holder.bindAsset(assetModel)
                     Payload.LOCKS -> holder.bindLocks(locksModel)
+                    Payload.DELEGATIONS -> holder.bindDelegations(delegationsModel)
                 }
             }
         }
@@ -62,10 +67,15 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
         this.locksModel = locksModel
         notifyItemChanged(0, Payload.LOCKS)
     }
+
+    fun setDelegations(delegationsModel: GovernanceLocksModel?) {
+        this.delegationsModel = delegationsModel
+        notifyItemChanged(0, Payload.DELEGATIONS)
+    }
 }
 
 private enum class Payload {
-    ASSET, LOCKS
+    ASSET, LOCKS, DELEGATIONS
 }
 
 class HeaderHolder(private val imageLoader: ImageLoader, view: View, handler: ReferendaListHeaderAdapter.Handler) : RecyclerView.ViewHolder(view) {
@@ -81,9 +91,14 @@ class HeaderHolder(private val imageLoader: ImageLoader, view: View, handler: Re
         }
     }
 
-    fun bind(assetModel: AssetSelectorModel?, locksModel: GovernanceLocksModel?) {
+    fun bind(
+        assetModel: AssetSelectorModel?,
+        locksModel: GovernanceLocksModel?,
+        delegationsModel: GovernanceLocksModel?
+    ) {
         bindAsset(assetModel)
         bindLocks(locksModel)
+        bindDelegations(delegationsModel)
     }
 
     fun bindAsset(assetModel: AssetSelectorModel?) {
@@ -94,5 +109,21 @@ class HeaderHolder(private val imageLoader: ImageLoader, view: View, handler: Re
         itemView.governanceLocksLocked.letOrHide(locksModel) {
             itemView.governanceLocksLocked.setModel(it)
         }
+
+        updateLocksContainerVisibility()
+    }
+
+    fun bindDelegations(model: GovernanceLocksModel?) {
+        itemView.governanceLocksDelegations.letOrHide(model) {
+            itemView.governanceLocksDelegations.setModel(it)
+        }
+
+        updateLocksContainerVisibility()
+    }
+
+    private fun updateLocksContainerVisibility() {
+        val contentVisible = itemView.governanceLocksHeader.children.any { it.isVisible }
+
+        itemView.governanceLocksHeader.setVisible(contentVisible)
     }
 }

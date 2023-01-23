@@ -27,6 +27,10 @@ class Gov2DelegationsRepository(
     private val delegateMetadataApi: DelegateMetadataApi,
 ) : DelegationsRepository {
 
+    override suspend fun isDelegationSupported(): Boolean {
+        return true
+    }
+
     override suspend fun getDelegatesStats(
         recentVotesBlockThreshold: BlockNumber,
         chain: Chain

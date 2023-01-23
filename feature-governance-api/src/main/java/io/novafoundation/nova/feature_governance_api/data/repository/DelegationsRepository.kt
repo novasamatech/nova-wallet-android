@@ -12,6 +12,8 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 interface DelegationsRepository {
 
+    suspend fun isDelegationSupported(): Boolean
+
     suspend fun getDelegatesStats(
         recentVotesBlockThreshold: BlockNumber,
         chain: Chain

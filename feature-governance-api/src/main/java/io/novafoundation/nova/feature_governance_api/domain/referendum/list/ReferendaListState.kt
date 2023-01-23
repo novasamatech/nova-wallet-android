@@ -5,10 +5,20 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 
 class ReferendaListState(
     val groupedReferenda: GroupedList<ReferendumGroup, ReferendumPreview>,
-    val locksOverview: GovernanceLocksOverview?
+    val locksOverview: GovernanceLocksOverview?,
+    val delegated: DelegatedState
 )
 
 class GovernanceLocksOverview(
     val locked: Balance,
     val hasClaimableLocks: Boolean
 )
+
+sealed class DelegatedState {
+
+    object DelegationNotSupported : DelegatedState()
+
+    object NotDelegated: DelegatedState()
+
+    class Delegated(val amount: Balance): DelegatedState()
+}

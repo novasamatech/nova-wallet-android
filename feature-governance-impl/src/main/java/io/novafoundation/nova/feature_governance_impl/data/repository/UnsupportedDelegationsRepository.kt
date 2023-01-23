@@ -11,6 +11,10 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class UnsupportedDelegationsRepository : DelegationsRepository {
 
+    override suspend fun isDelegationSupported(): Boolean {
+        return false
+    }
+
     override suspend fun getDelegatesStats(recentVotesBlockThreshold: BlockNumber, chain: Chain): List<DelegateStats> {
         return emptyList()
     }

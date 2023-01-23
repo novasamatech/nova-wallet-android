@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimScheduleC
 import io.novafoundation.nova.feature_governance_api.domain.locks.RealClaimScheduleCalculator
 import io.novafoundation.nova.feature_governance_api.domain.locks.hasClaimableLocks
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.DelegatedState
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.GovernanceLocksOverview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListState
@@ -75,6 +76,7 @@ class RealReferendaListInteractor(
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
         val undecidingTimeout = governanceSource.referenda.undecidingTimeout(chain.id)
         val voteLockingPeriod = governanceSource.convictionVoting.voteLockingPeriod(chain.id)
+        val delegationSupported = governanceSource.delegationsRepository.isDelegationSupported()
 
         val trackLocksFlow = governanceSource.convictionVoting.trackLocksFlowOrEmpty(voterAccountId, asset.fullId)
 
@@ -109,7 +111,8 @@ class RealReferendaListInteractor(
 
             ReferendaListState(
                 groupedReferenda = intermediateData.referenda,
-                locksOverview = locksOverview
+                locksOverview = locksOverview,
+                delegated = determineDelegatedState(intermediateData.voting, delegationSupported),
             )
         }
     }
@@ -233,6 +236,19 @@ class RealReferendaListInteractor(
             is ReferendumStatus.NotExecuted -> ReferendumGroup.COMPLETED
 
             else -> ReferendumGroup.ONGOING
+        }
+    }
+
+    private fun determineDelegatedState(voting: Map<TrackId, Voting>, delegationsSupported: Boolean): DelegatedState {
+        if (!delegationsSupported) return DelegatedState.DelegationNotSupported
+
+        val delegatedAmount =  voting.values.filterIsInstance<Voting.Delegating>()
+            .maxOfOrNull { it.amount }
+
+        return if (delegatedAmount != null) {
+            DelegatedState.Delegated(delegatedAmount)
+        } else {
+            DelegatedState.NotDelegated
         }
     }
 }
