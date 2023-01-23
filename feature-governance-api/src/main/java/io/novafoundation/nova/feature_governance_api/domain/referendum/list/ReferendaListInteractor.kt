@@ -6,5 +6,19 @@ import kotlinx.coroutines.flow.Flow
 
 interface ReferendaListInteractor {
 
-    fun referendaListStateFlow(voterAccountId: AccountId?, selectedGovernanceOption: SupportedGovernanceOption): Flow<ReferendaListState>
+    fun referendaListStateFlow(
+        voterAccountId: AccountId?,
+        selectedGovernanceOption: SupportedGovernanceOption
+    ): Flow<ReferendaListState>
 }
+
+class Voter(val accountId: AccountId, val type: Type) {
+
+    companion object;
+
+    enum class Type {
+        USER, ACCOUNT
+    }
+}
+
+fun Voter.Companion.user(accountId: AccountId) = Voter(accountId, Voter.Type.USER)

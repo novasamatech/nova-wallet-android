@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegati
 
 import com.google.gson.annotations.SerializedName
 import io.novafoundation.nova.common.data.network.subquery.SubQueryNodes
-import java.math.BigInteger
 
 class DelegateDelegatorsResponse(
     val delegations: SubQueryNodes<DelegatorRemote>
@@ -10,8 +9,6 @@ class DelegateDelegatorsResponse(
 
     class DelegatorRemote(
         @SerializedName("delegator") val address: String,
-        val delegation: DelegationRemote
+        val delegation: VoteRemote
     )
-
-    class DelegationRemote(val amount: BigInteger, val conviction: String)
 }

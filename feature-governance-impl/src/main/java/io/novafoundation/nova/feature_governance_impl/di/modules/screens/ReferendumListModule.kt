@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.di.modules.screens
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
@@ -27,10 +28,12 @@ class ReferendumListModule {
         governanceSourceRegistry: GovernanceSourceRegistry,
         referendaConstructor: ReferendaConstructor,
         referendaSortingProvider: ReferendaSortingProvider,
+        identityRepository: OnChainIdentityRepository,
     ): ReferendaListInteractor = RealReferendaListInteractor(
         chainStateRepository = chainStateRepository,
         governanceSourceRegistry = governanceSourceRegistry,
         referendaConstructor = referendaConstructor,
         referendaSortingProvider = referendaSortingProvider,
+        identityRepository = identityRepository,
     )
 }
