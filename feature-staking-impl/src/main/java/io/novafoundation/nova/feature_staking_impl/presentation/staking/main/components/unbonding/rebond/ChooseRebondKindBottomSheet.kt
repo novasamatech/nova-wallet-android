@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import io.novafoundation.nova.common.mixin.actionAwaitable.ChooseOneOfAwaitableAction
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
-import io.novafoundation.nova.common.view.bottomSheet.list.fixed.item
+import io.novafoundation.nova.common.view.bottomSheet.list.fixed.textItem
 import io.novafoundation.nova.feature_staking_impl.R
 
 class ChooseRebondKindBottomSheet(
@@ -20,7 +20,7 @@ class ChooseRebondKindBottomSheet(
         setTitle(R.string.staking_rebond)
 
         chooseOneOfAwaitableAction.payload.forEach { rebondKind ->
-            item(R.drawable.ic_staking_outline, rebondKind.title) {
+            textItem(R.drawable.ic_staking_outline, rebondKind.title) {
                 chooseOneOfAwaitableAction.onSuccess(rebondKind)
             }
         }

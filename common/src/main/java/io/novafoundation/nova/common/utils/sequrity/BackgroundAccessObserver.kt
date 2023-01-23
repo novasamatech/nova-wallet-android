@@ -9,7 +9,8 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
@@ -24,19 +25,25 @@ class BackgroundAccessObserver(
         private const val PREFS_ON_PAUSE_TIME = "ON_PAUSE_TIME"
     }
 
-    enum class EventType {
-        REQUEST_ACCESS
+    enum class State {
+        REQUEST_ACCESS, NOTHING
     }
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 
-    private val _requestAccessFlow = MutableSharedFlow<EventType>()
+    private val _stateFlow = MutableStateFlow(State.NOTHING)
 
-    val eventFlow: Flow<EventType> = _requestAccessFlow
+    val requestAccessFlow: Flow<State> = _stateFlow
+        .filter { it == State.REQUEST_ACCESS }
 
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+    }
+
+    fun onAccessed() {
+        _stateFlow.value = State.NOTHING
+        preferences.removeField(PREFS_ON_PAUSE_TIME)
     }
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -59,7 +66,11 @@ class BackgroundAccessObserver(
 
     private fun notifyEveryone() {
         launch {
-            _requestAccessFlow.emit(EventType.REQUEST_ACCESS)
+            if (_stateFlow.value == State.REQUEST_ACCESS) {
+                _stateFlow.emit(State.REQUEST_ACCESS)
+            } else {
+                _stateFlow.value = State.REQUEST_ACCESS
+            }
         }
     }
 }

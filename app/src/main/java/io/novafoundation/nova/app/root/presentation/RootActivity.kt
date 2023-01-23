@@ -66,6 +66,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
         intent?.let(::processIntent)
 
+        viewModel.applySafeModeIfEnabled()
 //        processJsonOpenIntent()
     }
 

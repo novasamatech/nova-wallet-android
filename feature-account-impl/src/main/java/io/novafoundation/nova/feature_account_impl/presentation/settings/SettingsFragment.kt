@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import kotlinx.android.synthetic.main.fragment_profile.accountView
+import kotlinx.android.synthetic.main.fragment_profile.settingsSafeMode
 import kotlinx.android.synthetic.main.fragment_profile.settingsAppVersion
 import kotlinx.android.synthetic.main.fragment_profile.settingsAvatar
 import kotlinx.android.synthetic.main.fragment_profile.settingsContainer
@@ -24,6 +25,7 @@ import kotlinx.android.synthetic.main.fragment_profile.settingsNetworks
 import kotlinx.android.synthetic.main.fragment_profile.settingsPin
 import kotlinx.android.synthetic.main.fragment_profile.settingsPrivacy
 import kotlinx.android.synthetic.main.fragment_profile.settingsRateUs
+import kotlinx.android.synthetic.main.fragment_profile.settingsSafeModeContainer
 import kotlinx.android.synthetic.main.fragment_profile.settingsTelegram
 import kotlinx.android.synthetic.main.fragment_profile.settingsTerms
 import kotlinx.android.synthetic.main.fragment_profile.settingsTwitter
@@ -64,6 +66,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         settingsEmail.setOnClickListener { viewModel.emailClicked() }
         settingsRateUs.setOnClickListener { viewModel.rateUsClicked() }
 
+        settingsSafeModeContainer.setOnClickListener { viewModel.changeSafeMode() }
         settingsPin.setOnClickListener { viewModel.changePinCodeClicked() }
 
         settingsAvatar.setOnClickListener { viewModel.selectedWalletClicked() }
@@ -80,6 +83,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
     }
 
     override fun subscribe(viewModel: SettingsViewModel) {
+        setupSafeModeConfirmation(viewModel.safeModeAwaitableAction)
         observeBrowserEvents(viewModel)
 
         viewModel.selectedWalletModel.observe {
@@ -95,6 +99,10 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
 
         viewModel.selectedLanguageFlow.observe {
             settingsLanguage.setValue(it.displayName)
+        }
+
+        viewModel.safeModeStatus.observe {
+            settingsSafeMode.isChecked = it
         }
 
         viewModel.appVersionFlow.observe(settingsAppVersion::setText)

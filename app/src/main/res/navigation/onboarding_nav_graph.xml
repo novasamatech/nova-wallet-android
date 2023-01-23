@@ -30,36 +30,36 @@
 
 
         <action
+            android:id="@+id/action_welcomeFragment_to_mnemonic_nav_graph"
+            app:destination="@id/mnemonic_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            android:id="@+id/action_welcomeFragment_to_mnemonic_nav_graph"
-            app:destination="@id/mnemonic_nav_graph" />
+            app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
             android:id="@+id/action_welcomeFragment_to_createWatchWalletFragment"
+            app:destination="@id/createWatchWalletFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            app:destination="@id/createWatchWalletFragment" />
+            app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
             android:id="@+id/action_welcomeFragment_to_import_parity_signer_graph"
-            app:destination="@id/import_parity_signer_graph" />
-
-        <action
+            app:destination="@id/import_parity_signer_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
             android:id="@+id/action_welcomeFragment_to_import_ledger_graph"
-            app:destination="@id/import_ledger_graph" />
+            app:destination="@id/import_ledger_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
 
@@ -70,12 +70,12 @@
         tools:layout="@layout/fragment_create_wallet_name">
 
         <action
+            android:id="@+id/action_createAccountFragment_to_mnemonic_nav_graph"
+            app:destination="@id/mnemonic_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            android:id="@+id/action_createAccountFragment_to_mnemonic_nav_graph"
-            app:destination="@id/mnemonic_nav_graph" />
+            app:popExitAnim="@anim/fragment_close_exit" />
 
     </fragment>
 
@@ -86,9 +86,9 @@
 
     <fragment
         android:id="@+id/createWatchWalletFragment"
-        tools:layout="@layout/fragment_create_watch_wallet"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create.CreateWatchWalletFragment"
-        android:label="CreateWatchWalletFragment">
+        android:label="CreateWatchWalletFragment"
+        tools:layout="@layout/fragment_create_watch_wallet">
 
         <action
             android:id="@+id/action_watchWalletFragment_to_pincodeFragment"

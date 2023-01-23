@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
 import io.novafoundation.nova.core_db.dao.PhishingSitesDao
@@ -62,6 +63,8 @@ interface DAppFeatureDependencies {
     fun runtimeVersionsRepository(): RuntimeVersionsRepository
 
     fun dappAuthorizationDao(): DappAuthorizationDao
+
+    fun browserHostSettingsDao(): BrowserHostSettingsDao
 
     val phishingSitesDao: PhishingSitesDao
 

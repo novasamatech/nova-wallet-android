@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.io.MainThreadExecutor
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.R
@@ -38,6 +39,7 @@ class PinCodeModule {
         router: AccountRouter,
         deviceVibrator: DeviceVibrator,
         resourceManager: ResourceManager,
+        backgroundAccessObserver: BackgroundAccessObserver,
         updateNotificationsInteractor: UpdateNotificationsInteractor,
         pinCodeAction: PinCodeAction
     ): ViewModel {
@@ -46,6 +48,7 @@ class PinCodeModule {
             router,
             deviceVibrator,
             resourceManager,
+            backgroundAccessObserver,
             updateNotificationsInteractor,
             pinCodeAction
         )

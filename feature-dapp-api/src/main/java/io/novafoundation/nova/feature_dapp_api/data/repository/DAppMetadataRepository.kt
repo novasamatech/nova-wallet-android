@@ -5,8 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface DAppMetadataRepository {
 
-    suspend fun ensureSynced()
-
     suspend fun syncDAppMetadatas()
 
     suspend fun getDAppMetadata(baseUrl: String): DappMetadata?

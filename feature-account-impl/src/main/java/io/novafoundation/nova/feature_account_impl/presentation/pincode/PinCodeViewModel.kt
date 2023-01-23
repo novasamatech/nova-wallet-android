@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.navigation.DelayedNavigation
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.R
@@ -19,6 +20,7 @@ class PinCodeViewModel(
     private val router: AccountRouter,
     private val deviceVibrator: DeviceVibrator,
     private val resourceManager: ResourceManager,
+    private val backgroundAccessObserver: BackgroundAccessObserver,
     private val updateNotificationsInteractor: UpdateNotificationsInteractor,
     val pinCodeAction: PinCodeAction
 ) : BaseViewModel() {
@@ -53,11 +55,15 @@ class PinCodeViewModel(
     private var fingerPrintAvailable = false
     private var currentState: ScreenState? = null
 
+    val isBackRoutingBlocked: Boolean
+        get() = pinCodeAction is PinCodeAction.CheckAfterInactivity
+
     fun startAuth() {
         when (pinCodeAction) {
             is PinCodeAction.Create -> {
                 currentState = ScreenState.Creating
             }
+            is PinCodeAction.CheckAfterInactivity,
             is PinCodeAction.Check -> {
                 currentState = ScreenState.Checking
                 _showFingerPrintEvent.value = Event(Unit)
@@ -165,6 +171,10 @@ class PinCodeViewModel(
         when (pinCodeAction) {
             is PinCodeAction.Create -> router.openAfterPinCode(pinCodeAction.delayedNavigation)
             is PinCodeAction.Check -> checkForUpdatesAndRoute(pinCodeAction.delayedNavigation)
+            is PinCodeAction.CheckAfterInactivity -> {
+                backgroundAccessObserver.onAccessed()
+                router.openAfterPinCode(pinCodeAction.delayedNavigation)
+            }
             is PinCodeAction.Change -> {
                 when (currentState) {
                     is ScreenState.Checking -> {
@@ -210,5 +220,9 @@ class PinCodeViewModel(
 
             authSuccess()
         }
+    }
+
+    fun finishApp() {
+        router.finishApp()
     }
 }

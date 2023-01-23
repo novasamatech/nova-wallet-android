@@ -10,10 +10,14 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserHostSettingsRepository
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRepository
+import io.novafoundation.nova.feature_dapp_impl.data.repository.RealBrowserHostSettingsRepository
+import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserViewModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
@@ -26,12 +30,20 @@ class DAppBrowserModule {
 
     @Provides
     @ScreenScope
+    fun provideBrowserHostSettingsRepository(
+        browserHostSettingsDao: BrowserHostSettingsDao
+    ): BrowserHostSettingsRepository = RealBrowserHostSettingsRepository(browserHostSettingsDao)
+
+    @Provides
+    @ScreenScope
     fun provideInteractor(
         phishingSitesRepository: PhishingSitesRepository,
         favouritesDAppRepository: FavouritesDAppRepository,
+        browserHostSettingsRepository: BrowserHostSettingsRepository
     ) = DappBrowserInteractor(
         phishingSitesRepository = phishingSitesRepository,
-        favouritesDAppRepository = favouritesDAppRepository
+        favouritesDAppRepository = favouritesDAppRepository,
+        browserHostSettingsRepository = browserHostSettingsRepository
     )
 
     @Provides
@@ -55,18 +67,20 @@ class DAppBrowserModule {
         signRequester: DAppSignCommunicator,
         searchRequester: DAppSearchCommunicator,
         initialUrl: String,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         extensionStoreFactory: ExtensionStoreFactory,
+        dAppInteractor: DappInteractor,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
         return DAppBrowserViewModel(
             router = router,
             interactor = interactor,
+            dAppInteractor = dAppInteractor,
             selectedAccountUseCase = selectedAccountUseCase,
             signRequester = signRequester,
             dAppSearchRequester = searchRequester,
             initialUrl = initialUrl,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            extensionStoreFactory = extensionStoreFactory
+            extensionStoreFactory = extensionStoreFactory,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory
         )
     }
 }
