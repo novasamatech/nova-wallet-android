@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.data.repository
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Delegation
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateDetailedStats
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateMetadata
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateStats
@@ -24,5 +25,9 @@ class UnsupportedDelegationsRepository : DelegationsRepository {
 
     override suspend fun getDelegateMetadata(chain: Chain, delegate: AccountId): DelegateMetadata? {
         return null
+    }
+
+    override suspend fun getDelegationsTo(delegate: AccountId, chain: Chain): List<Delegation> {
+        return emptyList()
     }
 }

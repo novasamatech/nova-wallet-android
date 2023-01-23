@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats
 
 import io.novafoundation.nova.common.data.network.subquery.SubQueryResponse
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DelegateDelegatorsRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DelegateDetailedStatsRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DelegateStatsRequest
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DelegateDelegatorsResponse
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DelegateDetailedStatsResponse
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DelegateStatsResponse
 import retrofit2.http.Body
@@ -22,4 +24,10 @@ interface DelegationsSubqueryApi {
         @Url url: String,
         @Body body: DelegateDetailedStatsRequest
     ): SubQueryResponse<DelegateDetailedStatsResponse>
+
+    @POST
+    suspend fun getDelegateDelegators(
+        @Url url: String,
+        @Body body: DelegateDelegatorsRequest
+    ): SubQueryResponse<DelegateDelegatorsResponse>
 }

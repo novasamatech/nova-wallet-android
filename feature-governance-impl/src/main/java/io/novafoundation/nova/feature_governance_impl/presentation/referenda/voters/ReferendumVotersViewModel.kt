@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.Re
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ReferendumVotersInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.model.VoterModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
@@ -33,7 +32,6 @@ class ReferendumVotersViewModel(
     private val governanceSharedState: GovernanceSharedState,
     private val externalActions: ExternalActions.Presentation,
     private val addressIconGenerator: AddressIconGenerator,
-    private val identityProviderFactory: GovernanceIdentityProviderFactory,
     private val referendumVotersInteractor: ReferendumVotersInteractor,
     private val resourceManager: ResourceManager
 ) : BaseViewModel(), ExternalActions by externalActions {

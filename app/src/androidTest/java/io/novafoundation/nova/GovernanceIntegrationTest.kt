@@ -178,7 +178,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
     }
 
     @Test
-    fun should() = runTest {
+    fun shouldFetchChooseTrackData() = runTest {
         val interactor = governanceApi.newDelegationChooseTrackInteractor
         val updateSystem = governanceApi.governanceUpdateSystem
 
@@ -196,6 +196,22 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
                 Presets: ${trackData.presets}
             """.trimIndent()
         )
+    }
+
+    @Test
+    fun shouldFetchDelegators() = runTest {
+        val delegateAddress = "DCZyhphXsRLcW84G9WmWEXtAA8DKGtVGSFZLJYty8Ajjyfa" // ChaosDAO
+
+        val interactor = governanceApi.delegateDelegatorsInteractor
+        val updateSystem = governanceApi.governanceUpdateSystem
+
+        updateSystem.start()
+            .inBackground()
+            .launchIn(this)
+
+        val delegators = interactor.delegatorsFlow(delegateAddress.toAccountId()).first()
+
+        Log.d(this@GovernanceIntegrationTest.LOG_TAG, delegators.toString())
     }
 
     private suspend fun source(supportedGovernance: SupportedGovernanceOption) = governanceApi.governanceSourceRegistry.sourceFor(supportedGovernance)
