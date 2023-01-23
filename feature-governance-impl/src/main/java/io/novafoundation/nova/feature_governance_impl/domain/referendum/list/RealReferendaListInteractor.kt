@@ -223,30 +223,30 @@ class RealReferendaListInteractor(
             null -> emptyMap()
 
             Voter.Type.USER -> {
-                val historicalVoting = delegationsRepository.allHistoricalVotesOf(voter.accountId, chain)
+                val historicalVoting = delegationsRepository.allHistoricalVotesOf(voter.accountId, chain).orEmpty()
+                val delegatesAccountIds = historicalVoting.values.mapNotNull {
+                    it.castOrNull<UserVote.Delegated>()?.delegate
+                }
+                val identities = identityRepository.getIdentitiesFromIds(delegatesAccountIds, chain.id)
 
-                if (historicalVoting != null) {
-                    val delegatesAccountIds = historicalVoting.values.mapNotNull {
-                        it.castOrNull<UserVote.Delegated>()?.delegate
-                    }
-                    val identities = identityRepository.getIdentitiesFromIds(delegatesAccountIds, chain.id)
+                val offChainVotesHistory = historicalVoting.mapValues { (_, userVote) ->
+                    when (userVote) {
+                        is UserVote.Delegated -> ReferendumVote.Account(
+                            who = userVote.delegate,
+                            whoIdentity = identities[userVote.delegate]?.display?.let(::Identity),
+                            vote = userVote.vote
+                        )
 
-                    historicalVoting.mapValues { (_, userVote) ->
-                        when (userVote) {
-                            is UserVote.Delegated -> ReferendumVote.Account(
-                                who = userVote.delegate,
-                                whoIdentity = identities[userVote.delegate]?.display?.let(::Identity),
-                                vote = userVote.vote
-                            )
-
-                            is UserVote.Direct -> ReferendumVote.User(userVote.vote)
-                        }
-                    }
-                } else {
-                    onChainVoting.flattenCastingVotes().mapValues { (_, accountVote) ->
-                        ReferendumVote.User(accountVote)
+                        is UserVote.Direct -> ReferendumVote.User(userVote.vote)
                     }
                 }
+
+                val onChainVotesHistory = onChainVoting.flattenCastingVotes().mapValues { (_, accountVote) ->
+                    ReferendumVote.User(accountVote)
+                }
+
+                // priority is for on chain data
+                offChainVotesHistory + onChainVotesHistory
             }
 
             Voter.Type.ACCOUNT -> {
@@ -254,16 +254,15 @@ class RealReferendaListInteractor(
                 val identity = identityRepository.getIdentityFromId(chain.id, voter.accountId)
                     ?.display?.let(::Identity)
 
-                @Suppress("IfThenToElvis")
-                if (historicalVoting != null) {
-                    historicalVoting.mapValues { (_, directVote) ->
-                        ReferendumVote.Account(voter.accountId, identity, directVote.vote)
-                    }
-                } else {
-                    onChainVoting.flattenCastingVotes().mapValues { (_, accountVote) ->
-                        ReferendumVote.Account(voter.accountId, identity, accountVote)
-                    }
+                val offChainVotes = historicalVoting.orEmpty().mapValues { (_, directVote) ->
+                    ReferendumVote.Account(voter.accountId, identity, directVote.vote)
                 }
+
+                val onChainVotes = onChainVoting.flattenCastingVotes().mapValues { (_, accountVote) ->
+                    ReferendumVote.Account(voter.accountId, identity, accountVote)
+                }
+
+                offChainVotes + onChainVotes
             }
         }
     }
