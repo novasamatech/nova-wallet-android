@@ -120,7 +120,7 @@ class ReferendaListViewModel(
     }
 
     private fun mapDelegatedToUi(delegatedState: DelegatedState, asset: Asset): GovernanceLocksModel? {
-        return when(delegatedState) {
+        return when (delegatedState) {
             is DelegatedState.Delegated -> GovernanceLocksModel(
                 amount = mapAmountToAmountModel(delegatedState.amount, asset).token,
                 title = resourceManager.getString(R.string.delegation_your_delegations),

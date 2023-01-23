@@ -242,7 +242,7 @@ class RealReferendaListInteractor(
     private fun determineDelegatedState(voting: Map<TrackId, Voting>, delegationsSupported: Boolean): DelegatedState {
         if (!delegationsSupported) return DelegatedState.DelegationNotSupported
 
-        val delegatedAmount =  voting.values.filterIsInstance<Voting.Delegating>()
+        val delegatedAmount = voting.values.filterIsInstance<Voting.Delegating>()
             .maxOfOrNull { it.amount }
 
         return if (delegatedAmount != null) {

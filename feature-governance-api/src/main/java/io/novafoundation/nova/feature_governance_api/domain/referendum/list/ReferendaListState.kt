@@ -18,7 +18,7 @@ sealed class DelegatedState {
 
     object DelegationNotSupported : DelegatedState()
 
-    object NotDelegated: DelegatedState()
+    object NotDelegated : DelegatedState()
 
-    class Delegated(val amount: Balance): DelegatedState()
+    class Delegated(val amount: Balance) : DelegatedState()
 }
