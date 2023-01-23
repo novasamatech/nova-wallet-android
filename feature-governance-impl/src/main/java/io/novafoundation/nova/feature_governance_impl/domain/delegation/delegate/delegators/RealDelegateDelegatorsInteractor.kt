@@ -16,7 +16,7 @@ class RealDelegateDelegatorsInteractor(
     private val identityRepository: OnChainIdentityRepository,
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val governanceSharedState: GovernanceSharedState,
-): DelegateDelegatorsInteractor {
+) : DelegateDelegatorsInteractor {
 
     override fun delegatorsFlow(delegateId: AccountId): Flow<List<Delegator>> {
         return flowOf { delegatorsOf(delegateId) }

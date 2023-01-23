@@ -10,10 +10,8 @@ data class Delegation(
     val delegate: AccountId,
 ) {
 
-   data class Vote(
+    data class Vote(
         val amount: Balance,
         val conviction: Conviction
     )
 }
-
-
