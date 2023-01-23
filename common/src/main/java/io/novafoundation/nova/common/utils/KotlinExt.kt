@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.math.BigDecimal
@@ -242,3 +243,11 @@ operator fun ByteArray.compareTo(other: ByteArray): Int {
 }
 
 fun ByteArrayComparator() = Comparator<ByteArray> { a, b -> a.compareTo(b) }
+
+inline fun CoroutineScope.withChildScope(action: CoroutineScope.() -> Unit) {
+    val childScope = childScope()
+
+    action(childScope)
+
+    childScope.cancel()
+}

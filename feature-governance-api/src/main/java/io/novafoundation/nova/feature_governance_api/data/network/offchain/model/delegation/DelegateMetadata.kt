@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_governance_api.data.network.offchain.mode
 
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
-class OffChainDelegateMetadata(
+class DelegateMetadata(
     val accountId: AccountId,
     val shortDescription: String,
     val longDescription: String?,

@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list
 
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateFiltering
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegatePreview
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateSorting
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateFiltering
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateSorting
 
 interface DelegateListInteractor {
 

@@ -7,8 +7,6 @@ interface Delegate {
 
     val accountId: AccountId
 
-    val stats: DelegateStats
-
     val metadata: Metadata?
 
     val onChainIdentity: OnChainIdentity?

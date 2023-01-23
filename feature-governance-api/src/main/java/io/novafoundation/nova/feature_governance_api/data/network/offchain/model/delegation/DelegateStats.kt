@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_governance_api.data.network.offchain.mode
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
-class OffChainDelegateStats(
+class DelegateStats(
     val accountId: AccountId,
     val delegationsCount: Int,
     val delegatedVotes: Balance,
