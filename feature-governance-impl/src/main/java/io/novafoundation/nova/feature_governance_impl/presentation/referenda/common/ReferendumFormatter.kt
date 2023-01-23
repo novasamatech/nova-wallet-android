@@ -17,7 +17,24 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ay
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.passing
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.AUCTION_ADMIN
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.BIG_SPEND
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.BIG_TIPPER
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.FELLOWSHIP_ADMIN
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.GENERAL_ADMIN
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.LEASE_ADMIN
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.MEDIUM_SPEND
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.OTHER
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.REFERENDUM_CANCELLER
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.REFERENDUM_KILLER
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.ROOT
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.SMALL_SPEND
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.SMALL_TIPPER
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.STAKING_ADMIN
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.TREASURER
+import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.WHITELISTED_CALLER
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.domain.track.category.TrackCategorizer
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumStatusModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimationStyleRefresher
@@ -54,7 +71,8 @@ interface ReferendumFormatter {
 private val oneDay = 1.days
 
 class RealReferendumFormatter(
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val trackCategorizer: TrackCategorizer,
 ) : ReferendumFormatter {
 
     override fun formatVoting(voting: ReferendumVoting, token: Token): ReferendumVotingModel {
@@ -81,83 +99,83 @@ class RealReferendumFormatter(
     }
 
     override fun formatTrack(track: ReferendumTrack, asset: Chain.Asset): ReferendumTrackModel {
-        return when (track.name) {
-            "root" -> ReferendumTrackModel(
+        return when (trackCategorizer.typeOf(track.name)) {
+            ROOT -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_track_root),
                 icon = asset.iconUrl?.let { Icon.FromLink(it) } ?: Icon.FromDrawableRes(R.drawable.ic_block),
                 sameWithOther = track.sameWithOther
             )
-            "whitelisted_caller" -> ReferendumTrackModel(
+            WHITELISTED_CALLER -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_whitelisted_caller),
                 icon = Icon.FromDrawableRes(R.drawable.ic_users),
                 sameWithOther = track.sameWithOther
             )
-            "staking_admin" -> ReferendumTrackModel(
+            STAKING_ADMIN -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_staking_admin),
                 icon = Icon.FromDrawableRes(R.drawable.ic_staking_filled),
                 sameWithOther = track.sameWithOther
             )
-            "treasurer" -> ReferendumTrackModel(
+            TREASURER -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_track_treasurer),
                 icon = Icon.FromDrawableRes(R.drawable.ic_gem),
                 sameWithOther = track.sameWithOther
             )
-            "lease_admin" -> ReferendumTrackModel(
+            LEASE_ADMIN -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_track_lease_admin),
                 icon = Icon.FromDrawableRes(R.drawable.ic_governance_check_to_slot),
                 sameWithOther = track.sameWithOther
             )
-            "fellowship_admin" -> ReferendumTrackModel(
+            FELLOWSHIP_ADMIN -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_track_fellowship_admin),
                 icon = Icon.FromDrawableRes(R.drawable.ic_users),
                 sameWithOther = track.sameWithOther
             )
-            "general_admin" -> ReferendumTrackModel(
+            GENERAL_ADMIN -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_track_general_admin),
                 icon = Icon.FromDrawableRes(R.drawable.ic_governance_check_to_slot),
                 sameWithOther = track.sameWithOther
             )
-            "auction_admin" -> ReferendumTrackModel(
+            AUCTION_ADMIN -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_track_auction_admin),
                 icon = Icon.FromDrawableRes(R.drawable.ic_rocket),
                 sameWithOther = track.sameWithOther
             )
-            "referendum_canceller" -> ReferendumTrackModel(
+            REFERENDUM_CANCELLER -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_track_referendum_canceller),
                 icon = Icon.FromDrawableRes(R.drawable.ic_governance_check_to_slot),
                 sameWithOther = track.sameWithOther
             )
-            "referendum_killer" -> ReferendumTrackModel(
+            REFERENDUM_KILLER -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_track_referendum_killer),
                 icon = Icon.FromDrawableRes(R.drawable.ic_governance_check_to_slot),
                 sameWithOther = track.sameWithOther
             )
-            "small_tipper" -> ReferendumTrackModel(
+            SMALL_TIPPER -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_track_small_tipper),
                 icon = Icon.FromDrawableRes(R.drawable.ic_gem),
                 sameWithOther = track.sameWithOther
             )
-            "big_tipper" -> ReferendumTrackModel(
+            BIG_TIPPER -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_track_big_tipper),
                 icon = Icon.FromDrawableRes(R.drawable.ic_gem),
                 sameWithOther = track.sameWithOther
             )
-            "small_spender" -> ReferendumTrackModel(
+            SMALL_SPEND -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_track_small_spender),
                 icon = Icon.FromDrawableRes(R.drawable.ic_gem),
                 sameWithOther = track.sameWithOther
             )
-            "medium_spender" -> ReferendumTrackModel(
+            MEDIUM_SPEND -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_track_medium_spender),
                 icon = Icon.FromDrawableRes(R.drawable.ic_gem),
                 sameWithOther = track.sameWithOther
             )
-            "big_spender" -> ReferendumTrackModel(
+            BIG_SPEND -> ReferendumTrackModel(
                 name = resourceManager.getString(R.string.referendum_track_big_spender),
                 icon = Icon.FromDrawableRes(R.drawable.ic_gem),
                 sameWithOther = track.sameWithOther
             )
-            else -> ReferendumTrackModel(
+            OTHER -> ReferendumTrackModel(
                 name = mapUnknownTrackNameToUi(track.name),
                 icon = Icon.FromDrawableRes(R.drawable.ic_block),
                 sameWithOther = track.sameWithOther
