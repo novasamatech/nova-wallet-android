@@ -627,7 +627,7 @@
     <string name="settings_email">Написать разработчикам</string>
     <string name="settings_general">Основные</string>
     <string name="settings_preferences">Предпочтения</string>
-    <string name="settings_safe_mode_confirmation_message">Запись экрана и скриншоты будут недоступны. Свернутое приложение будет отображать экран-заставку вместо содержимого</string>
+    <string name="settings_safe_mode_confirmation_message">Запись экрана и скриншоты будут недоступны. Свернутое приложение не будет отображать содержимое</string>
     <string name="settings_safe_mode_confirmation_title">Безопасный режим</string>
     <string name="settings_security">Безопасность</string>
     <string name="settings_support">Поддержка и обратная связь</string>
