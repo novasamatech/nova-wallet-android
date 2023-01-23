@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
 import com.google.android.material.card.MaterialCardView
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.dp
@@ -48,5 +49,9 @@ class BannerView @JvmOverloads constructor(
         } else {
             bannerContent.addView(child, params)
         }
+    }
+
+    fun setImage(@DrawableRes imageRes: Int) {
+        bannerImage.setImageResource(imageRes)
     }
 }
