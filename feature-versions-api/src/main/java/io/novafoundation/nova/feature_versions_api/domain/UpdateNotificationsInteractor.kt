@@ -6,5 +6,5 @@ interface UpdateNotificationsInteractor {
 
     suspend fun getUpdateNotifications(): List<UpdateNotification>
 
-    fun skipNewUpdates()
+    suspend fun skipNewUpdates()
 }

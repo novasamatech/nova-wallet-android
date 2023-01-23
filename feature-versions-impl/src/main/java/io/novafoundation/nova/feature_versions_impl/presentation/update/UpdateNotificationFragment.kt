@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.navigation.DelayedNavigation
 import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.common.presentation.SearchState
 import io.novafoundation.nova.common.utils.getTopSystemBarInset
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_versions_impl.R

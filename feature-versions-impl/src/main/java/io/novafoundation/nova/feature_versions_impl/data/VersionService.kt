@@ -12,7 +12,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 
-
 class VersionService(
     private val context: Context,
     private val preferences: Preferences,
@@ -33,15 +32,17 @@ class VersionService(
             .any { checkpointVersion < it.key || it.value.severity == REMOTE_SEVERITY_CRITICAL }
     }
 
-    suspend fun getNewVersions(): List<UpdateNotification> {
+    suspend fun getNewUpdateNotifications(): List<UpdateNotification> {
         return syncAndGetVersions()
             .filter { currentVersion < it.key }
             .map { getChangelogAsync(it.key, it.value) }
             .awaitAll()
     }
 
-    fun skipCurrentUpdates() {
-        preferences.putString(PREF_VERSION_CHECKPOINT, currentVersion.toString())
+    suspend fun skipCurrentUpdates() {
+        val latestUpdateNotification = getNewUpdateNotifications()
+            .maxWith { first, second -> first.version.compareTo(second.version) }
+        preferences.putString(PREF_VERSION_CHECKPOINT, latestUpdateNotification.version.toString())
     }
 
     private fun getRecentVersionCheckpoint(): Version? {
@@ -82,7 +83,6 @@ class VersionService(
         }
         return packageInfo.versionName.toVersion()
     }
-
 
     private fun String.toVersion(): Version {
         val cleanedVersion = replace("[^\\d.]".toRegex(), "")

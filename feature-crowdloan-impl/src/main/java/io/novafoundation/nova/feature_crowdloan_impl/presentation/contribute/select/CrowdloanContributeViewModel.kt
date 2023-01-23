@@ -213,7 +213,7 @@ class CrowdloanContributeViewModel(
     val crowdloanDetailModelFlow = crowdloanFlow.map { crowdloan ->
         CrowdloanDetailsModel(
             leasePeriod = resourceManager.formatDuration(crowdloan.leasePeriodInMillis),
-            leasedUntil = resourceManager.formatDate(crowdloan.leasedUntilInMillis)
+            leasedUntil = resourceManager.formatDateTime(crowdloan.leasedUntilInMillis)
         )
     }
         .inBackground()

@@ -94,7 +94,7 @@ fun BigDecimal.formatFractionAsPercentage(): String {
     return fractionToPercentage().formatAsPercentage()
 }
 
-fun Date.formatDaysSinceEpoch(resourceManager: ResourceManager): String {
+fun Date.formatDateSinceEpoch(resourceManager: ResourceManager): String {
     val currentDays = System.currentTimeMillis().daysFromMillis()
     val diff = currentDays - time.daysFromMillis()
 

@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.navigation.DelayedNavigation
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.formatting.formatDaysSinceEpoch
+import io.novafoundation.nova.common.utils.formatting.formatDateSinceEpoch
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_versions_api.domain.Severity
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotification
@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_versions_api.presentation.VersionsRouter
 import io.novafoundation.nova.feature_versions_impl.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 class UpdateNotificationViewModel(
     private val router: VersionsRouter,
@@ -41,8 +42,10 @@ class UpdateNotificationViewModel(
     }.withLoading()
 
     fun skipClicked() {
-        interactor.skipNewUpdates()
-        router.skipUpdatesClicked(nextNavigation)
+        launch {
+            interactor.skipNewUpdates()
+            router.skipUpdatesClicked(nextNavigation)
+        }
     }
 
     fun installUpdateClicked() {
@@ -74,7 +77,7 @@ class UpdateNotificationViewModel(
                 mapSeverity(it.severity),
                 mapSeverityColor(it.severity),
                 mapSeverityBackground(it.severity),
-                it.time.formatDaysSinceEpoch(resourceManager)
+                it.time.formatDateSinceEpoch(resourceManager)
             )
         }
     }

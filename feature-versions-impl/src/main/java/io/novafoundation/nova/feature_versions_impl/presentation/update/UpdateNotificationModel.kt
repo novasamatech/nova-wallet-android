@@ -19,5 +19,4 @@ class UpdateNotificationModel(
     val date: String
 )
 
-
 class SeeAllButtonModel

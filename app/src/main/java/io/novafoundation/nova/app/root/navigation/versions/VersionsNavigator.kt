@@ -33,7 +33,7 @@ class VersionsNavigator(
         val activity = navigationHolder.contextManager.getActivity()
         require(activity != null)
         val packageName = activity.packageName
-        
+
         try {
             activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
         } catch (e: ActivityNotFoundException) {
