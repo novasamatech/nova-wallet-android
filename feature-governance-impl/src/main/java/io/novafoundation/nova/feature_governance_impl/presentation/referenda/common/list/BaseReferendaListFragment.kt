@@ -20,7 +20,7 @@ abstract class BaseReferendaListFragment<V : BaseViewModel> : BaseFragment<V>(),
     protected val referendaListAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendaListAdapter(this, imageLoader) }
 
     protected fun Flow<LoadingState<List<Any?>>>.observeReferendaList() {
-       observeWhenVisible {
+        observeWhenVisible {
             when (it) {
                 is LoadingState.Loaded -> {
                     shimmeringAdapter.showPlaceholder(false)

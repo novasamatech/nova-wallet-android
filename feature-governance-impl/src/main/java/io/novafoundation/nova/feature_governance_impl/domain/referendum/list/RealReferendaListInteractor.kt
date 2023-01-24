@@ -332,7 +332,7 @@ class RealReferendaListInteractor(
                 }
 
                 if (onlyRecentVotes) {
-                    //we do not take on-chain votes with recent votes limitations since we cannot filter on-chain votes by time
+                    // we do not take on-chain votes with recent votes limitations since we cannot filter on-chain votes by time
                     offChainVotes
                 } else {
                     offChainVotes + onChainVotes
