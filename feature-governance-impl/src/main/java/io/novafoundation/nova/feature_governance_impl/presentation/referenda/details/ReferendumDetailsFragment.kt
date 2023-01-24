@@ -133,7 +133,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         setupExternalActions(viewModel)
         observeValidations(viewModel)
 
-        viewModel.referendumDetailsModelFlow.observe {
+        viewModel.referendumDetailsModelFlow.observeWhenVisible {
             when (it) {
                 is LoadingState.Loading -> {
                     setContentVisible(false)
@@ -146,15 +146,15 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
             }
         }
 
-        viewModel.proposerAddressModel.observe(referendumDetailsProposer::setAddressOrHide)
+        viewModel.proposerAddressModel.observeWhenVisible(referendumDetailsProposer::setAddressOrHide)
 
-        viewModel.referendumCallModelFlow.observe(::setReferendumCall)
+        viewModel.referendumCallModelFlow.observeWhenVisible(::setReferendumCall)
 
-        viewModel.referendumDApps.observe(referendumDetailsDappList::setDAppsOrHide)
+        viewModel.referendumDApps.observeWhenVisible(referendumDetailsDappList::setDAppsOrHide)
 
-        viewModel.voteButtonState.observe(referendumDetailsVotingStatus::setVoteButtonState)
+        viewModel.voteButtonState.observeWhenVisible(referendumDetailsVotingStatus::setVoteButtonState)
 
-        viewModel.showFullDetails.observe(referendumFullDetails::setVisible)
+        viewModel.showFullDetails.observeWhenVisible(referendumFullDetails::setVisible)
     }
 
     private fun setReferendumState(model: ReferendumDetailsModel) {
