@@ -8,7 +8,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.navigation.DelayedNavigation
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.getTopSystemBarInset
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
