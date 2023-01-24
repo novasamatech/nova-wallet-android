@@ -148,7 +148,6 @@ class ReferendumDetailsViewModel(
         .shareWhileSubscribed()
 
     val referendumDApps = flowOfAll {
-        val chainId = selectedAssetSharedState.chainId()
         val selectedGovernanceOption = selectedAssetSharedState.selectedOption()
         governanceDAppsInteractor.observeReferendumDapps(payload.toReferendumId(), selectedGovernanceOption)
     }
