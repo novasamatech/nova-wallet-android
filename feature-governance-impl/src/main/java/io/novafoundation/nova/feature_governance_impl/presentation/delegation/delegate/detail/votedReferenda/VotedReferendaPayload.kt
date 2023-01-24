@@ -7,4 +7,5 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class VotedReferendaPayload(
     val accountId: AccountId,
+    val onlyRecentVotes: Boolean
 ): Parcelable

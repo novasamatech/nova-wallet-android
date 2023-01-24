@@ -11,9 +11,9 @@ interface ReferendaListInteractor {
         selectedGovernanceOption: SupportedGovernanceOption
     ): Flow<ReferendaListState>
 
-    fun referendaListFlow(
+    fun votedReferendaListFlow(
         voter: Voter,
-        onlyVoted: Boolean
+        onlyRecentVotes: Boolean
     ): Flow<List<ReferendumPreview>>
 }
 

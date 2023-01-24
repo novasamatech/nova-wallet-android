@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda
 
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
@@ -26,7 +27,7 @@ class VotedReferendaViewModel(
 
     private val voter = Voter.account(payload.accountId)
 
-    private val referendaListFlow = interactor.referendaListFlow(voter, onlyVoted = true)
+    private val referendaListFlow = interactor.votedReferendaListFlow(voter, payload.onlyRecentVotes)
         .inBackground()
         .shareWhileSubscribed()
 
@@ -38,6 +39,12 @@ class VotedReferendaViewModel(
     }
         .inBackground()
         .withLoading()
+        .shareWhileSubscribed()
+
+    val votedReferendaCount = referendaListFlow.map {
+        it.size.format()
+    }
+        .inBackground()
         .shareWhileSubscribed()
 
     fun openReferendum(referendum: ReferendumModel) {

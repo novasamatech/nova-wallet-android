@@ -42,12 +42,15 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Voter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.user
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.state.selectedOption
+import io.novafoundation.nova.runtime.util.blockInPast
 import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.hash.isPositive
@@ -72,7 +75,7 @@ class RealReferendaListInteractor(
     private val referendaConstructor: ReferendaConstructor,
     private val referendaSortingProvider: ReferendaSortingProvider,
     private val identityRepository: OnChainIdentityRepository,
-    private val governanceSharedState: GovernanceSharedState
+    private val governanceSharedState: GovernanceSharedState,
 ) : ReferendaListInteractor {
 
     override fun referendaListStateFlow(
@@ -87,17 +90,18 @@ class RealReferendaListInteractor(
         }
     }
 
-    override fun referendaListFlow(voter: Voter, onlyVoted: Boolean): Flow<List<ReferendumPreview>> {
+    override fun votedReferendaListFlow(voter: Voter, onlyRecentVotes: Boolean): Flow<List<ReferendumPreview>> {
         return flowOfAll {
             val selectedGovernanceOption = governanceSharedState.selectedOption()
 
-            referendaListFlowSuspend(voter, selectedGovernanceOption)
+            referendaListFlowSuspend(voter, selectedGovernanceOption, onlyRecentVotes)
         }
     }
 
     private suspend fun referendaListFlowSuspend(
         voter: Voter,
-        selectedGovernanceOption: SupportedGovernanceOption
+        selectedGovernanceOption: SupportedGovernanceOption,
+        onlyRecentVotes: Boolean
     ): Flow<List<ReferendumPreview>> {
         val chain = selectedGovernanceOption.assetWithChain.chain
 
@@ -115,7 +119,7 @@ class RealReferendaListInteractor(
 
                 val onChainVoting = async { governanceSource.convictionVoting.votingFor(voter.accountId, chain.id) }
 
-                val voterVotes = governanceSource.constructVoterVotes(voter, onChainVoting.await(), chain)
+                val voterVotes = governanceSource.constructVoterVotes(voter, onChainVoting.await(), chain, onlyRecentVotes)
 
                 val referenda = governanceSource.constructReferendumPreviews(
                     voting = voterVotes,
@@ -127,8 +131,8 @@ class RealReferendaListInteractor(
                     electorate = electorate.await()
                 )
 
-                sortReferendaPreviews(referenda.onlyVoted())
-                    .values.flatten()
+                val sorting = referendaSortingProvider.getVotedReferendumSorting()
+                referenda.onlyVoted().sortedWith(sorting)
             }
         }
     }
@@ -163,7 +167,7 @@ class RealReferendaListInteractor(
 
                 val onChainVoting = async { voter?.accountId?.let { governanceSource.convictionVoting.votingFor(it, chain.id) }.orEmpty() }
 
-                val voterVotes = governanceSource.constructVoterVotes(voter, onChainVoting.await(), chain)
+                val voterVotes = governanceSource.constructVoterVotes(voter, onChainVoting.await(), chain, onlyRecentVotes = false)
 
                 val referenda = governanceSource.constructReferendumPreviews(
                     voting = voterVotes,
@@ -274,7 +278,8 @@ class RealReferendaListInteractor(
     private suspend fun GovernanceSource.constructVoterVotes(
         voter: Voter?,
         onChainVoting: Map<TrackId, Voting>,
-        chain: Chain
+        chain: Chain,
+        onlyRecentVotes: Boolean
     ): Map<ReferendumId, ReferendumVote> {
         return when (voter?.type) {
             null -> emptyMap()
@@ -307,7 +312,14 @@ class RealReferendaListInteractor(
             }
 
             Voter.Type.ACCOUNT -> {
-                val historicalVoting = delegationsRepository.directHistoricalVotesOf(voter.accountId, chain)
+                val recentVotesBlockThreshold = if (onlyRecentVotes) {
+                    val blockTimeConverter = chainStateRepository.blockDurationEstimator(chain.id)
+                    blockTimeConverter.blockInPast(RECENT_VOTES_PERIOD)
+                } else {
+                    null
+                }
+
+                val historicalVoting = delegationsRepository.directHistoricalVotesOf(voter.accountId, chain, recentVotesBlockThreshold)
                 val identity = identityRepository.getIdentityFromId(chain.id, voter.accountId)
                     ?.display?.let(::Identity)
 
@@ -319,7 +331,12 @@ class RealReferendaListInteractor(
                     ReferendumVote.Account(voter.accountId, identity, accountVote)
                 }
 
-                offChainVotes + onChainVotes
+                if (onlyRecentVotes) {
+                    //we do not take on-chain votes with recent votes limitations since we cannot filter on-chain votes by time
+                    offChainVotes
+                } else {
+                    offChainVotes + onChainVotes
+                }
             }
         }
     }

@@ -12,7 +12,18 @@
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         android:id="@+id/votedReferendaToolbar"
-        app:titleText="@string/referendum_voted_referenda" />
+        app:titleText="@string/referendum_voted_referenda" >
+
+        <io.novafoundation.nova.common.view.CounterView
+            android:id="@+id/votedReferendaCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="16dp"
+            android:visibility="gone"
+            tools:text="5"
+            tools:visibility="visible" />
+    </io.novafoundation.nova.common.view.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/votedReferendaList"

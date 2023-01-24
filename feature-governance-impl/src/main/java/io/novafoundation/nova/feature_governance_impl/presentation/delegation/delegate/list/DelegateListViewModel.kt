@@ -79,7 +79,7 @@ class DelegateListViewModel(
         val delegate = delegateModels.first().dataOrNull?.getOrNull(position) ?: return@launch
 
         // TODO show delegate details instead
-        val payload = VotedReferendaPayload(delegate.accountId)
+        val payload = VotedReferendaPayload(delegate.accountId, onlyRecentVotes = true)
         router.openVotedReferenda(payload)
     }
 

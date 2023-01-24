@@ -123,9 +123,15 @@ class Gov2DelegationsRepository(
         }
     }
 
-    override suspend fun directHistoricalVotesOf(user: AccountId, chain: Chain): Map<ReferendumId, UserVote.Direct>? {
+    override suspend fun directHistoricalVotesOf(
+        user: AccountId,
+        chain: Chain,
+        recentVotesBlockThreshold: BlockNumber?
+    ): Map<ReferendumId, UserVote.Direct>? {
+        val blockThreshold = recentVotesBlockThreshold ?: BlockNumber.ZERO
+
         return accountSubQueryRequest(user, chain) { externalApiLink, userAddress ->
-            val request = DirectHistoricalVotesRequest(userAddress)
+            val request = DirectHistoricalVotesRequest(userAddress, blockThreshold)
             val response = delegationsSubqueryApi.getDirectHistoricalVotes(externalApiLink, request)
 
             response.data.direct.toUserVoteMap().filterNotNull()

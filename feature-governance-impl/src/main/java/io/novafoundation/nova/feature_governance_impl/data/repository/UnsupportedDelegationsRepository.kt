@@ -41,7 +41,11 @@ class UnsupportedDelegationsRepository : DelegationsRepository {
         return null
     }
 
-    override suspend fun directHistoricalVotesOf(user: AccountId, chain: Chain): Map<ReferendumId, UserVote.Direct>? {
+    override suspend fun directHistoricalVotesOf(
+        user: AccountId,
+        chain: Chain,
+        recentVotesBlockThreshold: BlockNumber?
+    ): Map<ReferendumId, UserVote.Direct>? {
         return null
     }
 }
