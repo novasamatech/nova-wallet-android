@@ -4,9 +4,16 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class DelegationBannerService(
+interface DelegationBannerRepository {
+
+    fun shouldShowBannerFlow(): Flow<Boolean>
+
+    fun hideBanner()
+}
+
+class RealDelegationBannerRepository(
     private val preferences: Preferences
-) {
+) : DelegationBannerRepository {
 
     companion object {
         private const val PREFS_SHOULD_SHOW_BANNER = "PREFS_SHOULD_SHOW_BANNER"
@@ -14,11 +21,11 @@ class DelegationBannerService(
 
     private val shouldShowBannerFlow = MutableStateFlow(preferences.getBoolean(PREFS_SHOULD_SHOW_BANNER, true))
 
-    fun shouldShowBannerFlow(): Flow<Boolean> {
+    override fun shouldShowBannerFlow(): Flow<Boolean> {
         return shouldShowBannerFlow
     }
 
-    fun hideBanner() {
+    override fun hideBanner() {
         shouldShowBannerFlow.value = false
         preferences.putBoolean(PREFS_SHOULD_SHOW_BANNER, false)
     }

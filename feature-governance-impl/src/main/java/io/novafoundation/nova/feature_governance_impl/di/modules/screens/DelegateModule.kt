@@ -13,8 +13,9 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.NewDelegationChooseTrackInteractor
-import io.novafoundation.nova.feature_governance_impl.data.DelegationBannerService
+import io.novafoundation.nova.feature_governance_impl.data.DelegationBannerRepository
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.data.RealDelegationBannerRepository
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.delegators.RealDelegateDelegatorsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.details.RealDelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.list.RealDelegateListInteractor
@@ -29,7 +30,7 @@ class DelegateModule {
 
     @Provides
     @FeatureScope
-    fun provideDelegationBannerService(preferences: Preferences) = DelegationBannerService(preferences)
+    fun provideDelegationBannerService(preferences: Preferences): DelegationBannerRepository = RealDelegationBannerRepository(preferences)
 
     @Provides
     @FeatureScope
@@ -37,7 +38,7 @@ class DelegateModule {
         governanceSourceRegistry: GovernanceSourceRegistry,
         chainStateRepository: ChainStateRepository,
         identityRepository: OnChainIdentityRepository,
-        delegationBannerService: DelegationBannerService
+        delegationBannerService: DelegationBannerRepository
     ): DelegateListInteractor = RealDelegateListInteractor(
         governanceSourceRegistry = governanceSourceRegistry,
         chainStateRepository = chainStateRepository,
