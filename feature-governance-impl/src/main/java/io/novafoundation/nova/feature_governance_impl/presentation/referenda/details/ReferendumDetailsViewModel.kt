@@ -1,13 +1,11 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.details
 
-import android.util.Log
 import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.firstOnLoad
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
@@ -66,7 +64,6 @@ import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -102,7 +99,6 @@ class ReferendumDetailsViewModel(
 
         interactor.referendumDetailsFlow(payload.toReferendumId(), selectedGovernanceOption, voterAccountId)
     }
-        .onEach { Log.d(LOG_TAG, "New referendum details state") }
         .inBackground()
         .shareWhileSubscribed()
 
