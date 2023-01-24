@@ -31,7 +31,7 @@ class UpdateNotificationViewModel(
             notifications.take(1)
         }
         buildList {
-            val banner = getBannerOrNull(result)
+            val banner = getBannerOrNull(notifications)
             banner?.let { add(it) }
             addAll(mapUpdateNotificationsToModels(result))
             if (notifications.size > 1 && !shouldShowAll) {
@@ -108,13 +108,15 @@ class UpdateNotificationViewModel(
     private fun getBannerOrNull(notifications: List<UpdateNotification>): UpdateNotificationBannerModel? {
         if (hasCriticalUpdates(notifications)) {
             return UpdateNotificationBannerModel(
-                R.drawable.advertisement_calendar, // TODO: another image
+                R.drawable.ic_critical_update,
+                R.drawable.ic_banner_yellow_gradient,
                 resourceManager.getString(R.string.update_notifications_critical_update_alert_titile),
                 resourceManager.getString(R.string.update_notifications_critical_update_alert_subtitile)
             )
         } else if (hasMajorUpdates(notifications)) {
             return UpdateNotificationBannerModel(
-                R.drawable.advertisement_calendar, // TODO: another image
+                R.drawable.ic_major_update,
+                R.drawable.ic_banner_turquoise_gradient,
                 resourceManager.getString(R.string.update_notifications_major_update_alert_titile),
                 resourceManager.getString(R.string.update_notifications_major_update_alert_subtitile)
             )

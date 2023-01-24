@@ -9,5 +9,4 @@ interface SplashRouter : SecureRouter {
     fun openCreatePincode()
 
     fun openInitialCheckPincode()
-
 }

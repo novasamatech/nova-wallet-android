@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeA
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.fingerprint.FingerprintCallback
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.fingerprint.FingerprintWrapper
-import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 
 @Module(
     includes = [

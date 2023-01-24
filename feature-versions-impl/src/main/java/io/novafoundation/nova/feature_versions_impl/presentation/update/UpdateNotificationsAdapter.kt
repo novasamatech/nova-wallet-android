@@ -77,6 +77,7 @@ class UpdateNotificationBannerHolder(view: View) : GroupedListHolder(view) {
 
     fun bind(item: UpdateNotificationBannerModel) {
         itemView.itemUpdateNotificationBanner.setImage(item.iconRes)
+        itemView.itemUpdateNotificationBanner.setBannerBackground(item.backgroundRes)
         itemView.itemUpdateNotificationAlertTitle.text = item.title
         itemView.itemUpdateNotificationAlertSubtitle.text = item.message
     }

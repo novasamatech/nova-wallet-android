@@ -13,7 +13,7 @@ class Version(
     private val major: Long,
     private val minor: Long,
     private val patch: Long
-) {
+) : Comparable<Version> {
 
     companion object {
         fun getComparator(): Comparator<Version> {
@@ -23,7 +23,7 @@ class Version(
         }
     }
 
-    operator fun compareTo(other: Version): Int {
+    override operator fun compareTo(other: Version): Int {
         return getComparator()
             .compare(this, other)
     }

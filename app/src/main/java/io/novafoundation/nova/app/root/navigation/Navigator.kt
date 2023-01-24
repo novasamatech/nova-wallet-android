@@ -83,7 +83,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.c
 import io.novafoundation.nova.feature_staking_impl.presentation.story.StoryFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
-import io.novafoundation.nova.feature_versions_impl.presentation.update.UpdateNotificationFragment
 import io.novafoundation.nova.splash.SplashRouter
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.Flow

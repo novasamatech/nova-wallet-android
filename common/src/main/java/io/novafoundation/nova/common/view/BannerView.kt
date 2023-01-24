@@ -51,6 +51,10 @@ class BannerView @JvmOverloads constructor(
         }
     }
 
+    fun setBannerBackground(@DrawableRes backgroundRes: Int) {
+        bannerBackground.setBackgroundResource(backgroundRes)
+    }
+
     fun setImage(@DrawableRes imageRes: Int) {
         bannerImage.setImageResource(imageRes)
     }

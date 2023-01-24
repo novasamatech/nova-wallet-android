@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 interface RootDependencies {
 
     fun updateNotificationsInteractor(): UpdateNotificationsInteractor
-    
+
     fun contributionsInteractor(): ContributionsInteractor
 
     fun crowdloanRepository(): CrowdloanRepository

@@ -5,6 +5,7 @@ import androidx.annotation.DrawableRes
 
 class UpdateNotificationBannerModel(
     @DrawableRes val iconRes: Int,
+    @DrawableRes val backgroundRes: Int,
     val title: String,
     val message: String
 )
