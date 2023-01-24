@@ -42,7 +42,7 @@ class GovernanceV2Module {
     @FeatureScope
     fun provideConvictionVotingRepository(
         @Named(REMOTE_STORAGE_SOURCE) storageSource: StorageDataSource,
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
     ) = GovV2ConvictionVotingRepository(storageSource, chainRegistry)
 
     @Provides

@@ -13,23 +13,21 @@
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:layout_gravity="center_vertical"
-        tools:layout_marginVertical="3dp"
-        tools:layout_marginEnd="6dp"
         android:gravity="center_vertical"
         app:tint="@color/chip_icon"
+        tools:layout_marginEnd="6dp"
+        tools:layout_marginVertical="3dp"
         tools:src="@drawable/ic_info_cicrle_filled_16" />
 
     <TextView
         android:id="@+id/chipText"
-        style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        tools:layout_marginVertical="4.5dp"
-        tools:layout_marginEnd="8dp"
-        android:includeFontPadding="false"
-        android:textAllCaps="true"
         android:textColor="@color/chip_text"
+        tools:layout_marginEnd="8dp"
+        tools:layout_marginVertical="4.5dp"
+        tools:style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
         tools:text="main agenda" />
 
 </merge>

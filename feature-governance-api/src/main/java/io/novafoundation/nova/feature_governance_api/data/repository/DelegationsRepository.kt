@@ -4,13 +4,17 @@ import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Delegation
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateDetailedStats
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateMetadata
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateStats
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.vote.UserVote
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 interface DelegationsRepository {
+
+    suspend fun isDelegationSupported(): Boolean
 
     suspend fun getDelegatesStats(
         recentVotesBlockThreshold: BlockNumber,
@@ -28,6 +32,10 @@ interface DelegationsRepository {
     suspend fun getDelegateMetadata(chain: Chain, delegate: AccountId): DelegateMetadata?
 
     suspend fun getDelegationsTo(delegate: AccountId, chain: Chain): List<Delegation>
+
+    suspend fun allHistoricalVotesOf(user: AccountId, chain: Chain): Map<ReferendumId, UserVote>?
+
+    suspend fun directHistoricalVotesOf(user: AccountId, chain: Chain): Map<ReferendumId, UserVote.Direct>?
 }
 
 suspend fun DelegationsRepository.getDelegatesMetadataOrEmpty(chain: Chain): List<DelegateMetadata> {

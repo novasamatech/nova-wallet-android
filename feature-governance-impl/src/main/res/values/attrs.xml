@@ -35,6 +35,7 @@
         <attr name="chipSize" format="enum">
             <enum name="normal" value="0" />
             <enum name="small" value="1" />
+            <enum name="sum" value="2" />
         </attr>
         <attr name="android:textColor" />
         <attr name="chipTextAppearance" format="reference" />
