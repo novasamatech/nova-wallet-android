@@ -74,7 +74,7 @@ interface BaseFragmentMixin<T : BaseViewModel> : WithContextExtensions {
         }
     }
 
-    fun <V> Flow<V>.observeCancelling(collector: suspend (V) -> Unit) {
+    fun <V> Flow<V>.observeWhenVisible(collector: suspend (V) -> Unit) {
         fragment.viewLifecycleOwner.lifecycleScope.launchWhenResumed {
             collect(collector)
         }
