@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.DelegatedState
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.GovernanceLocksOverview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumGroup
@@ -76,6 +77,14 @@ class ReferendaListViewModel(
         .inBackground()
         .shareWhileSubscribed()
 
+    val governanceDelegated = referendaListStateFlow.mapLoading {
+        val asset = assetSelectorMixin.selectedAssetFlow.first()
+
+        mapDelegatedToUi(it.delegated, asset)
+    }
+        .inBackground()
+        .shareWhileSubscribed()
+
     val referendaUiFlow = referendaListStateFlow.mapLoading { state ->
         val asset = assetSelectorMixin.selectedAssetFlow.first()
 
@@ -104,9 +113,28 @@ class ReferendaListViewModel(
         if (locksOverview == null) return null
 
         return GovernanceLocksModel(
+            title = resourceManager.getString(R.string.wallet_balance_locked),
             amount = mapAmountToAmountModel(locksOverview.locked, asset).token,
             hasUnlockableLocks = locksOverview.hasClaimableLocks
         )
+    }
+
+    private fun mapDelegatedToUi(delegatedState: DelegatedState, asset: Asset): GovernanceLocksModel? {
+        return when (delegatedState) {
+            is DelegatedState.Delegated -> GovernanceLocksModel(
+                amount = mapAmountToAmountModel(delegatedState.amount, asset).token,
+                title = resourceManager.getString(R.string.delegation_your_delegations),
+                hasUnlockableLocks = false
+            )
+
+            DelegatedState.NotDelegated -> GovernanceLocksModel(
+                amount = null,
+                title = resourceManager.getString(R.string.delegation_add_delegation),
+                hasUnlockableLocks = false
+            )
+
+            DelegatedState.DelegationNotSupported -> null
+        }
     }
 
     private fun mapReferendumGroupToUi(referendumGroup: ReferendumGroup, groupSize: Int): ReferendaGroupModel {

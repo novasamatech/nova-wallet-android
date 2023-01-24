@@ -66,6 +66,10 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
             referendaHeaderAdapter.setLocks(it.dataOrNull)
         }
 
+        viewModel.governanceDelegated.observe {
+            referendaHeaderAdapter.setDelegations(it.dataOrNull)
+        }
+
         viewModel.referendaUiFlow.observe {
             when (it) {
                 is LoadingState.Loaded -> {

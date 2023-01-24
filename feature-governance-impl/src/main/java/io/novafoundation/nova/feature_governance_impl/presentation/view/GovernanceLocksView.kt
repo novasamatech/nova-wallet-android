@@ -46,6 +46,7 @@ class GovernanceLocksView @JvmOverloads constructor(
     }
 
     fun setModel(model: GovernanceLocksModel) {
+        governanceLockedTitle.text = model.title
         governanceLockAmount.setTextOrHide(model.amount)
         governanceUnlockBadge.isVisible = model.hasUnlockableLocks
     }
@@ -53,5 +54,6 @@ class GovernanceLocksView @JvmOverloads constructor(
 
 class GovernanceLocksModel(
     val amount: String?,
+    val title: String,
     val hasUnlockableLocks: Boolean
 )
