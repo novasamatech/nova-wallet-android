@@ -7,6 +7,8 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaFragment
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsFragment
@@ -30,7 +32,7 @@ class GovernanceNavigator(
 
     override fun openReferendum(payload: ReferendumDetailsPayload) {
         val bundle = ReferendumDetailsFragment.getBundle(payload)
-        navController?.navigate(R.id.action_mainFragment_to_referendum_details, bundle)
+        navController?.navigate(R.id.action_open_referendum_details, bundle)
     }
 
     override fun openReferendumFullDetails(payload: ReferendumFullDetailsPayload) = performNavigation(
@@ -63,6 +65,11 @@ class GovernanceNavigator(
     }
 
     override fun openAddDelegation() = performNavigation(R.id.action_mainFragment_to_delegation)
+
+    override fun openVotedReferenda(payload: VotedReferendaPayload) = performNavigation(
+        actionId = R.id.action_delegateListFragment_to_votedReferendaFragment,
+        args = VotedReferendaFragment.getBundle(payload)
+    )
 
     override fun openDAppBrowser(initialUrl: String) = performNavigation(
         actionId = R.id.action_referendumDetailsFragment_to_DAppBrowserGraph,

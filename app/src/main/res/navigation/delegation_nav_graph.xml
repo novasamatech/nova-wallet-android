@@ -10,5 +10,18 @@
         tools:layout="@layout/fragment_delegate_list"
         android:id="@+id/delegateListFragment"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.DelegateListFragment"
-        android:label="DelegateListFragment" />
+        android:label="DelegateListFragment" >
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_delegateListFragment_to_votedReferendaFragment"
+            app:destination="@id/votedReferendaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/votedReferendaFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaFragment"
+        android:label="VotedReferendaFragment" />
 </navigation>

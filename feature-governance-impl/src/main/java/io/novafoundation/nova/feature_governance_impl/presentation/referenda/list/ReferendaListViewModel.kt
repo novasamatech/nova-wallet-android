@@ -162,7 +162,7 @@ class ReferendaListViewModel(
             track = referendum.track?.let { referendumFormatter.formatTrack(it, token.configuration) },
             number = referendumFormatter.formatId(referendum.id),
             voting = referendum.voting?.let { referendumFormatter.formatVoting(it, token) },
-            yourVote = mapUserVoteToUi(referendum.userVote, token, chain)
+            yourVote = mapUserVoteToUi(referendum.referendumVote, token, chain)
         )
     }
 

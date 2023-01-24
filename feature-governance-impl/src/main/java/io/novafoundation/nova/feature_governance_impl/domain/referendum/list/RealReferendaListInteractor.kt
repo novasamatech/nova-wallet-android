@@ -41,11 +41,13 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Voter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.user
+import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.state.selectedOption
 import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.hash.isPositive
@@ -70,20 +72,75 @@ class RealReferendaListInteractor(
     private val referendaConstructor: ReferendaConstructor,
     private val referendaSortingProvider: ReferendaSortingProvider,
     private val identityRepository: OnChainIdentityRepository,
+    private val governanceSharedState: GovernanceSharedState
 ) : ReferendaListInteractor {
 
     override fun referendaListStateFlow(
         voterAccountId: AccountId?,
         selectedGovernanceOption: SupportedGovernanceOption
     ): Flow<ReferendaListState> {
-        return flowOfAll { referendaListStateFlowSuspend(voterAccountId, selectedGovernanceOption) }
+        return flowOfAll {
+            referendaListStateFlowSuspend(
+                voter = voterAccountId?.let(Voter.Companion::user),
+                selectedGovernanceOption = selectedGovernanceOption
+            )
+        }
+    }
+
+    override fun referendaListFlow(voter: Voter, onlyVoted: Boolean): Flow<List<ReferendumPreview>> {
+        return flowOfAll {
+            val selectedGovernanceOption = governanceSharedState.selectedOption()
+
+            referendaListFlowSuspend(voter, selectedGovernanceOption)
+        }
+    }
+
+    private suspend fun referendaListFlowSuspend(
+        voter: Voter,
+        selectedGovernanceOption: SupportedGovernanceOption
+    ): Flow<List<ReferendumPreview>> {
+        val chain = selectedGovernanceOption.assetWithChain.chain
+
+        val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
+        val tracksById = governanceSource.referenda.getTracksById(chain.id)
+
+        return chainStateRepository.currentBlockNumberFlow(chain.id).map { currentBlockNumber ->
+            coroutineScope {
+                val onChainReferenda = async { governanceSource.referenda.getAllOnChainReferenda(chain.id) }
+                val offChainInfo = async {
+                    governanceSource.offChainInfo.referendumPreviews(chain)
+                        .associateBy(OffChainReferendumPreview::referendumId)
+                }
+                val electorate = async { governanceSource.referenda.electorate(chain.id) }
+
+                val onChainVoting = async { governanceSource.convictionVoting.votingFor(voter.accountId, chain.id) }
+
+                val voterVotes = governanceSource.constructVoterVotes(voter, onChainVoting.await(), chain)
+
+                val referenda = governanceSource.constructReferendumPreviews(
+                    voting = voterVotes,
+                    onChainReferenda = onChainReferenda.await(),
+                    selectedGovernanceOption = selectedGovernanceOption,
+                    tracksById = tracksById,
+                    currentBlockNumber = currentBlockNumber,
+                    offChainInfo = offChainInfo.await(),
+                    electorate = electorate.await()
+                )
+
+                sortReferendaPreviews(referenda.onlyVoted())
+                    .values.flatten()
+            }
+        }
+    }
+
+    private fun List<ReferendumPreview>.onlyVoted(): List<ReferendumPreview> {
+        return filter { it.referendumVote != null }
     }
 
     private suspend fun referendaListStateFlowSuspend(
-        voterAccountId: AccountId?,
+        voter: Voter?,
         selectedGovernanceOption: SupportedGovernanceOption
     ): Flow<ReferendaListState> {
-        val voter = voterAccountId?.let(Voter.Companion::user)
         val chain = selectedGovernanceOption.assetWithChain.chain
         val asset = selectedGovernanceOption.assetWithChain.asset
 
@@ -208,7 +265,7 @@ class RealReferendaListInteractor(
                 },
                 status = statuses.getValue(onChainReferendum.id),
                 voting = votingsById[onChainReferendum.id],
-                userVote = voting[onChainReferendum.id]
+                referendumVote = voting[onChainReferendum.id]
             )
         }
         return referenda

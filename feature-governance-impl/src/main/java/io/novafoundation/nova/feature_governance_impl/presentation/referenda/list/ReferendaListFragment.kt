@@ -5,33 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
-import coil.ImageLoader
-import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.list.PlaceholderAdapter
-import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.list.BaseReferendaListFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetChange
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetClick
 import kotlinx.android.synthetic.main.fragment_referenda_list.referendaList
-import javax.inject.Inject
 
-class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaListAdapter.Handler, ReferendaListHeaderAdapter.Handler {
-
-    @Inject
-    protected lateinit var imageLoader: ImageLoader
+class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel>(), ReferendaListHeaderAdapter.Handler {
 
     private val referendaHeaderAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendaListHeaderAdapter(imageLoader, this) }
-
-    private val shimmeringAdapter by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.item_referenda_shimmering) }
-
-    private val placeholderAdapter by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.item_referenda_placeholder) }
-
-    private val referendaListAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendaListAdapter(this, imageLoader) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,19 +57,7 @@ class ReferendaListFragment : BaseFragment<ReferendaListViewModel>(), ReferendaL
             referendaHeaderAdapter.setDelegations(it.dataOrNull)
         }
 
-        viewModel.referendaUiFlow.observeWhenVisible {
-            when (it) {
-                is LoadingState.Loaded -> {
-                    shimmeringAdapter.showPlaceholder(false)
-                    referendaListAdapter.submitList(it.data)
-                    placeholderAdapter.showPlaceholder(it.data.isEmpty())
-                }
-                is LoadingState.Loading -> {
-                    shimmeringAdapter.showPlaceholder(true)
-                    referendaListAdapter.submitList(emptyList())
-                }
-            }
-        }
+        viewModel.referendaUiFlow.observeReferendaList()
     }
 
     override fun onReferendaClick(referendum: ReferendumModel) {

@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.di.VotedReferendaComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.di.DelegateListComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.di.ReferendumDescriptionComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.di.ReferendumDetailsComponent
@@ -52,6 +53,8 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
     fun governanceLocksOverviewFactory(): GovernanceLocksOverviewComponent.Factory
 
     fun delegateListFactory(): DelegateListComponent.Factory
+
+    fun votedReferendaFactory(): VotedReferendaComponent.Factory
 
     @Component.Factory
     interface Factory {
