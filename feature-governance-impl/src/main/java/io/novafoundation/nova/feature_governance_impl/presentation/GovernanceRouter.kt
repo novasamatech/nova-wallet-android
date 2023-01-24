@@ -35,4 +35,6 @@ interface GovernanceRouter : ReturnableRouter {
     fun openAccountDetails(id: Long)
 
     fun openAddDelegation()
+
+    fun openBecomingDelegateTutorial()
 }

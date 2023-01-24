@@ -1,5 +1,8 @@
 package io.novafoundation.nova.app.root.navigation.governance
 
+import android.content.Intent
+import android.net.Uri
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
@@ -63,6 +66,13 @@ class GovernanceNavigator(
     }
 
     override fun openAddDelegation() = performNavigation(R.id.action_mainFragment_to_delegation)
+
+    override fun openBecomingDelegateTutorial() {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse("http://www.example.com") // TODO: add variable in build.gradle
+        navigationHolder.contextManager.getActivity()
+            ?.startActivity(intent)
+    }
 
     override fun openDAppBrowser(initialUrl: String) = performNavigation(
         actionId = R.id.action_referendumDetailsFragment_to_DAppBrowserGraph,

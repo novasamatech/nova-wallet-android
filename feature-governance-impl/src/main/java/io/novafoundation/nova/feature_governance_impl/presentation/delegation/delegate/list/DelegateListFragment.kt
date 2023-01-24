@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -23,12 +24,14 @@ import kotlinx.android.synthetic.main.fragment_delegate_list.delegateListSorting
 import kotlinx.android.synthetic.main.fragment_delegate_list.delegateListToolbar
 import javax.inject.Inject
 
-class DelegateListFragment : BaseFragment<DelegateListViewModel>(), DelegateListAdapter.Handler {
+class DelegateListFragment : BaseFragment<DelegateListViewModel>(), DelegateListAdapter.Handler, DelegateBannerAdapter.Handler {
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
 
+    private val bannerAdapter by lazy(LazyThreadSafetyMode.NONE) { DelegateBannerAdapter(this) }
     private val delegateListAdapter by lazy(LazyThreadSafetyMode.NONE) { DelegateListAdapter(imageLoader, this) }
+    private val adapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(bannerAdapter, delegateListAdapter) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,7 +44,7 @@ class DelegateListFragment : BaseFragment<DelegateListViewModel>(), DelegateList
     override fun initViews() {
         delegateListList.itemAnimator = null
         delegateListList.setHasFixedSize(true)
-        delegateListList.adapter = delegateListAdapter
+        delegateListList.adapter = adapter
 
         delegateListToolbar.applyStatusBarInsets()
         delegateListToolbar.setHomeButtonListener { viewModel.backClicked() }
@@ -61,9 +64,14 @@ class DelegateListFragment : BaseFragment<DelegateListViewModel>(), DelegateList
         setupListChooserMixin(viewModel.sortingMixin, delegateListSorting)
         setupListChooserMixin(viewModel.filteringMixin, delegateListFilters)
 
+        viewModel.bannerModel.observe {
+            val bannerList = it?.let { listOf(it) }.orEmpty()
+            bannerAdapter.submitList(bannerList)
+        }
+
         viewModel.delegateModels.observe {
             when (it) {
-                is ExtendedLoadingState.Error -> { }
+                is ExtendedLoadingState.Error -> {}
                 is ExtendedLoadingState.Loaded -> {
                     delegateListList.makeVisible()
                     delegateListProgress.makeGone()
@@ -76,6 +84,14 @@ class DelegateListFragment : BaseFragment<DelegateListViewModel>(), DelegateList
                 }
             }
         }
+    }
+
+    override fun closeBanner() {
+        viewModel.closeBanner()
+    }
+
+    override fun describeYourselfClicked() {
+        viewModel.openBecomingDelegateTutorial()
     }
 
     override fun itemClicked(position: Int) {

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="delegation_list_banner_title">Are you a Delegate?</string>
+    <string name="delegation_list_banner_description">Tell us more about yourself so Nova users get to know you better</string>
+    <string name="delegation_list_describe_yourself_action">Describe yourself</string>
+
     <string name="common_sort_by">Sort by</string>
 
     <string name="delegation_delegate_filter_all">All accounts</string>

@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateSorting
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.delegateComparator
+import io.novafoundation.nova.feature_governance_impl.data.DelegationBannerService
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.mapAccountTypeToDomain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -22,13 +23,23 @@ import io.novafoundation.nova.runtime.util.blockInPast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 class RealDelegateListInteractor(
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val chainStateRepository: ChainStateRepository,
     private val identityRepository: OnChainIdentityRepository,
+    private val delegationBannerService: DelegationBannerService
 ) : DelegateListInteractor {
+
+    override fun shouldShowDelegationBanner(): Flow<Boolean> {
+        return delegationBannerService.shouldShowBannerFlow()
+    }
+
+    override fun hideDelegationBanner() {
+        delegationBannerService.hideBanner()
+    }
 
     override suspend fun getDelegates(
         sorting: DelegateSorting,

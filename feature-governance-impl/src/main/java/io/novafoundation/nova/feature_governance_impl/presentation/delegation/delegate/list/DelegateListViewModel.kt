@@ -19,8 +19,10 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.model.DelegateListModel
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.model.DelegationsBannerModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class DelegateListViewModel(
@@ -46,6 +48,10 @@ class DelegateListViewModel(
         selectorTitleRes = R.string.wallet_filters_header
     )
 
+    val bannerModel = interactor.shouldShowDelegationBanner()
+        .map { if (it) DelegationsBannerModel() else null }
+        .shareInBackground()
+
     private val delegateQueryInputs = combine(
         sortingMixin.selectedValue,
         filteringMixin.selectedValue,
@@ -59,7 +65,6 @@ class DelegateListViewModel(
 
     val delegateModels = delegates.mapLoading { delegates ->
         val governanceOption = governanceSharedState.selectedOption.first()
-
         delegates.map { mapDelegatePreviewToUi(it, governanceOption) }
     }.shareInBackground()
 
@@ -76,6 +81,7 @@ class DelegateListViewModel(
 
     fun delegateClicked(position: Int) = launch {
         val delegate = delegateModels.first().dataOrNull?.getOrNull(position) ?: return@launch
+        require(delegate is DelegateListModel)
 
         showMessage("TODO - clicked ${delegate.name}")
     }
@@ -100,5 +106,13 @@ class DelegateListViewModel(
         }
 
         return resourceManager.getString(resourceId)
+    }
+
+    fun openBecomingDelegateTutorial() {
+        router.openBecomingDelegateTutorial()
+    }
+
+    fun closeBanner() {
+        interactor.hideDelegationBanner()
     }
 }
