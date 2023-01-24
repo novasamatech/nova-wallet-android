@@ -9,8 +9,6 @@
 
     <include app:graph="@navigation/onboarding_nav_graph" />
 
-    <include app:graph="@navigation/versions_nav_graph" />
-
     <action
         android:id="@+id/action_open_main"
         app:destination="@id/main_nav_graph"
@@ -39,13 +37,11 @@
 
     <action
         android:id="@+id/action_open_update_notifications"
-        app:destination="@id/versions_nav_graph"
+        app:destination="@id/updateNotificationsFragment"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit"
-        app:popUpTo="@id/root_nav_graph"
-        app:popUpToInclusive="true" />
+        app:popExitAnim="@anim/fragment_close_exit" />
 
     <fragment
         android:id="@+id/splashFragment"
@@ -82,5 +78,12 @@
         android:label="fragment_pincode"
         app:useAdd="true"
         tools:layout="@layout/fragment_pincode" />
+
+    <fragment
+        android:id="@+id/updateNotificationsFragment"
+        android:name="io.novafoundation.nova.feature_versions_impl.presentation.update.UpdateNotificationFragment"
+        android:label="updateNotificationsFragment"
+        app:useAdd="true"
+        tools:layout="@layout/fragment_update_notifications" />
 
 </navigation>

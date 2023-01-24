@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contrib
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_wallet_api.di.Wallet
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
@@ -22,6 +23,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 interface RootDependencies {
 
+    fun updateNotificationsInteractor(): UpdateNotificationsInteractor
+    
     fun contributionsInteractor(): ContributionsInteractor
 
     fun crowdloanRepository(): CrowdloanRepository

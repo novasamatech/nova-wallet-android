@@ -12,8 +12,10 @@ import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection.ExternalRequirement
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -27,7 +29,8 @@ class RootViewModel(
     private val networkStateMixin: NetworkStateMixin,
     private val contributionsInteractor: ContributionsInteractor,
     private val backgroundAccessObserver: BackgroundAccessObserver,
-    private val safeModeService: SafeModeService
+    private val safeModeService: SafeModeService,
+    private val updateNotificationsInteractor: UpdateNotificationsInteractor
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin {
 
     private var willBeClearedForLanguageChange = false
@@ -42,6 +45,11 @@ class RootViewModel(
 
         backgroundAccessObserver.requestAccessFlow
             .onEach { verifyUserIfNeed() }
+            .launchIn(this)
+
+        updateNotificationsInteractor.inAppUpdatesCheckAllowedFlow()
+            .filter { it }
+            .onEach { rootRouter.openUpdateNotifications() }
             .launchIn(this)
 
         syncCurrencies()

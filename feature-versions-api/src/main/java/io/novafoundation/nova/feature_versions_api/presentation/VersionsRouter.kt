@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.navigation.DelayedNavigation
 
 interface VersionsRouter {
 
-    fun skipUpdatesClicked(nextNavigation: DelayedNavigation)
-
     fun openInstallUpdates()
+
+    fun back()
 }

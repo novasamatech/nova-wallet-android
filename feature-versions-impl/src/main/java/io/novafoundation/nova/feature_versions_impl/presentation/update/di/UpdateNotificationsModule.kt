@@ -23,10 +23,9 @@ class UpdateNotificationsModule {
     fun provideViewModel(
         router: VersionsRouter,
         interactor: UpdateNotificationsInteractor,
-        nextNavigation: DelayedNavigation,
         resourceManager: ResourceManager
     ): ViewModel {
-        return UpdateNotificationViewModel(router, interactor, nextNavigation, resourceManager)
+        return UpdateNotificationViewModel(router, interactor, resourceManager)
     }
 
     @Provides

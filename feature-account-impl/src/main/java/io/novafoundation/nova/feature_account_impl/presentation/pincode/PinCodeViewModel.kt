@@ -21,7 +21,6 @@ class PinCodeViewModel(
     private val deviceVibrator: DeviceVibrator,
     private val resourceManager: ResourceManager,
     private val backgroundAccessObserver: BackgroundAccessObserver,
-    private val updateNotificationsInteractor: UpdateNotificationsInteractor,
     val pinCodeAction: PinCodeAction
 ) : BaseViewModel() {
 
@@ -170,7 +169,7 @@ class PinCodeViewModel(
     private fun authSuccess() {
         when (pinCodeAction) {
             is PinCodeAction.Create -> router.openAfterPinCode(pinCodeAction.delayedNavigation)
-            is PinCodeAction.Check -> checkForUpdatesAndRoute(pinCodeAction.delayedNavigation)
+            is PinCodeAction.Check -> router.openAfterPinCode(delayedNavigation)
             is PinCodeAction.CheckAfterInactivity -> {
                 backgroundAccessObserver.onAccessed()
                 router.openAfterPinCode(pinCodeAction.delayedNavigation)
@@ -188,16 +187,6 @@ class PinCodeViewModel(
                     }
                     else -> {}
                 }
-            }
-        }
-    }
-
-    private fun checkForUpdatesAndRoute(delayedNavigation: DelayedNavigation) {
-        launch {
-            if (updateNotificationsInteractor.hasImportantUpdates()) {
-                router.openUpdateNotificationsFromPinCode(delayedNavigation)
-            } else {
-                router.openAfterPinCode(delayedNavigation)
             }
         }
     }

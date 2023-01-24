@@ -75,7 +75,5 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun openAddLedgerChainAccountFlow(payload: AddAccountPayload.ChainAccount)
 
-    fun openUpdateNotificationsFromPinCode(delayedNavigation: DelayedNavigation)
-
     fun finishApp()
 }

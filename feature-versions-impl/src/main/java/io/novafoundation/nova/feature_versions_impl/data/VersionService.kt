@@ -10,6 +10,8 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 
 class VersionService(
@@ -26,10 +28,14 @@ class VersionService(
 
     private var versions = mapOf<Version, VersionResponse>()
 
-    suspend fun hasImportantUpdates(): Boolean {
+    private val _inAppUpdatesCheckAllowed = MutableStateFlow(false)
+    val inAppUpdatesCheckAllowed: Flow<Boolean> = _inAppUpdatesCheckAllowed
+
+    suspend fun checkForUpdates() {
         val checkpointVersion = getRecentVersionCheckpoint() ?: currentVersion
-        return syncAndGetVersions()
+        val hasImportantUpdates = syncAndGetVersions()
             .any { checkpointVersion < it.key || it.value.severity == REMOTE_SEVERITY_CRITICAL }
+        _inAppUpdatesCheckAllowed.value = hasImportantUpdates
     }
 
     suspend fun getNewUpdateNotifications(): List<UpdateNotification> {

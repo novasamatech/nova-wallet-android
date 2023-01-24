@@ -19,8 +19,7 @@ interface UpdateNotificationsComponent {
     interface Factory {
 
         fun create(
-            @BindsInstance fragment: Fragment,
-            @BindsInstance nextNavigation: DelayedNavigation
+            @BindsInstance fragment: Fragment
         ): UpdateNotificationsComponent
     }
 

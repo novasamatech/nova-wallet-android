@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.add.Impo
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.model.HardwareWalletModel
+import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import kotlinx.coroutines.launch
 
 class WelcomeViewModel(
@@ -22,7 +23,8 @@ class WelcomeViewModel(
     private val appLinksProvider: AppLinksProvider,
     private val addAccountPayload: AddAccountPayload,
     private val importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
-    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    updateNotificationsInteractor: UpdateNotificationsInteractor
 ) : BaseViewModel(),
     ImportTypeChooserMixin by importTypeChooserMixin,
     Browserable {
@@ -32,6 +34,12 @@ class WelcomeViewModel(
     val selectHardwareWallet = actionAwaitableMixinFactory.fixedSelectionOf<HardwareWalletModel>()
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
+
+    init {
+        launch {
+            updateNotificationsInteractor.checkForUpdates()
+        }
+    }
 
     fun createAccountClicked() {
         when (addAccountPayload) {

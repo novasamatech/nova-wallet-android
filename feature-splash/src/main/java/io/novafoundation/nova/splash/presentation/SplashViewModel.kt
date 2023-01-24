@@ -9,8 +9,7 @@ import kotlinx.coroutines.launch
 
 class SplashViewModel(
     private val router: SplashRouter,
-    private val repository: AccountRepository,
-    private val updateNotificationsInteractor: UpdateNotificationsInteractor
+    private val repository: AccountRepository
 ) : BaseViewModel() {
 
     init {
@@ -35,11 +34,7 @@ class SplashViewModel(
         }
     }
 
-    private suspend fun openWelcomeScreen() {
-        if (updateNotificationsInteractor.hasImportantUpdates()) {
-            router.openUpdateNotificationsFromSplash()
-        } else {
-            router.openWelcomeScreen()
-        }
+    private fun openWelcomeScreen() {
+        router.openWelcomeScreen()
     }
 }

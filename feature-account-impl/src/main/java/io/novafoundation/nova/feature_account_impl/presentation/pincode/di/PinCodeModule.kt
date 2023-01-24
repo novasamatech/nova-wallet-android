@@ -40,7 +40,6 @@ class PinCodeModule {
         deviceVibrator: DeviceVibrator,
         resourceManager: ResourceManager,
         backgroundAccessObserver: BackgroundAccessObserver,
-        updateNotificationsInteractor: UpdateNotificationsInteractor,
         pinCodeAction: PinCodeAction
     ): ViewModel {
         return PinCodeViewModel(
@@ -49,7 +48,6 @@ class PinCodeModule {
             deviceVibrator,
             resourceManager,
             backgroundAccessObserver,
-            updateNotificationsInteractor,
             pinCodeAction
         )
     }

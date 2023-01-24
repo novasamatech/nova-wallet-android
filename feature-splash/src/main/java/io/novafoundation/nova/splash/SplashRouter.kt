@@ -10,5 +10,4 @@ interface SplashRouter : SecureRouter {
 
     fun openInitialCheckPincode()
 
-    fun openUpdateNotificationsFromSplash()
 }

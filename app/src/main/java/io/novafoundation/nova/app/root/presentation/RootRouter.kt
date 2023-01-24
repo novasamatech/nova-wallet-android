@@ -5,4 +5,6 @@ interface RootRouter {
     fun returnToWallet()
 
     fun nonCancellableVerify()
+
+    fun openUpdateNotifications()
 }

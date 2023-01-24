@@ -120,18 +120,6 @@ class Navigator(
         navController?.navigate(R.id.action_splash_to_pin, bundle)
     }
 
-    override fun openUpdateNotificationsFromSplash() {
-        val delayedNavigation = NavComponentDelayedNavigation(
-            R.id.action_update_notifications_to_onboarding,
-            WelcomeFragment.bundle(false)
-        )
-        navController?.navigate(R.id.action_open_update_notifications, UpdateNotificationFragment.getBundle(delayedNavigation))
-    }
-
-    override fun openUpdateNotificationsFromPinCode(delayedNavigation: DelayedNavigation) {
-        navController?.navigate(R.id.action_open_update_notifications, UpdateNotificationFragment.getBundle(delayedNavigation))
-    }
-
     override fun openCreateAccount() {
         navController?.navigate(R.id.action_welcomeFragment_to_createAccountFragment)
     }
@@ -473,6 +461,10 @@ class Navigator(
         } else {
             navController?.navigate(R.id.action_pin_code_access_recovery, bundle)
         }
+    }
+
+    override fun openUpdateNotifications() {
+        navController?.navigate(R.id.action_open_update_notifications)
     }
 
     override fun returnToWallet() {

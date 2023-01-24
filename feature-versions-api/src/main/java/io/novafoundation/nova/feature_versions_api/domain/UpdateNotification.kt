@@ -14,18 +14,18 @@ class Version(
     private val minor: Long,
     private val patch: Long
 ) {
+
+    companion object {
+        fun getComparator(): Comparator<Version> {
+            return compareBy<Version> { it.major }
+                .thenBy { it.minor }
+                .thenBy { it.patch }
+        }
+    }
+
     operator fun compareTo(other: Version): Int {
-        val comparedMajor = major.compareTo(other.major)
-        if (comparedMajor != 0) {
-            return comparedMajor
-        }
-
-        val comparedMinor = minor.compareTo(other.minor)
-        if (comparedMinor != 0) {
-            return comparedMinor
-        }
-
-        return patch.compareTo(other.patch)
+        return getComparator()
+            .compare(this, other)
     }
 
     override fun toString(): String {

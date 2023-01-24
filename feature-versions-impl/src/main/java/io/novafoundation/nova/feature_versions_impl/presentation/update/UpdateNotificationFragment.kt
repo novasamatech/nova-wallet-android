@@ -21,16 +21,6 @@ import kotlinx.android.synthetic.main.fragment_update_notifications.updatesToolb
 
 class UpdateNotificationFragment : BaseFragment<UpdateNotificationViewModel>(), UpdateNotificationsAdapter.SeeAllClickedListener {
 
-    companion object {
-        private const val EXTRA_NEXT_NAVIGATION = "EXTRA_NEXT_NAVIGATION"
-
-        fun getBundle(nextNavigation: DelayedNavigation): Bundle {
-            return Bundle().apply {
-                putParcelable(EXTRA_NEXT_NAVIGATION, nextNavigation)
-            }
-        }
-    }
-
     private val adapter = UpdateNotificationsAdapter(this)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -38,6 +28,7 @@ class UpdateNotificationFragment : BaseFragment<UpdateNotificationViewModel>(), 
     }
 
     override fun initViews() {
+        onBackPressed { viewModel.skipClicked() }
         updatesToolbar.setOnApplyWindowInsetsListener { v, insets ->
             v.setPadding(0, insets.getTopSystemBarInset(), 0, 0)
             insets
@@ -53,7 +44,7 @@ class UpdateNotificationFragment : BaseFragment<UpdateNotificationViewModel>(), 
     override fun inject() {
         FeatureUtils.getFeature<VersionsFeatureComponent>(this, VersionsFeatureApi::class.java)
             .updateNotificationsFragmentComponentFactory()
-            .create(this, argument(EXTRA_NEXT_NAVIGATION))
+            .create(this)
             .inject(this)
     }
 

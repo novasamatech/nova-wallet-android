@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 class UpdateNotificationViewModel(
     private val router: VersionsRouter,
     private val interactor: UpdateNotificationsInteractor,
-    private val nextNavigation: DelayedNavigation,
     private val resourceManager: ResourceManager
 ) : BaseViewModel() {
 
@@ -44,7 +43,7 @@ class UpdateNotificationViewModel(
     fun skipClicked() {
         launch {
             interactor.skipNewUpdates()
-            router.skipUpdatesClicked(nextNavigation)
+            router.back()
         }
     }
 
