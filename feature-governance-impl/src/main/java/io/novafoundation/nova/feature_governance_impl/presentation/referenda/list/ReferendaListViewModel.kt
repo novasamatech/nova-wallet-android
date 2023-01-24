@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.withLoading
+import io.novafoundation.nova.common.utils.withLoadingShared
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
@@ -63,12 +63,12 @@ class ReferendaListViewModel(
 
     private val accountAndChainFlow = combineToPair(selectedAccount, selectedChainAndAssetFlow)
 
-    private val referendaListStateFlow = accountAndChainFlow.withLoading { (account, supportedOption) ->
-        val chainAndAsset = supportedOption.assetWithChain
-        val accountId = account.accountIdIn(chainAndAsset.chain)
+    private val referendaListStateFlow = accountAndChainFlow.withLoadingShared { (account, supportedOption) ->
+            val chainAndAsset = supportedOption.assetWithChain
+            val accountId = account.accountIdIn(chainAndAsset.chain)
 
-        referendaListInteractor.referendaListStateFlow(accountId, supportedOption)
-    }
+            referendaListInteractor.referendaListStateFlow(accountId, supportedOption)
+        }
         .inBackground()
         .shareWhileSubscribed()
 

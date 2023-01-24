@@ -1,10 +1,12 @@
 package io.novafoundation.nova.common.utils
 
 import androidx.lifecycle.LiveData
+import io.novafoundation.nova.common.presentation.ExtendedLoadingState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 
 // TODO waiting for multiple receivers feature, probably in Kotlin 1.7
 interface WithCoroutineScopeExtensions {
@@ -15,6 +17,11 @@ interface WithCoroutineScopeExtensions {
         started: SharingStarted = SharingStarted.Eagerly
     ) = shareIn(coroutineScope, started = started, replay = 1)
 
+    fun <T> Flow<T>.state(
+        started: SharingStarted = SharingStarted.Eagerly,
+        initialValue: T
+    ) = stateIn(coroutineScope, started, initialValue)
+
     fun <T> Flow<T>.shareLazily() = shareIn(coroutineScope, started = SharingStarted.Lazily, replay = 1)
 
     fun <T> Flow<T>.shareInBackground(
@@ -22,6 +29,10 @@ interface WithCoroutineScopeExtensions {
     ) = inBackground().share(started)
 
     fun <T> Flow<T>.shareWhileSubscribed() = share(SharingStarted.WhileSubscribed())
+
+    fun <T> Flow<T>.stateWhileSubscribed(initial: T) = state(SharingStarted.WhileSubscribed(), initial)
+
+    fun <T> Flow<ExtendedLoadingState<T>>.loadingStateWhileSubscribed() = stateWhileSubscribed(ExtendedLoadingState.Loading)
 
     fun <T> Flow<T>.asLiveData(): LiveData<T> {
         return asLiveData(coroutineScope)

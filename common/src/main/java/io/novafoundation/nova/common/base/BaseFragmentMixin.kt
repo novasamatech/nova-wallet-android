@@ -74,6 +74,12 @@ interface BaseFragmentMixin<T : BaseViewModel> : WithContextExtensions {
         }
     }
 
+    fun <V> Flow<V>.observeCancelling(collector: suspend (V) -> Unit) {
+        fragment.viewLifecycleOwner.lifecycleScope.launchWhenResumed {
+            collect(collector)
+        }
+    }
+
     fun <V> LiveData<V>.observe(observer: (V) -> Unit) {
         observe(fragment.viewLifecycleOwner, observer)
     }

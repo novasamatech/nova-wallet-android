@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
@@ -31,6 +32,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transform
@@ -81,6 +83,33 @@ fun <T, R> Flow<T>.withLoading(sourceSupplier: suspend (T) -> Flow<R>): Flow<Loa
 
         emitAll(newSource)
     }
+}
+
+private enum class InnerState {
+    INITIAL_START, SECONDARY_START, IN_PROGRESS
+}
+
+/**
+ * Modifies flow so that it firstly emits [LoadingState.Loading] state for each element from upstream.
+ * Then, it constructs new source via [sourceSupplier] and emits all of its items wrapped into [LoadingState.Loaded] state
+ * Old suppliers are discarded as per [Flow.transformLatest] behavior
+ *
+ * NOTE: This is a modified version of [withLoading] that is intended to be used ONLY with [SharingStarted.WhileSubscribed].
+ * In particular, it does not emit loading state on second and subsequent re-subscriptions
+ */
+fun <T, R> Flow<T>.withLoadingShared(sourceSupplier: suspend (T) -> Flow<R>): Flow<LoadingState<R>> {
+    var state: InnerState = InnerState.INITIAL_START
+
+    return transformLatest { item ->
+        if (state != InnerState.SECONDARY_START) {
+            emit(LoadingState.Loading())
+        }
+        state = InnerState.IN_PROGRESS
+
+        val newSource = sourceSupplier(item).map { LoadingState.Loaded(it) }
+
+        emitAll(newSource)
+    }.onCompletion { state = InnerState.SECONDARY_START }
 }
 
 /**
