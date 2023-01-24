@@ -28,7 +28,6 @@ class UpdateNotificationFragment : BaseFragment<UpdateNotificationViewModel>(), 
     }
 
     override fun initViews() {
-        onBackPressed { viewModel.skipClicked() }
         updatesToolbar.setOnApplyWindowInsetsListener { v, insets ->
             v.setPadding(0, insets.getTopSystemBarInset(), 0, 0)
             insets

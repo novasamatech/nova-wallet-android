@@ -37,15 +37,9 @@ class UpdateNotificationsAdapter(private val seeAllClickedListener: SeeAllClicke
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (viewType) {
-            TYPE_HEADER -> {
-                UpdateNotificationBannerHolder(parent.inflateChild(R.layout.item_update_notification_header))
-            }
-            TYPE_VERSION -> {
-                UpdateNotificationHolder(parent.inflateChild(R.layout.item_update_notification))
-            }
-            TYPE_SEE_ALL -> {
-                SeeAllButtonHolder(parent.inflateChild(R.layout.item_update_notification_see_all), seeAllClickedListener)
-            }
+            TYPE_HEADER -> UpdateNotificationBannerHolder(parent.inflateChild(R.layout.item_update_notification_header))
+            TYPE_VERSION -> UpdateNotificationHolder(parent.inflateChild(R.layout.item_update_notification))
+            TYPE_SEE_ALL -> SeeAllButtonHolder(parent.inflateChild(R.layout.item_update_notification_see_all), seeAllClickedListener)
             else -> throw IllegalStateException()
         }
     }

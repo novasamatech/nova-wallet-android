@@ -169,7 +169,7 @@ class PinCodeViewModel(
     private fun authSuccess() {
         when (pinCodeAction) {
             is PinCodeAction.Create -> router.openAfterPinCode(pinCodeAction.delayedNavigation)
-            is PinCodeAction.Check -> router.openAfterPinCode(delayedNavigation)
+            is PinCodeAction.Check -> router.openAfterPinCode(pinCodeAction.delayedNavigation)
             is PinCodeAction.CheckAfterInactivity -> {
                 backgroundAccessObserver.onAccessed()
                 router.openAfterPinCode(pinCodeAction.delayedNavigation)

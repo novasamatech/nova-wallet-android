@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_versions_impl.presentation.update
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.navigation.DelayedNavigation
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.formatDateSinceEpoch
@@ -26,9 +25,10 @@ class UpdateNotificationViewModel(
     private val notifications = flowOf { interactor.getUpdateNotifications() }
 
     val notificationModels = combine(showAllNotifications, notifications) { shouldShowAll, notifications ->
-        var result = notifications
-        if (notifications.size > 1 && !shouldShowAll) {
-            result = notifications.dropLast(notifications.size - 1)
+        val result = if (shouldShowAll) {
+            notifications
+        } else {
+            notifications.take(1)
         }
         buildList {
             val banner = getBannerOrNull(result)
@@ -70,13 +70,13 @@ class UpdateNotificationViewModel(
     private fun mapUpdateNotificationsToModels(list: List<UpdateNotification>): List<UpdateNotificationModel> {
         return list.mapIndexed { index, it ->
             UpdateNotificationModel(
-                it.version.toString(),
-                it.changelog,
-                index == 0,
-                mapSeverity(it.severity),
-                mapSeverityColor(it.severity),
-                mapSeverityBackground(it.severity),
-                it.time.formatDateSinceEpoch(resourceManager)
+                version = it.version.toString(),
+                changelog = it.changelog,
+                isLastUpdate = index == 0,
+                severity = mapSeverity(it.severity),
+                severityColorRes = mapSeverityColor(it.severity),
+                severityBackgroundRes = mapSeverityBackground(it.severity),
+                date = it.time.formatDateSinceEpoch(resourceManager)
             )
         }
     }

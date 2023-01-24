@@ -12,6 +12,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 class VersionService(
@@ -23,6 +25,8 @@ class VersionService(
     companion object {
         private const val PREF_VERSION_CHECKPOINT = "PREF_VERSION_CHECKPOINT"
     }
+
+    private val mutex = Mutex(false)
 
     private val currentVersion = getAppVersion()
 
@@ -58,7 +62,7 @@ class VersionService(
 
     private suspend fun getChangelogAsync(version: Version, versionResponse: VersionResponse): Deferred<UpdateNotification> {
         return withContext(Dispatchers.Default) {
-            async {
+            async(Dispatchers.Default) {
                 val versionFile = versionResponse.version.replace(".", "_")
                 val changelog = versionsFetcher.getChangelog(versionFile)
                 mapFromRemoteVersion(version, versionResponse, changelog)
@@ -67,12 +71,13 @@ class VersionService(
     }
 
     private suspend fun syncAndGetVersions(): Map<Version, VersionResponse> {
-        if (versions.isEmpty()) {
-            versions = runCatching { fetchVersions() }
-                .getOrElse { emptyMap() }
+        return mutex.withLock {
+            if (versions.isEmpty()) {
+                versions = runCatching { fetchVersions() }
+                    .getOrElse { emptyMap() }
+            }
+            versions
         }
-
-        return versions
     }
 
     private suspend fun fetchVersions(): Map<Version, VersionResponse> {
@@ -92,12 +97,8 @@ class VersionService(
 
     private fun String.toVersion(): Version {
         val cleanedVersion = replace("[^\\d.]".toRegex(), "")
-        val separatedVersion = cleanedVersion.split(".")
+        val (major, minor, patch) = cleanedVersion.split(".")
             .map { it.toLong() }
-        return Version(
-            separatedVersion[0],
-            separatedVersion[1],
-            separatedVersion[2]
-        )
+        return Version(major, minor, patch)
     }
 }
