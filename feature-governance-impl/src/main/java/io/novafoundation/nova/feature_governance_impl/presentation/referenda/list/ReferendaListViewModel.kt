@@ -64,11 +64,11 @@ class ReferendaListViewModel(
     private val accountAndChainFlow = combineToPair(selectedAccount, selectedChainAndAssetFlow)
 
     private val referendaListStateFlow = accountAndChainFlow.withLoadingShared { (account, supportedOption) ->
-            val chainAndAsset = supportedOption.assetWithChain
-            val accountId = account.accountIdIn(chainAndAsset.chain)
+        val chainAndAsset = supportedOption.assetWithChain
+        val accountId = account.accountIdIn(chainAndAsset.chain)
 
-            referendaListInteractor.referendaListStateFlow(accountId, supportedOption)
-        }
+        referendaListInteractor.referendaListStateFlow(accountId, supportedOption)
+    }
         .inBackground()
         .shareWhileSubscribed()
 
