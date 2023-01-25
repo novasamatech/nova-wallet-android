@@ -44,9 +44,11 @@ class RealDelegateListInteractor(
         filtering: DelegateFiltering,
         delegates: List<DelegatePreview>
     ): List<DelegatePreview> {
+        val comparator = compareByDescending<DelegatePreview> { it.hasMetadata() }
+            .thenComparing(sorting.delegateComparator())
+
         return delegates.applyFilter(filtering)
-            .sortedWith(sorting.delegateComparator())
-            .sortedByDescending { it.hasMetadata() }
+            .sortedWith(comparator)
     }
 
     @Suppress("SuspendFunctionOnCoroutineScope")
