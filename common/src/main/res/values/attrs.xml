@@ -208,6 +208,7 @@
     <declare-styleable name="BannerView">
         <attr name="android:src" format="reference" />
         <attr name="bannerBackground" format="reference|color" />
+        <attr name="showClose" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="ListChooserView">

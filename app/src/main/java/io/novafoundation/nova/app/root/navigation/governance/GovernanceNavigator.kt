@@ -1,7 +1,5 @@
 package io.novafoundation.nova.app.root.navigation.governance
 
-import android.content.Intent
-import android.net.Uri
 import androidx.navigation.NavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
