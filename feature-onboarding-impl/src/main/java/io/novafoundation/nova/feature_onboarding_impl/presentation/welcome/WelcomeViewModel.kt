@@ -36,9 +36,7 @@ class WelcomeViewModel(
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     init {
-        launch {
-            updateNotificationsInteractor.checkForUpdates()
-        }
+        updateNotificationsInteractor.allowInAppUpdateCheck()
     }
 
     fun createAccountClicked() {

@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection.ExternalRequirement
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -47,14 +46,20 @@ class RootViewModel(
             .onEach { verifyUserIfNeed() }
             .launchIn(this)
 
-        updateNotificationsInteractor.inAppUpdatesCheckAllowedFlow()
-            .filter { it }
-            .onEach { rootRouter.openUpdateNotifications() }
-            .launchIn(this)
+        checkForUpdates()
 
         syncCurrencies()
 
         updatePhishingAddresses()
+    }
+
+    private fun checkForUpdates() {
+        launch {
+            updateNotificationsInteractor.waitPermissionToUpdate()
+            if (updateNotificationsInteractor.hasImportantUpdates()) {
+                rootRouter.openUpdateNotifications()
+            }
+        }
     }
 
     private fun syncCurrencies() {

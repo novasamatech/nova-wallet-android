@@ -10,11 +10,11 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 
 class VersionService(
     private val context: Context,
@@ -35,11 +35,15 @@ class VersionService(
     private val _inAppUpdatesCheckAllowed = MutableStateFlow(false)
     val inAppUpdatesCheckAllowed: Flow<Boolean> = _inAppUpdatesCheckAllowed
 
-    suspend fun checkForUpdates() {
+    fun allowUpdate() {
+        _inAppUpdatesCheckAllowed.value = true
+    }
+
+    suspend fun hasImportantUpdates(): Boolean {
         val checkpointVersion = getRecentVersionCheckpoint() ?: currentVersion
-        val hasImportantUpdates = syncAndGetVersions()
+        return syncAndGetVersions()
+            .filterNot { it.value.severity == REMOTE_SEVERITY_NORMAL }
             .any { checkpointVersion < it.key || it.value.severity == REMOTE_SEVERITY_CRITICAL }
-        _inAppUpdatesCheckAllowed.value = hasImportantUpdates
     }
 
     suspend fun getNewUpdateNotifications(): List<UpdateNotification> {
@@ -61,7 +65,7 @@ class VersionService(
     }
 
     private suspend fun getChangelogAsync(version: Version, versionResponse: VersionResponse): Deferred<UpdateNotification> {
-        return withContext(Dispatchers.Default) {
+        return coroutineScope {
             async(Dispatchers.Default) {
                 val versionFile = versionResponse.version.replace(".", "_")
                 val changelog = versionsFetcher.getChangelog(versionFile)

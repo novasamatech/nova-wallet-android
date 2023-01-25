@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_versions_api.domain
 
-import kotlinx.coroutines.flow.Flow
-
 interface UpdateNotificationsInteractor {
 
-    fun inAppUpdatesCheckAllowedFlow(): Flow<Boolean>
+    suspend fun waitPermissionToUpdate()
 
-    suspend fun checkForUpdates()
+    fun allowInAppUpdateCheck()
+
+    suspend fun hasImportantUpdates(): Boolean
 
     suspend fun getUpdateNotifications(): List<UpdateNotification>
 

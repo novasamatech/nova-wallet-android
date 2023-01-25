@@ -9,7 +9,7 @@ import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.common.utils.getTopSystemBarInset
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_versions_impl.R
 import io.novafoundation.nova.feature_versions_impl.di.VersionsFeatureComponent
@@ -27,11 +27,7 @@ class UpdateNotificationFragment : BaseFragment<UpdateNotificationViewModel>(), 
     }
 
     override fun initViews() {
-        updatesToolbar.setOnApplyWindowInsetsListener { v, insets ->
-            v.setPadding(0, insets.getTopSystemBarInset(), 0, 0)
-            insets
-        }
-
+        updatesToolbar.applyStatusBarInsets()
         updatesList.adapter = adapter
         val decoration = UpdateNotificationsItemDecoration(requireContext())
         updatesList.addItemDecoration(decoration)

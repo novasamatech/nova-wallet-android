@@ -72,7 +72,7 @@ class UpdateNotificationViewModel(
             UpdateNotificationModel(
                 version = it.version.toString(),
                 changelog = it.changelog,
-                isLastUpdate = index == 0,
+                isLatestUpdate = index == 0,
                 severity = mapSeverity(it.severity),
                 severityColorRes = mapSeverityColor(it.severity),
                 severityBackgroundRes = mapSeverityBackground(it.severity),

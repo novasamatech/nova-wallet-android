@@ -98,7 +98,7 @@ class UpdateNotificationHolder(view: View) : GroupedListHolder(view) {
         item.severityColorRes?.let { itemView.itemNotificationSeverity.setTextColorRes(it) }
         item.severityBackgroundRes?.let { itemView.itemNotificationSeverity.background = itemView.context.getRoundedCornerDrawable(it, cornerSizeInDp = 6) }
 
-        itemView.itemNotificationLatest.isVisible = item.isLastUpdate
+        itemView.itemNotificationLatest.isVisible = item.isLatestUpdate
         itemView.itemNotificationDate.text = item.date
     }
 }

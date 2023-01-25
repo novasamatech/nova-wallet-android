@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_versions_api.domain.Version
 
 const val REMOTE_SEVERITY_CRITICAL = "Critical"
 const val REMOTE_SEVERITY_MAJOR = "Major"
+const val REMOTE_SEVERITY_NORMAL = "Normal"
 
 fun mapFromRemoteVersion(version: Version, versionResponse: VersionResponse, changelog: String): UpdateNotification {
     return UpdateNotification(
