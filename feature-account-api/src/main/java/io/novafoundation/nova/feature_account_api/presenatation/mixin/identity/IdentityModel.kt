@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model
+package io.novafoundation.nova.feature_account_api.presenatation.mixin.identity
 
 class IdentityModel(
     val display: String?,

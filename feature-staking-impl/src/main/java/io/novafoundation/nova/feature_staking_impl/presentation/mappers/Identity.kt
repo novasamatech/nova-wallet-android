@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.feature_account_api.data.model.ChildIdentity
 import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.data.model.RootIdentity
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.IdentityModel
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.IdentityParcelModel
 
 fun mapIdentityToIdentityParcelModel(identity: OnChainIdentity): IdentityParcelModel {
