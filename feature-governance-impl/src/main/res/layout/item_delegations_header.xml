@@ -1,92 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<io.novafoundation.nova.common.view.BannerView xmlns:android="http://schemas.android.com/apk/res/android"
+<io.novafoundation.nova.common.view.AdvertisementCard xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/itemDelegationBanner"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="16dp"
+    android:layout_marginHorizontal="16dp"
     android:layout_marginTop="4dp"
-    android:layout_marginEnd="16dp"
     android:layout_marginBottom="8dp"
-    android:paddingStart="12dp"
-    android:paddingEnd="12dp"
+    android:paddingHorizontal="12dp"
     android:paddingBottom="12dp"
-    android:src="@drawable/ic_banner_delegate_image"
-    app:bannerBackground="@drawable/ic_banner_blue_gradient"
+    app:advertisementCardBackground="@drawable/ic_banner_blue_gradient"
+    app:image="@drawable/ic_banner_delegate_image"
+    app:learnMore="@string/delegation_list_describe_yourself_action"
     app:showClose="true"
-    tools:background="@android:color/black">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/itemDelegationHeaderTitle"
-            style="@style/TextAppearance.NovaFoundation.SemiBold"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="76dp"
-            android:ellipsize="end"
-            android:includeFontPadding="false"
-            android:singleLine="true"
-            android:text="@string/delegation_list_banner_title"
-            android:textColor="@color/text_primary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/itemDelegationHeaderDescription"
-            style="@style/TextAppearance.NovaFoundation.Regular"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="76dp"
-            android:text="@string/delegation_list_banner_description"
-            android:textColor="@color/text_secondary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/itemDelegationHeaderTitle" />
-
-        <FrameLayout
-            android:id="@+id/itemDelegationHeaderDescriptionAction"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/itemDelegationHeaderDescription">
-
-            <TextView
-                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:drawablePadding="4dp"
-                android:gravity="center_vertical"
-                android:includeFontPadding="false"
-                android:minHeight="32dp"
-                android:text="@string/delegation_list_describe_yourself_action"
-                android:textColor="@color/button_text_accent"
-                app:drawableStartCompat="@drawable/ic_info_cicrle_filled_16"
-                app:drawableTint="@color/icon_accent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/itemDelegationHeaderDescription" />
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="center_vertical|end"
-                android:src="@drawable/ic_chevron_right"
-                app:tint="@color/icon_accent" />
-
-        </FrameLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</io.novafoundation.nova.common.view.BannerView>
+    app:subtitle="@string/delegation_list_banner_description"
+    app:title="@string/delegation_list_banner_title" />

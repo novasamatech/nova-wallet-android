@@ -23,7 +23,7 @@
         android:id="@+id/payoutAdvertisement"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/bg_advertisement_yellow"
+        app:advertisementCardBackground="@drawable/ic_banner_yellow_gradient"
         app:image="@drawable/advertisement_calendar"
         app:subtitle="@string/staking_pending_rewards_subtitle"
         app:title="@string/staking_pending_rewards_title" />
