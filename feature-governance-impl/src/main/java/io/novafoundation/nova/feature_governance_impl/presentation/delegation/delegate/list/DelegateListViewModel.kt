@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.model.DelegateListModel
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.model.DelegationsBannerModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -48,8 +47,7 @@ class DelegateListViewModel(
         selectorTitleRes = R.string.wallet_filters_header
     )
 
-    val bannerModel = interactor.shouldShowDelegationBanner()
-        .map { if (it) DelegationsBannerModel() else null }
+    val shouldShowBannerFlow = interactor.shouldShowDelegationBanner()
         .shareInBackground()
 
     private val delegateQueryInputs = combine(

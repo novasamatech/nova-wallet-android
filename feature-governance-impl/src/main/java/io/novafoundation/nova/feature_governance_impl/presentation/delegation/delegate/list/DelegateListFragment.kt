@@ -64,9 +64,8 @@ class DelegateListFragment : BaseFragment<DelegateListViewModel>(), DelegateList
         setupListChooserMixin(viewModel.sortingMixin, delegateListSorting)
         setupListChooserMixin(viewModel.filteringMixin, delegateListFilters)
 
-        viewModel.bannerModel.observe {
-            val bannerList = it?.let { listOf(it) }.orEmpty()
-            bannerAdapter.submitList(bannerList)
+        viewModel.shouldShowBannerFlow.observe {
+            bannerAdapter.showBanner(it)
         }
 
         viewModel.delegateModels.observe {
