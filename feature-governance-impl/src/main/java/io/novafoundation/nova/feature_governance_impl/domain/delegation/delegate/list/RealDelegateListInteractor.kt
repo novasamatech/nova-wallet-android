@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateSorting
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.delegateComparator
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.hasMetadata
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.mapAccountTypeToDomain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -31,19 +32,25 @@ class RealDelegateListInteractor(
 ) : DelegateListInteractor {
 
     override suspend fun getDelegates(
-        sorting: DelegateSorting,
-        filtering: DelegateFiltering,
         governanceOption: SupportedGovernanceOption,
     ): Result<List<DelegatePreview>> = withContext(Dispatchers.Default) {
         runCatching {
-            getDelegatesInternal(sorting, filtering, governanceOption)
+            getDelegatesInternal(governanceOption)
         }
+    }
+
+    override suspend fun applySortingAndFiltering(
+        sorting: DelegateSorting,
+        filtering: DelegateFiltering,
+        delegates: List<DelegatePreview>
+    ): List<DelegatePreview> {
+        return delegates.applyFilter(filtering)
+            .sortedWith(sorting.delegateComparator())
+            .sortedByDescending { it.hasMetadata() }
     }
 
     @Suppress("SuspendFunctionOnCoroutineScope")
     private suspend fun CoroutineScope.getDelegatesInternal(
-        sorting: DelegateSorting,
-        filtering: DelegateFiltering,
         governanceOption: SupportedGovernanceOption,
     ): List<DelegatePreview> {
         val chain = governanceOption.assetWithChain.chain
@@ -73,8 +80,7 @@ class RealDelegateListInteractor(
             )
         }
 
-        return delegates.applyFilter(filtering)
-            .sortedWith(sorting.delegateComparator())
+        return delegates
     }
 
     private fun mapStatsToDomain(stats: DelegateStats): DelegatePreview.Stats {
