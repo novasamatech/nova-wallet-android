@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -39,7 +40,8 @@ class RootActivityModule {
         externalRequirementsFlow: MutableStateFlow<ChainConnection.ExternalRequirement>,
         contributionsInteractor: ContributionsInteractor,
         backgroundAccessObserver: BackgroundAccessObserver,
-        safeModeService: SafeModeService
+        safeModeService: SafeModeService,
+        updateNotificationsInteractor: UpdateNotificationsInteractor
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -50,7 +52,8 @@ class RootActivityModule {
             networkStateMixin,
             contributionsInteractor,
             backgroundAccessObserver,
-            safeModeService
+            safeModeService,
+            updateNotificationsInteractor
         )
     }
 

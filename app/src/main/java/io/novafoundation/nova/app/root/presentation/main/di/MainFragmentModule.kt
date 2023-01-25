@@ -10,6 +10,7 @@ import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.app.root.presentation.main.MainViewModel
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 
 @Module(
     includes = [
@@ -22,9 +23,10 @@ class MainFragmentModule {
     @IntoMap
     @ViewModelKey(MainViewModel::class)
     fun provideViewModel(
-        interactor: RootInteractor
+        interactor: RootInteractor,
+        updateNotificationsInteractor: UpdateNotificationsInteractor
     ): ViewModel {
-        return MainViewModel(interactor)
+        return MainViewModel(interactor, updateNotificationsInteractor)
     }
 
     @Provides

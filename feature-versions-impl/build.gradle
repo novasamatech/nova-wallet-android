@@ -1,0 +1,66 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+apply from: '../tests.gradle'
+apply from: '../scripts/secrets.gradle'
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        buildConfigField "String", "NOTIFICATIONS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-wallet-android-releases/master/updates/v1/entrypoint_dev.json\""
+        buildConfigField "String", "NOTIFICATION_DETAILS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-wallet-android-releases/master/updates/changelogs/dev/\""
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField "String", "NOTIFICATIONS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-wallet-android-releases/master/updates/v1/entrypoint_release.json\""
+            buildConfigField "String", "NOTIFICATION_DETAILS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-wallet-android-releases/master/updates/v1/changelogs/release/\""
+        }
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+}
+
+dependencies {
+    implementation project(':common')
+    implementation project(':feature-versions-api')
+
+    implementation kotlinDep
+
+    implementation androidDep
+    implementation materialDep
+    implementation constraintDep
+
+    implementation coroutinesDep
+    implementation coroutinesAndroidDep
+    implementation viewModelKtxDep
+    implementation liveDataKtxDep
+    implementation lifeCycleKtxDep
+
+    implementation daggerDep
+    kapt daggerKapt
+
+    implementation retrofitDep
+
+    implementation lifecycleDep
+    kapt lifecycleKapt
+
+    testImplementation jUnitDep
+}

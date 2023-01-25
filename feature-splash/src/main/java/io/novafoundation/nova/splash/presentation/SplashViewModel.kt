@@ -18,14 +18,22 @@ class SplashViewModel(
     private fun openInitialDestination() {
         viewModelScope.launch {
             if (repository.isAccountSelected()) {
-                if (repository.isCodeSet()) {
-                    router.openInitialCheckPincode()
-                } else {
-                    router.openCreatePincode()
-                }
+                openPinCode()
             } else {
-                router.openWelcomeScreen()
+                openWelcomeScreen()
             }
         }
+    }
+
+    private suspend fun openPinCode() {
+        if (repository.isCodeSet()) {
+            router.openInitialCheckPincode()
+        } else {
+            router.openCreatePincode()
+        }
+    }
+
+    private fun openWelcomeScreen() {
+        router.openWelcomeScreen()
     }
 }
