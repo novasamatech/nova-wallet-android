@@ -81,7 +81,6 @@ class DelegateListViewModel(
 
     fun delegateClicked(position: Int) = launch {
         val delegate = delegateModels.first().dataOrNull?.getOrNull(position) ?: return@launch
-        require(delegate is DelegateListModel)
 
         showMessage("TODO - clicked ${delegate.name}")
     }
