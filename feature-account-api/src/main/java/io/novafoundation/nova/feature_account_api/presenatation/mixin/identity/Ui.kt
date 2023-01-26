@@ -17,4 +17,6 @@ fun BaseFragmentMixin<*>.setupIdentityMixin(
     mixin.openEmailEvent.observeEvent {
         providedContext.sendEmailIntent(it)
     }
+
+    mixin.identityFlow.observe(view::setModelOrHide)
 }

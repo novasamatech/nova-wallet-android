@@ -26,7 +26,7 @@ private class RealIdentityMixin(
     override val openBrowserEvent = MutableLiveData<Event<String>>()
     override val openEmailEvent = MutableLiveData<Event<String>>()
 
-    private val identityFlow = MutableStateFlow<IdentityModel?>(null)
+    override val identityFlow = MutableStateFlow<IdentityModel?>(null)
 
     override fun setIdentity(identity: IdentityModel?) {
         identityFlow.value = identity
@@ -37,7 +37,6 @@ private class RealIdentityMixin(
 
         setIdentity(identityModel)
     }
-
 
     override fun emailClicked() = useIdentityField(IdentityModel::email) {
         openEmailEvent.value = it.event()
