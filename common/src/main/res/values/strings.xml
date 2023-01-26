@@ -17,6 +17,8 @@
     <string name="update_notification_title">Update available</string>
     <string name="update_notification_install_btn">Install</string>
 
+    <string name="common_cannot_find_app">Sorry, you don\'t have the right app to process this request</string>
+
     <string name="common_enable">Enable</string>
     <string name="settings_safe_mode_confirmation_title">Safe mode</string>
     <string name="settings_safe_mode_confirmation_message">Screen recording and screenshots will not be available. The minimized app will not display the content</string>

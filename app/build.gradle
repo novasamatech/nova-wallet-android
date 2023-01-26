@@ -17,6 +17,8 @@ android {
         versionCode computeVersionCode()
         versionName computeVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "APP_UPDATE_SOURCE_LINK", "\"https://play.google.com/store/apps/details?id=io.novafoundation.nova.market\""
     }
     signingConfigs {
         dev {
@@ -70,6 +72,8 @@ android {
 
             versionNameSuffix '-github'
             applicationIdSuffix '.github'
+
+            buildConfigField "String", "APP_UPDATE_SOURCE_LINK", "\"https://github.com/nova-wallet/nova-android-app\""
         }
         develop {
             signingConfig signingConfigs.dev

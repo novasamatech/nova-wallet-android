@@ -54,7 +54,7 @@ class UpdateNotificationViewModel(
     }
 
     fun installUpdateClicked() {
-        router.openInstallUpdates()
+        router.openAppUpdater()
     }
 
     fun showAllNotifications() {
