@@ -16,7 +16,6 @@
         android:layout_marginBottom="7dp"
         tools:text="Label:" />
 
-
     <TextView
         android:id="@+id/viewListChooserValue"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Primary"

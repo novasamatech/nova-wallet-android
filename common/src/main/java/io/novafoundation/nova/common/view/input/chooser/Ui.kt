@@ -21,3 +21,16 @@ fun <T> BaseFragmentMixin<*>.setupListChooserMixin(
         listChooserMixin.selectorClicked()
     }
 }
+
+fun <T> BaseFragmentMixin<*>.setupListChooserMixinBottomSheet(
+    listChooserMixin: ListChooserMixin<T>
+) {
+    listChooserMixin.chooseNewOption.awaitableActionLiveData.observeEvent { action ->
+        ListChooserBottomSheet(
+            context = fragment.requireContext(),
+            payload = action.payload,
+            onCancel = action.onCancel,
+            onClicked = action.onSuccess,
+        ).show()
+    }
+}

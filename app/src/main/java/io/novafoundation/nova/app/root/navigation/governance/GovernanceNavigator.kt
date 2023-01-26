@@ -5,7 +5,9 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
+import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
+import io.novafoundation.nova.feature_governance_impl.BuildConfig
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionPayload
@@ -63,6 +65,11 @@ class GovernanceNavigator(
     }
 
     override fun openAddDelegation() = performNavigation(R.id.action_mainFragment_to_delegation)
+
+    override fun openBecomingDelegateTutorial() {
+        navigationHolder.contextManager.getActivity()
+            ?.showBrowser(BuildConfig.DELEGATION_TUTORIAL_URL)
+    }
 
     override fun openDAppBrowser(initialUrl: String) = performNavigation(
         actionId = R.id.action_referendumDetailsFragment_to_DAppBrowserGraph,

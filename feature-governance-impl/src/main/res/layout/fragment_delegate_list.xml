@@ -17,41 +17,18 @@
         app:layout_constraintTop_toTopOf="parent"
         app:titleText="@string/delegation_add_delegation" />
 
-    <io.novafoundation.nova.common.view.input.chooser.ListChooserView
-        android:id="@+id/delegateListFilters"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_weight="1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/delegateListToolbar"
-        app:listChooserView_label="Show"
-        tools:listChooserView_value="All accounts" />
-
-
-    <io.novafoundation.nova.common.view.input.chooser.ListChooserView
-        android:id="@+id/delegateListSorting"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_weight="1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/delegateListToolbar"
-        app:listChooserView_label="Sort by"
-        tools:listChooserView_value="Delegations" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/delegateListList"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:paddingTop="12dp"
         android:clipToPadding="false"
+        android:paddingTop="8dp"
         android:paddingBottom="8dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/delegateListFilters"
+        app:layout_constraintTop_toBottomOf="@id/delegateListToolbar"
         tools:listitem="@layout/item_delegate" />
 
     <ProgressBar

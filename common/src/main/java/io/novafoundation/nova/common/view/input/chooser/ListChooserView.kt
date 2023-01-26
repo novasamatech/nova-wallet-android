@@ -30,7 +30,7 @@ class ListChooserView @JvmOverloads constructor(
         viewListChooserLabel.text = suffixedLabel
     }
 
-    fun setValueDisplay(value: String) {
+    fun setValueDisplay(value: String?) {
         viewListChooserValue.text = value
     }
 

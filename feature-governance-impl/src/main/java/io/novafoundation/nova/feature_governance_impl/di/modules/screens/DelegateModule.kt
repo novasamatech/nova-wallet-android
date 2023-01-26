@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.di.modules.screens
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
@@ -12,7 +13,9 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.NewDelegationChooseTrackInteractor
+import io.novafoundation.nova.feature_governance_impl.data.DelegationBannerRepository
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.data.RealDelegationBannerRepository
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.delegators.RealDelegateDelegatorsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.details.RealDelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.list.RealDelegateListInteractor
@@ -27,14 +30,20 @@ class DelegateModule {
 
     @Provides
     @FeatureScope
+    fun provideDelegationBannerService(preferences: Preferences): DelegationBannerRepository = RealDelegationBannerRepository(preferences)
+
+    @Provides
+    @FeatureScope
     fun provideDelegateListInteractor(
         governanceSourceRegistry: GovernanceSourceRegistry,
         chainStateRepository: ChainStateRepository,
-        identityRepository: OnChainIdentityRepository
+        identityRepository: OnChainIdentityRepository,
+        delegationBannerService: DelegationBannerRepository
     ): DelegateListInteractor = RealDelegateListInteractor(
         governanceSourceRegistry = governanceSourceRegistry,
         chainStateRepository = chainStateRepository,
-        identityRepository = identityRepository
+        identityRepository = identityRepository,
+        delegationBannerService = delegationBannerService
     )
 
     @Provides

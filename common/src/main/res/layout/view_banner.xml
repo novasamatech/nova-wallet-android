@@ -7,7 +7,7 @@
     app:cardCornerRadius="12dp"
     app:cardElevation="0dp"
     app:strokeColor="@color/container_border"
-    app:strokeWidth="2dp"
+    app:strokeWidth="1dp"
     tools:parentTag="com.google.android.material.card.MaterialCardView">
 
     <androidx.constraintlayout.widget.ConstraintLayout
