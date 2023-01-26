@@ -38,5 +38,5 @@ enum class Severity {
 }
 
 fun Version.toUnderscoreString(): String {
-    return "${major}_${minor}_${patch}"
+    return "${major}_${minor}_$patch"
 }

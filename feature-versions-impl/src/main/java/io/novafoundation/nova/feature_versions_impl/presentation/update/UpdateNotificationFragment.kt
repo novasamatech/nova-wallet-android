@@ -24,7 +24,6 @@ import kotlinx.android.synthetic.main.fragment_update_notifications.updatesToolb
 
 class UpdateNotificationFragment : BaseFragment<UpdateNotificationViewModel>(), UpdateNotificationsSeeAllAdapter.SeeAllClickedListener {
 
-
     private val bannerAdapter = UpdateNotificationsBannerAdapter()
     private val listAdapter = UpdateNotificationsAdapter()
     private val seeAllAdapter = UpdateNotificationsSeeAllAdapter(this)

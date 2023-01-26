@@ -9,13 +9,13 @@
     <string name="update_notifications_severity_major">Major</string>
 
     <string name="update_notifications_critical_update_alert_titile">Critical update</string>
-    <string name="update_notifications_critical_update_alert_subtitile">To avoid any issues and improve the user experience, we strongly recommend install the updates as soon as possible.</string>
+    <string name="update_notifications_critical_update_alert_subtitile">To avoid any issues, and improve your user experience, we strongly recommend that you install recent updates as soon as possible</string>
 
     <string name="update_notifications_major_update_alert_titile">Major update</string>
-    <string name="update_notifications_major_update_alert_subtitile">Select another account as a controller to delegate staking management operations to it</string>
+    <string name="update_notifications_major_update_alert_subtitile">Lots of amazing new features are available for Nova Wallet! Make sure to update your application to access them</string>
 
     <string name="update_notification_title">Update available</string>
-    <string name="update_notification_install_btn">Install the updates</string>
+    <string name="update_notification_install_btn">Install</string>
 
     <string name="common_enable">Enable</string>
     <string name="settings_safe_mode_confirmation_title">Safe mode</string>

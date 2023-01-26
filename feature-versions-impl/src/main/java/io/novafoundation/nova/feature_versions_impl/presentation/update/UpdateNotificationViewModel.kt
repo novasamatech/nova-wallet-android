@@ -97,16 +97,16 @@ class UpdateNotificationViewModel(
 
     private fun mapSeverityColor(severity: Severity): Int? {
         return when (severity) {
-            Severity.CRITICAL -> R.color.text_warning
-            Severity.MAJOR -> R.color.chip_text
+            Severity.CRITICAL -> R.color.critical_update_chip_text
+            Severity.MAJOR -> R.color.major_update_chip_text
             Severity.NORMAL -> null
         }
     }
 
     private fun mapSeverityBackground(severity: Severity): Int? {
         return when (severity) {
-            Severity.CRITICAL -> R.color.warning_block_background
-            Severity.MAJOR -> R.color.chips_background
+            Severity.CRITICAL -> R.color.critical_update_chip_background
+            Severity.MAJOR -> R.color.major_update_chip_background
             Severity.NORMAL -> null
         }
     }
