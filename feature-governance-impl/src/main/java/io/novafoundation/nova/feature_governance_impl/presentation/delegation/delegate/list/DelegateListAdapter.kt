@@ -2,25 +2,16 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import coil.ImageLoader
 import coil.clear
-import coil.transform.CircleCropTransformation
-import coil.transform.RoundedCornersTransformation
-import coil.transform.Transformation
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
-import io.novafoundation.nova.common.utils.dpF
-import io.novafoundation.nova.common.utils.images.Icon
-import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextOrHide
-import io.novafoundation.nova.common.view.shape.DEFAULT_CORNER_RADIUS
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateTypeModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateIcon
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateTypeModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.model.DelegateListModel
@@ -80,7 +71,7 @@ class DelegateViewHolder(
     }
 
     fun bind(model: DelegateListModel) = with(containerView) {
-        itemDelegateIcon.setDelegateIcon(model.icon,imageLoader)
+        itemDelegateIcon.setDelegateIcon(model.icon, imageLoader)
         itemDelegateTitle.text = model.name
         itemDelegateDescription.setTextOrHide(model.description)
         itemDelegateDelegations.text = model.stats.delegations

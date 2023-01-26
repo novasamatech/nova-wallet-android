@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.updatePadding
 
-
 class ReadMoreView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

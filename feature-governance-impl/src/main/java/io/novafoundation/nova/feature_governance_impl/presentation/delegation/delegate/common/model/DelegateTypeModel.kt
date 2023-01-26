@@ -30,7 +30,6 @@ class DelegateIcon(val shape: IconShape, val icon: Icon) {
     }
 }
 
-
 fun NovaChipView.setDelegateTypeModel(model: DelegateTypeModel?) {
     setVisible(model != null)
     if (model == null) return

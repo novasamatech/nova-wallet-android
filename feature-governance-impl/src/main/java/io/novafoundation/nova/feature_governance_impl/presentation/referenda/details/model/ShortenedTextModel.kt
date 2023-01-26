@@ -37,7 +37,6 @@ class ShortenedTextModel private constructor(val shortenedText: CharSequence, va
     }
 }
 
-
 fun ShortenedTextModel?.applyTo(textView: TextView, readMoreView: ReadMoreView, markwon: Markwon) {
     if (this == null) {
         textView.makeGone()

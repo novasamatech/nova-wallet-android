@@ -71,7 +71,6 @@ class DelegateDetailsViewModel(
         chain: Chain,
         chainAsset: Chain.Asset,
     ): DelegateDetailsModel {
-
         return DelegateDetailsModel(
             addressModel = createDelegateAddressModel(delegateDetails, chain),
             metadata = createDelegateMetadata(delegateDetails, chain),

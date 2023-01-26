@@ -18,7 +18,7 @@ interface IdentityMixin : Browserable {
 
     fun webClicked()
 
-    interface Presentation: IdentityMixin {
+    interface Presentation : IdentityMixin {
 
         fun setIdentity(identity: IdentityModel?)
 

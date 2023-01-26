@@ -68,7 +68,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-
 class ReferendumDetailsViewModel(
     private val router: GovernanceRouter,
     private val payload: ReferendumDetailsPayload,

@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.withLoading
+import io.novafoundation.nova.common.utils.withLoadingShared
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Voter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.account
@@ -38,7 +38,7 @@ class VotedReferendaViewModel(
         referenda.map { referendumFormatter.formatReferendumPreview(it, token, chain) }
     }
         .inBackground()
-        .withLoading()
+        .withLoadingShared()
         .shareWhileSubscribed()
 
     val votedReferendaCount = referendaListFlow.map {

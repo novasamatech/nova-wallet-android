@@ -15,7 +15,6 @@ class IdentityModel(
     companion object;
 }
 
-
 fun IdentityModel.Companion.from(identity: OnChainIdentity): IdentityModel {
     return identity.run {
         IdentityModel(
