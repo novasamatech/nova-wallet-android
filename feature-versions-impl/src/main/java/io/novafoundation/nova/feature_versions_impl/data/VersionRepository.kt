@@ -63,6 +63,7 @@ class RealVersionRepository(
             .filter { currentVersion < it.key }
             .map { getChangelogAsync(it.key, it.value) }
             .awaitAll()
+            .filterNotNull()
     }
 
     override suspend fun skipCurrentUpdates() {
@@ -80,11 +81,11 @@ class RealVersionRepository(
         return checkpointVersion?.toVersion()
     }
 
-    private suspend fun getChangelogAsync(version: Version, versionResponse: VersionResponse): Deferred<UpdateNotification> {
+    private suspend fun getChangelogAsync(version: Version, versionResponse: VersionResponse): Deferred<UpdateNotification?> {
         return coroutineScope {
             async(Dispatchers.Default) {
                 val versionFileName = version.toUnderscoreString()
-                val changelog = versionsFetcher.getChangelog(versionFileName)
+                val changelog = runCatching { versionsFetcher.getChangelog(versionFileName) }.getOrNull()
                 mapFromRemoteVersion(version, versionResponse, changelog)
             }
         }

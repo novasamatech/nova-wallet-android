@@ -4,7 +4,7 @@ import java.util.Date
 
 class UpdateNotification(
     val version: Version,
-    val changelog: String,
+    val changelog: String?,
     val severity: Severity,
     val time: Date
 )

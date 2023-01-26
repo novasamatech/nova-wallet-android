@@ -76,15 +76,15 @@ class UpdateNotificationViewModel(
     }
 
     private fun mapUpdateNotificationsToModels(list: List<UpdateNotification>): List<UpdateNotificationModel> {
-        return list.mapIndexed { index, it ->
+        return list.mapIndexed { index, version ->
             UpdateNotificationModel(
-                version = it.version.toString(),
-                changelog = markwon.toMarkdown(it.changelog),
+                version = version.version.toString(),
+                changelog = version.changelog?.let { markwon.toMarkdown(it) },
                 isLatestUpdate = index == 0,
-                severity = mapSeverity(it.severity),
-                severityColorRes = mapSeverityColor(it.severity),
-                severityBackgroundRes = mapSeverityBackground(it.severity),
-                date = it.time.formatDateSinceEpoch(resourceManager)
+                severity = mapSeverity(version.severity),
+                severityColorRes = mapSeverityColor(version.severity),
+                severityBackgroundRes = mapSeverityBackground(version.severity),
+                date = version.time.formatDateSinceEpoch(resourceManager)
             )
         }
     }

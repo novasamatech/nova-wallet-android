@@ -50,6 +50,7 @@ class UpdateNotificationHolder(view: View) : GroupedListHolder(view) {
     fun bind(item: UpdateNotificationModel) {
         itemView.itemNotificationVersion.text = itemView.context.getString(R.string.update_notification_item_version, item.version)
         itemView.itemNotificationDescription.text = item.changelog
+        itemView.itemNotificationDescription.isVisible = item.changelog != null
 
         itemView.itemNotificationSeverity.isGone = item.severity == null
         itemView.itemNotificationSeverity.text = item.severity

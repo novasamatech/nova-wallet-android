@@ -12,7 +12,7 @@ class UpdateNotificationBannerModel(
 
 class UpdateNotificationModel(
     val version: String,
-    val changelog: CharSequence,
+    val changelog: CharSequence?,
     val isLatestUpdate: Boolean,
     val severity: String?,
     @ColorRes val severityColorRes: Int?,
