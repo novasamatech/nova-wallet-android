@@ -22,3 +22,7 @@ data class DelegatePreview(
 
     data class Stats(val delegationsCount: Int, val delegatedVotes: Balance, val recentVotes: Int)
 }
+
+fun DelegatePreview.hasMetadata(): Boolean {
+    return metadata != null
+}

@@ -13,8 +13,12 @@ interface DelegateListInteractor {
     fun hideDelegationBanner()
 
     suspend fun getDelegates(
-        sorting: DelegateSorting,
-        filtering: DelegateFiltering,
         governanceOption: SupportedGovernanceOption,
     ): Result<List<DelegatePreview>>
+
+    suspend fun applySortingAndFiltering(
+        sorting: DelegateSorting,
+        filtering: DelegateFiltering,
+        delegates: List<DelegatePreview>
+    ): List<DelegatePreview>
 }
