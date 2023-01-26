@@ -7,12 +7,12 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionFragment
+import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionFragment
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsFragment
@@ -78,14 +78,19 @@ class GovernanceNavigator(
         args = VotedReferendaFragment.getBundle(payload)
     )
 
+    override fun openDelegateFullDescription(payload: DescriptionPayload) = performNavigation(
+        actionId = R.id.action_delegateDetailsFragment_to_delegateFullDescription,
+        args = DescriptionFragment.getBundle(payload)
+    )
+
     override fun openDAppBrowser(initialUrl: String) = performNavigation(
         actionId = R.id.action_referendumDetailsFragment_to_DAppBrowserGraph,
         args = DAppBrowserFragment.getBundle(initialUrl)
     )
 
-    override fun openReferendumDescription(payload: ReferendumDescriptionPayload) = performNavigation(
+    override fun openReferendumDescription(payload: DescriptionPayload) = performNavigation(
         actionId = R.id.action_referendumDetailsFragment_to_referendumDescription,
-        args = ReferendumDescriptionFragment.getBundle(payload)
+        args = DescriptionFragment.getBundle(payload)
     )
 
     override fun openConfirmVoteReferendum(payload: ConfirmVoteReferendumPayload) = performNavigation(

@@ -1,17 +1,19 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.description
+package io.novafoundation.nova.feature_governance_impl.presentation.common.description
 
 import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 
-class ReferendumDescriptionViewModel(
+class DescriptionViewModel(
     private val router: GovernanceRouter,
-    private val payload: ReferendumDescriptionPayload,
+    private val payload: DescriptionPayload,
     val markwon: Markwon,
 ) : BaseViewModel() {
 
-    val referendumTitle = payload.title
+    val title = payload.title
+    val toolbarTitle = payload.toolbarTitle
+
     val markdownDescription = flowOf { markwon.toMarkdown(payload.description) }
         .shareInBackground()
 

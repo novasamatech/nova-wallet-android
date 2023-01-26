@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.description
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsModel.Metadata
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsModel.Stats
@@ -145,8 +146,16 @@ class DelegateDetailsViewModel(
         openVotedReferenda(onlyRecentVotes = false)
     }
 
-    fun readMoreClicked() {
-        showMessage("TODO - open description details")
+    fun readMoreClicked() = launch {
+        val delegateMetadata = delegateDetailsFlow.first().dataOrNull?.metadata
+        val description = delegateMetadata?.description ?: return@launch
+
+        val descriptionPayload = DescriptionPayload(
+            description = description,
+            toolbarTitle = delegateMetadata.name
+        )
+
+        router.openDelegateFullDescription(descriptionPayload)
     }
 
     fun addDelegation() {
