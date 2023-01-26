@@ -19,7 +19,7 @@
 
         <TextView
             android:id="@+id/itemUpdateNotificationAlertTitle"
-            style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+            style="@style/TextAppearance.NovaFoundation.Bold.Title3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
@@ -30,14 +30,13 @@
 
         <TextView
             android:id="@+id/itemUpdateNotificationAlertSubtitle"
-            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@string/update_notifications_critical_update_alert_subtitile"
-            tools:textColor="@color/text_secondary" />
+            android:textColor="@color/text_secondary"
+            tools:text="@string/update_notifications_critical_update_alert_subtitile" />
 
     </LinearLayout>
-
 
 </io.novafoundation.nova.common.view.BannerView>

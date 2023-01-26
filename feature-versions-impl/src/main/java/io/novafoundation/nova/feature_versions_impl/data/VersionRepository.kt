@@ -6,6 +6,7 @@ import android.os.Build
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotification
 import io.novafoundation.nova.feature_versions_api.domain.Version
+import io.novafoundation.nova.feature_versions_api.domain.toUnderscoreString
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -16,11 +17,23 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class VersionService(
+interface VersionRepository {
+    suspend fun hasImportantUpdates(): Boolean
+
+    suspend fun getNewUpdateNotifications(): List<UpdateNotification>
+
+    suspend fun skipCurrentUpdates()
+
+    fun inAppUpdatesCheckAllowedFlow(): Flow<Boolean>
+
+    fun allowUpdate()
+}
+
+class RealVersionRepository(
     private val context: Context,
     private val preferences: Preferences,
     private val versionsFetcher: VersionsFetcher
-) {
+) : VersionRepository {
 
     companion object {
         private const val PREF_VERSION_CHECKPOINT = "PREF_VERSION_CHECKPOINT"
@@ -33,30 +46,33 @@ class VersionService(
     private var versions = mapOf<Version, VersionResponse>()
 
     private val _inAppUpdatesCheckAllowed = MutableStateFlow(false)
-    val inAppUpdatesCheckAllowed: Flow<Boolean> = _inAppUpdatesCheckAllowed
 
-    fun allowUpdate() {
+    override fun allowUpdate() {
         _inAppUpdatesCheckAllowed.value = true
     }
 
-    suspend fun hasImportantUpdates(): Boolean {
+    override suspend fun hasImportantUpdates(): Boolean {
         val checkpointVersion = getRecentVersionCheckpoint() ?: currentVersion
         return syncAndGetVersions()
             .filterNot { it.value.severity == REMOTE_SEVERITY_NORMAL }
             .any { checkpointVersion < it.key || it.value.severity == REMOTE_SEVERITY_CRITICAL }
     }
 
-    suspend fun getNewUpdateNotifications(): List<UpdateNotification> {
+    override suspend fun getNewUpdateNotifications(): List<UpdateNotification> {
         return syncAndGetVersions()
             .filter { currentVersion < it.key }
             .map { getChangelogAsync(it.key, it.value) }
             .awaitAll()
     }
 
-    suspend fun skipCurrentUpdates() {
+    override suspend fun skipCurrentUpdates() {
         val latestUpdateNotification = getNewUpdateNotifications()
             .maxWith { first, second -> first.version.compareTo(second.version) }
         preferences.putString(PREF_VERSION_CHECKPOINT, latestUpdateNotification.version.toString())
+    }
+
+    override fun inAppUpdatesCheckAllowedFlow(): Flow<Boolean> {
+        return _inAppUpdatesCheckAllowed
     }
 
     private fun getRecentVersionCheckpoint(): Version? {
@@ -67,8 +83,8 @@ class VersionService(
     private suspend fun getChangelogAsync(version: Version, versionResponse: VersionResponse): Deferred<UpdateNotification> {
         return coroutineScope {
             async(Dispatchers.Default) {
-                val versionFile = versionResponse.version.replace(".", "_")
-                val changelog = versionsFetcher.getChangelog(versionFile)
+                val versionFileName = version.toUnderscoreString()
+                val changelog = versionsFetcher.getChangelog(versionFileName)
                 mapFromRemoteVersion(version, versionResponse, changelog)
             }
         }

@@ -10,8 +10,11 @@ import io.novafoundation.nova.feature_versions_api.domain.UpdateNotification
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_versions_api.presentation.VersionsRouter
 import io.novafoundation.nova.feature_versions_impl.R
+import io.novafoundation.nova.feature_versions_impl.presentation.update.models.UpdateNotificationBannerModel
+import io.novafoundation.nova.feature_versions_impl.presentation.update.models.UpdateNotificationModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class UpdateNotificationViewModel(
@@ -24,21 +27,24 @@ class UpdateNotificationViewModel(
 
     private val notifications = flowOf { interactor.getUpdateNotifications() }
 
+    val bannerModel = notifications.map { getBannerOrNull(it) }
+        .shareInBackground()
+
     val notificationModels = combine(showAllNotifications, notifications) { shouldShowAll, notifications ->
         val result = if (shouldShowAll) {
             notifications
         } else {
             notifications.take(1)
         }
-        buildList {
-            val banner = getBannerOrNull(notifications)
-            banner?.let { add(it) }
-            addAll(mapUpdateNotificationsToModels(result))
-            if (notifications.size > 1 && !shouldShowAll) {
-                add(SeeAllButtonModel())
-            }
-        }
-    }.withLoading()
+        mapUpdateNotificationsToModels(result)
+    }
+        .withLoading()
+        .shareInBackground()
+
+    val seeAllButtonVisible = combine(showAllNotifications, notifications) { shouldShowAll, notifications ->
+        notifications.size > 1 && !shouldShowAll
+    }
+        .shareInBackground()
 
     fun skipClicked() {
         launch {

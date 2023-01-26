@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_versions_impl.presentation.update
+package io.novafoundation.nova.feature_versions_impl.presentation.update.models
 
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -19,5 +19,3 @@ class UpdateNotificationModel(
     @ColorRes val severityBackgroundRes: Int?,
     val date: String
 )
-
-class SeeAllButtonModel

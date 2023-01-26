@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState
@@ -13,14 +14,21 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_versions_impl.R
 import io.novafoundation.nova.feature_versions_impl.di.VersionsFeatureComponent
+import io.novafoundation.nova.feature_versions_impl.presentation.update.adapters.UpdateNotificationsAdapter
+import io.novafoundation.nova.feature_versions_impl.presentation.update.adapters.UpdateNotificationsBannerAdapter
+import io.novafoundation.nova.feature_versions_impl.presentation.update.adapters.UpdateNotificationsSeeAllAdapter
 import kotlinx.android.synthetic.main.fragment_update_notifications.updateNotificationsProgress
 import kotlinx.android.synthetic.main.fragment_update_notifications.updatesApply
 import kotlinx.android.synthetic.main.fragment_update_notifications.updatesList
 import kotlinx.android.synthetic.main.fragment_update_notifications.updatesToolbar
 
-class UpdateNotificationFragment : BaseFragment<UpdateNotificationViewModel>(), UpdateNotificationsAdapter.SeeAllClickedListener {
+class UpdateNotificationFragment : BaseFragment<UpdateNotificationViewModel>(), UpdateNotificationsSeeAllAdapter.SeeAllClickedListener {
 
-    private val adapter = UpdateNotificationsAdapter(this)
+
+    private val bannerAdapter = UpdateNotificationsBannerAdapter()
+    private val listAdapter = UpdateNotificationsAdapter()
+    private val seeAllAdapter = UpdateNotificationsSeeAllAdapter(this)
+    private val adapter = ConcatAdapter(bannerAdapter, listAdapter, seeAllAdapter)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_update_notifications, container, false)
@@ -43,12 +51,20 @@ class UpdateNotificationFragment : BaseFragment<UpdateNotificationViewModel>(), 
     }
 
     override fun subscribe(viewModel: UpdateNotificationViewModel) {
+        viewModel.bannerModel.observe {
+            bannerAdapter.setModel(it)
+        }
+
         viewModel.notificationModels.observe {
             updateNotificationsProgress.isVisible = it is LoadingState.Loading
             updatesList.isGone = it is LoadingState.Loading
             if (it is LoadingState.Loaded) {
-                adapter.submitList(it.data)
+                listAdapter.submitList(it.data)
             }
+        }
+
+        viewModel.seeAllButtonVisible.observe {
+            seeAllAdapter.showButton(it)
         }
     }
 
