@@ -12,8 +12,8 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
 
-        buildConfigField "String", "NOTIFICATIONS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-wallet-android-releases/test/version/updates/v1/entrypoint_dev.json\""
-        buildConfigField "String", "NOTIFICATION_DETAILS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-wallet-android-releases/test/version/updates/changelogs/dev/\""
+        buildConfigField "String", "NOTIFICATIONS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-wallet-android-releases/master/updates/v1/entrypoint_dev.json\""
+        buildConfigField "String", "NOTIFICATION_DETAILS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-wallet-android-releases/master/updates/changelogs/dev/\""
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
