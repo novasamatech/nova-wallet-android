@@ -4,15 +4,15 @@ import java.util.Date
 
 class UpdateNotification(
     val version: Version,
-    val changelog: String,
+    val changelog: String?,
     val severity: Severity,
     val time: Date
 )
 
 class Version(
-    private val major: Long,
-    private val minor: Long,
-    private val patch: Long
+    val major: Long,
+    val minor: Long,
+    val patch: Long
 ) : Comparable<Version> {
 
     companion object {
@@ -35,4 +35,8 @@ class Version(
 
 enum class Severity {
     NORMAL, MAJOR, CRITICAL
+}
+
+fun Version.toUnderscoreString(): String {
+    return "${major}_${minor}_$patch"
 }

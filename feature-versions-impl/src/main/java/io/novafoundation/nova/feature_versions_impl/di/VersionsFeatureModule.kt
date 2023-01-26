@@ -7,7 +7,8 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
-import io.novafoundation.nova.feature_versions_impl.data.VersionService
+import io.novafoundation.nova.feature_versions_impl.data.RealVersionRepository
+import io.novafoundation.nova.feature_versions_impl.data.VersionRepository
 import io.novafoundation.nova.feature_versions_impl.data.VersionsFetcher
 import io.novafoundation.nova.feature_versions_impl.domain.RealUpdateNotificationsInteractor
 
@@ -24,11 +25,11 @@ class VersionsFeatureModule {
         context: Context,
         preferences: Preferences,
         versionsFetcher: VersionsFetcher
-    ) = VersionService(context, preferences, versionsFetcher)
+    ): VersionRepository = RealVersionRepository(context, preferences, versionsFetcher)
 
     @Provides
     @FeatureScope
     fun provideUpdateNotificationsInteractor(
-        versionService: VersionService
-    ): UpdateNotificationsInteractor = RealUpdateNotificationsInteractor(versionService)
+        versionRepository: VersionRepository
+    ): UpdateNotificationsInteractor = RealUpdateNotificationsInteractor(versionRepository)
 }

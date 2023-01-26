@@ -2,6 +2,7 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.app.BuildConfig
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.versions.VersionsNavigator
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -12,5 +13,5 @@ class VersionsNavigationModule {
 
     @Provides
     @ApplicationScope
-    fun provideRouter(navigationHolder: NavigationHolder): VersionsRouter = VersionsNavigator(navigationHolder)
+    fun provideRouter(navigationHolder: NavigationHolder): VersionsRouter = VersionsNavigator(navigationHolder, BuildConfig.APP_UPDATE_SOURCE_LINK)
 }

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_versions_impl.presentation.update
 
+import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
@@ -10,19 +11,26 @@ import io.novafoundation.nova.feature_versions_api.domain.UpdateNotification
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_versions_api.presentation.VersionsRouter
 import io.novafoundation.nova.feature_versions_impl.R
+import io.novafoundation.nova.feature_versions_impl.presentation.update.models.UpdateNotificationBannerModel
+import io.novafoundation.nova.feature_versions_impl.presentation.update.models.UpdateNotificationModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class UpdateNotificationViewModel(
     private val router: VersionsRouter,
     private val interactor: UpdateNotificationsInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val markwon: Markwon,
 ) : BaseViewModel() {
 
     private val showAllNotifications = MutableStateFlow(false)
 
     private val notifications = flowOf { interactor.getUpdateNotifications() }
+
+    val bannerModel = notifications.map { getBannerOrNull(it) }
+        .shareInBackground()
 
     val notificationModels = combine(showAllNotifications, notifications) { shouldShowAll, notifications ->
         val result = if (shouldShowAll) {
@@ -30,15 +38,15 @@ class UpdateNotificationViewModel(
         } else {
             notifications.take(1)
         }
-        buildList {
-            val banner = getBannerOrNull(notifications)
-            banner?.let { add(it) }
-            addAll(mapUpdateNotificationsToModels(result))
-            if (notifications.size > 1 && !shouldShowAll) {
-                add(SeeAllButtonModel())
-            }
-        }
-    }.withLoading()
+        mapUpdateNotificationsToModels(result)
+    }
+        .withLoading()
+        .shareInBackground()
+
+    val seeAllButtonVisible = combine(showAllNotifications, notifications) { shouldShowAll, notifications ->
+        notifications.size > 1 && !shouldShowAll
+    }
+        .shareInBackground()
 
     fun skipClicked() {
         launch {
@@ -48,7 +56,7 @@ class UpdateNotificationViewModel(
     }
 
     fun installUpdateClicked() {
-        router.openInstallUpdates()
+        router.openAppUpdater()
     }
 
     fun showAllNotifications() {
@@ -68,15 +76,15 @@ class UpdateNotificationViewModel(
     }
 
     private fun mapUpdateNotificationsToModels(list: List<UpdateNotification>): List<UpdateNotificationModel> {
-        return list.mapIndexed { index, it ->
+        return list.mapIndexed { index, version ->
             UpdateNotificationModel(
-                version = it.version.toString(),
-                changelog = it.changelog,
+                version = version.version.toString(),
+                changelog = version.changelog?.let { markwon.toMarkdown(it) },
                 isLatestUpdate = index == 0,
-                severity = mapSeverity(it.severity),
-                severityColorRes = mapSeverityColor(it.severity),
-                severityBackgroundRes = mapSeverityBackground(it.severity),
-                date = it.time.formatDateSinceEpoch(resourceManager)
+                severity = mapSeverity(version.severity),
+                severityColorRes = mapSeverityColor(version.severity),
+                severityBackgroundRes = mapSeverityBackground(version.severity),
+                date = version.time.formatDateSinceEpoch(resourceManager)
             )
         }
     }
@@ -91,16 +99,16 @@ class UpdateNotificationViewModel(
 
     private fun mapSeverityColor(severity: Severity): Int? {
         return when (severity) {
-            Severity.CRITICAL -> R.color.text_warning
-            Severity.MAJOR -> R.color.chip_text
+            Severity.CRITICAL -> R.color.critical_update_chip_text
+            Severity.MAJOR -> R.color.major_update_chip_text
             Severity.NORMAL -> null
         }
     }
 
     private fun mapSeverityBackground(severity: Severity): Int? {
         return when (severity) {
-            Severity.CRITICAL -> R.color.warning_block_background
-            Severity.MAJOR -> R.color.chips_background
+            Severity.CRITICAL -> R.color.critical_update_chip_background
+            Severity.MAJOR -> R.color.major_update_chip_background
             Severity.NORMAL -> null
         }
     }

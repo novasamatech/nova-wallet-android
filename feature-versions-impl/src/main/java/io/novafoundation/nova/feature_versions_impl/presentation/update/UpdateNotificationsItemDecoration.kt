@@ -9,6 +9,7 @@ import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.feature_versions_impl.R
+import io.novafoundation.nova.feature_versions_impl.presentation.update.adapters.UpdateNotificationHolder
 import kotlin.math.roundToInt
 
 class UpdateNotificationsItemDecoration(

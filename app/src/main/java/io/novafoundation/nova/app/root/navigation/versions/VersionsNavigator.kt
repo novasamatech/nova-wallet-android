@@ -1,25 +1,17 @@
 package io.novafoundation.nova.app.root.navigation.versions
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.net.Uri
+import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
+import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.feature_versions_api.presentation.VersionsRouter
 
 class VersionsNavigator(
-    private val navigationHolder: NavigationHolder
+    private val navigationHolder: NavigationHolder,
+    private val updateSourceLink: String
 ) : VersionsRouter {
 
-    override fun openInstallUpdates() {
-        val activity = navigationHolder.contextManager.getActivity()
-        require(activity != null)
-        val packageName = activity.packageName
-
-        try {
-            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
-        } catch (e: ActivityNotFoundException) {
-            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName")))
-        }
+    override fun openAppUpdater() {
+        navigationHolder.contextManager.getActivity()?.showBrowser(updateSourceLink, R.string.common_cannot_find_app)
     }
 
     override fun back() {
