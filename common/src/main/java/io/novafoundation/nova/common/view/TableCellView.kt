@@ -133,7 +133,7 @@ open class TableCellView @JvmOverloads constructor(
         tableCellValueDivider.setVisible(visible)
     }
 
-    fun setPrimaryValueIcon(@DrawableRes icon: Int, @ColorRes tint: Int? = null) {
+    fun setPrimaryValueIcon(@DrawableRes icon: Int?, @ColorRes tint: Int = ICON_TINT_DEFAULT) {
         tableCellValuePrimary.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 8, tint = tint)
     }
 

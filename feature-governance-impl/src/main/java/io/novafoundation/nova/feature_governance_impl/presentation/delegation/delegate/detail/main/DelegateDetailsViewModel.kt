@@ -18,7 +18,9 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.RecentVotes
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsModel.Metadata
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsModel.Stats
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsModel.VotesModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.DefaultCharacterLimit
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
@@ -90,8 +92,8 @@ class DelegateDetailsViewModel(
         return iconGenerator.createAccountAddressModel(chain, delegateDetails.accountId, addressModelName)
     }
 
-    private suspend fun createDelegateMetadata(delegateDetails: DelegateDetails, chain: Chain): DelegateDetailsModel.Metadata {
-        return DelegateDetailsModel.Metadata(
+    private suspend fun createDelegateMetadata(delegateDetails: DelegateDetails, chain: Chain): Metadata {
+        return Metadata(
             name = delegateMappers.formatDelegateName(delegateDetails, chain),
             icon = delegateMappers.mapDelegateIconToUi(delegateDetails),
             accountType = delegateMappers.mapDelegateTypeToUi(delegateDetails.metadata?.accountType),
@@ -99,17 +101,22 @@ class DelegateDetailsViewModel(
         )
     }
 
-    private suspend fun formatDelegationStats(stats: DelegateDetails.Stats?, chainAsset: Chain.Asset): DelegateDetailsModel.Stats? {
+    private suspend fun formatDelegationStats(stats: DelegateDetails.Stats?, chainAsset: Chain.Asset): Stats? {
         if (stats == null) return null
 
-        return DelegateDetailsModel.Stats(
+        return Stats(
             delegations = stats.delegationsCount.format(),
             delegatedVotes = chainAsset.amountFromPlanks(stats.delegatedVotes).format(),
-            recentVotes = RecentVotes(
-                label = delegateMappers.formattedRecentVotesPeriod(),
-                value = stats.recentVotes.format()
+            recentVotes = VotesModel(
+                customLabel = delegateMappers.formattedRecentVotesPeriod(),
+                votes = stats.recentVotes.format(),
+                extraInfoAvalable = stats.recentVotes > 0,
             ),
-            allVotes = stats.allVotes.format()
+            allVotes = VotesModel(
+                extraInfoAvalable = stats.allVotes > 0,
+                votes = stats.allVotes.format(),
+                customLabel = null
+            )
         )
     }
 
@@ -136,6 +143,14 @@ class DelegateDetailsViewModel(
 
     fun allVotesClicked() {
         openVotedReferenda(onlyRecentVotes = false)
+    }
+
+    fun readMoreClicked() {
+        showMessage("TODO - open description details")
+    }
+
+    fun addDelegation() {
+        showMessage("TODO - add delegation")
     }
 
     private fun openVotedReferenda(onlyRecentVotes: Boolean) {

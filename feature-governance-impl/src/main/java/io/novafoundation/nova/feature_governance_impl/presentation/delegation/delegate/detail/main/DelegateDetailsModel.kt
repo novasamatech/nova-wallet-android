@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateIcon
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateTypeModel
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.RecentVotes
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
 
 class DelegateDetailsModel(
@@ -15,8 +14,14 @@ class DelegateDetailsModel(
     class Stats(
         val delegations: String,
         val delegatedVotes: String,
-        val recentVotes: RecentVotes,
-        val allVotes: String,
+        val recentVotes: VotesModel,
+        val allVotes: VotesModel,
+    )
+
+    class VotesModel(
+        val extraInfoAvalable: Boolean,
+        val votes: String,
+        val customLabel: String?
     )
 
     class Metadata(

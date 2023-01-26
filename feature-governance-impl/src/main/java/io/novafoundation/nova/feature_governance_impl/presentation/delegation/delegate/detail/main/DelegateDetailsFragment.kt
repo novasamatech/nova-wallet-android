@@ -9,8 +9,10 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.setupIdentityMixin
@@ -70,6 +72,8 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
         delegateDetailsVotedOverall.setOnClickListener { viewModel.allVotesClicked() }
 
         delegateDetailsAccount.setOnClickListener { viewModel.accountActionsClicked() }
+
+        delegateDetailsDescriptionReadMore.setOnClickListener { viewModel.readMoreClicked() }
     }
 
     override fun inject() {
@@ -108,10 +112,9 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
 
         delegateDetailsDelegatedVotes.showValueOrHide(stats?.delegatedVotes)
         delegateDetailsDelegations.showValueOrHide(stats?.delegations)
-        delegateDetailsVotedOverall.showValueOrHide(stats?.allVotes)
 
-        delegateDetailsVotedRecently.showValueOrHide(stats?.recentVotes?.value)
-        stats?.recentVotes?.label?.let(delegateDetailsVotedRecently::setTitle)
+        delegateDetailsVotedOverall.setVotesModel(stats?.allVotes)
+        delegateDetailsVotedRecently.setVotesModel(stats?.recentVotes)
 
         if (delegate.metadata.description != null) {
             delegateDetailsMetadataGroup.makeVisible()
@@ -127,6 +130,20 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
         }
 
         delegateDetailsAccount.setAddressModel(delegate.addressModel)
+    }
+
+    private fun TableCellView.setVotesModel(model: DelegateDetailsModel.VotesModel?) = letOrHide(model) { votesModel ->
+        showValue(votesModel.votes)
+
+        if (votesModel.extraInfoAvalable) {
+            setPrimaryValueIcon(R.drawable.ic_info_cicrle_filled_16)
+            isEnabled = true
+        } else {
+            setPrimaryValueIcon(null)
+            isEnabled = false
+        }
+
+        votesModel.customLabel?.let(::setTitle)
     }
 
     private fun setDescription(maybeModel: ShortenedTextModel?) {
