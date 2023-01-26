@@ -34,6 +34,6 @@ fun mapIdentityParcelModelToIdentity(identity: IdentityParcelModel): OnChainIden
 
 fun mapIdentityParcelModelToIdentityModel(identity: IdentityParcelModel): IdentityModel {
     return with(identity) {
-        IdentityModel(display, legal, web, riot, email, pgpFingerprint, image, twitter)
+        IdentityModel(display, legal, web, riot, email, image, twitter)
     }
 }

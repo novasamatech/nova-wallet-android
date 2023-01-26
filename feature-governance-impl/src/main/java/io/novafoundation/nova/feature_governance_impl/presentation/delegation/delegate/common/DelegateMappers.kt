@@ -9,9 +9,10 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateIcon
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateStatsModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateTypeModel
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateTypeModel.IconShape
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.RecentVotes
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -20,7 +21,7 @@ interface DelegateMappers {
 
     fun mapDelegateTypeToUi(delegateType: DelegateAccountType?): DelegateTypeModel?
 
-    suspend fun mapDelegateIconToUi(delegate: Delegate): Icon
+    suspend fun mapDelegateIconToUi(delegate: Delegate): DelegateIcon
 
     suspend fun formatDelegateName(delegate: Delegate, chain: Chain): String
 
@@ -42,7 +43,6 @@ class RealDelegateMappers(
                 textColorRes = R.color.individual_chip_text,
                 backgroundColorRes = R.color.individual_chip_background,
                 iconColorRes = R.color.individual_chip_icon,
-                delegateIconShape = IconShape.ROUND
             )
 
             DelegateAccountType.ORGANIZATION -> DelegateTypeModel(
@@ -51,26 +51,37 @@ class RealDelegateMappers(
                 iconColorRes = R.color.organization_chip_icon,
                 textColorRes = R.color.organization_chip_icon,
                 backgroundColorRes = R.color.organization_chip_background,
-                delegateIconShape = IconShape.SQUARE
             )
 
             null -> null
         }
     }
 
-    override suspend fun mapDelegateIconToUi(delegate: Delegate): Icon {
+    override suspend fun mapDelegateIconToUi(delegate: Delegate): DelegateIcon {
         val iconUrl = delegate.metadata?.iconUrl
+        val accountType = delegate.metadata?.accountType
 
         return if (iconUrl != null) {
-            Icon.FromLink(iconUrl)
+            val icon = Icon.FromLink(iconUrl)
+
+            DelegateIcon(accountType.iconShape(), icon)
         } else {
             val addressIcon = addressIconGenerator.createAddressIcon(
                 delegate.accountId,
                 AddressIconGenerator.SIZE_BIG,
                 AddressIconGenerator.BACKGROUND_TRANSPARENT
             )
+            val icon = Icon.FromDrawable(addressIcon)
 
-            Icon.FromDrawable(addressIcon)
+            DelegateIcon(DelegateIcon.IconShape.NONE, icon)
+        }
+    }
+
+    private fun DelegateAccountType?.iconShape(): DelegateIcon.IconShape {
+        return when (this) {
+            DelegateAccountType.INDIVIDUAL -> DelegateIcon.IconShape.ROUND
+            DelegateAccountType.ORGANIZATION -> DelegateIcon.IconShape.SQUARE
+            null -> DelegateIcon.IconShape.NONE
         }
     }
 
@@ -89,7 +100,7 @@ class RealDelegateMappers(
         return DelegateStatsModel(
             delegations = stats.delegationsCount.format(),
             delegatedVotes = chainAsset.amountFromPlanks(stats.delegatedVotes).format(),
-            recentVotes = DelegateStatsModel.RecentVotes(
+            recentVotes = RecentVotes(
                 label = formattedRecentVotesPeriod(),
                 value = stats.recentVotes.format()
             )

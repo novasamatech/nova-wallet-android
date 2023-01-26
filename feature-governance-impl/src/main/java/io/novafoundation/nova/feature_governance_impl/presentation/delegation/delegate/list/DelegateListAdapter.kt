@@ -16,14 +16,14 @@ import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextOrHide
-import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.DEFAULT_CORNER_RADIUS
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateTypeModel
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateIcon
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateTypeModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.model.DelegateListModel
-import io.novafoundation.nova.feature_governance_impl.presentation.view.NovaChipView
 import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateDelegatedVotes
 import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateDelegations
 import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateDescription
@@ -80,7 +80,7 @@ class DelegateViewHolder(
     }
 
     fun bind(model: DelegateListModel) = with(containerView) {
-        itemDelegateIcon.setIcon(model.icon, model.type?.delegateIconShape)
+        itemDelegateIcon.setDelegateIcon(model.icon,imageLoader)
         itemDelegateTitle.text = model.name
         itemDelegateDescription.setTextOrHide(model.description)
         itemDelegateDelegations.text = model.stats.delegations
@@ -88,35 +88,10 @@ class DelegateViewHolder(
         itemDelegateRecentVotes.text = model.stats.recentVotes.value
         itemDelegateRecentVotesLabel.text = model.stats.recentVotes.label
 
-        itemDelegateType.bindDelegateType(model.type)
+        itemDelegateType.setDelegateTypeModel(model.type)
     }
 
     override fun unbind() = with(containerView) {
         itemDelegateIcon.clear()
-    }
-
-    private fun NovaChipView.bindDelegateType(model: DelegateTypeModel?) {
-        setVisible(model != null)
-        if (model == null) return
-
-        setText(model.text)
-        setIcon(model.iconRes)
-        setStyle(model.backgroundColorRes, model.textColorRes, model.iconColorRes)
-    }
-
-    private fun ImageView.setIcon(icon: Icon, iconShape: DelegateTypeModel.IconShape?) {
-        setIcon(icon, imageLoader) {
-            iconShape.coilTransformation()?.let {
-                transformations(it)
-            }
-        }
-    }
-
-    private fun DelegateTypeModel.IconShape?.coilTransformation(): Transformation? {
-        return when (this) {
-            DelegateTypeModel.IconShape.ROUND -> CircleCropTransformation()
-            DelegateTypeModel.IconShape.SQUARE -> RoundedCornersTransformation(DEFAULT_CORNER_RADIUS.dpF(containerView.context))
-            null -> null
-        }
     }
 }

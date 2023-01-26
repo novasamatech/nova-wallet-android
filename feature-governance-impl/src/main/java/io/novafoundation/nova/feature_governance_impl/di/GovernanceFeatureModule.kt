@@ -1,7 +1,12 @@
 package io.novafoundation.nova.feature_governance_impl.di
 
+import android.content.Context
+import android.text.util.Linkify
 import dagger.Module
 import dagger.Provides
+import io.noties.markwon.Markwon
+import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
+import io.noties.markwon.linkify.LinkifyPlugin
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -17,6 +22,7 @@ import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSize
 import io.novafoundation.nova.feature_governance_impl.data.preimage.RealPreImageSizer
 import io.novafoundation.nova.feature_governance_impl.data.repository.RealTreasuryRepository
 import io.novafoundation.nova.feature_governance_impl.data.source.RealGovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_impl.di.annotations.LightWeightMarkwon
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceDAppsModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceUpdatersModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV1
@@ -34,6 +40,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.R
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.RealTrackCategorizer
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.TrackCategorizer
+import io.novafoundation.nova.feature_governance_impl.markdown.StylePlugin
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.RealReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -159,4 +166,15 @@ class GovernanceFeatureModule {
         resourceManager: ResourceManager,
         trackCategorizer: TrackCategorizer
     ): ReferendumFormatter = RealReferendumFormatter(resourceManager, trackCategorizer)
+
+    @Provides
+    @FeatureScope
+    @LightWeightMarkwon
+    fun provideLightWeightMarkwon(context: Context): Markwon {
+        return Markwon.builder(context)
+            .usePlugin(LinkifyPlugin.create(Linkify.EMAIL_ADDRESSES or Linkify.WEB_URLS))
+            .usePlugin(StylePlugin(context))
+            .usePlugin(StrikethroughPlugin.create())
+            .build()
+    }
 }

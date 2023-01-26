@@ -4,13 +4,15 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
+import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityModel
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.from
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class RealIdentityMixinFactory(
     private val appLinksProvider: AppLinksProvider,
-): IdentityMixin.Factory {
+) : IdentityMixin.Factory {
 
     override fun create(): IdentityMixin.Presentation {
         return RealIdentityMixin(appLinksProvider)
@@ -19,7 +21,7 @@ class RealIdentityMixinFactory(
 
 private class RealIdentityMixin(
     private val appLinksProvider: AppLinksProvider,
-): IdentityMixin.Presentation {
+) : IdentityMixin.Presentation {
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
     override val openEmailEvent = MutableLiveData<Event<String>>()
@@ -28,6 +30,12 @@ private class RealIdentityMixin(
 
     override fun setIdentity(identity: IdentityModel?) {
         identityFlow.value = identity
+    }
+
+    override fun setIdentity(identity: OnChainIdentity?) {
+        val identityModel = identity?.run(IdentityModel.Companion::from)
+
+        setIdentity(identityModel)
     }
 
 

@@ -4,7 +4,6 @@ data class DelegateStatsModel(
     val delegations: String,
     val delegatedVotes: String,
     val recentVotes: RecentVotes
-) {
+)
 
-    data class RecentVotes(val label: String, val value: String)
-}
+data class RecentVotes(val label: String, val value: String)

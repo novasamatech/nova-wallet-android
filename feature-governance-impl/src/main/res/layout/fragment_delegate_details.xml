@@ -8,14 +8,18 @@
     tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/delegateDetailsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         app:titleText="@string/delegation_delegate_info" />
 
     <FrameLayout
+        android:id="@+id/delegateDetailsContent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:visibility="visible"
+        android:visibility="gone">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -134,9 +138,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     app:layout_constraintTop_toBottomOf="@id/delegateDetailsStats" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/delegateDetailsMetadataGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="delegateDetailsIcon,delegateDetailsTitle,delegateDetailsType,delegateDetailsDescription,delegateDetailsDescriptionReadMore" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>
-
 
         <io.novafoundation.nova.common.view.PrimaryButton
             android:layout_width="match_parent"
@@ -146,4 +155,12 @@
             android:layout_marginBottom="16dp"
             android:text="@string/delegation_add_delegation" />
     </FrameLayout>
+
+    <ProgressBar
+        android:id="@+id/delegateDetailsProgress"
+        style="@style/Widget.Nova.ProgressBar.Indeterminate"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1" />
 </LinearLayout>

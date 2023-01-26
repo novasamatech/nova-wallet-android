@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.de
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +12,6 @@ import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
@@ -26,8 +24,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDetailsModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.applyTo
 import io.novafoundation.nova.feature_governance_impl.presentation.view.setVoteModelOrHide
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetails
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsContainer
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsDappList
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsDescription
@@ -196,15 +194,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         referendumDetailsProgress.setVisible(!visible)
     }
 
-    private fun setDescription(maybeModel: ShortenedTextModel?) = referendumDetails.letOrHide(maybeModel) { model ->
-        val shortenedText = model.shortenedText
-
-        if (shortenedText is Spanned) {
-            viewModel.markwon.setParsedMarkdown(referendumDetailsDescription, shortenedText)
-        } else {
-            referendumDetailsDescription.text = shortenedText
-        }
-
-        referendumDetailsReadMore.setVisible(model.hasMore)
+    private fun setDescription(maybeModel: ShortenedTextModel?) {
+        maybeModel.applyTo(referendumDetailsDescription, referendumDetailsReadMore, viewModel.markwon)
     }
 }

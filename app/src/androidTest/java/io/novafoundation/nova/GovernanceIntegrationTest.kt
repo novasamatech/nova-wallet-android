@@ -160,7 +160,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
 
     @Test
     fun shouldFetchDelegateDetails() = runTest {
-        val delegateAddress = "DCZyhphXsRLcW84G9WmWEXtAA8DKGtVGSFZLJYty8Ajjyfa" // ChaosDAO
+        val delegateAccountId = "DCZyhphXsRLcW84G9WmWEXtAA8DKGtVGSFZLJYty8Ajjyfa".toAccountId() // ChaosDAO
 
         val interactor = governanceApi.delegateDetailsInteractor
         val updateSystem = governanceApi.governanceUpdateSystem
@@ -169,11 +169,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
             .inBackground()
             .launchIn(this)
 
-        val chain = kusama()
-        val delegate = interactor.getDelegateDetails(
-            delegateAddress = delegateAddress,
-            governanceOption = supportedGovernanceOption(chain, Chain.Governance.V2)
-        )
+        val delegate = interactor.getDelegateDetails(delegateAccountId)
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, delegate.toString())
     }
 

@@ -7,6 +7,8 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsFragment
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionFragment
@@ -66,8 +68,13 @@ class GovernanceNavigator(
 
     override fun openAddDelegation() = performNavigation(R.id.action_mainFragment_to_delegation)
 
+    override fun openDelegateDetails(payload: DelegateDetailsPayload) = performNavigation(
+        actionId = R.id.action_delegateListFragment_to_delegateDetailsFragment,
+        args = DelegateDetailsFragment.getBundle(payload)
+    )
+
     override fun openVotedReferenda(payload: VotedReferendaPayload) = performNavigation(
-        actionId = R.id.action_delegateListFragment_to_votedReferendaFragment,
+        actionId = R.id.action_delegateDetailsFragment_to_votedReferendaFragment,
         args = VotedReferendaFragment.getBundle(payload)
     )
 
