@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_versions_impl.presentation.update
 
+import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
@@ -20,7 +21,8 @@ import kotlinx.coroutines.launch
 class UpdateNotificationViewModel(
     private val router: VersionsRouter,
     private val interactor: UpdateNotificationsInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val markwon: Markwon,
 ) : BaseViewModel() {
 
     private val showAllNotifications = MutableStateFlow(false)
@@ -77,7 +79,7 @@ class UpdateNotificationViewModel(
         return list.mapIndexed { index, it ->
             UpdateNotificationModel(
                 version = it.version.toString(),
-                changelog = it.changelog,
+                changelog = markwon.toMarkdown(it.changelog),
                 isLatestUpdate = index == 0,
                 severity = mapSeverity(it.severity),
                 severityColorRes = mapSeverityColor(it.severity),
