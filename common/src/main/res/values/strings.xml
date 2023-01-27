@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="delegation_remove_votes">Remove votes</string>
+    <string name="delegation_tracks">Tracks</string>
+
+    <string name="common_element_and_more_format">%s (+%s more)</string>
+<!--    <string name="assets_manage_tokens_partial_networks">%s (+%s more)</string>-->
+
     <string name="delegation_all_votes">Voted for all time</string>
     <string name="delegation_delegate_info">Delegate info</string>
 
@@ -108,7 +114,6 @@
 
     <string name="assets_manage_tokens_title">Manage tokens</string>
     <string name="assets_manage_tokens_all_networks">All networks</string>
-    <string name="assets_manage_tokens_partial_networks">%s (+%s more)</string>
 
     <string name="common_no_app_to_handle_import_intent">File import application not found on device. Please install it and try again</string>
 

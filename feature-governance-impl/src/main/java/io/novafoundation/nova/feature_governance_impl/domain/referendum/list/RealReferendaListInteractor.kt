@@ -45,6 +45,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
+import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -264,7 +265,10 @@ class RealReferendaListInteractor(
                     ?.let(ReferendumPreview::OnChainMetadata),
                 track = onChainReferendum.track()?.let { trackId ->
                     tracksById[trackId]?.let { trackInfo ->
-                        ReferendumTrack(trackId, trackInfo.name, sameWithOther = tracksById.size == 1)
+                        ReferendumTrack(
+                            track = mapTrackInfoToTrack(trackInfo),
+                            sameWithOther = tracksById.size == 1
+                        )
                     }
                 },
                 status = statuses.getValue(onChainReferendum.id),

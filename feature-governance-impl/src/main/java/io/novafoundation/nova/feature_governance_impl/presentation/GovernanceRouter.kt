@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
@@ -45,4 +46,6 @@ interface GovernanceRouter : ReturnableRouter {
     fun openDelegateFullDescription(payload: DescriptionPayload)
 
     fun openBecomingDelegateTutorial()
+
+    fun openRemoveVotes(payload: RemoveVotesPayload)
 }

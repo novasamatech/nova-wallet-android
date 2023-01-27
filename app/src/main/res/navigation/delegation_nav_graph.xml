@@ -5,6 +5,13 @@
     android:id="@+id/delegation_nav_graph"
     app:startDestination="@id/delegateListFragment">
 
+    <action
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit"
+        android:id="@+id/action_open_remove_votes"
+        app:destination="@id/removeVoteFragment" />
 
     <fragment
         android:id="@+id/delegateListFragment"
@@ -54,4 +61,10 @@
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionFragment"
         android:label="ReferendumDescriptionFragment"
         tools:layout="@layout/fragment_description" />
+
+    <fragment
+        tools:layout="@layout/fragment_remove_votes"
+        android:id="@+id/removeVoteFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesFragment"
+        android:label="RemoveVoteFragment" />
 </navigation>

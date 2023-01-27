@@ -9,10 +9,11 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.description.di.DescriptionComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.di.DelegateDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.di.VotedReferendaComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.di.DelegateListComponent
-import io.novafoundation.nova.feature_governance_impl.presentation.common.description.di.DescriptionComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.di.RemoveVotesComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.di.ReferendumDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.di.ReferendumFullDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.di.ReferendaListComponent
@@ -58,6 +59,8 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
     fun delegateDetailsFactory(): DelegateDetailsComponent.Factory
 
     fun votedReferendaFactory(): VotedReferendaComponent.Factory
+
+    fun removeVoteFactory(): RemoveVotesComponent.Factory
 
     @Component.Factory
     interface Factory {
