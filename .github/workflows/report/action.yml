@@ -1,0 +1,37 @@
+name: Publish report to gh-pages
+description: That workflow will publish report to the github-pages
+inputs:
+  secret-token:
+    description: 'Secret token for gh deployment'
+    required: true
+  keep-reports-history:
+    description: 'History storage depth, integer'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+      - name: Get Allure history
+        uses: actions/checkout@v2
+        if: always()
+        continue-on-error: true
+        with:
+          repository: nova-wallet/test-runner
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Allure Report action
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          allure_results: allure-results
+          allure_history: allure-history
+          keep_reports: ${{ inputs.keep-reports-history }}
+
+      - name: Deploy report to Github Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          PERSONAL_TOKEN: ${{ inputs.secret-token }}
+          PUBLISH_BRANCH: gh-pages
+          PUBLISH_DIR: allure-history
