@@ -61,7 +61,7 @@ class RealRemoveTrackVotesInteractor(
     ) {
         val votings = convictionVoting.votingFor(accountId, chainId, trackIds)
 
-        votings.entries.onEach {  (trackId, voting) ->
+        votings.entries.onEach { (trackId, voting) ->
             voting.votedReferenda().onEach { referendumId ->
                 Log.d(this@RealRemoveTrackVotesInteractor.LOG_TAG, "Removing vote from $referendumId in track $trackId")
 

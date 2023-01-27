@@ -71,7 +71,8 @@ class GovV2ConvictionVotingRepository(
     override suspend fun votingFor(accountId: AccountId, chainId: ChainId, trackId: TrackId): Voting? {
         return remoteStorageSource.query(chainId) {
             runtime.metadata.convictionVoting().storage("VotingFor").query(
-                accountId, trackId.value,
+                accountId,
+                trackId.value,
                 binding = { decoded -> decoded?.let(::bindVoting) }
             )
         }

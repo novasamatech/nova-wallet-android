@@ -57,7 +57,7 @@ fun Voting.trackVotesNumber(): Int {
 }
 
 fun Voting.votedReferenda(): Collection<ReferendumId> {
-    return when(this) {
+    return when (this) {
         is Voting.Casting -> votes.keys
         is Voting.Delegating -> emptyList()
     }

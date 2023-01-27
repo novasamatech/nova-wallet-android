@@ -109,7 +109,6 @@ class RemoveVotesViewModel(
                 removeVotes()
             }
         }
-
     }
 
     private fun removeVotes() = launch {

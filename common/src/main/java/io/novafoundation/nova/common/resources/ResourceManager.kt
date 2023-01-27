@@ -40,7 +40,6 @@ fun ResourceManager.formatTimeLeft(elapsedTimeInMillis: Long): String {
     return getString(R.string.common_left, durationFormatted)
 }
 
-
 fun ResourceManager.formatListPreview(
     elements: List<String>,
     @StringRes zeroLabel: Int? = null,
