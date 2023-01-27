@@ -3,6 +3,21 @@ name: Pull request
 on:
   pull_request:
 
+env:
+  ACALA_PROD_AUTH_TOKEN: 'token'
+  ACALA_TEST_AUTH_TOKEN: 'token'
+  MOONBEAM_PROD_AUTH_TOKEN: 'token'
+  MOONBEAM_TEST_AUTH_TOKEN: 'token'
+  MOONPAY_PRODUCTION_SECRET: 'token'
+  MOONPAY_TEST_SECRET: 'token'
+  MERCURYO_PRODUCTION_SECRET: 'token'
+  MERCURYO_TEST_SECRET: 'token'
+  EHTERSCAN_API_KEY_MOONBEAM: 'token'
+  EHTERSCAN_API_KEY_MOONRIVER=: 'token'
+
+  CI_KEYSTORE_PASS: 'token'
+  CI_KEYSTORE_KEY_ALIAS: 'token'
+  CI_KEYSTORE_KEY_PASS: 'token'
 
 jobs:
 
