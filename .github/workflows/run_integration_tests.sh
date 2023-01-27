@@ -28,7 +28,7 @@ t = threading.Thread(target=update)
 t.dameon = True
 t.start()
 test_classes = os.getenv("TEST_CLASSES")
-run_command = f"adb shell am instrument -w -m -e debug false -e class {test_classes} io.novafoundation.nova.debug.test/io.qameta.allure.android.runners.AllureAndroidJUnitRunner"
+run_command = 'adb shell am instrument -w -m -e debug false -e class %s io.novafoundation.nova.debug.test/io.qameta.allure.android.runners.AllureAndroidJUnitRunner' % test_classes
 def run():
   os.system('adb wait-for-device')
   p = sp.Popen(run_command,shell=True, stdout=sp.PIPE, stderr=sp.PIPE, stdin=sp.PIPE)
