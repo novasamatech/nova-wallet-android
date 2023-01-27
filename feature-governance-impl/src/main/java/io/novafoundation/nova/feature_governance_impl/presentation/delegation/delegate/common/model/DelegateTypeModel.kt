@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.common.view.shape.DEFAULT_CORNER_RADIUS
+import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.view.NovaChipView
 
 class DelegateTypeModel(
@@ -40,6 +40,12 @@ fun NovaChipView.setDelegateTypeModel(model: DelegateTypeModel?) {
 }
 
 fun ImageView.setDelegateIcon(icon: DelegateIcon, imageLoader: ImageLoader) {
+    if (icon.shape == DelegateIcon.IconShape.SQUARE) {
+        setBackgroundResource(R.drawable.bg_delegate_organisation)
+    } else {
+        background = null
+    }
+
     setIcon(icon.icon, imageLoader) {
         icon.shape.coilTransformation(context)?.let {
             transformations(it)
@@ -50,7 +56,7 @@ fun ImageView.setDelegateIcon(icon: DelegateIcon, imageLoader: ImageLoader) {
 private fun DelegateIcon.IconShape.coilTransformation(context: Context): Transformation? {
     return when (this) {
         DelegateIcon.IconShape.ROUND -> CircleCropTransformation()
-        DelegateIcon.IconShape.SQUARE -> RoundedCornersTransformation(DEFAULT_CORNER_RADIUS.dpF(context))
+        DelegateIcon.IconShape.SQUARE -> RoundedCornersTransformation(8.dpF(context))
         DelegateIcon.IconShape.NONE -> null
     }
 }
