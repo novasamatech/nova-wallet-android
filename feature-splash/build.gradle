@@ -35,6 +35,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':common')
     implementation project(':feature-account-api')
+    implementation project(':feature-versions-api')
 
     implementation kotlinDep
 

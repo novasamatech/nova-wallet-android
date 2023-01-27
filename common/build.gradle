@@ -114,4 +114,10 @@ dependencies {
     implementation permissionsDep
 
     implementation flexBoxDep
+
+    implementation markdownDep
+    implementation markdownImage
+    implementation markdownTables
+    implementation markdownLinkify
+    implementation markdownStrikethrough
 }

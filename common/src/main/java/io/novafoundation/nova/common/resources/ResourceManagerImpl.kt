@@ -52,8 +52,16 @@ class ResourceManagerImpl(
         return px.toInt()
     }
 
-    override fun formatDate(timestamp: Long): String {
+    override fun formatDateTime(timestamp: Long): String {
         return timestamp.formatDateTime().toString()
+    }
+
+    override fun formatDate(timestamp: Long): String {
+        return DateUtils.formatDateTime(
+            contextManager.getApplicationContext(),
+            timestamp,
+            DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH
+        )
     }
 
     override fun formatTime(timestamp: Long): String {

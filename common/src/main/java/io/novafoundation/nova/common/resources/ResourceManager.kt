@@ -21,6 +21,7 @@ interface ResourceManager {
 
     fun measureInPx(dp: Int): Int
 
+    fun formatDateTime(timestamp: Long): String
     fun formatDate(timestamp: Long): String
     fun formatDuration(elapsedTime: Long): String
 
