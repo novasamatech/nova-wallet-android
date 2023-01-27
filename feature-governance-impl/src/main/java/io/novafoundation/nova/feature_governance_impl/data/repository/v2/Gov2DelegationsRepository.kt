@@ -142,7 +142,7 @@ class Gov2DelegationsRepository(
         return nodes.associateBy(
             keySelector = { ReferendumId(it.referendumId) },
             valueTransform = { directVoteRemote ->
-                val standardVote = directVoteRemote.standardVote ?: return@associateBy null
+                val standardVote = directVoteRemote.standardVote ?: return@associateBy UserVote.Direct(AccountVote.Unsupported)
 
                 UserVote.Direct(
                     AccountVote.Standard(

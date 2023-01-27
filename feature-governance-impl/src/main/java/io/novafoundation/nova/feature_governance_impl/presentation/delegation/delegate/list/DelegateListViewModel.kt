@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.model.DelegateListModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -78,9 +78,8 @@ class DelegateListViewModel(
     fun delegateClicked(position: Int) = launch {
         val delegate = delegateModels.first().dataOrNull?.getOrNull(position) ?: return@launch
 
-        // TODO show delegate details instead
-        val payload = VotedReferendaPayload(delegate.accountId, onlyRecentVotes = true)
-        router.openVotedReferenda(payload)
+        val payload = DelegateDetailsPayload(delegate.accountId)
+        router.openDelegateDetails(payload)
     }
 
     fun backClicked() {

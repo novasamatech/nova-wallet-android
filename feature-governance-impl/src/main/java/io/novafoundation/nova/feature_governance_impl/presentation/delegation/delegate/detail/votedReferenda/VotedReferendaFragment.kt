@@ -59,7 +59,7 @@ class VotedReferendaFragment : BaseReferendaListFragment<VotedReferendaViewModel
     override fun subscribe(viewModel: VotedReferendaViewModel) {
         viewModel.referendaUiFlow.observeReferendaList()
 
-        viewModel.votedReferendaCount.observe {
+        viewModel.votedReferendaCount.observeWhenVisible {
             votedReferendaCount.makeVisible()
             votedReferendaCount.text = it
         }
