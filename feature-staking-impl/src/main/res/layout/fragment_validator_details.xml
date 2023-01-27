@@ -73,48 +73,12 @@
 
         </io.novafoundation.nova.common.view.TableView>
 
-        <io.novafoundation.nova.common.view.TableView
+        <io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityView
             android:id="@+id/validatorIdentity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="12dp"
-            android:layout_marginEnd="16dp"
-            app:title="@string/identity_title">
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/validatorIdentityLegalName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/identity_legal_name_title" />
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/validatorIdentityEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryValueStyle="link"
-                app:title="@string/identity_email_title" />
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/validatorIdentityWeb"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryValueStyle="link"
-                app:title="@string/identity_web_title" />
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/validatorIdentityTwitter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryValueStyle="link"
-                app:title="@string/settings_twitter" />
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/validatorIdentityElementName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/identity_riot_name_title" />
-
-        </io.novafoundation.nova.common.view.TableView>
+            android:layout_marginEnd="16dp" />
     </LinearLayout>
 </ScrollView>

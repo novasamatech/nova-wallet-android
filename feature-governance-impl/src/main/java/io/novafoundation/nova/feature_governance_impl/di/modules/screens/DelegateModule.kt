@@ -51,11 +51,13 @@ class DelegateModule {
     fun provideDelegateDetailsInteractor(
         governanceSourceRegistry: GovernanceSourceRegistry,
         chainStateRepository: ChainStateRepository,
-        identityRepository: OnChainIdentityRepository
+        identityRepository: OnChainIdentityRepository,
+        governanceSharedState: GovernanceSharedState,
     ): DelegateDetailsInteractor = RealDelegateDetailsInteractor(
         governanceSourceRegistry = governanceSourceRegistry,
         chainStateRepository = chainStateRepository,
-        identityRepository = identityRepository
+        identityRepository = identityRepository,
+        governanceSharedState = governanceSharedState
     )
 
     @Provides

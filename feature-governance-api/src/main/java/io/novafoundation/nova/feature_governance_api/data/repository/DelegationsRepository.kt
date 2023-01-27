@@ -35,7 +35,11 @@ interface DelegationsRepository {
 
     suspend fun allHistoricalVotesOf(user: AccountId, chain: Chain): Map<ReferendumId, UserVote>?
 
-    suspend fun directHistoricalVotesOf(user: AccountId, chain: Chain): Map<ReferendumId, UserVote.Direct>?
+    suspend fun directHistoricalVotesOf(
+        user: AccountId,
+        chain: Chain,
+        recentVotesBlockThreshold: BlockNumber?
+    ): Map<ReferendumId, UserVote.Direct>?
 }
 
 suspend fun DelegationsRepository.getDelegatesMetadataOrEmpty(chain: Chain): List<DelegateMetadata> {

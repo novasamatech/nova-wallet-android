@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.presentation
 
 import io.novafoundation.nova.common.navigation.ReturnableRouter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
@@ -14,7 +16,7 @@ interface GovernanceRouter : ReturnableRouter {
 
     fun openDAppBrowser(initialUrl: String)
 
-    fun openReferendumDescription(payload: ReferendumDescriptionPayload)
+    fun openReferendumDescription(payload: DescriptionPayload)
 
     fun openReferendumFullDetails(payload: ReferendumFullDetailsPayload)
 
@@ -35,6 +37,12 @@ interface GovernanceRouter : ReturnableRouter {
     fun openAccountDetails(id: Long)
 
     fun openAddDelegation()
+
+    fun openDelegateDetails(payload: DelegateDetailsPayload)
+
+    fun openVotedReferenda(payload: VotedReferendaPayload)
+
+    fun openDelegateFullDescription(payload: DescriptionPayload)
 
     fun openBecomingDelegateTutorial()
 }

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.di
+package io.novafoundation.nova.feature_governance_impl.presentation.common.description.di
 
 import android.content.Context
 import android.text.util.Linkify
@@ -18,11 +18,11 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_governance_impl.markdown.StylePlugin
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionViewModel
+import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionViewModel
 
 @Module(includes = [ViewModelModule::class])
-class ReferendumDescriptionModule {
+class DescriptionModule {
 
     @Provides
     fun provideMarkwon(context: Context, imageLoader: ImageLoader): Markwon {
@@ -37,13 +37,13 @@ class ReferendumDescriptionModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(ReferendumDescriptionViewModel::class)
+    @ViewModelKey(DescriptionViewModel::class)
     fun provideViewModel(
         router: GovernanceRouter,
-        payload: ReferendumDescriptionPayload,
+        payload: DescriptionPayload,
         markwon: Markwon
     ): ViewModel {
-        return ReferendumDescriptionViewModel(
+        return DescriptionViewModel(
             router = router,
             payload = payload,
             markwon = markwon
@@ -54,7 +54,7 @@ class ReferendumDescriptionModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory,
-    ): ReferendumDescriptionViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(ReferendumDescriptionViewModel::class.java)
+    ): DescriptionViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(DescriptionViewModel::class.java)
     }
 }

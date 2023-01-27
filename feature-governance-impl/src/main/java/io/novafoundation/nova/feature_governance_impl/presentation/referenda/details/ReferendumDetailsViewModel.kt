@@ -39,10 +39,11 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDAppsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumCallModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.description.ReferendumDescriptionPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.DefaultCharacterLimit
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDAppModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDetailsModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
@@ -66,8 +67,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-private const val DESCRIPTION_LENGTH_LIMIT = 180
 
 class ReferendumDetailsViewModel(
     private val router: GovernanceRouter,
@@ -168,7 +167,7 @@ class ReferendumDetailsViewModel(
     fun readMoreClicked() = launch {
         val referendumTitle = referendumDetailsModelFlow.firstOnLoad().title
         val referendumDescription = mapReferendumDescriptionToUi(referendumDetailsFlow.first())
-        val payload = ReferendumDescriptionPayload(referendumTitle, referendumDescription)
+        val payload = DescriptionPayload(description = referendumDescription, title = referendumTitle)
         router.openReferendumDescription(payload)
     }
 
@@ -329,7 +328,7 @@ class ReferendumDetailsViewModel(
     private fun mapShortenedMarkdownDescription(referendumDetails: ReferendumDetails): ShortenedTextModel {
         val referendumDescription = mapReferendumDescriptionToUi(referendumDetails)
         val markdownDescription = markwon.toMarkdown(referendumDescription)
-        return ShortenedTextModel.from(markdownDescription, DESCRIPTION_LENGTH_LIMIT)
+        return ShortenedTextModel.from(markdownDescription, DefaultCharacterLimit.SHORT_PARAGRAPH)
     }
 
     private fun mapReferendumTitleToUi(referendumDetails: ReferendumDetails): String {

@@ -16,7 +16,10 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Re
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ayeVotesIfNotEmpty
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.passing
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.AUCTION_ADMIN
 import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.BIG_SPEND
 import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType.BIG_TIPPER
@@ -40,10 +43,13 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimationStyleRefresher
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVotePreviewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import kotlin.time.Duration.Companion.days
@@ -66,6 +72,12 @@ interface ReferendumFormatter {
     fun formatId(referendumId: ReferendumId): String
 
     fun formatUserVote(vote: AccountVote, token: Token): YourVoteModel?
+
+    fun formatReferendumPreview(
+        referendum: ReferendumPreview,
+        token: Token,
+        chain: Chain
+    ): ReferendumModel
 }
 
 private val oneDay = 1.days
@@ -330,6 +342,67 @@ class RealReferendumFormatter(
             voteTypeColorRes = colorRes,
             votes = votesFormatted,
             votesDetails = votesDetails
+        )
+    }
+
+    override fun formatReferendumPreview(
+        referendum: ReferendumPreview,
+        token: Token,
+        chain: Chain
+    ): ReferendumModel {
+        return ReferendumModel(
+            id = referendum.id,
+            status = formatStatus(referendum.status),
+            name = mapReferendumNameToUi(referendum),
+            timeEstimation = formatTimeEstimation(referendum.status),
+            track = referendum.track?.let { formatTrack(it, token.configuration) },
+            number = formatId(referendum.id),
+            voting = referendum.voting?.let { formatVoting(it, token) },
+            yourVote = mapReferendumVoteToUi(referendum.referendumVote, token, chain)
+        )
+    }
+
+    private fun mapReferendumNameToUi(referendum: ReferendumPreview): String {
+        return referendum.offChainMetadata?.title
+            ?: mapReferendumOnChainNameToUi(referendum)
+            ?: formatUnknownReferendumTitle(referendum.id)
+    }
+
+    private fun mapReferendumOnChainNameToUi(referendum: ReferendumPreview): String? {
+        return when (val proposal = referendum.onChainMetadata?.proposal) {
+            is ReferendumProposal.Call -> formatOnChainName(proposal.call)
+            else -> null
+        }
+    }
+
+    private fun mapReferendumVoteToUi(
+        vote: ReferendumVote?,
+        token: Token,
+        chain: Chain
+    ): YourVotePreviewModel? {
+        val isAye = vote?.vote?.isAye() ?: return null
+        val votes = vote.vote.votes(token.configuration) ?: return null
+
+        val voteTypeRes = if (isAye) R.string.referendum_vote_aye else R.string.referendum_vote_nay
+        val colorRes = if (isAye) R.color.text_positive else R.color.text_negative
+        val amountFormatted = votes.total.format()
+
+        val details = when (vote) {
+            is ReferendumVote.Account -> {
+                val accountFormatted = vote.whoIdentity?.name ?: chain.addressOf(vote.who)
+
+                resourceManager.getString(R.string.referendum_other_votes, amountFormatted, accountFormatted)
+            }
+
+            is ReferendumVote.User -> {
+                resourceManager.getString(R.string.referendum_your_vote_format, amountFormatted)
+            }
+        }
+
+        return YourVotePreviewModel(
+            voteType = resourceManager.getString(voteTypeRes),
+            colorRes = colorRes,
+            details = details
         )
     }
 

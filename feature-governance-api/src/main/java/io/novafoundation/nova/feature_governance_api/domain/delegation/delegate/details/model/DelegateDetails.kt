@@ -23,3 +23,6 @@ data class DelegateDetails(
 
     data class Stats(val delegationsCount: Int, val delegatedVotes: Balance, val recentVotes: Int, val allVotes: Int)
 }
+
+val DelegateDetails.Metadata.description: String?
+    get() = longDescription ?: shortDescription

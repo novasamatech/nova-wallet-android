@@ -10,6 +10,11 @@ interface ReferendaListInteractor {
         voterAccountId: AccountId?,
         selectedGovernanceOption: SupportedGovernanceOption
     ): Flow<ReferendaListState>
+
+    fun votedReferendaListFlow(
+        voter: Voter,
+        onlyRecentVotes: Boolean
+    ): Flow<List<ReferendumPreview>>
 }
 
 class Voter(val accountId: AccountId, val type: Type) {
@@ -22,3 +27,5 @@ class Voter(val accountId: AccountId, val type: Type) {
 }
 
 fun Voter.Companion.user(accountId: AccountId) = Voter(accountId, Voter.Type.USER)
+
+fun Voter.Companion.account(accountId: AccountId) = Voter(accountId, Voter.Type.ACCOUNT)

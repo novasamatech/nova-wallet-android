@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="delegation_all_votes">Voted for all time</string>
+    <string name="delegation_delegate_info">Delegate info</string>
+
+    <string name="referendum_voted_referenda">Voted referenda</string>
+
     <string name="referendum_other_votes">%s votes by %s</string>
 
     <string name="delegation_your_delegations">Your delegations</string>

@@ -22,7 +22,7 @@ data class ReferendumPreview(
     val onChainMetadata: OnChainMetadata?,
     val track: ReferendumTrack?,
     val voting: ReferendumVoting?,
-    val userVote: ReferendumVote?
+    val referendumVote: ReferendumVote?
 ) {
 
     data class OffChainMetadata(val title: String)

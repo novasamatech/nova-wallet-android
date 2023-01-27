@@ -113,6 +113,26 @@ fun <T, R> Flow<T>.withLoadingShared(sourceSupplier: suspend (T) -> Flow<R>): Fl
 }
 
 /**
+ * Modifies flow so that it firstly emits [LoadingState.Loading] state.
+ * Then emits each element from upstream wrapped into [LoadingState.Loaded] state.
+ *
+ * NOTE: This is a modified version of [withLoading] that is intended to be used ONLY with [SharingStarted.WhileSubscribed].
+ * In particular, it does not emit loading state on second and subsequent re-subscriptions
+ */
+fun <T> Flow<T>.withLoadingShared(): Flow<LoadingState<T>> {
+    var state: InnerState = InnerState.INITIAL_START
+
+    return map<T, LoadingState<T>> { LoadingState.Loaded(it) }
+        .onStart {
+            if (state != InnerState.SECONDARY_START) {
+                emit(LoadingState.Loading())
+            }
+            state = InnerState.IN_PROGRESS
+        }
+        .onCompletion { state = InnerState.SECONDARY_START }
+}
+
+/**
  * Similar to [Flow.takeWhile] but emits last element too
  */
 fun <T> Flow<T>.takeWhileInclusive(predicate: suspend (T) -> Boolean) = transformWhile {
