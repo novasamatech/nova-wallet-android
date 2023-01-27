@@ -10,7 +10,7 @@
     tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
-        android:id="@+id/referendumDescriptionToolbar"
+        android:id="@+id/descriptionToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
@@ -34,7 +34,7 @@
             android:paddingBottom="24dp">
 
             <TextView
-                android:id="@+id/referendumDescriptionTitle"
+                android:id="@+id/descriptionTitle"
                 style="@style/TextAppearance.NovaFoundation.Bold.Title1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
                 tools:text="Polkadot and Kusama participation in the 10th Pais Digital Chile Summit." />
 
             <TextView
-                android:id="@+id/referendumFullDescription"
+                android:id="@+id/descriptionFullDescription"
                 style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
