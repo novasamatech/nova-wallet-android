@@ -118,7 +118,7 @@ class ConfirmContributeViewModel(
     val crowdloanInfoFlow = crowdloanFlow.map { crowdloan ->
         LeasePeriodModel(
             leasePeriod = resourceManager.formatDuration(crowdloan.leasePeriodInMillis),
-            leasedUntil = resourceManager.formatDate(crowdloan.leasedUntilInMillis)
+            leasedUntil = resourceManager.formatDateTime(crowdloan.leasedUntilInMillis)
         )
     }
         .inBackground()

@@ -1,9 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="update_notification_item_version">Version %s</string>
+
+    <string name="update_notifications_show_more">See all available updates</string>
+    <string name="update_notifications_latest">Latest</string>
+    <string name="update_notifications_severity_critical">Critical</string>
+    <string name="update_notifications_severity_major">Major</string>
+
+    <string name="update_notifications_critical_update_alert_titile">Critical update</string>
+    <string name="update_notifications_critical_update_alert_subtitile">To avoid any issues, and improve your user experience, we strongly recommend that you install recent updates as soon as possible</string>
+
+    <string name="update_notifications_major_update_alert_titile">Major update</string>
+    <string name="update_notifications_major_update_alert_subtitile">Lots of amazing new features are available for Nova Wallet! Make sure to update your application to access them</string>
+
+    <string name="update_notification_title">Update available</string>
+    <string name="update_notification_install_btn">Install</string>
+
+    <string name="common_cannot_find_app">Sorry, you don\'t have the right app to process this request</string>
+
     <string name="common_enable">Enable</string>
     <string name="settings_safe_mode_confirmation_title">Safe mode</string>
-    <string name="settings_safe_mode_confirmation_message">Screen recording and screenshots will not be available. The minimized app will display splash screen instead of the content</string>
+    <string name="settings_safe_mode_confirmation_message">Screen recording and screenshots will not be available. The minimized app will not display the content</string>
 
     <string name="profile_settings_safe_mode_title">Safe mode</string>
 

@@ -42,13 +42,13 @@ fun Fragment.hideKeyboard() {
 
 fun Fragment.showBrowser(link: String) = requireContext().showBrowser(link)
 
-fun Context.showBrowser(link: String) {
+fun Context.showBrowser(link: String, errorMessageRes: Int = R.string.common_cannot_open_link) {
     val intent = Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(link) }
 
     try {
         startActivity(intent)
     } catch (e: ActivityNotFoundException) {
-        Toast.makeText(this, R.string.common_cannot_open_link, Toast.LENGTH_SHORT)
+        Toast.makeText(this, errorMessageRes, Toast.LENGTH_SHORT)
             .show()
     }
 }

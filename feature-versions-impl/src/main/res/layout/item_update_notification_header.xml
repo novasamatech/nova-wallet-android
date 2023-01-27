@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.novafoundation.nova.common.view.BannerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemUpdateNotificationBanner"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="12dp"
+    tools:bannerBackground="@drawable/ic_banner_gray_gradient">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="76dp"
+        android:layout_marginBottom="36dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/itemUpdateNotificationAlertTitle"
+            style="@style/TextAppearance.NovaFoundation.Bold.Title3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:textColor="@color/text_primary"
+            tools:text="@string/update_notifications_critical_update_alert_titile" />
+
+        <TextView
+            android:id="@+id/itemUpdateNotificationAlertSubtitle"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/text_secondary"
+            tools:text="@string/update_notifications_critical_update_alert_subtitile" />
+
+    </LinearLayout>
+
+</io.novafoundation.nova.common.view.BannerView>

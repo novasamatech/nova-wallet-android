@@ -190,6 +190,7 @@
     <string name="common_call">Вызов</string>
     <string name="common_cancel">Отмена</string>
     <string name="common_cancel_operation_warning">Вы уверены, что хотите отменить операцию?</string>
+    <string name="common_cannot_find_app">К сожалению, у вас нет подходящего приложения для обработки этого запроса</string>
     <string name="common_cannot_open_link">Не удается открыть данную ссылку</string>
     <string name="common_cannot_pay_network_fee_message" formatted="false">У вас недостаточно средств для оплаты комиссии сети в размере %s.\nДоступный баланс для оплаты комиссии после операции: %s</string>
     <string name="common_cannot_pay_network_fee_title">Недостаточно токенов для оплаты комиссии</string>
@@ -627,7 +628,7 @@
     <string name="settings_email">Написать разработчикам</string>
     <string name="settings_general">Основные</string>
     <string name="settings_preferences">Предпочтения</string>
-    <string name="settings_safe_mode_confirmation_message">Запись экрана и скриншоты будут недоступны. Свернутое приложение будет отображать экран-заставку вместо содержимого</string>
+    <string name="settings_safe_mode_confirmation_message">Запись экрана и скриншоты будут недоступны. Свернутое приложение не будет отображать содержимое</string>
     <string name="settings_safe_mode_confirmation_title">Безопасный режим</string>
     <string name="settings_security">Безопасность</string>
     <string name="settings_support">Поддержка и обратная связь</string>
@@ -902,6 +903,17 @@
     <string name="transfer_title">Перевод</string>
     <string name="transfers_empty">Входящие и исходящие\nтранзакции будут отображаться здесь</string>
     <string name="transfers_empty_v2_2_0">Ваши операции появятся здесь</string>
+    <string name="update_notification_install_btn">Установить</string>
+    <string name="update_notification_item_version">Версия %s</string>
+    <string name="update_notification_title">Доступно обновление</string>
+    <string name="update_notifications_critical_update_alert_subtitile">Чтобы избежать каких-либо проблем и улучшить ваш пользовательский опыт, мы настоятельно рекомендуем как можно скорее установить последние обновления</string>
+    <string name="update_notifications_critical_update_alert_titile">Критичное обновление</string>
+    <string name="update_notifications_latest">Последняя</string>
+    <string name="update_notifications_major_update_alert_subtitile">Новый потрясающий функционал уже доступен для Nova Wallet! Обязательно обновите приложение и наслаждайтесь им</string>
+    <string name="update_notifications_major_update_alert_titile">Крупное обновление</string>
+    <string name="update_notifications_severity_critical">Критичная</string>
+    <string name="update_notifications_severity_major">Важная</string>
+    <string name="update_notifications_show_more">Посмотреть все доступные обновления</string>
     <string name="username_setup_choose_title">Имя</string>
     <string name="username_setup_choose_title_v2_2_0">Имя кошелька</string>
     <string name="username_setup_hint">Данное имя будет отображаться только для вас и храниться только на вашем мобильном устройстве.</string>

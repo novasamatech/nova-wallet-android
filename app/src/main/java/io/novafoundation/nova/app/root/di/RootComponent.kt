@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
+import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
@@ -51,7 +52,8 @@ interface RootComponent {
             CurrencyFeatureApi::class,
             DbApi::class,
             CommonApi::class,
-            RuntimeApi::class
+            RuntimeApi::class,
+            VersionsFeatureApi::class
         ]
     )
     interface RootFeatureDependenciesComponent : RootDependencies

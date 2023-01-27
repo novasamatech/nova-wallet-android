@@ -1,9 +1,9 @@
-package io.novafoundation.nova.feature_governance_impl.markdown
+package io.novafoundation.nova.common.utils.markdown
 
 import android.content.Context
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.core.MarkwonTheme
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.common.R
 
 class StylePlugin(private val context: Context) : AbstractMarkwonPlugin() {
 
