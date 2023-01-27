@@ -10,12 +10,14 @@ import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.image.coil.CoilImagesPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
+import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.utils.markdown.StylePlugin
 
 @Module
 class MarkdownFullModule {
 
     @Provides
+    @ScreenScope
     fun provideMarkwon(context: Context, imageLoader: ImageLoader): Markwon {
         return Markwon.builder(context)
             .usePlugin(LinkifyPlugin.create(Linkify.EMAIL_ADDRESSES or Linkify.WEB_URLS))
