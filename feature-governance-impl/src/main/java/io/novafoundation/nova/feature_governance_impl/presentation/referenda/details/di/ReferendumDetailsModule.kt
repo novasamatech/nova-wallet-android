@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.di.modules.shared.MarkdownShortModule
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -29,7 +30,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.det
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 
-@Module(includes = [ViewModelModule::class])
+@Module(includes = [ViewModelModule::class, MarkdownShortModule::class])
 class ReferendumDetailsModule {
 
     @Provides

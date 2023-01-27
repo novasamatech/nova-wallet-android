@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.di.WelcomeComponent
+import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 
 @Component(
     dependencies = [
@@ -34,7 +35,8 @@ interface OnboardingFeatureComponent : OnboardingFeatureApi {
     @Component(
         dependencies = [
             CommonApi::class,
-            AccountFeatureApi::class
+            AccountFeatureApi::class,
+            VersionsFeatureApi::class
         ]
     )
     interface OnboardingFeatureDependenciesComponent : OnboardingFeatureDependencies

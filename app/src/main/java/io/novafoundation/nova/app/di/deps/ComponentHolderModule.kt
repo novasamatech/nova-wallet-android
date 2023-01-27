@@ -32,6 +32,8 @@ import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureHolder
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureHolder
+import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
+import io.novafoundation.nova.feature_versions_impl.di.VersionsFeatureHolder
 import io.novafoundation.nova.feature_vote.di.VoteFeatureApi
 import io.novafoundation.nova.feature_vote.di.VoteFeatureHolder
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -143,4 +145,10 @@ interface ComponentHolderModule {
     @ClassKey(NftFeatureApi::class)
     @IntoMap
     fun provideNftFeature(holder: NftFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(VersionsFeatureApi::class)
+    @IntoMap
+    fun provideVersionsFeature(holder: VersionsFeatureHolder): FeatureApiHolder
 }

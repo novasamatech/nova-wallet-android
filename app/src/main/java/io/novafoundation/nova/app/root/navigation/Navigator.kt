@@ -462,6 +462,10 @@ class Navigator(
         }
     }
 
+    override fun openUpdateNotifications() {
+        navController?.navigate(R.id.action_open_update_notifications)
+    }
+
     override fun returnToWallet() {
         // to achieve smooth animation
         postToUiThread {

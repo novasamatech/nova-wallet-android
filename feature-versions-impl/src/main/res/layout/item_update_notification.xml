@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp">
+
+    <TextView
+        android:id="@+id/itemNotificationVersion"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:includeFontPadding="false"
+        android:textColor="#fff"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Version 5.0.3" />
+
+    <TextView
+        android:id="@+id/itemNotificationSeverity"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:minHeight="16dp"
+        android:paddingHorizontal="6dp"
+        android:paddingVertical="1dp"
+        android:textColor="@color/chip_text"
+        app:layout_constraintBottom_toBottomOf="@id/itemNotificationVersion"
+        app:layout_constraintStart_toEndOf="@+id/itemNotificationVersion"
+        app:layout_constraintTop_toTopOf="@id/itemNotificationVersion"
+        tools:text="@string/update_notifications_severity_critical" />
+
+    <TextView
+        android:id="@+id/itemNotificationLatest"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:minHeight="16dp"
+        android:paddingHorizontal="6dp"
+        android:paddingVertical="1dp"
+        android:text="@string/update_notifications_latest"
+        android:textColor="@color/chip_text"
+        app:layout_constraintBottom_toBottomOf="@id/itemNotificationVersion"
+        app:layout_constraintStart_toEndOf="@+id/itemNotificationSeverity"
+        app:layout_constraintTop_toTopOf="@id/itemNotificationVersion" />
+
+    <TextView
+        android:id="@+id/itemNotificationDate"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/itemNotificationVersion"
+        tools:text="Dec 27, 2022" />
+
+    <TextView
+        android:id="@+id/itemNotificationDescription"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/itemNotificationDate"
+        tools:text="Tokens used in governance can now be used in staking Updated ERC-20 Transaction History screen to display actual transaction fee for transfers Fixed the fee calculation for tokens when a chain's main token is disabled" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

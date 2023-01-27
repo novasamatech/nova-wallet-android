@@ -276,7 +276,7 @@ class ReferendumDetailsViewModel(
     }
 
     private fun mapHistoricalTimelineEntryToUi(entry: ReferendumTimeline.Entry): TimelineLayout.TimelineState {
-        val formattedData = entry.at?.let(resourceManager::formatDate)
+        val formattedData = entry.at?.let(resourceManager::formatDateTime)
         val stateLabelRes = when (entry.state) {
             ReferendumTimeline.State.CREATED -> R.string.referendum_timeline_state_created
             ReferendumTimeline.State.APPROVED -> R.string.referendum_timeline_state_approved

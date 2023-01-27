@@ -19,9 +19,11 @@
     <color name="hint_text">#52FFFFFF</color>
     <color name="button_text_accent">#1F78FF</color>
     <color name="text_warning">#EBC50A</color>
+    <color name="critical_update_chip_text">#EBC50A</color>
     <color name="text_negative">#E53450</color>
     <color name="text_positive">#2FC864</color>
     <color name="progress_bar_text">#2AB0F2</color>
+    <color name="major_update_chip_text">#2AB0F2</color>
     <color name="conviction_slider_text_01x">#2AB0F2</color>
     <color name="conviction_slider_text_1x">#41D4D2</color>
     <color name="conviction_slider_text_2x">#58F8B2</color>
@@ -59,6 +61,8 @@
     <color name="voting_slider_background">#29999EC7</color>
     <color name="error_block_background">#29E53450</color>
     <color name="warning_block_background">#29EDCE36</color>
+    <color name="critical_update_chip_background">#1FEDCE36</color>
+    <color name="major_update_chip_background">#1F2AB0F2</color>
     <color name="blur_navigation_background">#66151D27</color>
     <color name="solid_navigation_background">#0F111A</color>
     <color name="dim_background">#7A08090E</color>
