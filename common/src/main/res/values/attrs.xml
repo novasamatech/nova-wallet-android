@@ -149,8 +149,10 @@
         <attr name="title" />
         <attr name="subtitle" />
         <attr name="image" />
+        <attr name="advertisementCardBackground" format="color|reference" />
         <attr name="learnMore" format="string" />
         <attr name="action" format="string" />
+        <attr name="showClose" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="AlertView">

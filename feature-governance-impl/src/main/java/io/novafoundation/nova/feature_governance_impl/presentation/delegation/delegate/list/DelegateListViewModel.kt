@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.dataOrNull
+import io.novafoundation.nova.common.presentation.map
 import io.novafoundation.nova.common.presentation.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.withLoadingResult
@@ -22,6 +23,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.model.DelegateListModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class DelegateListViewModel(
@@ -47,20 +49,23 @@ class DelegateListViewModel(
         selectorTitleRes = R.string.wallet_filters_header
     )
 
-    private val delegateQueryInputs = combine(
+    val shouldShowBannerFlow = interactor.shouldShowDelegationBanner()
+        .shareInBackground()
+
+    private val delegatesFlow = governanceSharedState.selectedOption
+        .withLoadingResult { interactor.getDelegates(it) }
+        .shareInBackground()
+
+    private val sortedAndFilteredDelegates = combine(
         sortingMixin.selectedValue,
         filteringMixin.selectedValue,
-        governanceSharedState.selectedOption,
-        ::Triple
-    )
+        delegatesFlow
+    ) { sorting, filtering, delegates ->
+        delegates.map { interactor.applySortingAndFiltering(sorting, filtering, it) }
+    }.share()
 
-    private val delegates = delegateQueryInputs.withLoadingResult { (sorting, filtering, selectedGovernance) ->
-        interactor.getDelegates(sorting, filtering, selectedGovernance)
-    }.shareInBackground()
-
-    val delegateModels = delegates.mapLoading { delegates ->
+    val delegateModels = sortedAndFilteredDelegates.mapLoading { delegates ->
         val governanceOption = governanceSharedState.selectedOption.first()
-
         delegates.map { mapDelegatePreviewToUi(it, governanceOption) }
     }.shareInBackground()
 
@@ -102,5 +107,13 @@ class DelegateListViewModel(
         }
 
         return resourceManager.getString(resourceId)
+    }
+
+    fun openBecomingDelegateTutorial() {
+        router.openBecomingDelegateTutorial()
+    }
+
+    fun closeBanner() {
+        interactor.hideDelegationBanner()
     }
 }

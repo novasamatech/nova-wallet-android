@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateSorting
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.delegateComparator
+import io.novafoundation.nova.feature_governance_impl.data.DelegationBannerRepository
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.hasMetadata
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.mapAccountTypeToDomain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -22,28 +24,46 @@ import io.novafoundation.nova.runtime.util.blockInPast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 class RealDelegateListInteractor(
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val chainStateRepository: ChainStateRepository,
     private val identityRepository: OnChainIdentityRepository,
+    private val delegationBannerService: DelegationBannerRepository
 ) : DelegateListInteractor {
 
+    override fun shouldShowDelegationBanner(): Flow<Boolean> {
+        return delegationBannerService.shouldShowBannerFlow()
+    }
+
+    override fun hideDelegationBanner() {
+        delegationBannerService.hideBanner()
+    }
+
     override suspend fun getDelegates(
-        sorting: DelegateSorting,
-        filtering: DelegateFiltering,
         governanceOption: SupportedGovernanceOption,
     ): Result<List<DelegatePreview>> = withContext(Dispatchers.Default) {
         runCatching {
-            getDelegatesInternal(sorting, filtering, governanceOption)
+            getDelegatesInternal(governanceOption)
         }
+    }
+
+    override suspend fun applySortingAndFiltering(
+        sorting: DelegateSorting,
+        filtering: DelegateFiltering,
+        delegates: List<DelegatePreview>
+    ): List<DelegatePreview> {
+        val comparator = compareByDescending<DelegatePreview> { it.hasMetadata() }
+            .thenComparing(sorting.delegateComparator())
+
+        return delegates.applyFilter(filtering)
+            .sortedWith(comparator)
     }
 
     @Suppress("SuspendFunctionOnCoroutineScope")
     private suspend fun CoroutineScope.getDelegatesInternal(
-        sorting: DelegateSorting,
-        filtering: DelegateFiltering,
         governanceOption: SupportedGovernanceOption,
     ): List<DelegatePreview> {
         val chain = governanceOption.assetWithChain.chain
@@ -73,8 +93,7 @@ class RealDelegateListInteractor(
             )
         }
 
-        return delegates.applyFilter(filtering)
-            .sortedWith(sorting.delegateComparator())
+        return delegates
     }
 
     private fun mapStatsToDomain(stats: DelegateStats): DelegatePreview.Stats {
