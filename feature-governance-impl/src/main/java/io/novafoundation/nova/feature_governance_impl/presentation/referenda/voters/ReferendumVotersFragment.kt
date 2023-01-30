@@ -16,15 +16,16 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.model.VoterModel
-import javax.inject.Inject
+import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoterModel
+import io.novafoundation.nova.feature_governance_impl.presentation.voters.list.VotersAdapter
 import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersCount
 import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersList
 import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersPlaceholder
 import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersProgress
 import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersToolbar
+import javax.inject.Inject
 
-class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), ReferendumVotersAdapter.Handler {
+class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), VotersAdapter.Handler {
 
     companion object {
         private const val KEY_PAYLOAD = "payload"
@@ -39,7 +40,7 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), Refe
     @Inject
     protected lateinit var imageLoader: ImageLoader
 
-    private val votersAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendumVotersAdapter(this) }
+    private val votersAdapter by lazy(LazyThreadSafetyMode.NONE) { VotersAdapter(this) }
 
     override fun onCreateView(
         inflater: LayoutInflater,

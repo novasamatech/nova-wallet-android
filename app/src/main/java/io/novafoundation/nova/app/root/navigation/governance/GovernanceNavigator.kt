@@ -11,6 +11,8 @@ import io.novafoundation.nova.feature_governance_impl.BuildConfig
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsFragment
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaFragment
@@ -80,6 +82,11 @@ class GovernanceNavigator(
     override fun openRemoveVotes(payload: RemoveVotesPayload) = performNavigation(
         actionId = R.id.action_open_remove_votes,
         args = RemoveVotesFragment.getBundle(payload)
+    )
+
+    override fun openDelegateDelegators(payload: DelegateDelegatorsPayload) = performNavigation(
+        actionId = R.id.action_delegateDetailsFragment_to_delegateDelegatorsFragment,
+        args = DelegateDelegatorsFragment.getBundle(payload)
     )
 
     override fun openDelegateDetails(payload: DelegateDetailsPayload) = performNavigation(

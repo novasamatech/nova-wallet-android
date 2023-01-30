@@ -12,7 +12,7 @@ class DelegateDetailsModel(
 ) {
 
     class Stats(
-        val delegations: String,
+        val delegations: VotesModel,
         val delegatedVotes: String,
         val recentVotes: VotesModel,
         val allVotes: VotesModel,

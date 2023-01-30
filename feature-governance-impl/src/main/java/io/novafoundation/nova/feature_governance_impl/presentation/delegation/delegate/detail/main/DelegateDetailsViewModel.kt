@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsModel.Metadata
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsModel.Stats
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsModel.VotesModel
@@ -107,16 +108,20 @@ class DelegateDetailsViewModel(
         if (stats == null) return null
 
         return Stats(
-            delegations = stats.delegationsCount.format(),
+            delegations = VotesModel(
+                votes = stats.delegationsCount.format(),
+                extraInfoAvalable = stats.delegationsCount > 0,
+                customLabel = null
+            ),
             delegatedVotes = chainAsset.amountFromPlanks(stats.delegatedVotes).format(),
             recentVotes = VotesModel(
-                customLabel = delegateMappers.formattedRecentVotesPeriod(),
                 votes = stats.recentVotes.format(),
                 extraInfoAvalable = stats.recentVotes > 0,
+                customLabel = delegateMappers.formattedRecentVotesPeriod(),
             ),
             allVotes = VotesModel(
-                extraInfoAvalable = stats.allVotes > 0,
                 votes = stats.allVotes.format(),
+                extraInfoAvalable = stats.allVotes > 0,
                 customLabel = null
             )
         )
@@ -136,7 +141,7 @@ class DelegateDetailsViewModel(
     }
 
     fun delegationsClicked() {
-        showMessage("TODO - open delegations")
+        router.openDelegateDelegators(DelegateDelegatorsPayload(payload.accountId))
     }
 
     fun recentVotesClicked() {

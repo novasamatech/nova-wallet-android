@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
@@ -52,6 +53,17 @@ inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = 
 fun <T> Flow<T>.withLoading(): Flow<LoadingState<T>> {
     return map<T, LoadingState<T>> { LoadingState.Loaded(it) }
         .onStart { emit(LoadingState.Loading()) }
+}
+
+/**
+ * Modifies flow so that it firstly emits [ExtendedLoadingState.Loading] state.
+ * Then emits each element from upstream wrapped into [ExtendedLoadingState.Loaded] state.
+ * If exception occurs, emits [ExtendedLoadingState.Error] state.
+ */
+fun <T> Flow<T>.withSafeLoading(): Flow<ExtendedLoadingState<T>> {
+    return map<T, ExtendedLoadingState<T>> { ExtendedLoadingState.Loaded(it) }
+        .onStart { emit(ExtendedLoadingState.Loading) }
+        .catch { emit(ExtendedLoadingState.Error(it)) }
 }
 
 suspend fun <T> Flow<LoadingState<T>>.firstOnLoad(): T = transform {

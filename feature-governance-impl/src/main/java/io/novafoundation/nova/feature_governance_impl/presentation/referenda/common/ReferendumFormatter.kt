@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.formatting.remainingTime
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amountMultiplier
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
@@ -231,9 +232,9 @@ class RealReferendumFormatter(
         val colorRes = if (isAye) R.color.text_positive else R.color.text_negative
 
         val votesAmountFormatted = mapAmountToAmountModel(votes.amount, token).token
-        val multiplierFormatted = votes.multiplier.format()
+        val multiplierFormatted = votes.conviction.amountMultiplier().format()
 
-        val votesFormatted = resourceManager.getString(R.string.referendum_votes_format, votes.total.format())
+        val votesFormatted = resourceManager.getString(R.string.referendum_votes_format, votes.totalVotes.format())
         val votesDetails = "$votesAmountFormatted × ${multiplierFormatted}x"
 
         return YourVoteModel(
@@ -284,7 +285,7 @@ class RealReferendumFormatter(
 
         val voteTypeRes = if (isAye) R.string.referendum_vote_aye else R.string.referendum_vote_nay
         val colorRes = if (isAye) R.color.text_positive else R.color.text_negative
-        val amountFormatted = votes.total.format()
+        val amountFormatted = votes.totalVotes.format()
 
         val details = when (vote) {
             is ReferendumVote.Account -> {

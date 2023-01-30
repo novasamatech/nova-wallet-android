@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.voteType
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ReferendumVoter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ReferendumVotersInteractor
@@ -45,10 +44,11 @@ class RealReferendumVotersInteractor(
 
         return voters.map { voter ->
             ReferendumVoter(
-                vote = voter.vote,
+                accountVote = voter.vote,
                 accountId = voter.accountId,
-                identity = identities[voter.accountId]
+                identity = identities[voter.accountId],
+                chainAsset = chainAsset,
             )
-        }.sortedByDescending { it.vote.votes(chainAsset)?.total.orZero() }
+        }.sortedByDescending { it.vote?.totalVotes.orZero() }
     }
 }
