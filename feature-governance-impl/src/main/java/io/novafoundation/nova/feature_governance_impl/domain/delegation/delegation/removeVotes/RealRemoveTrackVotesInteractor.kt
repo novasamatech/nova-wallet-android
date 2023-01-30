@@ -1,8 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.removeVotes
 
-import android.util.Log
-import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdOfSelectedMetaAccountIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
@@ -14,11 +13,14 @@ import io.novafoundation.nova.feature_governance_api.domain.track.Track
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.selectedOption
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class RealRemoveTrackVotesInteractor(
     private val extrinsicService: ExtrinsicService,
@@ -36,19 +38,19 @@ class RealRemoveTrackVotesInteractor(
             .map(::mapTrackInfoToTrack)
     }
 
-    override suspend fun calculateFee(trackIds: Collection<TrackId>): Balance {
+    override suspend fun calculateFee(trackIds: Collection<TrackId>): Balance = withContext(Dispatchers.IO) {
         val (chain, governance) = useSelectedGovernance()
         val accountId = accountRepository.requireIdOfSelectedMetaAccountIn(chain)
 
-        return extrinsicService.estimateFee(chain) {
+        extrinsicService.estimateFee(chain) {
             governance.removeVotes(trackIds, extrinsicBuilder = this, chain.id, accountId)
         }
     }
 
-    override suspend fun removeTrackVotes(trackIds: Collection<TrackId>): Result<String> {
+    override suspend fun removeTrackVotes(trackIds: Collection<TrackId>): Result<ExtrinsicStatus.InBlock> = withContext(Dispatchers.IO) {
         val (chain, governance) = useSelectedGovernance()
 
-        return extrinsicService.submitExtrinsicWithSelectedWallet(chain) { origin ->
+        extrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(chain) { origin ->
             governance.removeVotes(trackIds, extrinsicBuilder = this, chain.id, origin)
         }
     }
@@ -63,8 +65,6 @@ class RealRemoveTrackVotesInteractor(
 
         votings.entries.onEach { (trackId, voting) ->
             voting.votedReferenda().onEach { referendumId ->
-                Log.d(this@RealRemoveTrackVotesInteractor.LOG_TAG, "Removing vote from $referendumId in track $trackId")
-
                 with(convictionVoting) {
                     extrinsicBuilder.removeVote(trackId, referendumId)
                 }
