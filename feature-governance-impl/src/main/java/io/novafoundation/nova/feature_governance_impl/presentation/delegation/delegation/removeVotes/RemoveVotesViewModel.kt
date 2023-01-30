@@ -1,8 +1,12 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
@@ -17,6 +21,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegati
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.validations.handleRemoveVotesValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
@@ -57,7 +62,7 @@ class RemoveVotesViewModel(
     private val tracksFlow = flowOf { interactor.trackInfosOf(payload.trackIds) }
         .shareInBackground()
 
-    private val trackModels = tracksFlow
+    private val trackModelsFlow = tracksFlow
         .map { tracks ->
             val chainAsset = governanceSharedState.chainAsset()
             tracks.map { trackFormatter.formatTrack(it, chainAsset) }
@@ -76,6 +81,9 @@ class RemoveVotesViewModel(
 
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: Flow<Boolean> = _showNextProgress
+
+    private val _showTracksEvent = MutableLiveData<Event<List<TrackModel>>>()
+    val showTracksEvent: LiveData<Event<List<TrackModel>>> = _showTracksEvent
 
     init {
         loadFee()
@@ -133,8 +141,9 @@ class RemoveVotesViewModel(
         }
     }
 
-    fun tracksClicked() {
-        showMessage("TODO show tracks")
+    fun tracksClicked() = launch {
+        val trackModels = trackModelsFlow.first()
+        _showTracksEvent.value = trackModels.event()
     }
 
     private fun requireFee(block: (BigDecimal) -> Unit) = originFeeMixin.requireFee(

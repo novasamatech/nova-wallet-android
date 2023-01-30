@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
+import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -15,8 +16,12 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetChange
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetClick
 import kotlinx.android.synthetic.main.fragment_referenda_list.referendaList
+import javax.inject.Inject
 
 class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel>(), ReferendaListHeaderAdapter.Handler {
+
+    @Inject
+    protected lateinit var imageLoader: ImageLoader
 
     private val referendaHeaderAdapter by lazy(LazyThreadSafetyMode.NONE) { ReferendaListHeaderAdapter(imageLoader, this) }
 

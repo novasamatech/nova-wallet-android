@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -46,7 +45,6 @@ import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDeta
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsYourVote
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumFullDetails
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumTimelineContainer
-import javax.inject.Inject
 
 class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), WithContextExtensions {
 
@@ -59,9 +57,6 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
             }
         }
     }
-
-    @Inject
-    protected lateinit var imageLoader: ImageLoader
 
     override val providedContext: Context
         get() = requireContext()
@@ -156,7 +151,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
     }
 
     private fun setReferendumState(model: ReferendumDetailsModel) {
-        referendumDetailsTrack.setReferendumTrackModel(model.track, imageLoader)
+        referendumDetailsTrack.setReferendumTrackModel(model.track)
         referendumDetailsNumber.setText(model.number)
 
         referendumDetailsTitle.text = model.title
