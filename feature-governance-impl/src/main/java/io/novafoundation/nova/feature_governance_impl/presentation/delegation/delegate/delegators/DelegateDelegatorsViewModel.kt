@@ -66,7 +66,7 @@ class DelegateDelegatorsViewModel(
     }
 
     private suspend fun formatDelegatorVote(chainAsset: Chain.Asset, vote: Delegator.Vote): String {
-        return when(vote) {
+        return when (vote) {
             is Delegator.Vote.MultiTrack -> {
                 resourceManager.getString(R.string.delegation_multi_track_format, vote.trackCount)
             }

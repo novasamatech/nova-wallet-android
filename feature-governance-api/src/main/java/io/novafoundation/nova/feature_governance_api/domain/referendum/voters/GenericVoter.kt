@@ -23,4 +23,3 @@ interface GenericVoter<V : GenericVoter.Vote?> {
         override val totalVotes = amount * conviction.amountMultiplier()
     }
 }
-

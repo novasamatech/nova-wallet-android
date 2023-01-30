@@ -16,11 +16,11 @@ class Delegator(
     override val vote: Vote
 ) : GenericVoter<Delegator.Vote> {
 
-    sealed class Vote(override val totalVotes: BigDecimal): GenericVoter.Vote {
+    sealed class Vote(override val totalVotes: BigDecimal) : GenericVoter.Vote {
 
-        class SingleTrack(val delegation: ConvictionVote): Vote(delegation.totalVotes)
+        class SingleTrack(val delegation: ConvictionVote) : Vote(delegation.totalVotes)
 
-        class MultiTrack(val trackCount: Int, totalVotes: BigDecimal): Vote(totalVotes)
+        class MultiTrack(val trackCount: Int, totalVotes: BigDecimal) : Vote(totalVotes)
     }
 }
 
