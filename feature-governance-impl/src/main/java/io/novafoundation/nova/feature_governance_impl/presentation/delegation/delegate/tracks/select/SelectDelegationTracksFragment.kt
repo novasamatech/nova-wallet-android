@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.NestedAdapter
@@ -20,16 +19,17 @@ import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureCompon
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.adapter.SelectDelegationTracksAdapter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.adapter.SelectDelegationTracksHeaderAdapter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.adapter.SelectDelegationTracksPresetsAdapter
-import javax.inject.Inject
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.android.synthetic.main.fragment_select_delegation_tracks.selectDelegationTracksApply
 import kotlinx.android.synthetic.main.fragment_select_delegation_tracks.selectDelegationTracksList
 import kotlinx.android.synthetic.main.fragment_select_delegation_tracks.selectDelegationTracksProgress
 import kotlinx.android.synthetic.main.fragment_select_delegation_tracks.selectDelegationTracksToolbar
 
-
-class SelectDelegationTracksFragment : BaseFragment<SelectDelegationTracksViewModel>(), SelectDelegationTracksAdapter.Handler,
-    SelectDelegationTracksHeaderAdapter.Handler, SelectDelegationTracksPresetsAdapter.Handler {
+class SelectDelegationTracksFragment :
+    BaseFragment<SelectDelegationTracksViewModel>(),
+    SelectDelegationTracksAdapter.Handler,
+    SelectDelegationTracksHeaderAdapter.Handler,
+    SelectDelegationTracksPresetsAdapter.Handler {
 
     companion object {
         private const val EXTRA_PAYLOAD = "EXTRA_PAYLOAD"
@@ -41,14 +41,11 @@ class SelectDelegationTracksFragment : BaseFragment<SelectDelegationTracksViewMo
         }
     }
 
-    @Inject
-    lateinit var imageLoader: ImageLoader
-
     private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) { SelectDelegationTracksHeaderAdapter(this) }
     private val presetsAdapter by lazy(LazyThreadSafetyMode.NONE) {
         NestedAdapter(SelectDelegationTracksPresetsAdapter(this), RecyclerView.HORIZONTAL, Rect(12.dp, 8.dp, 12.dp, 12.dp))
     }
-    private val tracksAdapter by lazy(LazyThreadSafetyMode.NONE) { SelectDelegationTracksAdapter(this, imageLoader) }
+    private val tracksAdapter by lazy(LazyThreadSafetyMode.NONE) { SelectDelegationTracksAdapter(this) }
     private val concatAdapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(headerAdapter, presetsAdapter, tracksAdapter) }
 
     override fun onCreateView(
@@ -71,7 +68,8 @@ class SelectDelegationTracksFragment : BaseFragment<SelectDelegationTracksViewMo
 
     override fun inject() {
         FeatureUtils.getFeature<GovernanceFeatureComponent>(
-            requireContext(), GovernanceFeatureApi::class.java
+            requireContext(),
+            GovernanceFeatureApi::class.java
         ).selectDelegationTracks()
             .create(this, argument(EXTRA_PAYLOAD))
             .inject(this)

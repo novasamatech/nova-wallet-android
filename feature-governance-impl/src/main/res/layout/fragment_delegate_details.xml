@@ -22,10 +22,10 @@
         tools:visibility="visible">
 
         <ScrollView
-            android:paddingBottom="68dp"
-            android:clipToPadding="false"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="68dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -145,10 +145,10 @@
                 <io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityView
                     android:id="@+id/delegateDetailsIdentity"
                     android:layout_width="match_parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:layout_marginBottom="16dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/delegateDetailsStats" />
 
                 <androidx.constraintlayout.widget.Group
@@ -164,7 +164,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:id="@+id/delegateDetailsAddDelegation"
             android:layout_marginHorizontal="16dp"
             android:layout_marginBottom="16dp"
             android:text="@string/delegation_add_delegation" />

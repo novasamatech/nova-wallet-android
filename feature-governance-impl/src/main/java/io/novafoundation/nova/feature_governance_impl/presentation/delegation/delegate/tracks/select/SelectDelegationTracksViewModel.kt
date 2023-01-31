@@ -3,26 +3,24 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.toggle
-import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.common.utils.withLoadingResult
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.NewDelegationChooseTrackInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.model.TrackPreset
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.model.hasUnavailableTracks
+import io.novafoundation.nova.feature_governance_api.domain.track.Track
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_impl.presentation.common.formatters.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model.DelegationTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model.DelegationTracksPresetModel
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-
 
 class SelectDelegationTracksViewModel(
     private val newDelegationChooseTrackInteractor: NewDelegationChooseTrackInteractor,
@@ -80,11 +78,9 @@ class SelectDelegationTracksViewModel(
     }
 
     fun unavailableTracksClicked() {
-
     }
 
     fun openSetupConviction() {
-
     }
 
     fun presetClicked(position: Int) {
@@ -112,10 +108,10 @@ class SelectDelegationTracksViewModel(
         }
     }
 
-    private suspend fun mapTracksToModel(tracks: List<TrackInfo>, selectedTracks: List<TrackId>): List<DelegationTrackModel> {
+    private suspend fun mapTracksToModel(tracks: List<Track>, selectedTracks: List<TrackId>): List<DelegationTrackModel> {
         val asset = governanceSharedState.chainAsset()
         return tracks.map {
-            val trackModel = trackFormatter.formatTrack(it.id, it.name, asset)
+            val trackModel = trackFormatter.formatTrack(it, asset)
             DelegationTrackModel(
                 trackModel,
                 isSelected = it.id in selectedTracks

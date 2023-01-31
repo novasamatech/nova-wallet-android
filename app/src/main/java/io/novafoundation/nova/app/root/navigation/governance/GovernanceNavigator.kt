@@ -5,7 +5,6 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
-import io.novafoundation.nova.common.address.format.AddressFormat
 import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 import io.novafoundation.nova.feature_governance_impl.BuildConfig

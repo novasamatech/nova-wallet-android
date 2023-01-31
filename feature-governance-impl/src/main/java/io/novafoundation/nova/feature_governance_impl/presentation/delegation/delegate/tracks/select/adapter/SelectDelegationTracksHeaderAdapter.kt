@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import io.novafoundation.nova.common.utils.inflateChild

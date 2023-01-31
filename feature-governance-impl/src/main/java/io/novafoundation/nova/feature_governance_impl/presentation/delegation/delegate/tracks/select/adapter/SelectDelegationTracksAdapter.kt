@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import coil.ImageLoader
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
@@ -15,8 +14,7 @@ import kotlinx.android.synthetic.main.item_delegation_track.view.itemDelegationT
 import kotlinx.android.synthetic.main.item_delegation_track.view.itemDelegationTrackCheckbox
 
 class SelectDelegationTracksAdapter(
-    private val handler: Handler,
-    private val imageLoader: ImageLoader
+    private val handler: Handler
 ) : ListAdapter<DelegationTrackModel, DelegationTrackViewHolder>(DiffCallback) {
 
     interface Handler {
@@ -26,7 +24,7 @@ class SelectDelegationTracksAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DelegationTrackViewHolder {
         val containerView = parent.inflateChild(R.layout.item_delegation_track)
 
-        return DelegationTrackViewHolder(containerView, handler, imageLoader)
+        return DelegationTrackViewHolder(containerView, handler)
     }
 
     override fun onBindViewHolder(holder: DelegationTrackViewHolder, position: Int) {
@@ -60,8 +58,7 @@ private object DiffCallback : DiffUtil.ItemCallback<DelegationTrackModel>() {
 
 class DelegationTrackViewHolder(
     containerView: View,
-    handler: SelectDelegationTracksAdapter.Handler,
-    private val imageLoader: ImageLoader
+    handler: SelectDelegationTracksAdapter.Handler
 ) : ViewHolder(containerView) {
 
     init {
@@ -72,7 +69,7 @@ class DelegationTrackViewHolder(
         with(itemView) {
             bindSelected(item)
             itemDelegationTrack.setText(item.details.name)
-            itemDelegationTrack.setIcon(item.details.icon, imageLoader)
+            itemDelegationTrack.setIcon(item.details.icon)
         }
     }
 

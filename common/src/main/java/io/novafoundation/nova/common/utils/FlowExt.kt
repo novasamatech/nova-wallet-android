@@ -186,7 +186,7 @@ fun <T> Flow<T>.withLoadingResult(): Flow<ExtendedLoadingState<T>> {
     return asResultFlow()
         .transform { item ->
             emit(ExtendedLoadingState.Loading)
-            
+
             item
                 .onSuccess { emit(ExtendedLoadingState.Loaded(it)) }
                 .onFailure { emit(ExtendedLoadingState.Error(it)) }

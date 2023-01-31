@@ -1,7 +1,6 @@
 package io.novafoundation.nova.common.view
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.ContextThemeWrapper
 import android.view.Gravity
@@ -9,7 +8,6 @@ import androidx.appcompat.widget.AppCompatTextView
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.defaultOnNull
-import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.updatePadding
@@ -36,5 +34,4 @@ class ReadMoreView @JvmOverloads constructor(
         text = typedArray.getString(R.styleable.ReadMoreView_android_text)
             .defaultOnNull { context.getString(R.string.common_read_more) }
     }
-
 }
