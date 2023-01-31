@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.di
+package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -10,36 +10,36 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ReferendumVotersInteractor
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.DelegateDelegatorsInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersViewModel
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.voters.VotersFormatter
 
 @Module(includes = [ViewModelModule::class])
-class ReferendumVotersModule {
+class DelegateDelegatorsModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(ReferendumVotersViewModel::class)
+    @ViewModelKey(DelegateDelegatorsViewModel::class)
     fun provideViewModel(
-        payload: ReferendumVotersPayload,
+        payload: DelegateDelegatorsPayload,
         router: GovernanceRouter,
         governanceSharedState: GovernanceSharedState,
-        externalAction: ExternalActions.Presentation,
-        referendumVotersInteractor: ReferendumVotersInteractor,
-        resourceManager: ResourceManager,
+        externalActions: ExternalActions.Presentation,
+        interactor: DelegateDelegatorsInteractor,
         votersFormatter: VotersFormatter,
+        resourceManager: ResourceManager,
     ): ViewModel {
-        return ReferendumVotersViewModel(
+        return DelegateDelegatorsViewModel(
             payload = payload,
             router = router,
             governanceSharedState = governanceSharedState,
-            externalActions = externalAction,
-            referendumVotersInteractor = referendumVotersInteractor,
-            resourceManager = resourceManager,
-            votersFormatter = votersFormatter
+            externalActions = externalActions,
+            interactor = interactor,
+            votersFormatter = votersFormatter,
+            resourceManager = resourceManager
         )
     }
 
@@ -47,7 +47,7 @@ class ReferendumVotersModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory,
-    ): ReferendumVotersViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(ReferendumVotersViewModel::class.java)
+    ): DelegateDelegatorsViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(DelegateDelegatorsViewModel::class.java)
     }
 }

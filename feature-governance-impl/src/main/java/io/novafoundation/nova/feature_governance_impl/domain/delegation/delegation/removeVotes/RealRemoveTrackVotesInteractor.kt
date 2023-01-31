@@ -29,7 +29,7 @@ class RealRemoveTrackVotesInteractor(
     private val accountRepository: AccountRepository,
 ) : RemoveTrackVotesInteractor {
 
-    override suspend fun trackInfosOf(trackIds: Collection<TrackId>): List<Track> {
+    override suspend fun tracksOf(trackIds: Collection<TrackId>): List<Track> {
         val (chain, governance) = useSelectedGovernance()
         val trackIdsSet = trackIds.toSet()
 

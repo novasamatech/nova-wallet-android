@@ -6,12 +6,12 @@
     app:startDestination="@id/delegateListFragment">
 
     <action
+        android:id="@+id/action_open_remove_votes"
+        app:destination="@id/removeVoteFragment"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit"
-        android:id="@+id/action_open_remove_votes"
-        app:destination="@id/removeVoteFragment" />
+        app:popExitAnim="@anim/fragment_close_exit" />
 
     <fragment
         android:id="@+id/delegateListFragment"
@@ -42,12 +42,20 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
+            android:id="@+id/action_delegateDetailsFragment_to_delegateFullDescription"
+            app:destination="@id/delegateFullDescription"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            android:id="@+id/action_delegateDetailsFragment_to_delegateFullDescription"
-            app:destination="@id/delegateFullDescription" />
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_delegateDetailsFragment_to_delegateDelegatorsFragment"
+            app:destination="@id/delegateDelegatorsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -63,8 +71,13 @@
         tools:layout="@layout/fragment_description" />
 
     <fragment
-        tools:layout="@layout/fragment_remove_votes"
         android:id="@+id/removeVoteFragment"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesFragment"
-        android:label="RemoveVoteFragment" />
+        android:label="RemoveVoteFragment"
+        tools:layout="@layout/fragment_remove_votes" />
+
+    <fragment
+        android:id="@+id/delegateDelegatorsFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsFragment"
+        android:label="DelegateDelegatorsFragment" />
 </navigation>

@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.TableCellView
+import io.novafoundation.nova.common.view.setExtraInfoAvailable
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.setupIdentityMixin
@@ -114,8 +115,8 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
         val stats = delegate.stats
 
         delegateDetailsDelegatedVotes.showValueOrHide(stats?.delegatedVotes)
-        delegateDetailsDelegations.showValueOrHide(stats?.delegations)
 
+        delegateDetailsDelegations.setVotesModel(stats?.delegations)
         delegateDetailsVotedOverall.setVotesModel(stats?.allVotes)
         delegateDetailsVotedRecently.setVotesModel(stats?.recentVotes)
 
@@ -138,13 +139,7 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
     private fun TableCellView.setVotesModel(model: DelegateDetailsModel.VotesModel?) = letOrHide(model) { votesModel ->
         showValue(votesModel.votes)
 
-        if (votesModel.extraInfoAvalable) {
-            setPrimaryValueIcon(R.drawable.ic_info_cicrle_filled_16)
-            isEnabled = true
-        } else {
-            setPrimaryValueIcon(null)
-            isEnabled = false
-        }
+        setExtraInfoAvailable(votesModel.extraInfoAvalable)
 
         votesModel.customLabel?.let(::setTitle)
     }

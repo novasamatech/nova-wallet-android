@@ -59,7 +59,7 @@ class RemoveVotesViewModel(
 
     override val originFeeMixin = feeLoaderMixinFactory.create(assetFlow)
 
-    private val tracksFlow = flowOf { interactor.trackInfosOf(payload.trackIds) }
+    private val tracksFlow = flowOf { interactor.tracksOf(payload.trackIds) }
         .shareInBackground()
 
     private val trackModelsFlow = tracksFlow

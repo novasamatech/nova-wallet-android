@@ -7,7 +7,7 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 
 interface RemoveTrackVotesInteractor {
 
-    suspend fun trackInfosOf(trackIds: Collection<TrackId>): List<Track>
+    suspend fun tracksOf(trackIds: Collection<TrackId>): List<Track>
 
     suspend fun calculateFee(trackIds: Collection<TrackId>): Balance
 

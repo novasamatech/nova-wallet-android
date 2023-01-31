@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.model
+package io.novafoundation.nova.feature_governance_impl.presentation.voters
 
 import io.novafoundation.nova.common.address.AddressModel
 
