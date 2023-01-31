@@ -4,7 +4,6 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import coil.ImageLoader
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
@@ -35,7 +34,6 @@ import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumYourVot
 
 class ReferendaListAdapter(
     private val handler: Handler,
-    private val imageLoader: ImageLoader,
 ) : GroupedListAdapter<ReferendaGroupModel, ReferendumModel>(ReferendaDiffCallback) {
 
     interface Handler {
@@ -48,7 +46,7 @@ class ReferendaListAdapter(
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return ReferendumChildHolder(handler, imageLoader, parent.inflateChild(R.layout.item_referendum))
+        return ReferendumChildHolder(handler, parent.inflateChild(R.layout.item_referendum))
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: ReferendaGroupModel) {
@@ -127,7 +125,6 @@ private class ReferendaGroupHolder(containerView: View) : GroupedListHolder(cont
 
 private class ReferendumChildHolder(
     private val eventHandler: ReferendaListAdapter.Handler,
-    private val imageLoader: ImageLoader,
     containerView: View,
 ) : GroupedListHolder(containerView) {
 
@@ -175,7 +172,7 @@ private class ReferendumChildHolder(
     }
 
     fun bindTrack(item: ReferendumModel) = with(containerView) {
-        itemReferendumTrack.setReferendumTrackModel(item.track, imageLoader)
+        itemReferendumTrack.setReferendumTrackModel(item.track)
     }
 
     fun bindYourVote(item: ReferendumModel) = with(containerView) {
