@@ -159,7 +159,7 @@ class DelegateDetailsViewModel(
     }
 
     fun addDelegation() {
-        showMessage("TODO - add delegation")
+        router.openSelectDelegationTracks(payload.accountId)
     }
 
     private fun openVotedReferenda(onlyRecentVotes: Boolean) {

@@ -28,6 +28,18 @@
     <string name="delegation_delegated_votes">Delegated votes</string>
     <string name="delegation_recent_votes_format">Voted last %s</string>
 
+    <string name="select_delegation_tracks_available_tracks">Available tracks</string>
+    <string name="select_delegation_tracks_unavailable_tracks">Unavailable tracks</string>
+    <string name="select_delegation_tracks_title">Select tracks to add delegation</string>
+    <string name="select_delegation_tracks_description">Please select the tracks in which you would like to delegate your voting power.</string>
+
+    <string name="delegation_tracks_all_preset">Select all</string>
+    <string name="delegation_tracks_treasury_preset">Treasury</string>
+    <string name="delegation_tracks_governance_preset">Governance</string>
+    <string name="delegation_tracks_fellowship_preset">Fellowship</string>
+
+    <string name="delegation_tracks_disabled_apply_button_text">Select at least 1 track...</string>
+
     <string name="update_notification_item_version">Version %s</string>
 
     <string name="update_notifications_show_more">See all available updates</string>

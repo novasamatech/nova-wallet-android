@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.di.VotedReferendaComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.di.DelegateListComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.di.DescriptionComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.di.SelectDelegationTracksComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.di.ReferendumDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.di.ReferendumFullDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.di.ReferendaListComponent
@@ -58,6 +59,8 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
     fun delegateDetailsFactory(): DelegateDetailsComponent.Factory
 
     fun votedReferendaFactory(): VotedReferendaComponent.Factory
+
+    fun selectDelegationTracks(): SelectDelegationTracksComponent.Factory
 
     @Component.Factory
     interface Factory {

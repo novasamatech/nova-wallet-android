@@ -39,6 +39,7 @@ import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsT
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsVotedOverall
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsVotedRecently
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsAddDelegation
 
 class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
 
@@ -74,6 +75,7 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
         delegateDetailsAccount.setOnClickListener { viewModel.accountActionsClicked() }
 
         delegateDetailsDescriptionReadMore.setOnClickListener { viewModel.readMoreClicked() }
+        delegateDetailsAddDelegation.setOnClickListener { viewModel.addDelegation() }
     }
 
     override fun inject() {

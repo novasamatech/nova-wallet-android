@@ -5,6 +5,7 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
+import io.novafoundation.nova.common.address.format.AddressFormat
 import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 import io.novafoundation.nova.feature_governance_impl.BuildConfig
@@ -15,6 +16,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.SelectDelegationTracksFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsFragment
@@ -25,6 +27,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class GovernanceNavigator(
     private val navigationHolder: NavigationHolder,
@@ -74,6 +77,11 @@ class GovernanceNavigator(
         navigationHolder.contextManager.getActivity()
             ?.showBrowser(BuildConfig.DELEGATION_TUTORIAL_URL)
     }
+
+    override fun openSelectDelegationTracks(accountId: AccountId) = performNavigation(
+        actionId = R.id.action_delegateDetailsFragment_to_selectDelegationTracks,
+        args = SelectDelegationTracksFragment.newBundle(accountId)
+    )
 
     override fun openDelegateDetails(payload: DelegateDetailsPayload) = performNavigation(
         actionId = R.id.action_delegateListFragment_to_delegateDetailsFragment,

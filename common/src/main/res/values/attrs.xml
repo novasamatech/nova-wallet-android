@@ -152,7 +152,7 @@
         <attr name="advertisementCardBackground" format="color|reference" />
         <attr name="learnMore" format="string" />
         <attr name="action" format="string" />
-        <attr name="showClose" format="boolean"/>
+        <attr name="showClose" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="AlertView">
@@ -215,5 +215,9 @@
     <declare-styleable name="ListChooserView">
         <attr name="listChooserView_label" format="string" />
         <attr name="listChooserView_value" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="ReadMoreView">
+        <attr name="android:text" />
     </declare-styleable>
 </resources>

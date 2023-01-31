@@ -7,3 +7,7 @@ data class TrackPartition(
     val alreadyVoted: List<TrackInfo>,
     val alreadyDelegated: List<TrackInfo>
 )
+
+fun TrackPartition.hasUnavailableTracks(): Boolean {
+    return alreadyVoted.isNotEmpty() || alreadyDelegated.isNotEmpty()
+}

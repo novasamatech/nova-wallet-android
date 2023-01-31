@@ -34,6 +34,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.R
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.RealTrackCategorizer
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.TrackCategorizer
+import io.novafoundation.nova.feature_governance_impl.presentation.common.formatters.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.RealReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -155,8 +156,15 @@ class GovernanceFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideReferendumFormatter(
+    fun provideTracksFormatter(
         resourceManager: ResourceManager,
         trackCategorizer: TrackCategorizer
-    ): ReferendumFormatter = RealReferendumFormatter(resourceManager, trackCategorizer)
+    ): TrackFormatter = TrackFormatter(resourceManager, trackCategorizer)
+
+    @Provides
+    @FeatureScope
+    fun provideReferendumFormatter(
+        resourceManager: ResourceManager,
+        trackFormatter: TrackFormatter
+    ): ReferendumFormatter = RealReferendumFormatter(resourceManager, trackFormatter)
 }
