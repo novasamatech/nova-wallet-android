@@ -5,6 +5,14 @@
     android:id="@+id/delegation_nav_graph"
     app:startDestination="@id/delegateListFragment">
 
+    <action
+        android:id="@+id/action_open_remove_votes"
+        app:destination="@id/removeVoteFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
     <fragment
         android:id="@+id/delegateListFragment"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.DelegateListFragment"
@@ -42,6 +50,14 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
+            android:id="@+id/action_delegateDetailsFragment_to_delegateDelegatorsFragment"
+            app:destination="@id/delegateDelegatorsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
             android:id="@+id/action_delegateDetailsFragment_to_selectDelegationTracks"
             app:destination="@id/selectDelegationTracks"
             app:enterAnim="@anim/fragment_open_enter"
@@ -67,4 +83,15 @@
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.SelectDelegationTracksFragment"
         android:label="SelectDelegationTracksFragment"
         tools:layout="@layout/fragment_select_delegation_tracks" />
+
+    <fragment
+        android:id="@+id/removeVoteFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesFragment"
+        android:label="RemoveVoteFragment"
+        tools:layout="@layout/fragment_remove_votes" />
+
+    <fragment
+        android:id="@+id/delegateDelegatorsFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsFragment"
+        android:label="DelegateDelegatorsFragment" />
 </navigation>

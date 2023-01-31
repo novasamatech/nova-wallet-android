@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -16,6 +15,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersViewModel
+import io.novafoundation.nova.feature_governance_impl.presentation.voters.VotersFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ReferendumVotersModule {
@@ -28,18 +28,18 @@ class ReferendumVotersModule {
         router: GovernanceRouter,
         governanceSharedState: GovernanceSharedState,
         externalAction: ExternalActions.Presentation,
-        addressIconGenerator: AddressIconGenerator,
         referendumVotersInteractor: ReferendumVotersInteractor,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        votersFormatter: VotersFormatter,
     ): ViewModel {
         return ReferendumVotersViewModel(
-            payload,
-            router,
-            governanceSharedState,
-            externalAction,
-            addressIconGenerator,
-            referendumVotersInteractor,
-            resourceManager
+            payload = payload,
+            router = router,
+            governanceSharedState = governanceSharedState,
+            externalActions = externalAction,
+            referendumVotersInteractor = referendumVotersInteractor,
+            resourceManager = resourceManager,
+            votersFormatter = votersFormatter
         )
     }
 

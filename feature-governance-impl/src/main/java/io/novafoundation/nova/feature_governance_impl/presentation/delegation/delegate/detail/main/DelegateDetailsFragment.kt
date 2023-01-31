@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.TableCellView
+import io.novafoundation.nova.common.view.setExtraInfoAvailable
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.setupIdentityMixin
@@ -24,6 +25,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.applyTo
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsAccount
+import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsAddDelegation
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsContent
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsDelegatedVotes
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsDelegations
@@ -39,7 +41,6 @@ import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsT
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsVotedOverall
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsVotedRecently
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsAddDelegation
 
 class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
 
@@ -75,6 +76,7 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
         delegateDetailsAccount.setOnClickListener { viewModel.accountActionsClicked() }
 
         delegateDetailsDescriptionReadMore.setOnClickListener { viewModel.readMoreClicked() }
+
         delegateDetailsAddDelegation.setOnClickListener { viewModel.addDelegation() }
     }
 
@@ -113,8 +115,8 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
         val stats = delegate.stats
 
         delegateDetailsDelegatedVotes.showValueOrHide(stats?.delegatedVotes)
-        delegateDetailsDelegations.showValueOrHide(stats?.delegations)
 
+        delegateDetailsDelegations.setVotesModel(stats?.delegations)
         delegateDetailsVotedOverall.setVotesModel(stats?.allVotes)
         delegateDetailsVotedRecently.setVotesModel(stats?.recentVotes)
 
@@ -137,13 +139,7 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
     private fun TableCellView.setVotesModel(model: DelegateDetailsModel.VotesModel?) = letOrHide(model) { votesModel ->
         showValue(votesModel.votes)
 
-        if (votesModel.extraInfoAvalable) {
-            setPrimaryValueIcon(R.drawable.ic_info_cicrle_filled_16)
-            isEnabled = true
-        } else {
-            setPrimaryValueIcon(null)
-            isEnabled = false
-        }
+        setExtraInfoAvailable(votesModel.extraInfoAvalable)
 
         votesModel.customLabel?.let(::setTitle)
     }

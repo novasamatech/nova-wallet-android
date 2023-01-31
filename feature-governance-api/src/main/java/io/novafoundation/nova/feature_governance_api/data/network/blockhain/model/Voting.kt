@@ -2,8 +2,9 @@ package io.novafoundation.nova.feature_governance_api.data.network.blockhain.mod
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ConvictionVote
+import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.GenericVoter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
@@ -39,12 +40,6 @@ data class PriorLock(
     val amount: Balance,
 )
 
-data class VotesAmount(
-    val total: BigDecimal,
-    val amount: BigDecimal,
-    val multiplier: BigDecimal,
-)
-
 enum class VoteType {
     AYE, NAY
 }
@@ -56,6 +51,13 @@ fun Voting.trackVotesNumber(): Int {
     }
 }
 
+fun Voting.votedReferenda(): Collection<ReferendumId> {
+    return when (this) {
+        is Voting.Casting -> votes.keys
+        is Voting.Delegating -> emptyList()
+    }
+}
+
 fun AyeVote(amount: Balance, conviction: Conviction) = AccountVote.Standard(
     vote = Vote(
         aye = true,
@@ -64,21 +66,8 @@ fun AyeVote(amount: Balance, conviction: Conviction) = AccountVote.Standard(
     balance = amount
 )
 
-fun AccountVote.votes(chainAsset: Chain.Asset): VotesAmount? {
-    return when (this) {
-        AccountVote.Unsupported -> null
-
-        is AccountVote.Standard -> {
-            val amount = chainAsset.amountFromPlanks(balance)
-            val total = vote.conviction.votesFor(amount)
-
-            VotesAmount(
-                total = total,
-                amount = amount,
-                multiplier = vote.conviction.amountMultiplier()
-            )
-        }
-    }
+fun AccountVote.votes(chainAsset: Chain.Asset): GenericVoter.ConvictionVote? {
+    return ConvictionVote(this, chainAsset)
 }
 
 fun AccountVote.amount(): Balance {

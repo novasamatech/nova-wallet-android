@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import coil.ImageLoader
 import coil.clear
+import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
@@ -73,6 +74,8 @@ class NovaChipView @JvmOverloads constructor(
 
     private var size: Size = SIZE_DEFAULT
 
+    private val imageLoader: ImageLoader = FeatureUtils.getCommonApi(context).imageLoader()
+
     init {
         View.inflate(context, R.layout.view_chip, this)
         orientation = HORIZONTAL
@@ -84,9 +87,9 @@ class NovaChipView @JvmOverloads constructor(
 
         if (typedArray.hasValue(R.styleable.NovaChipView_chipIcon)) {
             val iconDrawable = typedArray.getDrawable(R.styleable.NovaChipView_chipIcon)
-            setIcon(iconDrawable)
+            setIconDrawable(iconDrawable)
         } else {
-            setIcon(null)
+            setIconDrawable(null)
         }
 
         if (typedArray.hasValue(R.styleable.NovaChipView_chipIconSize)) {
@@ -148,16 +151,16 @@ class NovaChipView @JvmOverloads constructor(
         }
     }
 
-    fun setIcon(icon: Icon?, imageLoader: ImageLoader) {
+    fun setIcon(icon: Icon?) {
         if (icon == null) {
-            setIcon(null)
+            setIconDrawable(drawable = null)
         } else {
             chipIcon.setIcon(icon, imageLoader)
         }
         useIcon(icon != null)
     }
 
-    fun setIcon(drawable: Drawable?) {
+    fun setIconDrawable(drawable: Drawable?) {
         chipIcon.setImageDrawable(drawable)
         useIcon(drawable != null)
     }

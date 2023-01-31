@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.utils.convictionVoting
+import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
@@ -71,9 +72,22 @@ class GovV2ConvictionVotingRepository(
         return remoteStorageSource.query(chainId) {
             runtime.metadata.convictionVoting().storage("VotingFor").query(
                 accountId,
+                trackId.value,
                 binding = { decoded -> decoded?.let(::bindVoting) }
             )
         }
+    }
+
+    override suspend fun votingFor(accountId: AccountId, chainId: ChainId, trackIds: Collection<TrackId>): Map<TrackId, Voting> {
+        val keys = trackIds.map { listOf(accountId, it.value) }
+
+        return remoteStorageSource.query(chainId) {
+            runtime.metadata.convictionVoting().storage("VotingFor").entries(
+                keysArguments = keys,
+                keyExtractor = { (_: AccountId, trackId: BigInteger) -> TrackId(trackId) },
+                binding = { decoded, _ -> decoded?.let(::bindVoting) }
+            )
+        }.filterNotNull()
     }
 
     override suspend fun votersOf(referendumId: ReferendumId, chainId: ChainId): List<ReferendumVoter> {
@@ -91,7 +105,7 @@ class GovV2ConvictionVotingRepository(
         claimable.actions.forEach { claimAction ->
             when (claimAction) {
                 is ClaimSchedule.ClaimAction.RemoveVote -> {
-                    convictionVotingRemoveVote(claimAction.trackId, claimAction.referendumId)
+                    removeVote(claimAction.trackId, claimAction.referendumId)
                 }
 
                 is ClaimSchedule.ClaimAction.Unlock -> {
@@ -103,6 +117,10 @@ class GovV2ConvictionVotingRepository(
 
     override fun ExtrinsicBuilder.vote(referendumId: ReferendumId, vote: AccountVote) {
         convictionVotingVote(referendumId, vote)
+    }
+
+    override fun ExtrinsicBuilder.removeVote(trackId: TrackId, referendumId: ReferendumId) {
+        convictionVotingRemoveVote(trackId, referendumId)
     }
 
     private fun bindTrackLocks(decoded: Any?): List<Pair<TrackId, Balance>> {

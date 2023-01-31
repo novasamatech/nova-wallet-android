@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.di
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -37,6 +38,10 @@ import io.novafoundation.nova.feature_governance_impl.domain.track.category.Trac
 import io.novafoundation.nova.feature_governance_impl.presentation.common.formatters.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.RealReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.track.RealTrackFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.voters.RealVotersFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.voters.VotersFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
@@ -165,6 +170,14 @@ class GovernanceFeatureModule {
     @FeatureScope
     fun provideReferendumFormatter(
         resourceManager: ResourceManager,
-        trackFormatter: TrackFormatter
+        trackFormatter: TrackFormatter,
     ): ReferendumFormatter = RealReferendumFormatter(resourceManager, trackFormatter)
+
+    @Provides
+    @FeatureScope
+    fun provideVotersFormatter(
+        resourceManager: ResourceManager,
+        addressIconGenerator: AddressIconGenerator,
+    ): VotersFormatter = RealVotersFormatter(addressIconGenerator, resourceManager)
+
 }

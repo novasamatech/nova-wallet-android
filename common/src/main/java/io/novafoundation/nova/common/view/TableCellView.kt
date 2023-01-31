@@ -201,3 +201,14 @@ fun TableCellView.showValueOrHide(primary: String?, secondary: String? = null) {
 
     setVisible(primary != null)
 }
+
+@Suppress("LiftReturnOrAssignment")
+fun TableCellView.setExtraInfoAvailable(available: Boolean) {
+    if (available) {
+        setPrimaryValueIcon(R.drawable.ic_info_cicrle_filled_16)
+        isEnabled = true
+    } else {
+        setPrimaryValueIcon(null)
+        isEnabled = false
+    }
+}

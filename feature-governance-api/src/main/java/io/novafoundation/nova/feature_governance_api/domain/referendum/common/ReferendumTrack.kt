@@ -1,5 +1,5 @@
 package io.novafoundation.nova.feature_governance_api.domain.referendum.common
 
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
+import io.novafoundation.nova.feature_governance_api.domain.track.Track
 
-data class ReferendumTrack(val id: TrackId, val name: String, val sameWithOther: Boolean)
+data class ReferendumTrack(val track: Track, val sameWithOther: Boolean)

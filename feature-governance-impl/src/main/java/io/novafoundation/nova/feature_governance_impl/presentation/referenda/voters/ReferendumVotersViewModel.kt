@@ -1,24 +1,21 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters
 
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
-import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.withLoading
-import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ReferendumVoter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ReferendumVotersInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.model.VoterModel
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
+import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoterModel
+import io.novafoundation.nova.feature_governance_impl.presentation.voters.VotersFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.voters.formatConvictionVoter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
@@ -31,9 +28,9 @@ class ReferendumVotersViewModel(
     private val router: GovernanceRouter,
     private val governanceSharedState: GovernanceSharedState,
     private val externalActions: ExternalActions.Presentation,
-    private val addressIconGenerator: AddressIconGenerator,
     private val referendumVotersInteractor: ReferendumVotersInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val votersFormatter: VotersFormatter,
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val chainFlow = flowOf { governanceSharedState.chain() }
@@ -65,20 +62,7 @@ class ReferendumVotersViewModel(
     }
 
     private suspend fun mapVotersToVoterModels(chain: Chain, chainAsset: Chain.Asset, voters: List<ReferendumVoter>): List<VoterModel> {
-        return voters.map { mapVoterToVoterModel(chain, chainAsset, it) }
-    }
-
-    private suspend fun mapVoterToVoterModel(chain: Chain, chainAsset: Chain.Asset, voter: ReferendumVoter): VoterModel {
-        val addressModel = addressIconGenerator.createAccountAddressModel(chain, voter.accountId, voter.identity?.name)
-        val votesAmount = voter.vote.votes(chainAsset)!!
-        val amount = votesAmount.amount.formatTokenAmount(chainAsset)
-        val multiplier = votesAmount.multiplier
-        val total = votesAmount.total.format()
-        return VoterModel(
-            addressModel,
-            resourceManager.getString(R.string.referendum_voter_vote, total),
-            resourceManager.getString(R.string.referendum_voter_vote_details, amount, multiplier)
-        )
+        return voters.map { votersFormatter.formatConvictionVoter(it, chain, chainAsset) }
     }
 
     private fun mapTypeToString(voteType: VoteType): String {

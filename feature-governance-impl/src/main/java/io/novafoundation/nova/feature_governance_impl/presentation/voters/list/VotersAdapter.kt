@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters
+package io.novafoundation.nova.feature_governance_impl.presentation.voters.list
 
 import android.view.View
 import android.view.ViewGroup
@@ -8,12 +8,12 @@ import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.setAddressModel
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.model.VoterModel
+import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoterModel
 import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVoterAddress
 import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVotesCount
 import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVotesCountDetails
 
-class ReferendumVotersAdapter(
+class VotersAdapter(
     private val handler: Handler,
 ) : ListAdapter<VoterModel, VoterHolder>(DiffCallback()) {
 
@@ -44,7 +44,7 @@ private class DiffCallback : DiffUtil.ItemCallback<VoterModel>() {
 }
 
 class VoterHolder(
-    private val eventHandler: ReferendumVotersAdapter.Handler,
+    private val eventHandler: VotersAdapter.Handler,
     containerView: View,
 ) : GroupedListHolder(containerView) {
 

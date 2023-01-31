@@ -29,9 +29,13 @@ interface ConvictionVotingRepository {
 
     suspend fun votingFor(accountId: AccountId, chainId: ChainId, trackId: TrackId): Voting?
 
+    suspend fun votingFor(accountId: AccountId, chainId: ChainId, trackIds: Collection<TrackId>): Map<TrackId, Voting>
+
     suspend fun votersOf(referendumId: ReferendumId, chainId: ChainId): List<ReferendumVoter>
 
     fun ExtrinsicBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable)
 
     fun ExtrinsicBuilder.vote(referendumId: ReferendumId, vote: AccountVote)
+
+    fun ExtrinsicBuilder.removeVote(trackId: TrackId, referendumId: ReferendumId)
 }

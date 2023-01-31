@@ -8,7 +8,6 @@ import androidx.annotation.CallSuper
 import androidx.annotation.DrawableRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.DialogExtensions
 import io.novafoundation.nova.common.utils.WithContextExtensions
@@ -75,7 +74,7 @@ abstract class DynamicListBottomSheet<T>(
     context: Context,
     private val payload: Payload<T>,
     private val diffCallback: DiffUtil.ItemCallback<T>,
-    private val onClicked: ClickHandler<T>,
+    private val onClicked: ClickHandler<T>?,
     private val onCancel: (() -> Unit)? = null,
 ) : BaseDynamicListBottomSheet(context), DynamicListSheetAdapter.Handler<T> {
 
@@ -98,7 +97,7 @@ abstract class DynamicListBottomSheet<T>(
     abstract fun holderCreator(): HolderCreator<T>
 
     override fun itemClicked(item: T) {
-        onClicked(item)
+        onClicked?.invoke(item)
 
         dismiss()
     }

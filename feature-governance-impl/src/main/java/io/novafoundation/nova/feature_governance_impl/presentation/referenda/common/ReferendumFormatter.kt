@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.formatting.remainingTime
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amountMultiplier
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
@@ -27,6 +28,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVotePreviewModel
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -41,7 +43,7 @@ interface ReferendumFormatter {
 
     fun formatVoting(voting: ReferendumVoting, token: Token): ReferendumVotingModel
 
-    fun formatTrack(track: ReferendumTrack, asset: Chain.Asset): ReferendumTrackModel
+    fun formatReferendumTrack(track: ReferendumTrack, asset: Chain.Asset): ReferendumTrackModel
 
     fun formatOnChainName(call: GenericCall.Instance): String
 
@@ -92,9 +94,10 @@ class RealReferendumFormatter(
         )
     }
 
-    override fun formatTrack(track: ReferendumTrack, asset: Chain.Asset): ReferendumTrackModel {
-        val trackModel = trackFormatter.formatTrack(track.id, track.name, asset)
-        return ReferendumTrackModel(trackModel, track.sameWithOther)
+    override fun formatReferendumTrack(track: ReferendumTrack, asset: Chain.Asset): ReferendumTrackModel {
+        val trackModel = trackFormatter.formatTrack(track.track, asset)
+
+        return ReferendumTrackModel(trackModel, sameWithOther = track.sameWithOther)
     }
 
     override fun formatOnChainName(call: GenericCall.Instance): String {
@@ -230,9 +233,9 @@ class RealReferendumFormatter(
         val colorRes = if (isAye) R.color.text_positive else R.color.text_negative
 
         val votesAmountFormatted = mapAmountToAmountModel(votes.amount, token).token
-        val multiplierFormatted = votes.multiplier.format()
+        val multiplierFormatted = votes.conviction.amountMultiplier().format()
 
-        val votesFormatted = resourceManager.getString(R.string.referendum_votes_format, votes.total.format())
+        val votesFormatted = resourceManager.getString(R.string.referendum_votes_format, votes.totalVotes.format())
         val votesDetails = "$votesAmountFormatted × ${multiplierFormatted}x"
 
         return YourVoteModel(
@@ -253,7 +256,7 @@ class RealReferendumFormatter(
             status = formatStatus(referendum.status),
             name = mapReferendumNameToUi(referendum),
             timeEstimation = formatTimeEstimation(referendum.status),
-            track = referendum.track?.let { formatTrack(it, token.configuration) },
+            track = referendum.track?.let { formatReferendumTrack(it, token.configuration) },
             number = formatId(referendum.id),
             voting = referendum.voting?.let { formatVoting(it, token) },
             yourVote = mapReferendumVoteToUi(referendum.referendumVote, token, chain)
@@ -283,7 +286,7 @@ class RealReferendumFormatter(
 
         val voteTypeRes = if (isAye) R.string.referendum_vote_aye else R.string.referendum_vote_nay
         val colorRes = if (isAye) R.color.text_positive else R.color.text_negative
-        val amountFormatted = votes.total.format()
+        val amountFormatted = votes.totalVotes.format()
 
         val details = when (vote) {
             is ReferendumVote.Account -> {
