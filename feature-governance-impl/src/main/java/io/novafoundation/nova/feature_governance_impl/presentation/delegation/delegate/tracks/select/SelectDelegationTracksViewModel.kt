@@ -1,7 +1,10 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.withLoadingResult
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
@@ -14,6 +17,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model.DelegationTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model.DelegationTracksPresetModel
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +43,10 @@ class SelectDelegationTracksViewModel(
 
     private val availableTrackFlow = chooseTrackDataFlow.map { it.trackPartition.available }
 
+    private val _showRemoveVotesSuggestion = MutableLiveData<Event<Boolean>>()
+
+    val showRemoveVotesSuggestion: LiveData<Event<Boolean>> = _showRemoveVotesSuggestion
+
     val trackPresetsModels = trackPresetsFlow
         .map { mapTrackPresets(it) }
         .shareInBackground()
@@ -57,12 +65,7 @@ class SelectDelegationTracksViewModel(
         .shareInBackground()
 
     init {
-        launch {
-            val chooseTrackData = chooseTrackDataFlow.first()
-            if (chooseTrackData.trackPartition.alreadyVoted.isNotEmpty()) {
-                // TODO open Remove votes bottom sheet
-            }
-        }
+        checkExistingVotes()
     }
 
     fun backClicked() {
@@ -83,10 +86,29 @@ class SelectDelegationTracksViewModel(
     fun openSetupConviction() {
     }
 
+    fun openRemoveVotesScreen() {
+        launch {
+            val chooseTrackData = chooseTrackDataFlow.first()
+            val tracksIds = chooseTrackData.trackPartition.alreadyVoted
+                .map { it.id.value }
+            val payload = RemoveVotesPayload(tracksIds)
+            router.openRemoveVotes(payload)
+        }
+    }
+
     fun presetClicked(position: Int) {
         launch {
             val selectedPreset = trackPresetsFlow.first()[position]
             selectedTracksFlow.value = selectedPreset.trackIds.toHashSet()
+        }
+    }
+
+    private fun checkExistingVotes() {
+        launch {
+            val chooseTrackData = chooseTrackDataFlow.first()
+            if (chooseTrackData.trackPartition.alreadyVoted.isNotEmpty()) {
+                _showRemoveVotesSuggestion.value = Event(true)
+            }
         }
     }
 

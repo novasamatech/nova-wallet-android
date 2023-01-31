@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureCompon
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.adapter.SelectDelegationTracksAdapter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.adapter.SelectDelegationTracksHeaderAdapter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.adapter.SelectDelegationTracksPresetsAdapter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesSuggestionBottomSheet
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.android.synthetic.main.fragment_select_delegation_tracks.selectDelegationTracksApply
 import kotlinx.android.synthetic.main.fragment_select_delegation_tracks.selectDelegationTracksList
@@ -107,6 +108,14 @@ class SelectDelegationTracksFragment :
             } else {
                 getString(R.string.delegation_tracks_disabled_apply_button_text)
             }
+        }
+
+        viewModel.showRemoveVotesSuggestion.observeEvent {
+            val bottomSheet = RemoveVotesSuggestionBottomSheet(
+                requireContext(),
+                onApply = viewModel::openRemoveVotesScreen
+            )
+            bottomSheet.show()
         }
     }
 
