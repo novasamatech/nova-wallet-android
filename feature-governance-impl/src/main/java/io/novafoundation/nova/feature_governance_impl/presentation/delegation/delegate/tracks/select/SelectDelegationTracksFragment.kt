@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.NestedAdapter
+import io.novafoundation.nova.common.list.PlaceholderAdapter
 import io.novafoundation.nova.common.presentation.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -45,8 +46,9 @@ class SelectDelegationTracksFragment :
     private val presetsAdapter by lazy(LazyThreadSafetyMode.NONE) {
         NestedAdapter(SelectDelegationTracksPresetsAdapter(this), RecyclerView.HORIZONTAL, Rect(12.dp, 8.dp, 12.dp, 12.dp))
     }
+    private val placeholderAdapter by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.item_tracks_placeholder) }
     private val tracksAdapter by lazy(LazyThreadSafetyMode.NONE) { SelectDelegationTracksAdapter(this) }
-    private val concatAdapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(headerAdapter, presetsAdapter, tracksAdapter) }
+    private val concatAdapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(headerAdapter, presetsAdapter, placeholderAdapter, tracksAdapter) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,6 +59,7 @@ class SelectDelegationTracksFragment :
     }
 
     override fun initViews() {
+        selectDelegationTracksList.itemAnimator = null
         selectDelegationTracksList.setHasFixedSize(true)
         selectDelegationTracksList.adapter = concatAdapter
 
@@ -81,6 +84,7 @@ class SelectDelegationTracksFragment :
         }
 
         viewModel.trackPresetsModels.observe {
+            presetsAdapter.show(it.isNotEmpty())
             presetsAdapter.submitList(it)
         }
 
@@ -88,8 +92,11 @@ class SelectDelegationTracksFragment :
             selectDelegationTracksProgress.isVisible = it is ExtendedLoadingState.Loading
             when (it) {
                 is ExtendedLoadingState.Error -> {}
-                is ExtendedLoadingState.Loading -> {}
-                is ExtendedLoadingState.Loaded -> tracksAdapter.submitList(it.data)
+                is ExtendedLoadingState.Loading -> placeholderAdapter.showPlaceholder(false)
+                is ExtendedLoadingState.Loaded -> {
+                    placeholderAdapter.showPlaceholder(it.data.isEmpty())
+                    tracksAdapter.submitList(it.data)
+                }
             }
         }
 

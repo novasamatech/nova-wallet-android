@@ -47,6 +47,7 @@
     <string name="delegation_tracks_fellowship_preset">Fellowship</string>
 
     <string name="delegation_tracks_disabled_apply_button_text">Select at least 1 track...</string>
+    <string name="delegation_tracks_empty_list_placeholder">No tracks are available to delegate</string>
 
     <string name="update_notification_item_version">Version %s</string>
 
