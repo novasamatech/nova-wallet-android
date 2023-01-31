@@ -24,7 +24,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsModel.Stats
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsModel.VotesModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.DefaultCharacterLimit
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -166,8 +166,9 @@ class DelegateDetailsViewModel(
 
     fun addDelegation() {
         // TODO open choose track instead
-        val tracIds = (0..50).map { it.toBigInteger() }
-        router.openRemoveVotes(RemoveVotesPayload(tracIds))
+        val tracksIds = (0..10).map { it.toBigInteger() }
+        val nextPayload = NewDelegationChooseAmountPayload(payload.accountId, tracksIds)
+        router.openNewDelegationChooseAmount(nextPayload)
     }
 
     private fun openVotedReferenda(onlyRecentVotes: Boolean) {

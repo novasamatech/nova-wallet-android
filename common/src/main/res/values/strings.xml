@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="delegation_undelegating_period">Undelegating period</string>
+
     <string name="delegation_multi_track_format">Across %s tracks</string>
 
     <string name="delegation_remove_votes">Remove votes</string>

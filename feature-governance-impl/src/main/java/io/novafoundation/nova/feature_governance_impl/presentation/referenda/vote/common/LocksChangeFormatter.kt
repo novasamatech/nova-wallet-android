@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common
 
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_governance_api.domain.locks.reusable.LocksChange
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Change
-import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model.AmountChangeModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model.LocksChangeModel
@@ -14,7 +14,7 @@ import kotlin.time.Duration
 interface LocksChangeFormatter {
 
     suspend fun mapLocksChangeToUi(
-        locksChange: GovernanceVoteAssistant.LocksChange,
+        locksChange: LocksChange,
         asset: Asset,
     ): LocksChangeModel
 
@@ -29,7 +29,7 @@ class RealLocksChangeFormatter(
 ) : LocksChangeFormatter {
 
     override suspend fun mapLocksChangeToUi(
-        locksChange: GovernanceVoteAssistant.LocksChange,
+        locksChange: LocksChange,
         asset: Asset
     ): LocksChangeModel {
         return LocksChangeModel(

@@ -56,6 +56,14 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_delegateDetailsFragment_to_newDelegationChooseAmountFragment"
+            app:destination="@id/newDelegationChooseAmountFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -80,4 +88,8 @@
         android:id="@+id/delegateDelegatorsFragment"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsFragment"
         android:label="DelegateDelegatorsFragment" />
+    <fragment
+        android:id="@+id/newDelegationChooseAmountFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountFragment"
+        android:label="NewDelegationChooseAmountFragment" />
 </navigation>
