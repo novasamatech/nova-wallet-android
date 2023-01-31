@@ -15,6 +15,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesFragment
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsFragment
@@ -74,6 +76,11 @@ class GovernanceNavigator(
         navigationHolder.contextManager.getActivity()
             ?.showBrowser(BuildConfig.DELEGATION_TUTORIAL_URL)
     }
+
+    override fun openRemoveVotes(payload: RemoveVotesPayload) = performNavigation(
+        actionId = R.id.action_open_remove_votes,
+        args = RemoveVotesFragment.getBundle(payload)
+    )
 
     override fun openDelegateDetails(payload: DelegateDetailsPayload) = performNavigation(
         actionId = R.id.action_delegateListFragment_to_delegateDetailsFragment,

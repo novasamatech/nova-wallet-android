@@ -163,6 +163,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
+            android:id="@+id/delegateDetailsAddDelegation"
             android:layout_marginHorizontal="16dp"
             android:layout_marginBottom="16dp"
             android:text="@string/delegation_add_delegation" />

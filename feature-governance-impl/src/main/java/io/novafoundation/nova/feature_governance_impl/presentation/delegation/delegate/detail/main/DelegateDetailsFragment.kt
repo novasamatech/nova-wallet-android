@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.applyTo
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsAccount
+import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsAddDelegation
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsContent
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsDelegatedVotes
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsDelegations
@@ -74,6 +75,8 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
         delegateDetailsAccount.setOnClickListener { viewModel.accountActionsClicked() }
 
         delegateDetailsDescriptionReadMore.setOnClickListener { viewModel.readMoreClicked() }
+
+        delegateDetailsAddDelegation.setOnClickListener { viewModel.addDelegation() }
     }
 
     override fun inject() {

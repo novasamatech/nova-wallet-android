@@ -75,6 +75,10 @@ class GovV1ConvictionVotingRepository(
         }
     }
 
+    override suspend fun votingFor(accountId: AccountId, chainId: ChainId, trackIds: Collection<TrackId>): Map<TrackId, Voting> {
+        unsupported()
+    }
+
     override suspend fun votersOf(referendumId: ReferendumId, chainId: ChainId): List<ReferendumVoter> {
         val allVotings = remoteStorageSource.query(chainId) {
             runtime.metadata.democracy().storage("VotingOf").entries(
@@ -90,7 +94,7 @@ class GovV1ConvictionVotingRepository(
         claimable.actions.forEach { claimAction ->
             when (claimAction) {
                 is ClaimSchedule.ClaimAction.RemoveVote -> {
-                    democracyRemoveVote(claimAction.referendumId)
+                    removeVote(claimAction.trackId, claimAction.referendumId)
                 }
 
                 is ClaimSchedule.ClaimAction.Unlock -> {
@@ -104,11 +108,19 @@ class GovV1ConvictionVotingRepository(
         democracyVote(referendumId, vote)
     }
 
+    override fun ExtrinsicBuilder.removeVote(trackId: TrackId, referendumId: ReferendumId) {
+        democracyRemoveVote(referendumId)
+    }
+
     private fun <T> T?.associatedWithTrack(): Map<TrackId, T> {
         return if (this != null) {
             mapOf(DemocracyTrackId to this)
         } else {
             emptyMap()
         }
+    }
+
+    private fun unsupported(): Nothing {
+        error("Unsupported operation for Governance 1 voting")
     }
 }

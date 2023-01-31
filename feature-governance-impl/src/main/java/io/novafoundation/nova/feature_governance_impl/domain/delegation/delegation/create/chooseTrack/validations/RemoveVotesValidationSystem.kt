@@ -1,16 +1,16 @@
-package io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.validations
+package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.validations
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 
-typealias UnlockReferendumValidationSystem = ValidationSystem<UnlockReferendumValidationPayload, UnlockGovernanceValidationFailure>
+typealias RemoteVotesValidationSystem = ValidationSystem<RemoveVotesValidationPayload, RemoveVotesValidationFailure>
 
-fun ValidationSystem.Companion.unlockReferendumValidationSystem(): UnlockReferendumValidationSystem = ValidationSystem {
+fun ValidationSystem.Companion.removeVotesValidationSystem(): RemoteVotesValidationSystem = ValidationSystem {
     sufficientBalance(
         fee = { it.fee },
         available = { it.asset.transferable },
         error = { payload, leftForFees ->
-            UnlockGovernanceValidationFailure.NotEnoughToPayFees(
+            RemoveVotesValidationFailure.NotEnoughToPayFees(
                 chainAsset = payload.asset.token.configuration,
                 availableToPayFees = leftForFees,
                 fee = payload.fee

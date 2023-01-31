@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_governance_api.data.repository.getTracksBy
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.locks.RealClaimScheduleCalculator
-import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Change
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.LocksChange
@@ -171,10 +170,6 @@ private class RealGovernanceLocksEstimator(
 
     private val allMaxLocked = balanceLocks.maxOfOrNull { it.amountInPlanks }
         .orZero()
-
-    override val track: ReferendumTrack? = onChainReferendum.status.asOngoingOrNull()?.let {
-        ReferendumTrack(it.track, tracks.getValue(it.track).name, sameWithOther = tracks.size == 1)
-    }
 
     override val trackVoting: Voting? = voting.findVotingFor(onChainReferendum)
 

@@ -32,6 +32,7 @@ import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSize
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.constructReferendumStatus
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallParser
+import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -135,7 +136,7 @@ class RealReferendumDetailsInteractor(
                         preImageHash = hash
                     )
                 },
-                track = track?.let { ReferendumTrack(it.id, it.name, sameWithOther = tracksById.size == 1) },
+                track = track?.let { ReferendumTrack(mapTrackInfoToTrack(it), sameWithOther = tracksById.size == 1) },
                 voting = voting,
                 timeline = ReferendumTimeline(
                     currentStatus = currentStatus,
