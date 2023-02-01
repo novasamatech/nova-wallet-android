@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountInteractor
@@ -41,6 +42,7 @@ class NewDelegationChooseAmountModule {
         convictionValuesProvider: ConvictionValuesProvider,
         locksFormatter: LocksFormatter,
         validationSystem: ChooseDelegationAmountValidationSystem,
+        resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
     ): ViewModel {
         return NewDelegationChooseAmountViewModel(
             feeLoaderMixinFactory = feeLoaderMixinFactory,
@@ -55,6 +57,7 @@ class NewDelegationChooseAmountModule {
             convictionValuesProvider = convictionValuesProvider,
             locksFormatter = locksFormatter,
             validationSystem = validationSystem,
+            resourcesHintsMixinFactory = resourcesHintsMixinFactory
         )
     }
 

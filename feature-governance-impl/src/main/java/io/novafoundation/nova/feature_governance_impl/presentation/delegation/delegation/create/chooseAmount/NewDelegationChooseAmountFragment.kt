@@ -8,6 +8,7 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
@@ -24,6 +25,7 @@ import kotlinx.android.synthetic.main.fragment_new_delegation_choose_amount.newD
 import kotlinx.android.synthetic.main.fragment_new_delegation_choose_amount.newDelegationChooseAmountAmountChipsScroll
 import kotlinx.android.synthetic.main.fragment_new_delegation_choose_amount.newDelegationChooseAmountConfirm
 import kotlinx.android.synthetic.main.fragment_new_delegation_choose_amount.newDelegationChooseAmountContainer
+import kotlinx.android.synthetic.main.fragment_new_delegation_choose_amount.newDelegationChooseAmountHints
 import kotlinx.android.synthetic.main.fragment_new_delegation_choose_amount.newDelegationChooseAmountLockedAmountChanges
 import kotlinx.android.synthetic.main.fragment_new_delegation_choose_amount.newDelegationChooseAmountLockedPeriodChanges
 import kotlinx.android.synthetic.main.fragment_new_delegation_choose_amount.newDelegationChooseAmountToolbar
@@ -69,6 +71,7 @@ class NewDelegationChooseAmountFragment : BaseFragment<NewDelegationChooseAmount
     override fun subscribe(viewModel: NewDelegationChooseAmountViewModel) {
         setupAmountChooser(viewModel.amountChooserMixin, newDelegationChooseAmountAmount)
         observeValidations(viewModel)
+        observeHints(viewModel.hintsMixin, newDelegationChooseAmountHints)
 
         newDelegationChooseAmountVotePower.votePowerSeekbar.setValues(viewModel.convictionValues)
         newDelegationChooseAmountVotePower.votePowerSeekbar.bindTo(viewModel.selectedConvictionIndex, viewLifecycleOwner.lifecycleScope)

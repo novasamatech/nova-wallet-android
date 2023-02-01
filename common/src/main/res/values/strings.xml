@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="delegation_delegate_hint_vote">Your votes will automatically vote alongside your delegates\' vote</string>
+    <string name="delegation_delegate_hint_unlock">Undelegating period will start after you revoke a delegation</string>
+
     <string name="delegation_error_self_delegate_title">Cannot delegate to self</string>
     <string name="delegation_error_self_delegate_message">You cannot delegate votes to yourself.</string>
 

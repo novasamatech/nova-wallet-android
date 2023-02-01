@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
+import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
@@ -19,6 +20,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRou
 import io.novafoundation.nova.feature_governance_impl.presentation.common.conviction.ConvictionValuesProvider
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.AmountChipModel
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.LocksFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.common.newDelegationHints
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -48,6 +50,7 @@ class NewDelegationChooseAmountViewModel(
     private val locksChangeFormatter: LocksChangeFormatter,
     private val convictionValuesProvider: ConvictionValuesProvider,
     private val locksFormatter: LocksFormatter,
+    private val resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
 ) : BaseViewModel(),
     WithFeeLoaderMixin,
     Validatable by validationExecutor {
@@ -65,6 +68,8 @@ class NewDelegationChooseAmountViewModel(
         balanceField = Asset::free,
         balanceLabel = R.string.wallet_balance_available
     )
+
+    val hintsMixin = resourcesHintsMixinFactory.newDelegationHints(viewModelScope)
 
     val convictionValues = convictionValuesProvider.convictionValues()
     val selectedConvictionIndex = MutableStateFlow(0)

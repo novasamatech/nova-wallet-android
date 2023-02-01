@@ -34,7 +34,7 @@ class HintsView @JvmOverloads constructor(
                 text = hint
 
                 if (index > 0) {
-                    updatePadding(top = 8.dp)
+                    updatePadding(top = 12.dp)
                 }
             }
         }.forEach(::addView)

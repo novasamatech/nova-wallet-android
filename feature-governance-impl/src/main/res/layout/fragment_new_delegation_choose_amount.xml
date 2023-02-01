@@ -78,7 +78,14 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 app:amountChanges_icon="@drawable/ic_time_16"
-                app:amountChanges_title="@string/referendum_vote_locking_period" />
+                app:amountChanges_title="@string/delegation_undelegating_period" />
+
+            <io.novafoundation.nova.common.mixin.hints.HintsView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="16dp"
+                android:id="@+id/newDelegationChooseAmountHints"/>
         </LinearLayout>
     </ScrollView>
 
