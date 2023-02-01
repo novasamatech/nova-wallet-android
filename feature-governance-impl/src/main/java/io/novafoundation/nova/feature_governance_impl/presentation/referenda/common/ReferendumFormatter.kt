@@ -67,7 +67,7 @@ private val oneDay = 1.days
 
 class RealReferendumFormatter(
     private val resourceManager: ResourceManager,
-    private val trackFormatter: TrackFormatter,
+    private val trackFormatter: TrackFormatter
 ) : ReferendumFormatter {
 
     override fun formatVoting(voting: ReferendumVoting, token: Token): ReferendumVotingModel {
