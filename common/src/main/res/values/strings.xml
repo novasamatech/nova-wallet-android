@@ -50,7 +50,7 @@
     <string name="delegation_tracks_empty_list_placeholder">No tracks are available to delegate</string>
 
     <string name="remove_votes_suggestion_title">Remove history of your votes?</string>
-    <string name="remove_votes_suggestion_description">You have previously voted in referendums in 3 tracks. In order to make these tracks available for delegation, you need to remove your existing votes.</string>
+    <string name="remove_votes_suggestion_description">You have previously voted in referendums in %d tracks. In order to make these tracks available for delegation, you need to remove your existing votes.</string>
     <string name="remove_votes_suggestion_button_text">Remove votes</string>
 
     <string name="update_notification_item_version">Version %s</string>

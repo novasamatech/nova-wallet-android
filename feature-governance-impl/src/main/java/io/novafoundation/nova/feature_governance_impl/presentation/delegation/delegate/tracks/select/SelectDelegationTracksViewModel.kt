@@ -45,9 +45,9 @@ class SelectDelegationTracksViewModel(
 
     private val availableTrackFlow = chooseTrackDataFlow.map { it.trackPartition.available }
 
-    private val _showRemoveVotesSuggestion = MutableLiveData<Event<Boolean>>()
+    private val _showRemoveVotesSuggestion = MutableLiveData<Event<Int>>()
 
-    val showRemoveVotesSuggestion: LiveData<Event<Boolean>> = _showRemoveVotesSuggestion
+    val showRemoveVotesSuggestion: LiveData<Event<Int>> = _showRemoveVotesSuggestion
 
     val trackPresetsModels = trackPresetsFlow
         .map { mapTrackPresets(it) }
@@ -114,8 +114,9 @@ class SelectDelegationTracksViewModel(
     private fun checkExistingVotes() {
         launch {
             val chooseTrackData = chooseTrackDataFlow.first()
-            if (chooseTrackData.trackPartition.alreadyVoted.isNotEmpty()) {
-                _showRemoveVotesSuggestion.value = Event(true)
+            val alreadyVoted = chooseTrackData.trackPartition.alreadyVoted
+            if (alreadyVoted.isNotEmpty()) {
+                _showRemoveVotesSuggestion.value = Event(alreadyVoted.size)
             }
         }
     }

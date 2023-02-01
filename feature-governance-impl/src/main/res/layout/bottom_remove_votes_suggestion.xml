@@ -14,7 +14,6 @@
         android:layout_marginTop="6dp" />
 
     <TextView
-        android:id="@+id/actionNotAllowedTitle"
         style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -23,7 +22,7 @@
         android:textColor="@color/text_primary" />
 
     <TextView
-        android:id="@+id/actionNotAllowedSubtitle"
+        android:id="@+id/removeVotesSuggestionDescription"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

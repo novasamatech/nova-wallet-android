@@ -109,7 +109,8 @@ class SelectDelegationTracksFragment :
 
         viewModel.showRemoveVotesSuggestion.observeEvent {
             val bottomSheet = RemoveVotesSuggestionBottomSheet(
-                requireContext(),
+                context = requireContext(),
+                votesCount = it,
                 onApply = viewModel::openRemoveVotesScreen
             )
             bottomSheet.show()
