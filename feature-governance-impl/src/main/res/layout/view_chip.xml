@@ -27,6 +27,7 @@
         android:textColor="@color/chip_text"
         tools:layout_marginEnd="8dp"
         tools:layout_marginVertical="4.5dp"
+        android:includeFontPadding="false"
         tools:style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
         tools:text="main agenda" />
 

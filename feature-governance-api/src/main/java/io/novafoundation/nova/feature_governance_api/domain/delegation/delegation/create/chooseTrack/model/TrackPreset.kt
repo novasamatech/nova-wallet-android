@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.model
 
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
+import io.novafoundation.nova.feature_governance_api.domain.track.Track
 
 data class TrackPreset(
     val type: Type,
@@ -24,6 +24,6 @@ fun TrackPreset.Companion.all(trackIds: List<TrackId>): TrackPreset {
 }
 
 @JvmName("allFromTrackInfo")
-fun TrackPreset.Companion.all(trackInfos: List<TrackInfo>): TrackPreset {
-    return all(trackInfos.map(TrackInfo::id))
+fun TrackPreset.Companion.all(trackInfos: List<Track>): TrackPreset {
+    return all(trackInfos.map(Track::id))
 }

@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.ful
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 interface GovernanceRouter : ReturnableRouter {
 
@@ -51,4 +52,6 @@ interface GovernanceRouter : ReturnableRouter {
     fun openRemoveVotes(payload: RemoveVotesPayload)
 
     fun openDelegateDelegators(payload: DelegateDelegatorsPayload)
+
+    fun openSelectDelegationTracks(accountId: AccountId)
 }

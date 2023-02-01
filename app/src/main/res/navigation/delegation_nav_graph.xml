@@ -56,6 +56,14 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_delegateDetailsFragment_to_selectDelegationTracks"
+            app:destination="@id/selectDelegationTracks"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -67,8 +75,14 @@
     <fragment
         android:id="@+id/delegateFullDescription"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionFragment"
-        android:label="ReferendumDescriptionFragment"
+        android:label="DescriptionFragment"
         tools:layout="@layout/fragment_description" />
+
+    <fragment
+        android:id="@+id/selectDelegationTracks"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.SelectDelegationTracksFragment"
+        android:label="SelectDelegationTracksFragment"
+        tools:layout="@layout/fragment_select_delegation_tracks" />
 
     <fragment
         android:id="@+id/removeVoteFragment"

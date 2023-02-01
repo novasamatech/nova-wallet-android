@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.SelectDelegationTracksFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsFragment
@@ -29,6 +30,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class GovernanceNavigator(
     private val navigationHolder: NavigationHolder,
@@ -78,6 +80,11 @@ class GovernanceNavigator(
         navigationHolder.contextManager.getActivity()
             ?.showBrowser(BuildConfig.DELEGATION_TUTORIAL_URL)
     }
+
+    override fun openSelectDelegationTracks(accountId: AccountId) = performNavigation(
+        actionId = R.id.action_delegateDetailsFragment_to_selectDelegationTracks,
+        args = SelectDelegationTracksFragment.newBundle(accountId)
+    )
 
     override fun openRemoveVotes(payload: RemoveVotesPayload) = performNavigation(
         actionId = R.id.action_open_remove_votes,

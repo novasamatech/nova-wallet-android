@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdOfSelectedMetaAccountIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackInfo
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
@@ -14,11 +13,13 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegatio
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.model.TrackPreset
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.model.all
 import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackCategory
+import io.novafoundation.nova.feature_governance_api.domain.track.Track
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.TrackAvailability.ALREADY_DELEGATED
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.TrackAvailability.ALREADY_VOTED
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.TrackAvailability.AVAILABLE
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.TrackCategorizer
+import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.flow.Flow
@@ -48,6 +49,7 @@ class RealNewDelegationChooseTrackInteractor(
         val chain = governanceOption.assetWithChain.chain
         val governanceSource = governanceSourceRegistry.sourceFor(governanceOption)
         val allTracks = governanceSource.referenda.getTracks(chain.id)
+            .map { mapTrackInfoToTrack(it) }
         val userAccountId = accountRepository.requireIdOfSelectedMetaAccountIn(chain)
 
         return chainStateRepository.currentBlockNumberFlow(chain.id).map {
@@ -68,7 +70,7 @@ class RealNewDelegationChooseTrackInteractor(
         }
     }
 
-    private fun buildPresets(tracks: List<TrackInfo>): List<TrackPreset> {
+    private fun buildPresets(tracks: List<Track>): List<TrackPreset> {
         val all = TrackPreset.all(tracks)
 
         val categorized = tracks.groupBy { trackCategorizer.categoryOf(it.name) }
@@ -78,7 +80,7 @@ class RealNewDelegationChooseTrackInteractor(
                 presetType?.let {
                     TrackPreset(
                         type = it,
-                        trackIds = tracks.map(TrackInfo::id)
+                        trackIds = tracks.map(Track::id)
                     )
                 }
             }
@@ -103,7 +105,7 @@ class RealNewDelegationChooseTrackInteractor(
         }
     }
 
-    private fun Map<TrackAvailability, List<TrackInfo>>.tracksThatAre(availability: TrackAvailability): List<TrackInfo> {
+    private fun Map<TrackAvailability, List<Track>>.tracksThatAre(availability: TrackAvailability): List<Track> {
         return get(availability).orEmpty()
     }
 }

@@ -160,7 +160,7 @@ class GovernanceFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideTrackFormatter(
+    fun provideTracksFormatter(
         trackCategorizer: TrackCategorizer,
         resourceManager: ResourceManager
     ): TrackFormatter = RealTrackFormatter(trackCategorizer, resourceManager)
