@@ -6,5 +6,5 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class SelectDelegationTracksPayload(
-    val accountId: AccountId
+    val delegateId: AccountId
 ) : Parcelable

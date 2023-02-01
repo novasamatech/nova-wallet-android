@@ -99,7 +99,7 @@ class GovernanceNavigator(
     )
 
     override fun openNewDelegationChooseAmount(payload: NewDelegationChooseAmountPayload) = performNavigation(
-        actionId = R.id.action_delegateDetailsFragment_to_newDelegationChooseAmountFragment,
+        actionId = R.id.action_selectDelegationTracks_to_newDelegationChooseAmountFragment,
         args = NewDelegationChooseAmountFragment.getBundle(payload)
     )
 
