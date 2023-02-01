@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.list.NestedAdapter
 import io.novafoundation.nova.common.list.PlaceholderAdapter
 import io.novafoundation.nova.common.presentation.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
@@ -42,13 +43,16 @@ class SelectDelegationTracksFragment :
         }
     }
 
-    private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) { SelectDelegationTracksHeaderAdapter(this) }
-    private val presetsAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        NestedAdapter(SelectDelegationTracksPresetsAdapter(this), RecyclerView.HORIZONTAL, Rect(12.dp, 8.dp, 12.dp, 12.dp))
-    }
-    private val placeholderAdapter by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.item_tracks_placeholder) }
-    private val tracksAdapter by lazy(LazyThreadSafetyMode.NONE) { SelectDelegationTracksAdapter(this) }
-    private val concatAdapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(headerAdapter, presetsAdapter, placeholderAdapter, tracksAdapter) }
+    private val headerAdapter = SelectDelegationTracksHeaderAdapter(this)
+
+    private val presetsAdapter = NestedAdapter(
+        nestedAdapter = SelectDelegationTracksPresetsAdapter(this),
+        orientation = RecyclerView.HORIZONTAL,
+        paddingInDp = Rect(12, 8, 12, 12)
+    )
+    private val placeholderAdapter = PlaceholderAdapter(R.layout.item_tracks_placeholder)
+    private val tracksAdapter = SelectDelegationTracksAdapter(this)
+    private val concatAdapter = ConcatAdapter(headerAdapter, presetsAdapter, placeholderAdapter, tracksAdapter)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -100,14 +104,7 @@ class SelectDelegationTracksFragment :
             }
         }
 
-        viewModel.isButtonEnabled.observe {
-            selectDelegationTracksApply.isEnabled = it
-            selectDelegationTracksApply.text = if (it) {
-                getString(R.string.common_continue)
-            } else {
-                getString(R.string.delegation_tracks_disabled_apply_button_text)
-            }
-        }
+        viewModel.buttonState.observe { selectDelegationTracksApply.setState(it) }
     }
 
     override fun trackClicked(position: Int) {

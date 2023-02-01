@@ -31,7 +31,7 @@ class SelectDelegationTracksPresetsAdapter(
 
 private object DelegationTracksPresetDiffCallback : DiffUtil.ItemCallback<DelegationTracksPresetModel>() {
     override fun areItemsTheSame(oldItem: DelegationTracksPresetModel, newItem: DelegationTracksPresetModel): Boolean {
-        return oldItem.value == newItem.value
+        return oldItem.label == newItem.label
     }
 
     override fun areContentsTheSame(oldItem: DelegationTracksPresetModel, newItem: DelegationTracksPresetModel): Boolean {
@@ -50,7 +50,7 @@ class DelegationTrackPresetViewHolder(
 
     fun bind(item: DelegationTracksPresetModel) {
         with(itemView) {
-            itemDelegationTracksPreset.text = item.value
+            itemDelegationTracksPreset.text = item.label
         }
     }
 }

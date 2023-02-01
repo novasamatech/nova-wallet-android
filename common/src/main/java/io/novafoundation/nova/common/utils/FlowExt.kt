@@ -182,25 +182,6 @@ fun <T, R> Flow<T>.withLoadingResult(source: suspend (T) -> Result<R>): Flow<Ext
     }
 }
 
-fun <T> Flow<T>.withLoadingResult(): Flow<ExtendedLoadingState<T>> {
-    return asResultFlow()
-        .transform { item ->
-            emit(ExtendedLoadingState.Loading)
-
-            item
-                .onSuccess { emit(ExtendedLoadingState.Loaded(it)) }
-                .onFailure { emit(ExtendedLoadingState.Error(it)) }
-        }
-}
-
-fun <T> Flow<T>.asResultFlow(): Flow<Result<T>> = flow {
-    try {
-        collect { value -> emit(Result.success(value)) }
-    } catch (e: Exception) {
-        Result.failure<T>(e)
-    }
-}
-
 fun <T> Flow<T>.asLiveData(scope: CoroutineScope): LiveData<T> {
     val liveData = MutableLiveData<T>()
 

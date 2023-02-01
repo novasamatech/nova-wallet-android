@@ -1,9 +1,10 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select
 
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.toggle
-import io.novafoundation.nova.common.utils.withLoadingResult
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.NewDelegationChooseTrackInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.model.TrackPreset
@@ -32,6 +33,7 @@ class SelectDelegationTracksViewModel(
 ) : BaseViewModel() {
 
     private val chooseTrackDataFlow = newDelegationChooseTrackInteractor.observeChooseTrackData()
+        .shareInBackground()
 
     private var selectedTracksFlow = MutableStateFlow(setOf<TrackId>())
 
@@ -44,16 +46,22 @@ class SelectDelegationTracksViewModel(
         .shareInBackground()
 
     val availableTrackModels = combine(availableTrackFlow, selectedTracksFlow) { tracks, selectedTracks ->
-        mapTracksToModel(tracks, selectedTracks.toList())
-    }.withLoadingResult()
+        mapTracksToModel(tracks, selectedTracks)
+    }.withSafeLoading()
         .shareInBackground()
 
     val showUnavailableTracksButton = chooseTrackDataFlow
         .map { it.trackPartition.hasUnavailableTracks() }
         .shareInBackground()
 
-    val isButtonEnabled = selectedTracksFlow
-        .map { it.isNotEmpty() }
+    val buttonState = selectedTracksFlow
+        .map {
+            if (it.isEmpty()) {
+                DescriptiveButtonState.Disabled(resourceManager.getString(R.string.delegation_tracks_disabled_apply_button_text))
+            } else {
+                DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
+            }
+        }
         .shareInBackground()
 
     init {
@@ -93,8 +101,8 @@ class SelectDelegationTracksViewModel(
     private fun mapTrackPresets(trackPresets: List<TrackPreset>): List<DelegationTracksPresetModel> {
         return trackPresets.map {
             DelegationTracksPresetModel(
-                mapPresetTypeToButtonName(it.type),
-                it.type
+                label = mapPresetTypeToButtonName(it.type),
+                trackPresetModels = it.type
             )
         }
     }
@@ -108,8 +116,9 @@ class SelectDelegationTracksViewModel(
         }
     }
 
-    private suspend fun mapTracksToModel(tracks: List<Track>, selectedTracks: List<TrackId>): List<DelegationTrackModel> {
+    private suspend fun mapTracksToModel(tracks: List<Track>, selectedTracks: Set<TrackId>): List<DelegationTrackModel> {
         val asset = governanceSharedState.chainAsset()
+
         return tracks.map {
             val trackModel = trackFormatter.formatTrack(it, asset)
             DelegationTrackModel(
