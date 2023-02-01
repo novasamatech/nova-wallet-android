@@ -101,7 +101,7 @@ fun ExtrinsicBuilder.convictionVotingDelegate(
         callName = "delegate",
         arguments = mapOf(
             "class" to trackId.value,
-            "to" to delegate,
+            "to" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, delegate),
             "conviction" to conviction.prepareForEncoding(),
             "balance" to amount
         )

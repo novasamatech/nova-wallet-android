@@ -8,9 +8,13 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votesFor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountInteractor
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.ChooseDelegationAmountValidationPayload
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.ChooseDelegationAmountValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.chooseChooseDelegationAmountValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.conviction.ConvictionValuesProvider
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.AmountChipModel
@@ -29,6 +33,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
 
 
 class NewDelegationChooseAmountViewModel(
@@ -39,7 +44,7 @@ class NewDelegationChooseAmountViewModel(
     private val payload: NewDelegationChooseAmountPayload,
     private val resourceManager: ResourceManager,
     private val router: GovernanceRouter,
-//    private val validationSystem: VoteReferendumValidationSystem,
+    private val validationSystem: ChooseDelegationAmountValidationSystem,
     private val validationExecutor: ValidationExecutor,
     private val locksChangeFormatter: LocksChangeFormatter,
     private val convictionValuesProvider: ConvictionValuesProvider,
@@ -126,9 +131,9 @@ class NewDelegationChooseAmountViewModel(
         )
     }
 
-   fun continueClicked() {
-
-   }
+    fun continueClicked() {
+        openConfirmIfValid()
+    }
 
     fun backClicked() {
         router.back()
@@ -138,44 +143,36 @@ class NewDelegationChooseAmountViewModel(
         amountChooserMixin.amountInput.value = chipModel.amountInput
     }
 
-//    private fun openConfirmIfValid(voteType: VoteType) = originFeeMixin.requireFee(this) { fee ->
-//        launch {
-//            val voteAssistant = delegateAssistantFlow.first()
-//
-//            val payload = VoteReferendumValidationPayload(
-//                onChainReferendum = voteAssistant.onChainReferendum,
-//                asset = selectedAsset.first(),
-//                trackVoting = voteAssistant.trackVoting,
-//                voteAmount = amountChooserMixin.amount.first(),
-//                fee = fee
-//            )
-//
-//            validationExecutor.requireValid(
-//                validationSystem = validationSystem,
-//                payload = payload,
-//                validationFailureTransformer = { handleVoteReferendumValidationFailure(it, resourceManager) },
-//                progressConsumer = validatingVoteType.progressConsumer(voteType),
-//            ) {
-//                validatingVoteType.value = null
-//
-//                openConfirm(it, voteType)
-//            }
-//        }
-//    }
-//
-//    private fun openConfirm(validationPayload: VoteReferendumValidationPayload, voteType: VoteType) = launch {
-//        val conviction = selectedConvictionFlow.first()
-//
-//        val confirmPayload = ConfirmVoteReferendumPayload(
-//            _referendumId = payload._referendumId,
-//            fee = validationPayload.fee,
-//            vote = AccountVoteParcelModel(
-//                amount = validationPayload.voteAmount,
-//                conviction = conviction,
-//                aye = voteType == VoteType.AYE
-//            )
-//        )
-//
-//        router.openConfirmVoteReferendum(confirmPayload)
-//    }
+    private fun openConfirmIfValid() = launch {
+        validationInProgressFlow.value = true
+        val fee = originFeeMixin.awaitFee()
+        val payload = ChooseDelegationAmountValidationPayload(
+            asset = selectedAsset.first(),
+            fee = fee,
+            amount = amountChooserMixin.amount.first(),
+            delegate = payload.delegate
+        )
+
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { chooseChooseDelegationAmountValidationFailure(it, resourceManager) },
+            progressConsumer = validationInProgressFlow.progressConsumer(),
+        ) {
+            validationInProgressFlow.value = false
+
+            openConfirm(it)
+        }
+
+    }
+
+    private fun openConfirm(validationPayload: ChooseDelegationAmountValidationPayload) = launch {
+        val conviction = selectedConvictionFlow.first()
+        val amount = validationPayload.amount
+        val delegate = validationPayload.delegate
+        val tracks = payload.trackIds
+
+        // TODO open confirm
+        showMessage("TODO - open confirm")
+    }
 }

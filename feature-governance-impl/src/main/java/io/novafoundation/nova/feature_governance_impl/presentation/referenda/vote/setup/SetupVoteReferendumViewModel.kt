@@ -34,7 +34,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -154,28 +153,28 @@ class SetupVoteReferendumViewModel(
         amountChooserMixin.amountInput.value = chipModel.amountInput
     }
 
-    private fun openConfirmIfValid(voteType: VoteType) = originFeeMixin.requireFee(this) { fee ->
-        launch {
-            val voteAssistant = voteAssistantFlow.first()
+    private fun openConfirmIfValid(voteType: VoteType) = launch {
+        validatingVoteType.value = voteType
+        val fee = originFeeMixin.awaitFee()
+        val voteAssistant = voteAssistantFlow.first()
 
-            val payload = VoteReferendumValidationPayload(
-                onChainReferendum = voteAssistant.onChainReferendum,
-                asset = selectedAsset.first(),
-                trackVoting = voteAssistant.trackVoting,
-                voteAmount = amountChooserMixin.amount.first(),
-                fee = fee
-            )
+        val payload = VoteReferendumValidationPayload(
+            onChainReferendum = voteAssistant.onChainReferendum,
+            asset = selectedAsset.first(),
+            trackVoting = voteAssistant.trackVoting,
+            voteAmount = amountChooserMixin.amount.first(),
+            fee = fee
+        )
 
-            validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                validationFailureTransformer = { handleVoteReferendumValidationFailure(it, resourceManager) },
-                progressConsumer = validatingVoteType.progressConsumer(voteType),
-            ) {
-                validatingVoteType.value = null
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { handleVoteReferendumValidationFailure(it, resourceManager) },
+            progressConsumer = validatingVoteType.progressConsumer(voteType),
+        ) {
+            validatingVoteType.value = null
 
-                openConfirm(it, voteType)
-            }
+            openConfirm(it, voteType)
         }
     }
 

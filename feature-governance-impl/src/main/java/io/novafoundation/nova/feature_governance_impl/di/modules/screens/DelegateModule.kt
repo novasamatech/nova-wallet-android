@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -23,6 +24,8 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.details.RealDelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.list.RealDelegateListInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.RealNewDelegationChooseAmountInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.ChooseDelegationAmountValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.chooseDelegationAmount
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.RealNewDelegationChooseTrackInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.TrackCategorizer
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
@@ -118,5 +121,14 @@ class DelegateModule {
             locksRepository = locksRepository,
             computationalCache = computationalCache
         )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideNewDelegationChooseAmountValidationSystem(
+        governanceSharedState: GovernanceSharedState,
+        accountRepository: AccountRepository
+    ): ChooseDelegationAmountValidationSystem {
+        return ValidationSystem.chooseDelegationAmount(governanceSharedState, accountRepository)
     }
 }
