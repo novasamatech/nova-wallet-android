@@ -3,11 +3,11 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votesFor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountInteractor
 import io.novafoundation.nova.feature_governance_impl.R
@@ -55,8 +55,6 @@ class NewDelegationChooseAmountViewModel(
 
     override val originFeeMixin = feeLoaderMixinFactory.create(selectedAsset)
 
-    private val validatingVoteType = MutableStateFlow<VoteType?>(null)
-
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = selectedAsset,
@@ -101,6 +99,16 @@ class NewDelegationChooseAmountViewModel(
         voteAssistant.reusableLocks().map { locksFormatter.formatReusableLock(it, asset) }
     }
         .shareInBackground()
+
+    private val validationInProgressFlow = MutableStateFlow(false)
+
+    val buttonState = combine(validationInProgressFlow, amountChooserMixin.amountInput) { inProgress, amountRaw ->
+        when {
+            inProgress -> DescriptiveButtonState.Loading
+            amountRaw.isEmpty() -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_enter_amount))
+            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_confirm))
+        }
+    }
 
     init {
         originFeeMixin.connectWith(
@@ -169,13 +177,5 @@ class NewDelegationChooseAmountViewModel(
 //        )
 //
 //        router.openConfirmVoteReferendum(confirmPayload)
-//    }
-
-//    private fun buttonStateFlow(forType: VoteType, @StringRes labelRes: Int) = validatingVoteType.map { validationType ->
-//        when (validationType) {
-//            null -> DescriptiveButtonState.Enabled(resourceManager.getString(labelRes))
-//            forType -> DescriptiveButtonState.Loading
-//            else -> DescriptiveButtonState.Disabled(resourceManager.getString(labelRes))
-//        }
 //    }
 }

@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
@@ -82,6 +83,8 @@ class NewDelegationChooseAmountFragment : BaseFragment<NewDelegationChooseAmount
         viewModel.votesFormattedFlow.observe {
             newDelegationChooseAmountVotePower.votePowerVotesText.text = it
         }
+
+        viewModel.buttonState.observe(newDelegationChooseAmountConfirm::setState)
     }
 
     private fun setChips(newChips: List<AmountChipModel>) {
