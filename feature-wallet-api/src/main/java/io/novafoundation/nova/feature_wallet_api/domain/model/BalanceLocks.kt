@@ -10,7 +10,7 @@ class BalanceLock(
     val id: String,
     val amountInPlanks: Balance,
     val chainAsset: Chain.Asset
-): Identifiable {
+) : Identifiable {
 
     override val identifier: String = id
 }

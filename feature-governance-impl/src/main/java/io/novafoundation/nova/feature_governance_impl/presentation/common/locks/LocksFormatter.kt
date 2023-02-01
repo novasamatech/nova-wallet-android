@@ -15,7 +15,7 @@ interface LocksFormatter {
 
 class RealLocksFormatter(
     private val resourceManager: ResourceManager
-): LocksFormatter {
+) : LocksFormatter {
 
     override fun formatReusableLock(
         reusableLock: ReusableLock,

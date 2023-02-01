@@ -10,7 +10,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBal
 
 typealias ChooseDelegationAmountValidationSystem = ValidationSystem<ChooseDelegationAmountValidationPayload, ChooseDelegationAmountValidationFailure>
 typealias ChooseDelegationAmountValidation = Validation<ChooseDelegationAmountValidationPayload, ChooseDelegationAmountValidationFailure>
-typealias ChooseDelegationAmountValidationSystemBuilder = ValidationSystemBuilder<ChooseDelegationAmountValidationPayload, ChooseDelegationAmountValidationFailure>
+typealias ChooseDelegationAmountValidationSystemBuilder =
+    ValidationSystemBuilder<ChooseDelegationAmountValidationPayload, ChooseDelegationAmountValidationFailure>
 
 fun ValidationSystem.Companion.chooseDelegationAmount(
     governanceSharedState: GovernanceSharedState,

@@ -26,5 +26,5 @@ fun ChooseDelegationAmountValidationSystemBuilder.notSelfDelegation(
     governanceSharedState: GovernanceSharedState,
     accountRepository: AccountRepository
 ) {
-  validate(NotSelfDelegationValidation(governanceSharedState, accountRepository))
+    validate(NotSelfDelegationValidation(governanceSharedState, accountRepository))
 }

@@ -35,7 +35,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
-
 class NewDelegationChooseAmountViewModel(
     private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     private val assetUseCase: AssetUseCase,
@@ -163,7 +162,6 @@ class NewDelegationChooseAmountViewModel(
 
             openConfirm(it)
         }
-
     }
 
     private fun openConfirm(validationPayload: ChooseDelegationAmountValidationPayload) = launch {
