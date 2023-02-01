@@ -21,10 +21,9 @@ class RemoveVotesSuggestionBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         removeVotesSuggestionDescription.text = context.getString(R.string.remove_votes_suggestion_description, votesCount)
-        removeVotesSuggestionSkip.setOnClickListener { dismiss() }
-        removeVotesSuggestionApply.setOnClickListener {
+        removeVotesSuggestionSkip.dismissOnClick()
+        removeVotesSuggestionApply.setDismissingClickListener {
             onApply()
-            dismiss()
         }
     }
 }

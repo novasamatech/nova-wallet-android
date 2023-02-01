@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.track
+package io.novafoundation.nova.feature_governance_impl.presentation.track.list
 
 import android.content.Context
 import android.os.Bundle
@@ -10,6 +10,8 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSh
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter.Handler
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
+import io.novafoundation.nova.feature_governance_impl.presentation.track.setTrackModel
 import kotlinx.android.synthetic.main.item_track.view.itemTrack
 
 class TrackListBottomSheet(

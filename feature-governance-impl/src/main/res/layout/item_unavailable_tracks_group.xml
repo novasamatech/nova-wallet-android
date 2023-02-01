@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:layout_marginTop="8dp"
+    tools:background="@color/secondary_screen_background">
+
+    <TextView
+        android:id="@+id/itemUnavailableTrackGroupTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:singleLine="true"
+        android:textColor="@color/text_secondary"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toTopOf="@+id/itemDelegateType"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toEndOf="@+id/itemDelegateIcon"
+        app:layout_constraintTop_toTopOf="@+id/itemDelegateIcon"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Tracks which you have existing votes in" />
+
+    <io.novafoundation.nova.common.view.ReadMoreView
+        android:id="@+id/itemUnavailableTrackGroupButton"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:text="@string/unavailable_tracks_button_text" />
+
+</LinearLayout>
