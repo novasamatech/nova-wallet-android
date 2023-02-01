@@ -16,6 +16,7 @@ interface LocksChangeFormatter {
     suspend fun mapLocksChangeToUi(
         locksChange: LocksChange,
         asset: Asset,
+        displayPeriodFromWhenSame: Boolean = true,
     ): LocksChangeModel
 
     suspend fun mapAmountChangeToUi(
@@ -30,11 +31,12 @@ class RealLocksChangeFormatter(
 
     override suspend fun mapLocksChangeToUi(
         locksChange: LocksChange,
-        asset: Asset
+        asset: Asset,
+        displayPeriodFromWhenSame: Boolean,
     ): LocksChangeModel {
         return LocksChangeModel(
             amountChange = mapAmountChangeToUi(locksChange.lockedAmountChange, asset),
-            periodChange = mapPeriodChangeToUi(locksChange.lockedPeriodChange),
+            periodChange = mapPeriodChangeToUi(locksChange.lockedPeriodChange, displayPeriodFromWhenSame),
             transferableChange = mapAmountChangeToUi(locksChange.transferableChange, asset)
         )
     }
@@ -62,7 +64,7 @@ class RealLocksChangeFormatter(
         }
     }
 
-    private fun mapPeriodChangeToUi(periodChange: Change<Duration>): AmountChangeModel {
+    private fun mapPeriodChangeToUi(periodChange: Change<Duration>, displayPeriodFromWhenSame: Boolean): AmountChangeModel {
         val from = resourceManager.formatDuration(periodChange.previousValue, estimated = false)
         val to = resourceManager.formatDuration(periodChange.newValue, estimated = false)
 
@@ -78,7 +80,7 @@ class RealLocksChangeFormatter(
                 )
             }
             is Change.Same -> AmountChangeModel(
-                from = from,
+                from = from.takeIf { displayPeriodFromWhenSame },
                 to = to,
                 difference = null,
                 positive = null

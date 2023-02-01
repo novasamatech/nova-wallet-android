@@ -91,7 +91,7 @@ class NewDelegationChooseAmountViewModel(
     }.shareInBackground()
 
     val locksChangeUiFlow = locksChangeFlow.map {
-        locksChangeFormatter.mapLocksChangeToUi(it, selectedAsset.first())
+        locksChangeFormatter.mapLocksChangeToUi(it, selectedAsset.first(), displayPeriodFromWhenSame = false)
     }
         .shareInBackground()
 

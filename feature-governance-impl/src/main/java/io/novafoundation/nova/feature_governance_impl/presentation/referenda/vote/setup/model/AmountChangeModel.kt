@@ -6,8 +6,8 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model.AmountChangeModel.DifferenceModel
 
 class AmountChangeModel(
-    val from: String,
     val to: String,
+    val from: String?,
     val difference: DifferenceModel?
 ) {
 
@@ -19,7 +19,7 @@ class AmountChangeModel(
 }
 
 fun AmountChangeModel(
-    from: String,
+    from: String?,
     to: String,
     difference: String?,
     positive: Boolean?
