@@ -115,7 +115,7 @@ class NewDelegationChooseAmountViewModel(
         when {
             inProgress -> DescriptiveButtonState.Loading
             amountRaw.isEmpty() -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_enter_amount))
-            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_confirm))
+            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
         }
     }
 
