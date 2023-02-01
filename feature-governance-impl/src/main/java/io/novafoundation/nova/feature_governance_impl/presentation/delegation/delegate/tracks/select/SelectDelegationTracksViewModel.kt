@@ -20,12 +20,15 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model.DelegationTracksPresetModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+
+class UnavailableTracksModel(val alreadyVoted: List<TrackModel>, val alreadyDelegated: List<TrackModel>)
 
 class SelectDelegationTracksViewModel(
     private val newDelegationChooseTrackInteractor: NewDelegationChooseTrackInteractor,
@@ -46,8 +49,10 @@ class SelectDelegationTracksViewModel(
     private val availableTrackFlow = chooseTrackDataFlow.map { it.trackPartition.available }
 
     private val _showRemoveVotesSuggestion = MutableLiveData<Event<Int>>()
-
     val showRemoveVotesSuggestion: LiveData<Event<Int>> = _showRemoveVotesSuggestion
+
+    private val _showUnavailableTracksEvent = MutableLiveData<Event<UnavailableTracksModel>>()
+    val showUnavailableTracksEvent: LiveData<Event<UnavailableTracksModel>> = _showUnavailableTracksEvent
 
     val trackPresetsModels = trackPresetsFlow
         .map { mapTrackPresets(it) }
@@ -89,6 +94,12 @@ class SelectDelegationTracksViewModel(
     }
 
     fun unavailableTracksClicked() {
+        launch {
+            val tracksPartition = chooseTrackDataFlow.first().trackPartition
+            val alreadyVotedModels = mapTracks(tracksPartition.alreadyVoted)
+            val alreadyDelegatedModels = mapTracks(tracksPartition.alreadyDelegated)
+            _showUnavailableTracksEvent.value = Event(UnavailableTracksModel(alreadyVotedModels, alreadyDelegatedModels))
+        }
     }
 
     fun openSetupConviction() {
@@ -149,5 +160,10 @@ class SelectDelegationTracksViewModel(
                 isSelected = it.id in selectedTracks
             )
         }
+    }
+
+    private suspend fun mapTracks(tracks: List<Track>): List<TrackModel> {
+        val asset = governanceSharedState.chainAsset()
+        return tracks.map { trackFormatter.formatTrack(it, asset) }
     }
 }
