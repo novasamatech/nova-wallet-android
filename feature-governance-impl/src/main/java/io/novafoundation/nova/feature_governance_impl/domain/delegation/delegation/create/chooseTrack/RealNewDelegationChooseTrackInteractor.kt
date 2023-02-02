@@ -98,8 +98,8 @@ class RealNewDelegationChooseTrackInteractor(
     }
 
     private fun Map<TrackId, Voting>.availabilityOf(trackId: TrackId): TrackAvailability {
-        return when (get(trackId)) {
-            is Voting.Casting -> ALREADY_VOTED
+        return when (val voting = get(trackId)) {
+            is Voting.Casting -> if (voting.votes.isEmpty()) AVAILABLE else ALREADY_VOTED
             is Voting.Delegating -> ALREADY_DELEGATED
             null -> AVAILABLE
         }
