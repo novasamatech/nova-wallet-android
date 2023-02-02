@@ -14,7 +14,7 @@
     <string name="delegation_tracks">Tracks</string>
 
     <string name="common_element_and_more_format">%s (+%s more)</string>
-<!--    <string name="assets_manage_tokens_partial_networks">%s (+%s more)</string>-->
+    <!--    <string name="assets_manage_tokens_partial_networks">%s (+%s more)</string>-->
 
     <string name="delegation_all_votes">Voted for all time</string>
     <string name="delegation_delegate_info">Delegate info</string>
@@ -56,6 +56,16 @@
 
     <string name="delegation_tracks_disabled_apply_button_text">Select at least 1 track...</string>
     <string name="delegation_tracks_empty_list_placeholder">No tracks are available to delegate</string>
+
+    <string name="remove_votes_suggestion_title">Remove history of your votes?</string>
+    <string name="remove_votes_suggestion_description">You have previously voted in referendums in %d tracks. In order to make these tracks available for delegation, you need to remove your existing votes.</string>
+    <string name="remove_votes_suggestion_button_text">Remove votes</string>
+
+    <string name="unavailable_tracks_title">Unavailable tracks</string>
+    <string name="unavailable_tracks_button_text">Remove votes in order to delegate in these tracks</string>
+
+    <string name="unavailable_tracks_voted_group">Tracks which you have existing votes in</string>
+    <string name="unavailable_tracks_delegated_group">Tracks that you have already delegated votes</string>
 
     <string name="update_notification_item_version">Version %s</string>
 

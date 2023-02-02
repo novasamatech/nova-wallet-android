@@ -1,8 +1,11 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
@@ -15,14 +18,18 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model.DelegationTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model.DelegationTracksPresetModel
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+
+class UnavailableTracksModel(val alreadyVoted: List<TrackModel>, val alreadyDelegated: List<TrackModel>)
 
 class SelectDelegationTracksViewModel(
     private val newDelegationChooseTrackInteractor: NewDelegationChooseTrackInteractor,
@@ -41,6 +48,12 @@ class SelectDelegationTracksViewModel(
     private val trackPresetsFlow = chooseTrackDataFlow.map { it.presets }
 
     private val availableTrackFlow = chooseTrackDataFlow.map { it.trackPartition.available }
+
+    private val _showRemoveVotesSuggestion = MutableLiveData<Event<Int>>()
+    val showRemoveVotesSuggestion: LiveData<Event<Int>> = _showRemoveVotesSuggestion
+
+    private val _showUnavailableTracksEvent = MutableLiveData<Event<UnavailableTracksModel>>()
+    val showUnavailableTracksEvent: LiveData<Event<UnavailableTracksModel>> = _showUnavailableTracksEvent
 
     val trackPresetsModels = trackPresetsFlow
         .map { mapTrackPresets(it) }
@@ -66,12 +79,7 @@ class SelectDelegationTracksViewModel(
         .shareInBackground()
 
     init {
-        launch {
-            val chooseTrackData = chooseTrackDataFlow.first()
-            if (chooseTrackData.trackPartition.alreadyVoted.isNotEmpty()) {
-                // TODO open Remove votes bottom sheet
-            }
-        }
+        checkExistingVotes()
     }
 
     fun backClicked() {
@@ -87,6 +95,12 @@ class SelectDelegationTracksViewModel(
     }
 
     fun unavailableTracksClicked() {
+        launch {
+            val tracksPartition = chooseTrackDataFlow.first().trackPartition
+            val alreadyVotedModels = mapTracks(tracksPartition.alreadyVoted)
+            val alreadyDelegatedModels = mapTracks(tracksPartition.alreadyDelegated)
+            _showUnavailableTracksEvent.value = Event(UnavailableTracksModel(alreadyVotedModels, alreadyDelegatedModels))
+        }
     }
 
     fun nextClicked() = launch {
@@ -98,10 +112,30 @@ class SelectDelegationTracksViewModel(
         router.openNewDelegationChooseAmount(payload)
     }
 
+    fun openRemoveVotesScreen() {
+        launch {
+            val chooseTrackData = chooseTrackDataFlow.first()
+            val tracksIds = chooseTrackData.trackPartition.alreadyVoted
+                .map { it.id.value }
+            val payload = RemoveVotesPayload(tracksIds)
+            router.openRemoveVotes(payload)
+        }
+    }
+
     fun presetClicked(position: Int) {
         launch {
             val selectedPreset = trackPresetsFlow.first()[position]
             selectedTracksFlow.value = selectedPreset.trackIds.toHashSet()
+        }
+    }
+
+    private fun checkExistingVotes() {
+        launch {
+            val chooseTrackData = chooseTrackDataFlow.first()
+            val alreadyVoted = chooseTrackData.trackPartition.alreadyVoted
+            if (alreadyVoted.isNotEmpty()) {
+                _showRemoveVotesSuggestion.value = Event(alreadyVoted.size)
+            }
         }
     }
 
@@ -133,5 +167,10 @@ class SelectDelegationTracksViewModel(
                 isSelected = it.id in selectedTracks
             )
         }
+    }
+
+    private suspend fun mapTracks(tracks: List<Track>): List<TrackModel> {
+        val asset = governanceSharedState.chainAsset()
+        return tracks.map { trackFormatter.formatTrack(it, asset) }
     }
 }
