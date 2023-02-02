@@ -10,8 +10,8 @@ import java.math.BigInteger
 class NewDelegationChooseAmountPayload(
     val delegate: AccountId,
     @Suppress("CanBeParameter") // val is required for Parcelize to work
-    private val _trackIdsRaw: List<BigInteger>
+    val trackIdsRaw: List<BigInteger>
 ) : Parcelable {
 
-    val trackIds = _trackIdsRaw.map(::TrackId)
+    val trackIds = trackIdsRaw.map(::TrackId)
 }

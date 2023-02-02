@@ -17,6 +17,7 @@ import coil.load
 import coil.transform.RoundedCornersTransformation
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.presentation.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.getAccentColor
 import io.novafoundation.nova.common.utils.getEnum
@@ -79,7 +80,7 @@ open class TableCellView @JvmOverloads constructor(
     private val contentGroup: Group
         get() = tableCellContent
 
-    private val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
+    val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
         FeatureUtils.getCommonApi(context).imageLoader()
     }
 
@@ -210,5 +211,13 @@ fun TableCellView.setExtraInfoAvailable(available: Boolean) {
     } else {
         setPrimaryValueIcon(null)
         isEnabled = false
+    }
+}
+
+fun <T> TableCellView.showLoadingState(state: ExtendedLoadingState<T>, showData: (T) -> Unit) {
+    when(state) {
+        is ExtendedLoadingState.Error -> showValue(context.getString(R.string.common_error_general_title))
+        is ExtendedLoadingState.Loaded -> showData(state.data)
+        ExtendedLoadingState.Loading -> showProgress()
     }
 }

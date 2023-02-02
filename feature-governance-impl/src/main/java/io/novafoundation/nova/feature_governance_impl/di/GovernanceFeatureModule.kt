@@ -33,6 +33,8 @@ import io.novafoundation.nova.feature_governance_impl.di.modules.screens.Referen
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.RealReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
+import io.novafoundation.nova.feature_governance_impl.domain.track.RealTracksUseCase
+import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.RealTrackCategorizer
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.TrackCategorizer
 import io.novafoundation.nova.feature_governance_impl.presentation.common.conviction.ConvictionValuesProvider
@@ -189,5 +191,12 @@ class GovernanceFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideConvictionValuesProvider(resourceManager: ResourceManager): ConvictionValuesProvider = RealConvictionValuesProvider()
+    fun provideConvictionValuesProvider(): ConvictionValuesProvider = RealConvictionValuesProvider()
+
+    @Provides
+    @FeatureScope
+    fun provideTracksUseCase(
+        governanceSharedState: GovernanceSharedState,
+        governanceSourceRegistry: GovernanceSourceRegistry,
+    ): TracksUseCase = RealTracksUseCase(governanceSharedState, governanceSourceRegistry)
 }

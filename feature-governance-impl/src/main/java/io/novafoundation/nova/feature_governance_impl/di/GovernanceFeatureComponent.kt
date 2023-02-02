@@ -14,8 +14,9 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.di.DelegateDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.di.VotedReferendaComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.di.DelegateListComponent
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.di.NewDelegationChooseAmountComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.di.SelectDelegationTracksComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.di.NewDelegationChooseAmountComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm.di.NewDelegationConfirmComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.di.RemoveVotesComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.di.ReferendumDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.di.ReferendumFullDetailsComponent
@@ -70,6 +71,8 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
     fun delegateDelegatorsFactory(): DelegateDelegatorsComponent.Factory
 
     fun newDelegationChooseAmountFactory(): NewDelegationChooseAmountComponent.Factory
+
+    fun newDelegationConfirmPayload(): NewDelegationConfirmComponent.Factory
 
     @Component.Factory
     interface Factory {

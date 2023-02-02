@@ -55,7 +55,7 @@ class VoterHolder(
     fun bind(item: VoterModel) = with(containerView) {
         setOnClickListener { eventHandler.onVoterClick(item) }
         itemVoterAddress.setAddressModel(item.addressModel)
-        itemVotesCount.text = item.votesCount
-        itemVotesCountDetails.text = item.votesCountDetails
+        itemVotesCount.text = item.vote.votesCount
+        itemVotesCountDetails.text = item.vote.votesCountDetails
     }
 }

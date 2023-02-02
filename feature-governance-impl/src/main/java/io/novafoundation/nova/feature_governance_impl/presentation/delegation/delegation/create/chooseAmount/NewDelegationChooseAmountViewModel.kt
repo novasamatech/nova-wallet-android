@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votesFor
@@ -21,6 +20,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.convic
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.AmountChipModel
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.LocksFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.common.newDelegationHints
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm.NewDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -85,7 +85,6 @@ class NewDelegationChooseAmountViewModel(
 
         delegateAssistant.estimateLocksAfterDelegating(amountPlanks, conviction, selectedAsset.first())
     }
-        .inBackground()
         .shareInBackground()
 
     val votesFormattedFlow = combine(
@@ -170,12 +169,14 @@ class NewDelegationChooseAmountViewModel(
     }
 
     private fun openConfirm(validationPayload: ChooseDelegationAmountValidationPayload) = launch {
-        val conviction = selectedConvictionFlow.first()
-        val amount = validationPayload.amount
-        val delegate = validationPayload.delegate
-        val tracks = payload.trackIds
+        val payload = NewDelegationConfirmPayload(
+            delegate = validationPayload.delegate,
+            trackIdsRaw = payload.trackIdsRaw,
+            amount = validationPayload.amount,
+            conviction = selectedConvictionFlow.first(),
+            fee = validationPayload.fee
+        )
 
-        // TODO open confirm
-        showMessage("TODO - open confirm")
+        router.openNewDelegationConfirm(payload)
     }
 }
