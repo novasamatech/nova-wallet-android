@@ -15,5 +15,5 @@ class DelegateLabel(
         override val name: String?,
         override val iconUrl: String?,
         override val accountType: DelegateAccountType
-    ): Delegate.Metadata
+    ) : Delegate.Metadata
 }

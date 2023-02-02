@@ -111,7 +111,6 @@ class NewDelegationConfirmViewModel(
         val locksChange = delegateAssistant.estimateLocksAfterDelegating(amountPlanks, payload.conviction, asset)
 
         locksChangeFormatter.mapLocksChangeToUi(locksChange, asset, displayPeriodFromWhenSame = false)
-
     }
         .shareInBackground()
 

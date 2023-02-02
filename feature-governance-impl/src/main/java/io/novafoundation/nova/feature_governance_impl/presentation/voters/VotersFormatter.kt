@@ -29,7 +29,7 @@ interface VotersFormatter {
     suspend fun formatTotalVotes(vote: GenericVoter.Vote?): String
 }
 
-suspend fun VotersFormatter.formatConvictionVote(convictionVote: ConvictionVote, chainAsset: Chain.Asset) : VoteModel {
+suspend fun VotersFormatter.formatConvictionVote(convictionVote: ConvictionVote, chainAsset: Chain.Asset): VoteModel {
     return VoteModel(
         votesCount = formatTotalVotes(convictionVote),
         votesCountDetails = formatConvictionVoteDetails(convictionVote, chainAsset)

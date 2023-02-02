@@ -9,7 +9,6 @@ import io.novafoundation.nova.runtime.state.selectedOption
 interface TracksUseCase {
 
     suspend fun tracksOf(trackIds: Collection<TrackId>): List<Track>
-
 }
 
 class RealTracksUseCase(

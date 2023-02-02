@@ -215,7 +215,7 @@ fun TableCellView.setExtraInfoAvailable(available: Boolean) {
 }
 
 fun <T> TableCellView.showLoadingState(state: ExtendedLoadingState<T>, showData: (T) -> Unit) {
-    when(state) {
+    when (state) {
         is ExtendedLoadingState.Error -> showValue(context.getString(R.string.common_error_general_title))
         is ExtendedLoadingState.Loaded -> showData(state.data)
         ExtendedLoadingState.Loading -> showProgress()

@@ -35,8 +35,6 @@ interface DelegateMappers {
     suspend fun formatDelegateLabel(delegateLabel: DelegateLabel, chain: Chain): DelegateLabelModel
 }
 
-
-
 class RealDelegateMappers(
     private val resourceManager: ResourceManager,
     private val addressIconGenerator: AddressIconGenerator,

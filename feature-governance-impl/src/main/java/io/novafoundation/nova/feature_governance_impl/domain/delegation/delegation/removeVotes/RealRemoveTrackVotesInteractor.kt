@@ -27,8 +27,6 @@ class RealRemoveTrackVotesInteractor(
     private val accountRepository: AccountRepository,
 ) : RemoveTrackVotesInteractor {
 
-
-
     override suspend fun calculateFee(trackIds: Collection<TrackId>): Balance = withContext(Dispatchers.IO) {
         val (chain, governance) = useSelectedGovernance()
         val accountId = accountRepository.requireIdOfSelectedMetaAccountIn(chain)
