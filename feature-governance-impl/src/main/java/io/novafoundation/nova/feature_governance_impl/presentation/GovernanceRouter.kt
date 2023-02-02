@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.descri
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
@@ -52,6 +53,8 @@ interface GovernanceRouter : ReturnableRouter {
     fun openRemoveVotes(payload: RemoveVotesPayload)
 
     fun openDelegateDelegators(payload: DelegateDelegatorsPayload)
+
+    fun openNewDelegationChooseAmount(payload: NewDelegationChooseAmountPayload)
 
     fun openSelectDelegationTracks(accountId: AccountId)
 }

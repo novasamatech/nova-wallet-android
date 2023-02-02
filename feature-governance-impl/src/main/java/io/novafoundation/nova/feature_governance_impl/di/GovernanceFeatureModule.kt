@@ -35,6 +35,10 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.R
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.RealTrackCategorizer
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.TrackCategorizer
+import io.novafoundation.nova.feature_governance_impl.presentation.common.conviction.ConvictionValuesProvider
+import io.novafoundation.nova.feature_governance_impl.presentation.common.conviction.RealConvictionValuesProvider
+import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.LocksFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.RealLocksFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.RealReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.RealTrackFormatter
@@ -178,4 +182,12 @@ class GovernanceFeatureModule {
         resourceManager: ResourceManager,
         addressIconGenerator: AddressIconGenerator,
     ): VotersFormatter = RealVotersFormatter(addressIconGenerator, resourceManager)
+
+    @Provides
+    @FeatureScope
+    fun provideLocksFormatter(resourceManager: ResourceManager): LocksFormatter = RealLocksFormatter(resourceManager)
+
+    @Provides
+    @FeatureScope
+    fun provideConvictionValuesProvider(resourceManager: ResourceManager): ConvictionValuesProvider = RealConvictionValuesProvider()
 }

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.validations
+package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.removeVotes.validations
 
 import io.novafoundation.nova.feature_wallet_api.domain.validation.NotEnoughToPayFeesError
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain

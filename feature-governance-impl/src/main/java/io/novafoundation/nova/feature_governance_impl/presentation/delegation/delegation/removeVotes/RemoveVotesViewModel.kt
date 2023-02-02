@@ -16,9 +16,9 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.removeVotes.RemoveTrackVotesInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.validations.RemoteVotesValidationSystem
-import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.validations.RemoveVotesValidationPayload
-import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.validations.handleRemoveVotesValidationFailure
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.removeVotes.validations.RemoteVotesValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.removeVotes.validations.RemoveVotesValidationPayload
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.removeVotes.validations.handleRemoveVotesValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.flow.Flow
@@ -33,7 +34,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 
 class RemoveVotesViewModel(
     private val interactor: RemoveTrackVotesInteractor,
@@ -104,7 +104,7 @@ class RemoveVotesViewModel(
         externalActions.showExternalActions(type, governanceSharedState.chain())
     }
 
-    private fun removeVotesIfValid(): Unit = requireFee { fee ->
+    private fun removeVotesIfValid(): Unit = originFeeMixin.requireFee(viewModel = this) { fee ->
         launch {
             val validationPayload = RemoveVotesValidationPayload(fee, assetFlow.first())
 
@@ -145,9 +145,4 @@ class RemoveVotesViewModel(
         val trackModels = trackModelsFlow.first()
         _showTracksEvent.value = trackModels.event()
     }
-
-    private fun requireFee(block: (BigDecimal) -> Unit) = originFeeMixin.requireFee(
-        block,
-        onError = { title, message -> showError(title, message) }
-    )
 }

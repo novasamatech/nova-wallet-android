@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRou
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model.DelegationTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model.DelegationTracksPresetModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
 import io.novafoundation.nova.runtime.state.chainAsset
@@ -102,7 +103,13 @@ class SelectDelegationTracksViewModel(
         }
     }
 
-    fun openSetupConviction() {
+    fun nextClicked() = launch {
+        val selectedTrackIds = selectedTracksFlow.value
+        val payload = NewDelegationChooseAmountPayload(
+            delegate = payload.delegateId,
+            _trackIdsRaw = selectedTrackIds.map(TrackId::value)
+        )
+        router.openNewDelegationChooseAmount(payload)
     }
 
     fun openRemoveVotesScreen() {

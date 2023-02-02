@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations
 
+import io.novafoundation.nova.feature_wallet_api.domain.validation.NotEnoughFreeBalanceError
 import io.novafoundation.nova.feature_wallet_api.domain.validation.NotEnoughToPayFeesError
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -14,9 +15,9 @@ sealed class VoteReferendumValidationFailure {
     ) : VoteReferendumValidationFailure(), NotEnoughToPayFeesError
 
     class AmountIsTooBig(
-        val chainAsset: Chain.Asset,
-        val availableToVote: BigDecimal,
-    ) : VoteReferendumValidationFailure()
+        override val chainAsset: Chain.Asset,
+        override val freeAfterFees: BigDecimal,
+    ) : VoteReferendumValidationFailure(), NotEnoughFreeBalanceError
 
     object ReferendumCompleted : VoteReferendumValidationFailure()
 

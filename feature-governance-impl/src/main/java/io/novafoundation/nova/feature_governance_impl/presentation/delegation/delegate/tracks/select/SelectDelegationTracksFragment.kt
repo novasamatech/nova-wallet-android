@@ -73,7 +73,7 @@ class SelectDelegationTracksFragment :
         selectDelegationTracksToolbar.applyStatusBarInsets()
         selectDelegationTracksToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        selectDelegationTracksApply.setOnClickListener { viewModel.openSetupConviction() }
+        selectDelegationTracksApply.setOnClickListener { viewModel.nextClicked() }
     }
 
     override fun inject() {
