@@ -14,12 +14,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginEnd="80dp"
+        android:ellipsize="end"
         android:includeFontPadding="false"
-        android:text="@string/referendum_details_your_vote"
+        android:singleLine="true"
         android:textColor="@color/text_secondary"
+        app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/linearLayout"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/delegation_referendum_details_vote" />
 
     <TextView
         android:id="@+id/viewYourVoteType"
@@ -28,6 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="6dp"
+        android:layout_marginEnd="32dp"
         android:background="@drawable/bg_chip"
         android:includeFontPadding="false"
         android:paddingHorizontal="8dp"
@@ -39,6 +46,7 @@
         tools:text="AYE" />
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginVertical="9dp"

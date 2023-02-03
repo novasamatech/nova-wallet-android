@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 
 class AllHistoricalVotesRequest(address: String) {
 

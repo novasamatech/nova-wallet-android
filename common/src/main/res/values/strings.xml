@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="delegation_referendum_vote">Your vote: %s via %s</string>
+    <string name="delegation_referendum_details_vote">Your votes via %s</string>
+
     <string name="delegation_delegate">Delegate</string>
     <string name="delegation_your_delegation">Your delegation</string>
 

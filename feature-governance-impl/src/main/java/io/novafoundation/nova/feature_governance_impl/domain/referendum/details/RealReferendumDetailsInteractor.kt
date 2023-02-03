@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_governance_impl.domain.referendum.details
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
+import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Proposal
@@ -14,10 +17,12 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.submissionDeposit
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.track
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumDetails
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.vote.UserVote
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest
 import io.novafoundation.nova.feature_governance_api.data.repository.PreImageRequest.FetchCondition.ALWAYS
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
+import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.data.thresold.gov1.asGovV1VotingThresholdOrNull
@@ -28,6 +33,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.details.R
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetails
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
 import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.constructReferendumStatus
@@ -49,6 +55,7 @@ class RealReferendumDetailsInteractor(
     private val referendaConstructor: ReferendaConstructor,
     private val preImageSizer: PreImageSizer,
     private val callFormatter: Gson,
+    private val identityRepository: OnChainIdentityRepository,
 ) : ReferendumDetailsInteractor {
 
     override fun referendumDetailsFlow(
@@ -103,7 +110,9 @@ class RealReferendumDetailsInteractor(
                 val voteByReferendumId = governanceSource.convictionVoting.votingFor(voterAccountId, chain.id)
                     .flattenCastingVotes()
 
-                voteByReferendumId[onChainReferendum.id]
+                val onChainVote = voteByReferendumId[onChainReferendum.id]
+
+                governanceSource.constructVoterVote(it, chain, referendumId, onChainVote)
             }
 
             val voting = referendaConstructor.constructReferendumVoting(
@@ -156,6 +165,37 @@ class RealReferendumDetailsInteractor(
                 )
             )
         }
+    }
+
+    @Suppress("MoveVariableDeclarationIntoWhen")
+    private suspend fun GovernanceSource.constructVoterVote(
+        voter: AccountId,
+        chain: Chain,
+        referendumId: ReferendumId,
+        onChainVote: AccountVote?,
+    ): ReferendumVote? {
+        val historicalVote = delegationsRepository.historicalVoteOf(voter, referendumId, chain)
+
+        val offChainReferendumVote = when(historicalVote) {
+            is UserVote.Delegated -> {
+                val identity = identityRepository.getIdentityFromId(chain.id, historicalVote.delegate)
+
+                ReferendumVote.UserDelegated(
+                    who = historicalVote.delegate,
+                    whoIdentity = identity?.let(::Identity),
+                    vote = historicalVote.vote
+                )
+            }
+
+            is UserVote.Direct -> ReferendumVote.UserDirect(historicalVote.vote)
+
+            null -> null
+        }
+
+        val onChainReferendumVote = onChainVote?.let(ReferendumVote::UserDirect)
+
+        // priority is for on chain data
+        return offChainReferendumVote ?: onChainReferendumVote
     }
 
     private fun constructProposer(

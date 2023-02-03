@@ -32,9 +32,26 @@ data class ReferendumPreview(
 
 sealed class ReferendumVote(val vote: AccountVote) {
 
-    class User(vote: AccountVote) : ReferendumVote(vote)
+    class UserDirect(vote: AccountVote) : ReferendumVote(vote)
 
-    class Account(val who: AccountId, val whoIdentity: Identity?, vote: AccountVote) : ReferendumVote(vote)
+    class UserDelegated(
+        override val who: AccountId,
+        override val whoIdentity: Identity?,
+        vote: AccountVote
+    ) : ReferendumVote(vote), WithDifferentVoter
+
+    class OtherAccount(
+        override val who: AccountId,
+        override val whoIdentity: Identity?,
+        vote: AccountVote
+    ): ReferendumVote(vote), WithDifferentVoter
+}
+
+interface WithDifferentVoter {
+
+    val who: AccountId
+
+    val whoIdentity: Identity?
 }
 
 sealed class ReferendumProposal {

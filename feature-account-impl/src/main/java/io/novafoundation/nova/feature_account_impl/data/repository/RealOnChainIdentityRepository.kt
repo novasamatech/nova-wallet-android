@@ -45,12 +45,14 @@ class RealOnChainIdentityRepository(
         accountIds: Collection<AccountId>,
         chainId: ChainId
     ): AccountIdKeyMap<OnChainIdentity?> = withContext(Dispatchers.Default) {
+        val distinctKeys = accountIds.mapToSet(::AccountIdKey)
+
         storageDataSource.query(chainId) {
             if (!runtime.metadata.hasModule(Modules.IDENTITY)) {
                 return@query emptyMap()
             }
 
-            val superOfArguments = accountIds.map { listOf(it) }
+            val superOfArguments = distinctKeys.map { listOf(it.value) }
             val superOfValues = runtime.metadata.identity().storage("SuperOf").entries(
                 keysArguments = superOfArguments,
                 keyExtractor = { (accountId: AccountId) -> AccountIdKey(accountId) },
@@ -66,9 +68,7 @@ class RealOnChainIdentityRepository(
                 parentIdentity?.let { ChildIdentity(superOf.childName, it) }
             }
 
-            val allAccountIdKeys = accountIds.mapToSet(::AccountIdKey)
-
-            val leftAccountIds = allAccountIdKeys - childIdentities.keys - parentIdentities.keys
+            val leftAccountIds = distinctKeys - childIdentities.keys - parentIdentities.keys
 
             val rootIdentities = fetchIdentities(leftAccountIds.toList())
 
