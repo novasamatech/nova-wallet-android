@@ -41,7 +41,6 @@ class YourDelegationsFragment :
 
     override fun initViews() {
         yourDelegationsList.itemAnimator = null
-        yourDelegationsList.setHasFixedSize(true)
         yourDelegationsList.adapter = delegateListAdapter
 
         yourDelegationsToolbar.applyStatusBarInsets()

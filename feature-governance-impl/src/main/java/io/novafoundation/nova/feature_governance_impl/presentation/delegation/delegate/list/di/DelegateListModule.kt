@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.DelegateListViewModel
-import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 
 @Module(includes = [ViewModelModule::class])
 class DelegateListModule {
@@ -29,8 +28,7 @@ class DelegateListModule {
         interactor: DelegateListInteractor,
         listChooserMixinFactory: ListChooserMixin.Factory,
         resourceManager: ResourceManager,
-        router: GovernanceRouter,
-        trackFormatter: TrackFormatter
+        router: GovernanceRouter
     ): ViewModel {
         return DelegateListViewModel(
             interactor = interactor,
