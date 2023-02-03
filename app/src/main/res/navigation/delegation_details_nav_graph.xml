@@ -67,7 +67,15 @@
         android:id="@+id/selectDelegationTracks"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.SelectDelegationTracksFragment"
         android:label="SelectDelegationTracksFragment"
-        tools:layout="@layout/fragment_select_delegation_tracks" />
+        tools:layout="@layout/fragment_select_delegation_tracks">
+        <action
+            android:id="@+id/action_selectDelegationTracks_to_newDelegationChooseAmountFragment"
+            app:destination="@id/newDelegationChooseAmountFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/removeVoteFragment"
@@ -79,4 +87,35 @@
         android:id="@+id/delegateDelegatorsFragment"
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsFragment"
         android:label="DelegateDelegatorsFragment" />
+
+    <fragment
+        android:id="@+id/newDelegationChooseAmountFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountFragment"
+        android:label="NewDelegationChooseAmountFragment"
+        tools:layout="@layout/fragment_new_delegation_choose_amount">
+
+        <action
+            android:id="@+id/action_newDelegationChooseAmountFragment_to_newDelegationConfirmFragment"
+            app:destination="@id/newDelegationConfirmFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/newDelegationConfirmFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm.NewDelegationConfirmFragment"
+        android:label="NewDelegationConfirmFragment"
+        tools:layout="@layout/fragment_new_delegation_confirm">
+
+        <action
+            android:id="@+id/action_finish_new_delegation_flow"
+            app:destination="@+id/your_delegations_nav_graph"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit"
+            app:popUpTo="@id/mainFragment" />
+    </fragment>
 </navigation>

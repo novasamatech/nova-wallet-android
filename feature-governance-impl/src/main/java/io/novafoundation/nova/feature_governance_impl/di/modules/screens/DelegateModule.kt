@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.track.category.Trac
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.RealDelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.voters.VotersFormatter
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
@@ -110,8 +111,9 @@ class DelegateModule {
     fun provideDelegateMappers(
         resourceManager: ResourceManager,
         addressIconGenerator: AddressIconGenerator,
-        trackFormatter: TrackFormatter
-    ): DelegateMappers = RealDelegateMappers(resourceManager, addressIconGenerator, trackFormatter)
+        trackFormatter: TrackFormatter,
+        votersFormatter: VotersFormatter
+    ): DelegateMappers = RealDelegateMappers(resourceManager, addressIconGenerator, trackFormatter, votersFormatter)
 
     @Provides
     @FeatureScope

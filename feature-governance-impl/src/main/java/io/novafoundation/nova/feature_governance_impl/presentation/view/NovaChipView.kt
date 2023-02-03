@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.view
 
 import android.content.Context
+import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
+import android.text.TextUtils.TruncateAt
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
@@ -113,7 +115,16 @@ class NovaChipView @JvmOverloads constructor(
         )
         chipText.setTextColorRes(textColorRes)
 
+        chipText.ellipsize = typedArray.getEllipsize()
+
         typedArray.recycle()
+    }
+
+    fun TypedArray.getEllipsize(): TruncateAt? {
+        val index = getInt(R.styleable.NovaChipView_android_ellipsize, -1)
+
+        if (index <= 0) return null
+        return TruncateAt.values()[index - 1]
     }
 
     fun setSize(size: Size) {

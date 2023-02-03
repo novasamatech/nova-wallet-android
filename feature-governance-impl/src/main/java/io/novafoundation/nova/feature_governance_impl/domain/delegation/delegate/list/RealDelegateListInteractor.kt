@@ -20,6 +20,8 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_impl.data.repository.DelegationBannerRepository
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.hasMetadata
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.hasVotes
+import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.GenericVoter
+import io.novafoundation.nova.feature_governance_api.domain.track.Track
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.mapAccountTypeToDomain
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
@@ -31,6 +33,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+
+class DelegateVote(
+    val track: Track,
+    val convictionVote: GenericVoter.ConvictionVote
+)
 
 class RealDelegateListInteractor(
     private val governanceSourceRegistry: GovernanceSourceRegistry,

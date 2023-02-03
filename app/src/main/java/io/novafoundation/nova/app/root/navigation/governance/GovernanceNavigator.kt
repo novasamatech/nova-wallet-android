@@ -86,10 +86,7 @@ class GovernanceNavigator(
     }
 
     override fun openYourDelegations() {
-        // TODO: navigatie after confirm delegate
-        when (navController?.currentDestination?.id) {
-            R.id.mainFragment -> performNavigation(R.id.action_mainFragment_to_your_delegation)
-        }
+        performNavigation(R.id.action_mainFragment_to_your_delegation)
     }
 
     override fun openBecomingDelegateTutorial() {
@@ -122,6 +119,7 @@ class GovernanceNavigator(
             R.id.yourDelegationsFragment -> performNavigation(R.id.action_yourDelegations_to_delegationDetails, args = bundle)
         }
     }
+
     override fun openNewDelegationChooseAmount(payload: NewDelegationChooseAmountPayload) = performNavigation(
         actionId = R.id.action_selectDelegationTracks_to_newDelegationChooseAmountFragment,
         args = NewDelegationChooseAmountFragment.getBundle(payload)

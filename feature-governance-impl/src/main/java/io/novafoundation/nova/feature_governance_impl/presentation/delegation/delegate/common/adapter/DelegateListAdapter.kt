@@ -97,8 +97,8 @@ class DelegateViewHolder(
             itemVotedTracksCount.setTextOrHide(delegation.otherTracksCount)
             itemDelegateVotesDetails.isVisible = delegation.votes != null
             if (delegation.votes != null) {
-                itemDelegateVotes.text = delegation.votes.amount
-                itemDelegateConvictionAmount.text = delegation.votes.details
+                itemDelegateVotes.text = delegation.votes.votesCount
+                itemDelegateConvictionAmount.text = delegation.votes.votesCountDetails
             }
         }
     }
