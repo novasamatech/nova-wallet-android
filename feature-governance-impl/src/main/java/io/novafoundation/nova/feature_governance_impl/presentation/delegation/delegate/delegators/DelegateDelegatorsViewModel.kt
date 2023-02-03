@@ -71,7 +71,7 @@ class DelegateDelegatorsViewModel(
                 resourceManager.getString(R.string.delegation_multi_track_format, vote.trackCount)
             }
             is Delegator.Vote.SingleTrack -> {
-                votersFormatter.formatConvictionVote(vote.delegation, chainAsset)
+                votersFormatter.formatConvictionVoteDetails(vote.delegation, chainAsset)
             }
         }
     }

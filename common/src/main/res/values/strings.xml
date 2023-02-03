@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="delegation_referendum_vote">Your votes: %s via %s</string>
+    <string name="delegation_referendum_details_vote">Your votes via %s</string>
+
+    <string name="delegation_delegate">Delegate</string>
+    <string name="delegation_your_delegation">Your delegation</string>
+
+    <string name="delegation_delegate_hint_vote">Your votes will automatically vote alongside your delegates\' vote</string>
+    <string name="delegation_delegate_hint_unlock">Undelegating period will start after you revoke a delegation</string>
+
+    <string name="delegation_error_self_delegate_title">Cannot delegate to self</string>
+    <string name="delegation_error_self_delegate_message">You cannot delegate votes to yourself.</string>
+
+    <string name="delegation_undelegating_period">Undelegating period</string>
+
     <string name="delegation_multi_track_format">Across %s tracks</string>
 
     <string name="delegation_remove_votes">Remove votes</string>

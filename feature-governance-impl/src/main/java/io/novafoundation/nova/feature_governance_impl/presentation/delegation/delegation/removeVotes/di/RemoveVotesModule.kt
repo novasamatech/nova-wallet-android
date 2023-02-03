@@ -20,9 +20,10 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.removeVotes.RemoveTrackVotesInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.validations.RemoteVotesValidationSystem
-import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.validations.removeVotesValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.removeVotes.RealRemoveTrackVotesInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.removeVotes.validations.RemoteVotesValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.removeVotes.validations.removeVotesValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesViewModel
@@ -64,7 +65,8 @@ class RemoveVotesModule {
         externalActions: ExternalActions.Presentation,
         validationExecutor: ValidationExecutor,
         validationSystem: RemoteVotesValidationSystem,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        tracksUseCase: TracksUseCase,
     ): ViewModel {
         return RemoveVotesViewModel(
             interactor = interactor,
@@ -79,7 +81,8 @@ class RemoveVotesModule {
             externalActions = externalActions,
             validationExecutor = validationExecutor,
             validationSystem = validationSystem,
-            resourceManager = resourceManager
+            resourceManager = resourceManager,
+            tracksUseCase = tracksUseCase
         )
     }
 

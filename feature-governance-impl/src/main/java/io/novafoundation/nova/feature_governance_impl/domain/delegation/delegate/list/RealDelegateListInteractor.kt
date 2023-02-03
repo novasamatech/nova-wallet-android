@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateSorting
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.delegateComparator
-import io.novafoundation.nova.feature_governance_impl.data.DelegationBannerRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.DelegationBannerRepository
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.hasMetadata
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.hasVotes
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD

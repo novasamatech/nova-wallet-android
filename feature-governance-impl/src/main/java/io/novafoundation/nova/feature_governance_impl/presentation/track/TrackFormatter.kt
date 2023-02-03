@@ -17,6 +17,13 @@ interface TrackFormatter {
     fun formatTracksSummary(tracks: List<Track>, asset: Chain.Asset): String
 }
 
+fun TrackFormatter.formatTracks(tracks: List<Track>, asset: Chain.Asset): TracksModel {
+    val trackModels = tracks.map { formatTrack(it, asset) }
+    val overview = formatTracksSummary(tracks, asset)
+
+    return TracksModel(trackModels, overview)
+}
+
 class RealTrackFormatter(
     private val trackCategorizer: TrackCategorizer,
     private val resourceManager: ResourceManager,

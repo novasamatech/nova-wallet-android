@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.formatting.remainingTime
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amountMultiplier
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
@@ -19,6 +18,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.WithDifferentVoter
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumStatusModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
@@ -29,8 +29,10 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVotePreviewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
+import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoteModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -54,7 +56,7 @@ interface ReferendumFormatter {
 
     fun formatId(referendumId: ReferendumId): String
 
-    fun formatUserVote(vote: AccountVote, token: Token): YourVoteModel?
+    fun formatUserVote(referendumVote: ReferendumVote, chain: Chain, chainAsset: Chain.Asset): YourVoteModel?
 
     fun formatReferendumPreview(
         referendum: ReferendumPreview,
@@ -224,24 +226,36 @@ class RealReferendumFormatter(
         return "#${referendumId.value.format()}"
     }
 
-    override fun formatUserVote(vote: AccountVote, token: Token): YourVoteModel? {
-        val isAye = vote.isAye() ?: return null
-        val votes = vote.votes(token.configuration) ?: return null
+    override fun formatUserVote(referendumVote: ReferendumVote, chain: Chain, chainAsset: Chain.Asset): YourVoteModel? {
+        val isAye = referendumVote.vote.isAye() ?: return null
+        val votes = referendumVote.vote.votes(chainAsset) ?: return null
 
         val voteTypeRes = if (isAye) R.string.referendum_vote_aye else R.string.referendum_vote_nay
         val colorRes = if (isAye) R.color.text_positive else R.color.text_negative
 
-        val votesAmountFormatted = mapAmountToAmountModel(votes.amount, token).token
+        val votesAmountFormatted = votes.amount.formatTokenAmount(chainAsset)
         val multiplierFormatted = votes.conviction.amountMultiplier().format()
 
-        val votesFormatted = resourceManager.getString(R.string.referendum_votes_format, votes.totalVotes.format())
+        val votesCount = resourceManager.getString(R.string.referendum_votes_format, votes.totalVotes.format())
         val votesDetails = "$votesAmountFormatted × ${multiplierFormatted}x"
 
+        val title = when (referendumVote) {
+            is ReferendumVote.UserDelegated -> {
+                val accountFormatted = referendumVote.voterDisplayIn(chain)
+
+                resourceManager.getString(R.string.delegation_referendum_details_vote, accountFormatted)
+            }
+
+            is ReferendumVote.UserDirect -> resourceManager.getString(R.string.referendum_details_your_vote)
+
+            is ReferendumVote.OtherAccount -> error("Not yet supported")
+        }
+
         return YourVoteModel(
-            voteTypeTitleRes = voteTypeRes,
+            voteTypeTextRes = voteTypeRes,
             voteTypeColorRes = colorRes,
-            votes = votesFormatted,
-            votesDetails = votesDetails
+            vote = VoteModel(votesCount, votesDetails),
+            voteTitle = title
         )
     }
 
@@ -288,14 +302,20 @@ class RealReferendumFormatter(
         val amountFormatted = votes.totalVotes.format()
 
         val details = when (vote) {
-            is ReferendumVote.Account -> {
-                val accountFormatted = vote.whoIdentity?.name ?: chain.addressOf(vote.who)
-
-                resourceManager.getString(R.string.referendum_other_votes, amountFormatted, accountFormatted)
+            is ReferendumVote.UserDirect -> {
+                resourceManager.getString(R.string.referendum_your_vote_format, amountFormatted)
             }
 
-            is ReferendumVote.User -> {
-                resourceManager.getString(R.string.referendum_your_vote_format, amountFormatted)
+            is ReferendumVote.UserDelegated -> {
+                val accountFormatted = vote.voterDisplayIn(chain)
+
+                resourceManager.getString(R.string.delegation_referendum_vote, amountFormatted, accountFormatted)
+            }
+
+            is ReferendumVote.OtherAccount -> {
+                val accountFormatted = vote.voterDisplayIn(chain)
+
+                resourceManager.getString(R.string.referendum_other_votes, amountFormatted, accountFormatted)
             }
         }
 
@@ -304,6 +324,10 @@ class RealReferendumFormatter(
             colorRes = colorRes,
             details = details
         )
+    }
+
+    private fun WithDifferentVoter.voterDisplayIn(chain: Chain): String {
+        return whoIdentity?.name ?: chain.addressOf(who)
     }
 
     private fun TimerValue.referendumStatusStyleRefresher(): ReferendumTimeEstimationStyleRefresher = {

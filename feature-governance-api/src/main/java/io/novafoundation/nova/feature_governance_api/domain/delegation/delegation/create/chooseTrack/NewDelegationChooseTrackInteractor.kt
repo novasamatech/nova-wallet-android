@@ -5,5 +5,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface NewDelegationChooseTrackInteractor {
 
+    suspend fun isAllowedToShowRemoveVotesSuggestion(): Boolean
+
+    suspend fun disallowShowRemoveVotesSuggestion()
+
     fun observeChooseTrackData(): Flow<ChooseTrackData>
 }

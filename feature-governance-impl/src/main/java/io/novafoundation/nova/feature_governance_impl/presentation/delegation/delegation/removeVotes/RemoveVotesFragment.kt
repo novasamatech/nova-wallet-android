@@ -66,7 +66,9 @@ class RemoveVotesFragment : BaseFragment<RemoveVotesViewModel>() {
         viewModel.selectedAccount.observe(removeVoteExtrinsicInfo::setAccount)
         viewModel.walletModel.observe(removeVoteExtrinsicInfo::setWallet)
 
-        viewModel.tracksSummary.observe(removeVoteTracks::showValue)
+        viewModel.tracksModelFlow.observe {
+            removeVoteTracks.showValue(it.overview)
+        }
 
         viewModel.showNextProgress.observe(removeVoteConfirm::setProgress)
 

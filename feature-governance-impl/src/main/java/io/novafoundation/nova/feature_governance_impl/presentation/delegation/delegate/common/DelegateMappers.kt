@@ -7,13 +7,16 @@ import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.isAllEquals
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amountMultiplier
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.Delegate
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateAccountType
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.label.DelegateLabel
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
 import io.novafoundation.nova.feature_governance_api.domain.track.Track
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateIcon
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateLabelModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateListModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateStatsModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateTypeModel
@@ -42,6 +45,8 @@ interface DelegateMappers {
     suspend fun formatDelegationStats(stats: DelegatePreview.Stats, chainAsset: Chain.Asset): DelegateStatsModel
 
     suspend fun formattedRecentVotesPeriod(): String
+
+    suspend fun formatDelegateLabel(delegateLabel: DelegateLabel, chain: Chain): DelegateLabelModel
 }
 
 class RealDelegateMappers(
@@ -174,6 +179,17 @@ class RealDelegateMappers(
         return resourceManager.getString(
             R.string.delegation_recent_votes_format,
             resourceManager.formatDuration(RECENT_VOTES_PERIOD, estimated = false)
+        )
+    }
+
+    override suspend fun formatDelegateLabel(delegateLabel: DelegateLabel, chain: Chain): DelegateLabelModel {
+        return DelegateLabelModel(
+            icon = mapDelegateIconToUi(delegateLabel),
+            addressModel = addressIconGenerator.createAccountAddressModel(
+                chain = chain,
+                accountId = delegateLabel.accountId,
+                name = formatDelegateName(delegateLabel, chain)
+            )
         )
     }
 }

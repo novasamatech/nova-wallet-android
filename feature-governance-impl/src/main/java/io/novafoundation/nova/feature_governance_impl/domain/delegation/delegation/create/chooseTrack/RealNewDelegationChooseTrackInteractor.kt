@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegatio
 import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackCategory
 import io.novafoundation.nova.feature_governance_api.domain.track.Track
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.data.repository.RemoveVotesSuggestionRepository
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.TrackAvailability.ALREADY_DELEGATED
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.TrackAvailability.ALREADY_VOTED
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.TrackAvailability.AVAILABLE
@@ -35,7 +36,16 @@ class RealNewDelegationChooseTrackInteractor(
     private val chainStateRepository: ChainStateRepository,
     private val accountRepository: AccountRepository,
     private val trackCategorizer: TrackCategorizer,
+    private val removeVotesSuggestionRepository: RemoveVotesSuggestionRepository,
 ) : NewDelegationChooseTrackInteractor {
+
+    override suspend fun isAllowedToShowRemoveVotesSuggestion(): Boolean {
+        return removeVotesSuggestionRepository.isAllowedToShowRemoveVotesSuggestion()
+    }
+
+    override suspend fun disallowShowRemoveVotesSuggestion() {
+        removeVotesSuggestionRepository.disallowShowRemoveVotesSuggestion()
+    }
 
     override fun observeChooseTrackData(): Flow<ChooseTrackData> {
         return flowOfAll {
@@ -71,7 +81,7 @@ class RealNewDelegationChooseTrackInteractor(
     }
 
     private fun buildPresets(tracks: List<Track>): List<TrackPreset> {
-        val all = TrackPreset.all(tracks)
+        val all = if (tracks.isNotEmpty()) TrackPreset.all(tracks) else null
 
         val categorized = tracks.groupBy { trackCategorizer.categoryOf(it.name) }
             .mapNotNull { (trackCategory, tracks) ->
@@ -85,7 +95,7 @@ class RealNewDelegationChooseTrackInteractor(
                 }
             }
 
-        return listOf(all) + categorized
+        return listOfNotNull(all) + categorized
     }
 
     private fun mapTrackCategoryToPresetType(trackCategory: TrackCategory): TrackPreset.Type? {
@@ -98,8 +108,8 @@ class RealNewDelegationChooseTrackInteractor(
     }
 
     private fun Map<TrackId, Voting>.availabilityOf(trackId: TrackId): TrackAvailability {
-        return when (get(trackId)) {
-            is Voting.Casting -> ALREADY_VOTED
+        return when (val voting = get(trackId)) {
+            is Voting.Casting -> if (voting.votes.isEmpty()) AVAILABLE else ALREADY_VOTED
             is Voting.Delegating -> ALREADY_DELEGATED
             null -> AVAILABLE
         }

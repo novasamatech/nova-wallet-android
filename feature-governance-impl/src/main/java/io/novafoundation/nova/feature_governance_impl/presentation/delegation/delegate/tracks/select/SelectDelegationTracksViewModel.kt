@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model.DelegationTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model.DelegationTracksPresetModel
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
@@ -31,15 +32,15 @@ import kotlinx.coroutines.launch
 class UnavailableTracksModel(val alreadyVoted: List<TrackModel>, val alreadyDelegated: List<TrackModel>)
 
 class SelectDelegationTracksViewModel(
-    private val newDelegationChooseTrackInteractor: NewDelegationChooseTrackInteractor,
+    private val interactor: NewDelegationChooseTrackInteractor,
     private val trackFormatter: TrackFormatter,
     private val governanceSharedState: GovernanceSharedState,
     private val resourceManager: ResourceManager,
     private val router: GovernanceRouter,
-    private val payload: SelectDelegationTracksPayload
+    private val payload: SelectDelegationTracksPayload,
 ) : BaseViewModel() {
 
-    private val chooseTrackDataFlow = newDelegationChooseTrackInteractor.observeChooseTrackData()
+    private val chooseTrackDataFlow = interactor.observeChooseTrackData()
         .shareInBackground()
 
     private var selectedTracksFlow = MutableStateFlow(setOf<TrackId>())
@@ -102,7 +103,17 @@ class SelectDelegationTracksViewModel(
         }
     }
 
-    fun openSetupConviction() {
+    fun nextClicked() = launch {
+        val selectedTrackIds = selectedTracksFlow.value
+        val payload = NewDelegationChooseAmountPayload(
+            delegate = payload.delegateId,
+            trackIdsRaw = selectedTrackIds.map(TrackId::value)
+        )
+        router.openNewDelegationChooseAmount(payload)
+    }
+
+    fun removeVotesSuggestionSkipped() = launch {
+        interactor.disallowShowRemoveVotesSuggestion()
     }
 
     fun openRemoveVotesScreen() {
@@ -126,7 +137,7 @@ class SelectDelegationTracksViewModel(
         launch {
             val chooseTrackData = chooseTrackDataFlow.first()
             val alreadyVoted = chooseTrackData.trackPartition.alreadyVoted
-            if (alreadyVoted.isNotEmpty()) {
+            if (alreadyVoted.isNotEmpty() && interactor.isAllowedToShowRemoveVotesSuggestion()) {
                 _showRemoveVotesSuggestion.value = Event(alreadyVoted.size)
             }
         }

@@ -21,9 +21,9 @@ import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureCompon
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.adapter.SelectDelegationTracksAdapter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.adapter.SelectDelegationTracksHeaderAdapter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.adapter.SelectDelegationTracksPresetsAdapter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesSuggestionBottomSheet
 import io.novafoundation.nova.feature_governance_impl.presentation.track.unavailable.UnavailableTracksBottomSheet
 import io.novafoundation.nova.feature_governance_impl.presentation.track.unavailable.UnavailableTracksPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesSuggestionBottomSheet
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.android.synthetic.main.fragment_select_delegation_tracks.selectDelegationTracksApply
 import kotlinx.android.synthetic.main.fragment_select_delegation_tracks.selectDelegationTracksList
@@ -73,7 +73,7 @@ class SelectDelegationTracksFragment :
         selectDelegationTracksToolbar.applyStatusBarInsets()
         selectDelegationTracksToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        selectDelegationTracksApply.setOnClickListener { viewModel.openSetupConviction() }
+        selectDelegationTracksApply.setOnClickListener { viewModel.nextClicked() }
     }
 
     override fun inject() {
@@ -113,7 +113,8 @@ class SelectDelegationTracksFragment :
             val bottomSheet = RemoveVotesSuggestionBottomSheet(
                 context = requireContext(),
                 votesCount = it,
-                onApply = viewModel::openRemoveVotesScreen
+                onApply = viewModel::openRemoveVotesScreen,
+                onSkip = viewModel::removeVotesSuggestionSkipped
             )
             bottomSheet.show()
         }

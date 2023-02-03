@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegat
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateDetailedStats
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateMetadata
+import io.novafoundation.nova.feature_governance_api.data.repository.getDelegateMetadataOrNull
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetails
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetailsInteractor
@@ -53,7 +54,7 @@ class RealDelegateDetailsInteractor(
         val recentVotesBlockThreshold = blockDurationEstimator.blockInPast(RECENT_VOTES_PERIOD)
 
         val delegatesStatsDeferred = async { delegationsRepository.getDetailedDelegateStats(delegateAddress, recentVotesBlockThreshold, chain) }
-        val delegateMetadatasDeferred = async { delegationsRepository.getDelegateMetadata(chain, delegateAccountId) }
+        val delegateMetadatasDeferred = async { delegationsRepository.getDelegateMetadataOrNull(chain, delegateAccountId) }
         val identity = async { identityRepository.getIdentityFromId(chain.id, delegateAccountId) }
 
         return DelegateDetails(

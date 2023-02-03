@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.model.request
+package io.novafoundation.nova.common.data.network.subquery
 
 object SubqueryExpressions {
 

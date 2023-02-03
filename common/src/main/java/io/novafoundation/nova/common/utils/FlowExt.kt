@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.presentation.ExtendedLoadingState
 import io.novafoundation.nova.common.presentation.LoadingState
+import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.isModifiable
 import io.novafoundation.nova.common.utils.input.modifyInput
@@ -123,6 +124,8 @@ fun <T, R> Flow<T>.withLoadingShared(sourceSupplier: suspend (T) -> Flow<R>): Fl
         emitAll(newSource)
     }.onCompletion { state = InnerState.SECONDARY_START }
 }
+
+suspend inline fun <reified T> Flow<ExtendedLoadingState<T>>.firstLoaded(): T = first { it.dataOrNull != null }.dataOrNull as T
 
 /**
  * Modifies flow so that it firstly emits [LoadingState.Loading] state.

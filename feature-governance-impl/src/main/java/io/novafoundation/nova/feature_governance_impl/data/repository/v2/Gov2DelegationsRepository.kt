@@ -12,11 +12,13 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateDetailedStats
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateMetadata
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateStats
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.vote.UserVote
 import io.novafoundation.nova.feature_governance_api.data.repository.DelegationsRepository
+import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingDelegate
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.metadata.DelegateMetadataApi
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.metadata.getDelegatesMetadata
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.DelegationsSubqueryApi
@@ -29,6 +31,7 @@ import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegatio
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DelegatedVoteRemote
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DirectVoteRemote
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.bindVoting
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -40,6 +43,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vot
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 
 class Gov2DelegationsRepository(
@@ -132,6 +136,10 @@ class Gov2DelegationsRepository(
         }
     }
 
+    override suspend fun historicalVoteOf(user: AccountId, referendumId: ReferendumId, chain: Chain): UserVote? {
+        return allHistoricalVotesOf(user, chain)?.get(referendumId)
+    }
+
     override suspend fun directHistoricalVotesOf(
         user: AccountId,
         chain: Chain,
@@ -147,16 +155,8 @@ class Gov2DelegationsRepository(
         }
     }
 
-    override suspend fun getDelegationsVotes(chain: Chain, accountId: AccountId): Map<TrackId, Voting.Delegating> {
-        val votings = remoteStorageSource.query(chain.id) {
-            runtime.metadata.convictionVoting().storage("VotingFor").entries(
-                accountId,
-                keyExtractor = { (_: AccountId, trackId: BigInteger) -> TrackId(trackId) },
-                binding = { decoded, _ -> bindVoting(decoded!!) }
-            )
-        }
-
-        return votings.filterIsInstance<TrackId, Voting.Delegating>()
+    override suspend fun ExtrinsicBuilder.delegate(delegate: AccountId, trackId: TrackId, amount: Balance, conviction: Conviction) {
+        convictionVotingDelegate(delegate, trackId, amount, conviction)
     }
 
     private fun SubQueryNodes<DirectVoteRemote>.toUserVoteMap(): Map<ReferendumId, UserVote.Direct?> {

@@ -31,7 +31,7 @@ class SelectDelegationTracksModule {
         payload: SelectDelegationTracksPayload
     ): ViewModel {
         return SelectDelegationTracksViewModel(
-            newDelegationChooseTrackInteractor = newDelegationChooseTrackInteractor,
+            interactor = newDelegationChooseTrackInteractor,
             trackFormatter = trackFormatter,
             governanceSharedState = governanceSharedState,
             resourceManager = resourceManager,
