@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.model.request
 
 import android.annotation.SuppressLint
+import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.and
+import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.anyOf
+import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.not
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
-import io.novafoundation.nova.feature_wallet_impl.data.network.model.request.SubqueryExpressions.and
-import io.novafoundation.nova.feature_wallet_impl.data.network.model.request.SubqueryExpressions.anyOf
-import io.novafoundation.nova.feature_wallet_impl.data.network.model.request.SubqueryExpressions.not
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset
 
 private class ModuleRestriction(

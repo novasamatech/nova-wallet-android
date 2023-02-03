@@ -127,6 +127,10 @@ class Gov2DelegationsRepository(
         }
     }
 
+    override suspend fun historicalVoteOf(user: AccountId, referendumId: ReferendumId, chain: Chain): UserVote? {
+        return allHistoricalVotesOf(user, chain)?.get(referendumId)
+    }
+
     override suspend fun directHistoricalVotesOf(
         user: AccountId,
         chain: Chain,

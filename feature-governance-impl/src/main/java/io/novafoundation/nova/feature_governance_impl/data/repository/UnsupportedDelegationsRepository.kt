@@ -45,6 +45,10 @@ class UnsupportedDelegationsRepository : DelegationsRepository {
         return null
     }
 
+    override suspend fun historicalVoteOf(user: AccountId, referendumId: ReferendumId, chain: Chain): UserVote? {
+        return null
+    }
+
     override suspend fun directHistoricalVotesOf(
         user: AccountId,
         chain: Chain,

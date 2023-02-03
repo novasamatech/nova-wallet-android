@@ -39,6 +39,8 @@ interface DelegationsRepository {
 
     suspend fun allHistoricalVotesOf(user: AccountId, chain: Chain): Map<ReferendumId, UserVote>?
 
+    suspend fun historicalVoteOf(user: AccountId, referendumId: ReferendumId, chain: Chain): UserVote?
+
     suspend fun directHistoricalVotesOf(
         user: AccountId,
         chain: Chain,

@@ -34,6 +34,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.details.v
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.valiadtions.ReferendumPreVoteValidationSystem
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDAppsInteractor
@@ -60,6 +61,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novafoundation.nova.runtime.state.selectedChainFlow
 import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.Dispatchers
@@ -127,8 +129,9 @@ class ReferendumDetailsViewModel(
     val voteButtonState = referendumDetailsFlow.map {
         when {
             it.timeline.currentStatus !is ReferendumStatus.Ongoing -> DescriptiveButtonState.Gone
-            it.userVote != null -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_revote))
-            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_vote))
+            it.userVote is ReferendumVote.UserDirect -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_revote))
+            it.userVote == null -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_vote))
+            else -> DescriptiveButtonState.Gone
         }
     }
 
@@ -214,18 +217,19 @@ class ReferendumDetailsViewModel(
 
     private suspend fun mapReferendumDetailsToUi(referendumDetails: ReferendumDetails): ReferendumDetailsModel {
         val timeEstimation = referendumFormatter.formatTimeEstimation(referendumDetails.timeline.currentStatus)
+        val (chain, chainAsset) = selectedAssetSharedState.chainAndAsset()
         val token = tokenFlow.first()
 
         return ReferendumDetailsModel(
-            track = referendumDetails.track?.let { referendumFormatter.formatReferendumTrack(it, token.configuration) },
+            track = referendumDetails.track?.let { referendumFormatter.formatReferendumTrack(it, chainAsset) },
             number = referendumFormatter.formatId(referendumDetails.id),
             title = mapReferendumTitleToUi(referendumDetails),
             description = mapShortenedMarkdownDescription(referendumDetails),
             voting = referendumDetails.voting?.let { referendumFormatter.formatVoting(it, token) },
             statusModel = referendumFormatter.formatStatus(referendumDetails.timeline.currentStatus),
-            yourVote = referendumDetails.userVote?.let { referendumFormatter.formatUserVote(it, token) },
-            ayeVoters = mapVotersToUi(referendumDetails.voting, VoteType.AYE, token.configuration),
-            nayVoters = mapVotersToUi(referendumDetails.voting, VoteType.NAY, token.configuration),
+            yourVote = referendumDetails.userVote?.let { referendumFormatter.formatUserVote(it, chain, chainAsset) },
+            ayeVoters = mapVotersToUi(referendumDetails.voting, VoteType.AYE, chainAsset),
+            nayVoters = mapVotersToUi(referendumDetails.voting, VoteType.NAY, chainAsset),
             timeEstimation = timeEstimation,
             timeline = mapTimelineToUi(referendumDetails.timeline, timeEstimation)
         )
