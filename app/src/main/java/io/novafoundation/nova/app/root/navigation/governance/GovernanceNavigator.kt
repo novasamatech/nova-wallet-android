@@ -78,7 +78,16 @@ class GovernanceNavigator(
         commonNavigator.openAccountDetails(id)
     }
 
-    override fun openAddDelegation() = performNavigation(R.id.action_mainFragment_to_delegation)
+    override fun openAddDelegation() {
+        when (navController?.currentDestination?.id) {
+            R.id.mainFragment -> performNavigation(R.id.action_mainFragment_to_delegation)
+            R.id.yourDelegationsFragment -> performNavigation(R.id.action_yourDelegations_to_delegationList)
+        }
+    }
+
+    override fun openYourDelegations() {
+        performNavigation(R.id.action_mainFragment_to_your_delegation)
+    }
 
     override fun openBecomingDelegateTutorial() {
         navigationHolder.contextManager.getActivity()
@@ -97,10 +106,19 @@ class GovernanceNavigator(
         args = RemoveVotesFragment.getBundle(payload)
     )
 
-    override fun openDelegateDelegators(payload: DelegateDelegatorsPayload) = performNavigation(
-        actionId = R.id.action_delegateDetailsFragment_to_delegateDelegatorsFragment,
-        args = DelegateDelegatorsFragment.getBundle(payload)
-    )
+    override fun openDelegateDelegators(payload: DelegateDelegatorsPayload) {
+        val bundle = DelegateDelegatorsFragment.getBundle(payload)
+        return performNavigation(R.id.action_delegateDetailsFragment_to_delegateDelegatorsFragment, args = bundle)
+    }
+
+    override fun openDelegateDetails(payload: DelegateDetailsPayload) {
+        val bundle = DelegateDetailsFragment.getBundle(payload)
+
+        when (navController?.currentDestination?.id) {
+            R.id.delegateListFragment -> performNavigation(R.id.action_delegateListFragment_to_delegateDetailsFragment, args = bundle)
+            R.id.yourDelegationsFragment -> performNavigation(R.id.action_yourDelegations_to_delegationDetails, args = bundle)
+        }
+    }
 
     override fun openNewDelegationChooseAmount(payload: NewDelegationChooseAmountPayload) = performNavigation(
         actionId = R.id.action_selectDelegationTracks_to_newDelegationChooseAmountFragment,
@@ -110,11 +128,6 @@ class GovernanceNavigator(
     override fun openNewDelegationConfirm(payload: NewDelegationConfirmPayload) = performNavigation(
         actionId = R.id.action_newDelegationChooseAmountFragment_to_newDelegationConfirmFragment,
         args = NewDelegationConfirmFragment.getBundle(payload)
-    )
-
-    override fun openDelegateDetails(payload: DelegateDetailsPayload) = performNavigation(
-        actionId = R.id.action_delegateListFragment_to_delegateDetailsFragment,
-        args = DelegateDetailsFragment.getBundle(payload)
     )
 
     override fun openVotedReferenda(payload: VotedReferendaPayload) = performNavigation(

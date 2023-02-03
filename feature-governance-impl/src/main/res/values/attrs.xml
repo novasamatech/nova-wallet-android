@@ -29,6 +29,7 @@
     </declare-styleable>
 
     <declare-styleable name="NovaChipView">
+        <attr name="android:ellipsize" />
         <attr name="chipIcon" format="reference" />
         <attr name="chipIconSize" format="dimension" />
         <attr name="android:text" />

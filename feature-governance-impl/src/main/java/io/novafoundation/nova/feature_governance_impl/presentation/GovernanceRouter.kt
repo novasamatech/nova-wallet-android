@@ -43,6 +43,8 @@ interface GovernanceRouter : ReturnableRouter {
 
     fun openAddDelegation()
 
+    fun openYourDelegations()
+
     fun openDelegateDetails(payload: DelegateDetailsPayload)
 
     fun openVotedReferenda(payload: VotedReferendaPayload)

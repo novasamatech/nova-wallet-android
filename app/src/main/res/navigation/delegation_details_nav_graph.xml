@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/delegation_details_nav_graph"
+    app:startDestination="@id/delegateDetailsFragment">
+
+    <action
+        android:id="@+id/action_open_remove_votes"
+        app:destination="@id/removeVoteFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <fragment
+        android:id="@+id/delegateDetailsFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsFragment"
+        android:label="DelegateDetailsFragment"
+        tools:layout="@layout/fragment_delegate_details">
+        <action
+            android:id="@+id/action_delegateDetailsFragment_to_votedReferendaFragment"
+            app:destination="@id/votedReferendaFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_delegateDetailsFragment_to_delegateFullDescription"
+            app:destination="@id/delegateFullDescription"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_delegateDetailsFragment_to_delegateDelegatorsFragment"
+            app:destination="@id/delegateDelegatorsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_delegateDetailsFragment_to_selectDelegationTracks"
+            app:destination="@id/selectDelegationTracks"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/votedReferendaFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaFragment"
+        android:label="VotedReferendaFragment"
+        tools:layout="@layout/fragment_voted_referenda" />
+
+    <fragment
+        android:id="@+id/delegateFullDescription"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionFragment"
+        android:label="DescriptionFragment"
+        tools:layout="@layout/fragment_description" />
+
+    <fragment
+        android:id="@+id/selectDelegationTracks"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.SelectDelegationTracksFragment"
+        android:label="SelectDelegationTracksFragment"
+        tools:layout="@layout/fragment_select_delegation_tracks">
+        <action
+            android:id="@+id/action_selectDelegationTracks_to_newDelegationChooseAmountFragment"
+            app:destination="@id/newDelegationChooseAmountFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/removeVoteFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesFragment"
+        android:label="RemoveVoteFragment"
+        tools:layout="@layout/fragment_remove_votes" />
+
+    <fragment
+        android:id="@+id/delegateDelegatorsFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsFragment"
+        android:label="DelegateDelegatorsFragment" />
+
+    <fragment
+        android:id="@+id/newDelegationChooseAmountFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountFragment"
+        android:label="NewDelegationChooseAmountFragment"
+        tools:layout="@layout/fragment_new_delegation_choose_amount">
+
+        <action
+            android:id="@+id/action_newDelegationChooseAmountFragment_to_newDelegationConfirmFragment"
+            app:destination="@id/newDelegationConfirmFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/newDelegationConfirmFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm.NewDelegationConfirmFragment"
+        android:label="NewDelegationConfirmFragment"
+        tools:layout="@layout/fragment_new_delegation_confirm">
+
+        <action
+            android:id="@+id/action_finish_new_delegation_flow"
+            app:destination="@+id/your_delegations_nav_graph"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit"
+            app:popUpTo="@id/mainFragment" />
+    </fragment>
+</navigation>

@@ -5,11 +5,13 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ConvictionVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.GenericVoter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
 import java.math.BigDecimal
 import java.math.BigInteger
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 sealed class Voting {
 
@@ -20,6 +22,8 @@ sealed class Voting {
 
     class Delegating(
         val amount: Balance,
+        val target: AccountId,
+        val conviction: Conviction,
         val prior: PriorLock
     ) : Voting()
 }
@@ -170,4 +174,8 @@ fun Conviction.amountMultiplier(): BigDecimal {
     }
 
     return multiplier.toBigDecimal()
+}
+
+fun Voting.Delegating.getConvictionVote(chainAsset: Chain.Asset): GenericVoter.ConvictionVote {
+    return GenericVoter.ConvictionVote(chainAsset.amountFromPlanks(amount), conviction)
 }

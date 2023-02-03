@@ -10,17 +10,15 @@ import io.novafoundation.nova.common.utils.withLoadingResult
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.common.view.input.chooser.createFromEnum
 import io.novafoundation.nova.common.view.input.chooser.selectedValue
-import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateFiltering
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateSorting
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.model.DelegateListModel
+import io.novafoundation.nova.runtime.state.chainAndAsset
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -31,7 +29,7 @@ class DelegateListViewModel(
     private val delegateMappers: DelegateMappers,
     private val listChooserMixinFactory: ListChooserMixin.Factory,
     private val resourceManager: ResourceManager,
-    private val router: GovernanceRouter
+    private val router: GovernanceRouter,
 ) : BaseViewModel() {
 
     val sortingMixin = listChooserMixinFactory.createFromEnum(
@@ -64,20 +62,9 @@ class DelegateListViewModel(
     }.share()
 
     val delegateModels = sortedAndFilteredDelegates.mapLoading { delegates ->
-        val governanceOption = governanceSharedState.selectedOption.first()
-        delegates.map { mapDelegatePreviewToUi(it, governanceOption) }
+        val chainWithAsset = governanceSharedState.chainAndAsset()
+        delegates.map { delegateMappers.mapDelegatePreviewToUi(it, chainWithAsset) }
     }.shareInBackground()
-
-    private suspend fun mapDelegatePreviewToUi(delegatePreview: DelegatePreview, governanceOption: SupportedGovernanceOption): DelegateListModel {
-        return DelegateListModel(
-            icon = delegateMappers.mapDelegateIconToUi(delegatePreview),
-            accountId = delegatePreview.accountId,
-            name = delegateMappers.formatDelegateName(delegatePreview, governanceOption.assetWithChain.chain),
-            type = delegateMappers.mapDelegateTypeToUi(delegatePreview.metadata?.accountType),
-            description = delegatePreview.metadata?.shortDescription,
-            stats = delegateMappers.formatDelegationStats(delegatePreview.stats, governanceOption.assetWithChain.asset)
-        )
-    }
 
     fun delegateClicked(position: Int) = launch {
         val delegate = delegateModels.first().dataOrNull?.getOrNull(position) ?: return@launch

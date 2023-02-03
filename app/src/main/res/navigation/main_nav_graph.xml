@@ -372,8 +372,15 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
-    </fragment>
 
+        <action
+            android:id="@+id/action_mainFragment_to_your_delegation"
+            app:destination="@id/your_delegations_nav_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/accountsFragment"
@@ -1094,4 +1101,6 @@
     <include app:graph="@navigation/referendum_unlock_graph" />
 
     <include app:graph="@navigation/delegation_nav_graph" />
+
+    <include app:graph="@navigation/your_delegations_nav_graph" />
 </navigation>
