@@ -18,9 +18,11 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.NewDelegationChooseTrackInteractor
-import io.novafoundation.nova.feature_governance_impl.data.DelegationBannerRepository
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.data.RealDelegationBannerRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.DelegationBannerRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.RealDelegationBannerRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.RealRemoveVotesSuggestionRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.RemoveVotesSuggestionRepository
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.delegators.RealDelegateDelegatorsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.details.RealDelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.label.RealDelegateLabelUseCase
@@ -78,12 +80,14 @@ class DelegateModule {
         chainStateRepository: ChainStateRepository,
         accountRepository: AccountRepository,
         trackCategorizer: TrackCategorizer,
+        removeVotesSuggestionRepository: RemoveVotesSuggestionRepository,
     ): NewDelegationChooseTrackInteractor = RealNewDelegationChooseTrackInteractor(
         governanceSharedState = governanceSharedState,
         governanceSourceRegistry = governanceSourceRegistry,
         chainStateRepository = chainStateRepository,
         accountRepository = accountRepository,
-        trackCategorizer = trackCategorizer
+        trackCategorizer = trackCategorizer,
+        removeVotesSuggestionRepository = removeVotesSuggestionRepository
     )
 
     @Provides
@@ -141,4 +145,8 @@ class DelegateModule {
         governanceSourceRegistry: GovernanceSourceRegistry,
         identityRepository: OnChainIdentityRepository,
     ): DelegateLabelUseCase = RealDelegateLabelUseCase(governanceSharedState, governanceSourceRegistry, identityRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideRemoveVotesSuggestionRepository(preferences: Preferences): RemoveVotesSuggestionRepository = RealRemoveVotesSuggestionRepository(preferences)
 }

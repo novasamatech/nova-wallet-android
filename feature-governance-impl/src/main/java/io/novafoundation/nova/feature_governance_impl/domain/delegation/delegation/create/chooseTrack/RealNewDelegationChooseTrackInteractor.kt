@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegatio
 import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackCategory
 import io.novafoundation.nova.feature_governance_api.domain.track.Track
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.data.repository.RemoveVotesSuggestionRepository
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.TrackAvailability.ALREADY_DELEGATED
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.TrackAvailability.ALREADY_VOTED
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.TrackAvailability.AVAILABLE
@@ -35,7 +36,16 @@ class RealNewDelegationChooseTrackInteractor(
     private val chainStateRepository: ChainStateRepository,
     private val accountRepository: AccountRepository,
     private val trackCategorizer: TrackCategorizer,
+    private val removeVotesSuggestionRepository: RemoveVotesSuggestionRepository,
 ) : NewDelegationChooseTrackInteractor {
+
+    override suspend fun isAllowedToShowRemoveVotesSuggestion(): Boolean {
+        return removeVotesSuggestionRepository.isAllowedToShowRemoveVotesSuggestion()
+    }
+
+    override suspend fun disallowShowRemoveVotesSuggestion() {
+        removeVotesSuggestionRepository.disallowShowRemoveVotesSuggestion()
+    }
 
     override fun observeChooseTrackData(): Flow<ChooseTrackData> {
         return flowOfAll {

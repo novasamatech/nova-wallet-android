@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.data
+package io.novafoundation.nova.feature_governance_impl.data.repository
 
 import io.novafoundation.nova.common.data.storage.Preferences
 import kotlinx.coroutines.flow.Flow

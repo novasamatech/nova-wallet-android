@@ -12,6 +12,7 @@ class RemoveVotesSuggestionBottomSheet(
     context: Context,
     private val votesCount: Int,
     private val onApply: () -> Unit,
+    private val onSkip: () -> Unit,
 ) : BaseBottomSheet(context) {
 
     init {
@@ -21,7 +22,9 @@ class RemoveVotesSuggestionBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         removeVotesSuggestionDescription.text = context.getString(R.string.remove_votes_suggestion_description, votesCount)
-        removeVotesSuggestionSkip.dismissOnClick()
+        removeVotesSuggestionSkip.setDismissingClickListener {
+            onSkip()
+        }
         removeVotesSuggestionApply.setDismissingClickListener {
             onApply()
         }
