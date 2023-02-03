@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.li
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.toListWithHeaders
+import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.presentation.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.combineToPair
@@ -31,6 +32,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToA
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.launch
 
 class ReferendaListViewModel(
     assetSelectorFactory: AssetSelectorFactory,
@@ -149,6 +151,14 @@ class ReferendaListViewModel(
     }
 
     fun delegationsClicked() {
-        governanceRouter.openAddDelegation()
+        launch {
+            val state = referendaListStateFlow.first().dataOrNull ?: return@launch
+
+            if (state.delegated is DelegatedState.Delegated) {
+                governanceRouter.openYourDelegations()
+            } else {
+                governanceRouter.openAddDelegation()
+            }
+        }
     }
 }

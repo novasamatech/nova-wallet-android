@@ -58,6 +58,7 @@
 
     <string name="unavailable_tracks_voted_group">Tracks which you have existing votes in</string>
     <string name="unavailable_tracks_delegated_group">Tracks that you have already delegated votes</string>
+    <string name="delegate_more_tracks">+%d</string>
 
     <string name="update_notification_item_version">Version %s</string>
 

@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegati
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.TrackCategorizer
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.RealDelegateMappers
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 @Module
@@ -38,12 +39,14 @@ class DelegateModule {
         governanceSourceRegistry: GovernanceSourceRegistry,
         chainStateRepository: ChainStateRepository,
         identityRepository: OnChainIdentityRepository,
-        delegationBannerService: DelegationBannerRepository
+        delegationBannerService: DelegationBannerRepository,
+        accountRepository: AccountRepository
     ): DelegateListInteractor = RealDelegateListInteractor(
         governanceSourceRegistry = governanceSourceRegistry,
         chainStateRepository = chainStateRepository,
         identityRepository = identityRepository,
-        delegationBannerService = delegationBannerService
+        delegationBannerService = delegationBannerService,
+        accountRepository = accountRepository
     )
 
     @Provides
@@ -81,7 +84,7 @@ class DelegateModule {
     fun provideDelegateDelegatorsInteractor(
         governanceSharedState: GovernanceSharedState,
         governanceSourceRegistry: GovernanceSourceRegistry,
-        identityRepository: OnChainIdentityRepository
+        identityRepository: OnChainIdentityRepository,
     ): DelegateDelegatorsInteractor = RealDelegateDelegatorsInteractor(
         governanceSharedState = governanceSharedState,
         governanceSourceRegistry = governanceSourceRegistry,
@@ -93,5 +96,6 @@ class DelegateModule {
     fun provideDelegateMappers(
         resourceManager: ResourceManager,
         addressIconGenerator: AddressIconGenerator,
-    ): DelegateMappers = RealDelegateMappers(resourceManager, addressIconGenerator)
+        trackFormatter: TrackFormatter
+    ): DelegateMappers = RealDelegateMappers(resourceManager, addressIconGenerator, trackFormatter)
 }

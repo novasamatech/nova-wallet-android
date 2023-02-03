@@ -1,7 +1,8 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list
+package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.adapter
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import coil.ImageLoader
 import coil.clear
@@ -10,11 +11,15 @@ import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.addRipple
-import io.novafoundation.nova.common.view.shape.getBlockDrawable
+import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateIcon
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateTypeModel
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.model.DelegateListModel
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateListModel
+import io.novafoundation.nova.feature_governance_impl.presentation.track.setTrackModel
+import io.novafoundation.nova.feature_governance_impl.presentation.view.setTextOrHide
+import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateCardView
+import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateConvictionAmount
 import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateDelegatedVotes
 import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateDelegations
 import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateDescription
@@ -23,6 +28,11 @@ import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateRecentVotes
 import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateRecentVotesLabel
 import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateTitle
 import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateType
+import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateVotedBlock
+import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateVotes
+import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateVotesDetails
+import kotlinx.android.synthetic.main.item_delegate.view.itemVotedTrack
+import kotlinx.android.synthetic.main.item_delegate.view.itemVotedTracksCount
 
 class DelegateListAdapter(
     private val imageLoader: ImageLoader,
@@ -66,7 +76,7 @@ class DelegateViewHolder(
         with(containerView) {
             setOnClickListener { handler.itemClicked(bindingAdapterPosition) }
 
-            background = with(context) { addRipple(getBlockDrawable()) }
+            itemDelegateCardView.foreground = with(context) { addRipple(mask = getRippleMask(0)) }
         }
     }
 
@@ -78,8 +88,19 @@ class DelegateViewHolder(
         itemDelegateDelegatedVotes.text = model.stats.delegatedVotes
         itemDelegateRecentVotes.text = model.stats.recentVotes.value
         itemDelegateRecentVotesLabel.text = model.stats.recentVotes.label
-
         itemDelegateType.setDelegateTypeModel(model.type)
+
+        val delegation = model.delegation
+        itemDelegateVotedBlock.isVisible = delegation != null
+        if (delegation != null) {
+            itemVotedTrack.setTrackModel(delegation.firstTrack)
+            itemVotedTracksCount.setTextOrHide(delegation.otherTracksCount)
+            itemDelegateVotesDetails.isVisible = delegation.votes != null
+            if (delegation.votes != null) {
+                itemDelegateVotes.text = delegation.votes.amount
+                itemDelegateConvictionAmount.text = delegation.votes.details
+            }
+        }
     }
 
     override fun unbind() = with(containerView) {

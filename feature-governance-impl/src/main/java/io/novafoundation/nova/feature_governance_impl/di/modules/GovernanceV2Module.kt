@@ -82,8 +82,9 @@ class GovernanceV2Module {
     @FeatureScope
     fun provideDelegationsRepository(
         delegationStatsApi: DelegationsSubqueryApi,
-        delegateMetadataApi: DelegateMetadataApi
-    ) = Gov2DelegationsRepository(delegationStatsApi, delegateMetadataApi)
+        delegateMetadataApi: DelegateMetadataApi,
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageDataSource: StorageDataSource,
+    ) = Gov2DelegationsRepository(delegationStatsApi, delegateMetadataApi, remoteStorageDataSource)
 
     @Provides
     @FeatureScope

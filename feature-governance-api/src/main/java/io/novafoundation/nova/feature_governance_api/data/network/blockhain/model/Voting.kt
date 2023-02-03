@@ -10,6 +10,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Con
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
 import java.math.BigDecimal
 import java.math.BigInteger
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 sealed class Voting {
 
@@ -20,6 +21,8 @@ sealed class Voting {
 
     class Delegating(
         val amount: Balance,
+        val target: AccountId,
+        val conviction: Conviction,
         val prior: PriorLock
     ) : Voting()
 }
