@@ -19,9 +19,11 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.removeVotes.validations.RemoteVotesValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.removeVotes.validations.RemoveVotesValidationPayload
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.removeVotes.validations.handleRemoveVotesValidationFailure
+import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
+import io.novafoundation.nova.feature_governance_impl.presentation.track.formatTracks
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
@@ -49,6 +51,7 @@ class RemoveVotesViewModel(
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: RemoteVotesValidationSystem,
     private val resourceManager: ResourceManager,
+    private val tracksUseCase: TracksUseCase,
 ) : BaseViewModel(),
     WithFeeLoaderMixin,
     Validatable by validationExecutor,
@@ -59,19 +62,15 @@ class RemoveVotesViewModel(
 
     override val originFeeMixin = feeLoaderMixinFactory.create(assetFlow)
 
-    private val tracksFlow = flowOf { interactor.tracksOf(payload.trackIds) }
+    private val tracksFlow = flowOf { tracksUseCase.tracksOf(payload.trackIds) }
         .shareInBackground()
 
-    private val trackModelsFlow = tracksFlow
+    val tracksModelFlow = tracksFlow
         .map { tracks ->
             val chainAsset = governanceSharedState.chainAsset()
-            tracks.map { trackFormatter.formatTrack(it, chainAsset) }
+            trackFormatter.formatTracks(tracks, chainAsset)
         }
-
-    val tracksSummary = tracksFlow.map { tracks ->
-        val chainAsset = governanceSharedState.chainAsset()
-        trackFormatter.formatTracksSummary(tracks, chainAsset)
-    }.shareInBackground()
+        .shareInBackground()
 
     val walletModel = walletUiUseCase.selectedWalletUiFlow()
         .shareInBackground()
@@ -142,7 +141,7 @@ class RemoveVotesViewModel(
     }
 
     fun tracksClicked() = launch {
-        val trackModels = trackModelsFlow.first()
-        _showTracksEvent.value = trackModels.event()
+        val trackModels = tracksModelFlow.first()
+        _showTracksEvent.value = trackModels.tracks.event()
     }
 }

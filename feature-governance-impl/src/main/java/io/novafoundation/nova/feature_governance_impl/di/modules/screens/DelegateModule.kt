@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.DelegateDelegatorsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetailsInteractor
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.label.DelegateLabelUseCase
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.NewDelegationChooseTrackInteractor
@@ -22,6 +23,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.RealDelegationBannerRepository
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.delegators.RealDelegateDelegatorsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.details.RealDelegateDetailsInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.label.RealDelegateLabelUseCase
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.list.RealDelegateListInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.RealNewDelegationChooseAmountInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.ChooseDelegationAmountValidationSystem
@@ -131,4 +133,12 @@ class DelegateModule {
     ): ChooseDelegationAmountValidationSystem {
         return ValidationSystem.chooseDelegationAmount(governanceSharedState, accountRepository)
     }
+
+    @Provides
+    @FeatureScope
+    fun provideDelegateLabelUseCase(
+        governanceSharedState: GovernanceSharedState,
+        governanceSourceRegistry: GovernanceSourceRegistry,
+        identityRepository: OnChainIdentityRepository,
+    ): DelegateLabelUseCase = RealDelegateLabelUseCase(governanceSharedState, governanceSourceRegistry, identityRepository)
 }

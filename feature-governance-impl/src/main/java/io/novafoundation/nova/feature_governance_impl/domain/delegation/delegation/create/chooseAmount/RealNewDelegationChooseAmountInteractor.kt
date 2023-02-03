@@ -57,7 +57,7 @@ class RealNewDelegationChooseAmountInteractor(
         }
     }
 
-    override suspend fun vote(
+    override suspend fun delegate(
         amount: Balance,
         conviction: Conviction,
         delegate: AccountId,

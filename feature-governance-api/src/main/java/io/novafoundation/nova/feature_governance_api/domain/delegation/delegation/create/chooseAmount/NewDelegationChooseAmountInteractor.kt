@@ -21,7 +21,7 @@ interface NewDelegationChooseAmountInteractor {
         tracks: Collection<TrackId>,
     ): Balance
 
-    suspend fun vote(
+    suspend fun delegate(
         amount: Balance,
         conviction: Conviction,
         delegate: AccountId,

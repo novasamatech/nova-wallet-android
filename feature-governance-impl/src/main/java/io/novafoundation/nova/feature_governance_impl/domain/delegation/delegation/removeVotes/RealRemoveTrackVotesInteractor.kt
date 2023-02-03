@@ -9,9 +9,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.removeVotes.RemoveTrackVotesInteractor
-import io.novafoundation.nova.feature_governance_api.domain.track.Track
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -28,15 +26,6 @@ class RealRemoveTrackVotesInteractor(
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val accountRepository: AccountRepository,
 ) : RemoveTrackVotesInteractor {
-
-    override suspend fun tracksOf(trackIds: Collection<TrackId>): List<Track> {
-        val (chain, governance) = useSelectedGovernance()
-        val trackIdsSet = trackIds.toSet()
-
-        return governance.referenda.getTracks(chain.id)
-            .filter { it.id in trackIdsSet }
-            .map(::mapTrackInfoToTrack)
-    }
 
     override suspend fun calculateFee(trackIds: Collection<TrackId>): Balance = withContext(Dispatchers.IO) {
         val (chain, governance) = useSelectedGovernance()

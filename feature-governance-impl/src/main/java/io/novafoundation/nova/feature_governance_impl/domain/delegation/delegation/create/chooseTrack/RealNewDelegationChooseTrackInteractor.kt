@@ -71,7 +71,7 @@ class RealNewDelegationChooseTrackInteractor(
     }
 
     private fun buildPresets(tracks: List<Track>): List<TrackPreset> {
-        val all = TrackPreset.all(tracks)
+        val all = if (tracks.isNotEmpty()) TrackPreset.all(tracks) else null
 
         val categorized = tracks.groupBy { trackCategorizer.categoryOf(it.name) }
             .mapNotNull { (trackCategory, tracks) ->
@@ -85,7 +85,7 @@ class RealNewDelegationChooseTrackInteractor(
                 }
             }
 
-        return listOf(all) + categorized
+        return listOfNotNull(all) + categorized
     }
 
     private fun mapTrackCategoryToPresetType(trackCategory: TrackCategory): TrackPreset.Type? {

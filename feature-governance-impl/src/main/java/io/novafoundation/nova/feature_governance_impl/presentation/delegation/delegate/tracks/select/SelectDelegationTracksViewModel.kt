@@ -107,7 +107,7 @@ class SelectDelegationTracksViewModel(
         val selectedTrackIds = selectedTracksFlow.value
         val payload = NewDelegationChooseAmountPayload(
             delegate = payload.delegateId,
-            _trackIdsRaw = selectedTrackIds.map(TrackId::value)
+            trackIdsRaw = selectedTrackIds.map(TrackId::value)
         )
         router.openNewDelegationChooseAmount(payload)
     }
