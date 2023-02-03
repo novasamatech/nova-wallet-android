@@ -239,7 +239,7 @@ class RealReferendumFormatter(
         val votesCount = resourceManager.getString(R.string.referendum_votes_format, votes.totalVotes.format())
         val votesDetails = "$votesAmountFormatted × ${multiplierFormatted}x"
 
-        val title = when(referendumVote) {
+        val title = when (referendumVote) {
             is ReferendumVote.UserDelegated -> {
                 val accountFormatted = referendumVote.voterDisplayIn(chain)
 
@@ -326,7 +326,7 @@ class RealReferendumFormatter(
         )
     }
 
-    private fun WithDifferentVoter.voterDisplayIn(chain: Chain) : String {
+    private fun WithDifferentVoter.voterDisplayIn(chain: Chain): String {
         return whoIdentity?.name ?: chain.addressOf(who)
     }
 

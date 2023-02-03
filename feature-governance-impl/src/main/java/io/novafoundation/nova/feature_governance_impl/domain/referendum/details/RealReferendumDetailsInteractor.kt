@@ -176,7 +176,7 @@ class RealReferendumDetailsInteractor(
     ): ReferendumVote? {
         val historicalVote = delegationsRepository.historicalVoteOf(voter, referendumId, chain)
 
-        val offChainReferendumVote = when(historicalVote) {
+        val offChainReferendumVote = when (historicalVote) {
             is UserVote.Delegated -> {
                 val identity = identityRepository.getIdentityFromId(chain.id, historicalVote.delegate)
 

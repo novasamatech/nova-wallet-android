@@ -44,7 +44,7 @@ sealed class ReferendumVote(val vote: AccountVote) {
         override val who: AccountId,
         override val whoIdentity: Identity?,
         vote: AccountVote
-    ): ReferendumVote(vote), WithDifferentVoter
+    ) : ReferendumVote(vote), WithDifferentVoter
 }
 
 interface WithDifferentVoter {
