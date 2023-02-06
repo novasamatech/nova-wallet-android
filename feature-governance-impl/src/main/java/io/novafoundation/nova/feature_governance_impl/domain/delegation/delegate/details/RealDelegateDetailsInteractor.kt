@@ -38,7 +38,6 @@ class RealDelegateDetailsInteractor(
         }
     }
 
-    @Suppress("SuspendFunctionOnCoroutineScope")
     private suspend fun getDelegateDetailsInternal(
         delegateAccountId: AccountId,
     ): DelegateDetails = coroutineScope {
