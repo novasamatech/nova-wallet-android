@@ -13,7 +13,7 @@ data class DelegatePreview(
     val stats: Stats,
     override val metadata: Metadata?,
     override val onChainIdentity: OnChainIdentity?,
-    val votes: Map<Track, Voting.Delegating>?
+    val userDelegations: Map<Track, Voting.Delegating>?
 ) : Delegate {
 
     data class Metadata(
@@ -30,6 +30,6 @@ fun DelegatePreview.hasMetadata(): Boolean {
     return metadata != null
 }
 
-fun DelegatePreview.hasVotes(): Boolean {
-    return votes?.isNotEmpty() ?: false
+fun DelegatePreview.hasUserDelegations(): Boolean {
+    return userDelegations?.isNotEmpty() ?: false
 }

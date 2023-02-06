@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_governance_api.data.repository
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
-import io.novafoundation.nova.common.utils.filterIsInstance
+import io.novafoundation.nova.common.utils.filterValuesIsInstance
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumVoter
@@ -36,7 +36,7 @@ interface ConvictionVotingRepository {
 
     suspend fun delegatingFor(accountId: AccountId, chainId: ChainId): Map<TrackId, Voting.Delegating> {
         return votingFor(accountId, chainId)
-            .filterIsInstance<TrackId, Voting.Delegating>()
+            .filterValuesIsInstance<TrackId, Voting.Delegating>()
     }
 
     fun ExtrinsicBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable)

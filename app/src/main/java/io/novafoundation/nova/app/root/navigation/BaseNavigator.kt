@@ -18,7 +18,7 @@ abstract class BaseNavigator(
      */
     fun performNavigation(
         cases: Array<Pair<Int, Int>>,
-        args: Bundle?
+        args: Bundle? = null
     ) {
         val navController = navigationHolder.navController
 
