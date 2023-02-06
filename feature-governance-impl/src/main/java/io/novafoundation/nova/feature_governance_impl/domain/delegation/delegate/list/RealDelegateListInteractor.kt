@@ -7,8 +7,8 @@ import io.novafoundation.nova.common.utils.applyFilter
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdOfSelectedMetaAccountIn
-import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateStats
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateMetadata
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateStats
 import io.novafoundation.nova.feature_governance_api.data.repository.getDelegatesMetadataOrEmpty
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
@@ -17,18 +17,18 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateSorting
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.delegateComparator
-import io.novafoundation.nova.feature_governance_impl.data.repository.DelegationBannerRepository
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.hasMetadata
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.hasVotes
+import io.novafoundation.nova.feature_governance_impl.data.repository.DelegationBannerRepository
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.mapAccountTypeToDomain
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.util.blockInPast
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
@@ -88,10 +88,9 @@ class RealDelegateListInteractor(
         return compareByDescending { it.hasMetadata() }
     }
 
-    @Suppress("SuspendFunctionOnCoroutineScope")
-    private suspend fun CoroutineScope.getDelegatesInternal(
+    private suspend fun getDelegatesInternal(
         governanceOption: SupportedGovernanceOption,
-    ): List<DelegatePreview> {
+    ): List<DelegatePreview> = coroutineScope {
         val chain = governanceOption.assetWithChain.chain
         val accountId = accountRepository.requireIdOfSelectedMetaAccountIn(chain)
 
@@ -132,7 +131,7 @@ class RealDelegateListInteractor(
             )
         }
 
-        return delegates
+        delegates
     }
 
     private fun mapStatsToDomain(stats: DelegateStats): DelegatePreview.Stats {
