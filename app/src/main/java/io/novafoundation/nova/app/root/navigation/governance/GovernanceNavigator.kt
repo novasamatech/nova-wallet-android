@@ -79,10 +79,12 @@ class GovernanceNavigator(
     }
 
     override fun openAddDelegation() {
-        when (navController?.currentDestination?.id) {
-            R.id.mainFragment -> performNavigation(R.id.action_mainFragment_to_delegation)
-            R.id.yourDelegationsFragment -> performNavigation(R.id.action_yourDelegations_to_delegationList)
-        }
+        performNavigation(
+            cases = arrayOf(
+                R.id.mainFragment to R.id.action_mainFragment_to_delegation,
+                R.id.yourDelegationsFragment to R.id.action_yourDelegations_to_delegationList,
+            )
+        )
     }
 
     override fun openYourDelegations() {
@@ -112,12 +114,13 @@ class GovernanceNavigator(
     }
 
     override fun openDelegateDetails(payload: DelegateDetailsPayload) {
-        val bundle = DelegateDetailsFragment.getBundle(payload)
-
-        when (navController?.currentDestination?.id) {
-            R.id.delegateListFragment -> performNavigation(R.id.action_delegateListFragment_to_delegateDetailsFragment, args = bundle)
-            R.id.yourDelegationsFragment -> performNavigation(R.id.action_yourDelegations_to_delegationDetails, args = bundle)
-        }
+        performNavigation(
+            cases = arrayOf(
+                R.id.delegateListFragment to R.id.action_delegateListFragment_to_delegateDetailsFragment,
+                R.id.yourDelegationsFragment to R.id.action_yourDelegations_to_delegationDetails,
+            ),
+            args = DelegateDetailsFragment.getBundle(payload)
+        )
     }
 
     override fun openNewDelegationChooseAmount(payload: NewDelegationChooseAmountPayload) = performNavigation(

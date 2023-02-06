@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.presentation
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 @Deprecated("Use ExtendedLoadingState instead since it offers support for errors too")
@@ -45,3 +46,5 @@ val <T> LoadingState<T>.dataOrNull: T?
         is LoadingState.Loaded -> this.data
         else -> null
     }
+
+suspend inline fun <reified T> Flow<LoadingState<T>>.firstLoaded(): T = first { it.dataOrNull != null }.dataOrNull as T

@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.li
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.toListWithHeaders
-import io.novafoundation.nova.common.presentation.dataOrNull
+import io.novafoundation.nova.common.presentation.firstLoaded
 import io.novafoundation.nova.common.presentation.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.combineToPair
@@ -152,7 +152,7 @@ class ReferendaListViewModel(
 
     fun delegationsClicked() {
         launch {
-            val state = referendaListStateFlow.first().dataOrNull ?: return@launch
+            val state = referendaListStateFlow.firstLoaded()
 
             if (state.delegated is DelegatedState.Delegated) {
                 governanceRouter.openYourDelegations()

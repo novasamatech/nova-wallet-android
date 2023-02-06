@@ -34,11 +34,9 @@ interface DelegateMappers {
 
     suspend fun mapDelegatePreviewToUi(delegatePreview: DelegatePreview, chainWithAsset: ChainWithAsset): DelegateListModel
 
-    suspend fun mapDelegation(votes: Map<Track, Voting.Delegating>, chainAsset: Chain.Asset): DelegateListModel.YourDelegationInfo?
+    suspend fun mapVote(votes: List<Voting.Delegating>, chainAsset: Chain.Asset): VoteModel?
 
     fun mapDelegateTypeToUi(delegateType: DelegateAccountType?): DelegateTypeModel?
-
-    suspend fun mapVote(votes: List<Voting.Delegating>, chainAsset: Chain.Asset): VoteModel?
 
     suspend fun mapDelegateIconToUi(delegate: Delegate): DelegateIcon
 
@@ -69,20 +67,7 @@ class RealDelegateMappers(
             type = mapDelegateTypeToUi(delegatePreview.metadata?.accountType),
             description = delegatePreview.metadata?.shortDescription,
             stats = formatDelegationStats(delegatePreview.stats, chainWithAsset.asset),
-            delegation = delegatePreview.votes?.let { mapDelegation(it, chainWithAsset.asset) }
-        )
-    }
-
-    override suspend fun mapDelegation(votes: Map<Track, Voting.Delegating>, chainAsset: Chain.Asset): DelegateListModel.YourDelegationInfo? {
-        if (votes.isEmpty()) return null
-
-        val firstTrack = trackFormatter.formatTrack(votes.keys.first(), chainAsset)
-        val otherTracksCount = votes.size - 1
-        val otherTracksCountStr = if (otherTracksCount > 0) resourceManager.getString(R.string.delegate_more_tracks, otherTracksCount) else null
-        return DelegateListModel.YourDelegationInfo(
-            firstTrack = firstTrack,
-            otherTracksCount = otherTracksCountStr,
-            votes = mapVote(votes.values.toList(), chainAsset)
+            delegation = delegatePreview.userDelegations?.let { mapDelegation(it, chainWithAsset.asset) }
         )
     }
 
@@ -184,6 +169,19 @@ class RealDelegateMappers(
                 accountId = delegateLabel.accountId,
                 name = formatDelegateName(delegateLabel, chain)
             )
+        )
+    }
+
+    private suspend fun mapDelegation(votes: Map<Track, Voting.Delegating>, chainAsset: Chain.Asset): DelegateListModel.YourDelegationInfo? {
+        if (votes.isEmpty()) return null
+
+        val firstTrack = trackFormatter.formatTrack(votes.keys.first(), chainAsset)
+        val otherTracksCount = votes.size - 1
+        val otherTracksCountStr = if (otherTracksCount > 0) resourceManager.getString(R.string.delegate_more_tracks, otherTracksCount) else null
+        return DelegateListModel.YourDelegationInfo(
+            firstTrack = firstTrack,
+            otherTracksCount = otherTracksCountStr,
+            votes = mapVote(votes.values.toList(), chainAsset)
         )
     }
 }

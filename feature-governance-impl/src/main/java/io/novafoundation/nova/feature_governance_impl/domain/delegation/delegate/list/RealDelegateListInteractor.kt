@@ -6,9 +6,12 @@ import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.applyFilter
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdOfSelectedMetaAccountIn
-import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateMetadata
+import io.novafoundation.nova.feature_account_api.domain.interfaces.getIdOfSelectedMetaAccountIn
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateStats
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateMetadata
+import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
+import io.novafoundation.nova.feature_governance_api.data.repository.OnChainReferendaRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.getDelegatesMetadataOrEmpty
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
@@ -18,11 +21,13 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateSorting
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.delegateComparator
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.hasMetadata
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.hasVotes
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.hasUserDelegations
+import io.novafoundation.nova.feature_governance_api.domain.track.Track
 import io.novafoundation.nova.feature_governance_impl.data.repository.DelegationBannerRepository
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.mapAccountTypeToDomain
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.util.blockInPast
@@ -60,7 +65,7 @@ class RealDelegateListInteractor(
         return withContext(Dispatchers.Default) {
             runCatching {
                 getDelegatesInternal(governanceOption)
-                    .filter { it.hasVotes() }
+                    .filter { it.hasUserDelegations() }
             }
         }
     }
@@ -92,7 +97,6 @@ class RealDelegateListInteractor(
         governanceOption: SupportedGovernanceOption,
     ): List<DelegatePreview> = coroutineScope {
         val chain = governanceOption.assetWithChain.chain
-        val accountId = accountRepository.requireIdOfSelectedMetaAccountIn(chain)
 
         val governanceSource = governanceSourceRegistry.sourceFor(governanceOption)
         val convictionVotingRepository = governanceSource.convictionVoting
@@ -110,13 +114,7 @@ class RealDelegateListInteractor(
 
         val identities = identityRepository.getIdentitiesFromIds(delegateAccountIds, chain.id)
 
-        val tracks = referendaRepository.getTracks(chain.id)
-            .map { mapTrackInfoToTrack(it) }
-            .associateBy { it.id }
-        val delegationVotes = convictionVotingRepository.delegatingFor(accountId, chain.id)
-            .mapKeys { tracks.getValue(it.key) }
-            .toList()
-            .groupBy { it.second.target.intoKey() }
+        val userDelegations = getUserDelegationsOrEmpty(chain, convictionVotingRepository, referendaRepository)
 
         val delegates = delegatesStatsDeferred.await().map { delegateStats ->
             val metadata = delegateMetadatasByAccountId[delegateStats.accountId]
@@ -127,11 +125,27 @@ class RealDelegateListInteractor(
                 stats = mapStatsToDomain(delegateStats),
                 metadata = mapMetadataToDomain(metadata),
                 onChainIdentity = identity,
-                votes = delegationVotes[delegateStats.accountId]?.toMap()
+                userDelegations = userDelegations[delegateStats.accountId]?.toMap()
             )
         }
 
         delegates
+    }
+
+    private suspend fun getUserDelegationsOrEmpty(
+        chain: Chain,
+        convictionVotingRepository: ConvictionVotingRepository,
+        referendaRepository: OnChainReferendaRepository
+    ): Map<AccountIdKey, List<Pair<Track, Voting.Delegating>>> {
+        val accountId = accountRepository.getIdOfSelectedMetaAccountIn(chain) ?: return emptyMap()
+
+        val tracks = referendaRepository.getTracks(chain.id)
+            .map { mapTrackInfoToTrack(it) }
+            .associateBy { it.id }
+        return convictionVotingRepository.delegatingFor(accountId, chain.id)
+            .mapKeys { tracks.getValue(it.key) }
+            .toList()
+            .groupBy { it.second.target.intoKey() }
     }
 
     private fun mapStatsToDomain(stats: DelegateStats): DelegatePreview.Stats {
