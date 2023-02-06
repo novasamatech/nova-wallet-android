@@ -35,8 +35,7 @@ interface ConvictionVotingRepository {
     suspend fun votersOf(referendumId: ReferendumId, chainId: ChainId): List<ReferendumVoter>
 
     suspend fun delegatingFor(accountId: AccountId, chainId: ChainId): Map<TrackId, Voting.Delegating> {
-        return votingFor(accountId, chainId)
-            .filterIsInstance<TrackId, Voting.Delegating>()
+        return votingFor(accountId, chainId).filterIsInstance()
     }
 
     fun ExtrinsicBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable)

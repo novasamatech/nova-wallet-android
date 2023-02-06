@@ -16,9 +16,9 @@ import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.state.selectedOption
 import io.novafoundation.nova.runtime.util.blockInPast
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 
 class RealDelegateDetailsInteractor(
@@ -39,9 +39,9 @@ class RealDelegateDetailsInteractor(
     }
 
     @Suppress("SuspendFunctionOnCoroutineScope")
-    private suspend fun CoroutineScope.getDelegateDetailsInternal(
+    private suspend fun getDelegateDetailsInternal(
         delegateAccountId: AccountId,
-    ): DelegateDetails {
+    ): DelegateDetails = coroutineScope {
         val governanceOption = governanceSharedState.selectedOption()
 
         val chain = governanceOption.assetWithChain.chain
@@ -57,7 +57,7 @@ class RealDelegateDetailsInteractor(
         val delegateMetadatasDeferred = async { delegationsRepository.getDelegateMetadataOrNull(chain, delegateAccountId) }
         val identity = async { identityRepository.getIdentityFromId(chain.id, delegateAccountId) }
 
-        return DelegateDetails(
+        DelegateDetails(
             accountId = delegateAccountId,
             stats = delegatesStatsDeferred.await()?.let(::mapStatsToDomain),
             metadata = delegateMetadatasDeferred.await()?.let(::mapMetadataToDomain),
