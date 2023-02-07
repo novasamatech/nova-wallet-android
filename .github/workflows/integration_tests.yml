@@ -1,4 +1,4 @@
-name: Pull request
+name: Integration tests
 
 on:
   pull_request:
@@ -101,3 +101,25 @@ jobs:
         with:
           secret-token: ${{ secrets.GITHUB_TOKEN }}
           keep-reports-history: 30
+
+  alert:
+    runs-on: ubuntu-latest
+    needs: report
+    if: always() && (needs.integration-tests.result == 'failure')
+    env:
+      GITHUB_WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Report
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            Integration tests failed on ${{ github.ref }} branch
+
+            Failed run:
+            ${{ env.GITHUB_WORKFLOW_URL }}
+
+            Report:
+            https://improved-enigma-vryoz6l.pages.github.io/${{ github.run_number }}
