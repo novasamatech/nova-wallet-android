@@ -25,6 +25,10 @@ class UnsupportedDelegationsRepository : DelegationsRepository {
         return emptyList()
     }
 
+    override suspend fun getDelegatesStatsByAccountIds(recentVotesBlockThreshold: BlockNumber, accountIds: List<AccountId>, chain: Chain): List<DelegateStats> {
+        return emptyList()
+    }
+
     override suspend fun getDetailedDelegateStats(delegateAddress: String, recentVotesBlockThreshold: BlockNumber, chain: Chain): DelegateDetailedStats? {
         return null
     }

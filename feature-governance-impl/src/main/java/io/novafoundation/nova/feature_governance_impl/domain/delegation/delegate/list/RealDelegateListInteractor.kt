@@ -4,6 +4,8 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.get
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.applyFilter
+import io.novafoundation.nova.feature_account_api.data.model.AccountIdKeyMap
+import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.getIdOfSelectedMetaAccountIn
@@ -22,7 +24,6 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.delegateComparator
 import io.novafoundation.nova.feature_governance_impl.data.repository.DelegationBannerRepository
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.hasMetadata
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.hasUserDelegations
 import io.novafoundation.nova.feature_governance_api.domain.track.Track
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.mapAccountTypeToDomain
@@ -34,6 +35,7 @@ import io.novafoundation.nova.runtime.util.blockInPast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
@@ -61,12 +63,9 @@ class RealDelegateListInteractor(
         }
     }
 
-    override suspend fun getDelegatedDelegates(governanceOption: SupportedGovernanceOption): Result<List<DelegatePreview>> {
-        return withContext(Dispatchers.Default) {
-            runCatching {
-                getDelegatesInternal(governanceOption)
-                    .filter { it.hasUserDelegations() }
-            }
+    override suspend fun getUserDelegates(governanceOption: SupportedGovernanceOption): Result<List<DelegatePreview>> {
+        return runCatching {
+            getUserDelegatesInternal(governanceOption)
         }
     }
 
@@ -91,6 +90,37 @@ class RealDelegateListInteractor(
 
     private fun getMetadataComparator(): Comparator<DelegatePreview> {
         return compareByDescending { it.hasMetadata() }
+    }
+
+    private suspend fun getUserDelegatesInternal(
+        governanceOption: SupportedGovernanceOption,
+    ): List<DelegatePreview> = coroutineScope {
+        val chain = governanceOption.assetWithChain.chain
+
+        val governanceSource = governanceSourceRegistry.sourceFor(governanceOption)
+        val convictionVotingRepository = governanceSource.convictionVoting
+        val delegationsRepository = governanceSource.delegationsRepository
+        val referendaRepository = governanceSource.referenda
+
+        val userDelegations = getUserDelegationsOrEmpty(chain, convictionVotingRepository, referendaRepository)
+        val delegateAccountIds = userDelegations.mapKeys { it.key.value }.keys.toList()
+
+        val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.id)
+        val recentVotesBlockThreshold = blockDurationEstimator.blockInPast(RECENT_VOTES_PERIOD)
+
+        val delegatesStatsDeferred = async { delegationsRepository.getDelegatesStatsByAccountIds(recentVotesBlockThreshold, delegateAccountIds, chain) }
+        val delegateMetadatasDeferred = async { delegationsRepository.getDelegatesMetadataOrEmpty(chain) }
+
+        val delegateMetadatasByAccountId = delegateMetadatasDeferred.await().associateBy { AccountIdKey(it.accountId) }
+
+        val identities = identityRepository.getIdentitiesFromIds(delegateAccountIds, chain.id)
+
+        mapDelegateStatsToPreviews(
+            delegatesStatsDeferred.await(),
+            delegateMetadatasByAccountId,
+            identities,
+            userDelegations
+        )
     }
 
     @Suppress("SuspendFunctionOnCoroutineScope")
@@ -166,5 +196,25 @@ class RealDelegateListInteractor(
             iconUrl = metadata.profileImageUrl,
             name = metadata.name
         )
+    }
+
+    private fun mapDelegateStatsToPreviews(
+        delegateStatsList: List<DelegateStats>,
+        delegateMetadatasByAccountId: AccountIdKeyMap<DelegateMetadata>,
+        identities: AccountIdKeyMap<OnChainIdentity?>,
+        userDelegations: AccountIdKeyMap<List<Pair<Track, Voting.Delegating>>>,
+    ): List<DelegatePreview> {
+        return delegateStatsList.map { delegateStats ->
+            val metadata = delegateMetadatasByAccountId[delegateStats.accountId]
+            val identity = identities[delegateStats.accountId]
+
+            DelegatePreview(
+                accountId = delegateStats.accountId,
+                stats = mapStatsToDomain(delegateStats),
+                metadata = mapMetadataToDomain(metadata),
+                onChainIdentity = identity,
+                userDelegations = userDelegations[delegateStats.accountId]?.toMap()
+            )
+        }
     }
 }

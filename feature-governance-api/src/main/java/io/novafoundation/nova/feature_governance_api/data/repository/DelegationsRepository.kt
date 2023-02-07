@@ -25,6 +25,12 @@ interface DelegationsRepository {
         chain: Chain
     ): List<DelegateStats>
 
+    suspend fun getDelegatesStatsByAccountIds(
+        recentVotesBlockThreshold: BlockNumber,
+        accountIds: List<AccountId>,
+        chain: Chain
+    ): List<DelegateStats>
+
     suspend fun getDetailedDelegateStats(
         delegateAddress: String,
         recentVotesBlockThreshold: BlockNumber,
