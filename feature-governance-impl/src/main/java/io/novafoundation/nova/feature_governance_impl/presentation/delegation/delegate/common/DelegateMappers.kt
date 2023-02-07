@@ -56,7 +56,6 @@ suspend fun DelegateMappers.formatDelegationsOverviewOrNull(votes: Delegator.Vot
     return votes?.let { formatDelegationsOverview(votes, chainAsset) }
 }
 
-
 class RealDelegateMappers(
     private val resourceManager: ResourceManager,
     private val addressIconGenerator: AddressIconGenerator,
