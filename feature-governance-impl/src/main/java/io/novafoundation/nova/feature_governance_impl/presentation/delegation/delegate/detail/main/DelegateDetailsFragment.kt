@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.setExtraInfoAvailable
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.setupIdentityMixin
@@ -121,6 +122,8 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
             TrackDelegationListBottomSheet(requireContext(), tracksDelegations)
                 .show()
         }
+
+        viewModel.addDelegationButtonState.observeWhenVisible(delegateDetailsAddDelegation::setState)
     }
 
     private fun setContent(delegate: DelegateDetailsModel) {

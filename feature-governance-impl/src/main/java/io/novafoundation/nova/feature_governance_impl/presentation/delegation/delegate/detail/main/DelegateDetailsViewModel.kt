@@ -6,8 +6,10 @@ import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.presentation.mapLoading
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.firstLoaded
@@ -21,6 +23,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.description
 import io.novafoundation.nova.feature_governance_api.domain.track.Track
+import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
@@ -41,6 +44,7 @@ import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class DelegateDetailsViewModel(
@@ -53,6 +57,7 @@ class DelegateDetailsViewModel(
     private val delegateMappers: DelegateMappers,
     private val governanceSharedState: GovernanceSharedState,
     private val trackFormatter: TrackFormatter,
+    private val resourceManager: ResourceManager,
     val markwon: Markwon,
 ) : BaseViewModel(), ExternalActions.Presentation by externalActions {
 
@@ -77,6 +82,16 @@ class DelegateDetailsViewModel(
 
         it.userDelegations.map { (track, delegation) ->
             formatTrackDelegation(track, delegation, chainAsset)
+        }
+    }.shareWhileSubscribed()
+
+    val addDelegationButtonState = delegateDetailsFlow.map { state ->
+       val data = state.dataOrNull
+
+        when {
+            data == null -> DescriptiveButtonState.Gone
+            data.userDelegations.isNotEmpty() -> DescriptiveButtonState.Gone
+            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.delegation_add_delegation))
         }
     }.shareWhileSubscribed()
 
