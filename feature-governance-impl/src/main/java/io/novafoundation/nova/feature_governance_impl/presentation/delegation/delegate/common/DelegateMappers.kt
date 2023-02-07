@@ -36,6 +36,8 @@ interface DelegateMappers {
 
     fun mapDelegateTypeToUi(delegateType: DelegateAccountType?): DelegateTypeModel?
 
+    suspend fun mapVote(votes: List<Voting.Delegating>, chainAsset: Chain.Asset): VoteModel?
+
     suspend fun mapDelegateIconToUi(delegate: Delegate): DelegateIcon
 
     suspend fun formatDelegateName(delegate: Delegate, chain: Chain): String
@@ -67,6 +69,17 @@ class RealDelegateMappers(
             stats = formatDelegationStats(delegatePreview.stats, chainWithAsset.asset),
             delegation = delegatePreview.userDelegations?.let { mapDelegation(it, chainWithAsset.asset) }
         )
+    }
+
+    override suspend fun mapVote(votes: List<Voting.Delegating>, chainAsset: Chain.Asset): VoteModel? {
+        val isAllVotesEquals = votes.isAllEquals { it.amount to it.conviction }
+
+        if (isAllVotesEquals) {
+            val firstVote = votes.first().getConvictionVote(chainAsset)
+            return votersFormatter.formatConvictionVote(firstVote, chainAsset)
+        }
+
+        return null
     }
 
     override fun mapDelegateTypeToUi(delegateType: DelegateAccountType?): DelegateTypeModel? {
@@ -170,16 +183,5 @@ class RealDelegateMappers(
             otherTracksCount = otherTracksCountStr,
             votes = mapVote(votes.values.toList(), chainAsset)
         )
-    }
-
-    private suspend fun mapVote(votes: List<Voting.Delegating>, chainAsset: Chain.Asset): VoteModel? {
-        val isAllVotesEquals = votes.isAllEquals { it.amount to it.conviction }
-
-        if (isAllVotesEquals) {
-            val firstVote = votes.first().getConvictionVote(chainAsset)
-            return votersFormatter.formatConvictionVote(firstVote, chainAsset)
-        }
-
-        return null
     }
 }
