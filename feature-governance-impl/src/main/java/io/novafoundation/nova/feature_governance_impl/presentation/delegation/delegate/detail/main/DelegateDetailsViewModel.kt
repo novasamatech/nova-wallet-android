@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.model.DelegatorVote
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetails
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.description
@@ -28,6 +29,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.formatDelegationsOverviewOrNull
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsModel.Metadata
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsModel.Stats
@@ -166,9 +168,11 @@ class DelegateDetailsViewModel(
     private suspend fun formatYourDelegation(votes: Map<Track, Voting.Delegating>, chainAsset: Chain.Asset): YourDelegationModel? {
         if (votes.isEmpty()) return null
 
+        val delegatorVote = DelegatorVote(votes.values, chainAsset)
+
         return YourDelegationModel(
             trackSummary = trackFormatter.formatTracksSummary(votes.keys, chainAsset),
-            vote = delegateMappers.formatDelegationsOverview(votes.values, chainAsset)
+            vote = delegateMappers.formatDelegationsOverviewOrNull(delegatorVote, chainAsset)
         )
     }
 

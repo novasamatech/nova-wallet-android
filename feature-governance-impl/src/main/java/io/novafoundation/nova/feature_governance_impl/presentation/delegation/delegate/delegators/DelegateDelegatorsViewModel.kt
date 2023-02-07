@@ -2,16 +2,15 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.mapLoading
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.DelegateDelegatorsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.model.Delegator
-import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoterModel
 import io.novafoundation.nova.feature_governance_impl.presentation.voters.VotersFormatter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -27,7 +26,7 @@ class DelegateDelegatorsViewModel(
     private val governanceSharedState: GovernanceSharedState,
     private val externalActions: ExternalActions.Presentation,
     private val votersFormatter: VotersFormatter,
-    private val resourceManager: ResourceManager,
+    private val delegateMappers: DelegateMappers,
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val chainFlow = flowOf { governanceSharedState.chain() }
@@ -60,19 +59,8 @@ class DelegateDelegatorsViewModel(
 
     private suspend fun mapDelegatorsToDelegatorModels(chain: Chain, chainAsset: Chain.Asset, voters: List<Delegator>): List<VoterModel> {
         return voters.map { delegator ->
-            val voteDetails = formatDelegatorVote(chainAsset, delegator.vote)
-            votersFormatter.formatVoter(delegator, chain, chainAsset, voteDetails)
-        }
-    }
-
-    private suspend fun formatDelegatorVote(chainAsset: Chain.Asset, vote: Delegator.Vote): String {
-        return when (vote) {
-            is Delegator.Vote.MultiTrack -> {
-                resourceManager.getString(R.string.delegation_multi_track_format, vote.trackCount)
-            }
-            is Delegator.Vote.SingleTrack -> {
-                votersFormatter.formatConvictionVoteDetails(vote.delegation, chainAsset)
-            }
+            val delegationModel = delegateMappers.formatDelegationsOverview(delegator.vote, chainAsset)
+            votersFormatter.formatVoter(delegator, chain, chainAsset, delegationModel)
         }
     }
 }

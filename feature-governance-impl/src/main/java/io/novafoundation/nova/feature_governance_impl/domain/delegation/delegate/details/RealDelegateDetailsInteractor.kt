@@ -50,6 +50,7 @@ class RealDelegateDetailsInteractor(
         val governanceOption = governanceSharedState.selectedOption()
 
         val chain = governanceOption.assetWithChain.chain
+        val chainAsset = governanceOption.assetWithChain.asset
         val delegateAddress = chain.addressOf(delegateAccountId)
 
         val governanceSource = governanceSourceRegistry.sourceFor(governanceOption)
