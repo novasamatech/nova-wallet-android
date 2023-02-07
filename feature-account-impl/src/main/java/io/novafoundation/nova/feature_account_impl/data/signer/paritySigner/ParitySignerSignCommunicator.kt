@@ -1,5 +1,0 @@
-package io.novafoundation.nova.feature_account_impl.data.signer.paritySigner
-
-import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
-
-interface ParitySignerSignCommunicator : SignInterScreenCommunicator
