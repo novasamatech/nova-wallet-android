@@ -1,3 +1,0 @@
-package io.novafoundation.nova.feature_onboarding_api.di
-
-interface OnboardingFeatureApi

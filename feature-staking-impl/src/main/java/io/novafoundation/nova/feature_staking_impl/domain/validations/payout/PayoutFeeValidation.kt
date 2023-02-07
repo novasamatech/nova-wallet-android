@@ -1,5 +1,0 @@
-package io.novafoundation.nova.feature_staking_impl.domain.validations.payout
-
-import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughToPayFeesValidation
-
-typealias PayoutFeeValidation = EnoughToPayFeesValidation<MakePayoutPayload, PayoutValidationFailure>
