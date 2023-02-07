@@ -145,20 +145,12 @@ class RealDelegateListInteractor(
 
         val userDelegations = getUserDelegationsOrEmpty(chain, convictionVotingRepository, referendaRepository)
 
-        val delegates = delegatesStatsDeferred.await().map { delegateStats ->
-            val metadata = delegateMetadatasByAccountId[delegateStats.accountId]
-            val identity = identities[delegateStats.accountId]
-
-            DelegatePreview(
-                accountId = delegateStats.accountId,
-                stats = mapStatsToDomain(delegateStats),
-                metadata = mapMetadataToDomain(metadata),
-                onChainIdentity = identity,
-                userDelegations = userDelegations[delegateStats.accountId]?.toMap()
-            )
-        }
-
-        delegates
+        mapDelegateStatsToPreviews(
+            delegatesStatsDeferred.await(),
+            delegateMetadatasByAccountId,
+            identities,
+            userDelegations
+        )
     }
 
     private suspend fun getUserDelegationsOrEmpty(
