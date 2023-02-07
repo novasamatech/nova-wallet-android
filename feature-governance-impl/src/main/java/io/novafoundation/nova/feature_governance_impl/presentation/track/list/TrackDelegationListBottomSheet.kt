@@ -39,10 +39,9 @@ class TrackDelegationHolder(
         item: TrackDelegationModel,
         isSelected: Boolean,
         handler: DynamicListSheetAdapter.Handler<TrackDelegationModel>
-    ) = with(itemView){
+    ) = with(itemView) {
         itemTrackDelegationTrack.setTrackModel(item.track)
         itemTrackDelegationVotesCount.text = item.delegation.votesCount
         itemTrackDelegationVotesCountDetails.text = item.delegation.votesCountDetails
     }
 }
-

@@ -86,7 +86,7 @@ class DelegateDetailsViewModel(
     }.shareWhileSubscribed()
 
     val addDelegationButtonState = delegateDetailsFlow.map { state ->
-       val data = state.dataOrNull
+        val data = state.dataOrNull
 
         when {
             data == null -> DescriptiveButtonState.Gone
@@ -98,7 +98,6 @@ class DelegateDetailsViewModel(
     init {
         useIdentity()
     }
-
 
     fun backClicked() {
         router.back()
