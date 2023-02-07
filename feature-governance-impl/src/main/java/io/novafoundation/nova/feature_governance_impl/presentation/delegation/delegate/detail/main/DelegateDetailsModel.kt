@@ -3,12 +3,14 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateIcon
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateTypeModel
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.view.YourDelegationModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
 
 class DelegateDetailsModel(
     val addressModel: AddressModel,
     val metadata: Metadata,
-    val stats: Stats?
+    val stats: Stats?,
+    val userDelegation: YourDelegationModel?
 ) {
 
     class Stats(

@@ -14,7 +14,7 @@ interface TrackFormatter {
 
     fun formatTrack(track: Track, asset: Chain.Asset): TrackModel
 
-    fun formatTracksSummary(tracks: List<Track>, asset: Chain.Asset): String
+    fun formatTracksSummary(tracks: Collection<Track>, asset: Chain.Asset): String
 }
 
 fun TrackFormatter.formatTracks(tracks: List<Track>, asset: Chain.Asset): TracksModel {
@@ -98,7 +98,7 @@ class RealTrackFormatter(
         }
     }
 
-    override fun formatTracksSummary(tracks: List<Track>, asset: Chain.Asset): String {
+    override fun formatTracksSummary(tracks: Collection<Track>, asset: Chain.Asset): String {
         val trackLabels = tracks.map { formatTrack(it, asset).name }
 
         return resourceManager.formatListPreview(trackLabels)

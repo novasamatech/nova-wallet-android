@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model
 
 import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.Delegate
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateAccountType
+import io.novafoundation.nova.feature_governance_api.domain.track.Track
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
@@ -10,7 +12,8 @@ data class DelegateDetails(
     override val accountId: AccountId,
     val stats: Stats?,
     override val metadata: Metadata?,
-    override val onChainIdentity: OnChainIdentity?
+    override val onChainIdentity: OnChainIdentity?,
+    val userDelegations: Map<Track, Voting.Delegating>
 ) : Delegate {
 
     data class Metadata(
@@ -24,5 +27,5 @@ data class DelegateDetails(
     data class Stats(val delegationsCount: Int, val delegatedVotes: Balance, val recentVotes: Int, val allVotes: Int)
 }
 
-val DelegateDetails.Metadata.description: String?
+val DelegateDetails.Metadata.description: String
     get() = longDescription ?: shortDescription

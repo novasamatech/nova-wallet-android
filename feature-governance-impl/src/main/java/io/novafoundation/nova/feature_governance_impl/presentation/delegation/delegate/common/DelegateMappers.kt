@@ -5,8 +5,8 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.isAllEquals
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.getConvictionVote
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.Delegate
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateAccountType
@@ -34,7 +34,9 @@ interface DelegateMappers {
 
     suspend fun mapDelegatePreviewToUi(delegatePreview: DelegatePreview, chainWithAsset: ChainWithAsset): DelegateListModel
 
-    suspend fun mapVote(votes: List<Voting.Delegating>, chainAsset: Chain.Asset): VoteModel?
+    suspend fun formatDelegationsOverview(votes: Collection<Voting.Delegating>, chainAsset: Chain.Asset): VoteModel?
+
+    suspend fun formatDelegation(delegation: Voting.Delegating, chainAsset: Chain.Asset): VoteModel
 
     fun mapDelegateTypeToUi(delegateType: DelegateAccountType?): DelegateTypeModel?
 
@@ -71,15 +73,20 @@ class RealDelegateMappers(
         )
     }
 
-    override suspend fun mapVote(votes: List<Voting.Delegating>, chainAsset: Chain.Asset): VoteModel? {
+    override suspend fun formatDelegationsOverview(votes: Collection<Voting.Delegating>, chainAsset: Chain.Asset): VoteModel? {
         val isAllVotesEquals = votes.isAllEquals { it.amount to it.conviction }
 
         if (isAllVotesEquals) {
-            val firstVote = votes.first().getConvictionVote(chainAsset)
-            return votersFormatter.formatConvictionVote(firstVote, chainAsset)
+            return formatDelegation(votes.first(), chainAsset)
         }
 
         return null
+    }
+
+    override suspend fun formatDelegation(delegation: Voting.Delegating, chainAsset: Chain.Asset): VoteModel {
+        val convictionVote = delegation.getConvictionVote(chainAsset)
+
+        return votersFormatter.formatConvictionVote(convictionVote, chainAsset)
     }
 
     override fun mapDelegateTypeToUi(delegateType: DelegateAccountType?): DelegateTypeModel? {
@@ -181,7 +188,7 @@ class RealDelegateMappers(
         return DelegateListModel.YourDelegationInfo(
             firstTrack = firstTrack,
             otherTracksCount = otherTracksCountStr,
-            votes = mapVote(votes.values.toList(), chainAsset)
+            votes = formatDelegationsOverview(votes.values.toList(), chainAsset)
         )
     }
 }

@@ -76,7 +76,9 @@ class NovaChipView @JvmOverloads constructor(
 
     private var size: Size = SIZE_DEFAULT
 
-    private val imageLoader: ImageLoader = FeatureUtils.getCommonApi(context).imageLoader()
+    private val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
+        FeatureUtils.getCommonApi(context).imageLoader()
+    }
 
     init {
         View.inflate(context, R.layout.view_chip, this)

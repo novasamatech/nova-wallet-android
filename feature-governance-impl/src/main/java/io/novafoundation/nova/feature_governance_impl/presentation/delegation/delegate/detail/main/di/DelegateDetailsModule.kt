@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRou
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsViewModel
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 
 @Module(includes = [ViewModelModule::class, MarkdownShortModule::class])
 class DelegateDetailsModule {
@@ -36,6 +37,7 @@ class DelegateDetailsModule {
         delegateMappers: DelegateMappers,
         governanceSharedState: GovernanceSharedState,
         markwon: Markwon,
+        trackFormatter: TrackFormatter
     ): ViewModel {
         return DelegateDetailsViewModel(
             interactor = interactor,
@@ -46,6 +48,7 @@ class DelegateDetailsModule {
             router = router,
             delegateMappers = delegateMappers,
             governanceSharedState = governanceSharedState,
+            trackFormatter = trackFormatter,
             markwon = markwon
         )
     }

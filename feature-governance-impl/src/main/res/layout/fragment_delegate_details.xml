@@ -104,13 +104,21 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/delegateDetailsDescriptionMetadataBottomSpacing" />
 
+                <io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.view.YourDelegationView
+                    android:id="@+id/delegateDetailsYourDelegation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/delegateDetailsAccount" />
+
                 <io.novafoundation.nova.common.view.TableView
                     android:id="@+id/delegateDetailsStats"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/delegateDetailsAccount"
+                    app:layout_constraintTop_toBottomOf="@id/delegateDetailsYourDelegation"
                     app:title="@string/delegation_delegations">
 
                     <io.novafoundation.nova.common.view.TableCellView
