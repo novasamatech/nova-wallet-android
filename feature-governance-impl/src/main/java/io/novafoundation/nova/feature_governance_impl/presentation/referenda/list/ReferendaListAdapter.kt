@@ -1,9 +1,16 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.list
 
+import android.graphics.Color
+import android.text.Editable
+import android.text.Spannable
+import android.text.Spanned
+import android.text.TextWatcher
+import android.text.style.ForegroundColorSpan
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import io.noties.markwon.SpannableBuilder.Span
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
@@ -11,6 +18,7 @@ import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.utils.textwatchers.NonTranslucentEmojisTextWatcher
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getRippleMask
@@ -140,6 +148,8 @@ private class ReferendumChildHolder(
                 mask = getRippleMask(cornerSizeDp = 12)
             )
         }
+
+        containerView.itemReferendumYourVoteDetails.addTextChangedListener(NonTranslucentEmojisTextWatcher())
     }
 
     fun bind(item: ReferendumModel) = with(containerView) {

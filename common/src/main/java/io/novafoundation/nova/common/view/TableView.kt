@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.children
@@ -67,7 +68,7 @@ open class TableView @JvmOverloads constructor(
 
         dividerPath.reset()
         children.toList()
-            .filterNot { it == titleView }
+            .filter { it != titleView && it.visibility == View.VISIBLE }
             .withoutLast()
             .forEach {
                 dividerPath.moveTo(childHorizontalPadding, it.bottom.toFloat())

@@ -8,11 +8,11 @@
     tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/votedReferendaToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
-        android:id="@+id/votedReferendaToolbar"
-        app:titleText="@string/referendum_voted_referenda" >
+        app:titleText="@string/referendum_voted_referenda">
 
         <io.novafoundation.nova.common.view.CounterView
             android:id="@+id/votedReferendaCount"
