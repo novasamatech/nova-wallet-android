@@ -106,7 +106,6 @@ class RealChooseTrackInteractor(
 
                 val partition = partitionConstructor(userVotings, allTracks)
 
-
                 val presets = buildPresets(partition.available)
 
                 ChooseTrackData(partition, presets)

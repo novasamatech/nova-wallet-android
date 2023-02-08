@@ -65,7 +65,6 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
 
     fun votedReferendaFactory(): VotedReferendaComponent.Factory
 
-
     fun removeVoteFactory(): RemoveVotesComponent.Factory
 
     fun delegateDelegatorsFactory(): DelegateDelegatorsComponent.Factory

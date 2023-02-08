@@ -26,6 +26,4 @@ class NewDelegationChooseTracksFragment : SelectDelegationTracksFragment<NewDele
             .create(this, argument(EXTRA_PAYLOAD))
             .inject(this)
     }
-
-
 }

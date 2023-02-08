@@ -113,7 +113,6 @@ class RealNewDelegationChooseAmountInteractor(
                     // its a new delegation - just delegate
                     delegationInTrack == null -> delegate(delegate, trackId, amount, conviction)
                 }
-
             }
         }
     }

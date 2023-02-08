@@ -20,7 +20,7 @@ class NewDelegationChooseTracksViewModel(
     resourceManager: ResourceManager,
     private val router: GovernanceRouter,
     private val payload: NewDelegationChooseTracksPayload
-): SelectDelegationTracksViewModel(
+) : SelectDelegationTracksViewModel(
     interactor = interactor,
     trackFormatter = trackFormatter,
     governanceSharedState = governanceSharedState,
