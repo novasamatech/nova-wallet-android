@@ -1,16 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.list
 
-import android.graphics.Color
-import android.text.Editable
-import android.text.Spannable
-import android.text.Spanned
-import android.text.TextWatcher
-import android.text.style.ForegroundColorSpan
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import io.noties.markwon.SpannableBuilder.Span
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder

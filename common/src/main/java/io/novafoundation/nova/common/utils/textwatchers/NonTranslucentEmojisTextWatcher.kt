@@ -37,10 +37,10 @@ class NonTranslucentEmojisTextWatcher : TextWatcher {
     }
 
     private fun isEmoji(c: Char): Boolean {
-        return c.code in 0x2600..0x27BF
-            || c.code in 0x1F300..0x1F5FF
-            || c.code in 0x1F600..0x1F64F
-            || c.code in 0x1F680..0x1F6FF
-            || c.code in 0x1F900..0x1F9FF
+        return c.code in 0x2600..0x27BF ||
+            c.code in 0x1F300..0x1F5FF ||
+            c.code in 0x1F600..0x1F64F ||
+            c.code in 0x1F680..0x1F6FF ||
+            c.code in 0x1F900..0x1F9FF
     }
 }
