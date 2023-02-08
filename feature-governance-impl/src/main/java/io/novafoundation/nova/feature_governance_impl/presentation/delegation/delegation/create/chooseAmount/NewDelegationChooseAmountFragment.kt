@@ -73,6 +73,8 @@ class NewDelegationChooseAmountFragment : BaseFragment<NewDelegationChooseAmount
         observeValidations(viewModel)
         observeHints(viewModel.hintsMixin, newDelegationChooseAmountHints)
 
+        viewModel.title.observe(newDelegationChooseAmountToolbar::setTitle)
+
         newDelegationChooseAmountVotePower.votePowerSeekbar.setValues(viewModel.convictionValues)
         newDelegationChooseAmountVotePower.votePowerSeekbar.bindTo(viewModel.selectedConvictionIndex, viewLifecycleOwner.lifecycleScope)
 

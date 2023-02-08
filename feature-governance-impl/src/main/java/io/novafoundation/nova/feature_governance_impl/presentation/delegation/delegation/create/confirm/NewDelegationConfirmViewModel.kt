@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.common.newDelegationHints
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.common.newDelegationTitle
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
@@ -77,6 +78,10 @@ class NewDelegationConfirmViewModel(
     Validatable by validationExecutor,
     WithFeeLoaderMixin,
     ExternalActions by externalActions {
+
+    val title = flowOf {
+        resourceManager.newDelegationTitle(isEditMode = payload.isEditMode)
+    }.shareInBackground()
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -187,7 +192,7 @@ class NewDelegationConfirmViewModel(
                 conviction = payload.conviction,
                 delegate = payload.delegate,
                 tracks = payload.trackIds,
-                shouldRemoveOtherTracks = payload.shouldRemoveOtherTracks
+                shouldRemoveOtherTracks = payload.isEditMode
             )
         }
 

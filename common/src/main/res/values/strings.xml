@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="delegation_edit_delegation">Edit delegation</string>
+
+    <string name="select_delegation_tracks_add_title">Select tracks to add delegation</string>
+    <string name="select_delegation_tracks_edit_title">Select tracks to edit delegation</string>
+
     <string name="common_revoke">Revoke</string>
 
     <!--<string name="referendum_track_root">main agenda</string>
@@ -86,7 +91,6 @@
 
     <string name="select_delegation_tracks_available_tracks">Available tracks</string>
     <string name="select_delegation_tracks_unavailable_tracks">Unavailable tracks</string>
-    <string name="select_delegation_tracks_title">Select tracks to add delegation</string>
     <string name="select_delegation_tracks_description">Please select the tracks in which you would like to delegate your voting power.</string>
 
     <string name="delegation_tracks_all_preset">Select all</string>

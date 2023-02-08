@@ -11,7 +11,7 @@ class NewDelegationChooseAmountPayload(
     val delegate: AccountId,
     @Suppress("CanBeParameter") // val is required for Parcelize to work
     val trackIdsRaw: List<BigInteger>,
-    val removeOtherTracks: Boolean,
+    val isEditMode: Boolean,
 ) : Parcelable {
 
     val trackIds = trackIdsRaw.map(::TrackId)

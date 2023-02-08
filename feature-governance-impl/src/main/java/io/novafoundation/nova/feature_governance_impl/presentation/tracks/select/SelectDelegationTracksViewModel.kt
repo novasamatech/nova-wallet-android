@@ -1,3 +1,5 @@
+@file:Suppress("LeakingThis")
+
 package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select
 
 import androidx.lifecycle.LiveData
@@ -6,6 +8,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
@@ -39,16 +42,24 @@ abstract class SelectDelegationTracksViewModel(
     private val governanceSharedState: GovernanceSharedState,
     private val resourceManager: ResourceManager,
     private val router: GovernanceRouter,
-    private val chooseTrackDataFlow: Flow<ChooseTrackData>
+    chooseTrackDataFlow: Flow<ChooseTrackData>
 ) : BaseViewModel() {
 
     protected abstract fun nextClicked(trackIds: List<BigInteger>)
 
+    abstract val title: Flow<String>
+
+    private val chooseTrackDataFlowShared = chooseTrackDataFlow
+        .inBackground()
+        .shareWhileSubscribed()
+
     private val selectedTracksFlow = MutableStateFlow(setOf<TrackId>())
 
-    private val trackPresetsFlow = chooseTrackDataFlow.map { it.presets }
+    private val trackPresetsFlow = chooseTrackDataFlowShared.map { it.presets }
+        .shareWhileSubscribed()
 
-    private val availableTrackFlow = chooseTrackDataFlow.map { it.trackPartition.available }
+    private val availableTrackFlow = chooseTrackDataFlowShared.map { it.trackPartition.available }
+        .shareWhileSubscribed()
 
     private val _showRemoveVotesSuggestion = MutableLiveData<Event<Int>>()
     val showRemoveVotesSuggestion: LiveData<Event<Int>> = _showRemoveVotesSuggestion
@@ -57,17 +68,16 @@ abstract class SelectDelegationTracksViewModel(
     val showUnavailableTracksEvent: LiveData<Event<UnavailableTracksModel>> = _showUnavailableTracksEvent
 
     val trackPresetsModels = trackPresetsFlow
-        .map { mapTrackPresets(it) }
-        .shareInBackground()
+        .map(::mapTrackPresets)
+        .shareWhileSubscribed()
 
-    val availableTrackModels = combine(availableTrackFlow, selectedTracksFlow) { tracks, selectedTracks ->
-        mapTracksToModel(tracks, selectedTracks)
-    }.withSafeLoading()
-        .shareInBackground()
+    val availableTrackModels = combine(availableTrackFlow, selectedTracksFlow, ::mapTracksToModel)
+        .withSafeLoading()
+        .shareWhileSubscribed()
 
     val showUnavailableTracksButton = chooseTrackDataFlow
         .map { it.trackPartition.hasUnavailableTracks() }
-        .shareInBackground()
+        .shareWhileSubscribed()
 
     val buttonState = selectedTracksFlow
         .map {
@@ -99,7 +109,7 @@ abstract class SelectDelegationTracksViewModel(
 
     fun unavailableTracksClicked() {
         launch {
-            val tracksPartition = chooseTrackDataFlow.first().trackPartition
+            val tracksPartition = chooseTrackDataFlowShared.first().trackPartition
             val alreadyVotedModels = mapTracks(tracksPartition.alreadyVoted)
             val alreadyDelegatedModels = mapTracks(tracksPartition.alreadyDelegated)
             _showUnavailableTracksEvent.value = Event(UnavailableTracksModel(alreadyVotedModels, alreadyDelegatedModels))
@@ -117,7 +127,7 @@ abstract class SelectDelegationTracksViewModel(
 
     fun openRemoveVotesScreen() {
         launch {
-            val chooseTrackData = chooseTrackDataFlow.first()
+            val chooseTrackData = chooseTrackDataFlowShared.first()
             val tracksIds = chooseTrackData.trackPartition.alreadyVoted
                 .map { it.id.value }
             val payload = RemoveVotesPayload(tracksIds)
@@ -134,7 +144,7 @@ abstract class SelectDelegationTracksViewModel(
 
     private fun applyPreCheckedTracks() {
         launch {
-            val preCheckedTrackIds = chooseTrackDataFlow.first().trackPartition.preCheckedTrackIds
+            val preCheckedTrackIds = chooseTrackDataFlowShared.first().trackPartition.preCheckedTrackIds
 
             if (preCheckedTrackIds.isNotEmpty()) {
                 selectedTracksFlow.value = preCheckedTrackIds
@@ -144,7 +154,7 @@ abstract class SelectDelegationTracksViewModel(
 
     private fun checkRemoveVotes() {
         launch {
-            val chooseTrackData = chooseTrackDataFlow.first()
+            val chooseTrackData = chooseTrackDataFlowShared.first()
             val alreadyVoted = chooseTrackData.trackPartition.alreadyVoted
             if (alreadyVoted.isNotEmpty() && interactor.isAllowedToShowRemoveVotesSuggestion()) {
                 _showRemoveVotesSuggestion.value = Event(alreadyVoted.size)

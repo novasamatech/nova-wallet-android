@@ -62,16 +62,18 @@ abstract class SelectDelegationTracksFragment<V : SelectDelegationTracksViewMode
     }
 
     override fun subscribe(viewModel: V) {
-        viewModel.showUnavailableTracksButton.observe {
+        viewModel.title.observeWhenVisible(headerAdapter::setTitle)
+
+        viewModel.showUnavailableTracksButton.observeWhenVisible {
             headerAdapter.showUnavailableTracks(it)
         }
 
-        viewModel.trackPresetsModels.observe {
+        viewModel.trackPresetsModels.observeWhenVisible {
             presetsAdapter.show(it.isNotEmpty())
             presetsAdapter.submitList(it)
         }
 
-        viewModel.availableTrackModels.observe {
+        viewModel.availableTrackModels.observeWhenVisible {
             selectDelegationTracksProgress.isVisible = it is ExtendedLoadingState.Loading
             when (it) {
                 is ExtendedLoadingState.Error -> {}
@@ -83,7 +85,7 @@ abstract class SelectDelegationTracksFragment<V : SelectDelegationTracksViewMode
             }
         }
 
-        viewModel.buttonState.observe { selectDelegationTracksApply.setState(it) }
+        viewModel.buttonState.observeWhenVisible(selectDelegationTracksApply::setState)
 
         viewModel.showRemoveVotesSuggestion.observeEvent {
             val bottomSheet = RemoveVotesSuggestionBottomSheet(

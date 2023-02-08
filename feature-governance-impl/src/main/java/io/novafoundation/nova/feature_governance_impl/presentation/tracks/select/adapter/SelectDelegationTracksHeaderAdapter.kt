@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_governance_impl.R
 import kotlinx.android.synthetic.main.item_delegation_tracks_header.view.itemDelegationTracksUnavailableTracks
 import kotlinx.android.synthetic.main.item_delegation_tracks_header.view.itemDelegationTracksUnavailableTracksText
+import kotlinx.android.synthetic.main.item_delegation_tracks_header.view.selectDelegationTracksTitle
 
 class SelectDelegationTracksHeaderAdapter(
     private val handler: Handler
@@ -19,6 +20,7 @@ class SelectDelegationTracksHeaderAdapter(
     }
 
     private var showUnavailableTracks: Boolean = false
+    private var title: String? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DelegationTracksHeaderViewHolder {
         val containerView = parent.inflateChild(R.layout.item_delegation_tracks_header)
@@ -31,12 +33,16 @@ class SelectDelegationTracksHeaderAdapter(
     }
 
     override fun onBindViewHolder(holder: DelegationTracksHeaderViewHolder, position: Int) {
-        holder.bind(showUnavailableTracks)
+        holder.bind(showUnavailableTracks, title)
     }
 
     fun showUnavailableTracks(show: Boolean) {
         showUnavailableTracks = show
         notifyItemChanged(0)
+    }
+
+    fun setTitle(title: String) {
+        this.title = title
     }
 }
 
@@ -51,7 +57,8 @@ class DelegationTracksHeaderViewHolder(
         }
     }
 
-    fun bind(showUnavailableTracks: Boolean) {
+    fun bind(showUnavailableTracks: Boolean, title: String?) {
         itemView.itemDelegationTracksUnavailableTracks.isInvisible = !showUnavailableTracks
+        itemView.selectDelegationTracksTitle.text = title
     }
 }
