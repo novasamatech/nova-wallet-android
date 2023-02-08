@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
-
+    <string name="common_revoke">Revoke</string>
 
     <!--<string name="referendum_track_root">main agenda</string>
     <string name="referendum_whitelisted_caller">fellowship: whitelist</string>

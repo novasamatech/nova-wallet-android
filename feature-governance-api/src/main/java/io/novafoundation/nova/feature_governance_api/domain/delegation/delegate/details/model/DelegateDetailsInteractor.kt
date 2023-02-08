@@ -1,10 +1,11 @@
 package io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model
 
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import kotlinx.coroutines.flow.Flow
 
 interface DelegateDetailsInteractor {
 
-    suspend fun getDelegateDetails(
+    fun delegateDetailsFlow(
         delegateAccountId: AccountId,
-    ): Result<DelegateDetails>
+    ): Flow<DelegateDetails>
 }

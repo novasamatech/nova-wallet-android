@@ -8,11 +8,11 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.DelegateDelegatorsInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.DelegateDelegatorsViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.voters.VotersFormatter
@@ -30,7 +30,7 @@ class DelegateDelegatorsModule {
         externalActions: ExternalActions.Presentation,
         interactor: DelegateDelegatorsInteractor,
         votersFormatter: VotersFormatter,
-        resourceManager: ResourceManager,
+        delegateMappers: DelegateMappers,
     ): ViewModel {
         return DelegateDelegatorsViewModel(
             payload = payload,
@@ -39,7 +39,7 @@ class DelegateDelegatorsModule {
             externalActions = externalActions,
             interactor = interactor,
             votersFormatter = votersFormatter,
-            resourceManager = resourceManager
+            delegateMappers = delegateMappers
         )
     }
 

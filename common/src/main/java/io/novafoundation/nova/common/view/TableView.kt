@@ -15,10 +15,13 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setBackgroundColorRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
+
+private const val SHOW_BACKGROUND_DEAULT = true
 
 open class TableView @JvmOverloads constructor(
     context: Context,
@@ -28,21 +31,26 @@ open class TableView @JvmOverloads constructor(
 
     override val providedContext: Context = context
 
-    val titleView: TextView
+    val titleView: TextView = addTitleView()
 
     private val childHorizontalPadding = 16.dpF(context)
     private val dividerPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val dividerPath = Path()
 
+    private var showBackground: Boolean = SHOW_BACKGROUND_DEAULT
+
     init {
         orientation = VERTICAL
 
-        background = getRoundedCornerDrawable(R.color.block_background)
-        clipToOutline = true
-
-        titleView = addTitleView()
-
         attrs?.let(::applyAttributes)
+
+        if (showBackground) {
+            background = getRoundedCornerDrawable(R.color.block_background)
+        } else {
+            setBackgroundColorRes(android.R.color.transparent)
+        }
+
+        clipToOutline = true
 
         dividerPaint.apply {
             color = context.getColor(R.color.divider)
@@ -67,7 +75,7 @@ open class TableView @JvmOverloads constructor(
 
         dividerPath.reset()
         children.toList()
-            .filterNot { it == titleView }
+            .filter { it != titleView && it.isVisible }
             .withoutLast()
             .forEach {
                 dividerPath.moveTo(childHorizontalPadding, it.bottom.toFloat())
@@ -92,6 +100,8 @@ open class TableView @JvmOverloads constructor(
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.TableView) {
         val title = it.getString(R.styleable.TableView_title)
         setTitle(title)
+
+        showBackground = it.getBoolean(R.styleable.TableView_showBackground, SHOW_BACKGROUND_DEAULT)
     }
 
     private fun setupTableChildrenAppearance() {
