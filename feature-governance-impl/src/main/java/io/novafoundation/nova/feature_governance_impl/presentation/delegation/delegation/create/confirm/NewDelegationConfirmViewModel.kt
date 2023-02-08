@@ -186,7 +186,8 @@ class NewDelegationConfirmViewModel(
                 amount = amountPlanks,
                 conviction = payload.conviction,
                 delegate = payload.delegate,
-                tracks = payload.trackIds
+                tracks = payload.trackIds,
+                shouldRemoveOtherTracks = payload.shouldRemoveOtherTracks
             )
         }
 

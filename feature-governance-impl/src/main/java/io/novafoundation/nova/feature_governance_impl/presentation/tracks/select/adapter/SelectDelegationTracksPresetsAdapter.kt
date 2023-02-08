@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.adapter
+package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.adapter
 
 import android.view.View
 import android.view.ViewGroup
@@ -7,12 +7,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model.DelegationTracksPresetModel
+import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.model.DelegationTracksPresetModel
 import kotlinx.android.synthetic.main.item_delegation_tracks_preset.view.itemDelegationTracksPreset
 
 class SelectDelegationTracksPresetsAdapter(
     private val handler: Handler
-) : ListAdapter<DelegationTracksPresetModel, DelegationTrackPresetViewHolder>(DelegationTracksPresetDiffCallback) {
+) : ListAdapter<DelegationTracksPresetModel, DelegationTrackPresetViewHolder>(
+    DelegationTracksPresetDiffCallback
+) {
 
     interface Handler {
         fun presetClicked(position: Int)

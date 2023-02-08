@@ -3,8 +3,11 @@ package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegat
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdOfSelectedMetaAccountIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
-import io.novafoundation.nova.feature_governance_api.data.repository.DelegationsRepository
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.delegations
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
@@ -34,6 +37,7 @@ class RealNewDelegationChooseAmountInteractor(
     private val extrinsicService: ExtrinsicService,
     private val locksRepository: BalanceLocksRepository,
     private val computationalCache: ComputationalCache,
+    private val accountRepository: AccountRepository,
 ) : NewDelegationChooseAmountInteractor {
 
     override fun delegateAssistantFlow(coroutineScope: CoroutineScope): Flow<DelegateAssistant> {
@@ -48,12 +52,14 @@ class RealNewDelegationChooseAmountInteractor(
         amount: Balance,
         conviction: Conviction,
         delegate: AccountId,
-        tracks: Collection<TrackId>
+        tracks: Collection<TrackId>,
+        shouldRemoveOtherTracks: Boolean,
     ): Balance {
         val (chain, governanceSource) = useSelectedGovernance()
+        val origin = accountRepository.requireIdOfSelectedMetaAccountIn(chain)
 
         return extrinsicService.estimateFee(chain) {
-            delegate(governanceSource.delegationsRepository, amount, conviction, delegate, tracks)
+            delegate(governanceSource, amount, conviction, delegate, origin, chain, tracks, shouldRemoveOtherTracks)
         }
     }
 
@@ -61,27 +67,59 @@ class RealNewDelegationChooseAmountInteractor(
         amount: Balance,
         conviction: Conviction,
         delegate: AccountId,
-        tracks: Collection<TrackId>
+        tracks: Collection<TrackId>,
+        shouldRemoveOtherTracks: Boolean,
     ): Result<ExtrinsicStatus.InBlock> {
         val (chain, governanceSource) = useSelectedGovernance()
 
-        return extrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(chain) {
-            delegate(governanceSource.delegationsRepository, amount, conviction, delegate, tracks)
+        return extrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(chain) { origin ->
+            delegate(governanceSource, amount, conviction, delegate, origin, chain, tracks, shouldRemoveOtherTracks)
         }
     }
 
     private suspend fun ExtrinsicBuilder.delegate(
-        delegationsRepository: DelegationsRepository,
+        governanceSource: GovernanceSource,
         amount: Balance,
         conviction: Conviction,
         delegate: AccountId,
-        tracks: Collection<TrackId>
+        user: AccountId,
+        chain: Chain,
+        tracks: Collection<TrackId>,
+        shouldRemoveOtherTracks: Boolean,
     ) {
-        with(delegationsRepository) {
+        val tracksSet = tracks.toSet()
+        val delegations = governanceSource.convictionVoting.votingFor(user, chain.id).delegations(to = delegate)
+        val alreadyDelegatedTracks = delegations.keys
+        val tracksToRemove = if (shouldRemoveOtherTracks) alreadyDelegatedTracks - tracksSet else emptySet()
+
+        with(governanceSource.delegationsRepository) {
+            tracksToRemove.forEach { track ->
+                undelegate(track)
+            }
+
             tracks.forEach { trackId ->
-                delegate(delegate, trackId, amount, conviction)
+                val delegationInTrack = delegations[trackId]
+
+                when {
+                    // replace existing delegation with new one
+                    delegationInTrack != null && !delegationInTrack.sameAs(amount, conviction) -> {
+                        undelegate(trackId)
+                        delegate(delegate, trackId, amount, conviction)
+                    }
+
+                    // do nothing - delegation is the same
+                    delegationInTrack != null && delegationInTrack.sameAs(amount, conviction) -> {}
+
+                    // its a new delegation - just delegate
+                    delegationInTrack == null -> delegate(delegate, trackId, amount, conviction)
+                }
+
             }
         }
+    }
+
+    private fun Voting.Delegating.sameAs(amount: Balance, conviction: Conviction): Boolean {
+        return amount == this.amount && conviction == this.conviction
     }
 
     private suspend fun voteAssistantFlowSuspend(

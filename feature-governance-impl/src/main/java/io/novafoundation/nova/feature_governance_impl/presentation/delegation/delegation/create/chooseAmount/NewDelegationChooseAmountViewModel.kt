@@ -128,7 +128,8 @@ class NewDelegationChooseAmountViewModel(
                     amount = amount.toPlanks(),
                     conviction = conviction,
                     delegate = payload.delegate,
-                    tracks = payload.trackIds
+                    tracks = payload.trackIds,
+                    shouldRemoveOtherTracks = payload.removeOtherTracks
                 )
             }
         )
@@ -174,7 +175,8 @@ class NewDelegationChooseAmountViewModel(
             trackIdsRaw = payload.trackIdsRaw,
             amount = validationPayload.amount,
             conviction = selectedConvictionFlow.first(),
-            fee = validationPayload.fee
+            fee = validationPayload.fee,
+            shouldRemoveOtherTracks = payload.removeOtherTracks
         )
 
         router.openNewDelegationConfirm(payload)

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model
+package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.model
 
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
 

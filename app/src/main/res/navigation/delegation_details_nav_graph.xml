@@ -65,7 +65,7 @@
 
     <fragment
         android:id="@+id/selectDelegationTracks"
-        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.SelectDelegationTracksFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack.NewDelegationChooseTracksFragment"
         android:label="SelectDelegationTracksFragment"
         tools:layout="@layout/fragment_select_delegation_tracks">
         <action

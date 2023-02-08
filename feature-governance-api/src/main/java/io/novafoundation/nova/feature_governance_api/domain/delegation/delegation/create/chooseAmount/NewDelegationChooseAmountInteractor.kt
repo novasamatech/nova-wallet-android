@@ -19,6 +19,7 @@ interface NewDelegationChooseAmountInteractor {
         conviction: Conviction,
         delegate: AccountId,
         tracks: Collection<TrackId>,
+        shouldRemoveOtherTracks: Boolean,
     ): Balance
 
     suspend fun delegate(
@@ -26,5 +27,6 @@ interface NewDelegationChooseAmountInteractor {
         conviction: Conviction,
         delegate: AccountId,
         tracks: Collection<TrackId>,
+        shouldRemoveOtherTracks: Boolean,
     ): Result<ExtrinsicStatus.InBlock>
 }

@@ -182,7 +182,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
             .inBackground()
             .launchIn(this)
 
-        val trackData = interactor.observeChooseTrackData().first()
+        val trackData = interactor.observeNewDelegationTrackData().first()
 
         Log.d(this@GovernanceIntegrationTest.LOG_TAG,
             """

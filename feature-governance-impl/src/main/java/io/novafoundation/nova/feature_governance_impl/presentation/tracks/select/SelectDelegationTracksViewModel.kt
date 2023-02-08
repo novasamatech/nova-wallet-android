@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select
+package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,41 +9,42 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.NewDelegationChooseTrackInteractor
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.model.TrackPreset
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.model.hasUnavailableTracks
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.common.chooseTrack.ChooseTrackInteractor
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.common.chooseTrack.model.ChooseTrackData
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.common.chooseTrack.model.TrackPreset
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.common.chooseTrack.model.hasUnavailableTracks
 import io.novafoundation.nova.feature_governance_api.domain.track.Track
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model.DelegationTrackModel
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model.DelegationTracksPresetModel
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
+import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.model.DelegationTrackModel
+import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.model.DelegationTracksPresetModel
 import io.novafoundation.nova.runtime.state.chainAsset
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.math.BigInteger
 
 class UnavailableTracksModel(val alreadyVoted: List<TrackModel>, val alreadyDelegated: List<TrackModel>)
 
-class SelectDelegationTracksViewModel(
-    private val interactor: NewDelegationChooseTrackInteractor,
+abstract class SelectDelegationTracksViewModel(
+    private val interactor: ChooseTrackInteractor,
     private val trackFormatter: TrackFormatter,
     private val governanceSharedState: GovernanceSharedState,
     private val resourceManager: ResourceManager,
     private val router: GovernanceRouter,
-    private val payload: SelectDelegationTracksPayload,
+    private val chooseTrackDataFlow: Flow<ChooseTrackData>
 ) : BaseViewModel() {
 
-    private val chooseTrackDataFlow = interactor.observeChooseTrackData()
-        .shareInBackground()
+    protected abstract fun nextClicked(trackIds: List<BigInteger>)
 
-    private var selectedTracksFlow = MutableStateFlow(setOf<TrackId>())
+    private val selectedTracksFlow = MutableStateFlow(setOf<TrackId>())
 
     private val trackPresetsFlow = chooseTrackDataFlow.map { it.presets }
 
@@ -79,7 +80,9 @@ class SelectDelegationTracksViewModel(
         .shareInBackground()
 
     init {
-        checkExistingVotes()
+        checkRemoveVotes()
+
+        applyPreCheckedTracks()
     }
 
     fun backClicked() {
@@ -105,11 +108,7 @@ class SelectDelegationTracksViewModel(
 
     fun nextClicked() = launch {
         val selectedTrackIds = selectedTracksFlow.value
-        val payload = NewDelegationChooseAmountPayload(
-            delegate = payload.delegateId,
-            trackIdsRaw = selectedTrackIds.map(TrackId::value)
-        )
-        router.openNewDelegationChooseAmount(payload)
+        nextClicked(selectedTrackIds.map(TrackId::value))
     }
 
     fun removeVotesSuggestionSkipped() = launch {
@@ -133,7 +132,17 @@ class SelectDelegationTracksViewModel(
         }
     }
 
-    private fun checkExistingVotes() {
+    private fun applyPreCheckedTracks() {
+        launch {
+            val preCheckedTrackIds = chooseTrackDataFlow.first().trackPartition.preCheckedTrackIds
+
+            if (preCheckedTrackIds.isNotEmpty()) {
+                selectedTracksFlow.value = preCheckedTrackIds
+            }
+        }
+    }
+
+    private fun checkRemoveVotes() {
         launch {
             val chooseTrackData = chooseTrackDataFlow.first()
             val alreadyVoted = chooseTrackData.trackPartition.alreadyVoted

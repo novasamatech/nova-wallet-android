@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.adapter
+package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.adapter
 
 import android.view.View
 import android.view.ViewGroup

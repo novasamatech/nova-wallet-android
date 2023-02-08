@@ -1,0 +1,42 @@
+package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack
+
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.common.chooseTrack.ChooseTrackInteractor
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.common.chooseTrack.model.ChooseTrackData
+import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.SelectDelegationTracksViewModel
+import kotlinx.coroutines.flow.Flow
+import java.math.BigInteger
+
+class NewDelegationChooseTracksViewModel(
+    interactor: ChooseTrackInteractor,
+    trackFormatter: TrackFormatter,
+    governanceSharedState: GovernanceSharedState,
+    resourceManager: ResourceManager,
+    private val router: GovernanceRouter,
+    private val payload: NewDelegationChooseTracksPayload
+): SelectDelegationTracksViewModel(
+    interactor = interactor,
+    trackFormatter = trackFormatter,
+    governanceSharedState = governanceSharedState,
+    resourceManager = resourceManager,
+    router = router,
+    chooseTrackDataFlow = interactor.chooseTrackDataFlowFor(payload)
+) {
+
+    override fun nextClicked(trackIds: List<BigInteger>) {
+        val nextPayload = NewDelegationChooseAmountPayload(payload.delegateId, trackIds, removeOtherTracks = payload.isEditMode)
+        router.openNewDelegationChooseAmount(nextPayload)
+    }
+}
+
+private fun ChooseTrackInteractor.chooseTrackDataFlowFor(payload: NewDelegationChooseTracksPayload): Flow<ChooseTrackData> {
+    return if (payload.isEditMode) {
+        observeEditDelegationTrackData(payload.delegateId)
+    } else {
+        observeNewDelegationTrackData()
+    }
+}

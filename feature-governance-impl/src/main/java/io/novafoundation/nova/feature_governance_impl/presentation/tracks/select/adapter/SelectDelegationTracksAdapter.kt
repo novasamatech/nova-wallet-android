@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.adapter
+package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.adapter
 
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.model.DelegationTrackModel
+import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.model.DelegationTrackModel
 import kotlinx.android.synthetic.main.item_delegation_track.view.itemDelegationTrack
 import kotlinx.android.synthetic.main.item_delegation_track.view.itemDelegationTrackCheckbox
 

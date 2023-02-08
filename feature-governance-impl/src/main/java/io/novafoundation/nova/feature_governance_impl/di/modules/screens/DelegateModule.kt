@@ -16,8 +16,8 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.label.DelegateLabelUseCase
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.common.chooseTrack.ChooseTrackInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountInteractor
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.NewDelegationChooseTrackInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.repository.DelegationBannerRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.RealDelegationBannerRepository
@@ -30,7 +30,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.RealNewDelegationChooseAmountInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.ChooseDelegationAmountValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.chooseDelegationAmount
-import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.RealNewDelegationChooseTrackInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.RealChooseTrackInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.TrackCategorizer
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.RealDelegateMappers
@@ -87,7 +87,7 @@ class DelegateModule {
         accountRepository: AccountRepository,
         trackCategorizer: TrackCategorizer,
         removeVotesSuggestionRepository: RemoveVotesSuggestionRepository,
-    ): NewDelegationChooseTrackInteractor = RealNewDelegationChooseTrackInteractor(
+    ): ChooseTrackInteractor = RealChooseTrackInteractor(
         governanceSharedState = governanceSharedState,
         governanceSourceRegistry = governanceSourceRegistry,
         chainStateRepository = chainStateRepository,
@@ -126,6 +126,7 @@ class DelegateModule {
         extrinsicService: ExtrinsicService,
         locksRepository: BalanceLocksRepository,
         computationalCache: ComputationalCache,
+        accountRepository: AccountRepository,
     ): NewDelegationChooseAmountInteractor {
         return RealNewDelegationChooseAmountInteractor(
             governanceSourceRegistry = governanceSourceRegistry,
@@ -133,7 +134,8 @@ class DelegateModule {
             selectedChainState = selectedChainState,
             extrinsicService = extrinsicService,
             locksRepository = locksRepository,
-            computationalCache = computationalCache
+            computationalCache = computationalCache,
+            accountRepository = accountRepository
         )
     }
 
