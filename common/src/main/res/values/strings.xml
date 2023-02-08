@@ -99,7 +99,7 @@
 
     <string name="remove_votes_suggestion_title">Remove history of your votes?</string>
     <plurals name="remove_votes_suggestion_description">
-        <item quantity="one" formatted="true">You have previously voted in referendums in %d track. In order to make these tracks available for delegation, you need to remove your existing votes.</item>
+        <item quantity="one" formatted="true">You have previously voted in referendums in %d track. In order to make this track available for delegation, you need to remove your existing votes.</item>
         <item quantity="other" formatted="true">You have previously voted in referendums in %d tracks. In order to make these tracks available for delegation, you need to remove your existing votes.</item>
     </plurals>
 
