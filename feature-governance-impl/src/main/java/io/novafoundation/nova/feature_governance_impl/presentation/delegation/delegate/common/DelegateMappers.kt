@@ -34,9 +34,9 @@ interface DelegateMappers {
 
     suspend fun mapDelegatePreviewToUi(delegatePreview: DelegatePreview, chainWithAsset: ChainWithAsset): DelegateListModel
 
-    fun mapDelegateTypeToUi(delegateType: DelegateAccountType?): DelegateTypeModel?
-
     suspend fun mapVote(votes: List<Voting.Delegating>, chainAsset: Chain.Asset): VoteModel?
+
+    fun mapDelegateTypeToUi(delegateType: DelegateAccountType?): DelegateTypeModel?
 
     suspend fun mapDelegateIconToUi(delegate: Delegate): DelegateIcon
 
