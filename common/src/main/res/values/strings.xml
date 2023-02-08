@@ -1,5 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+
+    <!--<string name="referendum_track_root">main agenda</string>
+    <string name="referendum_whitelisted_caller">fellowship: whitelist</string>
+    <string name="referendum_staking_admin">staking</string>
+    <string name="referendum_track_treasurer">Treasury: ANY</string>
+    <string name="referendum_track_lease_admin">Governance: lease</string>
+    <string name="referendum_track_fellowship_admin">fellowship: admin</string>
+    <string name="referendum_track_general_admin">governance: registrar</string>
+    <string name="referendum_track_auction_admin">crowdloans</string>
+    <string name="referendum_track_referendum_canceller">governance: canceller</string>
+    <string name="referendum_track_referendum_killer">governance: killer</string>
+    <string name="referendum_track_small_tipper">Treasury: small tips</string>
+    <string name="referendum_track_big_tipper">Treasury: big tips</string>
+    <string name="referendum_track_small_spender">Treasury: Small spend</string>
+    <string name="referendum_track_medium_spender">Treasury: medium spend</string>
+    <string name="referendum_track_big_spender">Treasury: big spend</string>-->
+
+    <string name="referendum_track_root">Main agenda</string>
+    <string name="referendum_whitelisted_caller">Fellowship: whitelist</string>
+    <string name="referendum_staking_admin">Staking</string>
+    <string name="referendum_track_treasurer">Treasury: any</string>
+    <string name="referendum_track_lease_admin">Governance: lease</string>
+    <string name="referendum_track_fellowship_admin">Fellowship: admin</string>
+    <string name="referendum_track_general_admin">Governance: registrar</string>
+    <string name="referendum_track_auction_admin">Crowdloans</string>
+    <string name="referendum_track_referendum_canceller">Governance: canceller</string>
+    <string name="referendum_track_referendum_killer">Governance: killer</string>
+    <string name="referendum_track_small_tipper">Treasury: small tips</string>
+    <string name="referendum_track_big_tipper">Treasury: big tips</string>
+    <string name="referendum_track_small_spender">Treasury: small spend</string>
+    <string name="referendum_track_medium_spender">Treasury: medium spend</string>
+    <string name="referendum_track_big_spender">Treasury: big spend</string>
+
     <string name="delegation_referendum_vote">Your votes: %s via %s</string>
     <string name="delegation_referendum_details_vote">Your votes via %s</string>
 
@@ -9,8 +43,8 @@
     <string name="delegation_delegate_hint_vote">Your votes will automatically vote alongside your delegates\' vote</string>
     <string name="delegation_delegate_hint_unlock">Undelegating period will start after you revoke a delegation</string>
 
-    <string name="delegation_error_self_delegate_title">Cannot delegate to self</string>
-    <string name="delegation_error_self_delegate_message">You cannot delegate votes to yourself.</string>
+    <string name="delegation_error_self_delegate_title">Cannot delegate to yourself</string>
+    <string name="delegation_error_self_delegate_message">You cannot delegate to yourself, please choose different address</string>
 
     <string name="delegation_undelegating_period">Undelegating period</string>
 
@@ -64,14 +98,18 @@
     <string name="delegation_tracks_empty_list_placeholder">No tracks are available to delegate</string>
 
     <string name="remove_votes_suggestion_title">Remove history of your votes?</string>
-    <string name="remove_votes_suggestion_description">You have previously voted in referendums in %d tracks. In order to make these tracks available for delegation, you need to remove your existing votes.</string>
+    <plurals name="remove_votes_suggestion_description">
+        <item quantity="one" formatted="true">You have previously voted in referendums in %d track. In order to make this track available for delegation, you need to remove your existing votes.</item>
+        <item quantity="other" formatted="true">You have previously voted in referendums in %d tracks. In order to make these tracks available for delegation, you need to remove your existing votes.</item>
+    </plurals>
+
     <string name="remove_votes_suggestion_button_text">Remove votes</string>
 
     <string name="unavailable_tracks_title">Unavailable tracks</string>
     <string name="unavailable_tracks_button_text">Remove votes in order to delegate in these tracks</string>
 
     <string name="unavailable_tracks_voted_group">Tracks which you have existing votes in</string>
-    <string name="unavailable_tracks_delegated_group">Tracks that you have already delegated votes</string>
+    <string name="unavailable_tracks_delegated_group">Tracks that you have already delegated votes to</string>
     <string name="delegate_more_tracks">+%d</string>
 
     <string name="update_notification_item_version">Version %s</string>
@@ -246,22 +284,6 @@
     <string name="referendum_status_time_reject_in">Reject in %s</string>
     <string name="referendum_status_time_approve_in">Approve in %s</string>
     <string name="referendum_status_time_execute_in">Execute in %s</string>
-
-    <string name="referendum_track_root">main agenda</string>
-    <string name="referendum_whitelisted_caller">fellowship: whitelist</string>
-    <string name="referendum_staking_admin">staking</string>
-    <string name="referendum_track_treasurer">Treasury: ANY</string>
-    <string name="referendum_track_lease_admin">Governance: lease</string>
-    <string name="referendum_track_fellowship_admin">fellowship: admin</string>
-    <string name="referendum_track_general_admin">governance: registrar</string>
-    <string name="referendum_track_auction_admin">crowdloans</string>
-    <string name="referendum_track_referendum_canceller">governance: canceller</string>
-    <string name="referendum_track_referendum_killer">governance: killer</string>
-    <string name="referendum_track_small_tipper">Treasury: small tips</string>
-    <string name="referendum_track_big_tipper">Treasury: big tips</string>
-    <string name="referendum_track_small_spender">Treasury: Small spend</string>
-    <string name="referendum_track_medium_spender">Treasury: medium spend</string>
-    <string name="referendum_track_big_spender">Treasury: big spend</string>
 
     <string name="referendum_vote_aye">Aye</string>
     <string name="referendum_vote_nay">Nay</string>
