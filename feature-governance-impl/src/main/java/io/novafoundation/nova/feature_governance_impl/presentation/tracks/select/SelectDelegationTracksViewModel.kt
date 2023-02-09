@@ -49,6 +49,8 @@ abstract class SelectDelegationTracksViewModel(
 
     abstract val title: Flow<String>
 
+    abstract val showDescription: Boolean
+
     private val chooseTrackDataFlowShared = chooseTrackDataFlow
         .inBackground()
         .shareWhileSubscribed()

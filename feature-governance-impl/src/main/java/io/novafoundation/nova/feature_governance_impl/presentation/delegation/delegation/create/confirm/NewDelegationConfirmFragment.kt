@@ -66,7 +66,7 @@ class NewDelegationConfirmFragment : BaseFragment<NewDelegationConfirmViewModel>
             requireContext(),
             GovernanceFeatureApi::class.java
         )
-            .newDelegationConfirmPayload()
+            .newDelegationConfirmFactory()
             .create(this, argument(PAYLOAD))
             .inject(this)
     }

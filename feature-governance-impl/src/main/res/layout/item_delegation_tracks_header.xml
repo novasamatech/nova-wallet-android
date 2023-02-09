@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingBottom="8dp"
     tools:background="@color/secondary_screen_background">
 
     <TextView
@@ -13,6 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
+        android:paddingBottom="8dp"
         android:text="@string/select_delegation_tracks_add_title"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -22,7 +24,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp"
         android:text="@string/select_delegation_tracks_description"
         android:textColor="@color/text_secondary"
         app:layout_constraintTop_toBottomOf="@id/selectDelegationTracksTitle" />
@@ -54,17 +55,24 @@
         android:id="@+id/itemDelegationTracksUnavailableTracksText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:gravity="center_vertical"
         android:text="@string/select_delegation_tracks_unavailable_tracks"
-        app:layout_constraintBottom_toBottomOf="@+id/selectDelegationTracksAvailableTitle"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/selectDelegationTracksAvailableTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/selectDelegationTracksDescription" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/itemDelegationTracksUnavailableTracks"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="itemDelegationTracksUnavailableTracksText,itemDelegationTracksUnavailableTracksLeftIcon" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/itemDelegationTracksDescriptionGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="selectDelegationTracksDescription, selectDelegationTracksAvailableTitle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

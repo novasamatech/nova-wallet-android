@@ -37,7 +37,8 @@ abstract class SelectDelegationTracksFragment<V : SelectDelegationTracksViewMode
     private val presetsAdapter = NestedAdapter(
         nestedAdapter = SelectDelegationTracksPresetsAdapter(this),
         orientation = RecyclerView.HORIZONTAL,
-        paddingInDp = Rect(12, 8, 12, 12)
+        paddingInDp = Rect(12, 8, 12, 12),
+        disableItemAnimations = true
     )
     private val placeholderAdapter = PlaceholderAdapter(R.layout.item_tracks_placeholder)
     private val tracksAdapter = SelectDelegationTracksAdapter(this)
@@ -62,6 +63,8 @@ abstract class SelectDelegationTracksFragment<V : SelectDelegationTracksViewMode
     }
 
     override fun subscribe(viewModel: V) {
+        headerAdapter.setShowDescription(viewModel.showDescription)
+
         viewModel.title.observeWhenVisible(headerAdapter::setTitle)
 
         viewModel.showUnavailableTracksButton.observeWhenVisible {
