@@ -11,8 +11,8 @@ import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentit
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.getIdOfSelectedMetaAccountIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
-import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateStats
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateMetadata
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateStats
 import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.OnChainReferendaRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.getDelegatesMetadataOrEmpty
@@ -188,7 +188,7 @@ class RealDelegateListInteractor(
                 stats = mapStatsToDomain(delegateStats),
                 metadata = mapMetadataToDomain(metadata),
                 onChainIdentity = identity,
-                userDelegations = userDelegations[delegateStats.accountId]?.toMap()
+                userDelegations = userDelegations[delegateStats.accountId]?.toMap().orEmpty()
             )
         }
     }

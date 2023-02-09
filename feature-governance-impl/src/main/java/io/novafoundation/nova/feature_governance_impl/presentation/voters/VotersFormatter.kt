@@ -21,6 +21,13 @@ interface VotersFormatter {
         voteCountDetails: String,
     ): VoterModel
 
+    suspend fun formatVoter(
+        voter: GenericVoter<*>,
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        voteModel: VoteModel
+    ): VoterModel
+
     suspend fun formatConvictionVoteDetails(
         convictionVote: ConvictionVote,
         chainAsset: Chain.Asset
@@ -51,14 +58,23 @@ class RealVotersFormatter(
 ) : VotersFormatter {
 
     override suspend fun formatVoter(voter: GenericVoter<*>, chain: Chain, chainAsset: Chain.Asset, voteCountDetails: String): VoterModel {
+        return formatVoter(
+            voter = voter,
+            chain = chain,
+            chainAsset = chainAsset,
+            voteModel = VoteModel(
+                votesCount = formatTotalVotes(voter.vote),
+                votesCountDetails = voteCountDetails
+            )
+        )
+    }
+
+    override suspend fun formatVoter(voter: GenericVoter<*>, chain: Chain, chainAsset: Chain.Asset, voteModel: VoteModel): VoterModel {
         val addressModel = addressIconGenerator.createAccountAddressModel(chain, voter.accountId, voter.identity?.name)
 
         return VoterModel(
             addressModel = addressModel,
-            vote = VoteModel(
-                votesCount = formatTotalVotes(voter.vote),
-                votesCountDetails = voteCountDetails
-            )
+            vote = voteModel
         )
     }
 

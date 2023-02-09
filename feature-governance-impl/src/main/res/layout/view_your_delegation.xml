@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:orientation="vertical"
+    tools:parentTag="android.widget.LinearLayout"
+    tools:background="@color/block_background">
+
+    <io.novafoundation.nova.common.view.TableView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:showBackground="false"
+        app:title="@string/delegation_your_delegation">
+
+        <io.novafoundation.nova.common.view.TableCellView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+            android:id="@+id/viewYourDelegationTracks"
+            app:title="@string/delegation_tracks" />
+
+        <io.novafoundation.nova.common.view.TableCellView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/viewYourDelegationDelegation"
+            app:title="@string/delegation_your_delegation" />
+    </io.novafoundation.nova.common.view.TableView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="horizontal">
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:layout_weight="1"
+            android:id="@+id/viewYourDelegationRemove"
+            android:text="@string/common_revoke"
+            app:appearance="secondary" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/viewYourDelegationEdit"
+            android:text="@string/common_edit"
+            app:appearance="primary" />
+    </LinearLayout>
+</merge>

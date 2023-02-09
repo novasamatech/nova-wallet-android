@@ -67,7 +67,6 @@ class SelectDelegationTracksFragment :
 
     override fun initViews() {
         selectDelegationTracksList.itemAnimator = null
-        selectDelegationTracksList.setHasFixedSize(true)
         selectDelegationTracksList.adapter = concatAdapter
 
         selectDelegationTracksToolbar.applyStatusBarInsets()

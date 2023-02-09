@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.setExtraInfoAvailable
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.setupIdentityMixin
@@ -22,8 +23,10 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateIcon
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateTypeModel
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.view.setModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.applyTo
+import io.novafoundation.nova.feature_governance_impl.presentation.track.list.TrackDelegationListBottomSheet
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsAccount
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsAddDelegation
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsContent
@@ -40,6 +43,7 @@ import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsT
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsType
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsVotedOverall
 import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsVotedRecently
+import kotlinx.android.synthetic.main.fragment_delegate_details.delegateDetailsYourDelegation
 import javax.inject.Inject
 
 class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
@@ -78,6 +82,10 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
         delegateDetailsDescriptionReadMore.setOnClickListener { viewModel.readMoreClicked() }
 
         delegateDetailsAddDelegation.setOnClickListener { viewModel.addDelegation() }
+
+        delegateDetailsYourDelegation.onTracksClicked { viewModel.tracksClicked() }
+        delegateDetailsYourDelegation.onEditClicked { viewModel.editDelegationClicked() }
+        delegateDetailsYourDelegation.onRevokeClicked { viewModel.revokeDelegationClicked() }
     }
 
     override fun inject() {
@@ -94,7 +102,7 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
         setupExternalActions(viewModel)
         setupIdentityMixin(viewModel.identityMixin, delegateDetailsIdentity)
 
-        viewModel.delegateDetailsLoadingState.observe { loadingState ->
+        viewModel.delegateDetailsLoadingState.observeWhenVisible { loadingState ->
             when (loadingState) {
                 is ExtendedLoadingState.Error -> {}
                 is ExtendedLoadingState.Loaded -> {
@@ -109,6 +117,13 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
                 }
             }
         }
+
+        viewModel.showTracksEvent.observeEvent { tracksDelegations ->
+            TrackDelegationListBottomSheet(requireContext(), tracksDelegations)
+                .show()
+        }
+
+        viewModel.addDelegationButtonState.observeWhenVisible(delegateDetailsAddDelegation::setState)
     }
 
     private fun setContent(delegate: DelegateDetailsModel) {
@@ -134,6 +149,8 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
         }
 
         delegateDetailsAccount.setAddressModel(delegate.addressModel)
+
+        delegateDetailsYourDelegation.setModel(delegate.userDelegation)
     }
 
     private fun TableCellView.setVotesModel(model: DelegateDetailsModel.VotesModel?) = letOrHide(model) { votesModel ->
