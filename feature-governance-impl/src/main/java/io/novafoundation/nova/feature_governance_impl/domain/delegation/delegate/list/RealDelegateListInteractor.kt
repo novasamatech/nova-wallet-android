@@ -34,8 +34,6 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.util.blockInPast
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -65,7 +63,7 @@ class RealDelegateListInteractor(
             getDelegatesInternal(governanceOption) { blockNumber, _, chain ->
                 val delegationsRepository = governanceSourceRegistry.sourceFor(governanceOption)
                     .delegationsRepository
-                async { delegationsRepository.getDelegatesStats(blockNumber, chain) }
+                delegationsRepository.getDelegatesStats(blockNumber, chain)
             }
         }
     }
@@ -75,7 +73,7 @@ class RealDelegateListInteractor(
             getDelegatesInternal(governanceOption) { blockNumber, userDelegationAccountIds, chain ->
                 val delegationsRepository = governanceSourceRegistry.sourceFor(governanceOption)
                     .delegationsRepository
-                async { delegationsRepository.getDelegatesStatsByAccountIds(blockNumber, userDelegationAccountIds, chain) }
+                delegationsRepository.getDelegatesStatsByAccountIds(blockNumber, userDelegationAccountIds, chain)
             }
         }
     }
@@ -105,7 +103,11 @@ class RealDelegateListInteractor(
 
     private suspend fun getDelegatesInternal(
         governanceOption: SupportedGovernanceOption,
-        statsConstructor: suspend CoroutineScope.(BlockNumber, List<AccountId>, Chain) -> Deferred<List<DelegateStats>>
+        statsConstructor: suspend (
+            blockNumber: BlockNumber,
+            userDelegationsAccoundIds: List<AccountId>,
+            chain: Chain
+        ) -> List<DelegateStats>
     ): List<DelegatePreview> = coroutineScope {
         val chain = governanceOption.assetWithChain.chain
 
@@ -120,7 +122,7 @@ class RealDelegateListInteractor(
         val userDelegations = getUserDelegationsOrEmpty(chain, convictionVotingRepository, referendaRepository)
         val userDelegationAccountIds = userDelegations.keys.map { it.value }
 
-        val delegatesStatsDeferred = statsConstructor(recentVotesBlockThreshold, userDelegationAccountIds, chain)
+        val delegatesStatsDeferred = async { statsConstructor(recentVotesBlockThreshold, userDelegationAccountIds, chain) }
         val delegateMetadatasDeferred = async { delegationsRepository.getDelegatesMetadataOrEmpty(chain) }
 
         val delegateAccountIds = delegatesStatsDeferred.await().map(DelegateStats::accountId)
