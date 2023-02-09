@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegati
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.ChooseDelegationAmountValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.chooseDelegationAmount
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.RealChooseTrackInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.TrackCategorizer
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.RealDelegateMappers
@@ -69,13 +70,15 @@ class DelegateModule {
         chainStateRepository: ChainStateRepository,
         identityRepository: OnChainIdentityRepository,
         governanceSharedState: GovernanceSharedState,
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
+        tracksUseCase: TracksUseCase,
     ): DelegateDetailsInteractor = RealDelegateDetailsInteractor(
         governanceSourceRegistry = governanceSourceRegistry,
         chainStateRepository = chainStateRepository,
         identityRepository = identityRepository,
         governanceSharedState = governanceSharedState,
-        accountRepository = accountRepository
+        accountRepository = accountRepository,
+        tracksUseCase = tracksUseCase
     )
 
     @Provides

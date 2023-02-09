@@ -85,7 +85,7 @@ class DelegateDetailsViewModel(
         val chainAsset = governanceSharedState.chainAsset()
 
         it.userDelegations.map { (track, delegation) ->
-            formatTrackDelegation(track, delegation, chainAsset)
+            delegateMappers.formatTrackDelegation(delegation, track, chainAsset)
         }
     }.shareWhileSubscribed()
 
@@ -193,13 +193,6 @@ class DelegateDetailsViewModel(
             icon = delegateMappers.mapDelegateIconToUi(delegateDetails),
             accountType = delegateMappers.mapDelegateTypeToUi(delegateDetails.metadata?.accountType),
             description = createDelegateDescription(delegateDetails.metadata)
-        )
-    }
-
-    private suspend fun formatTrackDelegation(track: Track, delegation: Voting.Delegating, chainAsset: Chain.Asset): TrackDelegationModel {
-        return TrackDelegationModel(
-            track = trackFormatter.formatTrack(track, chainAsset),
-            delegation = delegateMappers.formatDelegation(delegation, chainAsset)
         )
     }
 

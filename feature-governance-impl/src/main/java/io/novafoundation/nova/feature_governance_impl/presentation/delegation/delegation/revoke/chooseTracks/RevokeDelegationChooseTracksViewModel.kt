@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegatio
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.SelectDelegationTracksViewModel
 import kotlinx.coroutines.flow.Flow
@@ -34,6 +35,7 @@ class RevokeDelegationChooseTracksViewModel(
     }.shareInBackground()
 
     override fun nextClicked(trackIds: List<BigInteger>) {
-        showMessage("TODO - open revoke confirm")
+        val nextPayload = RevokeDelegationConfirmPayload(payload.delegateId, trackIds)
+        router.openRevokeDelegationsConfirm(nextPayload)
     }
 }

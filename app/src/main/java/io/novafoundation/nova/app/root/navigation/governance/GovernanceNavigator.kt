@@ -27,6 +27,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.chooseTracks.RevokeDelegationChooseTracksFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.chooseTracks.RevokeDelegationChooseTracksPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmFragment
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsFragment
@@ -98,11 +100,16 @@ class GovernanceNavigator(
             ?.showBrowser(BuildConfig.DELEGATION_TUTORIAL_URL)
     }
 
-    override fun finishDelegateFlow() = performNavigation(R.id.action_finish_new_delegation_flow)
+    override fun backToYourDelegations() = performNavigation(R.id.action_back_to_your_delegations)
 
     override fun openRevokeDelegationChooseTracks(payload: RevokeDelegationChooseTracksPayload) = performNavigation(
         actionId = R.id.action_delegateDetailsFragment_to_revokeDelegationChooseTracksFragment,
         args = RevokeDelegationChooseTracksFragment.getBundle(payload)
+    )
+
+    override fun openRevokeDelegationsConfirm(payload: RevokeDelegationConfirmPayload) = performNavigation(
+        actionId = R.id.action_revokeDelegationChooseTracksFragment_to_revokeDelegationConfirmFragment,
+        args = RevokeDelegationConfirmFragment.getBundle(payload)
     )
 
     override fun openRemoveVotes(payload: RemoveVotesPayload) = performNavigation(

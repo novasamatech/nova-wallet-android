@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm
+package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -19,58 +19,48 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.label.DelegateLabelUseCase
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.ChooseDelegationAmountValidationPayload
-import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.ChooseDelegationAmountValidationSystem
-import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.chooseChooseDelegationAmountValidationFailure
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.revoke.RevokeDelegationsInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.revoke.validations.RevokeDelegationValidationPayload
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.revoke.validations.RevokeDelegationValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.revoke.validations.handleRevokeDelegationValidationFailure
 import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.common.newDelegationHints
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.common.newDelegationTitle
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.formatDelegationsOverviewOrNull
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.common.revokeDelegationHints
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackDelegationModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
-import io.novafoundation.nova.feature_governance_impl.presentation.track.formatTracks
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.VotersFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.formatConvictionVote
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class NewDelegationConfirmViewModel(
+class RevokeDelegationConfirmViewModel(
     private val router: GovernanceRouter,
     private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     private val externalActions: ExternalActions.Presentation,
     private val governanceSharedState: GovernanceSharedState,
     private val walletUiUseCase: WalletUiUseCase,
     private val selectedAccountUseCase: SelectedAccountUseCase,
-    private val interactor: NewDelegationChooseAmountInteractor,
+    private val interactor: RevokeDelegationsInteractor,
     private val trackFormatter: TrackFormatter,
     private val assetUseCase: AssetUseCase,
-    private val payload: NewDelegationConfirmPayload,
-    private val validationSystem: ChooseDelegationAmountValidationSystem,
+    private val payload: RevokeDelegationConfirmPayload,
+    private val validationSystem: RevokeDelegationValidationSystem,
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
-    private val locksChangeFormatter: LocksChangeFormatter,
     private val resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
-    private val votersFormatter: VotersFormatter,
     private val tracksUseCase: TracksUseCase,
     private val delegateFormatters: DelegateMappers,
     private val delegateLabelUseCase: DelegateLabelUseCase,
@@ -79,23 +69,15 @@ class NewDelegationConfirmViewModel(
     WithFeeLoaderMixin,
     ExternalActions by externalActions {
 
-    val title = flowOf {
-        resourceManager.newDelegationTitle(isEditMode = payload.isEditMode)
-    }.shareInBackground()
-
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
 
     override val originFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(assetFlow)
 
-    val hintsMixin = resourcesHintsMixinFactory.newDelegationHints(viewModelScope)
+    val hintsMixin = resourcesHintsMixinFactory.revokeDelegationHints(viewModelScope)
 
     val walletModel: Flow<WalletModel> = walletUiUseCase.selectedWalletUiFlow()
         .shareInBackground()
-
-    val amountModelFlow = assetFlow.map {
-        mapAmountToAmountModel(payload.amount, it)
-    }.shareInBackground()
 
     val currentAddressModelFlow = selectedAccountUseCase.selectedAddressModelFlow { governanceSharedState.chain() }
         .shareInBackground()
@@ -103,39 +85,43 @@ class NewDelegationConfirmViewModel(
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: Flow<Boolean> = _showNextProgress
 
-    private val delegateAssistantFlow = interactor.delegateAssistantFlow(viewModelScope)
-
-    private val convictionVote = payload.convictionVote
-
-    val delegationModel = flowOf {
-        votersFormatter.formatConvictionVote(convictionVote, governanceSharedState.chainAsset())
-    }.shareInBackground()
-
-    val locksChangeUiFlow = combine(delegateAssistantFlow, assetFlow) { delegateAssistant, asset ->
-        val amountPlanks = asset.token.planksFromAmount(payload.amount)
-        val locksChange = delegateAssistant.estimateLocksAfterDelegating(amountPlanks, payload.conviction, asset)
-
-        locksChangeFormatter.mapLocksChangeToUi(locksChange, asset, displayPeriodFromWhenSame = false)
-    }
-        .shareInBackground()
-
-    val tracksModelFlow = flowOf { tracksUseCase.tracksOf(payload.trackIds) }
-        .map { tracks ->
-            val chainAsset = governanceSharedState.chainAsset()
-            trackFormatter.formatTracks(tracks, chainAsset)
-        }
-        .shareInBackground()
-
-    val delegateLabelModel = flowOf { delegateLabelUseCase.getDelegateLabel(payload.delegate) }
+    val delegateLabelModel = flowOf { delegateLabelUseCase.getDelegateLabel(payload.delegateId) }
         .map { delegateFormatters.formatDelegateLabel(it, governanceSharedState.chain()) }
         .withSafeLoading()
         .shareInBackground()
 
-    private val _showTracksEvent = MutableLiveData<Event<List<TrackModel>>>()
-    val showTracksEvent: LiveData<Event<List<TrackModel>>> = _showTracksEvent
+    private val _showTracksEvent = MutableLiveData<Event<List<TrackDelegationModel>>>()
+    val showTracksEvent: LiveData<Event<List<TrackDelegationModel>>> = _showTracksEvent
+
+    private val revokeDelegationData = interactor.revokeDelegationDataFlow(payload.trackIds)
+        .shareInBackground()
+
+    private val trackDelegationModelsFlow = revokeDelegationData
+        .map { data ->
+            val chainAsset = governanceSharedState.chainAsset()
+            data.delegations.map { (track, delegation) ->
+                delegateFormatters.formatTrackDelegation(delegation, track, chainAsset)
+            }
+        }
+        .shareInBackground()
+
+    val tracksSummary = revokeDelegationData.map {
+        val chainAsset = governanceSharedState.chainAsset()
+        trackFormatter.formatTracksSummary(it.delegations.keys, chainAsset)
+    }.shareInBackground()
+
+    val undelegatingPeriod = revokeDelegationData
+        .map { resourceManager.formatDuration(it.undelegatingPeriod, estimated = false) }
+        .withSafeLoading()
+        .shareInBackground()
+
+    val userDelegation = revokeDelegationData.map {
+        val chainAsset = governanceSharedState.chainAsset()
+        delegateFormatters.formatDelegationsOverviewOrNull(it.delegationsOverview, chainAsset)
+    }.shareInBackground()
 
     init {
-        setFee()
+        loadFee()
     }
 
     fun accountClicked() = launch {
@@ -153,27 +139,23 @@ class NewDelegationConfirmViewModel(
     }
 
     fun tracksClicked() = launch {
-        val trackModels = tracksModelFlow.first()
-        _showTracksEvent.value = trackModels.tracks.event()
+        val trackModels = trackDelegationModelsFlow.first()
+        _showTracksEvent.value = trackModels.event()
     }
 
     fun confirmClicked() = launch {
         val asset = assetFlow.first()
-        val amountPlanks = asset.token.planksFromAmount(payload.amount)
-        val validationPayload = ChooseDelegationAmountValidationPayload(
-            asset = asset,
-            fee = payload.fee,
-            amount = payload.amount,
-            delegate = payload.delegate
-        )
+        val fee = originFeeMixin.awaitFee()
+
+        val validationPayload = RevokeDelegationValidationPayload(fee, asset)
 
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = validationPayload,
-            validationFailureTransformer = { chooseChooseDelegationAmountValidationFailure(it, resourceManager) },
+            validationFailureTransformer = { handleRevokeDelegationValidationFailure(it, resourceManager) },
             progressConsumer = _showNextProgress.progressConsumer(),
         ) {
-            performDelegate(amountPlanks)
+            performDelegate()
         }
     }
 
@@ -181,19 +163,17 @@ class NewDelegationConfirmViewModel(
         router.back()
     }
 
-    private fun setFee() = launch {
-        originFeeMixin.setFee(payload.fee)
+    private fun loadFee() = launch {
+        originFeeMixin.loadFee(
+            coroutineScope = coroutineScope,
+            feeConstructor = { interactor.calculateFee(payload.trackIds) },
+            onRetryCancelled = {}
+        )
     }
 
-    private fun performDelegate(amountPlanks: Balance) = launch {
+    private fun performDelegate() = launch {
         val result = withContext(Dispatchers.Default) {
-            interactor.delegate(
-                amount = amountPlanks,
-                conviction = payload.conviction,
-                delegate = payload.delegate,
-                tracks = payload.trackIds,
-                shouldRemoveOtherTracks = payload.isEditMode
-            )
+            interactor.revokeDelegations(payload.trackIds)
         }
 
         result.onSuccess {
