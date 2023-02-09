@@ -34,6 +34,6 @@ class RevokeDelegationChooseTracksViewModel(
     }.shareInBackground()
 
     override fun nextClicked(trackIds: List<BigInteger>) {
-       showMessage("TODO - open revoke confirm")
+        showMessage("TODO - open revoke confirm")
     }
 }
