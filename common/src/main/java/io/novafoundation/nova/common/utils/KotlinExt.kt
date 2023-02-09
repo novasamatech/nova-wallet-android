@@ -60,7 +60,7 @@ inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fol
 
 suspend operator fun <T> Deferred<T>.invoke() = await()
 
-inline fun <T> List<T>.sumByBigDecimal(extractor: (T) -> BigDecimal) = fold(BigDecimal.ZERO) { acc, element ->
+inline fun <T> Iterable<T>.sumByBigDecimal(extractor: (T) -> BigDecimal) = fold(BigDecimal.ZERO) { acc, element ->
     acc + extractor(element)
 }
 

@@ -26,11 +26,11 @@ class TrackListBottomSheet(
     }
 
     override fun holderCreator(): HolderCreator<TrackModel> = {
-        AccountHolder(it.inflateChild(R.layout.item_track))
+        TrackHolder(it.inflateChild(R.layout.item_track))
     }
 }
 
-class AccountHolder(
+class TrackHolder(
     itemView: View
 ) : DynamicListSheetAdapter.Holder<TrackModel>(itemView) {
 

@@ -110,19 +110,21 @@ private enum class InnerState {
  * NOTE: This is a modified version of [withLoading] that is intended to be used ONLY with [SharingStarted.WhileSubscribed].
  * In particular, it does not emit loading state on second and subsequent re-subscriptions
  */
-fun <T, R> Flow<T>.withLoadingShared(sourceSupplier: suspend (T) -> Flow<R>): Flow<LoadingState<R>> {
+fun <T, R> Flow<T>.withLoadingShared(sourceSupplier: suspend (T) -> Flow<R>): Flow<ExtendedLoadingState<R>> {
     var state: InnerState = InnerState.INITIAL_START
 
     return transformLatest { item ->
         if (state != InnerState.SECONDARY_START) {
-            emit(LoadingState.Loading())
+            emit(ExtendedLoadingState.Loading)
         }
         state = InnerState.IN_PROGRESS
 
-        val newSource = sourceSupplier(item).map { LoadingState.Loaded(it) }
+        val newSource = sourceSupplier(item).map { ExtendedLoadingState.Loaded(it) }
 
         emitAll(newSource)
-    }.onCompletion { state = InnerState.SECONDARY_START }
+    }
+        .catch { emit(ExtendedLoadingState.Error(it)) }
+        .onCompletion { state = InnerState.SECONDARY_START }
 }
 
 suspend inline fun <reified T> Flow<ExtendedLoadingState<T>>.firstLoaded(): T = first { it.dataOrNull != null }.dataOrNull as T
@@ -134,16 +136,17 @@ suspend inline fun <reified T> Flow<ExtendedLoadingState<T>>.firstLoaded(): T = 
  * NOTE: This is a modified version of [withLoading] that is intended to be used ONLY with [SharingStarted.WhileSubscribed].
  * In particular, it does not emit loading state on second and subsequent re-subscriptions
  */
-fun <T> Flow<T>.withLoadingShared(): Flow<LoadingState<T>> {
+fun <T> Flow<T>.withLoadingShared(): Flow<ExtendedLoadingState<T>> {
     var state: InnerState = InnerState.INITIAL_START
 
-    return map<T, LoadingState<T>> { LoadingState.Loaded(it) }
+    return map<T, ExtendedLoadingState<T>> { ExtendedLoadingState.Loaded(it) }
         .onStart {
             if (state != InnerState.SECONDARY_START) {
-                emit(LoadingState.Loading())
+                emit(ExtendedLoadingState.Loading)
             }
             state = InnerState.IN_PROGRESS
         }
+        .catch { emit(ExtendedLoadingState.Error(it)) }
         .onCompletion { state = InnerState.SECONDARY_START }
 }
 
