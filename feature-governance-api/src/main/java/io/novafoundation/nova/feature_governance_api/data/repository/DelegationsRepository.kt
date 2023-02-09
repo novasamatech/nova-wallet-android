@@ -59,6 +59,8 @@ interface DelegationsRepository {
         amount: Balance,
         conviction: Conviction
     )
+
+    suspend fun ExtrinsicBuilder.undelegate(trackId: TrackId)
 }
 
 suspend fun DelegationsRepository.getDelegatesMetadataOrEmpty(chain: Chain): List<DelegateMetadata> {

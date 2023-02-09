@@ -76,6 +76,8 @@ class NewDelegationConfirmFragment : BaseFragment<NewDelegationConfirmViewModel>
         setupExternalActions(viewModel)
         observeHints(viewModel.hintsMixin, newDelegationConfirmHints)
 
+        viewModel.title.observe(newDelegationConfirmToolbar::setTitle)
+
         viewModel.amountModelFlow.observe(newDelegationConfirmAmount::setAmount)
 
         setupFeeLoading(viewModel, newDelegationConfirmInformation.fee)

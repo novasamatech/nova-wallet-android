@@ -16,6 +16,7 @@ class NewDelegationConfirmPayload(
     val amount: BigDecimal,
     val conviction: Conviction,
     val fee: BigDecimal,
+    val isEditMode: Boolean,
 ) : Parcelable {
 
     val trackIds = trackIdsRaw.map(::TrackId)

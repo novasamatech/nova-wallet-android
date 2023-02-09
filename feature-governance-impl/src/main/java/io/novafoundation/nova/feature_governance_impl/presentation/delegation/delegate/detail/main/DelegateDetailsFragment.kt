@@ -81,7 +81,7 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
 
         delegateDetailsDescriptionReadMore.setOnClickListener { viewModel.readMoreClicked() }
 
-        delegateDetailsAddDelegation.setOnClickListener { viewModel.addDelegation() }
+        delegateDetailsAddDelegation.setOnClickListener { viewModel.addDelegationClicked() }
 
         delegateDetailsYourDelegation.onTracksClicked { viewModel.tracksClicked() }
         delegateDetailsYourDelegation.onEditClicked { viewModel.editDelegationClicked() }

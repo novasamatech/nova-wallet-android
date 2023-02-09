@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.offchain.model
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.vote.UserVote
 import io.novafoundation.nova.feature_governance_api.data.repository.DelegationsRepository
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingDelegate
+import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingUndelegate
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.metadata.DelegateMetadataApi
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.metadata.getDelegatesMetadata
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.DelegationsSubqueryApi
@@ -152,6 +153,10 @@ class Gov2DelegationsRepository(
 
     override suspend fun ExtrinsicBuilder.delegate(delegate: AccountId, trackId: TrackId, amount: Balance, conviction: Conviction) {
         convictionVotingDelegate(delegate, trackId, amount, conviction)
+    }
+
+    override suspend fun ExtrinsicBuilder.undelegate(trackId: TrackId) {
+        convictionVotingUndelegate(trackId)
     }
 
     private fun SubQueryNodes<DirectVoteRemote>.toUserVoteMap(): Map<ReferendumId, UserVote.Direct?> {

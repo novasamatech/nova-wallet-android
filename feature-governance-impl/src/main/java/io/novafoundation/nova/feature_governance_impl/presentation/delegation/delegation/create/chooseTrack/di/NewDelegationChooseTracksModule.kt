@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.di
+package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -9,29 +9,29 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseTrack.NewDelegationChooseTrackInteractor
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.common.chooseTrack.ChooseTrackInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.SelectDelegationTracksPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.SelectDelegationTracksViewModel
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack.NewDelegationChooseTracksPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack.NewDelegationChooseTracksViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 
 @Module(includes = [ViewModelModule::class])
-class SelectDelegationTracksModule {
+class NewDelegationChooseTracksModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(SelectDelegationTracksViewModel::class)
+    @ViewModelKey(NewDelegationChooseTracksViewModel::class)
     fun provideViewModel(
-        newDelegationChooseTrackInteractor: NewDelegationChooseTrackInteractor,
+        interactor: ChooseTrackInteractor,
         trackFormatter: TrackFormatter,
         governanceSharedState: GovernanceSharedState,
         resourceManager: ResourceManager,
         router: GovernanceRouter,
-        payload: SelectDelegationTracksPayload
+        payload: NewDelegationChooseTracksPayload
     ): ViewModel {
-        return SelectDelegationTracksViewModel(
-            interactor = newDelegationChooseTrackInteractor,
+        return NewDelegationChooseTracksViewModel(
+            interactor = interactor,
             trackFormatter = trackFormatter,
             governanceSharedState = governanceSharedState,
             resourceManager = resourceManager,
@@ -44,7 +44,7 @@ class SelectDelegationTracksModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory,
-    ): SelectDelegationTracksViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(SelectDelegationTracksViewModel::class.java)
+    ): NewDelegationChooseTracksViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(NewDelegationChooseTracksViewModel::class.java)
     }
 }

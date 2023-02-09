@@ -64,4 +64,8 @@ class UnsupportedDelegationsRepository : DelegationsRepository {
     override suspend fun ExtrinsicBuilder.delegate(delegate: AccountId, trackId: TrackId, amount: Balance, conviction: Conviction) {
         error("Unsupported")
     }
+
+    override suspend fun ExtrinsicBuilder.undelegate(trackId: TrackId) {
+        error("Unsupported")
+    }
 }

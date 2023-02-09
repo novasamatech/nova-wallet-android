@@ -108,6 +108,16 @@ fun ExtrinsicBuilder.convictionVotingDelegate(
     )
 }
 
+fun ExtrinsicBuilder.convictionVotingUndelegate(trackId: TrackId): ExtrinsicBuilder {
+    return call(
+        moduleName = Modules.CONVICTION_VOTING,
+        callName = "undelegate",
+        arguments = mapOf(
+            "class" to trackId.value,
+        )
+    )
+}
+
 private fun Conviction.prepareForEncoding(): Any {
     return DictEnum.Entry(name, null)
 }
