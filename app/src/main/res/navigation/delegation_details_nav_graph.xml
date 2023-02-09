@@ -49,6 +49,14 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_delegateDetailsFragment_to_revokeDelegationChooseTracksFragment"
+            app:destination="@id/revokeDelegationChooseTracksFragment" />
     </fragment>
 
     <fragment
@@ -118,4 +126,13 @@
             app:popExitAnim="@anim/fragment_open_exit"
             app:popUpTo="@id/mainFragment" />
     </fragment>
+
+
+    <fragment
+        tools:layout="@layout/fragment_select_delegation_tracks"
+        android:id="@+id/revokeDelegationChooseTracksFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.chooseTracks.RevokeDelegationChooseTracksFragment"
+        android:label="RevokeDelegationChooseTracksFragment" />
+
+
 </navigation>

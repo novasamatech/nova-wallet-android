@@ -2,11 +2,12 @@ package io.novafoundation.nova.feature_governance_impl.presentation.tracks.selec
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_governance_impl.R
+import kotlinx.android.synthetic.main.item_delegation_tracks_header.view.itemDelegationTracksDescriptionGroup
 import kotlinx.android.synthetic.main.item_delegation_tracks_header.view.itemDelegationTracksUnavailableTracks
 import kotlinx.android.synthetic.main.item_delegation_tracks_header.view.itemDelegationTracksUnavailableTracksText
 import kotlinx.android.synthetic.main.item_delegation_tracks_header.view.selectDelegationTracksTitle
@@ -21,6 +22,7 @@ class SelectDelegationTracksHeaderAdapter(
 
     private var showUnavailableTracks: Boolean = false
     private var title: String? = null
+    private var showDescription: Boolean = true
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DelegationTracksHeaderViewHolder {
         val containerView = parent.inflateChild(R.layout.item_delegation_tracks_header)
@@ -33,7 +35,7 @@ class SelectDelegationTracksHeaderAdapter(
     }
 
     override fun onBindViewHolder(holder: DelegationTracksHeaderViewHolder, position: Int) {
-        holder.bind(showUnavailableTracks, title)
+        holder.bind(showUnavailableTracks, title, showDescription)
     }
 
     fun showUnavailableTracks(show: Boolean) {
@@ -43,6 +45,12 @@ class SelectDelegationTracksHeaderAdapter(
 
     fun setTitle(title: String) {
         this.title = title
+        notifyItemChanged(0)
+    }
+
+    fun setShowDescription(show: Boolean) {
+        showDescription = show
+        notifyItemChanged(0)
     }
 }
 
@@ -57,8 +65,9 @@ class DelegationTracksHeaderViewHolder(
         }
     }
 
-    fun bind(showUnavailableTracks: Boolean, title: String?) {
-        itemView.itemDelegationTracksUnavailableTracks.isInvisible = !showUnavailableTracks
-        itemView.selectDelegationTracksTitle.text = title
+    fun bind(showUnavailableTracks: Boolean, title: String?, showDescription: Boolean) = with(itemView) {
+        itemDelegationTracksUnavailableTracks.setVisible(showUnavailableTracks)
+        selectDelegationTracksTitle.text = title
+        itemDelegationTracksDescriptionGroup.setVisible(showDescription)
     }
 }

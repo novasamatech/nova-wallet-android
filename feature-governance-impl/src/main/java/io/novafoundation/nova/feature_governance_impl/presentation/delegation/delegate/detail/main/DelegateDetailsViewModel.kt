@@ -37,6 +37,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.view.YourDelegationModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack.NewDelegationChooseTracksPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.chooseTracks.RevokeDelegationChooseTracksPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.DefaultCharacterLimit
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackDelegationModel
@@ -117,7 +118,8 @@ class DelegateDetailsViewModel(
     }
 
     fun revokeDelegationClicked() {
-        showMessage("TODO - revoke clicked")
+        val nextPayload = RevokeDelegationChooseTracksPayload(payload.accountId)
+        router.openRevokeDelegationChooseTracks(nextPayload)
     }
 
     fun accountActionsClicked() = launch {
