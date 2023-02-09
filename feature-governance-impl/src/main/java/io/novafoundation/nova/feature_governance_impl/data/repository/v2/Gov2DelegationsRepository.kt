@@ -21,9 +21,11 @@ import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegatio
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.AllHistoricalVotesRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DelegateDelegatorsRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DelegateDetailedStatsRequest
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DelegateStatsByAddressesRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DelegateStatsRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DirectHistoricalVotesRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DelegateDelegatorsResponse
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DelegateStatsResponse
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DelegatedVoteRemote
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DirectVoteRemote
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -53,18 +55,20 @@ class Gov2DelegationsRepository(
     ): List<DelegateStats> {
         val externalApiLink = chain.externalApi<GovernanceDelegations>()?.url ?: return emptyList()
         val request = DelegateStatsRequest(recentVotesBlockThreshold)
-
         val response = delegationsSubqueryApi.getDelegateStats(externalApiLink, request)
         val delegateStats = response.data.delegates.nodes
 
-        return delegateStats.map { delegate ->
-            DelegateStats(
-                accountId = chain.accountIdOf(delegate.address),
-                delegationsCount = delegate.delegators,
-                delegatedVotes = delegate.delegatorVotes,
-                recentVotes = delegate.delegateVotes.totalCount
-            )
-        }
+        return mapDelegateStats(delegateStats, chain)
+    }
+
+    override suspend fun getDelegatesStatsByAccountIds(recentVotesBlockThreshold: BlockNumber, accountIds: List<AccountId>, chain: Chain): List<DelegateStats> {
+        val externalApiLink = chain.externalApi<GovernanceDelegations>()?.url ?: return emptyList()
+        val addresses = accountIds.map { chain.addressOf(it) }
+        val request = DelegateStatsByAddressesRequest(recentVotesBlockThreshold, addresses = addresses)
+        val response = delegationsSubqueryApi.getDelegateStats(externalApiLink, request)
+        val delegateStats = response.data.delegates.nodes
+
+        return mapDelegateStats(delegateStats, chain)
     }
 
     override suspend fun getDetailedDelegateStats(
@@ -220,5 +224,16 @@ class Gov2DelegationsRepository(
         return runCatching { action(externalApiLink, address) }
             .onFailure { Log.e(LOG_TAG, "Failed to execute subquery request", it) }
             .getOrNull()
+    }
+
+    private fun mapDelegateStats(delegateStats: List<DelegateStatsResponse.Delegate>, chain: Chain): List<DelegateStats> {
+        return delegateStats.map { delegate ->
+            DelegateStats(
+                accountId = chain.accountIdOf(delegate.address),
+                delegationsCount = delegate.delegators,
+                delegatedVotes = delegate.delegatorVotes,
+                recentVotes = delegate.delegateVotes.totalCount
+            )
+        }
     }
 }

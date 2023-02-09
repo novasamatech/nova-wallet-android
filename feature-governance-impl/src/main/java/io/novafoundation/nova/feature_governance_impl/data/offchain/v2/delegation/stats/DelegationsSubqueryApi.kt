@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.subquery.SubQueryResponse
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.AllHistoricalVotesRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DelegateDelegatorsRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DelegateDetailedStatsRequest
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DelegateStatsByAddressesRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DelegateStatsRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DirectHistoricalVotesRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.AllVotesResponse
@@ -21,6 +22,12 @@ interface DelegationsSubqueryApi {
     suspend fun getDelegateStats(
         @Url url: String,
         @Body body: DelegateStatsRequest
+    ): SubQueryResponse<DelegateStatsResponse>
+
+    @POST
+    suspend fun getDelegateStats(
+        @Url url: String,
+        @Body body: DelegateStatsByAddressesRequest
     ): SubQueryResponse<DelegateStatsResponse>
 
     @POST
