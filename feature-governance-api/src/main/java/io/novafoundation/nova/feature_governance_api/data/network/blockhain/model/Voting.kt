@@ -48,6 +48,10 @@ enum class VoteType {
     AYE, NAY
 }
 
+fun VoteType.isAye(): Boolean {
+    return this == VoteType.AYE
+}
+
 fun Voting.trackVotesNumber(): Int {
     return when (this) {
         is Voting.Casting -> votes.size

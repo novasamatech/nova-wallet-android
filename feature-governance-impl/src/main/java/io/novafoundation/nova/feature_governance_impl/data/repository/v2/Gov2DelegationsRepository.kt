@@ -38,6 +38,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi.GovernanceDelegations
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
+import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.mapConvictionFromString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
@@ -170,7 +171,7 @@ class Gov2DelegationsRepository(
                         balance = standardVote.vote.amount,
                         vote = Vote(
                             aye = directVoteRemote.standardVote.aye,
-                            conviction = mapConvictionFromRemote(directVoteRemote.standardVote.vote.conviction)
+                            conviction = mapConvictionFromString(directVoteRemote.standardVote.vote.conviction)
                         )
                     ),
                 )
@@ -191,7 +192,7 @@ class Gov2DelegationsRepository(
                         balance = standardVote.amount,
                         vote = Vote(
                             aye = aye,
-                            conviction = mapConvictionFromRemote(delegatedVoteRemote.vote.conviction)
+                            conviction = mapConvictionFromString(delegatedVoteRemote.vote.conviction)
                         )
                     ),
                 )
@@ -207,15 +208,11 @@ class Gov2DelegationsRepository(
         return Delegation(
             vote = Delegation.Vote(
                 amount = delegation.delegation.amount,
-                conviction = mapConvictionFromRemote(delegation.delegation.conviction)
+                conviction = mapConvictionFromString(delegation.delegation.conviction)
             ),
             delegator = chain.accountIdOf(delegation.address),
             delegate = delegate
         )
-    }
-
-    private fun mapConvictionFromRemote(remote: String): Conviction {
-        return Conviction.values().first { it.name == remote }
     }
 
     private inline fun <R> accountSubQueryRequest(
