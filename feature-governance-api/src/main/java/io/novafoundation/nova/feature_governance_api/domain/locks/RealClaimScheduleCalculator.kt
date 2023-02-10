@@ -54,7 +54,6 @@ class RealClaimScheduleCalculator(
     private val trackLocks: Map<TrackId, Balance>,
 ) : ClaimScheduleCalculator {
 
-
     override fun totalGovernanceLock(): Balance {
         return trackLocks.values.maxOrNull().orZero()
     }
@@ -92,9 +91,9 @@ class RealClaimScheduleCalculator(
      *    However, unlock time for votes is at least unlock time of corresponding prior.
      * c. Find a gap between [votingByTrack] and [trackLocks], which indicates an extra claimable amount
      *    To provide additive effect of gap, we add total voting lock on top of it:
-    if [votingByTrack] has some pending locks - they gonna delay their amount but always leaving trackGap untouched & claimable
-    On the other hand, if other tracks have locks bigger than [votingByTrack]'s total lock,
-    trackGap will be partially or full delayed by them
+     if [votingByTrack] has some pending locks - they gonna delay their amount but always leaving trackGap untouched & claimable
+     On the other hand, if other tracks have locks bigger than [votingByTrack]'s total lock,
+     trackGap will be partially or full delayed by them
      *
      * During this step we also determine the list of [ClaimAffect],
      * which later gets translated to [ClaimSchedule.ClaimAction].
@@ -143,7 +142,7 @@ class RealClaimScheduleCalculator(
             buildList {
                 gapClaimableLock(trackId, voting, gapBetweenVotingAndLocked)
 
-                when(voting) {
+                when (voting) {
                     is Voting.Casting -> castingClaimableLocks(trackId, voting)
                     is Voting.Delegating -> delegatingClaimableLocks(trackId, voting)
                 }

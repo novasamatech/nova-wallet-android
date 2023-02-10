@@ -20,7 +20,7 @@ class GovernanceLocksOverview(
 
     sealed class ClaimTime {
 
-        class At(val timer: TimerValue): ClaimTime()
+        class At(val timer: TimerValue) : ClaimTime()
 
         object UntilAction : ClaimTime()
     }

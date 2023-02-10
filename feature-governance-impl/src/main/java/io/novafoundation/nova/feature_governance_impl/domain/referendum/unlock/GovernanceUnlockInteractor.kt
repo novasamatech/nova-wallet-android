@@ -188,7 +188,7 @@ class RealGovernanceUnlockInteractor(
 
                 is UnlockChunk.Pending -> GovernanceLocksOverview.Lock.Pending(
                     amount = chunk.amount,
-                    claimTime = when(val claimTime = chunk.claimableAt) {
+                    claimTime = when (val claimTime = chunk.claimableAt) {
                         is ClaimTime.At -> GovernanceLocksOverview.ClaimTime.At(durationEstimator.timerUntil(claimTime.block))
                         ClaimTime.UntilAction -> GovernanceLocksOverview.ClaimTime.UntilAction
                     }
