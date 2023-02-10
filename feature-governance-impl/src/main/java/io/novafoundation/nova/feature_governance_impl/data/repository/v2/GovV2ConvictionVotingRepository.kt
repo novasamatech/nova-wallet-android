@@ -176,13 +176,14 @@ class GovV2ConvictionVotingRepository(
         val isAye = standardVote.aye
         val conviction = standardVote.vote.conviction
         val amount = standardVote.vote.amount
+        val delegators = voter.delegatorVotes.nodes
         return ReferendumVoter(
-            chain.accountIdOf(voter.voterId),
-            AccountVote.Standard(
-                Vote(isAye, mapConvictionFromString(conviction)),
-                amount
+            accountId = chain.accountIdOf(voter.voterId),
+            vote = AccountVote.Standard(
+                vote = Vote(isAye, mapConvictionFromString(conviction)),
+                balance = amount
             ),
-            voter.delegatorVotes.nodes.map {
+            delegators = delegators.map {
                 Delegation(
                     vote = Delegation.Vote(it.vote.amount, mapConvictionFromString(it.vote.conviction)),
                     delegator = chain.accountIdOf(it.delegatorId),

@@ -58,7 +58,6 @@ class RealReferendumVotersInteractor(
         val voters = votersDeferred.await()
 
         val votersAccountIds = voters.flatMap { it.getAllAccountIds() }
-            .distinctBy { it.intoKey() }
 
         val identities = identityProvider.identitiesFor(votersAccountIds, chainAsset.chainId)
 
