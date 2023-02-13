@@ -36,7 +36,7 @@ class YourMultiVotePreviewView @JvmOverloads constructor(
         val itemsToModify = max(voteTypeViews.size, votes.size)
 
         for (index in 0 until itemsToModify) {
-            if (index < votes.size)  { // we want to show content
+            if (index < votes.size) { // we want to show content
                 val view = getOrCreateView(index) ?: return
 
                 view.makeVisible()

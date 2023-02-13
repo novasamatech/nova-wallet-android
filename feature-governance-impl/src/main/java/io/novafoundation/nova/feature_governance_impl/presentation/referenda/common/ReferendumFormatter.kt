@@ -253,7 +253,7 @@ class RealReferendumFormatter(
 
         val yourVoteModels = formatAccountVote(referendumVote.vote, chainAsset).map { formattedVoteComponent ->
             val votesDetails = "${formattedVoteComponent.amount} × ${formattedVoteComponent.multiplier}x"
-            val votesCount = resourceManager.getString(R.string.referendum_votes_format,formattedVoteComponent.votes)
+            val votesCount = resourceManager.getString(R.string.referendum_votes_format, formattedVoteComponent.votes)
 
             YourVoteModel(
                 voteDirection = formattedVoteComponent.direction,
@@ -261,7 +261,6 @@ class RealReferendumFormatter(
                 voteTitle = title
             )
         }
-
 
         return YourMultiVoteModel(yourVoteModels)
     }
@@ -326,7 +325,6 @@ class RealReferendumFormatter(
             )
         }
 
-
         return YourMultiVotePreviewModel(voteComponents)
     }
 
@@ -359,7 +357,7 @@ class RealReferendumFormatter(
     }
 
     private fun formatAccountVote(vote: AccountVote, chainAsset: Chain.Asset): List<AccountVoteFormatComponent> {
-        return when(vote) {
+        return when (vote) {
             is AccountVote.Standard -> {
                 val voteDirection = if (vote.vote.aye) VoteType.AYE else VoteType.NAY
                 val convictionVote = GenericVoter.ConvictionVote(chainAsset.amountFromPlanks(vote.balance), vote.vote.conviction)
@@ -400,8 +398,8 @@ class RealReferendumFormatter(
         }
     }
 
-    private fun formatVoteType(voteDirection: VoteType) : VoteDirectionModel {
-        return when(voteDirection) {
+    private fun formatVoteType(voteDirection: VoteType): VoteDirectionModel {
+        return when (voteDirection) {
             VoteType.AYE -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_aye), R.color.text_positive)
             VoteType.NAY -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_nay), R.color.text_negative)
             VoteType.ABSTAIN -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_abstain), R.color.text_secondary)

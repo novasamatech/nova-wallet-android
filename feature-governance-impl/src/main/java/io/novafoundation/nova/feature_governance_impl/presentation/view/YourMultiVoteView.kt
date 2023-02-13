@@ -37,7 +37,7 @@ class YourMultiVoteView @JvmOverloads constructor(
 
         removeAllViews()
 
-        votes.forEach {voteModel ->
+        votes.forEach { voteModel ->
             val voteView = YourVoteView(context)
             voteView.setVoteModelOrHide(voteModel)
             addView(voteView)
