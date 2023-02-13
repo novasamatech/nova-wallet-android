@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceLocksOverview
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceLocksOverview.ClaimTime
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceLocksOverview.Lock
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceUnlockInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.canClaimTokens
@@ -54,8 +55,8 @@ class GovernanceLocksOverviewViewModel(
     }
 
     private fun mapUnlockChunkToUi(lock: Lock, index: Int, token: Token): GovernanceLockModel {
-        return when (lock) {
-            is Lock.Claimable -> GovernanceLockModel(
+        return when {
+            lock is Lock.Claimable -> GovernanceLockModel(
                 index = index,
                 amount = mapAmountToAmountModel(lock.amount, token).token,
                 status = StatusContent.Text(resourceManager.getString(R.string.referendum_unlock_unlockable)),
@@ -63,14 +64,25 @@ class GovernanceLocksOverviewViewModel(
                 statusIconRes = null,
                 statusIconColorRes = null
             )
-            is Lock.Pending -> GovernanceLockModel(
+            lock is Lock.Pending && lock.claimTime is ClaimTime.At -> GovernanceLockModel(
                 index = index,
                 amount = mapAmountToAmountModel(lock.amount, token).token,
-                status = StatusContent.Timer(lock.timer),
-                statusIconColorRes = R.color.icon_secondary,
+                status = StatusContent.Timer(lock.claimTime.timer),
+                statusColorRes = R.color.text_secondary,
                 statusIconRes = R.drawable.ic_time_16,
-                statusColorRes = R.color.text_secondary
+                statusIconColorRes = R.color.icon_secondary
             )
+
+            lock is Lock.Pending && lock.claimTime is ClaimTime.UntilAction -> GovernanceLockModel(
+                index = index,
+                amount = mapAmountToAmountModel(lock.amount, token).token,
+                status = StatusContent.Text(resourceManager.getString(R.string.delegation_your_delegation)),
+                statusColorRes = R.color.text_secondary,
+                statusIconRes = null,
+                statusIconColorRes = null
+            )
+
+            else -> error("Not possible")
         }
     }
 }

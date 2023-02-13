@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovern
 import io.novafoundation.nova.feature_governance_api.data.source.trackLocksFlowOrEmpty
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule.UnlockChunk
+import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimTime
 import io.novafoundation.nova.feature_governance_api.domain.locks.RealClaimScheduleCalculator
 import io.novafoundation.nova.feature_governance_api.domain.locks.claimableChunk
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Change
@@ -187,7 +188,10 @@ class RealGovernanceUnlockInteractor(
 
                 is UnlockChunk.Pending -> GovernanceLocksOverview.Lock.Pending(
                     amount = chunk.amount,
-                    timer = durationEstimator.timerUntil(chunk.claimableAt)
+                    claimTime = when (val claimTime = chunk.claimableAt) {
+                        is ClaimTime.At -> GovernanceLocksOverview.ClaimTime.At(durationEstimator.timerUntil(claimTime.block))
+                        ClaimTime.UntilAction -> GovernanceLocksOverview.ClaimTime.UntilAction
+                    }
                 )
             }
         }

@@ -24,7 +24,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import jp.co.soramitsu.fearless_utils.hash.isPositive
 
 private data class ClaimableLock(
-    val claimAt: BlockNumber,
+    val claimAt: ClaimTime,
     val amount: Balance,
     val affected: Set<ClaimAffect>,
 )
@@ -45,7 +45,7 @@ private class GroupedClaimAffects(
 typealias UnlockGap = Map<TrackId, Balance>
 
 class RealClaimScheduleCalculator(
-    private val voting: Map<TrackId, Voting>,
+    private val votingByTrack: Map<TrackId, Voting>,
     private val currentBlockNumber: BlockNumber,
     private val referenda: Map<ReferendumId, OnChainReferendum>,
     private val tracks: Map<TrackId, TrackInfo>,
@@ -89,10 +89,10 @@ class RealClaimScheduleCalculator(
      * a. Each non-zero prior has a single individual unlock
      * b. Each non-zero vote has a single individual unlock.
      *    However, unlock time for votes is at least unlock time of corresponding prior.
-     * c. Find a gap between [voting] and [trackLocks], which indicates an extra claimable amount
+     * c. Find a gap between [votingByTrack] and [trackLocks], which indicates an extra claimable amount
      *    To provide additive effect of gap, we add total voting lock on top of it:
-     if [voting] has some pending locks - they gonna delay their amount but always leaving trackGap untouched & claimable
-     On the other hand, if other tracks have locks bigger than [voting]'s total lock,
+     if [votingByTrack] has some pending locks - they gonna delay their amount but always leaving trackGap untouched & claimable
+     On the other hand, if other tracks have locks bigger than [votingByTrack]'s total lock,
      trackGap will be partially or full delayed by them
      *
      * During this step we also determine the list of [ClaimAffect],
@@ -117,13 +117,9 @@ class RealClaimScheduleCalculator(
      *  in claimable chunk's actions in order to not to do them twice.
      */
     override fun estimateClaimSchedule(): ClaimSchedule {
-        val castingVotes = voting.entries.mapNotNull { (trackId, voting) ->
-            voting.castOrNull<Voting.Casting>()?.let { trackId to it }
-        }
-
         // step 1 - determine/estimate individual unlocks for all priors and votes
         // result example: [(1500, 1 KSM), (1200, 2 KSM), (1000, 1 KSM)]
-        val claimableLocks = individualClaimableLocks(castingVotes)
+        val claimableLocks = individualClaimableLocks()
 
         // step 2 - fold all locks with same lockAt
         // { 1500: 1 KSM, 1200: 2 KSM, 1000: 1 KSM }
@@ -139,51 +135,75 @@ class RealClaimScheduleCalculator(
         return ClaimSchedule(chunks)
     }
 
-    private fun individualClaimableLocks(castingVotes: List<Pair<TrackId, Voting.Casting>>): List<ClaimableLock> {
-        val gapBetweenVotingAndLocked = voting.gapWith(trackLocks)
+    private fun individualClaimableLocks(): List<ClaimableLock> {
+        val gapBetweenVotingAndLocked = votingByTrack.gapWith(trackLocks)
 
-        return castingVotes.flatMap { (trackId, voting) ->
-            val trackAffects = setOf(ClaimAffect.Track(trackId))
-
-            val priorLock = ClaimableLock(
-                claimAt = voting.prior.unlockAt,
-                amount = voting.prior.amount,
-                affected = trackAffects
-            )
-
-            val standardVotes = voting.votes.mapValuesNotNull { (_, votes) ->
-                votes.castOrNull<AccountVote.Standard>()
-            }
-            val standardVoteLocks = standardVotes.map { (referendumId, standardVote) ->
-                val estimatedEnd = maxConvictionEndOf(standardVote, referendumId)
-                val lock = ClaimableLock(
-                    claimAt = estimatedEnd,
-                    amount = standardVote.balance,
-                    affected = setOf(ClaimAffect.Vote(trackId, referendumId))
-                )
-
-                // we estimate whether prior will affect the vote when performing `removeVote`
-                lock.timeAtLeast(priorLock.claimAt)
-            }
-
-            val trackGap = gapBetweenVotingAndLocked[trackId].orZero()
-            val trackGapLock = if (trackGap.isPositive()) {
-                ClaimableLock(
-                    claimAt = currentBlockNumber,
-                    amount = trackGap + voting.totalLock(),
-                    affected = trackAffects
-                )
-            } else {
-                null
-            }
-
+        return votingByTrack.flatMap { (trackId, voting) ->
             buildList {
-                if (priorLock.reasonableToClaim()) add(priorLock)
-                if (trackGapLock != null) add(trackGapLock)
+                gapClaimableLock(trackId, voting, gapBetweenVotingAndLocked)
 
-                addAll(standardVoteLocks)
+                when (voting) {
+                    is Voting.Casting -> castingClaimableLocks(trackId, voting)
+                    is Voting.Delegating -> delegatingClaimableLocks(trackId, voting)
+                }
             }
         }
+    }
+
+    private fun MutableList<ClaimableLock>.gapClaimableLock(trackId: TrackId, voting: Voting, gap: UnlockGap) {
+        val trackGap = gap[trackId].orZero()
+
+        if (trackGap.isPositive()) {
+            val lock = ClaimableLock(
+                claimAt = ClaimTime.At(currentBlockNumber),
+                amount = trackGap + voting.totalLock(),
+                affected = setOf(ClaimAffect.Track(trackId))
+            )
+
+            add(lock)
+        }
+    }
+
+    private fun MutableList<ClaimableLock>.delegatingClaimableLocks(trackId: TrackId, voting: Voting.Delegating) {
+        val delegationLock = ClaimableLock(
+            claimAt = ClaimTime.UntilAction,
+            amount = voting.amount,
+            affected = emptySet()
+        )
+        val priorLock = ClaimableLock(
+            claimAt = ClaimTime.At(voting.prior.unlockAt),
+            amount = voting.prior.amount,
+            affected = setOf(ClaimAffect.Track(trackId))
+        )
+
+        add(delegationLock)
+        if (priorLock.reasonableToClaim()) add(priorLock)
+    }
+
+    private fun MutableList<ClaimableLock>.castingClaimableLocks(trackId: TrackId, voting: Voting.Casting) {
+        val priorLock = ClaimableLock(
+            claimAt = ClaimTime.At(voting.prior.unlockAt),
+            amount = voting.prior.amount,
+            affected = setOf(ClaimAffect.Track(trackId))
+        )
+
+        val standardVotes = voting.votes.mapValuesNotNull { (_, votes) ->
+            votes.castOrNull<AccountVote.Standard>()
+        }
+        val standardVoteLocks = standardVotes.map { (referendumId, standardVote) ->
+            val estimatedEnd = maxConvictionEndOf(standardVote, referendumId)
+            val lock = ClaimableLock(
+                claimAt = ClaimTime.At(estimatedEnd),
+                amount = standardVote.balance,
+                affected = setOf(ClaimAffect.Vote(trackId, referendumId))
+            )
+
+            // we estimate whether prior will affect the vote when performing `removeVote`
+            lock.timeAtLeast(priorLock.claimAt)
+        }
+
+        if (priorLock.reasonableToClaim()) add(priorLock)
+        addAll(standardVoteLocks)
     }
 
     private fun combineSameUnlockAt(claimableLocks: List<ClaimableLock>) =
@@ -192,9 +212,9 @@ class RealClaimScheduleCalculator(
                 locks.reduce { current, next -> current.foldSameTime(next) }
             }
 
-    private fun constructUnlockSchedule(maxUnlockedByTime: Map<BlockNumber, ClaimableLock>): List<ClaimableLock> {
+    private fun constructUnlockSchedule(maxUnlockedByTime: Map<ClaimTime, ClaimableLock>): List<ClaimableLock> {
         var currentMaxLock = Balance.ZERO
-        var currentMaxLockAt: BlockNumber? = null
+        var currentMaxLockAt: ClaimTime? = null
 
         val result = maxUnlockedByTime.toMutableMap()
 
@@ -335,12 +355,17 @@ private fun ClaimableLock.reasonableToClaim(): Boolean {
     return amount.isPositive()
 }
 
-private infix fun ClaimableLock.timeAtLeast(time: BlockNumber): ClaimableLock {
-    return copy(claimAt = claimAt.max(time))
+private infix fun ClaimableLock.timeAtLeast(time: ClaimTime): ClaimableLock {
+    val newClaimAt = maxOf(claimAt, time)
+
+    return copy(claimAt = newClaimAt)
 }
 
 private fun ClaimableLock.claimableAt(at: BlockNumber): Boolean {
-    return claimAt <= at
+    return when (claimAt) {
+        is ClaimTime.At -> claimAt.block <= at
+        ClaimTime.UntilAction -> false
+    }
 }
 
 private fun ClaimableLock.toUnlockChunk(currentBlockNumber: BlockNumber): UnlockChunk {

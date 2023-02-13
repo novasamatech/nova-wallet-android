@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule.
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule.UnlockChunk
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 interface ClaimScheduleTestBuilder {
 
@@ -30,6 +31,8 @@ interface ClaimScheduleTestBuilder {
 
             fun voting(builder: Voting.() -> Unit)
 
+            fun delegating(builder: Delegating.() -> Unit)
+
             interface Voting {
 
                 fun prior(amount: Int, unlockAt: Int)
@@ -37,6 +40,12 @@ interface ClaimScheduleTestBuilder {
                 fun vote(amount: Int, referendumId: Int, unlockAt: Int)
             }
 
+            interface Delegating {
+
+                fun prior(amount: Int, unlockAt: Int)
+
+                fun delegate(amount: Int)
+            }
         }
     }
 
@@ -47,6 +56,8 @@ interface ClaimScheduleTestBuilder {
         fun claimable(amount: Int, actions: ClaimableActions.() -> Unit)
 
         fun nonClaimable(amount: Int, claimAt: Int)
+
+        fun nonClaimable(amount: Int)
 
         interface ClaimableActions {
 
@@ -99,7 +110,11 @@ private class ExpectedBuilder : ClaimScheduleTestBuilder.Expect {
     }
 
     override fun nonClaimable(amount: Int, claimAt: Int) {
-        chunks.add(UnlockChunk.Pending(amount.toBigInteger(), claimAt.toBigInteger()))
+        chunks.add(UnlockChunk.Pending(amount.toBigInteger(), ClaimTime.At(claimAt.toBigInteger())))
+    }
+
+    override fun nonClaimable(amount: Int) {
+        chunks.add(UnlockChunk.Pending(amount.toBigInteger(), ClaimTime.UntilAction))
     }
 
     fun buildSchedule(): ClaimSchedule {
@@ -160,7 +175,7 @@ private class GivenBuilder : ClaimScheduleTestBuilder.Given {
 
     fun build(): RealClaimScheduleCalculator {
         return RealClaimScheduleCalculator(
-            voting = voting,
+            votingByTrack = voting,
             currentBlockNumber = currentBlockNumber,
             referenda = referenda,
             trackLocks = trackLocks,
@@ -179,22 +194,11 @@ private class GivenBuilder : ClaimScheduleTestBuilder.Given {
 
 private fun PriorLock(): PriorLock = PriorLock(BlockNumber.ZERO, Balance.ZERO)
 
-private class TrackBuilder : ClaimScheduleTestBuilder.Given.Track, ClaimScheduleTestBuilder.Given.Track.Voting {
-
-    private var trackLock: Balance = Balance.ZERO
+private class VotingBuilder : ClaimScheduleTestBuilder.Given.Track.Voting {
 
     private var prior: PriorLock = PriorLock()
     private val votes = mutableMapOf<ReferendumId, AccountVote>()
     private var referendumApprovedAt = mutableMapOf<ReferendumId, BlockNumber>()
-
-    override fun lock(lock: Int) {
-        trackLock = lock.toBigInteger()
-    }
-
-    override fun voting(builder: ClaimScheduleTestBuilder.Given.Track.Voting.() -> Unit) {
-        builder(this)
-    }
-
     override fun prior(amount: Int, unlockAt: Int) {
         prior = PriorLock(unlockAt = unlockAt.toBigInteger(), amount = amount.toBigInteger())
     }
@@ -205,8 +209,59 @@ private class TrackBuilder : ClaimScheduleTestBuilder.Given.Track, ClaimSchedule
         referendumApprovedAt[referendumIdTyped] = unlockAt.toBigInteger()
     }
 
-    fun buildVoting(): Voting.Casting {
-        return Voting.Casting(votes, prior)
+    fun buildReferendaApprovedAt(): Map<ReferendumId, BlockNumber> {
+        return referendumApprovedAt
+    }
+
+    fun build(): Voting.Casting = Voting.Casting(votes, prior)
+}
+
+private class DelegatingBuilder : ClaimScheduleTestBuilder.Given.Track.Delegating {
+
+    private var prior: PriorLock = PriorLock()
+    private var delegation: Balance? = null
+    override fun prior(amount: Int, unlockAt: Int) {
+        prior = PriorLock(unlockAt = unlockAt.toBigInteger(), amount = amount.toBigInteger())
+    }
+
+    override fun delegate(amount: Int) {
+        delegation = amount.toBigInteger()
+    }
+
+    fun build(): Voting.Delegating {
+        return Voting.Delegating(
+            amount = requireNotNull(delegation),
+            target = AccountId(32),
+            conviction = Conviction.None, // we don't use conviction since it doesn't matter until undelegated
+            prior = prior,
+        )
+    }
+}
+
+private class TrackBuilder : ClaimScheduleTestBuilder.Given.Track {
+
+    private var trackLock: Balance = Balance.ZERO
+
+    private var voting: Voting = Voting.Casting(emptyMap(), PriorLock())
+    private var referendumApprovedAt = mapOf<ReferendumId, BlockNumber>()
+
+    override fun lock(lock: Int) {
+        trackLock = lock.toBigInteger()
+    }
+
+    override fun voting(builder: ClaimScheduleTestBuilder.Given.Track.Voting.() -> Unit) {
+        val votingBuilder = VotingBuilder().apply(builder)
+
+        voting = votingBuilder.build()
+        referendumApprovedAt = votingBuilder.buildReferendaApprovedAt()
+    }
+
+    override fun delegating(builder: ClaimScheduleTestBuilder.Given.Track.Delegating.() -> Unit) {
+        voting = DelegatingBuilder().apply(builder).build()
+    }
+
+    fun buildVoting(): Voting {
+        return voting
     }
 
     fun buildReferendaApprovedAt(): Map<ReferendumId, BlockNumber> {
