@@ -14,9 +14,11 @@ import io.novafoundation.nova.feature_governance_api.data.repository.getTracksBy
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetails
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetailsInteractor
+import io.novafoundation.nova.feature_governance_api.domain.track.matchWith
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.mapAccountTypeToDomain
+import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -36,6 +38,7 @@ class RealDelegateDetailsInteractor(
     private val identityRepository: OnChainIdentityRepository,
     private val governanceSharedState: GovernanceSharedState,
     private val accountRepository: AccountRepository,
+    private val tracksUseCase: TracksUseCase,
 ) : DelegateDetailsInteractor {
 
     override fun delegateDetailsFlow(delegateAccountId: AccountId): Flow<DelegateDetails> {
@@ -50,7 +53,6 @@ class RealDelegateDetailsInteractor(
         val governanceOption = governanceSharedState.selectedOption()
 
         val chain = governanceOption.assetWithChain.chain
-        val chainAsset = governanceOption.assetWithChain.asset
         val delegateAddress = chain.addressOf(delegateAccountId)
 
         val governanceSource = governanceSourceRegistry.sourceFor(governanceOption)
@@ -79,7 +81,7 @@ class RealDelegateDetailsInteractor(
                 val delegationsDeferred = async {
                     userAccountId?.let { governanceSource.convictionVoting.delegationsOf(it, delegateAccountId, chain.id) }
                         .orEmpty()
-                        .mapKeys { (trackId, _) -> tracks.getValue(trackId) }
+                        .matchWith(tracks)
                 }
 
                 DelegateDetails(

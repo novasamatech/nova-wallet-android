@@ -11,6 +11,8 @@ interface TracksUseCase {
     suspend fun tracksOf(trackIds: Collection<TrackId>): List<Track>
 }
 
+suspend fun TracksUseCase.tracksByIdOf(trackIds: Collection<TrackId>) = tracksOf(trackIds).associateBy { it.id }
+
 class RealTracksUseCase(
     private val governanceSharedState: GovernanceSharedState,
     private val governanceSourceRegistry: GovernanceSourceRegistry,

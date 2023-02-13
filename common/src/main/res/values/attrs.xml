@@ -84,6 +84,7 @@
         <attr name="primaryValueTextAppearance" format="reference" />
         <attr name="secondaryValueTextAppearance" format="reference" />
         <attr name="titleIcon" format="reference|color" />
+        <attr name="titleIconStart" format="reference|color" />
         <attr name="primaryValueIconTint" format="color" />
     </declare-styleable>
 
