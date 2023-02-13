@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.li
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
+import androidx.core.view.isGone
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
@@ -28,9 +28,8 @@ import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumStatus
 import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumThreshold
 import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumTimeEstimate
 import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumTrack
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumYourVoiceGroup
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumYourVoteDetails
-import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumYourVoteType
+import kotlinx.android.synthetic.main.item_referendum.view.itemReferendumYourVote
+import kotlinx.android.synthetic.main.item_referendum.view.itermReferendumDivider
 
 class ReferendaListAdapter(
     private val handler: Handler,
@@ -176,13 +175,8 @@ private class ReferendumChildHolder(
     }
 
     fun bindYourVote(item: ReferendumModel) = with(containerView) {
-        val vote = item.yourVote
-        itemReferendumYourVoiceGroup.isVisible = vote != null
-        if (vote != null) {
-            itemReferendumYourVoteType.text = vote.voteType
-            itemReferendumYourVoteType.setTextColorRes(vote.colorRes)
-            itemReferendumYourVoteDetails.text = vote.details
-        }
+        itemReferendumYourVote.setModel(item.yourVote)
+        itermReferendumDivider.isGone = item.yourVote?.votes.isNullOrEmpty()
     }
 
     fun bindVoting(child: ReferendumModel) = with(containerView) {
