@@ -14,11 +14,13 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.di.DelegateDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.di.VotedReferendaComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.di.DelegateListComponent
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.di.SelectDelegationTracksComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegated.di.YourDelegationsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.di.NewDelegationChooseAmountComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack.di.NewDelegationChooseTracksComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm.di.NewDelegationConfirmComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.di.RemoveVotesComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.chooseTracks.di.RevokeDelegationChooseTracksComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.di.RevokeDelegationConfirmComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.di.ReferendumDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.di.ReferendumFullDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.di.ReferendaListComponent
@@ -65,17 +67,21 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
 
     fun votedReferendaFactory(): VotedReferendaComponent.Factory
 
-    fun selectDelegationTracks(): SelectDelegationTracksComponent.Factory
-
     fun removeVoteFactory(): RemoveVotesComponent.Factory
 
     fun delegateDelegatorsFactory(): DelegateDelegatorsComponent.Factory
 
     fun yourDelegationsFactory(): YourDelegationsComponent.Factory
 
+    fun newDelegationChooseTracks(): NewDelegationChooseTracksComponent.Factory
+
     fun newDelegationChooseAmountFactory(): NewDelegationChooseAmountComponent.Factory
 
-    fun newDelegationConfirmPayload(): NewDelegationConfirmComponent.Factory
+    fun newDelegationConfirmFactory(): NewDelegationConfirmComponent.Factory
+
+    fun revokeDelegationChooseTracksFactory(): RevokeDelegationChooseTracksComponent.Factory
+
+    fun revokeDelegationConfirmFactory(): RevokeDelegationConfirmComponent.Factory
 
     @Component.Factory
     interface Factory {

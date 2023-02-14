@@ -66,7 +66,7 @@ class NewDelegationConfirmFragment : BaseFragment<NewDelegationConfirmViewModel>
             requireContext(),
             GovernanceFeatureApi::class.java
         )
-            .newDelegationConfirmPayload()
+            .newDelegationConfirmFactory()
             .create(this, argument(PAYLOAD))
             .inject(this)
     }
@@ -75,6 +75,8 @@ class NewDelegationConfirmFragment : BaseFragment<NewDelegationConfirmViewModel>
         observeValidations(viewModel)
         setupExternalActions(viewModel)
         observeHints(viewModel.hintsMixin, newDelegationConfirmHints)
+
+        viewModel.title.observe(newDelegationConfirmToolbar::setTitle)
 
         viewModel.amountModelFlow.observe(newDelegationConfirmAmount::setAmount)
 

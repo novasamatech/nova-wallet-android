@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
@@ -20,6 +21,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.convic
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.AmountChipModel
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.LocksFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.common.newDelegationHints
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.common.newDelegationTitle
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm.NewDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -54,6 +56,10 @@ class NewDelegationChooseAmountViewModel(
 ) : BaseViewModel(),
     WithFeeLoaderMixin,
     Validatable by validationExecutor {
+
+    val title = flowOf {
+        resourceManager.newDelegationTitle(isEditMode = payload.isEditMode)
+    }.shareInBackground()
 
     private val selectedAsset = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -128,7 +134,8 @@ class NewDelegationChooseAmountViewModel(
                     amount = amount.toPlanks(),
                     conviction = conviction,
                     delegate = payload.delegate,
-                    tracks = payload.trackIds
+                    tracks = payload.trackIds,
+                    shouldRemoveOtherTracks = payload.isEditMode
                 )
             }
         )
@@ -174,7 +181,8 @@ class NewDelegationChooseAmountViewModel(
             trackIdsRaw = payload.trackIdsRaw,
             amount = validationPayload.amount,
             conviction = selectedConvictionFlow.first(),
-            fee = validationPayload.fee
+            fee = validationPayload.fee,
+            isEditMode = payload.isEditMode
         )
 
         router.openNewDelegationConfirm(payload)

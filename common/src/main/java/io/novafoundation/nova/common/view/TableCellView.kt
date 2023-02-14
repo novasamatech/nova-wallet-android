@@ -26,6 +26,7 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.postToSelf
 import io.novafoundation.nova.common.utils.setDrawableEnd
+import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
@@ -149,8 +150,12 @@ open class TableCellView @JvmOverloads constructor(
         }
     }
 
-    fun setTitleIcon(@DrawableRes icon: Int?) {
+    fun setTitleIconEnd(@DrawableRes icon: Int?) {
         tableCellTitle.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 4, tint = ICON_TINT_DEFAULT)
+    }
+
+    fun setTitleIconStart(@DrawableRes icon: Int?) {
+        tableCellTitle.setDrawableStart(icon, widthInDp = 16, paddingInDp = 4, tint = ICON_TINT_DEFAULT)
     }
 
     fun showValue(primary: String, secondary: String? = null) {
@@ -181,8 +186,11 @@ open class TableCellView @JvmOverloads constructor(
         val primaryValueStyle = typedArray.getEnum(R.styleable.TableCellView_primaryValueStyle, default = FieldStyle.TEXT)
         setPrimaryValueStyle(primaryValueStyle)
 
-        val titleIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIcon)
-        titleIcon?.let(::setTitleIcon)
+        val titleIconEnd = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIcon)
+        titleIconEnd?.let(::setTitleIconEnd)
+
+        val titleIconStart = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIconStart)
+        titleIconStart?.let(::setTitleIconStart)
 
         val titleTextAppearance = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleValueTextAppearance)
         titleTextAppearance?.let(title::setTextAppearance)
@@ -220,4 +228,8 @@ fun <T> TableCellView.showLoadingState(state: ExtendedLoadingState<T>, showData:
         is ExtendedLoadingState.Loaded -> showData(state.data)
         ExtendedLoadingState.Loading -> showProgress()
     }
+}
+
+fun TableCellView.showLoadingValue(state: ExtendedLoadingState<String>) {
+    showLoadingState(state, ::showValue)
 }

@@ -8,22 +8,35 @@ import io.novafoundation.nova.common.utils.convictionVoting
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Delegation
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumVoter
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.voteType
 import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingRemoveVote
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingUnlock
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingVote
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.DelegationsSubqueryApi
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.ReferendumVotersRequest
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.ReferendumVoterRemote
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.bindVoting
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.votersFor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
+import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
+import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.mapConvictionFromString
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
@@ -35,6 +48,7 @@ import java.math.BigInteger
 class GovV2ConvictionVotingRepository(
     private val remoteStorageSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
+    private val delegateSubqueryApi: DelegationsSubqueryApi
 ) : ConvictionVotingRepository {
 
     override val voteLockId: String = "pyconvot"
@@ -90,8 +104,32 @@ class GovV2ConvictionVotingRepository(
         }.filterNotNull()
     }
 
-    override suspend fun votersOf(referendumId: ReferendumId, chainId: ChainId): List<ReferendumVoter> {
-        val allVotings = remoteStorageSource.query(chainId) {
+    override suspend fun votersOf(referendumId: ReferendumId, chain: Chain, type: VoteType): List<ReferendumVoter> {
+        val governanceDelegationsExternalApi = chain.externalApi<Chain.ExternalApi.GovernanceDelegations>()
+        return if (governanceDelegationsExternalApi != null) {
+            runCatching { getVotersFromIndexer(referendumId, chain, governanceDelegationsExternalApi, type) }
+                .getOrElse { getVotersFromChain(referendumId, chain, type) }
+        } else {
+            getVotersFromChain(referendumId, chain, type)
+        }
+    }
+
+    private suspend fun getVotersFromIndexer(
+        referendumId: ReferendumId,
+        chain: Chain,
+        api: Chain.ExternalApi.GovernanceDelegations,
+        type: VoteType
+    ): List<ReferendumVoter> {
+        val request = ReferendumVotersRequest(referendumId.value, type.isAye())
+        val response = delegateSubqueryApi.getReferendumVoters(api.url, request)
+        return response.data
+            .voters
+            .nodes
+            .map { mapVoterFromRemote(it, chain) }
+    }
+
+    private suspend fun getVotersFromChain(referendumId: ReferendumId, chain: Chain, type: VoteType): List<ReferendumVoter> {
+        val allVotings = remoteStorageSource.query(chain.id) {
             runtime.metadata.convictionVoting().storage("VotingFor").entries(
                 keyExtractor = { it },
                 binding = { decoded, _ -> bindVoting(decoded!!) }
@@ -99,6 +137,8 @@ class GovV2ConvictionVotingRepository(
         }
 
         return allVotings.votersFor(referendumId)
+            .filter { it.vote.voteType() == type }
+            .filter { it.vote is AccountVote.Standard }
     }
 
     override fun ExtrinsicBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable) {
@@ -129,5 +169,31 @@ class GovV2ConvictionVotingRepository(
 
             TrackId(bindNumber(trackId)) to bindNumber(balance)
         }
+    }
+
+    private fun mapVoterFromRemote(voter: ReferendumVoterRemote, chain: Chain): ReferendumVoter {
+        val standardVote = voter.standardVote
+        val isAye = standardVote.aye
+        val conviction = standardVote.vote.conviction
+        val amount = standardVote.vote.amount
+        val delegators = voter.delegatorVotes.nodes
+        return ReferendumVoter(
+            accountId = chain.accountIdOf(voter.voterId),
+            vote = AccountVote.Standard(
+                vote = Vote(isAye, mapConvictionFromString(conviction)),
+                balance = amount
+            ),
+            delegators = delegators.map {
+                Delegation(
+                    vote = Delegation.Vote(it.vote.amount, mapConvictionFromString(it.vote.conviction)),
+                    delegator = chain.accountIdOf(it.delegatorId),
+                    delegate = chain.accountIdOf(voter.voterId),
+                )
+            }
+        )
+    }
+
+    private fun mapConvictionFromRemote(remote: String): Conviction {
+        return Conviction.values().first { it.name == remote }
     }
 }

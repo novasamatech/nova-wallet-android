@@ -6,14 +6,16 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack.NewDelegationChooseTracksPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm.NewDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.chooseTracks.RevokeDelegationChooseTracksPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.ConfirmVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 interface GovernanceRouter : ReturnableRouter {
 
@@ -57,11 +59,15 @@ interface GovernanceRouter : ReturnableRouter {
 
     fun openDelegateDelegators(payload: DelegateDelegatorsPayload)
 
-    fun openSelectDelegationTracks(accountId: AccountId)
+    fun openNewDelegationChooseTracks(payload: NewDelegationChooseTracksPayload)
 
     fun openNewDelegationChooseAmount(payload: NewDelegationChooseAmountPayload)
 
     fun openNewDelegationConfirm(payload: NewDelegationConfirmPayload)
 
-    fun finishDelegateFlow()
+    fun backToYourDelegations()
+
+    fun openRevokeDelegationChooseTracks(payload: RevokeDelegationChooseTracksPayload)
+
+    fun openRevokeDelegationsConfirm(payload: RevokeDelegationConfirmPayload)
 }

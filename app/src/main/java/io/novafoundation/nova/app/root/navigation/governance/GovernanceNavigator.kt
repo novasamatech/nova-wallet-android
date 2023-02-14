@@ -17,13 +17,18 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
-import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.tracks.select.SelectDelegationTracksFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack.NewDelegationChooseTracksFragment
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack.NewDelegationChooseTracksPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm.NewDelegationConfirmFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm.NewDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes.RemoveVotesPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.chooseTracks.RevokeDelegationChooseTracksFragment
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.chooseTracks.RevokeDelegationChooseTracksPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmFragment
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.RevokeDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsFragment
@@ -34,7 +39,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersFragment
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class GovernanceNavigator(
     private val navigationHolder: NavigationHolder,
@@ -96,12 +100,17 @@ class GovernanceNavigator(
             ?.showBrowser(BuildConfig.DELEGATION_TUTORIAL_URL)
     }
 
-    override fun openSelectDelegationTracks(accountId: AccountId) = performNavigation(
-        actionId = R.id.action_delegateDetailsFragment_to_selectDelegationTracks,
-        args = SelectDelegationTracksFragment.newBundle(accountId)
+    override fun backToYourDelegations() = performNavigation(R.id.action_back_to_your_delegations)
+
+    override fun openRevokeDelegationChooseTracks(payload: RevokeDelegationChooseTracksPayload) = performNavigation(
+        actionId = R.id.action_delegateDetailsFragment_to_revokeDelegationChooseTracksFragment,
+        args = RevokeDelegationChooseTracksFragment.getBundle(payload)
     )
 
-    override fun finishDelegateFlow() = performNavigation(R.id.action_finish_new_delegation_flow)
+    override fun openRevokeDelegationsConfirm(payload: RevokeDelegationConfirmPayload) = performNavigation(
+        actionId = R.id.action_revokeDelegationChooseTracksFragment_to_revokeDelegationConfirmFragment,
+        args = RevokeDelegationConfirmFragment.getBundle(payload)
+    )
 
     override fun openRemoveVotes(payload: RemoveVotesPayload) = performNavigation(
         actionId = R.id.action_open_remove_votes,
@@ -122,6 +131,11 @@ class GovernanceNavigator(
             args = DelegateDetailsFragment.getBundle(payload)
         )
     }
+
+    override fun openNewDelegationChooseTracks(payload: NewDelegationChooseTracksPayload) = performNavigation(
+        actionId = R.id.action_delegateDetailsFragment_to_selectDelegationTracks,
+        args = NewDelegationChooseTracksFragment.getBundle(payload)
+    )
 
     override fun openNewDelegationChooseAmount(payload: NewDelegationChooseAmountPayload) = performNavigation(
         actionId = R.id.action_selectDelegationTracks_to_newDelegationChooseAmountFragment,

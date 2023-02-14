@@ -36,6 +36,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsModel.VotesModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.view.YourDelegationModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.VotedReferendaPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack.NewDelegationChooseTracksPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.chooseTracks.RevokeDelegationChooseTracksPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.DefaultCharacterLimit
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackDelegationModel
@@ -83,7 +85,7 @@ class DelegateDetailsViewModel(
         val chainAsset = governanceSharedState.chainAsset()
 
         it.userDelegations.map { (track, delegation) ->
-            formatTrackDelegation(track, delegation, chainAsset)
+            delegateMappers.formatTrackDelegation(delegation, track, chainAsset)
         }
     }.shareWhileSubscribed()
 
@@ -112,11 +114,47 @@ class DelegateDetailsViewModel(
     }
 
     fun editDelegationClicked() {
-        showMessage("TODO - edit clicked")
+        openNewDelegation(editMode = true)
     }
 
     fun revokeDelegationClicked() {
-        showMessage("TODO - revoke clicked")
+        val nextPayload = RevokeDelegationChooseTracksPayload(payload.accountId)
+        router.openRevokeDelegationChooseTracks(nextPayload)
+    }
+
+    fun accountActionsClicked() = launch {
+        val address = delegateDetailsLoadingState.firstLoaded().addressModel.address
+        val chain = governanceSharedState.chain()
+
+        externalActions.showExternalActions(ExternalActions.Type.Address(address), chain)
+    }
+
+    fun delegationsClicked() {
+        router.openDelegateDelegators(DelegateDelegatorsPayload(payload.accountId))
+    }
+
+    fun recentVotesClicked() {
+        openVotedReferenda(onlyRecentVotes = true, title = delegateMappers.formattedRecentVotesPeriod())
+    }
+
+    fun allVotesClicked() {
+        openVotedReferenda(onlyRecentVotes = false)
+    }
+
+    fun addDelegationClicked() {
+        openNewDelegation(editMode = false)
+    }
+
+    fun readMoreClicked() = launch {
+        val delegateMetadata = delegateDetailsFlow.first().dataOrNull?.metadata
+        val description = delegateMetadata?.description ?: return@launch
+
+        val descriptionPayload = DescriptionPayload(
+            description = description,
+            toolbarTitle = delegateMetadata.name
+        )
+
+        router.openDelegateFullDescription(descriptionPayload)
     }
 
     private fun useIdentity() = launch {
@@ -155,13 +193,6 @@ class DelegateDetailsViewModel(
             icon = delegateMappers.mapDelegateIconToUi(delegateDetails),
             accountType = delegateMappers.mapDelegateTypeToUi(delegateDetails.metadata?.accountType),
             description = createDelegateDescription(delegateDetails.metadata)
-        )
-    }
-
-    private suspend fun formatTrackDelegation(track: Track, delegation: Voting.Delegating, chainAsset: Chain.Asset): TrackDelegationModel {
-        return TrackDelegationModel(
-            track = trackFormatter.formatTrack(track, chainAsset),
-            delegation = delegateMappers.formatDelegation(delegation, chainAsset)
         )
     }
 
@@ -205,39 +236,9 @@ class DelegateDetailsViewModel(
         return ShortenedTextModel.from(markdownParsed, DefaultCharacterLimit.SHORT_PARAGRAPH)
     }
 
-    fun accountActionsClicked() = launch {
-        val address = delegateDetailsLoadingState.firstLoaded().addressModel.address
-        val chain = governanceSharedState.chain()
-
-        externalActions.showExternalActions(ExternalActions.Type.Address(address), chain)
-    }
-
-    fun delegationsClicked() {
-        router.openDelegateDelegators(DelegateDelegatorsPayload(payload.accountId))
-    }
-
-    fun recentVotesClicked() {
-        openVotedReferenda(onlyRecentVotes = true, title = delegateMappers.formattedRecentVotesPeriod())
-    }
-
-    fun allVotesClicked() {
-        openVotedReferenda(onlyRecentVotes = false)
-    }
-
-    fun readMoreClicked() = launch {
-        val delegateMetadata = delegateDetailsFlow.first().dataOrNull?.metadata
-        val description = delegateMetadata?.description ?: return@launch
-
-        val descriptionPayload = DescriptionPayload(
-            description = description,
-            toolbarTitle = delegateMetadata.name
-        )
-
-        router.openDelegateFullDescription(descriptionPayload)
-    }
-
-    fun addDelegation() {
-        router.openSelectDelegationTracks(payload.accountId)
+    private fun openNewDelegation(editMode: Boolean) {
+        val nextPayload = NewDelegationChooseTracksPayload(payload.accountId, editMode)
+        router.openNewDelegationChooseTracks(nextPayload)
     }
 
     private fun openVotedReferenda(onlyRecentVotes: Boolean, title: String? = null) {

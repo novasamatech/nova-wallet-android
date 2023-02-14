@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateStatsModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateTypeModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.RecentVotes
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackDelegationModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoteModel
 import io.novafoundation.nova.feature_governance_impl.presentation.voters.VotersFormatter
@@ -38,6 +39,8 @@ interface DelegateMappers {
     suspend fun formatDelegationsOverview(votes: Delegator.Vote, chainAsset: Chain.Asset): VoteModel
 
     suspend fun formatDelegation(delegation: Voting.Delegating, chainAsset: Chain.Asset): VoteModel
+
+    suspend fun formatTrackDelegation(delegation: Voting.Delegating, track: Track, chainAsset: Chain.Asset): TrackDelegationModel
 
     fun mapDelegateTypeToUi(delegateType: DelegateAccountType?): DelegateTypeModel?
 
@@ -97,6 +100,13 @@ class RealDelegateMappers(
         val convictionVote = delegation.getConvictionVote(chainAsset)
 
         return votersFormatter.formatConvictionVote(convictionVote, chainAsset)
+    }
+
+    override suspend fun formatTrackDelegation(delegation: Voting.Delegating, track: Track, chainAsset: Chain.Asset): TrackDelegationModel {
+        return TrackDelegationModel(
+            track = trackFormatter.formatTrack(track, chainAsset),
+            delegation = formatDelegation(delegation, chainAsset)
+        )
     }
 
     override fun mapDelegateTypeToUi(delegateType: DelegateAccountType?): DelegateTypeModel? {

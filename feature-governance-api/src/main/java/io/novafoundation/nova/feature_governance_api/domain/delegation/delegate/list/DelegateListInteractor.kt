@@ -16,7 +16,7 @@ interface DelegateListInteractor {
         governanceOption: SupportedGovernanceOption,
     ): Result<List<DelegatePreview>>
 
-    suspend fun getDelegatedDelegates(
+    suspend fun getUserDelegates(
         governanceOption: SupportedGovernanceOption,
     ): Result<List<DelegatePreview>>
 

@@ -25,6 +25,10 @@ class UnsupportedDelegationsRepository : DelegationsRepository {
         return emptyList()
     }
 
+    override suspend fun getDelegatesStatsByAccountIds(recentVotesBlockThreshold: BlockNumber, accountIds: List<AccountId>, chain: Chain): List<DelegateStats> {
+        return emptyList()
+    }
+
     override suspend fun getDetailedDelegateStats(delegateAddress: String, recentVotesBlockThreshold: BlockNumber, chain: Chain): DelegateDetailedStats? {
         return null
     }
@@ -58,6 +62,10 @@ class UnsupportedDelegationsRepository : DelegationsRepository {
     }
 
     override suspend fun ExtrinsicBuilder.delegate(delegate: AccountId, trackId: TrackId, amount: Balance, conviction: Conviction) {
+        error("Unsupported")
+    }
+
+    override suspend fun ExtrinsicBuilder.undelegate(trackId: TrackId) {
         error("Unsupported")
     }
 }

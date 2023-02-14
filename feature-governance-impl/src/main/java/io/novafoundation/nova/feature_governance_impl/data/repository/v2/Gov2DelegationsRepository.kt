@@ -15,15 +15,18 @@ import io.novafoundation.nova.feature_governance_api.data.network.offchain.model
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.vote.UserVote
 import io.novafoundation.nova.feature_governance_api.data.repository.DelegationsRepository
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingDelegate
+import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingUndelegate
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.metadata.DelegateMetadataApi
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.metadata.getDelegatesMetadata
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.DelegationsSubqueryApi
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.AllHistoricalVotesRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DelegateDelegatorsRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DelegateDetailedStatsRequest
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DelegateStatsByAddressesRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DelegateStatsRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request.DirectHistoricalVotesRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DelegateDelegatorsResponse
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DelegateStatsResponse
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DelegatedVoteRemote
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DirectVoteRemote
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -35,6 +38,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi.GovernanceDelegations
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
+import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.mapConvictionFromString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
@@ -53,18 +57,20 @@ class Gov2DelegationsRepository(
     ): List<DelegateStats> {
         val externalApiLink = chain.externalApi<GovernanceDelegations>()?.url ?: return emptyList()
         val request = DelegateStatsRequest(recentVotesBlockThreshold)
-
         val response = delegationsSubqueryApi.getDelegateStats(externalApiLink, request)
         val delegateStats = response.data.delegates.nodes
 
-        return delegateStats.map { delegate ->
-            DelegateStats(
-                accountId = chain.accountIdOf(delegate.address),
-                delegationsCount = delegate.delegators,
-                delegatedVotes = delegate.delegatorVotes,
-                recentVotes = delegate.delegateVotes.totalCount
-            )
-        }
+        return mapDelegateStats(delegateStats, chain)
+    }
+
+    override suspend fun getDelegatesStatsByAccountIds(recentVotesBlockThreshold: BlockNumber, accountIds: List<AccountId>, chain: Chain): List<DelegateStats> {
+        val externalApiLink = chain.externalApi<GovernanceDelegations>()?.url ?: return emptyList()
+        val addresses = accountIds.map { chain.addressOf(it) }
+        val request = DelegateStatsByAddressesRequest(recentVotesBlockThreshold, addresses = addresses)
+        val response = delegationsSubqueryApi.getDelegateStats(externalApiLink, request)
+        val delegateStats = response.data.delegates.nodes
+
+        return mapDelegateStats(delegateStats, chain)
     }
 
     override suspend fun getDetailedDelegateStats(
@@ -150,6 +156,10 @@ class Gov2DelegationsRepository(
         convictionVotingDelegate(delegate, trackId, amount, conviction)
     }
 
+    override suspend fun ExtrinsicBuilder.undelegate(trackId: TrackId) {
+        convictionVotingUndelegate(trackId)
+    }
+
     private fun SubQueryNodes<DirectVoteRemote>.toUserVoteMap(): Map<ReferendumId, UserVote.Direct?> {
         return nodes.associateBy(
             keySelector = { ReferendumId(it.referendumId) },
@@ -161,7 +171,7 @@ class Gov2DelegationsRepository(
                         balance = standardVote.vote.amount,
                         vote = Vote(
                             aye = directVoteRemote.standardVote.aye,
-                            conviction = mapConvictionFromRemote(directVoteRemote.standardVote.vote.conviction)
+                            conviction = mapConvictionFromString(directVoteRemote.standardVote.vote.conviction)
                         )
                     ),
                 )
@@ -182,7 +192,7 @@ class Gov2DelegationsRepository(
                         balance = standardVote.amount,
                         vote = Vote(
                             aye = aye,
-                            conviction = mapConvictionFromRemote(delegatedVoteRemote.vote.conviction)
+                            conviction = mapConvictionFromString(delegatedVoteRemote.vote.conviction)
                         )
                     ),
                 )
@@ -198,15 +208,11 @@ class Gov2DelegationsRepository(
         return Delegation(
             vote = Delegation.Vote(
                 amount = delegation.delegation.amount,
-                conviction = mapConvictionFromRemote(delegation.delegation.conviction)
+                conviction = mapConvictionFromString(delegation.delegation.conviction)
             ),
             delegator = chain.accountIdOf(delegation.address),
             delegate = delegate
         )
-    }
-
-    private fun mapConvictionFromRemote(remote: String): Conviction {
-        return Conviction.values().first { it.name == remote }
     }
 
     private inline fun <R> accountSubQueryRequest(
@@ -220,5 +226,16 @@ class Gov2DelegationsRepository(
         return runCatching { action(externalApiLink, address) }
             .onFailure { Log.e(LOG_TAG, "Failed to execute subquery request", it) }
             .getOrNull()
+    }
+
+    private fun mapDelegateStats(delegateStats: List<DelegateStatsResponse.Delegate>, chain: Chain): List<DelegateStats> {
+        return delegateStats.map { delegate ->
+            DelegateStats(
+                accountId = chain.accountIdOf(delegate.address),
+                delegationsCount = delegate.delegators,
+                delegatedVotes = delegate.delegatorVotes,
+                recentVotes = delegate.delegateVotes.totalCount
+            )
+        }
     }
 }

@@ -25,6 +25,12 @@ interface DelegationsRepository {
         chain: Chain
     ): List<DelegateStats>
 
+    suspend fun getDelegatesStatsByAccountIds(
+        recentVotesBlockThreshold: BlockNumber,
+        accountIds: List<AccountId>,
+        chain: Chain
+    ): List<DelegateStats>
+
     suspend fun getDetailedDelegateStats(
         delegateAddress: String,
         recentVotesBlockThreshold: BlockNumber,
@@ -53,6 +59,8 @@ interface DelegationsRepository {
         amount: Balance,
         conviction: Conviction
     )
+
+    suspend fun ExtrinsicBuilder.undelegate(trackId: TrackId)
 }
 
 suspend fun DelegationsRepository.getDelegatesMetadataOrEmpty(chain: Chain): List<DelegateMetadata> {
