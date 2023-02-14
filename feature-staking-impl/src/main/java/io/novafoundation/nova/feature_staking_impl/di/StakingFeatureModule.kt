@@ -21,6 +21,8 @@ import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
+import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.LocalBagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealSessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
@@ -158,6 +160,12 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideBagListRepository(
+        @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
+    ): BagListRepository = LocalBagListRepository(localStorageSource)
+
+    @Provides
+    @FeatureScope
     fun provideStakingInteractor(
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
@@ -223,13 +231,15 @@ class StakingFeatureModule {
     fun provideAlertsInteractor(
         stakingRepository: StakingRepository,
         stakingConstantsRepository: StakingConstantsRepository,
-        sharedState: StakingSharedState,
         walletRepository: WalletRepository,
+        bagListRepository: BagListRepository,
+        totalIssuanceRepository: TotalIssuanceRepository,
     ) = AlertsInteractor(
         stakingRepository,
         stakingConstantsRepository,
-        sharedState,
-        walletRepository
+        walletRepository,
+        bagListRepository,
+        totalIssuanceRepository
     )
 
     @Provides
