@@ -50,7 +50,7 @@ interface DelegateMappers {
 
     suspend fun formatDelegationStats(stats: DelegatePreview.Stats, chainAsset: Chain.Asset): DelegateStatsModel
 
-    suspend fun formattedRecentVotesPeriod(): String
+    fun formattedRecentVotesPeriod(): String
 
     suspend fun formatDelegateLabel(delegateLabel: DelegateLabel, chain: Chain): DelegateLabelModel
 }
@@ -181,7 +181,7 @@ class RealDelegateMappers(
         )
     }
 
-    override suspend fun formattedRecentVotesPeriod(): String {
+    override fun formattedRecentVotesPeriod(): String {
         return resourceManager.getString(
             R.string.delegation_recent_votes_format,
             resourceManager.formatDuration(RECENT_VOTES_PERIOD, estimated = false)

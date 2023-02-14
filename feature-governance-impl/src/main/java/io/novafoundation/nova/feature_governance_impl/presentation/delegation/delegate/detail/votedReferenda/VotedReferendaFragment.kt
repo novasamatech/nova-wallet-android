@@ -39,6 +39,7 @@ class VotedReferendaFragment : BaseReferendaListFragment<VotedReferendaViewModel
     }
 
     override fun initViews() {
+        viewModel.payload.overriddenTitle?.let { votedReferendaToolbar.setTitle(it) }
         votedReferendaToolbar.setHomeButtonListener { viewModel.backClicked() }
         votedReferendaToolbar.applyStatusBarInsets()
 

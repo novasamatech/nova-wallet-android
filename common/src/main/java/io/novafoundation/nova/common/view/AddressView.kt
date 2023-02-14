@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setDrawableEnd
+import io.novafoundation.nova.common.utils.setTextColorRes
 import kotlinx.android.synthetic.main.view_address.view.addressImage
 import kotlinx.android.synthetic.main.view_address.view.addressValue
 
@@ -26,6 +27,16 @@ class AddressView @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_address, this)
         setEndIcon(R.drawable.ic_info_cicrle_filled_16)
+        attrs?.let { applyStyleAttrs(it) }
+    }
+
+    private fun applyStyleAttrs(attrs: AttributeSet) {
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.AddressView)
+
+        val textColorRes = typedArray.getResourceId(R.styleable.AddressView_android_textColor, R.color.text_secondary)
+        addressValue.setTextColorRes(textColorRes)
+
+        typedArray.recycle()
     }
 
     fun setAddress(icon: Drawable, address: String) {
@@ -37,7 +48,7 @@ class AddressView @JvmOverloads constructor(
         if (iconRes == null) {
             addressValue.setDrawableEnd(null)
         } else {
-            addressValue.setDrawableEnd(iconRes, widthInDp = 16, tint = R.color.text_secondary, paddingInDp = 6)
+            addressValue.setDrawableEnd(iconRes, widthInDp = 16, tint = R.color.icon_secondary, paddingInDp = 6)
         }
     }
 }

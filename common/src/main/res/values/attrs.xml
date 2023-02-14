@@ -222,4 +222,8 @@
     <declare-styleable name="ReadMoreView">
         <attr name="android:text" />
     </declare-styleable>
+
+    <declare-styleable name="AddressView">
+        <attr name="android:textColor"/>
+    </declare-styleable>
 </resources>

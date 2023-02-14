@@ -8,10 +8,9 @@ import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.list.PlaceholderAdapter
 import io.novafoundation.nova.common.presentation.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.common.view.input.chooser.setupListChooserMixinBottomSheet
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -19,7 +18,6 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.adapter.DelegateListAdapter
 import kotlinx.android.synthetic.main.fragment_delegate_list.delegateListList
-import kotlinx.android.synthetic.main.fragment_delegate_list.delegateListProgress
 import kotlinx.android.synthetic.main.fragment_delegate_list.delegateListToolbar
 import javax.inject.Inject
 
@@ -34,8 +32,9 @@ class DelegateListFragment :
 
     private val bannerAdapter by lazy(LazyThreadSafetyMode.NONE) { DelegateBannerAdapter(this) }
     private val sortAndFilterAdapter by lazy(LazyThreadSafetyMode.NONE) { DelegateSortAndFilterAdapter(this) }
+    private val placeholderAdapter by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.item_delegates_shimmering) }
     private val delegateListAdapter by lazy(LazyThreadSafetyMode.NONE) { DelegateListAdapter(imageLoader, this) }
-    private val adapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(bannerAdapter, sortAndFilterAdapter, delegateListAdapter) }
+    private val adapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(bannerAdapter, sortAndFilterAdapter, placeholderAdapter, delegateListAdapter) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -84,11 +83,11 @@ class DelegateListFragment :
             when (it) {
                 is ExtendedLoadingState.Error -> {}
                 is ExtendedLoadingState.Loaded -> {
-                    delegateListProgress.makeGone()
+                    placeholderAdapter.showPlaceholder(false)
                     delegateListAdapter.submitListPreservingViewPoint(it.data, delegateListList)
                 }
                 ExtendedLoadingState.Loading -> {
-                    delegateListProgress.makeVisible()
+                    placeholderAdapter.showPlaceholder(true)
                     delegateListAdapter.submitList(emptyList())
                 }
             }

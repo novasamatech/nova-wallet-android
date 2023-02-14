@@ -134,7 +134,7 @@ class DelegateDetailsViewModel(
     }
 
     fun recentVotesClicked() {
-        openVotedReferenda(onlyRecentVotes = true)
+        openVotedReferenda(onlyRecentVotes = true, title = delegateMappers.formattedRecentVotesPeriod())
     }
 
     fun allVotesClicked() {
@@ -241,8 +241,8 @@ class DelegateDetailsViewModel(
         router.openNewDelegationChooseTracks(nextPayload)
     }
 
-    private fun openVotedReferenda(onlyRecentVotes: Boolean) {
-        val votedReferendaPayload = VotedReferendaPayload(payload.accountId, onlyRecentVotes)
+    private fun openVotedReferenda(onlyRecentVotes: Boolean, title: String? = null) {
+        val votedReferendaPayload = VotedReferendaPayload(payload.accountId, onlyRecentVotes, overriddenTitle = title)
         router.openVotedReferenda(votedReferendaPayload)
     }
 }
