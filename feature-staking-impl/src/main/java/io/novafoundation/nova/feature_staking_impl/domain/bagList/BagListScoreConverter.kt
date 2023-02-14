@@ -18,7 +18,7 @@ private val U64_MAX = BigInteger("18446744073709551615")
 
 private class U128BagListScoreConverter(
     private val totalIssuance: Balance
-): BagListScoreConverter {
+) : BagListScoreConverter {
 
     private val factor = (totalIssuance / U64_MAX).max(BigInteger.ONE)
 

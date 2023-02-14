@@ -24,7 +24,7 @@ interface BagListRepository {
 
 class LocalBagListRepository(
     private val localStorage: StorageDataSource
-): BagListRepository {
+) : BagListRepository {
 
     override suspend fun bagThresholds(chainId: ChainId): List<BagListNode.Score>? {
         return localStorage.query(chainId) {
@@ -33,11 +33,10 @@ class LocalBagListRepository(
     }
 
     override fun listNodeFlow(stash: AccountId, chainId: ChainId): Flow<BagListNode?> {
-       return localStorage.subscribe(chainId) {
-
-           runtime.metadata.voterListOrNull()?.storage("ListNodes")?.observe(stash, binding = ::bindBagListNode)
-               ?: flowOf(null)
-       }
+        return localStorage.subscribe(chainId) {
+            runtime.metadata.voterListOrNull()?.storage("ListNodes")?.observe(stash, binding = ::bindBagListNode)
+                ?: flowOf(null)
+        }
     }
 
     private fun bindBagListNode(decoded: Any?): BagListNode? = runCatching {

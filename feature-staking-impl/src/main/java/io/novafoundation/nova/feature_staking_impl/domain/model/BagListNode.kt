@@ -12,12 +12,10 @@ class BagListNode(
 ) {
 
     @JvmInline
-    value class Score(val value: BigInteger): Comparable<Score> {
+    value class Score(val value: BigInteger) : Comparable<Score> {
 
         override fun compareTo(other: Score): Int {
             return value.compareTo(other.value)
         }
     }
 }
-
-
