@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.emptyEthereumAccountId
+import io.novafoundation.nova.common.utils.findIsInstanceOrNull
 import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -41,8 +42,9 @@ val Chain.isSubstrateBased
 val Chain.commissionAsset
     get() = utilityAsset
 
-val Chain.ExternalApi.GovernanceSection.polkassemblyParameters
-    get() = parameters as? Chain.ExternalApi.GovernanceSection.Parameters.Polkassembly
+inline fun <reified T : Chain.ExternalApi> Chain.externalApi(): T? {
+    return externalApis.findIsInstanceOrNull<T>()
+}
 
 val Chain.Asset.isUtilityAsset: Boolean
     get() = id == 0

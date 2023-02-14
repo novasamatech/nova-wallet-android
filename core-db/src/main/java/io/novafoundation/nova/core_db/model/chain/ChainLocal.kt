@@ -14,8 +14,6 @@ data class ChainLocal(
     val icon: String,
     @Embedded
     val types: TypesConfig?,
-    @Embedded
-    val externalApi: ExternalApi?,
     val prefix: Int,
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
@@ -31,20 +29,4 @@ data class ChainLocal(
         val url: String,
         val overridesCommon: Boolean,
     )
-
-    data class ExternalApi(
-        @Embedded(prefix = "staking_")
-        val staking: Section?,
-
-        @Embedded(prefix = "crowdloans_")
-        val crowdloans: Section?,
-
-        @Embedded(prefix = "governance_")
-        val governance: GovernanceSection?,
-    ) {
-
-        data class Section(val url: String, val type: String)
-
-        data class GovernanceSection(val url: String, val type: String, val parameters: String?)
-    }
 }

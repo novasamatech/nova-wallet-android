@@ -15,7 +15,8 @@ fun Map<StorageKeyComponents, Voting?>.votersFor(referendumId: ReferendumId): Li
         votes?.get(referendumId)?.let { accountVote ->
             ReferendumVoter(
                 accountId = voterId,
-                vote = accountVote
+                vote = accountVote,
+                delegators = emptyList()
             )
         }
     }

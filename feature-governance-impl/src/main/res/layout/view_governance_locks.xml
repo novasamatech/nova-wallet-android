@@ -8,30 +8,39 @@
     tools:background="@color/secondary_screen_background"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
+    <ImageView
+        android:id="@+id/governanceLockedIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/icon_secondary"
+        tools:src="@drawable/ic_lock" />
+
     <TextView
         android:id="@+id/governanceLockedTitle"
         style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="13dp"
-        android:layout_marginBottom="13dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
         android:includeFontPadding="false"
         android:text="@string/wallet_balance_locked"
         android:textColor="@color/text_primary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/governanceLockedIcon"
         app:layout_constraintTop_toTopOf="parent" />
 
     <io.novafoundation.nova.feature_governance_impl.presentation.view.NovaChipView
         android:id="@+id/governanceLockAmount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="16dp"
         android:layout_marginStart="8dp"
-        app:chipIcon="@drawable/ic_lock"
-        app:chipIconSize="12dp"
-        app:chipTextAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        app:chipSize="sum"
+        app:chipTextAppearance="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/governanceLockedTitle"
         app:layout_constraintTop_toTopOf="parent"
@@ -59,7 +68,6 @@
         android:id="@+id/governanceUnlockForwardIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="16dp"
         android:layout_marginEnd="16dp"
         android:src="@drawable/ic_chevron_right"
         app:layout_constraintBottom_toBottomOf="parent"

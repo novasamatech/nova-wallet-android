@@ -22,7 +22,7 @@ data class Chain(
     val assets: List<Asset>,
     val nodes: List<Node>,
     val explorers: List<Explorer>,
-    val externalApi: ExternalApi?,
+    val externalApis: List<ExternalApi>,
     val icon: String,
     val addressPrefix: Int,
     val types: Types?,
@@ -36,7 +36,6 @@ data class Chain(
 
     companion object // extensions
 
-    val assetsBySymbol = assets.associateBy(Asset::symbol)
     val assetsById = assets.associateBy(Asset::id)
 
     data class Additional(
@@ -119,34 +118,28 @@ data class Chain(
         override val identifier = "$chainId:$name"
     }
 
-    data class ExternalApi(
-        val staking: Section?,
-        val history: List<TransferHistoryApi>,
-        val crowdloans: Section?,
-        val governance: GovernanceSection?
-    ) {
-        data class Section(val type: Type, val url: String) {
-            enum class Type {
-                SUBQUERY, GITHUB, UNKNOWN, POLKASSEMBLY, ETHERSCAN
+    sealed class ExternalApi(val url: String) {
+
+        sealed class Transfers(url: String) : ExternalApi(url) {
+
+            class Substrate(url: String) : Transfers(url)
+
+            class Evm(url: String) : Transfers(url)
+        }
+
+        class Crowdloans(url: String) : ExternalApi(url)
+
+        class Staking(url: String) : ExternalApi(url)
+
+        class GovernanceReferenda(url: String, val source: Source.Polkassembly) : ExternalApi(url) {
+
+            sealed class Source {
+
+                class Polkassembly(val network: String?) : Source()
             }
         }
 
-        data class GovernanceSection(val type: Section.Type, val url: String, val parameters: Parameters?) {
-            sealed interface Parameters {
-                data class Polkassembly(val network: String) : Parameters
-            }
-        }
-
-        data class TransferHistoryApi(
-            val assetType: AssetType,
-            val apiType: Section.Type,
-            val url: String
-        ) {
-
-            enum class AssetType {
-                SUBSTRATE, EVM, UNSUPPORTED
-            }
-        }
+        class GovernanceDelegations(url: String) : ExternalApi(url)
     }
 
     enum class Governance {

@@ -18,10 +18,10 @@ import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovern
 import io.novafoundation.nova.feature_governance_api.data.source.trackLocksFlowOrEmpty
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule.UnlockChunk
+import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimTime
 import io.novafoundation.nova.feature_governance_api.domain.locks.RealClaimScheduleCalculator
 import io.novafoundation.nova.feature_governance_api.domain.locks.claimableChunk
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Change
-import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Change
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceUnlockAffects.RemainsLockedInfo
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -188,7 +188,10 @@ class RealGovernanceUnlockInteractor(
 
                 is UnlockChunk.Pending -> GovernanceLocksOverview.Lock.Pending(
                     amount = chunk.amount,
-                    timer = durationEstimator.timerUntil(chunk.claimableAt)
+                    claimTime = when (val claimTime = chunk.claimableAt) {
+                        is ClaimTime.At -> GovernanceLocksOverview.ClaimTime.At(durationEstimator.timerUntil(claimTime.block))
+                        ClaimTime.UntilAction -> GovernanceLocksOverview.ClaimTime.UntilAction
+                    }
                 )
             }
         }
@@ -226,12 +229,10 @@ class RealGovernanceUnlockInteractor(
                 transferableChange = Change(
                     previousValue = transferableCurrent,
                     newValue = newTransferable,
-                    absoluteDifference = transferableChange
                 ),
                 governanceLockChange = Change(
                     previousValue = locksOverview.totalLocked,
                     newValue = newGovernanceLock,
-                    absoluteDifference = claimable.amount
                 ),
                 claimableChunk = claimable,
                 remainsLockedInfo = remainsLockedInfo,

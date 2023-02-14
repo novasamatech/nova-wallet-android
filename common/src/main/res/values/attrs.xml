@@ -84,11 +84,13 @@
         <attr name="primaryValueTextAppearance" format="reference" />
         <attr name="secondaryValueTextAppearance" format="reference" />
         <attr name="titleIcon" format="reference|color" />
+        <attr name="titleIconStart" format="reference|color" />
         <attr name="primaryValueIconTint" format="color" />
     </declare-styleable>
 
     <declare-styleable name="TableView">
         <attr name="title" />
+        <attr name="showBackground" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="GoNextView">
@@ -149,8 +151,10 @@
         <attr name="title" />
         <attr name="subtitle" />
         <attr name="image" />
+        <attr name="advertisementCardBackground" format="color|reference" />
         <attr name="learnMore" format="string" />
         <attr name="action" format="string" />
+        <attr name="showClose" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="AlertView">
@@ -208,5 +212,14 @@
     <declare-styleable name="BannerView">
         <attr name="android:src" format="reference" />
         <attr name="bannerBackground" format="reference|color" />
+    </declare-styleable>
+
+    <declare-styleable name="ListChooserView">
+        <attr name="listChooserView_label" format="string" />
+        <attr name="listChooserView_value" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="ReadMoreView">
+        <attr name="android:text" />
     </declare-styleable>
 </resources>

@@ -362,4 +362,95 @@ class RealClaimScheduleCalculatorTest {
             nonClaimable(amount = 1, claimAt = 2000)
         }
     }
+
+    @Test
+    fun `should handle standalone delegation`() = ClaimScheduleTest{
+        given {
+            track(0) {
+                delegating {
+                    delegate(1)
+                }
+            }
+        }
+
+        expect {
+            nonClaimable(amount = 1)
+        }
+    }
+
+    @Test
+    fun `should take delegation prior lock into account`() = ClaimScheduleTest{
+        given {
+            currentBlock(1000)
+
+            track(0) {
+                delegating {
+                    prior(amount = 10, unlockAt = 1100)
+
+                    delegate(1)
+                }
+            }
+        }
+
+        expect {
+            nonClaimable(amount = 9, claimAt = 1100) // prior is 10, but 1 is delayed because of delegation
+            nonClaimable(amount = 1)
+        }
+    }
+
+    @Test
+    fun `delegation plus gap case`() = ClaimScheduleTest{
+        given {
+            currentBlock(1000)
+
+            track(0) {
+                lock(10)
+
+                delegating {
+                    delegate(1)
+                }
+            }
+        }
+
+        expect {
+            claimable(amount = 9) {
+                unlock(0)
+            }
+            nonClaimable(amount = 1)
+        }
+    }
+
+    @Test
+    fun `delegate plus voting case`() = ClaimScheduleTest{
+        given {
+            currentBlock(1000)
+
+            track(0) {
+                delegating {
+                    delegate(1)
+                }
+            }
+
+            track(1) {
+                voting {
+                    prior(10, unlockAt = 1000)
+
+                    vote(amount = 5, unlockAt = 1100, referendumId = 0)
+                }
+            }
+        }
+
+        expect {
+
+            // 5 is claimable from track 1 priors
+            claimable(amount = 5) {
+                unlock(1)
+            }
+            // 4 is delayed until 1100 from track 1 votes
+            nonClaimable(amount = 4, claimAt = 1100)
+
+            // 1 is delayed indefinitely because of track 1 delegation
+            nonClaimable(amount = 1)
+        }
+    }
 }

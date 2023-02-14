@@ -10,10 +10,10 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.Ethersc
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanAccountTransfer
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.feeUsed
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.ext.requireErc20
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi.Section
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi.TransferHistoryApi
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlin.time.Duration.Companion.seconds
 
@@ -57,8 +57,8 @@ class EvmAssetHistory(
     ): DataPage<Operation> {
         val evmTransfersApi = chain.evmTransfersApi()
 
-        return when (evmTransfersApi?.apiType) {
-            Section.Type.ETHERSCAN -> getOperationsEtherscan(
+        return if (evmTransfersApi != null) {
+            getOperationsEtherscan(
                 pageSize = pageSize,
                 pageOffset = pageOffset,
                 accountId = accountId,
@@ -66,27 +66,23 @@ class EvmAssetHistory(
                 chainAsset = chainAsset,
                 apiUrl = evmTransfersApi.url
             )
-
-            else -> DataPage.empty()
+        } else {
+            DataPage.empty()
         }
     }
 
     override suspend fun getSyncedPageOffset(accountId: AccountId, chain: Chain, chainAsset: Chain.Asset): PageOffset {
         val evmTransfersApi = chain.evmTransfersApi()
 
-        return when (evmTransfersApi?.apiType) {
-            Section.Type.ETHERSCAN -> {
-                PageOffset.Loadable.PageNumber(page = SECOND_PAGE_INDEX)
-            }
-
-            else -> PageOffset.FullData
+        return if (evmTransfersApi != null) {
+            PageOffset.Loadable.PageNumber(page = SECOND_PAGE_INDEX)
+        } else {
+            PageOffset.FullData
         }
     }
 
-    private fun Chain.evmTransfersApi(): TransferHistoryApi? {
-        return externalApi?.history?.firstOrNull {
-            it.assetType == TransferHistoryApi.AssetType.EVM
-        }
+    private fun Chain.evmTransfersApi(): ExternalApi.Transfers.Evm? {
+        return externalApi()
     }
 
     private suspend fun getOperationsEtherscan(

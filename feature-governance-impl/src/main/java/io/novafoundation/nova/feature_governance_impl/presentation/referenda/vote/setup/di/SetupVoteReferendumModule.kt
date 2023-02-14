@@ -13,6 +13,8 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.conviction.ConvictionValuesProvider
+import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.LocksFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
@@ -39,6 +41,8 @@ class SetupVoteReferendumModule {
         validationExecutor: ValidationExecutor,
         referendumFormatter: ReferendumFormatter,
         locksChangeFormatter: LocksChangeFormatter,
+        convictionValuesProvider: ConvictionValuesProvider,
+        locksFormatter: LocksFormatter,
     ): ViewModel {
         return SetupVoteReferendumViewModel(
             feeLoaderMixinFactory = feeLoaderMixinFactory,
@@ -51,7 +55,9 @@ class SetupVoteReferendumModule {
             validationSystem = validationSystem,
             validationExecutor = validationExecutor,
             referendumFormatter = referendumFormatter,
-            locksChangeFormatter = locksChangeFormatter
+            locksChangeFormatter = locksChangeFormatter,
+            convictionValuesProvider = convictionValuesProvider,
+            locksFormatter = locksFormatter,
         )
     }
 

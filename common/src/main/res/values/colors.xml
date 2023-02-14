@@ -100,6 +100,14 @@
     <color name="voting_slider_indicator_active">#08090E</color>
     <color name="voting_slider_indicator_inactive">#7A08090E</color>
     <color name="voting_slider_knob_icon">#FFFFFF</color>
+    
+    <color name="individual_chip_icon">#2AB0F2</color>
+    <color name="individual_chip_text">#2AB0F2</color>
+    <color name="individual_chip_background">#292AB0F2</color>
+
+    <color name="organization_chip_icon">#EBC50A</color>
+    <color name="organization_chip_text">#EBC50A</color>
+    <color name="organization_chip_background">#29EDCE36</color>
 
     <!-- Shadow -->
     <color name="nft_stack_shadow">#B8000000</color>

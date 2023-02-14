@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.di
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV1
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV1Module
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV2
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV2Module
+import io.novafoundation.nova.feature_governance_impl.di.modules.screens.DelegateModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumDetailsModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumListModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumUnlockModule
@@ -31,8 +33,20 @@ import io.novafoundation.nova.feature_governance_impl.di.modules.screens.Referen
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.RealReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
+import io.novafoundation.nova.feature_governance_impl.domain.track.RealTracksUseCase
+import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
+import io.novafoundation.nova.feature_governance_impl.domain.track.category.RealTrackCategorizer
+import io.novafoundation.nova.feature_governance_impl.domain.track.category.TrackCategorizer
+import io.novafoundation.nova.feature_governance_impl.presentation.common.conviction.ConvictionValuesProvider
+import io.novafoundation.nova.feature_governance_impl.presentation.common.conviction.RealConvictionValuesProvider
+import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.LocksFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.RealLocksFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.RealReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.track.RealTrackFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.voters.RealVotersFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.voters.VotersFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
@@ -58,6 +72,7 @@ import javax.inject.Named
         ReferendumVotersModule::class,
         ReferendumVoteModule::class,
         ReferendumUnlockModule::class,
+        DelegateModule::class,
         GovernanceDAppsModule::class
     ]
 )
@@ -147,5 +162,41 @@ class GovernanceFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideReferendumFormatter(resourceManager: ResourceManager): ReferendumFormatter = RealReferendumFormatter(resourceManager)
+    fun provideTrackCategorizer(): TrackCategorizer = RealTrackCategorizer()
+
+    @Provides
+    @FeatureScope
+    fun provideTracksFormatter(
+        trackCategorizer: TrackCategorizer,
+        resourceManager: ResourceManager
+    ): TrackFormatter = RealTrackFormatter(trackCategorizer, resourceManager)
+
+    @Provides
+    @FeatureScope
+    fun provideReferendumFormatter(
+        resourceManager: ResourceManager,
+        trackFormatter: TrackFormatter,
+    ): ReferendumFormatter = RealReferendumFormatter(resourceManager, trackFormatter)
+
+    @Provides
+    @FeatureScope
+    fun provideVotersFormatter(
+        resourceManager: ResourceManager,
+        addressIconGenerator: AddressIconGenerator,
+    ): VotersFormatter = RealVotersFormatter(addressIconGenerator, resourceManager)
+
+    @Provides
+    @FeatureScope
+    fun provideLocksFormatter(resourceManager: ResourceManager): LocksFormatter = RealLocksFormatter(resourceManager)
+
+    @Provides
+    @FeatureScope
+    fun provideConvictionValuesProvider(): ConvictionValuesProvider = RealConvictionValuesProvider()
+
+    @Provides
+    @FeatureScope
+    fun provideTracksUseCase(
+        governanceSharedState: GovernanceSharedState,
+        governanceSourceRegistry: GovernanceSourceRegistry,
+    ): TracksUseCase = RealTracksUseCase(governanceSharedState, governanceSourceRegistry)
 }

@@ -6,7 +6,9 @@ import android.widget.RadioGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.presentation.ExtendedLoadingState
 import io.novafoundation.nova.common.presentation.LoadingState
+import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.isModifiable
 import io.novafoundation.nova.common.utils.input.modifyInput
@@ -21,6 +23,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
@@ -30,6 +34,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transform
@@ -49,6 +54,17 @@ inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = 
 fun <T> Flow<T>.withLoading(): Flow<LoadingState<T>> {
     return map<T, LoadingState<T>> { LoadingState.Loaded(it) }
         .onStart { emit(LoadingState.Loading()) }
+}
+
+/**
+ * Modifies flow so that it firstly emits [ExtendedLoadingState.Loading] state.
+ * Then emits each element from upstream wrapped into [ExtendedLoadingState.Loaded] state.
+ * If exception occurs, emits [ExtendedLoadingState.Error] state.
+ */
+fun <T> Flow<T>.withSafeLoading(): Flow<ExtendedLoadingState<T>> {
+    return map<T, ExtendedLoadingState<T>> { ExtendedLoadingState.Loaded(it) }
+        .onStart { emit(ExtendedLoadingState.Loading) }
+        .catch { emit(ExtendedLoadingState.Error(it)) }
 }
 
 suspend fun <T> Flow<LoadingState<T>>.firstOnLoad(): T = transform {
@@ -82,6 +98,58 @@ fun <T, R> Flow<T>.withLoading(sourceSupplier: suspend (T) -> Flow<R>): Flow<Loa
     }
 }
 
+private enum class InnerState {
+    INITIAL_START, SECONDARY_START, IN_PROGRESS
+}
+
+/**
+ * Modifies flow so that it firstly emits [LoadingState.Loading] state for each element from upstream.
+ * Then, it constructs new source via [sourceSupplier] and emits all of its items wrapped into [LoadingState.Loaded] state
+ * Old suppliers are discarded as per [Flow.transformLatest] behavior
+ *
+ * NOTE: This is a modified version of [withLoading] that is intended to be used ONLY with [SharingStarted.WhileSubscribed].
+ * In particular, it does not emit loading state on second and subsequent re-subscriptions
+ */
+fun <T, R> Flow<T>.withLoadingShared(sourceSupplier: suspend (T) -> Flow<R>): Flow<ExtendedLoadingState<R>> {
+    var state: InnerState = InnerState.INITIAL_START
+
+    return transformLatest { item ->
+        if (state != InnerState.SECONDARY_START) {
+            emit(ExtendedLoadingState.Loading)
+        }
+        state = InnerState.IN_PROGRESS
+
+        val newSource = sourceSupplier(item).map { ExtendedLoadingState.Loaded(it) }
+
+        emitAll(newSource)
+    }
+        .catch { emit(ExtendedLoadingState.Error(it)) }
+        .onCompletion { state = InnerState.SECONDARY_START }
+}
+
+suspend inline fun <reified T> Flow<ExtendedLoadingState<T>>.firstLoaded(): T = first { it.dataOrNull != null }.dataOrNull as T
+
+/**
+ * Modifies flow so that it firstly emits [LoadingState.Loading] state.
+ * Then emits each element from upstream wrapped into [LoadingState.Loaded] state.
+ *
+ * NOTE: This is a modified version of [withLoading] that is intended to be used ONLY with [SharingStarted.WhileSubscribed].
+ * In particular, it does not emit loading state on second and subsequent re-subscriptions
+ */
+fun <T> Flow<T>.withLoadingShared(): Flow<ExtendedLoadingState<T>> {
+    var state: InnerState = InnerState.INITIAL_START
+
+    return map<T, ExtendedLoadingState<T>> { ExtendedLoadingState.Loaded(it) }
+        .onStart {
+            if (state != InnerState.SECONDARY_START) {
+                emit(ExtendedLoadingState.Loading)
+            }
+            state = InnerState.IN_PROGRESS
+        }
+        .catch { emit(ExtendedLoadingState.Error(it)) }
+        .onCompletion { state = InnerState.SECONDARY_START }
+}
+
 /**
  * Similar to [Flow.takeWhile] but emits last element too
  */
@@ -102,11 +170,21 @@ inline fun <T, R> Flow<T?>.mapNullable(crossinline mapper: suspend (T) -> R): Fl
  */
 fun <T, R> Flow<T>.withLoadingSingle(sourceSupplier: suspend (T) -> R): Flow<LoadingState<R>> {
     return transformLatest { item ->
-        emit(LoadingState.Loading<R>())
+        emit(LoadingState.Loading())
 
         val newSource = LoadingState.Loaded(sourceSupplier(item))
 
         emit(newSource)
+    }
+}
+
+fun <T, R> Flow<T>.withLoadingResult(source: suspend (T) -> Result<R>): Flow<ExtendedLoadingState<R>> {
+    return transformLatest { item ->
+        emit(ExtendedLoadingState.Loading)
+
+        source(item)
+            .onSuccess { emit(ExtendedLoadingState.Loaded(it)) }
+            .onFailure { emit(ExtendedLoadingState.Error(it)) }
     }
 }
 

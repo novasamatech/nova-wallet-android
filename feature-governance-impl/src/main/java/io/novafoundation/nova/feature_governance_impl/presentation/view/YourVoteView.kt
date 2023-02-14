@@ -7,18 +7,20 @@ import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
-import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.letOrHide
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoteModel
+import kotlinx.android.synthetic.main.view_your_vote.view.viewYourVote
 import kotlinx.android.synthetic.main.view_your_vote.view.viewYourVoteType
 import kotlinx.android.synthetic.main.view_your_vote.view.viewYourVoteValue
 import kotlinx.android.synthetic.main.view_your_vote.view.viewYourVoteValueDetails
 
 class YourVoteModel(
-    @StringRes val voteTypeTitleRes: Int,
+    @StringRes val voteTypeTextRes: Int,
     @ColorRes val voteTypeColorRes: Int,
-    val votes: String,
-    val votesDetails: String
+    val voteTitle: String,
+    val vote: VoteModel,
 )
 
 class YourVoteView @JvmOverloads constructor(
@@ -39,13 +41,18 @@ class YourVoteView @JvmOverloads constructor(
         viewYourVoteType.setTextColorRes(voteColorRes)
     }
 
-    fun setVoteValue(value: String, valueDetails: String) {
+    fun setVoteTitle(voteTitle: String) {
+        viewYourVote.text = voteTitle
+    }
+
+    fun setVoteValue(value: String, valueDetails: String?) {
         viewYourVoteValue.text = value
         viewYourVoteValueDetails.text = valueDetails
     }
 }
 
 fun YourVoteView.setVoteModelOrHide(maybeModel: YourVoteModel?) = letOrHide(maybeModel) { model ->
-    setVoteType(model.voteTypeTitleRes, model.voteTypeColorRes)
-    setVoteValue(model.votes, model.votesDetails)
+    setVoteType(model.voteTypeTextRes, model.voteTypeColorRes)
+    setVoteValue(model.vote.votesCount, model.vote.votesCountDetails)
+    setVoteTitle(model.voteTitle)
 }

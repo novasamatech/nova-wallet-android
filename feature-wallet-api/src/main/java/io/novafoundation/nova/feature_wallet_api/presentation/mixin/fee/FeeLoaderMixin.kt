@@ -56,6 +56,8 @@ interface FeeLoaderMixin : Retriable {
             onError: (title: String, message: String) -> Unit,
         )
 
+        suspend fun awaitFee(): BigDecimal
+
         fun requireOptionalFee(
             block: (BigDecimal?) -> Unit,
             onError: (title: String, message: String) -> Unit,

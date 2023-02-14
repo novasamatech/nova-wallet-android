@@ -29,11 +29,22 @@
     </declare-styleable>
 
     <declare-styleable name="NovaChipView">
+        <attr name="android:ellipsize" />
         <attr name="chipIcon" format="reference" />
         <attr name="chipIconSize" format="dimension" />
         <attr name="android:text" />
+        <attr name="chipSize" format="enum">
+            <enum name="normal" value="0" />
+            <enum name="small" value="1" />
+            <enum name="sum" value="2" />
+        </attr>
         <attr name="android:textColor" />
         <attr name="chipTextAppearance" format="reference" />
         <attr name="backgroundColor" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="GovernanceLocksView">
+        <attr name="governanceLocksView_label" format="string" />
+        <attr name="governanceLocksView_icon" format="color|reference" />
     </declare-styleable>
 </resources>

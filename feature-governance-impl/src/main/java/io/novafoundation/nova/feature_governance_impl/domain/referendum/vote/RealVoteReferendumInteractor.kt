@@ -19,11 +19,11 @@ import io.novafoundation.nova.feature_governance_api.data.repository.getTracksBy
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.locks.RealClaimScheduleCalculator
-import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
-import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Change
+import io.novafoundation.nova.feature_governance_api.domain.locks.reusable.LocksChange
+import io.novafoundation.nova.feature_governance_api.domain.locks.reusable.ReusableLock
+import io.novafoundation.nova.feature_governance_api.domain.locks.reusable.addIfPositive
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Change
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant
-import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.LocksChange
-import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.GovernanceVoteAssistant.ReusableLock
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -37,7 +37,6 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.state.selectedOption
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
-import jp.co.soramitsu.fearless_utils.hash.isPositive
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -152,7 +151,7 @@ private class RealGovernanceLocksEstimator(
 ) : GovernanceVoteAssistant {
 
     private val claimScheduleCalculator = RealClaimScheduleCalculator(
-        voting = voting,
+        votingByTrack = voting,
         currentBlockNumber = blockDurationEstimator.currentBlock,
         // votedReferenda might not contain selected referenda so we add it manually
         referenda = votedReferenda + (onChainReferendum.id to onChainReferendum),
@@ -172,10 +171,6 @@ private class RealGovernanceLocksEstimator(
     private val allMaxLocked = balanceLocks.maxOfOrNull { it.amountInPlanks }
         .orZero()
 
-    override val track: ReferendumTrack? = onChainReferendum.status.asOngoingOrNull()?.let {
-        ReferendumTrack(it.track, tracks.getValue(it.track).name, sameWithOther = tracks.size == 1)
-    }
-
     override val trackVoting: Voting? = voting.findVotingFor(onChainReferendum)
 
     override suspend fun estimateLocksAfterVoting(
@@ -187,7 +182,6 @@ private class RealGovernanceLocksEstimator(
 
         val newGovernanceLocked = currentMaxGovernanceLocked.max(amount)
         val newMaxUnlocksAt = estimateUnlocksAt(changedVote = vote)
-        val lockedDifference = newGovernanceLocked - currentMaxGovernanceLocked
 
         val previousLockDuration = blockDurationEstimator.durationUntil(currentMaxUnlocksAt)
         val newLockDuration = blockDurationEstimator.durationUntil(newMaxUnlocksAt)
@@ -200,17 +194,14 @@ private class RealGovernanceLocksEstimator(
             lockedAmountChange = Change(
                 previousValue = currentMaxGovernanceLocked,
                 newValue = newGovernanceLocked,
-                absoluteDifference = lockedDifference.abs(),
             ),
             lockedPeriodChange = Change(
                 previousValue = previousLockDuration,
                 newValue = newLockDuration,
-                absoluteDifference = (newLockDuration - previousLockDuration).absoluteValue,
             ),
             transferableChange = Change(
                 previousValue = currentTransferablePlanks,
                 newValue = newTransferablePlanks,
-                absoluteDifference = (newTransferablePlanks - currentTransferablePlanks).abs()
             )
         )
     }
@@ -268,12 +259,6 @@ private class RealGovernanceLocksEstimator(
             values.firstOrNull {
                 it is Voting.Casting && onChainReferendum.id in it.votes.keys
             }
-        }
-    }
-
-    private fun MutableList<ReusableLock>.addIfPositive(type: ReusableLock.Type, amount: Balance) {
-        if (amount.isPositive()) {
-            add(ReusableLock(type, amount))
         }
     }
 }

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/your_delegations_nav_graph"
+    app:startDestination="@id/yourDelegationsFragment">
+
+    <include app:graph="@navigation/delegation_nav_graph" />
+    <include app:graph="@navigation/delegation_details_nav_graph" />
+
+    <fragment
+        android:id="@+id/yourDelegationsFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegated.YourDelegationsFragment"
+        android:label="YourDelegationsFragment"
+        tools:layout="@layout/fragment_your_delegations">
+
+        <action
+            android:id="@+id/action_yourDelegations_to_delegationList"
+            app:destination="@id/delegation_nav_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_yourDelegations_to_delegationDetails"
+            app:destination="@id/delegation_details_nav_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+</navigation>

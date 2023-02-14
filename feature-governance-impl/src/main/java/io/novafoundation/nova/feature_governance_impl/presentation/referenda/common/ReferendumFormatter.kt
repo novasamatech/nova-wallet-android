@@ -1,14 +1,12 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.common
 
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.formatting.remainingTime
-import io.novafoundation.nova.common.utils.images.Icon
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amountMultiplier
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
@@ -16,17 +14,27 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Re
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ayeVotesIfNotEmpty
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.passing
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.WithDifferentVoter
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumStatusModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimationStyleRefresher
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVotePreviewModel
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
+import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoteModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import kotlin.time.Duration.Companion.days
@@ -36,7 +44,7 @@ interface ReferendumFormatter {
 
     fun formatVoting(voting: ReferendumVoting, token: Token): ReferendumVotingModel
 
-    fun formatTrack(track: ReferendumTrack, asset: Chain.Asset): ReferendumTrackModel
+    fun formatReferendumTrack(track: ReferendumTrack, asset: Chain.Asset): ReferendumTrackModel
 
     fun formatOnChainName(call: GenericCall.Instance): String
 
@@ -48,13 +56,20 @@ interface ReferendumFormatter {
 
     fun formatId(referendumId: ReferendumId): String
 
-    fun formatUserVote(vote: AccountVote, token: Token): YourVoteModel?
+    fun formatUserVote(referendumVote: ReferendumVote, chain: Chain, chainAsset: Chain.Asset): YourVoteModel?
+
+    fun formatReferendumPreview(
+        referendum: ReferendumPreview,
+        token: Token,
+        chain: Chain
+    ): ReferendumModel
 }
 
 private val oneDay = 1.days
 
 class RealReferendumFormatter(
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val trackFormatter: TrackFormatter
 ) : ReferendumFormatter {
 
     override fun formatVoting(voting: ReferendumVoting, token: Token): ReferendumVotingModel {
@@ -80,89 +95,10 @@ class RealReferendumFormatter(
         )
     }
 
-    override fun formatTrack(track: ReferendumTrack, asset: Chain.Asset): ReferendumTrackModel {
-        return when (track.name) {
-            "root" -> ReferendumTrackModel(
-                name = resourceManager.getString(R.string.referendum_track_root),
-                icon = asset.iconUrl?.let { Icon.FromLink(it) } ?: Icon.FromDrawableRes(R.drawable.ic_block),
-                sameWithOther = track.sameWithOther
-            )
-            "whitelisted_caller" -> ReferendumTrackModel(
-                name = resourceManager.getString(R.string.referendum_whitelisted_caller),
-                icon = Icon.FromDrawableRes(R.drawable.ic_users),
-                sameWithOther = track.sameWithOther
-            )
-            "staking_admin" -> ReferendumTrackModel(
-                name = resourceManager.getString(R.string.referendum_staking_admin),
-                icon = Icon.FromDrawableRes(R.drawable.ic_staking_filled),
-                sameWithOther = track.sameWithOther
-            )
-            "treasurer" -> ReferendumTrackModel(
-                name = resourceManager.getString(R.string.referendum_track_treasurer),
-                icon = Icon.FromDrawableRes(R.drawable.ic_gem),
-                sameWithOther = track.sameWithOther
-            )
-            "lease_admin" -> ReferendumTrackModel(
-                name = resourceManager.getString(R.string.referendum_track_lease_admin),
-                icon = Icon.FromDrawableRes(R.drawable.ic_governance_check_to_slot),
-                sameWithOther = track.sameWithOther
-            )
-            "fellowship_admin" -> ReferendumTrackModel(
-                name = resourceManager.getString(R.string.referendum_track_fellowship_admin),
-                icon = Icon.FromDrawableRes(R.drawable.ic_users),
-                sameWithOther = track.sameWithOther
-            )
-            "general_admin" -> ReferendumTrackModel(
-                name = resourceManager.getString(R.string.referendum_track_general_admin),
-                icon = Icon.FromDrawableRes(R.drawable.ic_governance_check_to_slot),
-                sameWithOther = track.sameWithOther
-            )
-            "auction_admin" -> ReferendumTrackModel(
-                name = resourceManager.getString(R.string.referendum_track_auction_admin),
-                icon = Icon.FromDrawableRes(R.drawable.ic_rocket),
-                sameWithOther = track.sameWithOther
-            )
-            "referendum_canceller" -> ReferendumTrackModel(
-                name = resourceManager.getString(R.string.referendum_track_referendum_canceller),
-                icon = Icon.FromDrawableRes(R.drawable.ic_governance_check_to_slot),
-                sameWithOther = track.sameWithOther
-            )
-            "referendum_killer" -> ReferendumTrackModel(
-                name = resourceManager.getString(R.string.referendum_track_referendum_killer),
-                icon = Icon.FromDrawableRes(R.drawable.ic_governance_check_to_slot),
-                sameWithOther = track.sameWithOther
-            )
-            "small_tipper" -> ReferendumTrackModel(
-                name = resourceManager.getString(R.string.referendum_track_small_tipper),
-                icon = Icon.FromDrawableRes(R.drawable.ic_gem),
-                sameWithOther = track.sameWithOther
-            )
-            "big_tipper" -> ReferendumTrackModel(
-                name = resourceManager.getString(R.string.referendum_track_big_tipper),
-                icon = Icon.FromDrawableRes(R.drawable.ic_gem),
-                sameWithOther = track.sameWithOther
-            )
-            "small_spender" -> ReferendumTrackModel(
-                name = resourceManager.getString(R.string.referendum_track_small_spender),
-                icon = Icon.FromDrawableRes(R.drawable.ic_gem),
-                sameWithOther = track.sameWithOther
-            )
-            "medium_spender" -> ReferendumTrackModel(
-                name = resourceManager.getString(R.string.referendum_track_medium_spender),
-                icon = Icon.FromDrawableRes(R.drawable.ic_gem),
-                sameWithOther = track.sameWithOther
-            )
-            "big_spender" -> ReferendumTrackModel(
-                name = resourceManager.getString(R.string.referendum_track_big_spender),
-                icon = Icon.FromDrawableRes(R.drawable.ic_gem),
-                sameWithOther = track.sameWithOther
-            )
-            else -> ReferendumTrackModel(
-                name = mapUnknownTrackNameToUi(track.name),
-                icon = Icon.FromDrawableRes(R.drawable.ic_block),
-                sameWithOther = track.sameWithOther
-            )
-        }
+    override fun formatReferendumTrack(track: ReferendumTrack, asset: Chain.Asset): ReferendumTrackModel {
+        val trackModel = trackFormatter.formatTrack(track.track, asset)
+
+        return ReferendumTrackModel(trackModel, sameWithOther = track.sameWithOther)
     }
 
     override fun formatOnChainName(call: GenericCall.Instance): String {
@@ -171,10 +107,6 @@ class RealReferendumFormatter(
 
     override fun formatUnknownReferendumTitle(referendumId: ReferendumId): String {
         return resourceManager.getString(R.string.referendum_name_unknown, formatId(referendumId))
-    }
-
-    private fun mapUnknownTrackNameToUi(name: String): String {
-        return name.replace("_", " ").capitalize()
     }
 
     private fun formatThresholdInfo(
@@ -294,25 +226,108 @@ class RealReferendumFormatter(
         return "#${referendumId.value.format()}"
     }
 
-    override fun formatUserVote(vote: AccountVote, token: Token): YourVoteModel? {
-        val isAye = vote.isAye() ?: return null
-        val votes = vote.votes(token.configuration) ?: return null
+    override fun formatUserVote(referendumVote: ReferendumVote, chain: Chain, chainAsset: Chain.Asset): YourVoteModel? {
+        val isAye = referendumVote.vote.isAye() ?: return null
+        val votes = referendumVote.vote.votes(chainAsset) ?: return null
 
         val voteTypeRes = if (isAye) R.string.referendum_vote_aye else R.string.referendum_vote_nay
         val colorRes = if (isAye) R.color.text_positive else R.color.text_negative
 
-        val votesAmountFormatted = mapAmountToAmountModel(votes.amount, token).token
-        val multiplierFormatted = votes.multiplier.format()
+        val votesAmountFormatted = votes.amount.formatTokenAmount(chainAsset)
+        val multiplierFormatted = votes.conviction.amountMultiplier().format()
 
-        val votesFormatted = resourceManager.getString(R.string.referendum_votes_format, votes.total.format())
+        val votesCount = resourceManager.getString(R.string.referendum_votes_format, votes.totalVotes.format())
         val votesDetails = "$votesAmountFormatted × ${multiplierFormatted}x"
 
+        val title = when (referendumVote) {
+            is ReferendumVote.UserDelegated -> {
+                val accountFormatted = referendumVote.voterDisplayIn(chain)
+
+                resourceManager.getString(R.string.delegation_referendum_details_vote, accountFormatted)
+            }
+
+            is ReferendumVote.UserDirect -> resourceManager.getString(R.string.referendum_details_your_vote)
+
+            is ReferendumVote.OtherAccount -> error("Not yet supported")
+        }
+
         return YourVoteModel(
-            voteTypeTitleRes = voteTypeRes,
+            voteTypeTextRes = voteTypeRes,
             voteTypeColorRes = colorRes,
-            votes = votesFormatted,
-            votesDetails = votesDetails
+            vote = VoteModel(votesCount, votesDetails),
+            voteTitle = title
         )
+    }
+
+    override fun formatReferendumPreview(
+        referendum: ReferendumPreview,
+        token: Token,
+        chain: Chain
+    ): ReferendumModel {
+        return ReferendumModel(
+            id = referendum.id,
+            status = formatStatus(referendum.status),
+            name = mapReferendumNameToUi(referendum),
+            timeEstimation = formatTimeEstimation(referendum.status),
+            track = referendum.track?.let { formatReferendumTrack(it, token.configuration) },
+            number = formatId(referendum.id),
+            voting = referendum.voting?.let { formatVoting(it, token) },
+            yourVote = mapReferendumVoteToUi(referendum.referendumVote, token, chain)
+        )
+    }
+
+    private fun mapReferendumNameToUi(referendum: ReferendumPreview): String {
+        return referendum.offChainMetadata?.title
+            ?: mapReferendumOnChainNameToUi(referendum)
+            ?: formatUnknownReferendumTitle(referendum.id)
+    }
+
+    private fun mapReferendumOnChainNameToUi(referendum: ReferendumPreview): String? {
+        return when (val proposal = referendum.onChainMetadata?.proposal) {
+            is ReferendumProposal.Call -> formatOnChainName(proposal.call)
+            else -> null
+        }
+    }
+
+    private fun mapReferendumVoteToUi(
+        vote: ReferendumVote?,
+        token: Token,
+        chain: Chain
+    ): YourVotePreviewModel? {
+        val isAye = vote?.vote?.isAye() ?: return null
+        val votes = vote.vote.votes(token.configuration) ?: return null
+
+        val voteTypeRes = if (isAye) R.string.referendum_vote_aye else R.string.referendum_vote_nay
+        val colorRes = if (isAye) R.color.text_positive else R.color.text_negative
+        val amountFormatted = votes.totalVotes.format()
+
+        val details = when (vote) {
+            is ReferendumVote.UserDirect -> {
+                resourceManager.getString(R.string.referendum_your_vote_format, amountFormatted)
+            }
+
+            is ReferendumVote.UserDelegated -> {
+                val accountFormatted = vote.voterDisplayIn(chain)
+
+                resourceManager.getString(R.string.delegation_referendum_vote, amountFormatted, accountFormatted)
+            }
+
+            is ReferendumVote.OtherAccount -> {
+                val accountFormatted = vote.voterDisplayIn(chain)
+
+                resourceManager.getString(R.string.referendum_other_votes, amountFormatted, accountFormatted)
+            }
+        }
+
+        return YourVotePreviewModel(
+            voteType = resourceManager.getString(voteTypeRes),
+            colorRes = colorRes,
+            details = details
+        )
+    }
+
+    private fun WithDifferentVoter.voterDisplayIn(chain: Chain): String {
+        return whoIdentity?.name ?: chain.addressOf(who)
     }
 
     private fun TimerValue.referendumStatusStyleRefresher(): ReferendumTimeEstimationStyleRefresher = {

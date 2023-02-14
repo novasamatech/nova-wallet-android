@@ -17,6 +17,7 @@ import coil.load
 import coil.transform.RoundedCornersTransformation
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.presentation.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.getAccentColor
 import io.novafoundation.nova.common.utils.getEnum
@@ -25,6 +26,7 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.postToSelf
 import io.novafoundation.nova.common.utils.setDrawableEnd
+import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
@@ -79,7 +81,7 @@ open class TableCellView @JvmOverloads constructor(
     private val contentGroup: Group
         get() = tableCellContent
 
-    private val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
+    val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
         FeatureUtils.getCommonApi(context).imageLoader()
     }
 
@@ -133,7 +135,7 @@ open class TableCellView @JvmOverloads constructor(
         tableCellValueDivider.setVisible(visible)
     }
 
-    fun setPrimaryValueIcon(@DrawableRes icon: Int, @ColorRes tint: Int? = null) {
+    fun setPrimaryValueIcon(@DrawableRes icon: Int?, @ColorRes tint: Int = ICON_TINT_DEFAULT) {
         tableCellValuePrimary.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 8, tint = tint)
     }
 
@@ -148,8 +150,12 @@ open class TableCellView @JvmOverloads constructor(
         }
     }
 
-    fun setTitleIcon(@DrawableRes icon: Int?) {
+    fun setTitleIconEnd(@DrawableRes icon: Int?) {
         tableCellTitle.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 4, tint = ICON_TINT_DEFAULT)
+    }
+
+    fun setTitleIconStart(@DrawableRes icon: Int?) {
+        tableCellTitle.setDrawableStart(icon, widthInDp = 16, paddingInDp = 4, tint = ICON_TINT_DEFAULT)
     }
 
     fun showValue(primary: String, secondary: String? = null) {
@@ -180,8 +186,11 @@ open class TableCellView @JvmOverloads constructor(
         val primaryValueStyle = typedArray.getEnum(R.styleable.TableCellView_primaryValueStyle, default = FieldStyle.TEXT)
         setPrimaryValueStyle(primaryValueStyle)
 
-        val titleIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIcon)
-        titleIcon?.let(::setTitleIcon)
+        val titleIconEnd = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIcon)
+        titleIconEnd?.let(::setTitleIconEnd)
+
+        val titleIconStart = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIconStart)
+        titleIconStart?.let(::setTitleIconStart)
 
         val titleTextAppearance = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleValueTextAppearance)
         titleTextAppearance?.let(title::setTextAppearance)
@@ -200,4 +209,27 @@ fun TableCellView.showValueOrHide(primary: String?, secondary: String? = null) {
     }
 
     setVisible(primary != null)
+}
+
+@Suppress("LiftReturnOrAssignment")
+fun TableCellView.setExtraInfoAvailable(available: Boolean) {
+    if (available) {
+        setPrimaryValueIcon(R.drawable.ic_info_cicrle_filled_16)
+        isEnabled = true
+    } else {
+        setPrimaryValueIcon(null)
+        isEnabled = false
+    }
+}
+
+fun <T> TableCellView.showLoadingState(state: ExtendedLoadingState<T>, showData: (T) -> Unit) {
+    when (state) {
+        is ExtendedLoadingState.Error -> showValue(context.getString(R.string.common_error_general_title))
+        is ExtendedLoadingState.Loaded -> showData(state.data)
+        ExtendedLoadingState.Loading -> showProgress()
+    }
+}
+
+fun TableCellView.showLoadingValue(state: ExtendedLoadingState<String>) {
+    showLoadingState(state, ::showValue)
 }

@@ -6,7 +6,7 @@ data class ChainRemote(
     val assets: List<ChainAssetRemote>,
     val nodes: List<ChainNodeRemote>,
     val explorers: List<ChainExplorerRemote>?,
-    val externalApi: ChainExternalApiRemote?,
+    val externalApi: ChainExternalApisRemote?,
     val icon: String,
     val addressPrefix: Int,
     val types: ChainTypesInfo?,

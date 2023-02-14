@@ -12,7 +12,8 @@ import java.math.BigInteger
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
@@ -215,6 +216,8 @@ inline fun Duration.format(
 ): String {
     val withoutPrefix = toComponents { days, hours, minutes, seconds, _ ->
         when {
+            // if duration is zero, we want to display "0 days"
+            this == Duration.ZERO -> daysFormat(0)
             // format days + hours if both are present
             days > 0 && hours > 0 -> "${daysFormat(days.toInt())} ${hoursFormat(hours)}"
             // only days in case there is no hours

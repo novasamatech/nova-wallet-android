@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.novafoundation.nova.common.view.AdvertisementCard xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/itemDelegationBanner"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="8dp"
+    android:paddingHorizontal="12dp"
+    android:paddingBottom="12dp"
+    app:advertisementCardBackground="@drawable/ic_banner_blue_gradient"
+    app:image="@drawable/ic_banner_delegate_image"
+    app:learnMore="@string/delegation_list_describe_yourself_action"
+    app:showClose="true"
+    app:subtitle="@string/delegation_list_banner_description"
+    app:title="@string/delegation_list_banner_title" />

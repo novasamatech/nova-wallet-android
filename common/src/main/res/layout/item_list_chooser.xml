@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_primary_list_item"
+    android:orientation="horizontal">
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Primary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="13dp"
+        android:id="@+id/itemListChooserLabel"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="13dp"
+        android:layout_weight="1"
+        tools:text="All accounts" />
+
+    <RadioButton
+        android:id="@+id/itemListChooserCheck"
+        style="@style/Widget.Nova.RadioButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:clickable="false"
+        android:duplicateParentState="true" />
+
+</LinearLayout>

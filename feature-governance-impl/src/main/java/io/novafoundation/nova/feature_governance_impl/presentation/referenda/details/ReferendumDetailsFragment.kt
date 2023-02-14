@@ -2,18 +2,15 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.de
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
@@ -26,8 +23,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDetailsModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.applyTo
 import io.novafoundation.nova.feature_governance_impl.presentation.view.setVoteModelOrHide
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetails
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsContainer
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsDappList
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsDescription
@@ -48,7 +45,6 @@ import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDeta
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsYourVote
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumFullDetails
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumTimelineContainer
-import javax.inject.Inject
 
 class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), WithContextExtensions {
 
@@ -61,9 +57,6 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
             }
         }
     }
-
-    @Inject
-    protected lateinit var imageLoader: ImageLoader
 
     override val providedContext: Context
         get() = requireContext()
@@ -133,7 +126,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         setupExternalActions(viewModel)
         observeValidations(viewModel)
 
-        viewModel.referendumDetailsModelFlow.observe {
+        viewModel.referendumDetailsModelFlow.observeWhenVisible {
             when (it) {
                 is LoadingState.Loading -> {
                     setContentVisible(false)
@@ -146,19 +139,19 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
             }
         }
 
-        viewModel.proposerAddressModel.observe(referendumDetailsProposer::setAddressOrHide)
+        viewModel.proposerAddressModel.observeWhenVisible(referendumDetailsProposer::setAddressOrHide)
 
-        viewModel.referendumCallModelFlow.observe(::setReferendumCall)
+        viewModel.referendumCallModelFlow.observeWhenVisible(::setReferendumCall)
 
-        viewModel.referendumDApps.observe(referendumDetailsDappList::setDAppsOrHide)
+        viewModel.referendumDApps.observeWhenVisible(referendumDetailsDappList::setDAppsOrHide)
 
-        viewModel.voteButtonState.observe(referendumDetailsVotingStatus::setVoteButtonState)
+        viewModel.voteButtonState.observeWhenVisible(referendumDetailsVotingStatus::setVoteButtonState)
 
-        viewModel.showFullDetails.observe(referendumFullDetails::setVisible)
+        viewModel.showFullDetails.observeWhenVisible(referendumFullDetails::setVisible)
     }
 
     private fun setReferendumState(model: ReferendumDetailsModel) {
-        referendumDetailsTrack.setReferendumTrackModel(model.track, imageLoader)
+        referendumDetailsTrack.setReferendumTrackModel(model.track)
         referendumDetailsNumber.setText(model.number)
 
         referendumDetailsTitle.text = model.title
@@ -196,15 +189,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         referendumDetailsProgress.setVisible(!visible)
     }
 
-    private fun setDescription(maybeModel: ShortenedTextModel?) = referendumDetails.letOrHide(maybeModel) { model ->
-        val shortenedText = model.shortenedText
-
-        if (shortenedText is Spanned) {
-            viewModel.markwon.setParsedMarkdown(referendumDetailsDescription, shortenedText)
-        } else {
-            referendumDetailsDescription.text = shortenedText
-        }
-
-        referendumDetailsReadMore.setVisible(model.hasMore)
+    private fun setDescription(maybeModel: ShortenedTextModel?) {
+        maybeModel.applyTo(referendumDetailsDescription, referendumDetailsReadMore, viewModel.markwon)
     }
 }
