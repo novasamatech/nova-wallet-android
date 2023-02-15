@@ -40,6 +40,7 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.Su
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.payout.PayoutInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
@@ -160,6 +161,15 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideStakingSharedComputation(
+        computationalCache: ComputationalCache,
+        stakingRepository: StakingRepository,
+        rewardCalculatorFactory: RewardCalculatorFactory,
+        accountRepository: AccountRepository
+    ) = StakingSharedComputation(stakingRepository, computationalCache, rewardCalculatorFactory, accountRepository)
+
+    @Provides
+    @FeatureScope
     fun provideBagListRepository(
         @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
     ): BagListRepository = LocalBagListRepository(localStorageSource)
@@ -177,6 +187,7 @@ class StakingFeatureModule {
         stakingSharedState: StakingSharedState,
         assetUseCase: AssetUseCase,
         factory: EraTimeCalculatorFactory,
+        stakingSharedComputation: StakingSharedComputation,
     ) = StakingInteractor(
         walletRepository,
         accountRepository,
@@ -187,7 +198,8 @@ class StakingFeatureModule {
         stakingSharedState,
         payoutRepository,
         assetUseCase,
-        factory
+        factory,
+        stakingSharedComputation
     )
 
     @Provides
@@ -234,10 +246,12 @@ class StakingFeatureModule {
         walletRepository: WalletRepository,
         bagListRepository: BagListRepository,
         totalIssuanceRepository: TotalIssuanceRepository,
+        stakingSharedComputation: StakingSharedComputation,
     ) = AlertsInteractor(
         stakingRepository,
         stakingConstantsRepository,
         walletRepository,
+        stakingSharedComputation,
         bagListRepository,
         totalIssuanceRepository
     )
@@ -247,8 +261,8 @@ class StakingFeatureModule {
     fun provideRewardCalculatorFactory(
         repository: StakingRepository,
         totalIssuanceRepository: TotalIssuanceRepository,
-        sharedState: StakingSharedState
-    ) = RewardCalculatorFactory(repository, totalIssuanceRepository, sharedState)
+        stakingSharedComputation: dagger.Lazy<StakingSharedComputation>
+    ) = RewardCalculatorFactory(repository, totalIssuanceRepository, stakingSharedComputation)
 
     @Provides
     @FeatureScope
@@ -265,11 +279,13 @@ class StakingFeatureModule {
         identityRepository: OnChainIdentityRepository,
         rewardCalculatorFactory: RewardCalculatorFactory,
         stakingConstantsRepository: StakingConstantsRepository,
+        stakingSharedComputation: StakingSharedComputation
     ) = ValidatorProvider(
         stakingRepository,
         identityRepository,
         rewardCalculatorFactory,
-        stakingConstantsRepository
+        stakingConstantsRepository,
+        stakingSharedComputation
     )
 
     @Provides
@@ -400,13 +416,15 @@ class StakingFeatureModule {
         stakingConstantsRepository: StakingConstantsRepository,
         validatorProvider: ValidatorProvider,
         stahingSharedState: StakingSharedState,
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
+        stakingSharedComputation: StakingSharedComputation
     ) = CurrentValidatorsInteractor(
         stakingRepository,
         stakingConstantsRepository,
         validatorProvider,
         stahingSharedState,
-        accountRepository
+        accountRepository,
+        stakingSharedComputation,
     )
 
     @Provides

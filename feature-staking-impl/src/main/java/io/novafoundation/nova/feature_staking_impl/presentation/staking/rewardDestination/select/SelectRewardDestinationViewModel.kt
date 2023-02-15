@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapRewardDestinationModelToRewardDestination
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.staking.rewardDestination.ChangeRewardDestinationInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.rewardDestination.RewardDestinationValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.rewardDestination.RewardDestinationValidationSystem
@@ -24,6 +24,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDes
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.RewardDestinationParcelModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
@@ -38,13 +40,14 @@ import java.math.BigDecimal
 class SelectRewardDestinationViewModel(
     private val router: StakingRouter,
     private val interactor: StakingInteractor,
-    private val rewardCalculatorFactory: RewardCalculatorFactory,
     private val resourceManager: ResourceManager,
     private val changeRewardDestinationInteractor: ChangeRewardDestinationInteractor,
     private val validationSystem: RewardDestinationValidationSystem,
     private val validationExecutor: ValidationExecutor,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val rewardDestinationMixin: RewardDestinationMixin.Presentation,
+    private val selectedAssetSharedState: SingleAssetSharedState,
+    private val stakingSharedComputation: StakingSharedComputation,
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor,
@@ -54,14 +57,19 @@ class SelectRewardDestinationViewModel(
     private val _showNextProgress = MutableLiveData(false)
     val showNextProgress: LiveData<Boolean> = _showNextProgress
 
-    private val rewardCalculator = viewModelScope.async { rewardCalculatorFactory.create() }
-
+    private val rewardCalculator = viewModelScope.async {
+        stakingSharedComputation.rewardCalculator(
+            chainAsset = selectedAssetSharedState.chainAsset(),
+            scope = viewModelScope
+        )
+    }
+    
     private val rewardDestinationFlow = rewardDestinationMixin.rewardDestinationModelFlow
         .map { mapRewardDestinationModelToRewardDestination(it) }
         .inBackground()
         .share()
 
-    private val stashStateFlow = interactor.selectedAccountStakingStateFlow()
+    private val stashStateFlow = interactor.selectedAccountStakingStateFlow(viewModelScope)
         .filterIsInstance<StakingState.Stash>()
         .inBackground()
         .share()

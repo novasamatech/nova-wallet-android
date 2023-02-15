@@ -7,8 +7,7 @@ import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.calculateMaxPeriodReturns
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationSystem
@@ -25,28 +24,25 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
 class RelaychainStartStakingComponentFactory(
-    private val stakingInteractor: StakingInteractor,
     private val setupStakingSharedState: SetupStakingSharedState,
-    private val rewardCalculatorFactory: RewardCalculatorFactory,
     private val resourceManager: ResourceManager,
     private val router: StakingRouter,
     private val validationSystem: WelcomeStakingValidationSystem,
     private val validationExecutor: ValidationExecutor,
-) {
+    private val stakingSharedComputation: StakingSharedComputation,
+    ) {
 
     fun create(
         assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext
     ): StartStakingComponent = RelaychainStartStakingComponent(
-        stakingInteractor = stakingInteractor,
+        stakingSharedComputation = stakingSharedComputation,
         setupStakingSharedState = setupStakingSharedState,
-        rewardCalculatorFactory = rewardCalculatorFactory,
         resourceManager = resourceManager,
         router = router,
         validationSystem = validationSystem,
@@ -57,9 +53,8 @@ class RelaychainStartStakingComponentFactory(
 }
 
 private class RelaychainStartStakingComponent(
-    private val stakingInteractor: StakingInteractor,
+    private val stakingSharedComputation: StakingSharedComputation,
     private val setupStakingSharedState: SetupStakingSharedState,
-    private val rewardCalculatorFactory: RewardCalculatorFactory,
     private val resourceManager: ResourceManager,
     private val router: StakingRouter,
     private val validationSystem: WelcomeStakingValidationSystem,
@@ -71,11 +66,12 @@ private class RelaychainStartStakingComponent(
 
     private val currentSetupProgress = setupStakingSharedState.get<SetupStakingProcess.Initial>()
 
-    private val rewardCalculator = async { rewardCalculatorFactory.create(assetWithChain.asset) }
+    private val rewardCalculator = async { stakingSharedComputation.rewardCalculator(assetWithChain.asset, hostContext.scope) }
 
-    val selectedAccountStakingStateFlow = hostContext.selectedAccount.flatMapLatest {
-        stakingInteractor.selectedAccountStakingStateFlow(it, assetWithChain)
-    }.shareInBackground()
+    private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
+        assetWithChain = assetWithChain,
+        scope = hostContext.scope
+    )
 
     override suspend fun maxPeriodReturnPercentage(days: Int): BigDecimal {
         return rewardCalculator().calculateMaxPeriodReturns(days)

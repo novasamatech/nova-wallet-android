@@ -7,7 +7,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 import java.math.BigInteger
 
-class Token(
+data class Token(
     val rate: BigDecimal?,
     val currency: Currency,
     val recentRateChange: BigDecimal?,

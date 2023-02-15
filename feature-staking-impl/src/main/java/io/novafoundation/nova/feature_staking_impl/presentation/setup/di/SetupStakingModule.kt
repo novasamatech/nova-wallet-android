@@ -11,8 +11,9 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.setup.SetupStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure
@@ -32,7 +33,6 @@ class SetupStakingModule {
     fun provideViewModel(
         interactor: StakingInteractor,
         router: StakingRouter,
-        rewardCalculatorFactory: RewardCalculatorFactory,
         resourceManager: ResourceManager,
         setupStakingInteractor: SetupStakingInteractor,
         validationSystem: ValidationSystem<SetupStakingPayload, SetupStakingValidationFailure>,
@@ -40,12 +40,13 @@ class SetupStakingModule {
         setupStakingSharedState: SetupStakingSharedState,
         rewardDestinationMixin: RewardDestinationMixin.Presentation,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
-        amountChooserMixinFactory: AmountChooserMixin.Factory
+        amountChooserMixinFactory: AmountChooserMixin.Factory,
+        selectedAssetSharedState: StakingSharedState,
+        stakingSharedComputation: StakingSharedComputation,
     ): ViewModel {
         return SetupStakingViewModel(
             router,
             interactor,
-            rewardCalculatorFactory,
             resourceManager,
             setupStakingInteractor,
             validationSystem,
@@ -53,6 +54,8 @@ class SetupStakingModule {
             validationExecutor,
             feeLoaderMixin,
             rewardDestinationMixin,
+            selectedAssetSharedState,
+            stakingSharedComputation,
             amountChooserMixinFactory
         )
     }

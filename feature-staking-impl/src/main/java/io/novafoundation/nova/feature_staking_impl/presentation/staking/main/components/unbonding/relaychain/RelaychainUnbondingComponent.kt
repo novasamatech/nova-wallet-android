@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationPayload
@@ -34,7 +34,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
@@ -52,8 +51,8 @@ class RelaychainUnbondingComponentFactory(
     private val rebondValidationSystem: StakeActionsValidationSystem,
     private val redeemValidationSystem: StakeActionsValidationSystem,
     private val router: StakingRouter,
-    private val stakingInteractor: StakingInteractor,
-) {
+    private val stakingSharedComputation: StakingSharedComputation,
+    ) {
 
     fun create(
         assetWithChain: ChainWithAsset,
@@ -66,13 +65,13 @@ class RelaychainUnbondingComponentFactory(
         redeemValidationSystem = redeemValidationSystem,
         router = router,
         hostContext = hostContext,
-        stakingInteractor = stakingInteractor,
+        stakingSharedComputation = stakingSharedComputation,
         assetWithChain = assetWithChain
     )
 }
 
 private class RelaychainUnbondingComponent(
-    private val stakingInteractor: StakingInteractor,
+    private val stakingSharedComputation: StakingSharedComputation,
     private val unbondInteractor: UnbondInteractor,
     private val validationExecutor: ValidationExecutor,
     private val rebondValidationSystem: StakeActionsValidationSystem,
@@ -88,9 +87,10 @@ private class RelaychainUnbondingComponent(
 
     override val events = MutableLiveData<Event<UnbondingEvent>>()
 
-    val selectedAccountStakingStateFlow = hostContext.selectedAccount.flatMapLatest {
-        stakingInteractor.selectedAccountStakingStateFlow(it, assetWithChain)
-    }.shareInBackground()
+    private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
+        assetWithChain = assetWithChain,
+        scope = hostContext.scope
+    )
 
     private val unbondingsFlow = selectedAccountStakingStateFlow.transformLatest {
         if (it !is StakingState.Stash) {

@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.asLiveData
-import io.novafoundation.nova.common.utils.childScope
 import io.novafoundation.nova.common.utils.switchMap
+import io.novafoundation.nova.common.utils.withItemScope
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
@@ -15,11 +15,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 typealias ComponentCreator<S, E, A> = (ChainWithAsset, hostContext: ComponentHostContext) -> StatefullComponent<S, E, A>
@@ -51,14 +50,12 @@ private class CompoundStakingComponent<S, E, A>(
     private val hostContext: ComponentHostContext,
 ) : StatefullComponent<S, E, A>, CoroutineScope by hostContext.scope, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
 
-    private val childScope = hostContext.scope.childScope(supervised = true)
-    private val childHostContext = hostContext.copy(scope = childScope)
-
-    private val delegateFlow = singleAssetSharedState.assetWithChain.mapLatest {
-        childScope.coroutineContext.cancelChildren() // cancel current component
-
-        createDelegate(it)
-    }.shareInBackground()
+    private val delegateFlow = singleAssetSharedState.assetWithChain
+        .withItemScope(parentScope = hostContext.scope)
+        .map { (chainWithAsset, itemScope) ->
+            val childHostContext = hostContext.copy(scope = itemScope)
+            createDelegate(chainWithAsset, childHostContext)
+        }.shareInBackground()
 
     override val events: LiveData<Event<E>> = delegateFlow
         .asLiveData(this)
@@ -74,7 +71,7 @@ private class CompoundStakingComponent<S, E, A>(
         }
     }
 
-    private fun createDelegate(assetWithChain: ChainWithAsset): StatefullComponent<S, E, A> {
+    private fun createDelegate(assetWithChain: ChainWithAsset, childHostContext: ComponentHostContext): StatefullComponent<S, E, A> {
         return when (assetWithChain.asset.staking) {
             UNSUPPORTED -> UnsupportedComponent()
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainComponentCreator(assetWithChain, childHostContext)

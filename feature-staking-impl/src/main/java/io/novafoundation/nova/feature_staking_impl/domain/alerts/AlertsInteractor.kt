@@ -3,10 +3,12 @@ package io.novafoundation.nova.feature_staking_impl.domain.alerts
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.Alert.ChangeValidators.Reason
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListScoreConverter
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
 import io.novafoundation.nova.feature_staking_impl.domain.isNominationActive
 import io.novafoundation.nova.feature_staking_impl.domain.minimumStake
@@ -18,6 +20,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
@@ -31,6 +34,7 @@ class AlertsInteractor(
     private val stakingRepository: StakingRepository,
     private val stakingConstantsRepository: StakingConstantsRepository,
     private val walletRepository: WalletRepository,
+    private val stakingSharedComputation: StakingSharedComputation,
     private val bagListRepository: BagListRepository,
     private val totalIssuanceRepository: TotalIssuanceRepository,
 ) {
@@ -137,7 +141,7 @@ class AlertsInteractor(
         ::produceBagListAlert
     )
 
-    fun getAlertsFlow(stakingState: StakingState): Flow<List<Alert>> = flow {
+    fun getAlertsFlow(stakingState: StakingState, scope: CoroutineScope): Flow<List<Alert>> = flow {
         if (stakingState !is StakingState.Stash) {
             emit(emptyList())
             return@flow
@@ -151,7 +155,7 @@ class AlertsInteractor(
         val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
 
         val alertsFlow = combine(
-            stakingRepository.electedExposuresInActiveEra(chain.id),
+            stakingSharedComputation.electedExposuresInActiveEraFlow(chain.id, scope),
             walletRepository.assetFlow(stakingState.accountId, chainAsset),
             stakingRepository.observeActiveEraIndex(chain.id),
             bagListRepository.listNodeFlow(stakingState.stashId, chain.id)

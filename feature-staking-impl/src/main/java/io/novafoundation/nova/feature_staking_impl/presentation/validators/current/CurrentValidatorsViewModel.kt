@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.current
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.list.toValueList
@@ -58,13 +59,13 @@ class CurrentValidatorsViewModel(
     tokenUseCase: TokenUseCase,
 ) : CurrentStakeTargetsViewModel(), Validatable by validationExecutor {
 
-    private val stashFlow = stakingInteractor.selectedAccountStakingStateFlow()
+    private val stashFlow = stakingInteractor.selectedAccountStakingStateFlow(viewModelScope)
         .filterIsInstance<StakingState.Stash>()
         .inBackground()
         .share()
 
     private val groupedCurrentValidatorsFlow = stashFlow
-        .flatMapLatest(currentValidatorsInteractor::nominatedValidatorsFlow)
+        .flatMapLatest{ currentValidatorsInteractor.nominatedValidatorsFlow(it, viewModelScope) }
         .inBackground()
         .share()
 

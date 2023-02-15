@@ -1,18 +1,18 @@
 package io.novafoundation.nova.feature_staking_impl.domain.validators
 
 import io.novafoundation.nova.common.utils.toHexAccountId
-import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
-import io.novafoundation.nova.feature_staking_api.domain.api.getActiveElectedValidatorsExposures
-import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEra
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
+import kotlinx.coroutines.CoroutineScope
 
 sealed class ValidatorSource {
 
@@ -26,17 +26,18 @@ class ValidatorProvider(
     private val identityRepository: OnChainIdentityRepository,
     private val rewardCalculatorFactory: RewardCalculatorFactory,
     private val stakingConstantsRepository: StakingConstantsRepository,
+    private val stakingSharedComputation: StakingSharedComputation,
 ) {
 
     suspend fun getValidators(
         chain: Chain,
         chainAsset: Chain.Asset,
         source: ValidatorSource,
-        cachedExposures: AccountIdMap<Exposure>? = null,
+        scope: CoroutineScope,
     ): List<Validator> {
         val chainId = chain.id
 
-        val electedValidatorExposures = cachedExposures ?: stakingRepository.getActiveElectedValidatorsExposures(chainId)
+        val electedValidatorExposures = stakingSharedComputation.electedExposuresInActiveEra(chainId, scope)
 
         val requestedValidatorIds = when (source) {
             ValidatorSource.Elected -> electedValidatorExposures.keys.toList()

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.payouts.list
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.RetryPayload
@@ -78,7 +79,7 @@ class PayoutsListViewModel(
 
     private fun loadPayouts() {
         launch {
-            val result = interactor.calculatePendingPayouts()
+            val result = interactor.calculatePendingPayouts(viewModelScope)
 
             if (result.isSuccess) {
                 payoutsStatisticsFlow.emit(result.requireValue())
