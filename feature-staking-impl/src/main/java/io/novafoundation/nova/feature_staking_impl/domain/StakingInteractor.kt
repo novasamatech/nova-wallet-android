@@ -188,7 +188,7 @@ class StakingInteractor(
 
             NetworkInfo(
                 lockupPeriod = lockupPeriod,
-                minimumStake = minimumStakeNew(exposures, minimumNominatorBond),
+                minimumStake = minimumStake(exposures, minimumNominatorBond),
                 totalStake = totalStake(exposures),
                 stakingPeriod = StakingPeriod.Unlimited,
                 nominatorsCount = activeNominators(chainId, exposures),
