@@ -63,5 +63,6 @@ class StakingSharedComputation(
 }
 
 suspend fun StakingSharedComputation.electedExposuresInActiveEra(
-    chainId: ChainId, scope: CoroutineScope
+    chainId: ChainId,
+    scope: CoroutineScope
 ): AccountIdMap<Exposure> = electedExposuresInActiveEraFlow(chainId, scope).first()

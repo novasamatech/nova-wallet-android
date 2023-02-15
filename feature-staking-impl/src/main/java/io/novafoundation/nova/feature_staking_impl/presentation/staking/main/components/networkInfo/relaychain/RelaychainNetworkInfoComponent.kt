@@ -23,7 +23,7 @@ class RelaychainNetworkInfoComponentFactory(
     private val stakingInteractor: StakingInteractor,
     private val resourceManager: ResourceManager,
     private val stakingSharedComputation: StakingSharedComputation,
-    ) {
+) {
 
     fun create(
         assetWithChain: ChainWithAsset,

@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.domain.model
 
 import java.math.BigInteger
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
 
 data class NetworkInfo(
     val lockupPeriod: Duration,

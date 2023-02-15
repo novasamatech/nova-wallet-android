@@ -65,7 +65,7 @@ class CurrentValidatorsViewModel(
         .share()
 
     private val groupedCurrentValidatorsFlow = stashFlow
-        .flatMapLatest{ currentValidatorsInteractor.nominatedValidatorsFlow(it, viewModelScope) }
+        .flatMapLatest { currentValidatorsInteractor.nominatedValidatorsFlow(it, viewModelScope) }
         .inBackground()
         .share()
 

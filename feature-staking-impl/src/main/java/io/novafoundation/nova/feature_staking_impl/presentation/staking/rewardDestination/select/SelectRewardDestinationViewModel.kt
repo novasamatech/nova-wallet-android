@@ -63,7 +63,7 @@ class SelectRewardDestinationViewModel(
             scope = viewModelScope
         )
     }
-    
+
     private val rewardDestinationFlow = rewardDestinationMixin.rewardDestinationModelFlow
         .map { mapRewardDestinationModelToRewardDestination(it) }
         .inBackground()

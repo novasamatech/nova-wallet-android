@@ -82,7 +82,7 @@ class RelaychainModule {
         stakingInteractor = stakingInteractor,
         resourceManager = resourceManager,
         stakingSharedComputation = stakingSharedComputation,
-        )
+    )
 
     @Provides
     @ScreenScope

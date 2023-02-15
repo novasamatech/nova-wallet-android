@@ -52,7 +52,7 @@ class RelaychainUnbondingComponentFactory(
     private val redeemValidationSystem: StakeActionsValidationSystem,
     private val router: StakingRouter,
     private val stakingSharedComputation: StakingSharedComputation,
-    ) {
+) {
 
     fun create(
         assetWithChain: ChainWithAsset,

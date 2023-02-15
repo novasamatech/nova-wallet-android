@@ -35,7 +35,7 @@ class RelaychainStartStakingComponentFactory(
     private val validationSystem: WelcomeStakingValidationSystem,
     private val validationExecutor: ValidationExecutor,
     private val stakingSharedComputation: StakingSharedComputation,
-    ) {
+) {
 
     fun create(
         assetWithChain: ChainWithAsset,

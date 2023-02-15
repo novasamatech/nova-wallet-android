@@ -41,7 +41,7 @@ class RelaychainAlertsComponentFactory(
     private val bondMoreValidationSystem: StakeActionsValidationSystem,
     private val router: StakingRouter,
     private val stakingSharedComputation: StakingSharedComputation,
-    ) {
+) {
 
     fun create(
         assetWithChain: ChainWithAsset,
