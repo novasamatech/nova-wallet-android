@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateStatsModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateTypeModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.RecentVotes
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackDelegationModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoteModel
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
@@ -39,6 +40,8 @@ interface DelegateMappers {
 
     suspend fun formatDelegation(delegation: Voting.Delegating, chainAsset: Chain.Asset): VoteModel
 
+    suspend fun formatTrackDelegation(delegation: Voting.Delegating, track: Track, chainAsset: Chain.Asset): TrackDelegationModel
+
     fun mapDelegateTypeToUi(delegateType: DelegateAccountType?): DelegateTypeModel?
 
     suspend fun mapDelegateIconToUi(accountId: AccountId, metadata: Delegate.Metadata?): DelegateIcon
@@ -47,7 +50,7 @@ interface DelegateMappers {
 
     suspend fun formatDelegationStats(stats: DelegatePreview.Stats, chainAsset: Chain.Asset): DelegateStatsModel
 
-    suspend fun formattedRecentVotesPeriod(): String
+    fun formattedRecentVotesPeriod(): String
 
     suspend fun formatDelegateLabel(
         accountId: AccountId,
@@ -107,6 +110,13 @@ class RealDelegateMappers(
         val convictionVote = delegation.getConvictionVote(chainAsset)
 
         return votersFormatter.formatConvictionVote(convictionVote, chainAsset)
+    }
+
+    override suspend fun formatTrackDelegation(delegation: Voting.Delegating, track: Track, chainAsset: Chain.Asset): TrackDelegationModel {
+        return TrackDelegationModel(
+            track = trackFormatter.formatTrack(track, chainAsset),
+            delegation = formatDelegation(delegation, chainAsset)
+        )
     }
 
     override fun mapDelegateTypeToUi(delegateType: DelegateAccountType?): DelegateTypeModel? {
@@ -174,7 +184,7 @@ class RealDelegateMappers(
         )
     }
 
-    override suspend fun formattedRecentVotesPeriod(): String {
+    override fun formattedRecentVotesPeriod(): String {
         return resourceManager.getString(
             R.string.delegation_recent_votes_format,
             resourceManager.formatDuration(RECENT_VOTES_PERIOD, estimated = false)

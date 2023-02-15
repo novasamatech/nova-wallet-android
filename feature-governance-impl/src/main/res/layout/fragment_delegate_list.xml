@@ -31,15 +31,4 @@
         app:layout_constraintTop_toBottomOf="@id/delegateListToolbar"
         tools:listitem="@layout/item_delegate" />
 
-    <ProgressBar
-        android:id="@+id/delegateListProgress"
-        style="@style/Widget.Nova.ProgressBar.Indeterminate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/delegateListToolbar" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,7 +14,7 @@ value class ClaimSchedule(val chunks: List<UnlockChunk>) {
 
         data class Claimable(val amount: Balance, val actions: List<ClaimAction>) : UnlockChunk()
 
-        data class Pending(val amount: Balance, val claimableAt: BlockNumber) : UnlockChunk()
+        data class Pending(val amount: Balance, val claimableAt: ClaimTime) : UnlockChunk()
     }
 
     sealed class ClaimAction {
@@ -22,6 +22,22 @@ value class ClaimSchedule(val chunks: List<UnlockChunk>) {
         data class Unlock(val trackId: TrackId) : ClaimAction()
 
         data class RemoveVote(val trackId: TrackId, val referendumId: ReferendumId) : ClaimAction()
+    }
+}
+
+sealed class ClaimTime : Comparable<ClaimTime> {
+
+    object UntilAction : ClaimTime()
+
+    data class At(val block: BlockNumber) : ClaimTime()
+
+    override operator fun compareTo(other: ClaimTime): Int {
+        return when {
+            this is At && other is At -> block.compareTo(other.block)
+            this is UntilAction && other is UntilAction -> 0
+            this is UntilAction -> 1
+            else -> -1
+        }
     }
 }
 

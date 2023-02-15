@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="delegation_revoke_hint_unlock">After the undelegating period has expired, you will need to unlock your tokens.</string>
+
     <string name="delegation_edit_delegation">Edit delegation</string>
+    <string name="delegation_revoke_delegation">Revoke delegation</string>
 
     <string name="select_delegation_tracks_add_title">Select tracks to add delegation</string>
     <string name="select_delegation_tracks_revoke_title">Select tracks to revoke your delegation</string>

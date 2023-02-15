@@ -151,8 +151,6 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
 
         val chain = kusama()
         val delegates = interactor.getDelegates(
-            sorting = DelegateSorting.DELEGATIONS,
-            filtering = DelegateFiltering.ALL_ACCOUNTS,
             governanceOption = supportedGovernanceOption(chain, Chain.Governance.V2)
         )
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, delegates.toString())
@@ -169,7 +167,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
             .inBackground()
             .launchIn(this)
 
-        val delegate = interactor.getDelegateDetails(delegateAccountId)
+        val delegate = interactor.delegateDetailsFlow(delegateAccountId)
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, delegate.toString())
     }
 

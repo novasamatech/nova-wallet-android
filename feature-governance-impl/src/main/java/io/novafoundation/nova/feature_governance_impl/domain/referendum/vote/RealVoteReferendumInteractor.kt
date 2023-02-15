@@ -151,7 +151,7 @@ private class RealGovernanceLocksEstimator(
 ) : GovernanceVoteAssistant {
 
     private val claimScheduleCalculator = RealClaimScheduleCalculator(
-        voting = voting,
+        votingByTrack = voting,
         currentBlockNumber = blockDurationEstimator.currentBlock,
         // votedReferenda might not contain selected referenda so we add it manually
         referenda = votedReferenda + (onChainReferendum.id to onChainReferendum),

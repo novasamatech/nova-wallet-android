@@ -8,3 +8,8 @@ fun ResourcesHintsMixinFactory.newDelegationHints(coroutineScope: CoroutineScope
     coroutineScope = coroutineScope,
     hintsRes = listOf(R.string.delegation_delegate_hint_vote, R.string.delegation_delegate_hint_unlock)
 )
+
+fun ResourcesHintsMixinFactory.revokeDelegationHints(coroutineScope: CoroutineScope) = create(
+    coroutineScope = coroutineScope,
+    hintsRes = listOf(R.string.delegation_revoke_hint_unlock)
+)

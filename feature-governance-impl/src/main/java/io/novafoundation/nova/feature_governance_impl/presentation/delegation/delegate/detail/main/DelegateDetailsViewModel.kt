@@ -85,7 +85,7 @@ class DelegateDetailsViewModel(
         val chainAsset = governanceSharedState.chainAsset()
 
         it.userDelegations.map { (track, delegation) ->
-            formatTrackDelegation(track, delegation, chainAsset)
+            delegateMappers.formatTrackDelegation(delegation, track, chainAsset)
         }
     }.shareWhileSubscribed()
 
@@ -134,7 +134,7 @@ class DelegateDetailsViewModel(
     }
 
     fun recentVotesClicked() {
-        openVotedReferenda(onlyRecentVotes = true)
+        openVotedReferenda(onlyRecentVotes = true, title = delegateMappers.formattedRecentVotesPeriod())
     }
 
     fun allVotesClicked() {
@@ -196,13 +196,6 @@ class DelegateDetailsViewModel(
         )
     }
 
-    private suspend fun formatTrackDelegation(track: Track, delegation: Voting.Delegating, chainAsset: Chain.Asset): TrackDelegationModel {
-        return TrackDelegationModel(
-            track = trackFormatter.formatTrack(track, chainAsset),
-            delegation = delegateMappers.formatDelegation(delegation, chainAsset)
-        )
-    }
-
     private suspend fun formatYourDelegation(votes: Map<Track, Voting.Delegating>, chainAsset: Chain.Asset): YourDelegationModel? {
         if (votes.isEmpty()) return null
 
@@ -248,8 +241,8 @@ class DelegateDetailsViewModel(
         router.openNewDelegationChooseTracks(nextPayload)
     }
 
-    private fun openVotedReferenda(onlyRecentVotes: Boolean) {
-        val votedReferendaPayload = VotedReferendaPayload(payload.accountId, onlyRecentVotes)
+    private fun openVotedReferenda(onlyRecentVotes: Boolean, title: String? = null) {
+        val votedReferendaPayload = VotedReferendaPayload(payload.accountId, onlyRecentVotes, overriddenTitle = title)
         router.openVotedReferenda(votedReferendaPayload)
     }
 }

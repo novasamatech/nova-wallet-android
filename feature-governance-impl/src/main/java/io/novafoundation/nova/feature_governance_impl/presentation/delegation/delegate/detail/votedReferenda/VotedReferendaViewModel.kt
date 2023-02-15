@@ -22,7 +22,7 @@ class VotedReferendaViewModel(
     private val selectedTokenUseCase: TokenUseCase,
     private val governanceRouter: GovernanceRouter,
     private val referendumFormatter: ReferendumFormatter,
-    private val payload: VotedReferendaPayload,
+    val payload: VotedReferendaPayload,
 ) : BaseViewModel() {
 
     private val voter = Voter.account(payload.accountId)
