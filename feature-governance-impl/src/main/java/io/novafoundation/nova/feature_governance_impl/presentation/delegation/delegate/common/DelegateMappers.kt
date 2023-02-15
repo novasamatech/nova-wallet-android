@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.DelegateAccountType
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.model.Delegator
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.model.DelegatorVote
-import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.label.DelegateLabel
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
 import io.novafoundation.nova.feature_governance_api.domain.track.Track
 import io.novafoundation.nova.feature_governance_impl.R
@@ -23,13 +22,14 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateTypeModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.RecentVotes
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoteModel
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.VotersFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.formatConvictionVote
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoteModel
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.formatConvictionVote
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 interface DelegateMappers {
 
@@ -41,15 +41,20 @@ interface DelegateMappers {
 
     fun mapDelegateTypeToUi(delegateType: DelegateAccountType?): DelegateTypeModel?
 
-    suspend fun mapDelegateIconToUi(delegate: Delegate): DelegateIcon
+    suspend fun mapDelegateIconToUi(accountId: AccountId, metadata: Delegate.Metadata?): DelegateIcon
 
-    suspend fun formatDelegateName(delegate: Delegate, chain: Chain): String
+    suspend fun formatDelegateName(metadata: Delegate.Metadata?, identityName: String?, accountId: AccountId, chain: Chain): String
 
     suspend fun formatDelegationStats(stats: DelegatePreview.Stats, chainAsset: Chain.Asset): DelegateStatsModel
 
     suspend fun formattedRecentVotesPeriod(): String
 
-    suspend fun formatDelegateLabel(delegateLabel: DelegateLabel, chain: Chain): DelegateLabelModel
+    suspend fun formatDelegateLabel(
+        accountId: AccountId,
+        metadata: Delegate.Metadata?,
+        identityName: String?,
+        chain: Chain
+    ): DelegateLabelModel
 }
 
 suspend fun DelegateMappers.formatDelegationsOverviewOrNull(votes: Delegator.Vote?, chainAsset: Chain.Asset): VoteModel? {
@@ -68,9 +73,14 @@ class RealDelegateMappers(
         chainWithAsset: ChainWithAsset,
     ): DelegateListModel {
         return DelegateListModel(
-            icon = mapDelegateIconToUi(delegatePreview),
+            icon = mapDelegateIconToUi(delegatePreview.accountId, delegatePreview.metadata),
             accountId = delegatePreview.accountId,
-            name = formatDelegateName(delegatePreview, chainWithAsset.chain),
+            name = formatDelegateName(
+                metadata = delegatePreview.metadata,
+                identityName = delegatePreview.onChainIdentity?.display,
+                accountId = delegatePreview.accountId,
+                chain = chainWithAsset.chain
+            ),
             type = mapDelegateTypeToUi(delegatePreview.metadata?.accountType),
             description = delegatePreview.metadata?.shortDescription,
             stats = formatDelegationStats(delegatePreview.stats, chainWithAsset.asset),
@@ -121,9 +131,9 @@ class RealDelegateMappers(
         }
     }
 
-    override suspend fun mapDelegateIconToUi(delegate: Delegate): DelegateIcon {
-        val iconUrl = delegate.metadata?.iconUrl
-        val accountType = delegate.metadata?.accountType
+    override suspend fun mapDelegateIconToUi(accountId: AccountId, metadata: Delegate.Metadata?): DelegateIcon {
+        val iconUrl = metadata?.iconUrl
+        val accountType = metadata?.accountType
 
         return if (iconUrl != null) {
             val icon = Icon.FromLink(iconUrl)
@@ -131,7 +141,7 @@ class RealDelegateMappers(
             DelegateIcon(accountType.iconShape(), icon)
         } else {
             val addressIcon = addressIconGenerator.createAddressIcon(
-                delegate.accountId,
+                accountId,
                 AddressIconGenerator.SIZE_BIG,
                 AddressIconGenerator.BACKGROUND_TRANSPARENT
             )
@@ -149,15 +159,8 @@ class RealDelegateMappers(
         }
     }
 
-    override suspend fun formatDelegateName(delegate: Delegate, chain: Chain): String {
-        val metadataName = delegate.metadata?.name
-        val identityName = delegate.onChainIdentity?.display
-
-        return when {
-            identityName != null -> identityName
-            metadataName != null -> metadataName
-            else -> chain.addressOf(delegate.accountId)
-        }
+    override suspend fun formatDelegateName(metadata: Delegate.Metadata?, identityName: String?, accountId: AccountId, chain: Chain): String {
+        return identityName ?: metadata?.name ?: chain.addressOf(accountId)
     }
 
     override suspend fun formatDelegationStats(stats: DelegatePreview.Stats, chainAsset: Chain.Asset): DelegateStatsModel {
@@ -178,14 +181,25 @@ class RealDelegateMappers(
         )
     }
 
-    override suspend fun formatDelegateLabel(delegateLabel: DelegateLabel, chain: Chain): DelegateLabelModel {
+    override suspend fun formatDelegateLabel(
+        accountId: AccountId,
+        metadata: Delegate.Metadata?,
+        identityName: String?,
+        chain: Chain
+    ): DelegateLabelModel {
         return DelegateLabelModel(
-            icon = mapDelegateIconToUi(delegateLabel),
+            icon = mapDelegateIconToUi(accountId, metadata),
             addressModel = addressIconGenerator.createAccountAddressModel(
                 chain = chain,
-                accountId = delegateLabel.accountId,
-                name = formatDelegateName(delegateLabel, chain)
-            )
+                accountId = accountId,
+                name = formatDelegateName(
+                    metadata = metadata,
+                    identityName = identityName,
+                    accountId = accountId,
+                    chain = chain
+                )
+            ),
+            type = mapDelegateTypeToUi(metadata?.accountType)
         )
     }
 

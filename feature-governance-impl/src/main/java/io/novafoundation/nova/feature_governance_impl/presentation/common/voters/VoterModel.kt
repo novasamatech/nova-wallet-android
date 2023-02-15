@@ -1,11 +1,11 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.voters
+package io.novafoundation.nova.feature_governance_impl.presentation.common.voters
 
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.view.TableCellView
 
 class VoterModel(
     val addressModel: AddressModel,
-    val vote: VoteModel,
+    val vote: VoteModel
 )
 
 class VoteModel(

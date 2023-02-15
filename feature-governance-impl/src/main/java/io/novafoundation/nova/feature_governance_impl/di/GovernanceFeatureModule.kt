@@ -45,8 +45,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.RealTrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.RealVotersFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.VotersFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.RealVotersFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
@@ -182,7 +182,7 @@ class GovernanceFeatureModule {
     @FeatureScope
     fun provideVotersFormatter(
         resourceManager: ResourceManager,
-        addressIconGenerator: AddressIconGenerator,
+        addressIconGenerator: AddressIconGenerator
     ): VotersFormatter = RealVotersFormatter(addressIconGenerator, resourceManager)
 
     @Provides

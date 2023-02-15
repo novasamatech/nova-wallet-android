@@ -34,8 +34,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.formatTracks
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.VotersFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.formatConvictionVote
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.formatConvictionVote
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
@@ -127,7 +127,7 @@ class NewDelegationConfirmViewModel(
         .shareInBackground()
 
     val delegateLabelModel = flowOf { delegateLabelUseCase.getDelegateLabel(payload.delegate) }
-        .map { delegateFormatters.formatDelegateLabel(it, governanceSharedState.chain()) }
+        .map { delegateFormatters.formatDelegateLabel(it.accountId, it.metadata, it.onChainIdentity?.display, governanceSharedState.chain()) }
         .withSafeLoading()
         .shareInBackground()
 

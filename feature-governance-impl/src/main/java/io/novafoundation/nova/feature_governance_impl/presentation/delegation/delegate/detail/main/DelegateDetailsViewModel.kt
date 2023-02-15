@@ -189,8 +189,8 @@ class DelegateDetailsViewModel(
 
     private suspend fun createDelegateMetadata(delegateDetails: DelegateDetails, chain: Chain): Metadata {
         return Metadata(
-            name = delegateMappers.formatDelegateName(delegateDetails, chain),
-            icon = delegateMappers.mapDelegateIconToUi(delegateDetails),
+            name = delegateMappers.formatDelegateName(delegateDetails.metadata, delegateDetails.onChainIdentity?.display, delegateDetails.accountId, chain),
+            icon = delegateMappers.mapDelegateIconToUi(delegateDetails.accountId, delegateDetails.metadata),
             accountType = delegateMappers.mapDelegateTypeToUi(delegateDetails.metadata?.accountType),
             description = createDelegateDescription(delegateDetails.metadata)
         )

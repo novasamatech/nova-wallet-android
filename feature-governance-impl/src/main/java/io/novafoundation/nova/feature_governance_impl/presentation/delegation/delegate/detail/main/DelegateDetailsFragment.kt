@@ -139,7 +139,7 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
             delegateDetailsMetadataGroup.makeVisible()
 
             with(delegate.metadata) {
-                delegateDetailsIcon.setDelegateIcon(icon, imageLoader)
+                delegateDetailsIcon.setDelegateIcon(icon, imageLoader, 12)
                 delegateDetailsTitle.text = name
                 delegateDetailsType.setDelegateTypeModel(accountType)
                 setDescription(description)

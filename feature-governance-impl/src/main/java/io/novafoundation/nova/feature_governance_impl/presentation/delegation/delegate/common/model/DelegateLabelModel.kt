@@ -9,11 +9,12 @@ import io.novafoundation.nova.common.view.showLoadingState
 class DelegateLabelModel(
     val icon: DelegateIcon,
     val addressModel: AddressModel,
+    val type: DelegateTypeModel?
 )
 
 fun TableCellView.setDelegateLabelModel(model: DelegateLabelModel) {
     image.makeVisible()
-    image.setDelegateIcon(model.icon, imageLoader)
+    image.setDelegateIcon(model.icon, imageLoader, 4)
 
     showValue(model.addressModel.nameOrAddress)
 }

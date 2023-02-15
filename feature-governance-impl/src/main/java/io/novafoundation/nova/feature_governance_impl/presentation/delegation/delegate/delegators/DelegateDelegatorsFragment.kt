@@ -14,14 +14,14 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoterModel
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.list.VotersAdapter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoterModel
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.list.DelegatorsAdapter
 import kotlinx.android.synthetic.main.fragment_delegate_delegators.delegateDelegatorsCount
 import kotlinx.android.synthetic.main.fragment_delegate_delegators.delegateDelegatorsList
 import kotlinx.android.synthetic.main.fragment_delegate_delegators.delegateDelegatorsProgress
 import kotlinx.android.synthetic.main.fragment_delegate_delegators.delegateDelegatorsToolbar
 
-class DelegateDelegatorsFragment : BaseFragment<DelegateDelegatorsViewModel>(), VotersAdapter.Handler {
+class DelegateDelegatorsFragment : BaseFragment<DelegateDelegatorsViewModel>(), DelegatorsAdapter.Handler {
 
     companion object {
         private const val KEY_PAYLOAD = "payload"
@@ -33,7 +33,7 @@ class DelegateDelegatorsFragment : BaseFragment<DelegateDelegatorsViewModel>(), 
         }
     }
 
-    private val delegatorsAdapter = VotersAdapter(this)
+    private val delegatorsAdapter = DelegatorsAdapter(this)
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -13,9 +13,10 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ReferendumVotersInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersViewModel
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.VotersFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ReferendumVotersModule {
@@ -31,6 +32,7 @@ class ReferendumVotersModule {
         referendumVotersInteractor: ReferendumVotersInteractor,
         resourceManager: ResourceManager,
         votersFormatter: VotersFormatter,
+        delegateMappers: DelegateMappers
     ): ViewModel {
         return ReferendumVotersViewModel(
             payload = payload,
@@ -39,7 +41,8 @@ class ReferendumVotersModule {
             externalActions = externalAction,
             referendumVotersInteractor = referendumVotersInteractor,
             resourceManager = resourceManager,
-            votersFormatter = votersFormatter
+            votersFormatter = votersFormatter,
+            delegateMappers = delegateMappers
         )
     }
 
