@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoteDirectionModel
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoteModel
 import kotlinx.android.synthetic.main.view_your_vote.view.viewYourVote
 import kotlinx.android.synthetic.main.view_your_vote.view.viewYourVoteType

@@ -144,7 +144,7 @@ private fun Context.cornerDrawableFromColors(
     val strokeSizePx = density * strokeSizeInDp
 
     return MaterialShapeDrawable(shapeBuilder(cornerSizePx)).apply {
-        fillColor?.let { setFillColor(ColorStateList.valueOf(fillColor)) }
+        setFillColor(ColorStateList.valueOf(fillColor ?: Color.TRANSPARENT))
 
         strokeColor?.let {
             setStroke(strokeSizePx, it)
