@@ -5,11 +5,13 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
+import androidx.core.view.isVisible
 import com.google.android.material.card.MaterialCardView
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.dpF
 import kotlinx.android.synthetic.main.view_banner.view.bannerBackground
+import kotlinx.android.synthetic.main.view_banner.view.bannerClose
 import kotlinx.android.synthetic.main.view_banner.view.bannerContent
 import kotlinx.android.synthetic.main.view_banner.view.bannerImage
 
@@ -29,6 +31,10 @@ class BannerView @JvmOverloads constructor(
         applyAttributes(attrs)
     }
 
+    fun setOnCloseClickListener(listener: OnClickListener?) {
+        bannerClose.setOnClickListener(listener)
+    }
+
     private fun applyAttributes(attrs: AttributeSet?) {
         attrs?.let {
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.BannerView)
@@ -38,6 +44,9 @@ class BannerView @JvmOverloads constructor(
 
             val background = typedArray.getDrawable(R.styleable.BannerView_bannerBackground)
             bannerBackground.background = background
+
+            val showClose = typedArray.getBoolean(R.styleable.BannerView_showClose, false)
+            bannerClose.isVisible = showClose
 
             typedArray.recycle()
         }
