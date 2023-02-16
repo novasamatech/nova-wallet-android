@@ -48,11 +48,9 @@ class UpdateNotificationViewModel(
     }
         .shareInBackground()
 
-    fun skipClicked() {
-        launch {
-            interactor.skipNewUpdates()
-            router.back()
-        }
+    fun skipClicked() = launch {
+        interactor.skipNewUpdates()
+        router.back()
     }
 
     fun installUpdateClicked() {

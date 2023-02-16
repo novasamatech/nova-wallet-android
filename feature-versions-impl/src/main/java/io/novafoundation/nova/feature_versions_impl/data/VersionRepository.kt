@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
@@ -27,6 +28,8 @@ interface VersionRepository {
     fun inAppUpdatesCheckAllowedFlow(): Flow<Boolean>
 
     fun allowUpdate()
+
+    suspend fun loadVersions()
 }
 
 class RealVersionRepository(
@@ -51,6 +54,10 @@ class RealVersionRepository(
         _inAppUpdatesCheckAllowed.value = true
     }
 
+    override suspend fun loadVersions() {
+        syncAndGetVersions()
+    }
+
     override suspend fun hasImportantUpdates(): Boolean {
         val checkpointVersion = getRecentVersionCheckpoint() ?: currentVersion
         return syncAndGetVersions()
@@ -67,9 +74,9 @@ class RealVersionRepository(
     }
 
     override suspend fun skipCurrentUpdates() {
-        val latestUpdateNotification = getNewUpdateNotifications()
-            .maxWith { first, second -> first.version.compareTo(second.version) }
-        preferences.putString(PREF_VERSION_CHECKPOINT, latestUpdateNotification.version.toString())
+        val latestUpdateNotification = syncAndGetVersions()
+            .maxWith { first, second -> first.key.compareTo(second.key) }
+        preferences.putString(PREF_VERSION_CHECKPOINT, latestUpdateNotification.key.toString())
     }
 
     override fun inAppUpdatesCheckAllowedFlow(): Flow<Boolean> {
@@ -94,6 +101,7 @@ class RealVersionRepository(
     private suspend fun syncAndGetVersions(): Map<Version, VersionResponse> {
         return mutex.withLock {
             if (versions.isEmpty()) {
+                delay(5000)
                 versions = runCatching { fetchVersions() }
                     .getOrElse { emptyMap() }
             }

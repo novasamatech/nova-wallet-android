@@ -114,16 +114,18 @@ class SweetBlur(
     override fun onDraw() {
         if (!started) return
 
-        try {
-            targetView.post { makeBlurBackground() }
-        } catch (e: Exception) {
-            stop()
-            onException?.invoke(e) ?: throw e
+        targetView.post {
+            try {
+                makeBlurBackground()
+            } catch (e: Exception) {
+                stop()
+                onException?.invoke(e) ?: throw e
+            }
         }
     }
 
     private fun makeBlurBackground() {
-        val capturedBitmap = captureBitmap()
+        val capturedBitmap = captureBitmap() ?: return
         launch {
             try {
                 val bitmapDrawable = withContext(Dispatchers.Default) {
@@ -162,21 +164,22 @@ class SweetBlur(
         return clip
     }
 
-    private fun getTargetSizeBitmap(viewClip: RectF): Bitmap {
-        return Bitmap.createBitmap(
-            (viewClip.width() * downscaleFactor).toInt(),
-            (viewClip.height() * downscaleFactor).toInt(),
-            Bitmap.Config.ARGB_8888
-        )
+    private fun getTargetSizeBitmap(viewClip: RectF): Bitmap? {
+        val width = (viewClip.width() * downscaleFactor).toInt()
+        val height = (viewClip.height() * downscaleFactor).toInt()
+        if (width <= 0 || height <= 0) return null
+
+        return Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     }
 
     fun blurBitmap(src: Bitmap): Bitmap {
         return Toolkit.blur(src, radius)
     }
 
-    private fun captureBitmap(): Bitmap {
+    private fun captureBitmap(): Bitmap? {
         val viewClip = getViewClip()
-        val targetBitmap = getTargetSizeBitmap(viewClip)
+
+        val targetBitmap = getTargetSizeBitmap(viewClip) ?: return null
         targetBitmap.eraseColor(Color.BLACK)
         val canvas = SweetBlurCanvas(targetBitmap)
         canvas.clipRect(0f, 0f, viewClip.width() * downscaleFactor, viewClip.height() * downscaleFactor)

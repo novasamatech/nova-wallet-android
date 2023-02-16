@@ -9,6 +9,10 @@ class RealUpdateNotificationsInteractor(
     private val versionRepository: VersionRepository
 ) : UpdateNotificationsInteractor {
 
+    override suspend fun loadVersions() {
+        versionRepository.loadVersions()
+    }
+
     override suspend fun waitPermissionToUpdate() {
         versionRepository.inAppUpdatesCheckAllowedFlow().first { allowed -> allowed }
     }
