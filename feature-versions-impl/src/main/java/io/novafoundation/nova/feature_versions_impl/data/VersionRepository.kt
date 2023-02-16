@@ -12,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
@@ -101,7 +100,6 @@ class RealVersionRepository(
     private suspend fun syncAndGetVersions(): Map<Version, VersionResponse> {
         return mutex.withLock {
             if (versions.isEmpty()) {
-                delay(5000)
                 versions = runCatching { fetchVersions() }
                     .getOrElse { emptyMap() }
             }
