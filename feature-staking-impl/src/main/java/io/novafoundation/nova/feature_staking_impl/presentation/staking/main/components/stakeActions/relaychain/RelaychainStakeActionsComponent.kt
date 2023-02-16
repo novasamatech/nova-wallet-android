@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
-import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_CONTROLLER
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_PAYOUTS
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_REWARD_DESTINATION
@@ -32,12 +32,11 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 
 class RelaychainStakeActionsComponentFactory(
-    private val stakingInteractor: StakingInteractor,
+    private val stakingSharedComputation: StakingSharedComputation,
     private val resourceManager: ResourceManager,
     private val stakeActionsValidations: Map<String, StakeActionsValidationSystem>,
     private val router: StakingRouter,
@@ -47,7 +46,7 @@ class RelaychainStakeActionsComponentFactory(
         assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext
     ): StakeActionsComponent = RelaychainStakeActionsComponent(
-        stakingInteractor = stakingInteractor,
+        stakingSharedComputation = stakingSharedComputation,
         resourceManager = resourceManager,
         router = router,
         stakeActionsValidations = stakeActionsValidations,
@@ -57,7 +56,7 @@ class RelaychainStakeActionsComponentFactory(
 }
 
 private class RelaychainStakeActionsComponent(
-    private val stakingInteractor: StakingInteractor,
+    private val stakingSharedComputation: StakingSharedComputation,
     private val resourceManager: ResourceManager,
     private val router: StakingRouter,
     private val stakeActionsValidations: Map<String, StakeActionsValidationSystem>,
@@ -70,9 +69,10 @@ private class RelaychainStakeActionsComponent(
 
     override val events = MutableLiveData<Event<StakeActionsEvent>>()
 
-    private val selectedAccountStakingStateFlow = hostContext.selectedAccount.flatMapLatest {
-        stakingInteractor.selectedAccountStakingStateFlow(it, assetWithChain)
-    }.shareInBackground()
+    private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
+        assetWithChain = assetWithChain,
+        scope = hostContext.scope
+    )
 
     override val state = selectedAccountStakingStateFlow.transformLatest { stakingState ->
         if (stakingState is StakingState.Stash) {
@@ -122,7 +122,6 @@ private class RelaychainStakeActionsComponent(
         }
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     private fun availableActionsFor(stakingState: StakingState.Stash): List<ManageStakeAction> = buildList {
         add(ManageStakeAction.Companion::bondMore)
         add(ManageStakeAction.Companion::unbond)

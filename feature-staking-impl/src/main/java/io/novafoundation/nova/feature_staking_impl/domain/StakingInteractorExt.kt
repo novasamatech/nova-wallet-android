@@ -1,9 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.domain
 
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
 
 fun isNominationActive(
@@ -44,12 +45,12 @@ fun minimumStake(
     minimumNominatorBond: BigInteger,
 ): BigInteger {
     val stakeByNominator = exposures
-        .map(Exposure::others)
-        .flatten()
-        .fold(mutableMapOf<String, BigInteger>()) { acc, individualExposure ->
-            val currentExposure = acc.getOrDefault(individualExposure.who.toHexString(), BigInteger.ZERO)
-
-            acc[individualExposure.who.toHexString()] = currentExposure + individualExposure.value
+        .fold(mutableMapOf<AccountIdKey, BigInteger>()) { acc, exposure ->
+            exposure.others.forEach { individualExposure ->
+                val key = individualExposure.who.intoKey()
+                val currentExposure = acc.getOrDefault(key, BigInteger.ZERO)
+                acc[key] = currentExposure + individualExposure.value
+            }
 
             acc
         }

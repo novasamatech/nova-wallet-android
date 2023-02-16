@@ -35,6 +35,7 @@ import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -131,6 +132,7 @@ class WalletRepositoryImpl(
     override fun assetFlow(metaId: Long, chainAsset: Chain.Asset): Flow<Asset> {
         return assetCache.observeAsset(metaId, chainAsset.chainId, chainAsset.id)
             .map { mapAssetLocalToAsset(it, chainAsset) }
+            .distinctUntilChanged()
     }
 
     override suspend fun getAsset(accountId: AccountId, chainAsset: Chain.Asset): Asset? {

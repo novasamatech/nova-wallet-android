@@ -9,10 +9,10 @@ import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.Alert
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.Alert.ChangeValidators.Reason
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -35,19 +35,19 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 class RelaychainAlertsComponentFactory(
-    private val stakingInteractor: StakingInteractor,
     private val alertsInteractor: AlertsInteractor,
     private val resourceManager: ResourceManager,
     private val redeemValidationSystem: StakeActionsValidationSystem,
     private val bondMoreValidationSystem: StakeActionsValidationSystem,
     private val router: StakingRouter,
+    private val stakingSharedComputation: StakingSharedComputation,
 ) {
 
     fun create(
         assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext,
     ): AlertsComponent = RelaychainAlertsComponent(
-        stakingInteractor = stakingInteractor,
+        stakingSharedComputation = stakingSharedComputation,
         resourceManager = resourceManager,
         alertsInteractor = alertsInteractor,
         redeemValidationSystem = redeemValidationSystem,
@@ -60,9 +60,9 @@ class RelaychainAlertsComponentFactory(
 }
 
 private class RelaychainAlertsComponent(
-    private val stakingInteractor: StakingInteractor,
     private val alertsInteractor: AlertsInteractor,
     private val resourceManager: ResourceManager,
+    private val stakingSharedComputation: StakingSharedComputation,
 
     private val hostContext: ComponentHostContext,
     private val assetWithChain: ChainWithAsset,
@@ -74,14 +74,15 @@ private class RelaychainAlertsComponent(
     CoroutineScope by hostContext.scope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
 
-    private val selectedAccountStakingStateFlow = hostContext.selectedAccount.flatMapLatest {
-        stakingInteractor.selectedAccountStakingStateFlow(it, assetWithChain)
-    }.shareInBackground()
+    private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
+        assetWithChain = assetWithChain,
+        scope = hostContext.scope
+    )
 
     override val events = MutableLiveData<Event<AlertsEvent>>()
 
     override val state: Flow<AlertsState?> = selectedAccountStakingStateFlow.flatMapLatest {
-        alertsInteractor.getAlertsFlow(it)
+        alertsInteractor.getAlertsFlow(it, hostContext.scope)
     }
         .mapList { mapAlertToAlertModel(it) }
         .withLoading()
