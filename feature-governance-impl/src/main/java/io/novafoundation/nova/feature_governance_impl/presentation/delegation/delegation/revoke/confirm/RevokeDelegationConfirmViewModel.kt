@@ -86,7 +86,7 @@ class RevokeDelegationConfirmViewModel(
     val showNextProgress: Flow<Boolean> = _showNextProgress
 
     val delegateLabelModel = flowOf { delegateLabelUseCase.getDelegateLabel(payload.delegateId) }
-        .map { delegateFormatters.formatDelegateLabel(it, governanceSharedState.chain()) }
+        .map { delegateFormatters.formatDelegateLabel(it.accountId, it.metadata, it.onChainIdentity?.display, governanceSharedState.chain()) }
         .withSafeLoading()
         .shareInBackground()
 
@@ -132,8 +132,8 @@ class RevokeDelegationConfirmViewModel(
     }
 
     fun delegateClicked() = launch {
-        val addressModel = delegateLabelModel.firstLoaded().addressModel
-        val type = ExternalActions.Type.Address(addressModel.address)
+        val address = delegateLabelModel.firstLoaded().address
+        val type = ExternalActions.Type.Address(address)
 
         externalActions.showExternalActions(type, governanceSharedState.chain())
     }

@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.utils.textwatchers.NonTranslucentEmojisTextWatcher
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getRippleMask
@@ -140,8 +139,6 @@ private class ReferendumChildHolder(
                 mask = getRippleMask(cornerSizeDp = 12)
             )
         }
-
-        containerView.itemReferendumYourVoteDetails.addTextChangedListener(NonTranslucentEmojisTextWatcher())
     }
 
     fun bind(item: ReferendumModel) = with(containerView) {

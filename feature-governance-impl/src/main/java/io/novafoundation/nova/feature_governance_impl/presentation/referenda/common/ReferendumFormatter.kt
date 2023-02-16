@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.With
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.GenericVoter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.SplitVote
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoteDirectionModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumStatusModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimationStyleRefresher
@@ -34,8 +35,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourMultiVoteModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoteDirectionModel
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoteModel
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoteModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
@@ -79,6 +79,7 @@ private data class AccountVoteFormatComponent(
     val votes: String,
     val multiplier: String
 )
+
 class RealReferendumFormatter(
     private val resourceManager: ResourceManager,
     private val trackFormatter: TrackFormatter
