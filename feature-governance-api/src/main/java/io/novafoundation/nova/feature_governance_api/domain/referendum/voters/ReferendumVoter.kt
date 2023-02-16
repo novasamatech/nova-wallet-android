@@ -27,13 +27,14 @@ fun ReferendumVoter(
     identity: Identity?,
     accountId: AccountId,
     chainAsset: Chain.Asset,
-    delegators: List<ReferendumVoterDelegator>
+    delegators: List<ReferendumVoterDelegator>,
 ): ReferendumVoter {
     val vote = ConvictionVote(accountVote, chainAsset)
 
     return ReferendumVoter(vote, identity, accountId, delegators, null)
 }
 
+// TODO support split and splitAbstain votes
 fun ConvictionVote(accountVote: AccountVote, chainAsset: Chain.Asset): GenericVoter.ConvictionVote? {
     return when (accountVote) {
         is AccountVote.Standard -> {
@@ -41,5 +42,8 @@ fun ConvictionVote(accountVote: AccountVote, chainAsset: Chain.Asset): GenericVo
             GenericVoter.ConvictionVote(amount, accountVote.vote.conviction)
         }
         AccountVote.Unsupported -> null
+
+        is AccountVote.Split -> null
+        is AccountVote.SplitAbstain -> null
     }
 }

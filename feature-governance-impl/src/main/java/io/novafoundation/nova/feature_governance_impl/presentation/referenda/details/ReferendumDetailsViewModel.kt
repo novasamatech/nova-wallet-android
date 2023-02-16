@@ -315,6 +315,7 @@ class ReferendumDetailsViewModel(
                 voteTypeRes = R.string.referendum_vote_nay,
                 votesValue = formatVotesAmount(voting.approval.nayVotes.amount, chainAsset)
             )
+            VoteType.ABSTAIN -> null
         }
     }
 
