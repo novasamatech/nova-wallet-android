@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.nameOrAddress
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateIcon
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateTypeModelIcon
 import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVoterAddressContainer
@@ -70,7 +71,7 @@ private object MnemonicPayloadGenerator : PayloadGenerator<ExpandableVoterRVItem
 
 private class DiffCallback : BaseGroupedDiffCallback<ExpandableVoterRVItem, DelegatorVoterRVItem>(ExpandableVoterRVItem::class.java) {
     override fun areGroupItemsTheSame(oldItem: ExpandableVoterRVItem, newItem: ExpandableVoterRVItem): Boolean {
-        return oldItem.voter.addressModel.address == newItem.voter.addressModel.address
+        return oldItem.metadata.address == newItem.metadata.address
     }
 
     override fun areGroupContentsTheSame(oldItem: ExpandableVoterRVItem, newItem: ExpandableVoterRVItem): Boolean {
@@ -78,7 +79,7 @@ private class DiffCallback : BaseGroupedDiffCallback<ExpandableVoterRVItem, Dele
     }
 
     override fun areChildItemsTheSame(oldItem: DelegatorVoterRVItem, newItem: DelegatorVoterRVItem): Boolean {
-        return oldItem.voter.addressModel.address == newItem.voter.addressModel.address
+        return oldItem.metadata.address == newItem.metadata.address
     }
 
     override fun areChildContentsTheSame(oldItem: DelegatorVoterRVItem, newItem: DelegatorVoterRVItem): Boolean {
@@ -116,18 +117,14 @@ class ExpandableVoterHolder(
             containerView.setOnClickListener { eventHandler.onVoterClick(absoluteAdapterPosition) }
         }
 
-        val delegateIcon = item.metadata?.icon
-        if (delegateIcon == null) {
-            itemVoterImage.setImageDrawable(item.voter.addressModel.image)
-        } else {
-            itemVoterImage.setDelegateIcon(delegateIcon, imageLoader, 4)
-        }
-        itemVoterType.setDelegateTypeModelIcon(item.metadata?.type)
-        itemVoterAddress.text = item.voter.addressModel.nameOrAddress
+        val delegateIcon = item.metadata.icon
+        itemVoterImage.setDelegateIcon(delegateIcon, imageLoader, 4)
+        itemVoterType.setDelegateTypeModelIcon(item.metadata.type)
+        itemVoterAddress.text = item.metadata.nameOrAddress()
         itemVoterAddress.ellipsize = item.addressEllipsize
         itemVoterAddress.requestLayout()
-        itemVotesCount.text = item.voter.vote.votesCount
-        itemVotesCountDetails.text = item.voter.vote.votesCountDetails
+        itemVotesCount.text = item.vote.votesCount
+        itemVotesCountDetails.text = item.vote.votesCountDetails
         itemVotesCountDetails.isVisible = item.showConviction
     }
 
@@ -138,6 +135,8 @@ class ExpandableVoterHolder(
             } else {
                 itemVoterChevron.setImageResource(R.drawable.ic_chevron_down)
             }
+        } else {
+            itemVoterChevron.setImageDrawable(null)
         }
     }
 }
@@ -157,19 +156,14 @@ class VoterDelegatorHolder(
     }
 
     fun bind(item: DelegatorVoterRVItem) = with(containerView) {
-        val delegateIcon = item.metadata?.icon
-        if (delegateIcon == null) {
-            itemVoterImage.setImageDrawable(item.voter.addressModel.image)
-        } else {
-            itemVoterImage.setDelegateIcon(delegateIcon, imageLoader, 4)
-        }
+        val delegateIcon = item.metadata.icon
+        itemVoterImage.setDelegateIcon(delegateIcon, imageLoader, 4)
 
-        itemVoterType.setDelegateTypeModelIcon(item.metadata?.type)
-        itemVoterImage.setImageDrawable(item.voter.addressModel.image)
-        itemVoterAddress.text = item.voter.addressModel.nameOrAddress
+        itemVoterType.setDelegateTypeModelIcon(item.metadata.type)
+        itemVoterAddress.text = item.metadata.nameOrAddress()
         itemVoterAddress.ellipsize = item.addressEllipsize
         itemVoterAddress.requestLayout()
-        itemVotesCount.text = item.voter.vote.votesCount
-        itemVotesCountDetails.text = item.voter.vote.votesCountDetails
+        itemVotesCount.text = item.vote.votesCount
+        itemVotesCountDetails.text = item.vote.votesCountDetails
     }
 }

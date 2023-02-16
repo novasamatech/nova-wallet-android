@@ -81,7 +81,7 @@ class DelegateViewHolder(
     }
 
     fun bind(model: DelegateListModel) = with(containerView) {
-        itemDelegateIcon.setDelegateIcon(model.icon, imageLoader, 8)
+        itemDelegateIcon.setDelegateIcon(icon = model.icon, imageLoader = imageLoader, squareCornerRadiusDp = 8)
         itemDelegateTitle.text = model.name
         itemDelegateDescription.setTextOrHide(model.description)
         itemDelegateDelegations.text = model.stats.delegations

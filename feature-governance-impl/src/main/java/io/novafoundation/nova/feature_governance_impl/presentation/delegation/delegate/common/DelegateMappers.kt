@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.images.Icon
-import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.getConvictionVote
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.Delegate
@@ -199,15 +198,12 @@ class RealDelegateMappers(
     ): DelegateLabelModel {
         return DelegateLabelModel(
             icon = mapDelegateIconToUi(accountId, metadata),
-            addressModel = addressIconGenerator.createAccountAddressModel(
-                chain = chain,
+            address = chain.addressOf(accountId),
+            name = formatDelegateName(
+                metadata = metadata,
+                identityName = identityName,
                 accountId = accountId,
-                name = formatDelegateName(
-                    metadata = metadata,
-                    identityName = identityName,
-                    accountId = accountId,
-                    chain = chain
-                )
+                chain = chain
             ),
             type = mapDelegateTypeToUi(metadata?.accountType)
         )

@@ -8,7 +8,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class ReferendumVoter(
-    override val vote: GenericVoter.ConvictionVote?,
+    override val vote: GenericVoter.ConvictionVote,
     override val identity: Identity?,
     override val accountId: AccountId,
     val metadata: DelegateLabel.Metadata?,
@@ -33,7 +33,7 @@ fun ReferendumVoter(
     val vote = ConvictionVote(accountVote, chainAsset)
 
     return ReferendumVoter(
-        vote = vote,
+        vote = vote!!,
         identity = identity,
         accountId = accountId,
         metadata = metadata,

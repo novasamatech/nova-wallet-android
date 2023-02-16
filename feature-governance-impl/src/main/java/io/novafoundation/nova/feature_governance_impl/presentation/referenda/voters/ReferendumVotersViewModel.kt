@@ -23,7 +23,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.list.ExpandableVoterRVItem
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.list.VoterRvItem
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.formatConvictionVoter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.formatConvictionVote
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
@@ -58,7 +58,6 @@ class ReferendumVotersViewModel(
     private val expandedVoters: MutableStateFlow<Set<Int>> = MutableStateFlow(setOf())
 
     private val ev = expandedVoters
-        .shareInBackground()
 
     val voterModels = combine(voterList, ev) { voters, expandedVoters ->
         val chain = chainFlow.first()
@@ -82,7 +81,7 @@ class ReferendumVotersViewModel(
         val voters = voterModels.firstOnLoad()
         val voterItem = voters[position]
         val chain = chainFlow.first()
-        val type = ExternalActions.Type.Address(voterItem.voter.addressModel.address)
+        val type = ExternalActions.Type.Address(voterItem.metadata.address)
         externalActions.showExternalActions(type, chain)
     }
 
@@ -118,7 +117,7 @@ class ReferendumVotersViewModel(
 
         return ExpandableVoterRVItem(
             primaryIndex = index,
-            voter = votersFormatter.formatConvictionVoter(referendumVoter, chain, chainAsset),
+            vote = votersFormatter.formatConvictionVote(referendumVoter.vote, chainAsset),
             metadata = delegateMappers.formatDelegateLabel(
                 referendumVoter.accountId,
                 referendumVoter.metadata,
@@ -134,9 +133,8 @@ class ReferendumVotersViewModel(
 
     private suspend fun mapVoterDelegatorsToRvItem(referendumVoter: ReferendumVoter, chain: Chain, chainAsset: Chain.Asset): List<DelegatorVoterRVItem> {
         return referendumVoter.delegators.map {
-            val delegator = votersFormatter.formatConvictionVoter(it, chain, chainAsset)
             DelegatorVoterRVItem(
-                voter = delegator,
+                vote = votersFormatter.formatConvictionVote(it.vote, chainAsset),
                 metadata = delegateMappers.formatDelegateLabel(
                     accountId = it.accountId,
                     metadata = it.metadata,

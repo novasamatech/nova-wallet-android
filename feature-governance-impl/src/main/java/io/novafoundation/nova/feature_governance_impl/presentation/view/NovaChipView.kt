@@ -47,7 +47,8 @@ class NovaChipView @JvmOverloads constructor(
         val textTopMargin: Float,
         val textBottomMargin: Float,
         val textHorizontalMargin: Float,
-        @StyleRes val textAppearanceRes: Int
+        @StyleRes val textAppearanceRes: Int,
+        val cornerRadiusDp: Int
     ) {
         NORMAL(
             drawablePadding = 6f,
@@ -56,7 +57,8 @@ class NovaChipView @JvmOverloads constructor(
             textTopMargin = 4.5f,
             textBottomMargin = 4.5f,
             textHorizontalMargin = 8.0f,
-            textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Caps1
+            textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Caps1,
+            cornerRadiusDp = 8
         ),
 
         SMALL(
@@ -66,17 +68,19 @@ class NovaChipView @JvmOverloads constructor(
             textTopMargin = 1.5f,
             textBottomMargin = 1.5f,
             textHorizontalMargin = 6.0f,
-            textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Caps2
+            textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Caps2,
+            cornerRadiusDp = 6
         ),
 
         SUM(
             drawablePadding = 0f,
             iconVerticalMargin = 0f,
             iconHorizontalMargin = 0f,
-            textTopMargin = 1.5f,
-            textBottomMargin = 2.5f,
+            textTopMargin = 2f,
+            textBottomMargin = 2f,
             textHorizontalMargin = 6.0f,
-            textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Footnote
+            textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Footnote,
+            cornerRadiusDp = 8
         )
     }
 
@@ -229,8 +233,8 @@ class NovaChipView @JvmOverloads constructor(
     }
 
     private fun setChipBackground(backgroundTintColor: Int) {
-        background = getRoundedCornerDrawable(backgroundTintColor, cornerSizeDp = 8)
-            .withRippleMask(getRippleMask(cornerSizeDp = 8))
+        background = getRoundedCornerDrawable(backgroundTintColor, cornerSizeDp = size.cornerRadiusDp)
+            .withRippleMask(getRippleMask(cornerSizeDp = size.cornerRadiusDp))
     }
 
     private fun refreshSize() {

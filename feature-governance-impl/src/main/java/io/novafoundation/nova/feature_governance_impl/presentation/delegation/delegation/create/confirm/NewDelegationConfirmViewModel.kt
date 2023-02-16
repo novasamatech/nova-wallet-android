@@ -146,8 +146,8 @@ class NewDelegationConfirmViewModel(
     }
 
     fun delegateClicked() = launch {
-        val addressModel = delegateLabelModel.firstLoaded().addressModel
-        val type = ExternalActions.Type.Address(addressModel.address)
+        val address = delegateLabelModel.firstLoaded().address
+        val type = ExternalActions.Type.Address(address)
 
         externalActions.showExternalActions(type, governanceSharedState.chain())
     }
