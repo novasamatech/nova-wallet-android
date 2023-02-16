@@ -133,6 +133,25 @@ private fun bindAccountVote(decoded: Any?): AccountVote {
             )
         }
 
+        "Split" -> {
+            val splitVote = decoded.value.castToStruct()
+
+            AccountVote.Split(
+                aye = bindNumber(splitVote["aye"]),
+                nay = bindNumber(splitVote["nay"])
+            )
+        }
+
+        "SplitAbstain" -> {
+            val splitVote = decoded.value.castToStruct()
+
+            AccountVote.SplitAbstain(
+                aye = bindNumber(splitVote["aye"]),
+                nay = bindNumber(splitVote["nay"]),
+                abstain = bindNumber(splitVote["abstain"])
+            )
+        }
+
         else -> AccountVote.Unsupported
     }
 }

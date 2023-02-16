@@ -15,7 +15,9 @@ class DirectVotesResponse(
 
 class DirectVoteRemote(
     val referendumId: BigInteger,
-    val standardVote: StandardVoteRemote?
+    val standardVote: StandardVoteRemote?,
+    val splitVote: SplitVoteRemote?,
+    val splitAbstainVote: SplitAbstainVoteRemote?
 )
 
 class DelegatedVoteRemote(

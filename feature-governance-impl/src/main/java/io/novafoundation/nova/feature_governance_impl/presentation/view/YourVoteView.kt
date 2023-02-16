@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.ColorRes
-import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.letOrHide
@@ -16,11 +15,10 @@ import kotlinx.android.synthetic.main.view_your_vote.view.viewYourVoteType
 import kotlinx.android.synthetic.main.view_your_vote.view.viewYourVoteValue
 import kotlinx.android.synthetic.main.view_your_vote.view.viewYourVoteValueDetails
 
-class YourVoteModel(
-    @StringRes val voteTypeTextRes: Int,
-    @ColorRes val voteTypeColorRes: Int,
+data class YourVoteModel(
     val voteTitle: String,
     val vote: VoteModel,
+    val voteDirection: VoteDirectionModel,
 )
 
 class YourVoteView @JvmOverloads constructor(
@@ -33,11 +31,10 @@ class YourVoteView @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.view_your_vote, this)
-        background = getRoundedCornerDrawable(R.color.block_background)
     }
 
-    fun setVoteType(@StringRes voteTypeRes: Int, @ColorRes voteColorRes: Int) {
-        viewYourVoteType.setText(voteTypeRes)
+    fun setVoteType(voteType: String, @ColorRes voteColorRes: Int) {
+        viewYourVoteType.text = voteType
         viewYourVoteType.setTextColorRes(voteColorRes)
     }
 
@@ -52,7 +49,7 @@ class YourVoteView @JvmOverloads constructor(
 }
 
 fun YourVoteView.setVoteModelOrHide(maybeModel: YourVoteModel?) = letOrHide(maybeModel) { model ->
-    setVoteType(model.voteTypeTextRes, model.voteTypeColorRes)
+    setVoteType(model.voteDirection.text, model.voteDirection.textColor)
     setVoteValue(model.vote.votesCount, model.vote.votesCountDetails)
     setVoteTitle(model.voteTitle)
 }

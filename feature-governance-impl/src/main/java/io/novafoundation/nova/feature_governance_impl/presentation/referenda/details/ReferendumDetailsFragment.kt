@@ -24,7 +24,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDetailsModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.applyTo
-import io.novafoundation.nova.feature_governance_impl.presentation.view.setVoteModelOrHide
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsContainer
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsDappList
 import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsDescription
@@ -157,7 +156,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         referendumDetailsTitle.text = model.title
         setDescription(model.description)
 
-        referendumDetailsYourVote.setVoteModelOrHide(model.yourVote)
+        referendumDetailsYourVote.setModel(model.yourVote)
 
         referendumDetailsVotingStatus.setStatus(model.statusModel)
         referendumDetailsVotingStatus.setTimeEstimation(model.timeEstimation)

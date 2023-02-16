@@ -163,26 +163,37 @@ class Gov2DelegationsRepository(
     private fun SubQueryNodes<DirectVoteRemote>.toUserVoteMap(): Map<ReferendumId, UserVote.Direct?> {
         return nodes.associateBy(
             keySelector = { ReferendumId(it.referendumId) },
-            valueTransform = { directVoteRemote ->
-                val standardVote = directVoteRemote.standardVote ?: return@associateBy UserVote.Direct(AccountVote.Unsupported)
-
-                UserVote.Direct(
-                    AccountVote.Standard(
-                        balance = standardVote.vote.amount,
-                        vote = Vote(
-                            aye = directVoteRemote.standardVote.aye,
-                            conviction = mapConvictionFromString(directVoteRemote.standardVote.vote.conviction)
-                        )
-                    ),
-                )
-            }
+            valueTransform = { directVoteRemote -> UserVote.Direct(mapDirectVoteRemoteToAccountVote(directVoteRemote)) }
         )
+    }
+
+    private fun mapDirectVoteRemoteToAccountVote(vote: DirectVoteRemote): AccountVote {
+        return when {
+            vote.standardVote != null -> AccountVote.Standard(
+                balance = vote.standardVote.vote.amount,
+                vote = Vote(
+                    aye = vote.standardVote.aye,
+                    conviction = mapConvictionFromString(vote.standardVote.vote.conviction)
+                )
+            )
+            vote.splitVote != null -> AccountVote.Split(
+                aye = vote.splitVote.ayeAmount,
+                nay = vote.splitVote.nayAmount
+            )
+            vote.splitAbstainVote != null -> AccountVote.SplitAbstain(
+                aye = vote.splitAbstainVote.ayeAmount,
+                nay = vote.splitAbstainVote.nayAmount,
+                abstain = vote.splitAbstainVote.abstainAmount
+            )
+            else -> AccountVote.Unsupported
+        }
     }
 
     private fun SubQueryNodes<DelegatedVoteRemote>.toUserVoteMap(chain: Chain): Map<ReferendumId, UserVote.Delegated?> {
         return nodes.associateBy(
             keySelector = { ReferendumId(it.parent.referendumId) },
             valueTransform = { delegatedVoteRemote ->
+                // delegated votes do not participate in any vote rather than standard
                 val aye = delegatedVoteRemote.parent.standardVote?.aye ?: return@associateBy null
                 val standardVote = delegatedVoteRemote.vote
 

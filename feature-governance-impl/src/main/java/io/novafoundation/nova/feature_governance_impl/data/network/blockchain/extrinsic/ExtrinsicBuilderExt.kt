@@ -133,5 +133,7 @@ private fun AccountVote.prepareForEncoding(): Any {
                 "balance" to balance
             )
         )
+
+        else -> error("Not supported yet")
     }
 }

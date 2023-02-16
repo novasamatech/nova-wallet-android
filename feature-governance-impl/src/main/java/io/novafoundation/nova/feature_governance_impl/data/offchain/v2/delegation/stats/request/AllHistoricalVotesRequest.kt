@@ -10,6 +10,8 @@ class AllHistoricalVotesRequest(address: String) {
             nodes {
               referendumId
               standardVote
+              splitVote
+              splitAbstainVote
             }
           }
           
@@ -37,6 +39,8 @@ class DirectHistoricalVotesRequest(address: String, recentVotesBlockThreshold: B
             nodes {
               referendumId
               standardVote
+              splitVote
+              splitAbstainVote
             }
           }
         }

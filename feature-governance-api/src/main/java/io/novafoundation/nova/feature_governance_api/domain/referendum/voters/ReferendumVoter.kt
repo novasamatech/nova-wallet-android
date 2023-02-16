@@ -41,6 +41,7 @@ fun ReferendumVoter(
     )
 }
 
+// TODO support split and splitAbstain votes
 fun ConvictionVote(accountVote: AccountVote, chainAsset: Chain.Asset): GenericVoter.ConvictionVote? {
     return when (accountVote) {
         is AccountVote.Standard -> {
@@ -48,5 +49,8 @@ fun ConvictionVote(accountVote: AccountVote, chainAsset: Chain.Asset): GenericVo
             GenericVoter.ConvictionVote(amount, accountVote.vote.conviction)
         }
         AccountVote.Unsupported -> null
+
+        is AccountVote.Split -> null
+        is AccountVote.SplitAbstain -> null
     }
 }
