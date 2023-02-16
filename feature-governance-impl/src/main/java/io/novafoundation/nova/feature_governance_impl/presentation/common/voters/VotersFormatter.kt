@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.presentation.voters
+package io.novafoundation.nova.feature_governance_impl.presentation.common.voters
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -54,7 +54,7 @@ suspend fun VotersFormatter.formatConvictionVoter(
 
 class RealVotersFormatter(
     private val addressIconGenerator: AddressIconGenerator,
-    private val resourceManager: ResourceManager,
+    private val resourceManager: ResourceManager
 ) : VotersFormatter {
 
     override suspend fun formatVoter(voter: GenericVoter<*>, chain: Chain, chainAsset: Chain.Asset, voteCountDetails: String): VoterModel {

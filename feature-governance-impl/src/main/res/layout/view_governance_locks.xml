@@ -39,6 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:textColor="@color/chip_text"
         app:chipSize="sum"
         app:chipTextAppearance="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
         app:layout_constraintBottom_toBottomOf="parent"

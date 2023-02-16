@@ -16,8 +16,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoterModel
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.list.VotersAdapter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.list.VoterItemDecoration
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.list.VotersAdapter
 import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersCount
 import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersList
 import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersPlaceholder
@@ -40,7 +40,7 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), Vote
     @Inject
     protected lateinit var imageLoader: ImageLoader
 
-    private val votersAdapter by lazy(LazyThreadSafetyMode.NONE) { VotersAdapter(this) }
+    private val votersAdapter by lazy(LazyThreadSafetyMode.NONE) { VotersAdapter(this, imageLoader) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,15 +50,10 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), Vote
         return inflater.inflate(R.layout.fragment_referendum_voters, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initViews()
-    }
-
     override fun initViews() {
         referendumVotersToolbar.setTitle(viewModel.title)
         referendumVotersList.adapter = votersAdapter
-
+        referendumVotersList.addItemDecoration(VoterItemDecoration(requireContext(), votersAdapter))
         referendumVotersToolbar.setHomeButtonListener { viewModel.backClicked() }
     }
 
@@ -76,7 +71,7 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), Vote
         setupExternalActions(viewModel)
 
         viewModel.voterModels.observe {
-            if (it is LoadingState.Loaded<List<VoterModel>>) {
+            if (it is LoadingState.Loaded) {
                 val voters = it.data
                 referendumVotersCount.text = voters.size.format()
                 votersAdapter.submitList(voters)
@@ -91,7 +86,11 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), Vote
         }
     }
 
-    override fun onVoterClick(voter: VoterModel) {
-        viewModel.voterClicked(voter)
+    override fun onVoterClick(position: Int) {
+        viewModel.voterClicked(position)
+    }
+
+    override fun onExpandItemClick(position: Int) {
+        viewModel.expandVoterClicked(position)
     }
 }

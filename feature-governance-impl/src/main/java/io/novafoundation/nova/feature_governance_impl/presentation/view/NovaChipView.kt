@@ -24,8 +24,10 @@ import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.feature_governance_impl.R
+import kotlinx.android.synthetic.main.view_chip.view.chipDrawablePadding
 import kotlinx.android.synthetic.main.view_chip.view.chipIcon
 import kotlinx.android.synthetic.main.view_chip.view.chipText
 import kotlin.math.roundToInt
@@ -39,45 +41,57 @@ class NovaChipView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
 
     enum class Size(
+        val drawablePadding: Float,
         val iconVerticalMargin: Float,
         val iconHorizontalMargin: Float,
         val textTopMargin: Float,
         val textBottomMargin: Float,
         val textHorizontalMargin: Float,
-        @StyleRes val textAppearanceRes: Int
+        @StyleRes val textAppearanceRes: Int,
+        val cornerRadiusDp: Int
     ) {
         NORMAL(
+            drawablePadding = 6f,
             iconVerticalMargin = 3.0f,
             iconHorizontalMargin = 6.0f,
             textTopMargin = 4.5f,
             textBottomMargin = 4.5f,
             textHorizontalMargin = 8.0f,
-            textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Caps1
+            textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Caps1,
+            cornerRadiusDp = 8
         ),
 
         SMALL(
+            drawablePadding = 4f,
             iconVerticalMargin = 1.5f,
             iconHorizontalMargin = 4.0f,
             textTopMargin = 1.5f,
             textBottomMargin = 1.5f,
             textHorizontalMargin = 6.0f,
-            textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Caps2
+            textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Caps2,
+            cornerRadiusDp = 6
         ),
 
         SUM(
+            drawablePadding = 0f,
             iconVerticalMargin = 0f,
             iconHorizontalMargin = 0f,
-            textTopMargin = 1.5f,
-            textBottomMargin = 2.5f,
+            textTopMargin = 2f,
+            textBottomMargin = 2f,
             textHorizontalMargin = 6.0f,
-            textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Footnote
+            textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Footnote,
+            cornerRadiusDp = 8
         )
     }
 
     private var size: Size = SIZE_DEFAULT
 
     private val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
-        FeatureUtils.getCommonApi(context).imageLoader()
+        if (isInEditMode) {
+            ImageLoader.invoke(context)
+        } else {
+            FeatureUtils.getCommonApi(context).imageLoader()
+        }
     }
 
     init {
@@ -137,23 +151,30 @@ class NovaChipView @JvmOverloads constructor(
         } else {
             size.textHorizontalMargin.dp
         }
-        updatePadding(start = startPadding)
+
+        val endPadding = if (chipText.isVisible) {
+            size.textHorizontalMargin.dp
+        } else {
+            size.iconHorizontalMargin.dp
+        }
+
+        updatePadding(start = startPadding, end = endPadding)
 
         chipIcon.updateLayoutParams<MarginLayoutParams> {
             val vertical = size.iconVerticalMargin.dp
-            val horizontal = size.iconHorizontalMargin.dp
-            setMargins(0, vertical, horizontal, vertical)
+            setMargins(0, vertical, 0, vertical)
         }
 
         chipText.updateLayoutParams<MarginLayoutParams> {
             val top = size.textTopMargin.dp
             val bottom = size.textBottomMargin.dp
-            val end = size.textHorizontalMargin.dp
 
-            setMargins(0, top, end, bottom)
+            setMargins(0, top, 0, bottom)
         }
 
         chipText.setTextAppearance(size.textAppearanceRes)
+
+        chipDrawablePadding.layoutParams = LayoutParams(size.drawablePadding.dp, LayoutParams.MATCH_PARENT)
     }
 
     fun setIconSize(value: Float) {
@@ -171,16 +192,19 @@ class NovaChipView @JvmOverloads constructor(
             chipIcon.setIcon(icon, imageLoader)
         }
         useIcon(icon != null)
+        invalidateDrawablePadding()
     }
 
     fun setIconDrawable(drawable: Drawable?) {
         chipIcon.setImageDrawable(drawable)
         useIcon(drawable != null)
+        invalidateDrawablePadding()
     }
 
     fun setIcon(@DrawableRes drawableRes: Int) {
         chipIcon.setImageResource(drawableRes)
         useIcon(true)
+        invalidateDrawablePadding()
     }
 
     fun setStyle(@ColorRes backgroundColorRes: Int, @ColorRes textColorRes: Int, @ColorRes iconColorRes: Int) {
@@ -190,7 +214,8 @@ class NovaChipView @JvmOverloads constructor(
     }
 
     fun setText(text: String?) {
-        chipText.text = text
+        chipText.setTextOrHide(text)
+        invalidateDrawablePadding()
     }
 
     private fun useIcon(useIcon: Boolean) {
@@ -203,9 +228,13 @@ class NovaChipView @JvmOverloads constructor(
         chipIcon.clear()
     }
 
+    private fun invalidateDrawablePadding() {
+        chipDrawablePadding.isVisible = chipIcon.isVisible && chipText.isVisible
+    }
+
     private fun setChipBackground(backgroundTintColor: Int) {
-        background = getRoundedCornerDrawable(backgroundTintColor, cornerSizeDp = 8)
-            .withRippleMask(getRippleMask(cornerSizeDp = 8))
+        background = getRoundedCornerDrawable(backgroundTintColor, cornerSizeDp = size.cornerRadiusDp)
+            .withRippleMask(getRippleMask(cornerSizeDp = size.cornerRadiusDp))
     }
 
     private fun refreshSize() {
