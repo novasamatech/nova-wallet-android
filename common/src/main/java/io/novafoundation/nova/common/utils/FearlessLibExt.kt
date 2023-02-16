@@ -154,6 +154,8 @@ fun Module.constantOrNull(name: String) = constants[name]
 
 fun RuntimeMetadata.staking() = module(Modules.STAKING)
 
+fun RuntimeMetadata.voterListOrNull() = moduleOrNull(Modules.VOTER_LIST)
+
 fun RuntimeMetadata.system() = module(Modules.SYSTEM)
 
 fun RuntimeMetadata.balances() = module(Modules.BALANCES)
@@ -282,4 +284,6 @@ object Modules {
     const val PREIMAGE = "Preimage"
 
     const val DEMOCRACY = "Democracy"
+
+    const val VOTER_LIST = "VoterList"
 }

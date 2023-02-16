@@ -133,6 +133,11 @@ private class RelaychainAlertsComponent(
                 resourceManager.getString(R.string.staking_set_validators_message),
                 AlertModel.Type.CallToAction { router.openCurrentValidators() }
             )
+            Alert.Rebag -> AlertModel(
+                resourceManager.getString(R.string.staking_alert_rebag_title),
+                resourceManager.getString(R.string.staking_alert_rebag_message),
+                AlertModel.Type.CallToAction { hostContext.errorDisplayer(NotImplementedError("TODO")) }
+            )
         }
     }
 

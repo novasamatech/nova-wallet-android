@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.AccountRewardDestinationUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.AccountValidatorPrefsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ActiveEraUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.BagListNodeUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.CounterForNominatorsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.CurrentEraUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.HistoryDepthUpdater
@@ -230,6 +231,20 @@ class RelaychainStakingUpdatersModule {
     )
 
     @Provides
+    @FeatureScope
+    fun provideBagListNodeUpdater(
+        storageCache: StorageCache,
+        scope: AccountStakingScope,
+        sharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+    ) = BagListNodeUpdater(
+        scope,
+        storageCache,
+        sharedState,
+        chainRegistry,
+    )
+
+    @Provides
     @Relaychain
     @FeatureScope
     fun provideRelaychainStakingUpdaters(
@@ -246,6 +261,7 @@ class RelaychainStakingUpdatersModule {
         minBondUpdater: MinBondUpdater,
         maxNominatorsUpdater: MaxNominatorsUpdater,
         counterForNominatorsUpdater: CounterForNominatorsUpdater,
+        bagListNodeUpdater: BagListNodeUpdater,
     ): List<Updater> = listOf(
         activeEraUpdater,
         validatorExposureUpdater,
@@ -260,5 +276,6 @@ class RelaychainStakingUpdatersModule {
         minBondUpdater,
         maxNominatorsUpdater,
         counterForNominatorsUpdater,
+        bagListNodeUpdater
     )
 }

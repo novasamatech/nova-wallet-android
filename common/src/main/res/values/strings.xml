@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="staking_alert_rebag_title">Staking improvements</string>
+    <string name="staking_alert_rebag_message">Having outdated position in the queue of stake assignment to a validator may suspend your rewards</string>
+
     <string name="delegation_revoke_hint_unlock">After the undelegating period has expired, you will need to unlock your tokens.</string>
 
     <string name="delegation_edit_delegation">Edit delegation</string>
