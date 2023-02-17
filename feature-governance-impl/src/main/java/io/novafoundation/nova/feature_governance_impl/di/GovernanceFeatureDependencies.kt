@@ -20,7 +20,6 @@ import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentit
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -96,8 +95,6 @@ interface GovernanceFeatureDependencies {
     val governanceDAppsDao: GovernanceDAppsDao
 
     val networkApiCreator: NetworkApiCreator
-
-    val accountInteractor: AccountInteractor
 
     @Caching
     fun cachingIconGenerator(): AddressIconGenerator

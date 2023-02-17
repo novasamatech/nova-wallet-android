@@ -18,7 +18,7 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.withLoadingShared
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.validation.handleChainAccountNotFound
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -70,7 +70,7 @@ class DelegateDetailsViewModel(
     private val trackFormatter: TrackFormatter,
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
-    private val accountInteractor: AccountInteractor,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
     val markwon: Markwon,
 ) : BaseViewModel(), ExternalActions.Presentation by externalActions, Validatable by validationExecutor {
 
@@ -247,7 +247,7 @@ class DelegateDetailsViewModel(
 
     private fun openNewDelegation(editMode: Boolean) = launch {
         val chain = governanceSharedState.chain()
-        val metaAccount = accountInteractor.getSelectedMetaAccount()
+        val metaAccount = selectedAccountUseCase.getSelectedMetaAccount()
         val validationPayload = AddDelegationValidationPayload(chain, metaAccount)
 
         validationExecutor.requireValid(

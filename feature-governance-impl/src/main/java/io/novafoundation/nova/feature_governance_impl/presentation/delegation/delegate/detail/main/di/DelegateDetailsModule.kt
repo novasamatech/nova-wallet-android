@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetailsInteractor
@@ -43,7 +43,7 @@ class DelegateDetailsModule {
         trackFormatter: TrackFormatter,
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
-        accountInteractor: AccountInteractor
+        selectedAccountUseCase: SelectedAccountUseCase
     ): ViewModel {
         return DelegateDetailsViewModel(
             interactor = interactor,
@@ -57,7 +57,7 @@ class DelegateDetailsModule {
             trackFormatter = trackFormatter,
             resourceManager = resourceManager,
             validationExecutor = validationExecutor,
-            accountInteractor = accountInteractor,
+            selectedAccountUseCase = selectedAccountUseCase,
             markwon = markwon,
         )
     }
