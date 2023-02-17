@@ -13,11 +13,11 @@ class SplitVoteRemote(val ayeAmount: Balance, val nayAmount: Balance)
 class SplitAbstainVoteRemote(val ayeAmount: Balance, val nayAmount: Balance, val abstainAmount: Balance)
 
 interface MultiVoteRemote {
-    
+
     val standardVote: StandardVoteRemote?
-    
+
     val splitVote: SplitVoteRemote?
-    
+
     val splitAbstainVote: SplitAbstainVoteRemote?
 }
 
@@ -25,7 +25,7 @@ fun mapMultiVoteRemoteToAccountVote(vote: MultiVoteRemote): AccountVote {
     val standard = vote.standardVote
     val split = vote.splitVote
     val splitAbstain = vote.splitAbstainVote
-    
+
     return when {
         standard != null -> AccountVote.Standard(
             balance = standard.vote.amount,

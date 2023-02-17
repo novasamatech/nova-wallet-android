@@ -94,7 +94,7 @@ fun AccountVote.amount(): Balance {
 }
 
 fun AccountVote.conviction(): Conviction? {
-    return when(this) {
+    return when (this) {
         is AccountVote.Standard -> vote.conviction
         is AccountVote.Split -> Conviction.None
         is AccountVote.SplitAbstain -> Conviction.None
@@ -116,13 +116,13 @@ fun AccountVote.amountFor(type: VoteType): Balance? {
             if (direction == type) balance else Balance.ZERO
         }
 
-        is AccountVote.Split -> when(type) {
+        is AccountVote.Split -> when (type) {
             VoteType.AYE -> aye
             VoteType.NAY -> nay
             VoteType.ABSTAIN -> Balance.ZERO
         }
 
-        is AccountVote.SplitAbstain -> when(type) {
+        is AccountVote.SplitAbstain -> when (type) {
             VoteType.AYE -> aye
             VoteType.NAY -> nay
             VoteType.ABSTAIN -> abstain

@@ -18,7 +18,7 @@ class DirectVoteRemote(
     override val standardVote: StandardVoteRemote?,
     override val splitVote: SplitVoteRemote?,
     override val splitAbstainVote: SplitAbstainVoteRemote?
-): MultiVoteRemote
+) : MultiVoteRemote
 
 class DelegatedVoteRemote(
     val vote: VoteRemote,

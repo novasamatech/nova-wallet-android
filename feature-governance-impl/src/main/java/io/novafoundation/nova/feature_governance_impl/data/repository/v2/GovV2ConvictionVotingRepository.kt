@@ -187,6 +187,4 @@ class GovV2ConvictionVotingRepository(
             }
         )
     }
-
-
 }

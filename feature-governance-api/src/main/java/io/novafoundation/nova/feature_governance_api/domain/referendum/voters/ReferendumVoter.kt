@@ -19,11 +19,11 @@ class ReferendumVoter(
     val metadata: DelegateLabel.Metadata?,
 ) : GenericVoter<ReferendumVoter.Vote> {
 
-    sealed class Vote: GenericVoter.Vote {
+    sealed class Vote : GenericVoter.Vote {
 
-        class OnlySelf(val selfVote: GenericVoter.ConvictionVote): Vote(), GenericVoter.Vote by selfVote
+        class OnlySelf(val selfVote: GenericVoter.ConvictionVote) : Vote(), GenericVoter.Vote by selfVote
 
-        class WithDelegators(override val totalVotes: BigDecimal, val delegators: List<ReferendumVoterDelegator>): Vote()
+        class WithDelegators(override val totalVotes: BigDecimal, val delegators: List<ReferendumVoterDelegator>) : Vote()
     }
 }
 

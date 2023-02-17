@@ -114,7 +114,7 @@ class ReferendumVotersViewModel(
         isExpandable: Boolean,
         isExpanded: Boolean
     ): ExpandableVoterRVItem {
-        val voteModel =  when(val vote = referendumVoter.vote) {
+        val voteModel = when (val vote = referendumVoter.vote) {
             is ReferendumVoter.Vote.OnlySelf -> votersFormatter.formatConvictionVote(vote.selfVote, chainAsset)
             is ReferendumVoter.Vote.WithDelegators -> VoteModel(
                 votesCount = votersFormatter.formatTotalVotes(vote),

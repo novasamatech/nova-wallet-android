@@ -14,7 +14,7 @@ class ReferendumVoterRemote(
     override val splitVote: SplitVoteRemote?,
     override val splitAbstainVote: SplitAbstainVoteRemote?,
     val delegatorVotes: SubQueryNodes<ReferendumDelegatorVoteRemote>
-): MultiVoteRemote
+) : MultiVoteRemote
 
 class ReferendumDelegatorVoteRemote(
     @SerializedName("delegator") val delegatorId: String,
