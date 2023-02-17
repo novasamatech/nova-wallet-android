@@ -116,7 +116,8 @@ class VoterItemDecoration(
 
             val lastItem = expandedItems.last().view
             val lastItemAdapterPosition = linearLayoutManager.getPosition(lastItem)
-            if (adapter.getItemViewType(lastItemAdapterPosition + 1) == GroupedListAdapter.TYPE_CHILD) {
+            val nextItemAdapterPosition = lastItemAdapterPosition + 1
+            if (nextItemAdapterPosition < adapter.itemCount && adapter.getItemViewType(nextItemAdapterPosition) == GroupedListAdapter.TYPE_CHILD) {
                 treePath.moveTo(treeStrokeStartOffset, lastItem.bottom.toFloat() + lastItem.translationY)
             }
 
