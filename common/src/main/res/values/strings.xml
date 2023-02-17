@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="add_delegation_missing_account_message">You should add %s account to the wallet in order to delegate</string>
+
     <string name="referendum_vote_abstain">Abstain</string>
 
     <string name="delegation_revoke_hint_unlock">After the undelegating period has expired, you will need to unlock your tokens.</string>
