@@ -11,13 +11,14 @@ import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.nameOrAddress
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateIcon
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateTypeModelIcon
-import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVoterAddressContainer
 import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVoterAddress
+import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVoterAddressContainer
 import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVoterChevron
 import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVoterImage
 import kotlinx.android.synthetic.main.item_referendum_voter.view.itemVoterType
@@ -124,8 +125,7 @@ class ExpandableVoterHolder(
         itemVoterAddress.ellipsize = item.addressEllipsize
         itemVoterAddress.requestLayout()
         itemVotesCount.text = item.vote.votesCount
-        itemVotesCountDetails.text = item.vote.votesCountDetails
-        itemVotesCountDetails.isVisible = item.showConviction
+        itemVotesCountDetails.setTextOrHide(item.vote.votesCountDetails)
     }
 
     fun bindExpanding(item: ExpandableVoterRVItem) = with(containerView) {

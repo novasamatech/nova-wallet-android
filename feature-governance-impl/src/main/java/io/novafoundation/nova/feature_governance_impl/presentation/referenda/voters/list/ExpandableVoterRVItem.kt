@@ -16,7 +16,6 @@ class ExpandableVoterRVItem(
     override val metadata: DelegateLabelModel,
     val isExpandable: Boolean,
     val isExpanded: Boolean,
-    val showConviction: Boolean,
     override val addressEllipsize: TextUtils.TruncateAt
 ) : VoterRvItem
 

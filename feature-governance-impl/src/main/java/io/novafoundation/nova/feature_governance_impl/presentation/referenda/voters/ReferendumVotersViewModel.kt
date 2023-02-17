@@ -18,12 +18,13 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.Re
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoteModel
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.formatConvictionVote
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.list.DelegatorVoterRVItem
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.list.ExpandableVoterRVItem
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.list.VoterRvItem
-import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.formatConvictionVote
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
@@ -93,7 +94,7 @@ class ReferendumVotersViewModel(
     ): List<VoterRvItem> {
         return buildList {
             voters.forEachIndexed { index, referendumVoter ->
-                val isExpandable = referendumVoter.delegators.isNotEmpty()
+                val isExpandable = referendumVoter.vote is ReferendumVoter.Vote.WithDelegators
                 val isExpanded = index in expandedVoters
 
                 add(mapReferendumVoterToExpandableRvItem(index, referendumVoter, chain, chainAsset, isExpandable, isExpanded))
@@ -113,26 +114,34 @@ class ReferendumVotersViewModel(
         isExpandable: Boolean,
         isExpanded: Boolean
     ): ExpandableVoterRVItem {
-        val showConviction = !isExpandable
+        val voteModel = when (val vote = referendumVoter.vote) {
+            is ReferendumVoter.Vote.OnlySelf -> votersFormatter.formatConvictionVote(vote.selfVote, chainAsset)
+            is ReferendumVoter.Vote.WithDelegators -> VoteModel(
+                votesCount = votersFormatter.formatTotalVotes(vote),
+                votesCountDetails = null
+            )
+        }
 
         return ExpandableVoterRVItem(
             primaryIndex = index,
-            vote = votersFormatter.formatConvictionVote(referendumVoter.vote, chainAsset),
+            vote = voteModel,
             metadata = delegateMappers.formatDelegateLabel(
-                referendumVoter.accountId,
-                referendumVoter.metadata,
-                referendumVoter.identity?.name,
-                chain
+                accountId = referendumVoter.accountId,
+                metadata = referendumVoter.metadata,
+                identityName = referendumVoter.identity?.name,
+                chain = chain
             ),
             isExpandable = isExpandable,
             isExpanded = isExpanded,
-            showConviction = showConviction,
             addressEllipsize = mapAddressEllipsize(referendumVoter.metadata, referendumVoter.identity)
         )
     }
 
     private suspend fun mapVoterDelegatorsToRvItem(referendumVoter: ReferendumVoter, chain: Chain, chainAsset: Chain.Asset): List<DelegatorVoterRVItem> {
-        return referendumVoter.delegators.map {
+        val vote = referendumVoter.vote
+        if (vote !is ReferendumVoter.Vote.WithDelegators) return emptyList()
+
+        return vote.delegators.map {
             DelegatorVoterRVItem(
                 vote = votersFormatter.formatConvictionVote(it.vote, chainAsset),
                 metadata = delegateMappers.formatDelegateLabel(
