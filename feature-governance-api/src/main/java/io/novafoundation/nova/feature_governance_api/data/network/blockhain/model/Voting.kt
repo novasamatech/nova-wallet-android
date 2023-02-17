@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
+import jp.co.soramitsu.fearless_utils.hash.isPositive
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -92,15 +93,42 @@ fun AccountVote.amount(): Balance {
     }
 }
 
-fun AccountVote.voteType(): VoteType? {
+fun AccountVote.conviction(): Conviction? {
     return when (this) {
-        is AccountVote.Standard -> if (vote.aye) {
-            VoteType.AYE
-        } else {
-            VoteType.NAY
+        is AccountVote.Standard -> vote.conviction
+        is AccountVote.Split -> Conviction.None
+        is AccountVote.SplitAbstain -> Conviction.None
+        AccountVote.Unsupported -> null
+    }
+}
+
+fun AccountVote.hasAmountFor(type: VoteType): Boolean {
+    val amount = amountFor(type)
+
+    return amount != null && amount.isPositive()
+}
+
+fun AccountVote.amountFor(type: VoteType): Balance? {
+    return when (this) {
+        is AccountVote.Standard -> {
+            val direction = if (vote.aye) VoteType.AYE else VoteType.NAY
+
+            if (direction == type) balance else Balance.ZERO
         }
 
-        else -> null // TODO handle split and splitAbstain votes
+        is AccountVote.Split -> when (type) {
+            VoteType.AYE -> aye
+            VoteType.NAY -> nay
+            VoteType.ABSTAIN -> Balance.ZERO
+        }
+
+        is AccountVote.SplitAbstain -> when (type) {
+            VoteType.AYE -> aye
+            VoteType.NAY -> nay
+            VoteType.ABSTAIN -> abstain
+        }
+
+        AccountVote.Unsupported -> null
     }
 }
 

@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.view.NovaChipView
 
@@ -39,9 +40,17 @@ fun NovaChipView.setDelegateTypeModel(model: DelegateTypeModel?) {
     setStyle(model.backgroundColorRes, model.textColorRes, model.iconColorRes)
 }
 
-fun ImageView.setDelegateIcon(icon: DelegateIcon, imageLoader: ImageLoader) {
+fun NovaChipView.setDelegateTypeModelIcon(model: DelegateTypeModel?) {
+    setVisible(model != null)
+    if (model == null) return
+
+    setIcon(model.iconRes)
+    setStyle(model.backgroundColorRes, model.textColorRes, model.iconColorRes)
+}
+
+fun ImageView.setDelegateIcon(icon: DelegateIcon, imageLoader: ImageLoader, squareCornerRadiusDp: Int) {
     if (icon.shape == DelegateIcon.IconShape.SQUARE) {
-        setBackgroundResource(R.drawable.bg_delegate_organisation)
+        background = context.getRoundedCornerDrawable(null, R.color.container_border, squareCornerRadiusDp)
     } else {
         background = null
     }

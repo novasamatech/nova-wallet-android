@@ -8,4 +8,6 @@ interface DelegateDetailsInteractor {
     fun delegateDetailsFlow(
         delegateAccountId: AccountId,
     ): Flow<DelegateDetails>
+
+    fun validationSystemFor(): AddDelegationValidationSystem
 }

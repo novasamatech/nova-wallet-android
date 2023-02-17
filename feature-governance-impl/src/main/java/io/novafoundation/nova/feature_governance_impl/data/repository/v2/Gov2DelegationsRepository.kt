@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegatio
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DelegateStatsResponse
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DelegatedVoteRemote
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DirectVoteRemote
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.mapMultiVoteRemoteToAccountVote
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
@@ -47,8 +48,9 @@ class Gov2DelegationsRepository(
     private val delegateMetadataApi: DelegateMetadataApi,
 ) : DelegationsRepository {
 
-    override suspend fun isDelegationSupported(): Boolean {
-        return true
+    override suspend fun isDelegationSupported(chain: Chain): Boolean {
+        // we heavy rely on SubQuery API for delegations so we require it to be present
+        return chain.externalApi<GovernanceDelegations>() != null
     }
 
     override suspend fun getDelegatesStats(
@@ -163,30 +165,8 @@ class Gov2DelegationsRepository(
     private fun SubQueryNodes<DirectVoteRemote>.toUserVoteMap(): Map<ReferendumId, UserVote.Direct?> {
         return nodes.associateBy(
             keySelector = { ReferendumId(it.referendumId) },
-            valueTransform = { directVoteRemote -> UserVote.Direct(mapDirectVoteRemoteToAccountVote(directVoteRemote)) }
+            valueTransform = { directVoteRemote -> UserVote.Direct(mapMultiVoteRemoteToAccountVote(directVoteRemote)) }
         )
-    }
-
-    private fun mapDirectVoteRemoteToAccountVote(vote: DirectVoteRemote): AccountVote {
-        return when {
-            vote.standardVote != null -> AccountVote.Standard(
-                balance = vote.standardVote.vote.amount,
-                vote = Vote(
-                    aye = vote.standardVote.aye,
-                    conviction = mapConvictionFromString(vote.standardVote.vote.conviction)
-                )
-            )
-            vote.splitVote != null -> AccountVote.Split(
-                aye = vote.splitVote.ayeAmount,
-                nay = vote.splitVote.nayAmount
-            )
-            vote.splitAbstainVote != null -> AccountVote.SplitAbstain(
-                aye = vote.splitAbstainVote.ayeAmount,
-                nay = vote.splitAbstainVote.nayAmount,
-                abstain = vote.splitAbstainVote.abstainAmount
-            )
-            else -> AccountVote.Unsupported
-        }
     }
 
     private fun SubQueryNodes<DelegatedVoteRemote>.toUserVoteMap(chain: Chain): Map<ReferendumId, UserVote.Delegated?> {

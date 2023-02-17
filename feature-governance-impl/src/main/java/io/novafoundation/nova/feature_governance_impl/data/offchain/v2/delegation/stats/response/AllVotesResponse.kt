@@ -15,10 +15,10 @@ class DirectVotesResponse(
 
 class DirectVoteRemote(
     val referendumId: BigInteger,
-    val standardVote: StandardVoteRemote?,
-    val splitVote: SplitVoteRemote?,
-    val splitAbstainVote: SplitAbstainVoteRemote?
-)
+    override val standardVote: StandardVoteRemote?,
+    override val splitVote: SplitVoteRemote?,
+    override val splitAbstainVote: SplitAbstainVoteRemote?
+) : MultiVoteRemote
 
 class DelegatedVoteRemote(
     val vote: VoteRemote,

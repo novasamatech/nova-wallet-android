@@ -18,7 +18,7 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
 interface DelegationsRepository {
 
-    suspend fun isDelegationSupported(): Boolean
+    suspend fun isDelegationSupported(chain: Chain): Boolean
 
     suspend fun getDelegatesStats(
         recentVotesBlockThreshold: BlockNumber,

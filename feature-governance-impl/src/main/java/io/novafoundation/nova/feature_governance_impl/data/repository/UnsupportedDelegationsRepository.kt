@@ -17,7 +17,7 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
 class UnsupportedDelegationsRepository : DelegationsRepository {
 
-    override suspend fun isDelegationSupported(): Boolean {
+    override suspend fun isDelegationSupported(chain: Chain): Boolean {
         return false
     }
 

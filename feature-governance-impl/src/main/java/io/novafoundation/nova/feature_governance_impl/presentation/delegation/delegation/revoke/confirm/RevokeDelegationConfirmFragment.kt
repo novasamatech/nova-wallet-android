@@ -15,9 +15,9 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.setVoteModelOrHide
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateLabelState
 import io.novafoundation.nova.feature_governance_impl.presentation.track.list.TrackDelegationListBottomSheet
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.setVoteModelOrHide
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_revoke_delegation_confirm.revokeDelegationConfirmConfirm
 import kotlinx.android.synthetic.main.fragment_revoke_delegation_confirm.revokeDelegationConfirmDelegate

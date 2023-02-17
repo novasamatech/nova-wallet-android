@@ -6,6 +6,7 @@ import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.presentation.mapLoading
@@ -15,11 +16,17 @@ import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.firstLoaded
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.withLoadingShared
+import io.novafoundation.nova.common.validation.TransformedFailure
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.validation.handleChainAccountNotFound
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.model.DelegatorVote
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.AddDelegationValidationFailure
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.AddDelegationValidationPayload
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetails
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.description
@@ -62,8 +69,10 @@ class DelegateDetailsViewModel(
     private val governanceSharedState: GovernanceSharedState,
     private val trackFormatter: TrackFormatter,
     private val resourceManager: ResourceManager,
+    private val validationExecutor: ValidationExecutor,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
     val markwon: Markwon,
-) : BaseViewModel(), ExternalActions.Presentation by externalActions {
+) : BaseViewModel(), ExternalActions.Presentation by externalActions, Validatable by validationExecutor {
 
     val identityMixin = identityMixinFactory.create()
 
@@ -189,8 +198,8 @@ class DelegateDetailsViewModel(
 
     private suspend fun createDelegateMetadata(delegateDetails: DelegateDetails, chain: Chain): Metadata {
         return Metadata(
-            name = delegateMappers.formatDelegateName(delegateDetails, chain),
-            icon = delegateMappers.mapDelegateIconToUi(delegateDetails),
+            name = delegateMappers.formatDelegateName(delegateDetails.metadata, delegateDetails.onChainIdentity?.display, delegateDetails.accountId, chain),
+            icon = delegateMappers.mapDelegateIconToUi(delegateDetails.accountId, delegateDetails.metadata),
             accountType = delegateMappers.mapDelegateTypeToUi(delegateDetails.metadata?.accountType),
             description = createDelegateDescription(delegateDetails.metadata)
         )
@@ -236,13 +245,34 @@ class DelegateDetailsViewModel(
         return ShortenedTextModel.from(markdownParsed, DefaultCharacterLimit.SHORT_PARAGRAPH)
     }
 
-    private fun openNewDelegation(editMode: Boolean) {
-        val nextPayload = NewDelegationChooseTracksPayload(payload.accountId, editMode)
-        router.openNewDelegationChooseTracks(nextPayload)
+    private fun openNewDelegation(editMode: Boolean) = launch {
+        val chain = governanceSharedState.chain()
+        val metaAccount = selectedAccountUseCase.getSelectedMetaAccount()
+        val validationPayload = AddDelegationValidationPayload(chain, metaAccount)
+
+        validationExecutor.requireValid(
+            validationSystem = interactor.validationSystemFor(),
+            payload = validationPayload,
+            validationFailureTransformerCustom = { status, _ -> mapValidationFailureToUi(status.reason) }
+        ) {
+            val nextPayload = NewDelegationChooseTracksPayload(payload.accountId, editMode)
+            router.openNewDelegationChooseTracks(nextPayload)
+        }
     }
 
     private fun openVotedReferenda(onlyRecentVotes: Boolean, title: String? = null) {
         val votedReferendaPayload = VotedReferendaPayload(payload.accountId, onlyRecentVotes, overriddenTitle = title)
         router.openVotedReferenda(votedReferendaPayload)
+    }
+
+    private fun mapValidationFailureToUi(failure: AddDelegationValidationFailure): TransformedFailure {
+        return when (failure) {
+            is AddDelegationValidationFailure.NoChainAccountFailure -> handleChainAccountNotFound(
+                failure = failure,
+                resourceManager = resourceManager,
+                goToWalletDetails = { router.openAccountDetails(failure.account.id) },
+                addAccountDescriptionRes = R.string.add_delegation_missing_account_message
+            )
+        }
     }
 }

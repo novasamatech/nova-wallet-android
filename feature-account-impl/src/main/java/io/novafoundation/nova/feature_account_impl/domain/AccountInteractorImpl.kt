@@ -23,6 +23,7 @@ class AccountInteractorImpl(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
 ) : AccountInteractor {
+
     override suspend fun getMetaAccounts(): List<MetaAccount> {
         return accountRepository.allMetaAccounts()
     }

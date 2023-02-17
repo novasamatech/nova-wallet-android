@@ -107,7 +107,7 @@
 
     <color name="organization_chip_icon">#EBC50A</color>
     <color name="organization_chip_text">#EBC50A</color>
-    <color name="organization_chip_background">#29EDCE36</color>
+    <color name="organization_chip_background">#1FEDCE36</color>
 
     <!-- Shadow -->
     <color name="nft_stack_shadow">#B8000000</color>

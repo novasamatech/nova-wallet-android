@@ -11,8 +11,8 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoterModel
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.VotersFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoterModel
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset

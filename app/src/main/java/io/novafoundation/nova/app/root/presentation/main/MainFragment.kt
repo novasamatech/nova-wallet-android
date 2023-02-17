@@ -109,6 +109,6 @@ class MainFragment : BaseFragment<MainViewModel>() {
             .toTarget(bottomNavigationView)
             .catchException { bottomNavigationView.setBackgroundColorRes(R.color.solid_navigation_background) }
             .build()
-            .start()
+//            .start()
     }
 }

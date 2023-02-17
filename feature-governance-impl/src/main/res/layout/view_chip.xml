@@ -15,18 +15,23 @@
         android:layout_gravity="center_vertical"
         android:gravity="center_vertical"
         app:tint="@color/chip_icon"
-        tools:layout_marginEnd="6dp"
         tools:layout_marginVertical="3dp"
         tools:src="@drawable/ic_info_cicrle_filled_16" />
+
+    <Space
+        android:id="@+id/chipDrawablePadding"
+        android:layout_width="6dp"
+        android:layout_height="match_parent" />
 
     <TextView
         android:id="@+id/chipText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:lines="1"
         android:textColor="@color/chip_text"
         tools:layout_marginEnd="8dp"
-        android:lines="1"
         tools:layout_marginVertical="4.5dp"
         tools:style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
         tools:text="main agenda" />

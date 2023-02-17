@@ -9,6 +9,7 @@ object SubqueryExpressions {
     fun or(innerExpressions: Collection<String>) = or(*innerExpressions.toTypedArray())
 
     fun anyOf(innerExpressions: Collection<String>) = or(innerExpressions)
+    fun anyOf(vararg innerExpressions: String) = or(*innerExpressions)
 
     fun and(vararg innerExpressions: String): String {
         return compoundExpression("and", *innerExpressions)
