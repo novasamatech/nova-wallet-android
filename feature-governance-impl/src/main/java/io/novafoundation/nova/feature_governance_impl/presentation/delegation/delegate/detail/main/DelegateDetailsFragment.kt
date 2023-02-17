@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.presentation.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.letOrHide
@@ -101,6 +102,7 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel>() {
     override fun subscribe(viewModel: DelegateDetailsViewModel) {
         setupExternalActions(viewModel)
         setupIdentityMixin(viewModel.identityMixin, delegateDetailsIdentity)
+        observeValidations(viewModel)
 
         viewModel.delegateDetailsLoadingState.observeWhenVisible { loadingState ->
             when (loadingState) {
