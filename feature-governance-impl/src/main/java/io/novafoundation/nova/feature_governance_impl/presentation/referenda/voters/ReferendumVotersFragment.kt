@@ -9,7 +9,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -73,7 +72,6 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), Vote
         viewModel.voterModels.observe {
             if (it is LoadingState.Loaded) {
                 val voters = it.data
-                referendumVotersCount.text = voters.size.format()
                 votersAdapter.submitList(voters)
                 referendumVotersPlaceholder.isVisible = voters.isEmpty()
                 referendumVotersList.isVisible = voters.isNotEmpty()
@@ -84,6 +82,8 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), Vote
                 referendumVotersProgress.makeVisible()
             }
         }
+
+        viewModel.votersCount.observe(referendumVotersCount::setText)
     }
 
     override fun onVoterClick(position: Int) {

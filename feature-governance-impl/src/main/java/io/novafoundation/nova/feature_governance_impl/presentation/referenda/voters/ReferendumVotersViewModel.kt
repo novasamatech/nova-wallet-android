@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.firstOnLoad
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
@@ -31,6 +32,7 @@ import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class ReferendumVotersViewModel(
@@ -56,16 +58,17 @@ class ReferendumVotersViewModel(
 
     val title: String = mapTypeToString(payload.voteType)
 
-    private val expandedVoters: MutableStateFlow<Set<Int>> = MutableStateFlow(setOf())
+    private val expandedVotersFlow: MutableStateFlow<Set<Int>> = MutableStateFlow(setOf())
 
-    private val ev = expandedVoters
-
-    val voterModels = combine(voterList, ev) { voters, expandedVoters ->
+    val voterModels = combine(voterList, expandedVotersFlow) { voters, expandedVoters ->
         val chain = chainFlow.first()
         val chainAsset = chainAssetFlow.first()
         mapVotersToVoterModels(chain, chainAsset, voters, expandedVoters)
     }
         .withLoading()
+        .shareInBackground()
+
+    val votersCount = voterList.map { it.size.format() }
         .shareInBackground()
 
     fun backClicked() {
@@ -75,7 +78,7 @@ class ReferendumVotersViewModel(
     fun expandVoterClicked(position: Int) = launch {
         val voters = voterModels.firstOnLoad()
         val voterItem = voters[position] as? ExpandableVoterRVItem ?: return@launch
-        expandedVoters.value = expandedVoters.value.toggle(voterItem.primaryIndex)
+        expandedVotersFlow.value = expandedVotersFlow.value.toggle(voterItem.primaryIndex)
     }
 
     fun voterClicked(position: Int) = launch {
