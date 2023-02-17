@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.get
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
@@ -66,14 +65,14 @@ class RealReferendumVotersInteractor(
         voters.map { voter ->
             ReferendumVoter(
                 accountVote = voter.vote,
+                voteType = type,
                 accountId = voter.accountId,
                 identity = identities[voter.accountId],
                 chainAsset = chainAsset,
                 metadata = metadatas[voter.accountId]?.let { mapDelegateMetadata(it) },
                 delegators = voter.delegators.map { mapDelegator(it, metadatas, identities, chainAsset) }
-                    .sortedByDescending { it.vote.totalVotes }
             )
-        }.sortedByDescending { it.vote?.totalVotes.orZero() }
+        }.sortedByDescending { it.vote.totalVotes }
     }
 
     private fun mapDelegator(

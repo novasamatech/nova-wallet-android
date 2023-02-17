@@ -11,7 +11,7 @@ class VoterModel(
 )
 data class VoteModel(
     val votesCount: String,
-    val votesCountDetails: String
+    val votesCountDetails: String?
 )
 
 data class VoteDirectionModel(val text: String, @ColorRes val textColor: Int)
