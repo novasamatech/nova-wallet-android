@@ -26,7 +26,7 @@ class YourMultiVoteView @JvmOverloads constructor(
     }
 
     fun setModel(model: YourMultiVoteModel?) {
-        if (model == currentModel) {
+        if (model != null && model == currentModel) {
             return
         }
         currentModel = model
