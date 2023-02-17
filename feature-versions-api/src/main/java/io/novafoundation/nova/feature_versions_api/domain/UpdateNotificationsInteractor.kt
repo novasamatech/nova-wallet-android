@@ -11,4 +11,6 @@ interface UpdateNotificationsInteractor {
     suspend fun getUpdateNotifications(): List<UpdateNotification>
 
     suspend fun skipNewUpdates()
+
+    suspend fun loadVersions()
 }
