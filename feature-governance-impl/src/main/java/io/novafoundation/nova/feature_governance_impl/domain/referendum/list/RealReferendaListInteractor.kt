@@ -153,7 +153,7 @@ class RealReferendaListInteractor(
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
         val undecidingTimeout = governanceSource.referenda.undecidingTimeout(chain.id)
         val voteLockingPeriod = governanceSource.convictionVoting.voteLockingPeriod(chain.id)
-        val delegationSupported = governanceSource.delegationsRepository.isDelegationSupported()
+        val delegationSupported = governanceSource.delegationsRepository.isDelegationSupported(chain)
 
         val trackLocksFlow = governanceSource.convictionVoting.trackLocksFlowOrEmpty(voter?.accountId, asset.fullId)
 

@@ -48,8 +48,9 @@ class Gov2DelegationsRepository(
     private val delegateMetadataApi: DelegateMetadataApi,
 ) : DelegationsRepository {
 
-    override suspend fun isDelegationSupported(): Boolean {
-        return true
+    override suspend fun isDelegationSupported(chain: Chain): Boolean {
+        // we heavy rely on SubQuery API for delegations so we require it to be present
+        return chain.externalApi<GovernanceDelegations>() != null
     }
 
     override suspend fun getDelegatesStats(
