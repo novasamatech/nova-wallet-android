@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common
 
+import androidx.annotation.StringRes
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
@@ -49,7 +50,7 @@ interface DelegateMappers {
 
     suspend fun formatDelegationStats(stats: DelegatePreview.Stats, chainAsset: Chain.Asset): DelegateStatsModel
 
-    fun formattedRecentVotesPeriod(): String
+    fun formattedRecentVotesPeriod(@StringRes stringRes: Int): String
 
     suspend fun formatDelegateLabel(
         accountId: AccountId,
@@ -177,15 +178,15 @@ class RealDelegateMappers(
             delegations = stats.delegationsCount.format(),
             delegatedVotes = chainAsset.amountFromPlanks(stats.delegatedVotes).format(),
             recentVotes = RecentVotes(
-                label = formattedRecentVotesPeriod(),
+                label = formattedRecentVotesPeriod(R.string.delegation_recent_votes_format),
                 value = stats.recentVotes.format()
             )
         )
     }
 
-    override fun formattedRecentVotesPeriod(): String {
+    override fun formattedRecentVotesPeriod(@StringRes stringRes: Int): String {
         return resourceManager.getString(
-            R.string.delegation_recent_votes_format,
+            stringRes,
             resourceManager.formatDuration(RECENT_VOTES_PERIOD, estimated = false)
         )
     }

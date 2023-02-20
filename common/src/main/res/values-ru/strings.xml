@@ -127,6 +127,7 @@
     <string name="accounts_add_wallet">Добавить кошелёк</string>
     <string name="accounts_change_chain_account">Изменить аккаунт %s</string>
     <string name="accounts_change_chain_secrets">Изменить аккаунт</string>
+    <string name="add_delegation_missing_account_message">Вы должны добавить %s аккаунт в кошелек, чтобы иметь возможность делегировать</string>
     <string name="asset_add_evm_token_already_exist_message">Введенный адрес контракта уже добавлен в Nova как токен %s.</string>
     <string name="asset_add_evm_token_already_exist_title">Этот токен уже добавлен</string>
     <string name="asset_add_evm_token_invalid_coin_gecko_link_message">Пожалуйста, убедитесь, что введенный URL-адрес имеет следующую форму: www.coingecko.com/en/coins/tether.</string>
@@ -152,7 +153,6 @@
     <string name="assets_balance_details_locks_vesting">Вестинг</string>
     <string name="assets_filter_title">Фильтр токенов</string>
     <string name="assets_manage_tokens_all_networks">Все сети</string>
-    <string name="assets_manage_tokens_partial_networks" formatted="false">%s (и еще %s)</string>
     <string name="assets_manage_tokens_title">Управление токенами</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">Не переводите %s на Ledger аккаунт так как Ledger не поддерживает переводы %s, таким образом ассет будет недоступен для перевода на этом аккаунте</string>
     <string name="assets_receive_ledger_not_supported_title">Ledger не поддерживает этот токен</string>
@@ -214,6 +214,7 @@
     <string name="common_disabled">Отключен</string>
     <string name="common_done">Готово</string>
     <string name="common_edit">Редактировать</string>
+    <string name="common_element_and_more_format" formatted="false">%s (и еще %s)</string>
     <string name="common_email_chooser_title">Выберите приложение для работы с почтой</string>
     <string name="common_enable">Включить</string>
     <string name="common_enter_amount">Введите сумму...</string>
@@ -285,6 +286,7 @@
     <string name="common_remove">Удалить</string>
     <string name="common_reset">Сброс</string>
     <string name="common_retry">Повторить</string>
+    <string name="common_revoke">Отменить</string>
     <string name="common_save">Сохранить</string>
     <string name="common_search">Поиск</string>
     <string name="common_search_results_number">Результаты поиска: %d</string>
@@ -293,6 +295,7 @@
     <string name="common_signature_invalid">Неверная подпись</string>
     <string name="common_skip">Пропустить</string>
     <string name="common_skip_process">Пропустить</string>
+    <string name="common_sort_by">Сортировка по</string>
     <string name="common_status">Статус</string>
     <string name="common_substrate_address">Substrate адрес</string>
     <string name="common_time_left">Оставшееся время</string>
@@ -414,6 +417,45 @@
     <string name="dapp_sign_error_unsupported_chain">Неподдерживаемый блокчейн с генезис хэшем %s</string>
     <string name="dapp_sign_extrinsic_details_subtitle">Убедитесь, что операция правильная</string>
     <string name="dapp_sign_extrinsic_failed">Не удалось подписать запрошенную операцию</string>
+    <string name="delegation_add_delegation">Добавить делегацию</string>
+    <string name="delegation_all_votes">Голоса за все время</string>
+    <string name="delegation_delegate">Делегат</string>
+    <string name="delegation_delegate_filter_all">Все аккаунты</string>
+    <string name="delegation_delegate_filter_individuals">Личные аккаунты</string>
+    <string name="delegation_delegate_filter_organizations">Организации</string>
+    <string name="delegation_delegate_hint_unlock">Период выхода из делегации начнется после ее отмены</string>
+    <string name="delegation_delegate_hint_vote">Ваши голоса будут автоматически применяться вместе с голосами ваших делегатов</string>
+    <string name="delegation_delegate_info">Информация о делегате</string>
+    <string name="delegation_delegate_type_individual">Личный аккаунт</string>
+    <string name="delegation_delegate_type_organization">Организация</string>
+    <string name="delegation_delegated_votes">Голоса делегаторов</string>
+    <string name="delegation_delegations">Делегации</string>
+    <string name="delegation_edit_delegation">Изменить делегацию</string>
+    <string name="delegation_error_self_delegate_message">Вы не можете делегировать голоса себе, пожалуйста, выберите другой адрес</string>
+    <string name="delegation_error_self_delegate_title">Нельзя делегировать себе</string>
+    <string name="delegation_list_banner_description">Расскажите нам о себе, чтобы пользователи Nova узнали вас лучше</string>
+    <string name="delegation_list_banner_title">Вы уже стали делегатом?</string>
+    <string name="delegation_list_describe_yourself_action">Добавить описание</string>
+    <string name="delegation_multi_track_format">В %s треках</string>
+    <string name="delegation_recent_votes_format">Голоса за %s</string>
+    <string name="delegation_referendum_details_vote">Ваши голоса через %s</string>
+    <string name="delegation_referendum_vote" formatted="false">Ваши голоса: %s через %s</string>
+    <string name="delegation_remove_votes">Удалить голоса</string>
+    <string name="delegation_revoke_delegation">Отменить делегацию</string>
+    <string name="delegation_revoke_hint_unlock">После истечения периода выхода из делегации не забудьте разблокировать токены</string>
+    <string name="delegation_sorting_delegated_votes">Всем голосам</string>
+    <string name="delegation_sorting_delegations">Делегациям</string>
+    <string name="delegation_sorting_recent_votes_format">Голосам за %s</string>
+    <string name="delegation_tracks">Треки</string>
+    <string name="delegation_tracks_all_preset">Выбрать все</string>
+    <string name="delegation_tracks_disabled_apply_button_text">Выберите хотя бы 1 трек...</string>
+    <string name="delegation_tracks_empty_list_placeholder">Нет доступных треков для делегирования</string>
+    <string name="delegation_tracks_governance_preset">Управление</string>
+    <string name="delegation_tracks_treasury_preset">Казна</string>
+    <string name="delegation_undelegating_period">Период выхода из делегации</string>
+    <string name="delegation_your_delegation">Ваша делегация</string>
+    <string name="delegation_your_delegations">Ваши делегации</string>
+    <string name="delegations_filter">Показывать</string>
     <string name="ecdsa_selection_subtitle">(BTC/ETH совместимый)</string>
     <string name="ecdsa_selection_title">ECDSA</string>
     <string name="ed25519_selection_subtitle">ed25519 (альтернативный)</string>
@@ -548,6 +590,7 @@
     <string name="referendum_name_unknown">Референдум %s</string>
     <string name="referendum_nay_format">Против: %s</string>
     <string name="referendum_negative_voters_title">Голоса \"против\"</string>
+    <string name="referendum_other_votes" formatted="false">%s голосов через %s</string>
     <string name="referendum_positive_voters_title">Голоса \"за\"</string>
     <string name="referendum_staking_admin">Стейкинг</string>
     <string name="referendum_status_approved">Одобрен</string>
@@ -583,18 +626,19 @@
     <string name="referendum_track_auction_admin">Краудлоуны</string>
     <string name="referendum_track_big_spender">Казна: большие траты</string>
     <string name="referendum_track_big_tipper">Казна: большие чаевые</string>
-    <string name="referendum_track_fellowship_admin">fellowship: управление</string>
+    <string name="referendum_track_fellowship_admin">Fellowship: управление</string>
     <string name="referendum_track_general_admin">Управление: регистратор</string>
     <string name="referendum_track_lease_admin">Управление: аренда</string>
     <string name="referendum_track_medium_spender">Казна: средние траты</string>
     <string name="referendum_track_referendum_canceller">Управление: отмена</string>
     <string name="referendum_track_referendum_killer">Управление: удаление</string>
-    <string name="referendum_track_root">основная повестка</string>
+    <string name="referendum_track_root">Основная повестка</string>
     <string name="referendum_track_small_spender">Казна: мелкие траты</string>
     <string name="referendum_track_small_tipper">Казна: мелкие чаевые</string>
     <string name="referendum_track_treasurer">Казна: любое</string>
     <string name="referendum_unlock_remains_locked_format">остаются заблокированными в %s</string>
     <string name="referendum_unlock_unlockable">Можно разблокировать</string>
+    <string name="referendum_vote_abstain">Воздержался</string>
     <string name="referendum_vote_aye">За</string>
     <string name="referendum_vote_chip_all_locks">Уже заблокировано: %s</string>
     <string name="referendum_vote_chip_governance_lock">Уже в демократии: %s</string>
@@ -604,11 +648,12 @@
     <string name="referendum_vote_select_conviction_title">Умножьте количество голосов, увеличив период блокировки</string>
     <string name="referendum_vote_setup_title">Проголосовать за %s</string>
     <string name="referendum_vote_unlock_hint">По истечении периода блокировки не забудьте разблокировать свои токены</string>
+    <string name="referendum_voted_referenda">Голоса за все время</string>
     <string name="referendum_voter_vote">%s голосов</string>
     <string name="referendum_voter_vote_details" formatted="false">%s × %sx</string>
     <string name="referendum_voters_empty_list_placeholder">Список голосовавших появится здесь</string>
     <string name="referendum_votes_format">%s голосов</string>
-    <string name="referendum_whitelisted_caller">fellowship: белый список</string>
+    <string name="referendum_whitelisted_caller">Fellowship: белый список</string>
     <string name="referendum_your_vote_format">Ваш голос: %s голосов</string>
     <string name="refrendum_vote_already_completed_message">Референдум завершен, голосовать больше нельзя</string>
     <string name="refrendum_vote_already_completed_title">Референдум завершен</string>
@@ -617,6 +662,14 @@
     <string name="refrendum_vote_max_votes_reached_message">Вы набрали максимальное количество голосов за трек: %s</string>
     <string name="refrendum_vote_max_votes_reached_title">Достигнуто максимальное количество голосов</string>
     <string name="refrendum_vote_not_enough_available_message">У вас недостаточно токенов для голосования. Доступно для голосования: %s.</string>
+    <string name="remove_votes_suggestion_button_text">Удалить голоса</string>
+    <plurals name="remove_votes_suggestion_description">
+        <item quantity="one">Вы ранее голосовали в референдумах в %d треке. Для того, чтобы сделать этот трек доступным для делегирования вам необходимо удалить голоса.</item>
+        <item quantity="few"></item>
+        <item quantity="many">Вы ранее голосовали в референдумах в %d треках. Для того, чтобы сделать эти треки доступным для делегирования вам необходимо удалить голоса.</item>
+        <item quantity="other"></item>
+    </plurals>
+    <string name="remove_votes_suggestion_title">Удалить историю ваших голосов?</string>
     <string name="runtime_update_failure_description">Не удалось обновить информацию о среде выполнения блокчейна. Некоторые функции могут не работать.</string>
     <string name="runtime_update_failure_title">Ошибка обновления среды выполнения</string>
     <string name="search_contacts">Контакты</string>
@@ -624,6 +677,12 @@
     <string name="search_recipient_hint">Адрес аккаунта или имя аккаунта</string>
     <string name="search_recipient_welcome_v2_2_0">Здесь появятся результаты поиска</string>
     <string name="search_result_header">Результат поиска</string>
+    <string name="select_delegation_tracks_add_title">Выберите треки для делегирования</string>
+    <string name="select_delegation_tracks_available_tracks">Доступные треки</string>
+    <string name="select_delegation_tracks_description">Пожалуйста, выберите треки, в которых вы бы хотели делегировать ваши голоса.</string>
+    <string name="select_delegation_tracks_edit_title">Выберите треки для изменения делегации</string>
+    <string name="select_delegation_tracks_revoke_title">Выберите треки для отмены делегации</string>
+    <string name="select_delegation_tracks_unavailable_tracks">Недоступные треки</string>
     <string name="settings_community">Сообщество</string>
     <string name="settings_email">Написать разработчикам</string>
     <string name="settings_general">Основные</string>
@@ -903,6 +962,10 @@
     <string name="transfer_title">Перевод</string>
     <string name="transfers_empty">Входящие и исходящие\nтранзакции будут отображаться здесь</string>
     <string name="transfers_empty_v2_2_0">Ваши операции появятся здесь</string>
+    <string name="unavailable_tracks_button_text">Удалить голоса для делегирования в этих треках</string>
+    <string name="unavailable_tracks_delegated_group">Треки, в которых вы уже делегировали голоса</string>
+    <string name="unavailable_tracks_title">Недоступные треки</string>
+    <string name="unavailable_tracks_voted_group">Треки, в которых вы голосовали</string>
     <string name="update_notification_install_btn">Установить</string>
     <string name="update_notification_item_version">Версия %s</string>
     <string name="update_notification_title">Доступно обновление</string>
