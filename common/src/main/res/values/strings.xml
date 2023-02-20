@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="staking_rebag_current_bag">Current queue slot</string>
+    <string name="staking_rebag_new_bag">New queue slot</string>
+
     <string name="staking_alert_rebag_title">Staking improvements</string>
     <string name="staking_alert_rebag_message">Having outdated position in the queue of stake assignment to a validator may suspend your rewards</string>
 

@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindMultiAddre
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindRewardDestination
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigInteger
 
@@ -105,6 +106,16 @@ fun ExtrinsicBuilder.setPayee(rewardDestination: RewardDestination): ExtrinsicBu
         "set_payee",
         mapOf(
             "payee" to bindRewardDestination(rewardDestination)
+        )
+    )
+}
+
+fun ExtrinsicBuilder.rebag(dislocated: AccountId): ExtrinsicBuilder {
+    return call(
+        moduleName = "VoterList",
+        callName = "rebag",
+        arguments = mapOf(
+            "dislocated" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, dislocated)
         )
     )
 }

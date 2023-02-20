@@ -14,6 +14,11 @@ class BagListNode(
     @JvmInline
     value class Score(val value: BigInteger) : Comparable<Score> {
 
+        companion object {
+
+            fun zero() = Score(BigInteger.ZERO)
+        }
+
         override fun compareTo(other: Score): Int {
             return value.compareTo(other.value)
         }
