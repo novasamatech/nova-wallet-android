@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
-        app:titleText="@string/delegation_remove_votes" />
+        app:titleText="@string/staking_alert_rebag_title" />
 
     <io.novafoundation.nova.feature_wallet_api.presentation.view.extrinsic.GenericExtrinsicInformationView
         android:id="@+id/rebagExtrinsicInfo"
