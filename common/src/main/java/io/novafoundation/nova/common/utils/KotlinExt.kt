@@ -45,7 +45,7 @@ val BigDecimal.isNonNegative: Boolean
 val BigInteger.isZero: Boolean
     get() = signum() == 0
 
-inline fun <T: Comparable<T>, R: Comparable<R>> ClosedRange<T>.map(mapper: (T) -> R) : ClosedRange<R> {
+inline fun <T : Comparable<T>, R : Comparable<R>> ClosedRange<T>.map(mapper: (T) -> R): ClosedRange<R> {
     return mapper(start)..mapper(endInclusive)
 }
 

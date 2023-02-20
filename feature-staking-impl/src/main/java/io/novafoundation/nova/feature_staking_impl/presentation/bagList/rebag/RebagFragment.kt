@@ -22,7 +22,6 @@ import kotlinx.android.synthetic.main.fragment_rebag.rebagNewBag
 import kotlinx.android.synthetic.main.fragment_rebag.rebagToolbar
 
 class RebagFragment : BaseFragment<RebagViewModel>() {
-    
 
     override fun onCreateView(
         inflater: LayoutInflater,

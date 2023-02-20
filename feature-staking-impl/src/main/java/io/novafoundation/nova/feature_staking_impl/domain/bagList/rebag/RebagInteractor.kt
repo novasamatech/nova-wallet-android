@@ -29,7 +29,7 @@ class RealRebagInteractor(
     private val bagListRepository: BagListRepository,
     private val assetUseCase: AssetUseCase,
     private val extrinsicService: ExtrinsicService,
-): RebagInteractor {
+) : RebagInteractor {
 
     override suspend fun calculateFee(stakingState: StakingState.Stash): Balance {
         return extrinsicService.estimateFee(stakingState.chain) {

@@ -95,7 +95,8 @@ object BackDelayedNavigation : DelayedNavigation
 
 class Navigator(
     private val navigationHolder: NavigationHolder,
-) : BaseNavigator(navigationHolder), SplashRouter,
+) : BaseNavigator(navigationHolder),
+    SplashRouter,
     OnboardingRouter,
     AccountRouter,
     AssetsRouter,
