@@ -38,7 +38,7 @@ private class RealBagListLocator(private val thresholds: List<Score>) : BagListL
     private fun notionalBagIndexFor(score: Score): Int {
         val index = thresholds.binarySearch(score)
 
-        return if (index > 0) {
+        return if (index >= 0) {
             index
         } else {
             val insertionPoint = (-index - 1) // convert from inverted insertion point
