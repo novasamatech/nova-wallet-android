@@ -143,7 +143,7 @@ class DelegateDetailsViewModel(
     }
 
     fun recentVotesClicked() {
-        openVotedReferenda(onlyRecentVotes = true, title = delegateMappers.formattedRecentVotesPeriod())
+        openVotedReferenda(onlyRecentVotes = true, title = delegateMappers.formattedRecentVotesPeriod(R.string.delegation_recent_votes_format))
     }
 
     fun allVotesClicked() {
@@ -229,7 +229,7 @@ class DelegateDetailsViewModel(
             recentVotes = VotesModel(
                 votes = stats.recentVotes.format(),
                 extraInfoAvalable = stats.recentVotes > 0,
-                customLabel = delegateMappers.formattedRecentVotesPeriod(),
+                customLabel = delegateMappers.formattedRecentVotesPeriod(R.string.delegation_recent_votes_format),
             ),
             allVotes = VotesModel(
                 votes = stats.allVotes.format(),

@@ -15,22 +15,6 @@
 
     <string name="common_revoke">Revoke</string>
 
-    <!--<string name="referendum_track_root">main agenda</string>
-    <string name="referendum_whitelisted_caller">fellowship: whitelist</string>
-    <string name="referendum_staking_admin">staking</string>
-    <string name="referendum_track_treasurer">Treasury: ANY</string>
-    <string name="referendum_track_lease_admin">Governance: lease</string>
-    <string name="referendum_track_fellowship_admin">fellowship: admin</string>
-    <string name="referendum_track_general_admin">governance: registrar</string>
-    <string name="referendum_track_auction_admin">crowdloans</string>
-    <string name="referendum_track_referendum_canceller">governance: canceller</string>
-    <string name="referendum_track_referendum_killer">governance: killer</string>
-    <string name="referendum_track_small_tipper">Treasury: small tips</string>
-    <string name="referendum_track_big_tipper">Treasury: big tips</string>
-    <string name="referendum_track_small_spender">Treasury: Small spend</string>
-    <string name="referendum_track_medium_spender">Treasury: medium spend</string>
-    <string name="referendum_track_big_spender">Treasury: big spend</string>-->
-
     <string name="referendum_track_root">Main agenda</string>
     <string name="referendum_whitelisted_caller">Fellowship: whitelist</string>
     <string name="referendum_staking_admin">Staking</string>
@@ -67,7 +51,6 @@
     <string name="delegation_tracks">Tracks</string>
 
     <string name="common_element_and_more_format">%s (+%s more)</string>
-    <!--    <string name="assets_manage_tokens_partial_networks">%s (+%s more)</string>-->
 
     <string name="delegation_all_votes">Voted for all time</string>
     <string name="delegation_delegate_info">Delegate info</string>
@@ -97,6 +80,10 @@
     <string name="delegation_delegated_votes">Delegated votes</string>
     <string name="delegation_recent_votes_format">Voted last %s</string>
 
+    <string name="delegation_sorting_delegations">Delegations</string>
+    <string name="delegation_sorting_delegated_votes">Delegated votes</string>
+    <string name="delegation_sorting_recent_votes_format">Voted last %s</string>
+
     <string name="select_delegation_tracks_available_tracks">Available tracks</string>
     <string name="select_delegation_tracks_unavailable_tracks">Unavailable tracks</string>
     <string name="select_delegation_tracks_description">Please select the tracks in which you would like to delegate your voting power.</string>
@@ -104,7 +91,7 @@
     <string name="delegation_tracks_all_preset">Select all</string>
     <string name="delegation_tracks_treasury_preset">Treasury</string>
     <string name="delegation_tracks_governance_preset">Governance</string>
-    <string name="delegation_tracks_fellowship_preset">Fellowship</string>
+    <string name="delegation_tracks_fellowship_preset" translatable="false">Fellowship</string>
 
     <string name="delegation_tracks_disabled_apply_button_text">Select at least 1 track...</string>
     <string name="delegation_tracks_empty_list_placeholder">No tracks are available to delegate</string>
@@ -122,7 +109,9 @@
 
     <string name="unavailable_tracks_voted_group">Tracks which you have existing votes in</string>
     <string name="unavailable_tracks_delegated_group">Tracks that you have already delegated votes to</string>
-    <string name="delegate_more_tracks">+%d</string>
+    <string name="delegate_more_tracks" translatable="false">+%d</string>
+
+    <string name="delegations_filter">Show</string>
 
     <string name="update_notification_item_version">Version %s</string>
 
