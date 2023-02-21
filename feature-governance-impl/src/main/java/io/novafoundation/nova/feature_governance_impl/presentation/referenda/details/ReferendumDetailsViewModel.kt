@@ -388,7 +388,6 @@ class ReferendumDetailsViewModel(
         val referendumCall = referendumCallFlow.first()
 
         return checkAnyNonNull(
-            referendumDetails.proposer,
             referendumDetails.fullDetails.voteThreshold,
             referendumDetails.fullDetails.approvalCurve,
             referendumDetails.fullDetails.supportCurve,
