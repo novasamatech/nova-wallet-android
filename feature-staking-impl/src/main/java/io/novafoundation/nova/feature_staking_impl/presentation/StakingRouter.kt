@@ -72,4 +72,6 @@ interface StakingRouter {
     fun openConfirmRewardDestination(payload: ConfirmRewardDestinationPayload)
 
     fun openAccountDetails(metaAccountId: Long)
+
+    fun openRebag()
 }

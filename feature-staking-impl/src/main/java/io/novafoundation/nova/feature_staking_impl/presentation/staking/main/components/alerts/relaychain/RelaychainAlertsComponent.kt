@@ -137,7 +137,7 @@ private class RelaychainAlertsComponent(
             Alert.Rebag -> AlertModel(
                 resourceManager.getString(R.string.staking_alert_rebag_title),
                 resourceManager.getString(R.string.staking_alert_rebag_message),
-                AlertModel.Type.CallToAction { hostContext.errorDisplayer(NotImplementedError("TODO")) }
+                AlertModel.Type.CallToAction { router.openRebag() }
             )
         }
     }

@@ -12,6 +12,8 @@ interface BagListScoreConverter {
     }
 
     fun scoreOf(stake: Balance): BagListNode.Score
+
+    fun balanceOf(score: BagListNode.Score): Balance
 }
 
 private val U64_MAX = BigInteger("18446744073709551615")
@@ -24,5 +26,9 @@ private class U128BagListScoreConverter(
 
     override fun scoreOf(stake: Balance): BagListNode.Score {
         return BagListNode.Score(stake / factor)
+    }
+
+    override fun balanceOf(score: BagListNode.Score): Balance {
+        return score.value * factor
     }
 }
