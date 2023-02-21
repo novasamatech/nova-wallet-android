@@ -57,7 +57,7 @@ abstract class BaseNetworkInfoComponent(
 
         return createNetworkInfoItems(
             totalStaked = mapAmountToAmountModel(networkInfo.totalStake, asset),
-            minimumStake = mapAmountToAmountModel(networkInfo.minimumStake, asset, roundingMode = RoundingMode.FLOOR),
+            minimumStake = mapAmountToAmountModel(networkInfo.minimumStake, asset, roundingMode = RoundingMode.CEILING),
             activeNominators = networkInfo.nominatorsCount.format(),
             unstakingPeriod = unstakingPeriod,
             stakingPeriod = stakingPeriod,

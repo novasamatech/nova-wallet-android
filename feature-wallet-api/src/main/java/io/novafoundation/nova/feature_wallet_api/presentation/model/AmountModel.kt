@@ -73,7 +73,8 @@ fun mapAmountToAmountModel(
     token = asset.token,
     includeZeroFiat = includeZeroFiat,
     includeAssetTicker = includeAssetTicker,
-    tokenAmountSign = tokenAmountSign
+    tokenAmountSign = tokenAmountSign,
+    roundingMode = roundingMode
 )
 
 fun Asset.transferableAmountModel() = mapAmountToAmountModel(transferable, this)
