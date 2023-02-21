@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
-import io.novafoundation.nova.feature_staking_impl.data.repository.bagListLocator
+import io.novafoundation.nova.feature_staking_impl.data.repository.bagListLocatorOrNull
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.Alert.ChangeValidators.Reason
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListLocator
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListScoreConverter
@@ -47,7 +47,7 @@ class AlertsInteractor(
         val activeEra: BigInteger,
         val asset: Asset,
         val bagListNode: BagListNode?,
-        val bagListLocator: BagListLocator,
+        val bagListLocator: BagListLocator?,
         val bagListScoreConverter: BagListScoreConverter,
     ) {
 
@@ -154,7 +154,7 @@ class AlertsInteractor(
         val minimumNominatorBond = stakingRepository.minimumNominatorBond(chain.id)
         val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
         val bagListScoreConverter = BagListScoreConverter.U128(totalIssuance)
-        val bagListLocator = bagListRepository.bagListLocator(chain.id)
+        val bagListLocator = bagListRepository.bagListLocatorOrNull(chain.id)
 
         val alertsFlow = combine(
             stakingSharedComputation.electedExposuresInActiveEraFlow(chain.id, scope),

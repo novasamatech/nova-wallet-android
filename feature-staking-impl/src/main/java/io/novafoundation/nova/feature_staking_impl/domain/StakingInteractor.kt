@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.BagListReposi
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
-import io.novafoundation.nova.feature_staking_impl.data.repository.bagListLocator
+import io.novafoundation.nova.feature_staking_impl.data.repository.bagListLocatorOrNull
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListLocator
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListScoreConverter
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculator
@@ -188,7 +188,7 @@ class StakingInteractor(
 
     fun observeNetworkInfoState(chainId: ChainId, scope: CoroutineScope): Flow<NetworkInfo> = flow {
         val lockupPeriod = getLockupDuration(chainId)
-        val bagListLocator = bagListRepository.bagListLocator(chainId)
+        val bagListLocator = bagListRepository.bagListLocatorOrNull(chainId)
         val bagListScoreConverter = createBagListScoreConverter(chainId)
 
         val innerFlow = stakingSharedComputation.electedExposuresInActiveEraFlow(chainId, scope).map { exposuresMap ->
@@ -293,7 +293,7 @@ class StakingInteractor(
         val chainAsset = stakingSharedState.chainAsset()
         val chainId = chainAsset.chainId
 
-        val bagListLocator = bagListRepository.bagListLocator(chainId)
+        val bagListLocator = bagListRepository.bagListLocatorOrNull(chainId)
         val bagListScoreConverter = createBagListScoreConverter(chainId)
 
         combine(
@@ -357,7 +357,7 @@ class StakingInteractor(
         val activeEraIndex: BigInteger,
         val asset: Asset,
         val rewardedNominatorsPerValidator: Int,
-        val bagListLocator: BagListLocator,
+        val bagListLocator: BagListLocator?,
         val bagListScoreConverter: BagListScoreConverter,
     )
 }

@@ -47,7 +47,7 @@ fun Exposure.willAccountBeRewarded(
 fun minimumStake(
     exposures: Collection<Exposure>,
     minimumNominatorBond: BigInteger,
-    bagListLocator: BagListLocator,
+    bagListLocator: BagListLocator?,
     bagListScoreConverter: BagListScoreConverter,
 ): BigInteger {
     val stakeByNominator = exposures
@@ -62,6 +62,8 @@ fun minimumStake(
         }
 
     val minElectedStake = stakeByNominator.values.minOrNull().orZero().coerceAtLeast(minimumNominatorBond)
+
+    if (bagListLocator == null) return minElectedStake
 
     val lastElectedBag = bagListLocator.bagBoundaries(bagListScoreConverter.scoreOf(minElectedStake))
 

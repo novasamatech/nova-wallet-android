@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.rebag
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
-import io.novafoundation.nova.feature_staking_impl.data.repository.bagListLocator
+import io.novafoundation.nova.feature_staking_impl.data.repository.bagListLocatorOrThrow
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListScoreConverter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -47,7 +47,7 @@ class RealRebagInteractor(
         return flowOfAll {
             val chain = stakingState.chain
             val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
-            val bagListLocator = bagListRepository.bagListLocator(chain.id)
+            val bagListLocator = bagListRepository.bagListLocatorOrThrow(chain.id)
             val bagScoreConverter = BagListScoreConverter.U128(totalIssuance)
 
             combine(
