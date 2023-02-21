@@ -188,6 +188,8 @@ class StakingFeatureModule {
         assetUseCase: AssetUseCase,
         factory: EraTimeCalculatorFactory,
         stakingSharedComputation: StakingSharedComputation,
+        bagListRepository: BagListRepository,
+        totalIssuanceRepository: TotalIssuanceRepository,
     ) = StakingInteractor(
         walletRepository,
         accountRepository,
@@ -199,7 +201,9 @@ class StakingFeatureModule {
         payoutRepository,
         assetUseCase,
         factory,
-        stakingSharedComputation
+        stakingSharedComputation,
+        bagListRepository,
+        totalIssuanceRepository
     )
 
     @Provides

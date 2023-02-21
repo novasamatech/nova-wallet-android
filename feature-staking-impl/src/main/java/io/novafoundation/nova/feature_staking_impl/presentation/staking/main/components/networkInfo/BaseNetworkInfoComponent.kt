@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.math.RoundingMode
 
 abstract class BaseNetworkInfoComponent(
     private val resourceManager: ResourceManager,
@@ -56,7 +57,7 @@ abstract class BaseNetworkInfoComponent(
 
         return createNetworkInfoItems(
             totalStaked = mapAmountToAmountModel(networkInfo.totalStake, asset),
-            minimumStake = mapAmountToAmountModel(networkInfo.minimumStake, asset),
+            minimumStake = mapAmountToAmountModel(networkInfo.minimumStake, asset, roundingMode = RoundingMode.FLOOR),
             activeNominators = networkInfo.nominatorsCount.format(),
             unstakingPeriod = unstakingPeriod,
             stakingPeriod = stakingPeriod,
