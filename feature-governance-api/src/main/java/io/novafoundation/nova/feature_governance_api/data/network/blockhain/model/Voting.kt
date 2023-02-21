@@ -102,7 +102,20 @@ fun AccountVote.conviction(): Conviction? {
     }
 }
 
-fun AccountVote.hasAmountFor(type: VoteType): Boolean {
+fun AccountVote.votedFor(type: VoteType): Boolean {
+    return when (this) {
+        // we still want to show zero votes since it might have delegators
+        is AccountVote.Standard -> voteType == type
+
+        is AccountVote.Split -> hasPositiveAmountFor(type)
+
+        is AccountVote.SplitAbstain -> hasPositiveAmountFor(type)
+
+        AccountVote.Unsupported -> false
+    }
+}
+
+fun AccountVote.hasPositiveAmountFor(type: VoteType): Boolean {
     val amount = amountFor(type)
 
     return amount != null && amount.isPositive()
@@ -111,9 +124,7 @@ fun AccountVote.hasAmountFor(type: VoteType): Boolean {
 fun AccountVote.amountFor(type: VoteType): Balance? {
     return when (this) {
         is AccountVote.Standard -> {
-            val direction = if (vote.aye) VoteType.AYE else VoteType.NAY
-
-            if (direction == type) balance else Balance.ZERO
+            if (voteType == type) balance else Balance.ZERO
         }
 
         is AccountVote.Split -> when (type) {
@@ -131,6 +142,9 @@ fun AccountVote.amountFor(type: VoteType): Balance? {
         AccountVote.Unsupported -> null
     }
 }
+
+private val AccountVote.Standard.voteType: VoteType
+    get() = if (vote.aye) VoteType.AYE else VoteType.NAY
 
 fun Voting.votes(): Map<ReferendumId, AccountVote> {
     return when (this) {
