@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.OptionsBottomSheetDialog
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.PageCallback
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClient
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
@@ -40,7 +41,7 @@ import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserProgress
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserRefresh
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebView
 
-class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomSheetDialog.Callback {
+class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomSheetDialog.Callback, PageCallback {
 
     companion object {
 
@@ -133,7 +134,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     override fun subscribe(viewModel: DAppBrowserViewModel) {
         setupRemoveFavouritesConfirmation(viewModel.removeFromFavouritesConfirmation)
 
-        webViewClient = web3WebViewClientFactory.create(dappBrowserWebView, viewModel.extensionsStore, viewModel::onPageChanged)
+        webViewClient = web3WebViewClientFactory.create(dappBrowserWebView, viewModel.extensionsStore, viewModel::onPageChanged, this)
         dappBrowserWebView.injectWeb3(
             progressBar = dappBrowserProgress,
             fileChooser = fileChooser,
@@ -247,5 +248,9 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
 
     override fun onDesktopModeClick() {
         viewModel.onDesktopClick()
+    }
+
+    override fun handleBrowserIntent(intent: Intent) {
+        startActivity(intent)
     }
 }
