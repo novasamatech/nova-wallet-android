@@ -14,7 +14,7 @@ class DelegateListModel(
     val delegation: YourDelegationInfo?
 ) {
 
-    class YourDelegationInfo(
+    data class YourDelegationInfo(
         val firstTrack: TrackModel,
         val otherTracksCount: String?,
         val votes: VoteModel?,

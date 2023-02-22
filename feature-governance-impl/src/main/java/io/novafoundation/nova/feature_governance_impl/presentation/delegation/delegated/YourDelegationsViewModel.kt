@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.presentation.mapLoading
-import io.novafoundation.nova.common.utils.withLoadingResult
+import io.novafoundation.nova.common.utils.withLoadingShared
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateSorting
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
@@ -22,14 +22,13 @@ class YourDelegationsViewModel(
 ) : BaseViewModel() {
 
     private val delegatesFlow = governanceSharedState.selectedOption
-        .withLoadingResult { interactor.getUserDelegates(it) }
+        .withLoadingShared { interactor.getUserDelegates(it) }
         .mapLoading { interactor.applySorting(DelegateSorting.DELEGATIONS, it) }
-        .shareInBackground()
 
     val delegateModels = delegatesFlow.mapLoading { delegates ->
         val chainWithAsset = governanceSharedState.chainAndAsset()
         delegates.map { delegateMappers.mapDelegatePreviewToUi(it, chainWithAsset) }
-    }.shareInBackground()
+    }.shareWhileSubscribed()
 
     fun delegateClicked(position: Int) = launch {
         val delegate = delegateModels.first().dataOrNull?.getOrNull(position) ?: return@launch
