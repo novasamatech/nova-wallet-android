@@ -11,11 +11,21 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
 
-fun isNominationActive(
+enum class NominationStatus {
+    NOT_PRESENT, OVERSUBSCRIBED, ACTIVE
+}
+
+val NominationStatus.isActive: Boolean
+    get() = this == NominationStatus.ACTIVE
+
+val NominationStatus.isOversubscribed: Boolean
+    get() = this == NominationStatus.OVERSUBSCRIBED
+
+fun nominationStatus(
     stashId: AccountId,
     exposures: Collection<Exposure>,
     rewardedNominatorsPerValidator: Int
-): Boolean {
+): NominationStatus {
     val comparator = { accountId: IndividualExposure ->
         accountId.who.contentEquals(stashId)
     }
@@ -23,8 +33,13 @@ fun isNominationActive(
     val validatorsWithOurStake = exposures.filter { exposure ->
         exposure.others.any(comparator)
     }
+    if (validatorsWithOurStake.isEmpty()) {
+        return NominationStatus.NOT_PRESENT
+    }
 
-    return validatorsWithOurStake.any { it.willAccountBeRewarded(stashId, rewardedNominatorsPerValidator) }
+    val willBeRewarded = validatorsWithOurStake.any { it.willAccountBeRewarded(stashId, rewardedNominatorsPerValidator) }
+
+    return if (willBeRewarded) NominationStatus.ACTIVE else NominationStatus.OVERSUBSCRIBED
 }
 
 fun Exposure.willAccountBeRewarded(

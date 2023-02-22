@@ -158,7 +158,7 @@ class StakingInteractor(
         val chainId = nominatorState.chain.id
 
         when {
-            isNominationActive(nominatorState.stashId, it.eraStakers.values, it.rewardedNominatorsPerValidator) -> NominatorStatus.Active
+            nominationStatus(nominatorState.stashId, it.eraStakers.values, it.rewardedNominatorsPerValidator).isActive -> NominatorStatus.Active
 
             nominatorState.nominations.isWaiting(it.activeEraIndex) -> NominatorStatus.Waiting(
                 timeLeft = getEraTimeCalculator().calculate(nominatorState.nominations.submittedInEra + ERA_OFFSET).toLong()
