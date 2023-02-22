@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 class RelaychainAlertsComponentFactory(
     private val alertsInteractor: AlertsInteractor,
@@ -109,17 +110,17 @@ private class RelaychainAlertsComponent(
             is Alert.RedeemTokens -> {
                 AlertModel(
                     resourceManager.getString(R.string.staking_alert_redeem_title),
-                    formatAlertTokenAmount(alert.amount, alert.token),
+                    formatAlertTokenAmount(alert.amount, alert.token, RoundingMode.FLOOR),
                     AlertModel.Type.CallToAction(::redeemAlertClicked)
                 )
             }
 
             is Alert.BondMoreTokens -> {
-                val existentialDepositDisplay = formatAlertTokenAmount(alert.minimalStake, alert.token)
+                val minStakeFormatted = formatAlertTokenAmount(alert.minimalStake, alert.token, RoundingMode.CEILING)
 
                 AlertModel(
                     resourceManager.getString(R.string.staking_alert_bond_more_title),
-                    resourceManager.getString(R.string.staking_alert_bond_more_message, existentialDepositDisplay),
+                    resourceManager.getString(R.string.staking_alert_bond_more_message, minStakeFormatted),
                     AlertModel.Type.CallToAction(::bondMoreAlertClicked)
                 )
             }
@@ -142,16 +143,14 @@ private class RelaychainAlertsComponent(
         }
     }
 
-    private fun formatAlertTokenAmount(amount: BigDecimal, token: Token): String {
+    private fun formatAlertTokenAmount(amount: BigDecimal, token: Token, roundingMode: RoundingMode): String {
         val formattedFiat = token.priceOf(amount).formatAsCurrency(token.currency)
-        val formattedAmount = amount.formatTokenAmount(token.configuration)
+        val formattedAmount = amount.formatTokenAmount(token.configuration, roundingMode)
 
         return buildString {
             append(formattedAmount)
 
-            formattedFiat.let {
-                append(" ($it)")
-            }
+            append(" ($formattedFiat)")
         }
     }
 

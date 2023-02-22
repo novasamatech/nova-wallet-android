@@ -2,6 +2,7 @@ package io.novafoundation.nova.common.utils.formatting
 
 import java.math.BigDecimal
 import java.math.MathContext
+import java.math.RoundingMode
 
 class CompoundNumberFormatter(
     val abbreviations: List<NumberAbbreviation>,
@@ -21,11 +22,11 @@ class CompoundNumberFormatter(
         }
     }
 
-    override fun format(number: BigDecimal): String {
+    override fun format(number: BigDecimal, roundingMode: RoundingMode): String {
         val lastAbbreviationMatching = abbreviations.lastOrNull { number >= it.threshold } ?: abbreviations.first()
 
         val scaled = number.divide(lastAbbreviationMatching.divisor, MathContext.UNLIMITED)
 
-        return lastAbbreviationMatching.formatter.format(scaled) + lastAbbreviationMatching.suffix
+        return lastAbbreviationMatching.formatter.format(scaled, roundingMode) + lastAbbreviationMatching.suffix
     }
 }

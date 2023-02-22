@@ -2,8 +2,12 @@ package io.novafoundation.nova.feature_staking_impl.domain
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
+import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListLocator
+import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListScoreConverter
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
 
@@ -43,6 +47,8 @@ fun Exposure.willAccountBeRewarded(
 fun minimumStake(
     exposures: Collection<Exposure>,
     minimumNominatorBond: BigInteger,
+    bagListLocator: BagListLocator?,
+    bagListScoreConverter: BagListScoreConverter,
 ): BigInteger {
     val stakeByNominator = exposures
         .fold(mutableMapOf<AccountIdKey, BigInteger>()) { acc, exposure ->
@@ -55,5 +61,14 @@ fun minimumStake(
             acc
         }
 
-    return stakeByNominator.values.minOrNull()!!.coerceAtLeast(minimumNominatorBond)
+    val minElectedStake = stakeByNominator.values.minOrNull().orZero().coerceAtLeast(minimumNominatorBond)
+
+    if (bagListLocator == null) return minElectedStake
+
+    val lastElectedBag = bagListLocator.bagBoundaries(bagListScoreConverter.scoreOf(minElectedStake))
+
+    val nextBagThreshold = bagListScoreConverter.balanceOf(lastElectedBag.endInclusive)
+    val epsilon = Balance.ONE
+
+    return nextBagThreshold + epsilon
 }

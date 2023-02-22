@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.RoundingMode
 
 fun BigInteger.formatPlanks(chainAsset: Chain.Asset): String {
     return chainAsset.amountFromPlanks(this).formatTokenAmount(chainAsset)
@@ -18,12 +19,12 @@ fun ClosedRange<Balance>.formatPlanksRange(chainAsset: Chain.Asset): String {
     return "$startFormatted — $endFormatted"
 }
 
-fun BigDecimal.formatTokenAmount(chainAsset: Chain.Asset): String {
-    return formatTokenAmount(chainAsset.symbol)
+fun BigDecimal.formatTokenAmount(chainAsset: Chain.Asset, roundingMode: RoundingMode = RoundingMode.FLOOR): String {
+    return formatTokenAmount(chainAsset.symbol, roundingMode)
 }
 
-fun BigDecimal.formatTokenAmount(tokenSymbol: String): String {
-    return "${format()} $tokenSymbol"
+fun BigDecimal.formatTokenAmount(tokenSymbol: String, roundingMode: RoundingMode = RoundingMode.FLOOR): String {
+    return "${format(roundingMode)} $tokenSymbol"
 }
 
 fun BigDecimal.formatTokenChange(chainAsset: Chain.Asset, isIncome: Boolean): String {

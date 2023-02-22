@@ -23,7 +23,8 @@ interface BagListRepository {
     fun listNodeFlow(stash: AccountId, chainId: ChainId): Flow<BagListNode?>
 }
 
-suspend fun BagListRepository.bagListLocator(chainId: ChainId) = BagListLocator(bagThresholds(chainId).orEmpty())
+suspend fun BagListRepository.bagListLocatorOrNull(chainId: ChainId): BagListLocator? = bagThresholds(chainId)?.let(::BagListLocator)
+suspend fun BagListRepository.bagListLocatorOrThrow(chainId: ChainId): BagListLocator = requireNotNull(bagListLocatorOrNull(chainId))
 
 class LocalBagListRepository(
     private val localStorage: StorageDataSource

@@ -16,9 +16,13 @@ import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.Stakin
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapAccountToStakingAccount
 import io.novafoundation.nova.feature_staking_impl.data.model.Payout
+import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.bagListLocatorOrNull
+import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListLocator
+import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListScoreConverter
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
@@ -39,6 +43,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novafoundation.nova.runtime.state.chainAsset
@@ -69,6 +74,8 @@ class StakingInteractor(
     private val assetUseCase: AssetUseCase,
     private val factory: EraTimeCalculatorFactory,
     private val stakingSharedComputation: StakingSharedComputation,
+    private val bagListRepository: BagListRepository,
+    private val totalIssuanceRepository: TotalIssuanceRepository,
 ) {
     suspend fun calculatePendingPayouts(scope: CoroutineScope): Result<PendingPayoutsStatistics> = withContext(Dispatchers.Default) {
         runCatching {
@@ -158,10 +165,11 @@ class StakingInteractor(
             )
 
             else -> {
+                val minimumNominatorBond = stakingRepository.minimumNominatorBond(chainId)
+                val minStake = minimumStake(eraStakers, minimumNominatorBond, it.bagListLocator, it.bagListScoreConverter)
+
                 val inactiveReason = when {
-                    it.asset.bondedInPlanks < minimumStake(eraStakers, stakingRepository.minimumNominatorBond(chainId)) -> {
-                        NominatorStatus.Inactive.Reason.MIN_STAKE
-                    }
+                    it.asset.bondedInPlanks < minStake -> NominatorStatus.Inactive.Reason.MIN_STAKE
                     else -> NominatorStatus.Inactive.Reason.NO_ACTIVE_VALIDATOR
                 }
 
@@ -180,6 +188,8 @@ class StakingInteractor(
 
     fun observeNetworkInfoState(chainId: ChainId, scope: CoroutineScope): Flow<NetworkInfo> = flow {
         val lockupPeriod = getLockupDuration(chainId)
+        val bagListLocator = bagListRepository.bagListLocatorOrNull(chainId)
+        val bagListScoreConverter = createBagListScoreConverter(chainId)
 
         val innerFlow = stakingSharedComputation.electedExposuresInActiveEraFlow(chainId, scope).map { exposuresMap ->
             val exposures = exposuresMap.values
@@ -188,7 +198,7 @@ class StakingInteractor(
 
             NetworkInfo(
                 lockupPeriod = lockupPeriod,
-                minimumStake = minimumStake(exposures, minimumNominatorBond),
+                minimumStake = minimumStake(exposures, minimumNominatorBond, bagListLocator, bagListScoreConverter),
                 totalStake = totalStake(exposures),
                 stakingPeriod = StakingPeriod.Unlimited,
                 nominatorsCount = activeNominators(chainId, exposures),
@@ -196,6 +206,10 @@ class StakingInteractor(
         }
 
         emitAll(innerFlow)
+    }
+
+    private suspend fun createBagListScoreConverter(chainId: ChainId): BagListScoreConverter {
+        return BagListScoreConverter.U128(totalIssuanceRepository.getTotalIssuance(chainId))
     }
 
     suspend fun getLockupDuration() = withContext(Dispatchers.Default) {
@@ -279,6 +293,9 @@ class StakingInteractor(
         val chainAsset = stakingSharedState.chainAsset()
         val chainId = chainAsset.chainId
 
+        val bagListLocator = bagListRepository.bagListLocatorOrNull(chainId)
+        val bagListScoreConverter = createBagListScoreConverter(chainId)
+
         combine(
             stakingRepository.observeActiveEraIndex(chainId),
             walletRepository.assetFlow(state.accountId, chainAsset)
@@ -288,7 +305,14 @@ class StakingInteractor(
             val eraStakers = stakingSharedComputation.electedExposuresInActiveEra(chainId, scope)
             val rewardedNominatorsPerValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
-            val statusResolutionContext = StatusResolutionContext(eraStakers, activeEraIndex, asset, rewardedNominatorsPerValidator)
+            val statusResolutionContext = StatusResolutionContext(
+                eraStakers,
+                activeEraIndex,
+                asset,
+                rewardedNominatorsPerValidator,
+                bagListLocator,
+                bagListScoreConverter
+            )
 
             val status = statusResolver(statusResolutionContext)
 
@@ -332,6 +356,8 @@ class StakingInteractor(
         val eraStakers: AccountIdMap<Exposure>,
         val activeEraIndex: BigInteger,
         val asset: Asset,
-        val rewardedNominatorsPerValidator: Int
+        val rewardedNominatorsPerValidator: Int,
+        val bagListLocator: BagListLocator?,
+        val bagListScoreConverter: BagListScoreConverter,
     )
 }

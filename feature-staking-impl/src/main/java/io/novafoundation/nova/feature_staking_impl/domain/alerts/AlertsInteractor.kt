@@ -5,14 +5,15 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.bagListLocatorOrNull
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.Alert.ChangeValidators.Reason
+import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListLocator
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListScoreConverter
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
 import io.novafoundation.nova.feature_staking_impl.domain.isNominationActive
 import io.novafoundation.nova.feature_staking_impl.domain.minimumStake
 import io.novafoundation.nova.feature_staking_impl.domain.model.BagListNode
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -46,7 +47,8 @@ class AlertsInteractor(
         val activeEra: BigInteger,
         val asset: Asset,
         val bagListNode: BagListNode?,
-        val totalIssuance: Balance,
+        val bagListLocator: BagListLocator?,
+        val bagListScoreConverter: BagListScoreConverter,
     ) {
 
         val memo = mutableMapOf<Any, Any?>()
@@ -95,7 +97,7 @@ class AlertsInteractor(
 
     private fun produceMinStakeAlert(context: AlertContext) = requireState(context.stakingState) { state: StakingState.Stash ->
         with(context) {
-            val minimalStakeInPlanks = minimumStake(exposures.values, minimumNominatorBond)
+            val minimalStakeInPlanks = minimumStake(exposures.values, minimumNominatorBond, bagListLocator, bagListScoreConverter)
 
             if (
                 // do not show alert for validators
@@ -125,8 +127,7 @@ class AlertsInteractor(
     private fun produceBagListAlert(context: AlertContext) = requireState(context.stakingState) { _: StakingState.Stash.Nominator ->
         val bagListNode = context.bagListNode ?: return@requireState null
 
-        val scoreConverter = BagListScoreConverter.U128(context.totalIssuance)
-        val currentScore = scoreConverter.scoreOf(context.asset.bondedInPlanks)
+        val currentScore = context.bagListScoreConverter.scoreOf(context.asset.bondedInPlanks)
 
         Alert.Rebag.takeIf { currentScore > bagListNode.bagUpper }
     }
@@ -152,6 +153,8 @@ class AlertsInteractor(
         val maxRewardedNominatorsPerValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chain.id)
         val minimumNominatorBond = stakingRepository.minimumNominatorBond(chain.id)
         val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
+        val bagListScoreConverter = BagListScoreConverter.U128(totalIssuance)
+        val bagListLocator = bagListRepository.bagListLocatorOrNull(chain.id)
 
         val alertsFlow = combine(
             stakingSharedComputation.electedExposuresInActiveEraFlow(chain.id, scope),
@@ -168,7 +171,8 @@ class AlertsInteractor(
                 asset = asset,
                 activeEra = activeEra,
                 bagListNode = bagListNode,
-                totalIssuance = totalIssuance
+                bagListLocator = bagListLocator,
+                bagListScoreConverter = bagListScoreConverter
             )
 
             alertProducers.mapNotNull { it.invoke(context) }
