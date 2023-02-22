@@ -14,11 +14,11 @@ interface DelegateListInteractor {
 
     suspend fun getDelegates(
         governanceOption: SupportedGovernanceOption,
-    ): Result<List<DelegatePreview>>
+    ): Flow<List<DelegatePreview>>
 
     suspend fun getUserDelegates(
         governanceOption: SupportedGovernanceOption,
-    ): Result<List<DelegatePreview>>
+    ): Flow<List<DelegatePreview>>
 
     suspend fun applySortingAndFiltering(
         sorting: DelegateSorting,

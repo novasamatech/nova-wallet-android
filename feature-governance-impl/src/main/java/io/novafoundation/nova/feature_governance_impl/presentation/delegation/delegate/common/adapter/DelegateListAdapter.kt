@@ -62,7 +62,8 @@ private class DelegateDiffCallback : ItemCallback<DelegateListModel>() {
     }
 
     override fun areContentsTheSame(oldItem: DelegateListModel, newItem: DelegateListModel): Boolean {
-        return oldItem.stats == newItem.stats
+        return oldItem.stats == newItem.stats &&
+            oldItem.delegation == newItem.delegation
     }
 }
 

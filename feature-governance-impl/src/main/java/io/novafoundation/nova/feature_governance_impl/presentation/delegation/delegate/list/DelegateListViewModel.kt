@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.presentation.map
 import io.novafoundation.nova.common.presentation.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.withLoadingResult
+import io.novafoundation.nova.common.utils.withLoadingShared
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.common.view.input.chooser.createFromEnum
 import io.novafoundation.nova.common.view.input.chooser.selectedValue
@@ -50,8 +50,7 @@ class DelegateListViewModel(
         .shareInBackground()
 
     private val delegatesFlow = governanceSharedState.selectedOption
-        .withLoadingResult { interactor.getDelegates(it) }
-        .shareInBackground()
+        .withLoadingShared { interactor.getDelegates(it) }
 
     private val sortedAndFilteredDelegates = combine(
         sortingMixin.selectedValue,
@@ -59,12 +58,12 @@ class DelegateListViewModel(
         delegatesFlow
     ) { sorting, filtering, delegates ->
         delegates.map { interactor.applySortingAndFiltering(sorting, filtering, it) }
-    }.share()
+    }
 
     val delegateModels = sortedAndFilteredDelegates.mapLoading { delegates ->
         val chainWithAsset = governanceSharedState.chainAndAsset()
         delegates.map { delegateMappers.mapDelegatePreviewToUi(it, chainWithAsset) }
-    }.shareInBackground()
+    }.shareWhileSubscribed()
 
     fun delegateClicked(position: Int) = launch {
         val delegate = delegateModels.first().dataOrNull?.getOrNull(position) ?: return@launch

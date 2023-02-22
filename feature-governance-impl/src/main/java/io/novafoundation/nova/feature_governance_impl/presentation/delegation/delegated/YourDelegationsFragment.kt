@@ -60,7 +60,7 @@ class YourDelegationsFragment :
     }
 
     override fun subscribe(viewModel: YourDelegationsViewModel) {
-        viewModel.delegateModels.observe {
+        viewModel.delegateModels.observeWhenVisible {
             when (it) {
                 is ExtendedLoadingState.Error -> {}
                 is ExtendedLoadingState.Loaded -> {

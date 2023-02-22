@@ -79,7 +79,7 @@ class DelegateListFragment :
             bannerAdapter.showBanner(it)
         }
 
-        viewModel.delegateModels.observe {
+        viewModel.delegateModels.observeWhenVisible {
             when (it) {
                 is ExtendedLoadingState.Error -> {}
                 is ExtendedLoadingState.Loaded -> {
