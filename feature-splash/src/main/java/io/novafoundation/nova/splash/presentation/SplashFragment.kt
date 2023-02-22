@@ -33,6 +33,11 @@ class SplashFragment : BaseFragment<SplashViewModel>() {
             .inject(this)
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.openInitialDestination()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 

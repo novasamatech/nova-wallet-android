@@ -11,11 +11,7 @@ class SplashViewModel(
     private val repository: AccountRepository
 ) : BaseViewModel() {
 
-    init {
-        openInitialDestination()
-    }
-
-    private fun openInitialDestination() {
+    fun openInitialDestination() {
         viewModelScope.launch {
             if (repository.isAccountSelected()) {
                 openPinCode()
