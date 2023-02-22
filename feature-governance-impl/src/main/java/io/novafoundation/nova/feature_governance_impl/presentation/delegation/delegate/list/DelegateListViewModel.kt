@@ -79,9 +79,9 @@ class DelegateListViewModel(
 
     private suspend fun sortingDisplay(sorting: DelegateSorting): String {
         return when (sorting) {
-            DelegateSorting.DELEGATIONS -> resourceManager.getString(R.string.delegation_delegations)
-            DelegateSorting.DELEGATED_VOTES -> resourceManager.getString(R.string.delegation_delegated_votes)
-            DelegateSorting.VOTING_ACTIVITY -> delegateMappers.formattedRecentVotesPeriod()
+            DelegateSorting.DELEGATIONS -> resourceManager.getString(R.string.delegation_sorting_delegations)
+            DelegateSorting.DELEGATED_VOTES -> resourceManager.getString(R.string.delegation_sorting_delegated_votes)
+            DelegateSorting.VOTING_ACTIVITY -> delegateMappers.formattedRecentVotesPeriod(R.string.delegation_sorting_recent_votes_format)
         }
     }
 

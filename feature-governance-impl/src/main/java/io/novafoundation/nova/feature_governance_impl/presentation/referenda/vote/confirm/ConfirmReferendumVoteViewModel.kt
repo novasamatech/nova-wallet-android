@@ -101,6 +101,7 @@ class ConfirmReferendumVoteViewModel(
         val (chain, chainAsset) = governanceSharedState.chainAndAsset()
 
         referendumFormatter.formatUserVote(referendumVote, chain, chainAsset)
+            .votes.first()
     }.shareInBackground()
 
     val title = flowOf {

@@ -315,6 +315,7 @@ class ReferendumDetailsViewModel(
                 voteTypeRes = R.string.referendum_vote_nay,
                 votesValue = formatVotesAmount(voting.approval.nayVotes.amount, chainAsset)
             )
+            VoteType.ABSTAIN -> null
         }
     }
 
@@ -387,7 +388,6 @@ class ReferendumDetailsViewModel(
         val referendumCall = referendumCallFlow.first()
 
         return checkAnyNonNull(
-            referendumDetails.proposer,
             referendumDetails.fullDetails.voteThreshold,
             referendumDetails.fullDetails.approvalCurve,
             referendumDetails.fullDetails.supportCurve,

@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_governance_impl.R
+import kotlinx.android.synthetic.main.item_delegations_header.view.delegateBannerMoreContent
 import kotlinx.android.synthetic.main.item_delegations_header.view.itemDelegationBanner
 
 class DelegateBannerAdapter(
@@ -54,7 +55,7 @@ class DelegationsHeaderViewHolder(
             itemDelegationBanner.setOnCloseClickListener {
                 handler.closeBanner()
             }
-            itemDelegationBanner.setOnLearnMoreClickedListener {
+            delegateBannerMoreContent.setOnClickListener {
                 handler.describeYourselfClicked()
             }
         }

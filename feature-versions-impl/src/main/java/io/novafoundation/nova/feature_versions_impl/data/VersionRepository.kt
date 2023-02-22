@@ -27,6 +27,8 @@ interface VersionRepository {
     fun inAppUpdatesCheckAllowedFlow(): Flow<Boolean>
 
     fun allowUpdate()
+
+    suspend fun loadVersions()
 }
 
 class RealVersionRepository(
@@ -51,6 +53,10 @@ class RealVersionRepository(
         _inAppUpdatesCheckAllowed.value = true
     }
 
+    override suspend fun loadVersions() {
+        syncAndGetVersions()
+    }
+
     override suspend fun hasImportantUpdates(): Boolean {
         val checkpointVersion = getRecentVersionCheckpoint() ?: currentVersion
         return syncAndGetVersions()
@@ -67,9 +73,9 @@ class RealVersionRepository(
     }
 
     override suspend fun skipCurrentUpdates() {
-        val latestUpdateNotification = getNewUpdateNotifications()
-            .maxWith { first, second -> first.version.compareTo(second.version) }
-        preferences.putString(PREF_VERSION_CHECKPOINT, latestUpdateNotification.version.toString())
+        val latestUpdateNotification = syncAndGetVersions()
+            .maxWith { first, second -> first.key.compareTo(second.key) }
+        preferences.putString(PREF_VERSION_CHECKPOINT, latestUpdateNotification.key.toString())
     }
 
     override fun inAppUpdatesCheckAllowedFlow(): Flow<Boolean> {

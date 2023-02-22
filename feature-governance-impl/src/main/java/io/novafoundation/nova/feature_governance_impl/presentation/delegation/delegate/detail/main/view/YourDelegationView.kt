@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoteModel
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoteModel
 import kotlinx.android.synthetic.main.view_your_delegation.view.viewYourDelegationDelegation
 import kotlinx.android.synthetic.main.view_your_delegation.view.viewYourDelegationEdit
 import kotlinx.android.synthetic.main.view_your_delegation.view.viewYourDelegationRemove

@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -94,6 +95,9 @@ interface GovernanceFeatureDependencies {
     val governanceDAppsDao: GovernanceDAppsDao
 
     val networkApiCreator: NetworkApiCreator
+
+    @Caching
+    fun cachingIconGenerator(): AddressIconGenerator
 
     @ExtrinsicSerialization
     fun extrinsicGson(): Gson

@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegatio
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DelegateStatsResponse
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DelegatedVoteRemote
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.DirectVoteRemote
+import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response.mapMultiVoteRemoteToAccountVote
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
@@ -47,8 +48,9 @@ class Gov2DelegationsRepository(
     private val delegateMetadataApi: DelegateMetadataApi,
 ) : DelegationsRepository {
 
-    override suspend fun isDelegationSupported(): Boolean {
-        return true
+    override suspend fun isDelegationSupported(chain: Chain): Boolean {
+        // we heavy rely on SubQuery API for delegations so we require it to be present
+        return chain.externalApi<GovernanceDelegations>() != null
     }
 
     override suspend fun getDelegatesStats(
@@ -163,19 +165,7 @@ class Gov2DelegationsRepository(
     private fun SubQueryNodes<DirectVoteRemote>.toUserVoteMap(): Map<ReferendumId, UserVote.Direct?> {
         return nodes.associateBy(
             keySelector = { ReferendumId(it.referendumId) },
-            valueTransform = { directVoteRemote ->
-                val standardVote = directVoteRemote.standardVote ?: return@associateBy UserVote.Direct(AccountVote.Unsupported)
-
-                UserVote.Direct(
-                    AccountVote.Standard(
-                        balance = standardVote.vote.amount,
-                        vote = Vote(
-                            aye = directVoteRemote.standardVote.aye,
-                            conviction = mapConvictionFromString(directVoteRemote.standardVote.vote.conviction)
-                        )
-                    ),
-                )
-            }
+            valueTransform = { directVoteRemote -> UserVote.Direct(mapMultiVoteRemoteToAccountVote(directVoteRemote)) }
         )
     }
 
@@ -183,6 +173,7 @@ class Gov2DelegationsRepository(
         return nodes.associateBy(
             keySelector = { ReferendumId(it.parent.referendumId) },
             valueTransform = { delegatedVoteRemote ->
+                // delegated votes do not participate in any vote rather than standard
                 val aye = delegatedVoteRemote.parent.standardVote?.aye ?: return@associateBy null
                 val standardVote = delegatedVoteRemote.vote
 

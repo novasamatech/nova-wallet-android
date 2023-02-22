@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<io.novafoundation.nova.common.view.AdvertisementCard xmlns:android="http://schemas.android.com/apk/res/android"
+<io.novafoundation.nova.common.view.BannerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/itemDelegationBanner"
     android:layout_width="match_parent"
@@ -7,11 +7,75 @@
     android:layout_marginHorizontal="16dp"
     android:layout_marginTop="4dp"
     android:layout_marginBottom="8dp"
-    android:paddingHorizontal="12dp"
-    android:paddingBottom="12dp"
-    app:advertisementCardBackground="@drawable/ic_banner_blue_gradient"
-    app:image="@drawable/ic_banner_delegate_image"
-    app:learnMore="@string/delegation_list_describe_yourself_action"
-    app:showClose="true"
-    app:subtitle="@string/delegation_list_banner_description"
-    app:title="@string/delegation_list_banner_title" />
+    android:src="@drawable/ic_banner_delegate_image"
+    app:bannerBackground="@drawable/ic_banner_blue_gradient"
+    app:showClose="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="120dp"
+        android:paddingBottom="24dp">
+
+        <TextView
+            android:id="@+id/delegateBannerCardTitle"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/delegation_list_banner_title"
+            android:textColor="@color/text_primary"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/delegateBannerCardSubTitle"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingBottom="4dp"
+            android:text="@string/delegation_list_banner_description"
+            android:textColor="@color/text_secondary"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="@+id/delegateBannerCardTitle"
+            app:layout_constraintTop_toBottomOf="@+id/delegateBannerCardTitle" />
+
+        <TextView
+            android:id="@+id/delegateBannerMoreContent"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:drawablePadding="5dp"
+            android:gravity="center_vertical"
+            android:includeFontPadding="false"
+            android:minHeight="32dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:text="@string/delegation_list_describe_yourself_action"
+            android:textColor="@color/button_text_accent"
+            app:drawableStartCompat="@drawable/ic_info_cicrle_filled_16"
+            app:drawableTint="@color/icon_accent"
+            app:layout_constraintStart_toStartOf="@+id/delegateBannerCardSubTitle"
+            app:layout_constraintTop_toBottomOf="@+id/delegateBannerCardSubTitle" />
+
+        <ImageView
+            android:id="@+id/advertisementCardLearnMoreArrow"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_chevron_right"
+            app:layout_constraintBottom_toBottomOf="@+id/delegateBannerMoreContent"
+            app:layout_constraintStart_toEndOf="@+id/delegateBannerMoreContent"
+            app:layout_constraintTop_toTopOf="@+id/delegateBannerMoreContent"
+            app:tint="@color/icon_accent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</io.novafoundation.nova.common.view.BannerView>

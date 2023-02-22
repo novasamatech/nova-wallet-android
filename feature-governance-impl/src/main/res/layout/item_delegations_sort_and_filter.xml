@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="16dp"
-        app:listChooserView_label="Show"
+        app:listChooserView_label="@string/delegations_filter"
         tools:listChooserView_value="All accounts" />
 
 
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|end"
         android:layout_marginEnd="16dp"
-        app:listChooserView_label="Sort by"
+        app:listChooserView_label="@string/common_sort_by"
         tools:listChooserView_value="Delegations" />
 
 </FrameLayout>

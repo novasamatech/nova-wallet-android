@@ -69,12 +69,12 @@ fun Context.getBlockDrawable(@ColorRes strokeColorRes: Int? = null): Drawable {
 }
 
 fun Context.getRoundedCornerDrawable(
-    @ColorRes fillColorRes: Int = R.color.secondary_screen_background,
+    @ColorRes fillColorRes: Int? = R.color.secondary_screen_background,
     @ColorRes strokeColorRes: Int? = null,
     cornerSizeInDp: Int = DEFAULT_CORNER_RADIUS,
     strokeSizeInDp: Float = 1.0f,
 ): Drawable {
-    val fillColor = getColor(fillColorRes)
+    val fillColor = fillColorRes?.let(this::getColor)
     val strokeColor = strokeColorRes?.let(this::getColor)
 
     return getRoundedCornerDrawableFromColors(fillColor, strokeColor, cornerSizeInDp, strokeSizeInDp)
@@ -113,7 +113,7 @@ fun Context.getTopRoundedCornerDrawableFromColors(
 }
 
 fun Context.getRoundedCornerDrawableFromColors(
-    @ColorInt fillColor: Int = getColor(R.color.secondary_screen_background),
+    @ColorInt fillColor: Int? = getColor(R.color.secondary_screen_background),
     @ColorInt strokeColor: Int? = null,
     cornerSizeInDp: Int = DEFAULT_CORNER_RADIUS,
     strokeSizeInDp: Float = 1.0f,
@@ -132,7 +132,7 @@ fun Context.getRoundedCornerDrawableFromColors(
 }
 
 private fun Context.cornerDrawableFromColors(
-    @ColorInt fillColor: Int,
+    @ColorInt fillColor: Int?,
     @ColorInt strokeColor: Int?,
     cornerSizeInDp: Int,
     strokeSizeInDp: Float,
@@ -144,7 +144,7 @@ private fun Context.cornerDrawableFromColors(
     val strokeSizePx = density * strokeSizeInDp
 
     return MaterialShapeDrawable(shapeBuilder(cornerSizePx)).apply {
-        setFillColor(ColorStateList.valueOf(fillColor))
+        setFillColor(ColorStateList.valueOf(fillColor ?: Color.TRANSPARENT))
 
         strokeColor?.let {
             setStroke(strokeSizePx, it)

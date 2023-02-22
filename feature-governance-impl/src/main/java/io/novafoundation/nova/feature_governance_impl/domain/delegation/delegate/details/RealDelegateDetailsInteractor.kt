@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.details
 
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.getIdOfSelectedMetaAccountIn
+import io.novafoundation.nova.feature_account_api.domain.validation.hasChainAccount
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateDetailedStats
@@ -12,6 +14,8 @@ import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionV
 import io.novafoundation.nova.feature_governance_api.data.repository.getDelegateMetadataOrNull
 import io.novafoundation.nova.feature_governance_api.data.repository.getTracksById
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.AddDelegationValidationFailure.NoChainAccountFailure
+import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.AddDelegationValidationSystem
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetails
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.track.matchWith
@@ -45,6 +49,14 @@ class RealDelegateDetailsInteractor(
         return flowOfAll {
             delegateDetailsFlowInternal(delegateAccountId)
         }
+    }
+
+    override fun validationSystemFor(): AddDelegationValidationSystem = ValidationSystem {
+        hasChainAccount(
+            chain = { it.chain },
+            metaAccount = { it.metaAccount },
+            error = ::NoChainAccountFailure
+        )
     }
 
     private suspend fun delegateDetailsFlowInternal(

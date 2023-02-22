@@ -67,6 +67,7 @@ class Gov2OffChainReferendaInfoRepository(
 
     private fun mapReferendumStatusToTimelineEntry(status: ReferendumDetailsV2Response.Status): ReferendumTimeline.Entry? {
         val timelineState = when (status.status) {
+            "Submitted" -> ReferendumTimeline.State.CREATED
             "Ongoing" -> ReferendumTimeline.State.CREATED
             "Approved" -> ReferendumTimeline.State.APPROVED
             "Rejected" -> ReferendumTimeline.State.REJECTED

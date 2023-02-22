@@ -10,9 +10,11 @@ class ReferendumVotersResponse(
 class ReferendumVoterRemote(
     @SerializedName("voter") val voterId: String,
     val delegateId: String,
-    val standardVote: StandardVoteRemote,
+    override val standardVote: StandardVoteRemote?,
+    override val splitVote: SplitVoteRemote?,
+    override val splitAbstainVote: SplitAbstainVoteRemote?,
     val delegatorVotes: SubQueryNodes<ReferendumDelegatorVoteRemote>
-)
+) : MultiVoteRemote
 
 class ReferendumDelegatorVoteRemote(
     @SerializedName("delegator") val delegatorId: String,

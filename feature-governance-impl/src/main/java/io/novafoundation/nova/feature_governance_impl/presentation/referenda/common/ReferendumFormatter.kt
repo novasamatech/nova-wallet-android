@@ -5,10 +5,11 @@ import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.formatting.remainingTime
+import io.novafoundation.nova.common.utils.isZero
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.amountMultiplier
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votes
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ayeVotesIfNotEmpty
@@ -19,17 +20,22 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.WithDifferentVoter
+import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.GenericVoter
+import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.SplitVote
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoteDirectionModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumStatusModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimationStyleRefresher
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourMultiVotePreviewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVotePreviewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.view.YourMultiVoteModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
-import io.novafoundation.nova.feature_governance_impl.presentation.voters.VoteModel
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoteModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
@@ -56,7 +62,7 @@ interface ReferendumFormatter {
 
     fun formatId(referendumId: ReferendumId): String
 
-    fun formatUserVote(referendumVote: ReferendumVote, chain: Chain, chainAsset: Chain.Asset): YourVoteModel?
+    fun formatUserVote(referendumVote: ReferendumVote, chain: Chain, chainAsset: Chain.Asset): YourMultiVoteModel
 
     fun formatReferendumPreview(
         referendum: ReferendumPreview,
@@ -66,6 +72,13 @@ interface ReferendumFormatter {
 }
 
 private val oneDay = 1.days
+
+private data class AccountVoteFormatComponent(
+    val direction: VoteDirectionModel,
+    val amount: String,
+    val votes: String,
+    val multiplier: String
+)
 
 class RealReferendumFormatter(
     private val resourceManager: ResourceManager,
@@ -226,19 +239,7 @@ class RealReferendumFormatter(
         return "#${referendumId.value.format()}"
     }
 
-    override fun formatUserVote(referendumVote: ReferendumVote, chain: Chain, chainAsset: Chain.Asset): YourVoteModel? {
-        val isAye = referendumVote.vote.isAye() ?: return null
-        val votes = referendumVote.vote.votes(chainAsset) ?: return null
-
-        val voteTypeRes = if (isAye) R.string.referendum_vote_aye else R.string.referendum_vote_nay
-        val colorRes = if (isAye) R.color.text_positive else R.color.text_negative
-
-        val votesAmountFormatted = votes.amount.formatTokenAmount(chainAsset)
-        val multiplierFormatted = votes.conviction.amountMultiplier().format()
-
-        val votesCount = resourceManager.getString(R.string.referendum_votes_format, votes.totalVotes.format())
-        val votesDetails = "$votesAmountFormatted × ${multiplierFormatted}x"
-
+    override fun formatUserVote(referendumVote: ReferendumVote, chain: Chain, chainAsset: Chain.Asset): YourMultiVoteModel {
         val title = when (referendumVote) {
             is ReferendumVote.UserDelegated -> {
                 val accountFormatted = referendumVote.voterDisplayIn(chain)
@@ -251,12 +252,18 @@ class RealReferendumFormatter(
             is ReferendumVote.OtherAccount -> error("Not yet supported")
         }
 
-        return YourVoteModel(
-            voteTypeTextRes = voteTypeRes,
-            voteTypeColorRes = colorRes,
-            vote = VoteModel(votesCount, votesDetails),
-            voteTitle = title
-        )
+        val yourVoteModels = formatAccountVote(referendumVote.vote, chainAsset).map { formattedVoteComponent ->
+            val votesDetails = "${formattedVoteComponent.amount} × ${formattedVoteComponent.multiplier}x"
+            val votesCount = resourceManager.getString(R.string.referendum_votes_format, formattedVoteComponent.votes)
+
+            YourVoteModel(
+                voteDirection = formattedVoteComponent.direction,
+                vote = VoteModel(votesCount, votesDetails),
+                voteTitle = title
+            )
+        }
+
+        return YourMultiVoteModel(yourVoteModels)
     }
 
     override fun formatReferendumPreview(
@@ -272,7 +279,7 @@ class RealReferendumFormatter(
             track = referendum.track?.let { formatReferendumTrack(it, token.configuration) },
             number = formatId(referendum.id),
             voting = referendum.voting?.let { formatVoting(it, token) },
-            yourVote = mapReferendumVoteToUi(referendum.referendumVote, token, chain)
+            yourVote = referendum.referendumVote?.let { mapReferendumVoteToUi(it, token.configuration, chain) }
         )
     }
 
@@ -290,40 +297,36 @@ class RealReferendumFormatter(
     }
 
     private fun mapReferendumVoteToUi(
-        vote: ReferendumVote?,
-        token: Token,
+        referendumVote: ReferendumVote,
+        chainAsset: Chain.Asset,
         chain: Chain
-    ): YourVotePreviewModel? {
-        val isAye = vote?.vote?.isAye() ?: return null
-        val votes = vote.vote.votes(token.configuration) ?: return null
+    ): YourMultiVotePreviewModel {
+        val voteComponents = formatAccountVote(referendumVote.vote, chainAsset).map { formattedComponent ->
+            val details = when (referendumVote) {
+                is ReferendumVote.UserDirect -> {
+                    resourceManager.getString(R.string.referendum_your_vote_format, formattedComponent.votes)
+                }
 
-        val voteTypeRes = if (isAye) R.string.referendum_vote_aye else R.string.referendum_vote_nay
-        val colorRes = if (isAye) R.color.text_positive else R.color.text_negative
-        val amountFormatted = votes.totalVotes.format()
+                is ReferendumVote.UserDelegated -> {
+                    val accountFormatted = referendumVote.voterDisplayIn(chain)
 
-        val details = when (vote) {
-            is ReferendumVote.UserDirect -> {
-                resourceManager.getString(R.string.referendum_your_vote_format, amountFormatted)
+                    resourceManager.getString(R.string.delegation_referendum_vote, formattedComponent.votes, accountFormatted)
+                }
+
+                is ReferendumVote.OtherAccount -> {
+                    val accountFormatted = referendumVote.voterDisplayIn(chain)
+
+                    resourceManager.getString(R.string.referendum_other_votes, formattedComponent.votes, accountFormatted)
+                }
             }
 
-            is ReferendumVote.UserDelegated -> {
-                val accountFormatted = vote.voterDisplayIn(chain)
-
-                resourceManager.getString(R.string.delegation_referendum_vote, amountFormatted, accountFormatted)
-            }
-
-            is ReferendumVote.OtherAccount -> {
-                val accountFormatted = vote.voterDisplayIn(chain)
-
-                resourceManager.getString(R.string.referendum_other_votes, amountFormatted, accountFormatted)
-            }
+            YourVotePreviewModel(
+                voteDirection = formattedComponent.direction,
+                details = details
+            )
         }
 
-        return YourVotePreviewModel(
-            voteType = resourceManager.getString(voteTypeRes),
-            colorRes = colorRes,
-            details = details
-        )
+        return YourMultiVotePreviewModel(voteComponents)
     }
 
     private fun WithDifferentVoter.voterDisplayIn(chain: Chain): String {
@@ -352,5 +355,55 @@ class RealReferendumFormatter(
 
     private fun TimerValue.referendumStatusIsHot(): Boolean {
         return remainingTime().milliseconds < oneDay
+    }
+
+    private fun formatAccountVote(vote: AccountVote, chainAsset: Chain.Asset): List<AccountVoteFormatComponent> {
+        return when (vote) {
+            is AccountVote.Standard -> {
+                val voteDirection = if (vote.vote.aye) VoteType.AYE else VoteType.NAY
+                val convictionVote = GenericVoter.ConvictionVote(chainAsset.amountFromPlanks(vote.balance), vote.vote.conviction)
+
+                formatNonZeroConvictionVote(voteDirection to convictionVote, chainAsset = chainAsset)
+            }
+
+            is AccountVote.Split -> formatNonZeroConvictionVote(
+                VoteType.AYE to SplitVote(vote.aye, chainAsset),
+                VoteType.NAY to SplitVote(vote.nay, chainAsset),
+                chainAsset = chainAsset
+            )
+
+            is AccountVote.SplitAbstain -> formatNonZeroConvictionVote(
+                VoteType.AYE to SplitVote(vote.aye, chainAsset),
+                VoteType.NAY to SplitVote(vote.nay, chainAsset),
+                VoteType.ABSTAIN to SplitVote(vote.abstain, chainAsset),
+                chainAsset = chainAsset
+            )
+
+            AccountVote.Unsupported -> emptyList()
+        }
+    }
+
+    private fun formatNonZeroConvictionVote(
+        vararg directedVotes: Pair<VoteType, GenericVoter.ConvictionVote>,
+        chainAsset: Chain.Asset
+    ): List<AccountVoteFormatComponent> {
+        return directedVotes.mapNotNull { (direction, convictionVote) ->
+            if (convictionVote.amount.isZero) return@mapNotNull null
+
+            AccountVoteFormatComponent(
+                direction = formatVoteType(direction),
+                amount = convictionVote.amount.formatTokenAmount(chainAsset),
+                votes = convictionVote.totalVotes.format(),
+                multiplier = convictionVote.conviction.amountMultiplier().format()
+            )
+        }
+    }
+
+    private fun formatVoteType(voteDirection: VoteType): VoteDirectionModel {
+        return when (voteDirection) {
+            VoteType.AYE -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_aye), R.color.text_positive)
+            VoteType.NAY -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_nay), R.color.text_negative)
+            VoteType.ABSTAIN -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_abstain), R.color.text_secondary)
+        }
     }
 }
