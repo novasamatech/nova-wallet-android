@@ -6,7 +6,7 @@ import java.math.BigInteger
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class ReferendumDetailsPayload(val referendumId: BigInteger) : Parcelable
+class ReferendumDetailsPayload(val referendumId: BigInteger, val allowVoting: Boolean = true) : Parcelable
 
 fun ReferendumDetailsPayload.toReferendumId(): ReferendumId {
     return ReferendumId(referendumId)
