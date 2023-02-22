@@ -128,6 +128,7 @@ class ReferendumDetailsViewModel(
 
     val voteButtonState = referendumDetailsFlow.map {
         when {
+            !payload.allowVoting -> DescriptiveButtonState.Gone
             it.timeline.currentStatus !is ReferendumStatus.Ongoing -> DescriptiveButtonState.Gone
             it.userVote is ReferendumVote.UserDirect -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_revote))
             it.userVote == null -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_vote))
