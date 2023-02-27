@@ -130,7 +130,7 @@ class ReferendumDetailsViewModel(
         when {
             it.timeline.currentStatus !is ReferendumStatus.Ongoing -> DescriptiveButtonState.Gone
             it.userVote is ReferendumVote.UserDirect -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_revote))
-            it.userVote == null -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_vote))
+            it.userVote is ReferendumVote.UserDelegated || it.userVote == null -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.vote_vote))
             else -> DescriptiveButtonState.Gone
         }
     }
