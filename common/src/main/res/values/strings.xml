@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <!--<string name="assets_balance_details_locks_democrac">Democracy</string>-->
+    <string name="assets_balance_details_locks_democrac_v1">Governance v1</string>
+    <string name="assets_balance_details_locks_democrac_v2">OpenGov</string>
+
     <string name="add_delegation_missing_account_message">You should add %s account to the wallet in order to delegate</string>
 
     <string name="referendum_vote_abstain">Abstain</string>
@@ -448,7 +453,6 @@
     <string name="assets_select_send_your_wallets">Your wallets</string>
 
     <string name="assets_balance_details_locks_staking">Staking</string>
-    <string name="assets_balance_details_locks_democrac">Democracy</string>
     <string name="assets_balance_details_locks_vesting">Vesting</string>
     <string name="assets_balance_details_locks_phrelect">Elections</string>
 
