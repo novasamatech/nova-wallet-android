@@ -11,9 +11,11 @@ import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListLocator
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListScoreConverter
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
-import io.novafoundation.nova.feature_staking_impl.domain.isNominationActive
+import io.novafoundation.nova.feature_staking_impl.domain.isActive
+import io.novafoundation.nova.feature_staking_impl.domain.isOversubscribed
 import io.novafoundation.nova.feature_staking_impl.domain.minimumStake
 import io.novafoundation.nova.feature_staking_impl.domain.model.BagListNode
+import io.novafoundation.nova.feature_staking_impl.domain.nominationStatus
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -61,9 +63,10 @@ class AlertsInteractor(
         }
     }
 
-    private fun AlertContext.isStakingActive(stashId: AccountId) = useMemo(NOMINATIONS_ACTIVE_MEMO) {
-        isNominationActive(stashId, exposures.values, maxRewardedNominatorsPerValidator)
+    private fun AlertContext.nominationStatus(stashId: AccountId) = useMemo(NOMINATIONS_ACTIVE_MEMO) {
+        nominationStatus(stashId, exposures.values, maxRewardedNominatorsPerValidator)
     }
+    private fun AlertContext.isStakingActive(stashId: AccountId) = nominationStatus(stashId).isActive
 
     private fun produceSetValidatorsAlert(context: AlertContext): Alert? {
         return requireState(context.stakingState) { _: StakingState.Stash.None ->
@@ -79,8 +82,8 @@ class AlertsInteractor(
                 // none of nominated validators were elected
                 targets.intersect(context.exposures.keys).isEmpty() -> Alert.ChangeValidators(Reason.NONE_ELECTED)
 
-                // staking is inactive
-                context.isStakingActive(nominatorState.stashId).not() &&
+                // user's delegation is elected but it is in oversubscribed part
+                context.nominationStatus(nominatorState.stashId).isOversubscribed &&
                     // there is no pending change
                     nominatorState.nominations.isWaiting(context.activeEra).not() -> Alert.ChangeValidators(Reason.OVERSUBSCRIBED)
 
