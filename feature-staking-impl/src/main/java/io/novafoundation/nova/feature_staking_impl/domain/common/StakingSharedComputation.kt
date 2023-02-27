@@ -33,7 +33,6 @@ class ActiveEraInfo(
     val minStake: Balance,
 )
 
-
 class StakingSharedComputation(
     private val stakingRepository: StakingRepository,
     private val computationalCache: ComputationalCache,
@@ -110,4 +109,3 @@ suspend fun StakingSharedComputation.minStake(
     chainId: ChainId,
     scope: CoroutineScope
 ): Balance = activeEraInfo(chainId, scope).first().minStake
-
