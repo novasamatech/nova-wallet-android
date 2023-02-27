@@ -96,7 +96,8 @@ class RealDelegateListInteractor(
 
             mapDelegateStatsToPreviews(
                 delegatesStats!!,
-                delegateMetadataDeferred.await(),
+                delegateMetadataDeferred.await()
+                    .filterKeys { userDelegateIdsSet.contains(it) },
                 identities,
                 userDelegations
             )
@@ -195,22 +196,46 @@ class RealDelegateListInteractor(
     }
 
     private fun mapDelegateStatsToPreviews(
-        delegateStatsList: List<DelegateStats>,
+        delegateStats: List<DelegateStats>,
         delegateMetadata: AccountIdKeyMap<DelegateMetadata>,
         identities: AccountIdKeyMap<OnChainIdentity?>,
         userDelegations: AccountIdKeyMap<List<Pair<Track, Voting.Delegating>>>,
     ): List<DelegatePreview> {
-        return delegateStatsList.map { delegateStats ->
-            val metadata = delegateMetadata[delegateStats.accountId]
-            val identity = identities[delegateStats.accountId]
+        val statsAndMetadata = uniteStatsAndMetadata(delegateStats, delegateMetadata)
+        return statsAndMetadata.map { entry ->
+            val accountId = entry.key.value
+            val metadata = entry.value.first
+            val stats = entry.value.second
+            val identity = identities[accountId]
 
             DelegatePreview(
-                accountId = delegateStats.accountId,
-                stats = mapStatsToDomain(delegateStats),
+                accountId = accountId,
+                stats = stats?.let { mapStatsToDomain(it) } ?: emptyDelegateStats(),
                 metadata = mapMetadataToDomain(metadata),
                 onChainIdentity = identity,
-                userDelegations = userDelegations[delegateStats.accountId]?.toMap().orEmpty()
+                userDelegations = userDelegations[accountId]?.toMap().orEmpty()
             )
         }
+    }
+
+    private fun emptyDelegateStats(): DelegatePreview.Stats {
+        return DelegatePreview.Stats(0, 0.toBigInteger(), 0)
+    }
+
+    private fun uniteStatsAndMetadata(
+        delegateStats: List<DelegateStats>,
+        delegateMetadata: AccountIdKeyMap<DelegateMetadata>,
+    ): Map<AccountIdKey, Pair<DelegateMetadata?, DelegateStats?>> {
+        val result = mutableMapOf<AccountIdKey, Pair<DelegateMetadata?, DelegateStats?>>()
+        delegateStats.map {
+            val metadata = delegateMetadata[it.accountId]
+            result[it.accountId.intoKey()] = Pair(metadata, it)
+        }
+        delegateMetadata.map {
+            if (!result.containsKey(it.key)) {
+                result[it.key] = Pair(it.value, null)
+            }
+        }
+        return result
     }
 }
