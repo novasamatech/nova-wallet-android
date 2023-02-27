@@ -5,17 +5,15 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
-import io.novafoundation.nova.feature_staking_impl.data.repository.bagListLocatorOrNull
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.Alert.ChangeValidators.Reason
-import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListLocator
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListScoreConverter
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
 import io.novafoundation.nova.feature_staking_impl.domain.isActive
 import io.novafoundation.nova.feature_staking_impl.domain.isOversubscribed
-import io.novafoundation.nova.feature_staking_impl.domain.minimumStake
 import io.novafoundation.nova.feature_staking_impl.domain.model.BagListNode
 import io.novafoundation.nova.feature_staking_impl.domain.nominationStatus
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -45,11 +43,10 @@ class AlertsInteractor(
         val exposures: Map<String, Exposure>,
         val stakingState: StakingState,
         val maxRewardedNominatorsPerValidator: Int,
-        val minimumNominatorBond: BigInteger,
+        val minRecommendedStake: Balance,
         val activeEra: BigInteger,
         val asset: Asset,
         val bagListNode: BagListNode?,
-        val bagListLocator: BagListLocator?,
         val bagListScoreConverter: BagListScoreConverter,
     ) {
 
@@ -100,16 +97,14 @@ class AlertsInteractor(
 
     private fun produceMinStakeAlert(context: AlertContext) = requireState(context.stakingState) { state: StakingState.Stash ->
         with(context) {
-            val minimalStakeInPlanks = minimumStake(exposures.values, minimumNominatorBond, bagListLocator, bagListScoreConverter)
-
             if (
                 // do not show alert for validators
                 state !is StakingState.Stash.Validator &&
-                asset.bondedInPlanks < minimalStakeInPlanks &&
+                asset.bondedInPlanks < context.minRecommendedStake &&
                 // prevent alert for situation where all tokens are being unbounded
                 asset.bondedInPlanks > BigInteger.ZERO
             ) {
-                val minimalStake = asset.token.amountFromPlanks(minimalStakeInPlanks)
+                val minimalStake = asset.token.amountFromPlanks(context.minRecommendedStake)
 
                 Alert.BondMoreTokens(minimalStake, asset.token)
             } else {
@@ -154,27 +149,24 @@ class AlertsInteractor(
         val chainAsset = stakingState.chainAsset
 
         val maxRewardedNominatorsPerValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chain.id)
-        val minimumNominatorBond = stakingRepository.minimumNominatorBond(chain.id)
         val totalIssuance = totalIssuanceRepository.getTotalIssuance(chain.id)
         val bagListScoreConverter = BagListScoreConverter.U128(totalIssuance)
-        val bagListLocator = bagListRepository.bagListLocatorOrNull(chain.id)
 
         val alertsFlow = combine(
-            stakingSharedComputation.electedExposuresInActiveEraFlow(chain.id, scope),
+            stakingSharedComputation.activeEraInfo(chain.id, scope),
             walletRepository.assetFlow(stakingState.accountId, chainAsset),
             stakingRepository.observeActiveEraIndex(chain.id),
             bagListRepository.listNodeFlow(stakingState.stashId, chain.id)
-        ) { exposures, asset, activeEra, bagListNode ->
+        ) { activeEraInfo, asset, activeEra, bagListNode ->
 
             val context = AlertContext(
-                exposures = exposures,
+                exposures = activeEraInfo.exposures,
                 stakingState = stakingState,
                 maxRewardedNominatorsPerValidator = maxRewardedNominatorsPerValidator,
-                minimumNominatorBond = minimumNominatorBond,
+                minRecommendedStake = activeEraInfo.minStake,
                 asset = asset,
                 activeEra = activeEra,
                 bagListNode = bagListNode,
-                bagListLocator = bagListLocator,
                 bagListScoreConverter = bagListScoreConverter
             )
 

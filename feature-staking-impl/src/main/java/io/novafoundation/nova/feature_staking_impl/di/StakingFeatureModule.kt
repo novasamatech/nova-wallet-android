@@ -165,8 +165,17 @@ class StakingFeatureModule {
         computationalCache: ComputationalCache,
         stakingRepository: StakingRepository,
         rewardCalculatorFactory: RewardCalculatorFactory,
-        accountRepository: AccountRepository
-    ) = StakingSharedComputation(stakingRepository, computationalCache, rewardCalculatorFactory, accountRepository)
+        accountRepository: AccountRepository,
+        bagListRepository: BagListRepository,
+        totalIssuanceRepository: TotalIssuanceRepository,
+    ) = StakingSharedComputation(
+        stakingRepository = stakingRepository,
+        computationalCache = computationalCache,
+        rewardCalculatorFactory = rewardCalculatorFactory,
+        accountRepository = accountRepository,
+        bagListRepository = bagListRepository,
+        totalIssuanceRepository = totalIssuanceRepository
+    )
 
     @Provides
     @FeatureScope

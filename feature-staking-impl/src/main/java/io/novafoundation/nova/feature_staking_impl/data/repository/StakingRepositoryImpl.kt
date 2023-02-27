@@ -112,8 +112,8 @@ class StakingRepositoryImpl(
         binding = { scale, runtime -> bindActiveEra(scale, runtime) }
     )
 
-    override fun electedExposuresInActiveEra(chainId: ChainId) = observeActiveEraIndex(chainId).mapLatest {
-        getElectedValidatorsExposure(chainId, it)
+    override fun electedExposuresInActiveEra(chainId: ChainId) = observeActiveEraIndex(chainId).mapLatest { activeEraIndex ->
+        getElectedValidatorsExposure(chainId, activeEraIndex) to activeEraIndex
     }
 
     override suspend fun getElectedValidatorsExposure(chainId: ChainId, eraIndex: EraIndex) = localStorage.query(chainId) {

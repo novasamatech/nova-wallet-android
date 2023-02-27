@@ -15,6 +15,8 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
 
+typealias ExposuresWithEraIndex = Pair<AccountIdMap<Exposure>, EraIndex>
+
 interface StakingRepository {
 
     suspend fun eraStartSessionIndex(chainId: ChainId, currentEra: BigInteger): EraIndex
@@ -57,7 +59,7 @@ interface StakingRepository {
 
     suspend fun nominatorsCount(chainId: ChainId): BigInteger?
 
-    fun electedExposuresInActiveEra(chainId: ChainId): Flow<Map<String, Exposure>>
+    fun electedExposuresInActiveEra(chainId: ChainId): Flow<ExposuresWithEraIndex>
 }
 
 suspend fun StakingRepository.historicalEras(chainId: ChainId): List<BigInteger> {
