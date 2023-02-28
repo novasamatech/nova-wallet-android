@@ -23,10 +23,10 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.StakingReward
 import io.novafoundation.nova.feature_staking_impl.data.repository.bagListLocatorOrNull
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListLocator
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListScoreConverter
+import io.novafoundation.nova.feature_staking_impl.domain.common.ActiveEraInfo
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
-import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEra
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
 import io.novafoundation.nova.feature_staking_impl.domain.model.NetworkInfo
 import io.novafoundation.nova.feature_staking_impl.domain.model.NominatorStatus
@@ -145,7 +145,7 @@ class StakingInteractor(
         scope: CoroutineScope
     ): Flow<StakeSummary<ValidatorStatus>> = observeStakeSummary(validatorState, scope) {
         when {
-            isValidatorActive(validatorState.stashId, it.eraStakers) -> ValidatorStatus.ACTIVE
+            isValidatorActive(validatorState.stashId, it.activeEraInfo.exposures) -> ValidatorStatus.ACTIVE
             else -> ValidatorStatus.INACTIVE
         }
     }
@@ -154,22 +154,18 @@ class StakingInteractor(
         nominatorState: StakingState.Stash.Nominator,
         scope: CoroutineScope
     ): Flow<StakeSummary<NominatorStatus>> = observeStakeSummary(nominatorState, scope) {
-        val eraStakers = it.eraStakers.values
-        val chainId = nominatorState.chain.id
+        val eraStakers = it.activeEraInfo.exposures.values
 
         when {
-            nominationStatus(nominatorState.stashId, it.eraStakers.values, it.rewardedNominatorsPerValidator).isActive -> NominatorStatus.Active
+            nominationStatus(nominatorState.stashId, eraStakers, it.rewardedNominatorsPerValidator).isActive -> NominatorStatus.Active
 
-            nominatorState.nominations.isWaiting(it.activeEraIndex) -> NominatorStatus.Waiting(
+            nominatorState.nominations.isWaiting(it.activeEraInfo.eraIndex) -> NominatorStatus.Waiting(
                 timeLeft = getEraTimeCalculator().calculate(nominatorState.nominations.submittedInEra + ERA_OFFSET).toLong()
             )
 
             else -> {
-                val minimumNominatorBond = stakingRepository.minimumNominatorBond(chainId)
-                val minStake = minimumStake(eraStakers, minimumNominatorBond, it.bagListLocator, it.bagListScoreConverter)
-
                 val inactiveReason = when {
-                    it.asset.bondedInPlanks < minStake -> NominatorStatus.Inactive.Reason.MIN_STAKE
+                    it.asset.bondedInPlanks < it.activeEraInfo.minStake -> NominatorStatus.Inactive.Reason.MIN_STAKE
                     else -> NominatorStatus.Inactive.Reason.NO_ACTIVE_VALIDATOR
                 }
 
@@ -188,17 +184,13 @@ class StakingInteractor(
 
     fun observeNetworkInfoState(chainId: ChainId, scope: CoroutineScope): Flow<NetworkInfo> = flow {
         val lockupPeriod = getLockupDuration(chainId)
-        val bagListLocator = bagListRepository.bagListLocatorOrNull(chainId)
-        val bagListScoreConverter = createBagListScoreConverter(chainId)
 
-        val innerFlow = stakingSharedComputation.electedExposuresInActiveEraFlow(chainId, scope).map { exposuresMap ->
-            val exposures = exposuresMap.values
-
-            val minimumNominatorBond = stakingRepository.minimumNominatorBond(chainId)
+        val innerFlow = stakingSharedComputation.activeEraInfo(chainId, scope).map { activeEraInfo ->
+            val exposures = activeEraInfo.exposures.values
 
             NetworkInfo(
                 lockupPeriod = lockupPeriod,
-                minimumStake = minimumStake(exposures, minimumNominatorBond, bagListLocator, bagListScoreConverter),
+                minimumStake = activeEraInfo.minStake,
                 totalStake = totalStake(exposures),
                 stakingPeriod = StakingPeriod.Unlimited,
                 nominatorsCount = activeNominators(chainId, exposures),
@@ -297,17 +289,15 @@ class StakingInteractor(
         val bagListScoreConverter = createBagListScoreConverter(chainId)
 
         combine(
-            stakingRepository.observeActiveEraIndex(chainId),
+            stakingSharedComputation.activeEraInfo(chainId, scope),
             walletRepository.assetFlow(state.accountId, chainAsset)
-        ) { activeEraIndex, asset ->
+        ) { activeEraInfo, asset ->
             val totalStaked = asset.bonded
 
-            val eraStakers = stakingSharedComputation.electedExposuresInActiveEra(chainId, scope)
             val rewardedNominatorsPerValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
             val statusResolutionContext = StatusResolutionContext(
-                eraStakers,
-                activeEraIndex,
+                activeEraInfo,
                 asset,
                 rewardedNominatorsPerValidator,
                 bagListLocator,
@@ -353,8 +343,7 @@ class StakingInteractor(
     }
 
     private class StatusResolutionContext(
-        val eraStakers: AccountIdMap<Exposure>,
-        val activeEraIndex: BigInteger,
+        val activeEraInfo: ActiveEraInfo,
         val asset: Asset,
         val rewardedNominatorsPerValidator: Int,
         val bagListLocator: BagListLocator?,

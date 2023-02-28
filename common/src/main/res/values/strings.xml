@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+<!--    <string name="staking_setup_amount_too_low">Can\'t stake less than minimal value (%s)</string>-->
+    <string name="staking_setup_amount_too_low">You cannot stake less than the network minimum value (%s)</string>
+
+    <string name="staking_setup_amount_less_than_recommended">The recommended minimum stake to consistently receive rewards is %s.</string>
+
     <string name="staking_alert_bond_more_title">Stake more tokens</string>
 <!--    <string name="staking_alert_bond_more_title">Bond more tokens.</string>-->
 
@@ -1177,7 +1182,6 @@
     <string name="staking_selected_validators_mask">Validators (%d)</string>
     <string name="staking_set_validators_message">Validators are not selected</string>
     <string name="staking_set_validators_title">Select validators to start staking</string>
-    <string name="staking_setup_amount_too_low">Can\'t stake less than minimal value (%s)</string>
     <string name="staking_setup_restake">Restake</string>
     <string name="staking_setup_restake_v2_2_0">Restake rewards</string>
     <string name="staking_setup_reward_destination_section_title">How to use your rewards?</string>
