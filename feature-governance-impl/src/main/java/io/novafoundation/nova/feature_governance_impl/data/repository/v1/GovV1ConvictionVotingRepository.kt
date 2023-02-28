@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.hasAmountFor
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votedFor
 import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.democracyRemoveVote
@@ -91,7 +91,7 @@ class GovV1ConvictionVotingRepository(
         }
 
         return allVotings.votersFor(referendumId)
-            .filter { it.vote.hasAmountFor(type) }
+            .filter { it.vote.votedFor(type) }
     }
 
     override fun ExtrinsicBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable) {
