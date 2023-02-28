@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.argument
 import io.novafoundation.nova.common.utils.requireActualType
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.common.utils.xcmPalletName
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Fungibility
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
@@ -12,6 +13,7 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.Type
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.NumberType
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.call
@@ -41,9 +43,12 @@ private fun RuntimeSnapshot.prepareWeightForEncoding(weight: Weight): Any {
 
     return when {
         weightArgumentType.isWeightV1() -> weight
-        // it is either a Weight1.5 or we don't know how to handle it
-        else -> structOf("refTime" to weight)
+        else -> weight.encodeWeightV2()
     }
+}
+
+private fun Weight.encodeWeightV2(): Struct.Instance {
+    return structOf("refTime" to this, "proofSize" to Balance.ZERO)
 }
 
 private fun Type<*>.isWeightV1(): Boolean {
@@ -96,7 +101,8 @@ private fun XcmV2Instruction.toEncodableInstance() = when (this) {
         name = "BuyExecution",
         value = structOf(
             "fees" to fees.toEncodableInstance(),
-            "weight_limit" to weightLimit.toEncodableInstance()
+            // xcm v2 always uses v1 weights
+            "weight_limit" to weightLimit.toV1EncodableInstance()
         )
     )
     XcmV2Instruction.ClearOrigin -> DictEnum.Entry(
@@ -122,9 +128,14 @@ private fun XcmV2Instruction.toEncodableInstance() = when (this) {
     )
 }
 
-fun WeightLimit.toEncodableInstance() = when (this) {
+fun WeightLimit.toV1EncodableInstance() = when (this) {
     is WeightLimit.Limited -> DictEnum.Entry("Limited", weight)
     WeightLimit.Unlimited -> DictEnum.Entry("Unlimited", null)
+}
+
+fun WeightLimit.toVersionedEncodableInstance(runtimeSnapshot: RuntimeSnapshot) = when(this) {
+    is WeightLimit.Limited ->  DictEnum.Entry("Limited", runtimeSnapshot.prepareWeightForEncoding(weight))
+    WeightLimit.Unlimited ->  DictEnum.Entry("Unlimited", null)
 }
 
 private fun XcmMultiAssetFilter.toEncodableInstance() = when (this) {
@@ -147,6 +158,10 @@ fun VersionedMultiAssets.toEncodableInstance() = when (this) {
         name = "V1",
         value = assets.toEncodableInstance()
     )
+    is VersionedMultiAssets.V2 -> DictEnum.Entry(
+        name = "V2",
+        value = assets.toEncodableInstance()
+    )
 }
 
 fun VersionedMultiAsset.toEncodableInstance() = when (this) {
@@ -159,6 +174,10 @@ fun VersionedMultiAsset.toEncodableInstance() = when (this) {
 fun VersionedMultiLocation.toEncodableInstance() = when (this) {
     is VersionedMultiLocation.V1 -> DictEnum.Entry(
         name = "V1",
+        value = multiLocation.toEncodableInstance()
+    )
+    is VersionedMultiLocation.V2 -> DictEnum.Entry(
+        name = "V2",
         value = multiLocation.toEncodableInstance()
     )
 }

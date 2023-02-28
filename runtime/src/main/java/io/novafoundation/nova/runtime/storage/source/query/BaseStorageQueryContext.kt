@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.storage.source.query
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrZero
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.ComponentHolder
@@ -9,12 +10,18 @@ import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilderImpl
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.u16
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toByteArray
+import jp.co.soramitsu.fearless_utils.runtime.metadata.StorageEntryModifier
+import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
+import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntryType
 import jp.co.soramitsu.fearless_utils.runtime.metadata.splitKey
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKeys
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.math.BigInteger
 
 abstract class BaseStorageQueryContext(
     override val runtime: RuntimeSnapshot,
@@ -96,6 +103,19 @@ abstract class BaseStorageQueryContext(
 
     override suspend fun StorageEntry.entriesRaw(keysArguments: List<List<Any?>>): Map<String, String?> {
         return queryKeys(storageKeys(runtime, keysArguments), at)
+    }
+
+    override suspend fun Module.palletVersionOrThrow(): Int {
+        val manualStorageVersionEntry = StorageEntry(
+            moduleName = name,
+            name = ":__STORAGE_VERSION__:",
+            modifier = StorageEntryModifier.Required,
+            type = StorageEntryType.Plain(value = u16),
+            default = u16.toByteArray(runtime, BigInteger.ZERO),
+            documentation = emptyList()
+        )
+
+        return manualStorageVersionEntry.query(binding = ::bindNumberOrZero).toInt()
     }
 
     override suspend fun <V> StorageEntry.query(

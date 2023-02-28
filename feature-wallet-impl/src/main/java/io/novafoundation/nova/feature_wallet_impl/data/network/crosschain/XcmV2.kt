@@ -50,6 +50,8 @@ sealed class XcmMultiAssetFilter {
 sealed class VersionedMultiAssets {
 
     class V1(val assets: XcmMultiAssets) : VersionedMultiAssets()
+
+    class V2(val assets: XcmMultiAssets) : VersionedMultiAssets()
 }
 
 sealed class VersionedMultiAsset {
@@ -59,9 +61,20 @@ sealed class VersionedMultiAsset {
 
 sealed class VersionedMultiLocation {
     class V1(val multiLocation: MultiLocation) : VersionedMultiLocation()
+    class V2(val multiLocation: MultiLocation) : VersionedMultiLocation()
 }
 
-fun MultiLocation.versioned() = VersionedMultiLocation.V1(this)
+fun XcmMultiAssets.versioned(lowestAllowedVersion: XcmVersion?) = when {
+    lowestAllowedVersion == null -> VersionedMultiAssets.V2(this) // try out best with latest known version
+    lowestAllowedVersion <= XcmVersion.V1 -> VersionedMultiAssets.V1(this)
+    else ->  VersionedMultiAssets.V2(this)
+}
+
+fun MultiLocation.versioned(lowestAllowedVersion: XcmVersion?) = when {
+    lowestAllowedVersion == null -> VersionedMultiLocation.V2(this) // try out best with latest known version
+    lowestAllowedVersion <= XcmVersion.V1 -> VersionedMultiLocation.V1(this)
+    else ->  VersionedMultiLocation.V2(this)
+}
 
 class XcmMultiAsset(
     val id: Id,

@@ -199,13 +199,12 @@ fun RuntimeMetadata.treasury() = module(Modules.TREASURY)
 
 fun RuntimeMetadata.preImage() = module(Modules.PREIMAGE)
 
-fun RuntimeMetadata.xTokens() = module(Modules.X_TOKENS)
-
 fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
     return options.first(::hasModule)
 }
 
 fun RuntimeMetadata.xcmPalletName() = firstExistingModule("XcmPallet", "PolkadotXcm")
+fun RuntimeMetadata.xcmPallet() = module(firstExistingModule("XcmPallet", "PolkadotXcm"))
 
 fun StorageEntry.splitKeyToComponents(runtime: RuntimeSnapshot, key: String): ComponentHolder {
     return ComponentHolder(splitKey(runtime, key))
