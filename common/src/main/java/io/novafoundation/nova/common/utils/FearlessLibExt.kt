@@ -199,6 +199,8 @@ fun RuntimeMetadata.scheduler() = module(Modules.SCHEDULER)
 
 fun RuntimeMetadata.treasury() = module(Modules.TREASURY)
 
+fun RuntimeMetadata.electionProviderMultiPhaseOrNull() = moduleOrNull(Modules.ELECTION_PROVIDER_MULTI_PHASE)
+
 fun RuntimeMetadata.preImage() = module(Modules.PREIMAGE)
 
 fun RuntimeMetadata.xTokens() = module(Modules.X_TOKENS)
@@ -286,4 +288,6 @@ object Modules {
     const val DEMOCRACY = "Democracy"
 
     const val VOTER_LIST = "VoterList"
+
+    const val ELECTION_PROVIDER_MULTI_PHASE = "ElectionProviderMultiPhase"
 }
