@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.setAmountChangeModel
-import io.novafoundation.nova.feature_governance_impl.presentation.view.setVoteModelOrHide
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteAmount
 import kotlinx.android.synthetic.main.fragment_referendum_confirm_vote.confirmReferendumVoteConfirm
@@ -76,7 +75,7 @@ class ConfirmReferendumVoteFragment : BaseFragment<ConfirmReferendumVoteViewMode
 
         viewModel.amountModelFlow.observe(confirmReferendumVoteAmount::setAmount)
 
-        viewModel.accountVoteUi.observe(confirmReferendumVoteResult::setVoteModelOrHide)
+        viewModel.accountVoteUi.observe(confirmReferendumVoteResult::setModel)
 
         viewModel.title.observe(confirmReferendumVoteToolbar::setTitle)
 
