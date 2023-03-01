@@ -112,6 +112,8 @@ class GovernanceNavigator(
         args = RevokeDelegationConfirmFragment.getBundle(payload)
     )
 
+    override fun openDelegateSearch() {
+        performNavigation(R.id.action_delegateListFragment_to_delegateSearchFragment)
     }
 
     override fun openRemoveVotes(payload: RemoveVotesPayload) = performNavigation(
