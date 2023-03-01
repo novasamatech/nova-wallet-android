@@ -23,7 +23,9 @@ import io.novafoundation.nova.feature_staking_impl.data.network.subquery.Staking
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.LocalBagListRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.RealParasRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealSessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
@@ -185,6 +187,12 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideParasRepository(
+        @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
+    ): ParasRepository = RealParasRepository(localStorageSource)
+
+    @Provides
+    @FeatureScope
     fun provideStakingInteractor(
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
@@ -274,8 +282,9 @@ class StakingFeatureModule {
     fun provideRewardCalculatorFactory(
         repository: StakingRepository,
         totalIssuanceRepository: TotalIssuanceRepository,
-        stakingSharedComputation: dagger.Lazy<StakingSharedComputation>
-    ) = RewardCalculatorFactory(repository, totalIssuanceRepository, stakingSharedComputation)
+        stakingSharedComputation: dagger.Lazy<StakingSharedComputation>,
+        parasRepository: ParasRepository,
+    ) = RewardCalculatorFactory(repository, totalIssuanceRepository, stakingSharedComputation, parasRepository)
 
     @Provides
     @FeatureScope

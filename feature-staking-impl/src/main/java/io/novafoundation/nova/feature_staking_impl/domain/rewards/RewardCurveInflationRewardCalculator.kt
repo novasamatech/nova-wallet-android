@@ -3,27 +3,68 @@ package io.novafoundation.nova.feature_staking_impl.domain.rewards
 import java.math.BigInteger
 import kotlin.math.pow
 
-private const val PARACHAINS_ENABLED = false
+class InflationConfig(
+    val falloff: Double,
+    val maxInflation: Double,
+    val minInflation: Double,
+    val stakeTarget: Double,
+    val parachainAdjust: ParachainAdjust?
+) {
 
-private const val MINIMUM_INFLATION = 0.025
+    class ParachainAdjust(
+        val maxParachains: Int,
+        val activePublicParachains: Int,
+        val parachainReservedSupplyFraction: Double
+    )
 
-private val INFLATION_IDEAL = if (PARACHAINS_ENABLED) 0.2 else 0.1
-private val STAKED_PORTION_IDEAL = if (PARACHAINS_ENABLED) 0.5 else 0.75
+    companion object {
+        // defaults based on Polkadot and Kusama runtime
+        fun Default(activePublicParachains: Int?) = InflationConfig(
+            falloff = 0.05,
+            maxInflation = 0.1,
+            minInflation = 0.025,
+            stakeTarget = 0.75,
+            parachainAdjust = activePublicParachains?.let {
+                ParachainAdjust(
+                    maxParachains = 60,
+                    activePublicParachains = activePublicParachains,
+                    parachainReservedSupplyFraction = 0.3
+                )
+            }
+        )
+    }
+}
 
-private val INTEREST_IDEAL = INFLATION_IDEAL / STAKED_PORTION_IDEAL
+private fun InflationConfig.idealStake(): Double {
+    val parachainAdjust = if (parachainAdjust != null) {
+        with(parachainAdjust) {
+            val cappedActiveParachains = activePublicParachains.coerceAtMost(maxParachains)
 
-private const val DECAY_RATE = 0.05
+            cappedActiveParachains.toDouble() / maxParachains * parachainReservedSupplyFraction
+        }
+    } else {
+        0.0
+    }
+
+    return stakeTarget - parachainAdjust
+}
 
 class RewardCurveInflationRewardCalculator(
     validators: List<RewardCalculationTarget>,
     totalIssuance: BigInteger,
+    private val inflationConfig: InflationConfig,
 ) : InflationBasedRewardCalculator(validators, totalIssuance) {
 
-    override fun calculateYearlyInflation(stakedPortion: Double): Double {
-        return MINIMUM_INFLATION + if (stakedPortion in 0.0..STAKED_PORTION_IDEAL) {
-            stakedPortion * (INTEREST_IDEAL - MINIMUM_INFLATION / STAKED_PORTION_IDEAL)
+    override fun calculateYearlyInflation(stakedPortion: Double): Double = with(inflationConfig) {
+        val idealStake = idealStake()
+        val idealInterest = maxInflation / idealStake
+
+        val inflation = inflationConfig.minInflation + if (stakedPortion in 0.0..idealStake) {
+            stakedPortion * (idealInterest - minInflation / idealStake)
         } else {
-            (INTEREST_IDEAL * STAKED_PORTION_IDEAL - MINIMUM_INFLATION) * 2.0.pow((STAKED_PORTION_IDEAL - stakedPortion) / DECAY_RATE)
+            (idealInterest * idealStake - minInflation) * 2.0.pow((idealStake - stakedPortion) / falloff)
         }
+
+        inflation
     }
 }
