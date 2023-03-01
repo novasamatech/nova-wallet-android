@@ -17,7 +17,7 @@ private val LOWEST_PUBLIC_ID = 2000.toBigInteger()
 
 class RealParasRepository(
     private val localSource: StorageDataSource
-) : ParasRepository{
+) : ParasRepository {
 
     override suspend fun activePublicParachains(chainId: ChainId): Int? {
         return localSource.query(chainId) {
