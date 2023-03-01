@@ -188,6 +188,7 @@ fun RuntimeMetadata.identity() = module(Modules.IDENTITY)
 fun RuntimeMetadata.automationTime() = module(Modules.AUTOMATION_TIME)
 
 fun RuntimeMetadata.parachainInfoOrNull() = moduleOrNull(Modules.PARACHAIN_INFO)
+fun RuntimeMetadata.parasOrNull() = moduleOrNull(Modules.PARAS)
 
 fun RuntimeMetadata.referenda() = module(Modules.REFERENDA)
 
@@ -272,6 +273,8 @@ object Modules {
     const val IDENTITY = "Identity"
 
     const val PARACHAIN_INFO = "ParachainInfo"
+    const val PARAS = "Paras"
+
     const val X_TOKENS = "XTokens"
 
     const val AUTOMATION_TIME = "AutomationTime"

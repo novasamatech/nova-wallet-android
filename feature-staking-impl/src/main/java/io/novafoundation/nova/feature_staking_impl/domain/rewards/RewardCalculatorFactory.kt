@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
+import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEra
 import io.novafoundation.nova.feature_staking_impl.domain.error.accountIdNotFound
@@ -24,6 +25,7 @@ class RewardCalculatorFactory(
     private val stakingRepository: StakingRepository,
     private val totalIssuanceRepository: TotalIssuanceRepository,
     private val shareStakingSharedComputation: dagger.Lazy<StakingSharedComputation>,
+    private val parasRepository: ParasRepository,
 ) {
 
     suspend fun create(
@@ -56,9 +58,14 @@ class RewardCalculatorFactory(
         create(chainAsset, exposures, validatorsPrefs)
     }
 
-    private fun Chain.Asset.createRewardCalculator(validators: List<RewardCalculationTarget>, totalIssuance: BigInteger): RewardCalculator {
+    private suspend fun Chain.Asset.createRewardCalculator(validators: List<RewardCalculationTarget>, totalIssuance: BigInteger): RewardCalculator {
         return when (staking) {
-            RELAYCHAIN, RELAYCHAIN_AURA -> RewardCurveInflationRewardCalculator(validators, totalIssuance)
+            RELAYCHAIN, RELAYCHAIN_AURA -> {
+                val activePublicParachains = parasRepository.activePublicParachains(chainId)
+                val inflationConfig = InflationConfig.Default(activePublicParachains)
+
+                RewardCurveInflationRewardCalculator(validators, totalIssuance, inflationConfig)
+            }
             ALEPH_ZERO -> AlephZeroRewardCalculator(validators, chainAsset = this)
             UNSUPPORTED, PARACHAIN, TURING -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
         }
