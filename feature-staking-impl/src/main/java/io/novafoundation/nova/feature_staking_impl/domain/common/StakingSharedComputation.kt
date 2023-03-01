@@ -58,9 +58,18 @@ class StakingSharedComputation(
             val bagListLocator = bagListRepository.bagListLocatorOrNull(chainId)
             val totalIssuance = totalIssuanceRepository.getTotalIssuance(chainId)
             val bagListScoreConverter = BagListScoreConverter.U128(totalIssuance)
+            val maxElectingVoters = bagListRepository.maxElectingVotes(chainId)
+            val bagListSize = bagListRepository.bagListSize(chainId)
 
             electedExposuresWithActiveEraFlow(chainId, scope).map { (exposures, activeEraIndex) ->
-                val minStake = minimumStake(exposures.values, minBond, bagListLocator, bagListScoreConverter)
+                val minStake = minimumStake(
+                    exposures = exposures.values,
+                    minimumNominatorBond = minBond,
+                    bagListLocator = bagListLocator,
+                    bagListScoreConverter = bagListScoreConverter,
+                    bagListSize = bagListSize,
+                    maxElectingVoters = maxElectingVoters
+                )
 
                 ActiveEraInfo(activeEraIndex, exposures, minStake)
             }

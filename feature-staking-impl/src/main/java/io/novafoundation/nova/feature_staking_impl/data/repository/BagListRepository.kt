@@ -5,6 +5,8 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNullableAc
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.constant
+import io.novafoundation.nova.common.utils.electionProviderMultiPhaseOrNull
+import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.voterListOrNull
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListLocator
 import io.novafoundation.nova.feature_staking_impl.domain.model.BagListNode
@@ -15,10 +17,15 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import java.math.BigInteger
 
 interface BagListRepository {
 
     suspend fun bagThresholds(chainId: ChainId): List<BagListNode.Score>?
+
+    suspend fun bagListSize(chainId: ChainId): BigInteger?
+
+    suspend fun maxElectingVotes(chainId: ChainId): BigInteger?
 
     fun listNodeFlow(stash: AccountId, chainId: ChainId): Flow<BagListNode?>
 }
@@ -33,6 +40,18 @@ class LocalBagListRepository(
     override suspend fun bagThresholds(chainId: ChainId): List<BagListNode.Score>? {
         return localStorage.query(chainId) {
             runtime.metadata.voterListOrNull()?.constant("BagThresholds")?.getAs(collectionOf(::score))
+        }
+    }
+
+    override suspend fun bagListSize(chainId: ChainId): BigInteger? {
+        return localStorage.query(chainId) {
+            runtime.metadata.voterListOrNull()?.storage("CounterForListNodes")?.query(binding = ::bindNumber)
+        }
+    }
+
+    override suspend fun maxElectingVotes(chainId: ChainId): BigInteger? {
+        return localStorage.query(chainId) {
+            runtime.metadata.electionProviderMultiPhaseOrNull()?.numberConstant("MaxElectingVoters", runtime)
         }
     }
 

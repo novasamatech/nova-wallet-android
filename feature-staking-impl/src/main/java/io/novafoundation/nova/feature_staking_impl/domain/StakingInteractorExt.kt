@@ -64,7 +64,11 @@ fun minimumStake(
     minimumNominatorBond: BigInteger,
     bagListLocator: BagListLocator?,
     bagListScoreConverter: BagListScoreConverter,
+    bagListSize: BigInteger?,
+    maxElectingVoters: BigInteger?
 ): BigInteger {
+    if (bagListSize != null && maxElectingVoters != null && bagListSize < maxElectingVoters) return minimumNominatorBond
+
     val stakeByNominator = exposures
         .fold(mutableMapOf<AccountIdKey, BigInteger>()) { acc, exposure ->
             exposure.others.forEach { individualExposure ->
