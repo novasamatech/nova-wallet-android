@@ -1,6 +1,7 @@
-package io.novafoundation.nova.common.presentation
+package io.novafoundation.nova.common.domain
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.map
 
 sealed class ExtendedLoadingState<out T> {
@@ -29,3 +30,19 @@ val <T> ExtendedLoadingState<T>.dataOrNull: T?
         is ExtendedLoadingState.Loaded -> this.data
         else -> null
     }
+
+public fun ExtendedLoadingState<*>.isLoading(): Boolean {
+    return this is ExtendedLoadingState.Loading
+}
+
+suspend fun <T> FlowCollector<ExtendedLoadingState<T>>.emitLoaded(value: T) {
+    emit(ExtendedLoadingState.Loaded(value))
+}
+
+suspend fun <T> FlowCollector<ExtendedLoadingState<T>>.emitLoading() {
+    emit(ExtendedLoadingState.Loading)
+}
+
+suspend fun <T> FlowCollector<ExtendedLoadingState<T>>.emitError(throwable: Throwable) {
+    emit(ExtendedLoadingState.Error(throwable))
+}

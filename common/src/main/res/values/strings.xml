@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
-<!--
-    <string name="staking_reward_payouts_payout_all">Pay out all (%s)</string>
-    <string name="staking_pending_rewards_subtitle">You can pay them out yourself, when they are close to expire, but you will pay the fee</string>
--->
+    <string name="delegate_search_placeholder_default">Search result will be displayed here</string>
+    <string name="delegate_search_placeholder_empty">Address format is invalid. Make sure that address belongs to the right network</string>
+    <string name="delegate_search_result_count">search results: %d</string>
+    <string name="delegate_search_hint">Search by address or name</string>
+
+    <!--
+        <string name="staking_reward_payouts_payout_all">Pay out all (%s)</string>
+        <string name="staking_pending_rewards_subtitle">You can pay them out yourself, when they are close to expire, but you will pay the fee</string>
+    -->
     <string name="staking_reward_payouts_payout_all">Pay out all (%s)</string>
     <string name="staking_pending_rewards_subtitle">You can pay them out yourself, when they are close to expire, but you will pay the fee</string>
 

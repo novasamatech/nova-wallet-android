@@ -112,6 +112,8 @@ class GovernanceNavigator(
         args = RevokeDelegationConfirmFragment.getBundle(payload)
     )
 
+    }
+
     override fun openRemoveVotes(payload: RemoveVotesPayload) = performNavigation(
         actionId = R.id.action_open_remove_votes,
         args = RemoveVotesFragment.getBundle(payload)
@@ -127,6 +129,7 @@ class GovernanceNavigator(
             cases = arrayOf(
                 R.id.delegateListFragment to R.id.action_delegateListFragment_to_delegateDetailsFragment,
                 R.id.yourDelegationsFragment to R.id.action_yourDelegations_to_delegationDetails,
+                R.id.delegateSearchFragment to R.id.action_delegateSearchFragment_to_delegateDetailsFragment,
             ),
             args = DelegateDetailsFragment.getBundle(payload)
         )
