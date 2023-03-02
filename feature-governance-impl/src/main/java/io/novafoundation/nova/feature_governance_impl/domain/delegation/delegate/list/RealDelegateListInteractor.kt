@@ -201,15 +201,16 @@ class RealDelegateListInteractor(
         identities: AccountIdKeyMap<OnChainIdentity?>,
         userDelegations: AccountIdKeyMap<List<Pair<Track, Voting.Delegating>>>,
     ): List<DelegatePreview> {
-        val statsAndMetadata = uniteStatsAndMetadata(delegateStats, delegateMetadata)
-        return statsAndMetadata.map { entry ->
-            val accountId = entry.key.value
-            val metadata = entry.value.first
-            val stats = entry.value.second
+        val delegateStatsById = delegateStats.associateBy { it.accountId.intoKey() }
+        val allIds = delegateStatsById.keys + delegateMetadata.keys
+
+        return allIds.map { accountId ->
+            val stats = delegateStatsById[accountId]
+            val metadata = delegateMetadata[accountId]
             val identity = identities[accountId]
 
             DelegatePreview(
-                accountId = accountId,
+                accountId = accountId.value,
                 stats = stats?.let { mapStatsToDomain(it) } ?: emptyDelegateStats(),
                 metadata = mapMetadataToDomain(metadata),
                 onChainIdentity = identity,
@@ -219,23 +220,6 @@ class RealDelegateListInteractor(
     }
 
     private fun emptyDelegateStats(): DelegatePreview.Stats {
-        return DelegatePreview.Stats(0, 0.toBigInteger(), 0)
-    }
-
-    private fun uniteStatsAndMetadata(
-        delegateStats: List<DelegateStats>,
-        delegateMetadata: AccountIdKeyMap<DelegateMetadata>,
-    ): Map<AccountIdKey, Pair<DelegateMetadata?, DelegateStats?>> {
-        val result = mutableMapOf<AccountIdKey, Pair<DelegateMetadata?, DelegateStats?>>()
-        delegateStats.map {
-            val metadata = delegateMetadata[it.accountId]
-            result[it.accountId.intoKey()] = Pair(metadata, it)
-        }
-        delegateMetadata.map {
-            if (!result.containsKey(it.key)) {
-                result[it.key] = Pair(it.value, null)
-            }
-        }
-        return result
+        return DelegatePreview.Stats(delegationsCount = 0, delegatedVotes = 0.toBigInteger(), recentVotes = 0)
     }
 }
