@@ -172,7 +172,6 @@ class RealExtrinsicService(
         extrinsicsToSubmit
     }
 
-
     private suspend fun buildExtrinsic(
         chain: Chain,
         accountId: ByteArray,

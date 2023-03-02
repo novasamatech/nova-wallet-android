@@ -33,12 +33,11 @@ internal class RealExtrinsicSplitter(
     private val blockLimitsRepository: BlockLimitsRepository,
 ) : ExtrinsicSplitter {
 
-
     override suspend fun split(callBuilder: CallBuilder, chain: Chain): SplitCalls = coroutineScope {
         val weightByCallId = estimateWeightByCallType(callBuilder, chain)
 
         val blockLimit = blockLimitsRepository.maxWeightForNormalExtrinsics(chain.id)
-        
+
         callBuilder.splitCallsWith(weightByCallId, blockLimit)
     }
 
@@ -62,18 +61,18 @@ internal class RealExtrinsicSplitter(
 
     private suspend fun CallBuilder.splitCallsWith(weights: CallWeightsByType, blockLimit: Weight): SplitCalls {
         val split = mutableListOf<List<GenericCall.Instance>>()
-        
+
         var currentBatch = mutableListOf<GenericCall.Instance>()
         var currentBatchWeight: Weight = Weight.ZERO
 
         calls.forEach { call ->
             val estimatedCallWeight = weights.getValue(call.uniqueId).await()
-            
+
             if (currentBatchWeight + estimatedCallWeight > blockLimit) {
                 if (estimatedCallWeight > blockLimit) throw IllegalArgumentException("Impossible to fit call $call into a block")
 
                 split += currentBatch
-                
+
                 currentBatchWeight = estimatedCallWeight
                 currentBatch = mutableListOf(call)
             } else {
@@ -81,7 +80,7 @@ internal class RealExtrinsicSplitter(
                 currentBatch += call
             }
         }
-        
+
         if (currentBatch.isNotEmpty()) {
             split.add(currentBatch)
         }

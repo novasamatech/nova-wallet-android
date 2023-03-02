@@ -2,7 +2,6 @@ package io.novafoundation.nova.common.utils.multiResult
 
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult.RetriableFailure
 
-
 class RetriableMultiResult<T>(val succeeded: List<T>, val failed: RetriableFailure<T>?) {
 
     companion object
@@ -31,7 +30,7 @@ inline fun <T> RetriableMultiResult<T>.onAnyFailure(action: (failed: RetriableFa
 suspend fun <T, I> runMultiCatching(
     intermediateListLoading: suspend () -> List<I>,
     listProcessing: suspend (I) -> T
-) : RetriableMultiResult<T> {
+): RetriableMultiResult<T> {
     val intermediateList = runCatching { intermediateListLoading() }.getOrNull()
     if (intermediateList == null) {
         val retry = suspend { runMultiCatching(intermediateListLoading, listProcessing) }

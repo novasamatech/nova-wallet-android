@@ -16,7 +16,7 @@ interface BlockLimitsRepository {
 
 class RealBlockLimitsRepository(
     private val localStorageDataSource: StorageDataSource
-): BlockLimitsRepository {
+) : BlockLimitsRepository {
 
     override suspend fun maxWeightForNormalExtrinsics(chainId: ChainId): Weight {
         return localStorageDataSource.query(chainId) {

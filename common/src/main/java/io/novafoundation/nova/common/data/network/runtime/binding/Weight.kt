@@ -6,7 +6,7 @@ import java.math.BigInteger
 typealias Weight = BigInteger
 
 fun bindWeight(decoded: Any?): Weight {
-    return when(decoded) {
+    return when (decoded) {
         // weight v1
         is BalanceOf -> decoded
 

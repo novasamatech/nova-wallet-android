@@ -18,7 +18,7 @@ interface CallBuilder {
     ): CallBuilder
 }
 
-class SimpleCallBuilder(override val runtime: RuntimeSnapshot): CallBuilder {
+class SimpleCallBuilder(override val runtime: RuntimeSnapshot) : CallBuilder {
 
     override val calls = mutableListOf<GenericCall.Instance>()
 

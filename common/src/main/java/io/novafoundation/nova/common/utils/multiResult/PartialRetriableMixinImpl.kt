@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 
 class RealPartialRetriableMixinFactory(
     private val resourceManager: ResourceManager
-): PartialRetriableMixin.Factory {
+) : PartialRetriableMixin.Factory {
 
     override fun create(scope: CoroutineScope): PartialRetriableMixin.Presentation {
         return PartialRetriableMixinImpl(resourceManager, scope)
@@ -24,7 +24,7 @@ class RealPartialRetriableMixinFactory(
 private class PartialRetriableMixinImpl(
     private val resourceManager: ResourceManager,
     coroutineScope: CoroutineScope
-): PartialRetriableMixin.Presentation, CoroutineScope by coroutineScope {
+) : PartialRetriableMixin.Presentation, CoroutineScope by coroutineScope {
 
     override fun <T> handleMultiResult(
         multiResult: RetriableMultiResult<T>,
@@ -47,7 +47,7 @@ private class PartialRetriableMixinImpl(
         progressConsumer: ProgressConsumer?,
         onRetryCancelled: () -> Unit,
     ) {
-        val onRetry = { retrySubmission(failure,onSuccess, progressConsumer, onRetryCancelled) }
+        val onRetry = { retrySubmission(failure, onSuccess, progressConsumer, onRetryCancelled) }
 
         retryEvent.value = RetryPayload(
             title = resourceManager.getString(R.string.common_some_tx_failed_title),
