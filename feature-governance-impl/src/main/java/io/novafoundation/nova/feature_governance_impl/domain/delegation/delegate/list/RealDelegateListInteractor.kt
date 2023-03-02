@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.list
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.applyFilter
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateStats
