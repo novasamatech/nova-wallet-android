@@ -56,7 +56,7 @@ fun ImageView.setDelegateIcon(
 ) {
     if (icon.shape == DelegateIcon.IconShape.SQUARE) {
         val strokeWidthDp = 0.5f
-        setPadding(strokeWidthDp.dp(context))
+        setPadding(strokeWidthDp.dp(context).coerceAtLeast(1))
         background = context.getRoundedCornerDrawable(
             null,
             R.color.container_border,
