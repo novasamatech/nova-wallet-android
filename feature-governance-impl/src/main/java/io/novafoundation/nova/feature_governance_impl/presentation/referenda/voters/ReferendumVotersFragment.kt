@@ -51,6 +51,7 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), Vote
 
     override fun initViews() {
         referendumVotersToolbar.setTitle(viewModel.title)
+        referendumVotersList.setHasFixedSize(true)
         referendumVotersList.adapter = votersAdapter
         referendumVotersList.addItemDecoration(VoterItemDecoration(requireContext(), votersAdapter))
         referendumVotersToolbar.setHomeButtonListener { viewModel.backClicked() }
