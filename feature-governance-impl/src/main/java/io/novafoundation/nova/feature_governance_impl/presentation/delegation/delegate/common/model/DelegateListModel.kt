@@ -10,7 +10,7 @@ class DelegateListModel(
     val name: String,
     val type: DelegateTypeModel?,
     val description: String?,
-    val stats: DelegateStatsModel,
+    val stats: DelegateStatsModel?,
     val delegation: YourDelegationInfo?
 ) {
 

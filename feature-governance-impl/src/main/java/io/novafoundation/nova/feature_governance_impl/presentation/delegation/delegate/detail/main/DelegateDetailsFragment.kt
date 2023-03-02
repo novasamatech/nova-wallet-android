@@ -8,7 +8,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.presentation.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone

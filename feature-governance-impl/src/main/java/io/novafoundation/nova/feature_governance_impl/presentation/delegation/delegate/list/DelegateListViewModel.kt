@@ -2,9 +2,9 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.presentation.dataOrNull
-import io.novafoundation.nova.common.presentation.map
-import io.novafoundation.nova.common.presentation.mapLoading
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.map
+import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.withLoadingShared
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
@@ -96,6 +96,10 @@ class DelegateListViewModel(
 
     fun openBecomingDelegateTutorial() {
         router.openBecomingDelegateTutorial()
+    }
+
+    fun openSearch() {
+        router.openDelegateSearch()
     }
 
     fun closeBanner() {

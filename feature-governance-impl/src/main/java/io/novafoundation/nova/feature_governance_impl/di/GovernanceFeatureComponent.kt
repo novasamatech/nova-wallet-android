@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.di.DelegateDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.votedReferenda.di.VotedReferendaComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.di.DelegateListComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.search.di.DelegateSearchComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegated.di.YourDelegationsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseAmount.di.NewDelegationChooseAmountComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.chooseTrack.di.NewDelegationChooseTracksComponent
@@ -62,6 +63,8 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
     fun governanceLocksOverviewFactory(): GovernanceLocksOverviewComponent.Factory
 
     fun delegateListFactory(): DelegateListComponent.Factory
+
+    fun delegateSearchFactory(): DelegateSearchComponent.Factory
 
     fun delegateDetailsFactory(): DelegateDetailsComponent.Factory
 

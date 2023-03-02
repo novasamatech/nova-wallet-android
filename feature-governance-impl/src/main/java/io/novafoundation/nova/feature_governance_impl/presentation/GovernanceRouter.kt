@@ -70,4 +70,6 @@ interface GovernanceRouter : ReturnableRouter {
     fun openRevokeDelegationChooseTracks(payload: RevokeDelegationChooseTracksPayload)
 
     fun openRevokeDelegationsConfirm(payload: RevokeDelegationConfirmPayload)
+
+    fun openDelegateSearch()
 }

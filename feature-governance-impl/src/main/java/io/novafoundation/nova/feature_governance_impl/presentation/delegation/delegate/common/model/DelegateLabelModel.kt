@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model
 
-import io.novafoundation.nova.common.presentation.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.showLoadingState

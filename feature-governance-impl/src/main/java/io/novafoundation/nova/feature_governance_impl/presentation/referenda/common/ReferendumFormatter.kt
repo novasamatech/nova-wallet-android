@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.Ge
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.SplitVote
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoteDirectionModel
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoteModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumStatusModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimationStyleRefresher
@@ -35,7 +36,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourMultiVoteModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
-import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoteModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
@@ -363,7 +363,8 @@ class RealReferendumFormatter(
                 val voteDirection = if (vote.vote.aye) VoteType.AYE else VoteType.NAY
                 val convictionVote = GenericVoter.ConvictionVote(chainAsset.amountFromPlanks(vote.balance), vote.vote.conviction)
 
-                formatNonZeroConvictionVote(voteDirection to convictionVote, chainAsset = chainAsset)
+                val formattedComponent = formatDirectedConvictionVote(voteDirection, convictionVote, chainAsset)
+                listOf(formattedComponent)
             }
 
             is AccountVote.Split -> formatNonZeroConvictionVote(
@@ -390,14 +391,20 @@ class RealReferendumFormatter(
         return directedVotes.mapNotNull { (direction, convictionVote) ->
             if (convictionVote.amount.isZero) return@mapNotNull null
 
-            AccountVoteFormatComponent(
-                direction = formatVoteType(direction),
-                amount = convictionVote.amount.formatTokenAmount(chainAsset),
-                votes = convictionVote.totalVotes.format(),
-                multiplier = convictionVote.conviction.amountMultiplier().format()
-            )
+            formatDirectedConvictionVote(direction, convictionVote, chainAsset)
         }
     }
+
+    private fun formatDirectedConvictionVote(
+        direction: VoteType,
+        convictionVote: GenericVoter.ConvictionVote,
+        chainAsset: Chain.Asset
+    ): AccountVoteFormatComponent = AccountVoteFormatComponent(
+        direction = formatVoteType(direction),
+        amount = convictionVote.amount.formatTokenAmount(chainAsset),
+        votes = convictionVote.totalVotes.format(),
+        multiplier = convictionVote.conviction.amountMultiplier().format()
+    )
 
     private fun formatVoteType(voteDirection: VoteType): VoteDirectionModel {
         return when (voteDirection) {
