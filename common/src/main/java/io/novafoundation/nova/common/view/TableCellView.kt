@@ -17,7 +17,7 @@ import coil.load
 import coil.transform.RoundedCornersTransformation
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.presentation.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.getAccentColor
 import io.novafoundation.nova.common.utils.getEnum

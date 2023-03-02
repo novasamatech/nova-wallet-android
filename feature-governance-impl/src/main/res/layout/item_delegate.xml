@@ -178,6 +178,16 @@
             app:barrierDirection="bottom"
             app:constraint_referenced_ids="itemDelegateDelegationsLabel, itemDelegateDelegatedVotesLabel, itemDelegateRecentVotesLabel" />
 
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/itemDelegateStatsGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="itemStatLabelsBottom, itemDelegateRecentVotes,
+            itemDelegateRecentVotesLabel, itemDelegateDelegatedVotesDivider,
+            itemDelegateDelegatedVotesEnd, itemDelegateDelegatedVotes,
+            itemDelegateDelegatedVotesLabel, itemDelegateDelegationsDivider,
+            itemDelegateDelegationsEnd, itemDelegateDelegations, itemDelegateDelegationsLabel" />
+
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/itemStatsBottom"
             android:layout_width="wrap_content"

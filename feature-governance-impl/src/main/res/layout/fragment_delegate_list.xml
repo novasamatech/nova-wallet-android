@@ -15,6 +15,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:iconRight="@drawable/ic_search"
         app:titleText="@string/delegation_add_delegation" />
 
     <androidx.recyclerview.widget.RecyclerView

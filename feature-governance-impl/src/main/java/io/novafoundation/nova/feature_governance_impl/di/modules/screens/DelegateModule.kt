@@ -23,6 +23,8 @@ import io.novafoundation.nova.feature_governance_impl.data.repository.Delegation
 import io.novafoundation.nova.feature_governance_impl.data.repository.RealDelegationBannerRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.RealRemoveVotesSuggestionRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.RemoveVotesSuggestionRepository
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.repository.DelegateCommonRepository
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.repository.RealDelegateCommonRepository
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.delegators.RealDelegateDelegatorsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.details.RealDelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.label.RealDelegateLabelUseCase
@@ -49,18 +51,28 @@ class DelegateModule {
 
     @Provides
     @FeatureScope
-    fun provideDelegateListInteractor(
+    fun provideDelegateCommonRepository(
         governanceSourceRegistry: GovernanceSourceRegistry,
+        chainStateRepository: ChainStateRepository,
+        accountRepository: AccountRepository
+    ): DelegateCommonRepository = RealDelegateCommonRepository(
+        governanceSourceRegistry = governanceSourceRegistry,
+        chainStateRepository = chainStateRepository,
+        accountRepository = accountRepository
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideDelegateListInteractor(
         chainStateRepository: ChainStateRepository,
         identityRepository: OnChainIdentityRepository,
         delegationBannerService: DelegationBannerRepository,
-        accountRepository: AccountRepository
+        delegateCommonRepository: DelegateCommonRepository
     ): DelegateListInteractor = RealDelegateListInteractor(
-        governanceSourceRegistry = governanceSourceRegistry,
+        delegateCommonRepository = delegateCommonRepository,
         chainStateRepository = chainStateRepository,
         identityRepository = identityRepository,
-        delegationBannerService = delegationBannerService,
-        accountRepository = accountRepository
+        delegationBannerService = delegationBannerService
     )
 
     @Provides

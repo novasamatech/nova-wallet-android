@@ -6,9 +6,9 @@ import android.widget.RadioGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.novafoundation.nova.common.presentation.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.isModifiable
 import io.novafoundation.nova.common.utils.input.modifyInput
