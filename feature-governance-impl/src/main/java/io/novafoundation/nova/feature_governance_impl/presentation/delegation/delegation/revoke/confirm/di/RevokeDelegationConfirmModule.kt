@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -78,9 +79,9 @@ class RevokeDelegationConfirmModule {
         validationExecutor: ValidationExecutor,
         resourceManager: ResourceManager,
         resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
-        tracksUseCase: TracksUseCase,
         delegateFormatters: DelegateMappers,
         delegateLabelUseCase: DelegateLabelUseCase,
+        partialRetriableMixinFactory: PartialRetriableMixin.Factory
     ): ViewModel {
         return RevokeDelegationConfirmViewModel(
             router = router,
@@ -97,7 +98,7 @@ class RevokeDelegationConfirmModule {
             validationExecutor = validationExecutor,
             resourceManager = resourceManager,
             resourcesHintsMixinFactory = resourcesHintsMixinFactory,
-            tracksUseCase = tracksUseCase,
+            partialRetriableMixinFactory = partialRetriableMixinFactory,
             delegateFormatters = delegateFormatters,
             delegateLabelUseCase = delegateLabelUseCase
         )

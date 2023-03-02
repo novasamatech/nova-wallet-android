@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
@@ -90,13 +91,13 @@ fun ExtrinsicBuilder.democracyRemoveVote(
     )
 }
 
-fun ExtrinsicBuilder.convictionVotingDelegate(
+fun CallBuilder.convictionVotingDelegate(
     delegate: AccountId,
     trackId: TrackId,
     amount: Balance,
     conviction: Conviction
-): ExtrinsicBuilder {
-    return call(
+): CallBuilder {
+    return addCall(
         moduleName = Modules.CONVICTION_VOTING,
         callName = "delegate",
         arguments = mapOf(
@@ -108,8 +109,8 @@ fun ExtrinsicBuilder.convictionVotingDelegate(
     )
 }
 
-fun ExtrinsicBuilder.convictionVotingUndelegate(trackId: TrackId): ExtrinsicBuilder {
-    return call(
+fun CallBuilder.convictionVotingUndelegate(trackId: TrackId): CallBuilder {
+    return addCall(
         moduleName = Modules.CONVICTION_VOTING,
         callName = "undelegate",
         arguments = mapOf(

@@ -58,6 +58,8 @@ inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fol
     acc + extractor(element)
 }
 
+fun Iterable<BigInteger>.sum() = sumOf { it }
+
 suspend operator fun <T> Deferred<T>.invoke() = await()
 
 inline fun <T> Iterable<T>.sumByBigDecimal(extractor: (T) -> BigDecimal) = fold(BigDecimal.ZERO) { acc, element ->
