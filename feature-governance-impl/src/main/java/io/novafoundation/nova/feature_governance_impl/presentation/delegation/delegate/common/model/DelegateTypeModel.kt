@@ -1,13 +1,14 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model
 
-import android.content.Context
 import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.core.view.setPadding
 import coil.ImageLoader
 import coil.transform.CircleCropTransformation
 import coil.transform.RoundedCornersTransformation
 import coil.transform.Transformation
+import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIcon
@@ -48,24 +49,35 @@ fun NovaChipView.setDelegateTypeModelIcon(model: DelegateTypeModel?) {
     setStyle(model.backgroundColorRes, model.textColorRes, model.iconColorRes)
 }
 
-fun ImageView.setDelegateIcon(icon: DelegateIcon, imageLoader: ImageLoader, squareCornerRadiusDp: Int) {
+fun ImageView.setDelegateIcon(
+    icon: DelegateIcon,
+    imageLoader: ImageLoader,
+    squareCornerRadiusDp: Int
+) {
     if (icon.shape == DelegateIcon.IconShape.SQUARE) {
-        background = context.getRoundedCornerDrawable(null, R.color.container_border, squareCornerRadiusDp)
+        val strokeWidthDp = 0.5f
+        setPadding(strokeWidthDp.dp(context))
+        background = context.getRoundedCornerDrawable(
+            null,
+            R.color.container_border,
+            cornerSizeInDp = squareCornerRadiusDp,
+            strokeSizeInDp = strokeWidthDp
+        )
     } else {
         background = null
     }
 
     setIcon(icon.icon, imageLoader) {
-        icon.shape.coilTransformation(context)?.let {
+        icon.shape.coilTransformation(squareCornerRadiusDp.dpF(context))?.let {
             transformations(it)
         }
     }
 }
 
-private fun DelegateIcon.IconShape.coilTransformation(context: Context): Transformation? {
+private fun DelegateIcon.IconShape.coilTransformation(cornerRadiusPx: Float): Transformation? {
     return when (this) {
         DelegateIcon.IconShape.ROUND -> CircleCropTransformation()
-        DelegateIcon.IconShape.SQUARE -> RoundedCornersTransformation(8.dpF(context))
+        DelegateIcon.IconShape.SQUARE -> RoundedCornersTransformation(cornerRadiusPx)
         DelegateIcon.IconShape.NONE -> null
     }
 }
