@@ -13,7 +13,7 @@ data class DelegatePreview(
     val stats: Stats?,
     override val metadata: Metadata?,
     override val onChainIdentity: OnChainIdentity?,
-    val userDelegations: Map<Track, Voting.Delegating>?
+    val userDelegations: Map<Track, Voting.Delegating>
 ) : Delegate {
 
     data class Metadata(

@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.search.DelegateSearchInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
@@ -37,6 +38,8 @@ class DelegateSearchViewModel(
     private val searchResult = governanceSharedState.selectedOption
         .flatMapLatest { interactor.searchDelegates(query, it) }
         .distinctUntilChanged()
+        .inBackground()
+        .shareWhileSubscribed()
 
     val searchResultCount = searchResult
         .map {
@@ -46,7 +49,8 @@ class DelegateSearchViewModel(
             } else {
                 resourceManager.getString(R.string.delegate_search_result_count, delegates.size)
             }
-        }.shareInBackground()
+        }.inBackground()
+        .shareWhileSubscribed()
 
     val searchPlaceholderModel = combine(query, searchResult) { query, searchResultLoading ->
         val delegates = searchResultLoading.dataOrNull

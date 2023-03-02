@@ -74,7 +74,7 @@ class RealDelegateSearchInteractor(
             stats = null,
             metadata = null,
             onChainIdentity = identity,
-            userDelegations = null
+            userDelegations = emptyMap()
         )
     }
 
