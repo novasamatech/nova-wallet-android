@@ -41,6 +41,7 @@ class RealExtrinsicService(
     private val signerProvider: SignerProvider,
     private val extrinsicSplitter: ExtrinsicSplitter,
 ) : ExtrinsicService {
+
     override suspend fun submitMultiExtrinsicWithSelectedWallet(chain: Chain, formExtrinsic: FormMultiExtrinsicWithOrigin): RetriableMultiResult<String> {
         return runMultiCatching(
             intermediateListLoading = { constructSplitExtrinsicsForSubmission(chain, formExtrinsic) },
