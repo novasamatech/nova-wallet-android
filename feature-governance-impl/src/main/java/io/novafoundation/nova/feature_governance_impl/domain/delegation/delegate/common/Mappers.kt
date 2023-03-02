@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common
 
-import io.novafoundation.nova.common.address.get
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdKeyMap
 import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
@@ -15,21 +15,25 @@ fun mapAccountTypeToDomain(isOrganization: Boolean): DelegateAccountType {
 }
 
 fun mapDelegateStatsToPreviews(
-    delegateStatsList: List<DelegateStats>,
+    delegateStats: List<DelegateStats>,
     delegateMetadata: AccountIdKeyMap<DelegateMetadata>,
     identities: AccountIdKeyMap<OnChainIdentity?>,
     userDelegations: AccountIdKeyMap<List<Pair<Track, Voting.Delegating>>>,
 ): List<DelegatePreview> {
-    return delegateStatsList.map { delegateStats ->
-        val metadata = delegateMetadata[delegateStats.accountId]
-        val identity = identities[delegateStats.accountId]
+    val delegateStatsById = delegateStats.associateBy { it.accountId.intoKey() }
+    val allIds = delegateStatsById.keys + delegateMetadata.keys
+
+    return allIds.map { accountId ->
+        val stats = delegateStatsById[accountId]
+        val metadata = delegateMetadata[accountId]
+        val identity = identities[accountId]
 
         DelegatePreview(
-            accountId = delegateStats.accountId,
-            stats = mapStatsToDomain(delegateStats),
+            accountId = accountId.value,
+            stats = stats?.let { mapStatsToDomain(it) },
             metadata = mapMetadataToDomain(metadata),
             onChainIdentity = identity,
-            userDelegations = userDelegations[delegateStats.accountId]?.toMap().orEmpty()
+            userDelegations = userDelegations[accountId]?.toMap().orEmpty()
         )
     }
 }

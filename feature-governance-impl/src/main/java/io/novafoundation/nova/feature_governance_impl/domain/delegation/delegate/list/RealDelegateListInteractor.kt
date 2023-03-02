@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.list
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.applyFilter
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateStats
@@ -43,16 +44,16 @@ class RealDelegateListInteractor(
         val tracksDeferred = async { delegateCommonRepository.getTracks(governanceOption) }
 
         chainStateRepository.currentBlockNumberFlow(chain.id).map {
-            val userDelegations = delegateCommonRepository.getUserDelegationsOrEmpty(governanceOption, tracksDeferred.await())
-            val userDelegationIds = userDelegations.keys.map { it.value }
+            val userDelegates = delegateCommonRepository.getUserDelegationsOrEmpty(governanceOption, tracksDeferred.await())
+            val userDelegateIds = userDelegates.keys.map { it.value }
 
-            val identities = identityRepository.getIdentitiesFromIds(userDelegationIds, chain.id)
+            val identities = identityRepository.getIdentitiesFromIds(userDelegateIds, chain.id)
 
             mapDelegateStatsToPreviews(
                 delegatesStatsDeferred.await(),
                 delegateMetadataDeferred.await(),
                 identities,
-                userDelegations
+                userDelegates
             )
         }
     }
@@ -62,20 +63,24 @@ class RealDelegateListInteractor(
         val delegateMetadataDeferred = async { delegateCommonRepository.getMetadata(governanceOption) }
         val tracksDeferred = async { delegateCommonRepository.getTracks(governanceOption) }
         var delegatesStats: List<DelegateStats>? = null
+        var oldUserDelegateIds: Set<AccountIdKey> = setOf()
 
         chainStateRepository.currentBlockNumberFlow(chain.id).map {
             val userDelegations = delegateCommonRepository.getUserDelegationsOrEmpty(governanceOption, tracksDeferred.await())
-            val userDelegationIds = userDelegations.keys.map { it.value }
+            val userDelegateIdsSet = userDelegations.keys
+            val userDelegateIdsList = userDelegateIdsSet.map { it.value }
 
-            if (delegatesStats == null) {
-                delegatesStats = delegateCommonRepository.getDelegatesStats(governanceOption, userDelegationIds)
+            if (delegatesStats == null || oldUserDelegateIds != userDelegateIdsSet) {
+                oldUserDelegateIds = userDelegateIdsSet
+                delegatesStats = delegateCommonRepository.getDelegatesStats(governanceOption, userDelegateIdsList)
             }
 
-            val identities = identityRepository.getIdentitiesFromIds(userDelegationIds, chain.id)
+            val identities = identityRepository.getIdentitiesFromIds(userDelegateIdsList, chain.id)
 
             mapDelegateStatsToPreviews(
                 delegatesStats!!,
-                delegateMetadataDeferred.await(),
+                delegateMetadataDeferred.await()
+                    .filterKeys { userDelegateIdsSet.contains(it) },
                 identities,
                 userDelegations
             )
