@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.list.NestedAdapter
 import io.novafoundation.nova.common.list.PlaceholderAdapter
-import io.novafoundation.nova.common.presentation.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_governance_impl.R

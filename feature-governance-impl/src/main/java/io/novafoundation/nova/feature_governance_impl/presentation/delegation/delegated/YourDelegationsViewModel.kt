@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegated
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.presentation.dataOrNull
-import io.novafoundation.nova.common.presentation.mapLoading
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.utils.withLoadingShared
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateSorting

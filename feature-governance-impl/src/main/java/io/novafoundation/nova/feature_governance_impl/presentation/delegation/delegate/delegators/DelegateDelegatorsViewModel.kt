@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.presentation.mapLoading
+import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.withSafeLoading

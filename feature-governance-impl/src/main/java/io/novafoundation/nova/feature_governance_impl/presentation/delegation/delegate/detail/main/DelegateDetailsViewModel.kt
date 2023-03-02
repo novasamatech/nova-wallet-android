@@ -8,8 +8,8 @@ import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
-import io.novafoundation.nova.common.presentation.dataOrNull
-import io.novafoundation.nova.common.presentation.mapLoading
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
