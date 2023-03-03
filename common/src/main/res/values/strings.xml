@@ -5,14 +5,9 @@
     <string name="delegate_search_result_count">search results: %d</string>
     <string name="delegate_search_hint">Search by address or name</string>
 
-    <!--<string name="assets_balance_details_locks_democrac">Democracy</string>-->
-    <string name="assets_balance_details_locks_democrac_v1">Governance v1</string>
-    <string name="assets_balance_details_locks_democrac_v2">OpenGov</string>
+    <string name="assets_balance_details_locks_democrac_v1" translatable="false">Governance v1</string>
+    <string name="assets_balance_details_locks_democrac_v2" translatable="false">OpenGov</string>
 
-<!--
-    <string name="staking_reward_payouts_payout_all">Pay out all (%s)</string>
-    <string name="staking_pending_rewards_subtitle">You can pay them out yourself, when they are close to expire, but you will pay the fee</string>
--->
     <string name="staking_reward_payouts_payout_all">Pay out all (%s)</string>
     <string name="staking_pending_rewards_subtitle">You can pay them out yourself, when they are close to expire, but you will pay the fee</string>
 
