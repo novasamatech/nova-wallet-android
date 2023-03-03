@@ -20,7 +20,7 @@ class YourMultiVoteView @JvmOverloads constructor(
     init {
         orientation = VERTICAL
 
-        setPadding(0, 4.dp, 0, 4.dp)
+        setPadding(0, 5.dp, 0, 5.dp)
 
         background = context.getBlockDrawable()
     }
