@@ -54,7 +54,7 @@ class RealRevokeDelegationsInteractor(
     override suspend fun revokeDelegations(trackIds: Collection<TrackId>): RetriableMultiResult<ExtrinsicStatus.InBlock> {
         val (chain, source) = useSelectedGovernance()
 
-        return extrinsicService.submitMultiExtrinsicWithSelectedWalletAwaingInclusion(chain) {
+        return extrinsicService.submitMultiExtrinsicWithSelectedWalletAwaitingInclusion(chain) {
             revokeDelegations(source, trackIds)
         }
     }

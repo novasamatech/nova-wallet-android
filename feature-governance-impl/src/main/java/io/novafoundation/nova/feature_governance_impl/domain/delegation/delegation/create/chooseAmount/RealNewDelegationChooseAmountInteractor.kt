@@ -72,7 +72,7 @@ class RealNewDelegationChooseAmountInteractor(
     ): RetriableMultiResult<ExtrinsicStatus.InBlock> {
         val (chain, governanceSource) = useSelectedGovernance()
 
-        return extrinsicService.submitMultiExtrinsicWithSelectedWalletAwaingInclusion(chain) { origin ->
+        return extrinsicService.submitMultiExtrinsicWithSelectedWalletAwaitingInclusion(chain) { origin ->
             delegate(governanceSource, amount, conviction, delegate, origin, chain, tracks, shouldRemoveOtherTracks)
         }
     }

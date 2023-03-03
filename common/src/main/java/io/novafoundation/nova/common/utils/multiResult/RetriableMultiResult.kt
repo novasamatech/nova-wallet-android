@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.utils.multiResult
 
+import android.util.Log
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult.RetriableFailure
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -33,14 +34,23 @@ suspend fun <T, I> runMultiCatching(
     intermediateListLoading: suspend () -> List<I>,
     listProcessing: suspend (I) -> T
 ): RetriableMultiResult<T> = coroutineScope {
-    val intermediateList = runCatching { intermediateListLoading() }.getOrNull()
+    val intermediateList = runCatching { intermediateListLoading() }
+        .onFailure { Log.w("RetriableMultiResult", "Failed to construct multi result list", it) }
+        .getOrNull()
     if (intermediateList == null) {
         val retry = suspend { runMultiCatching(intermediateListLoading, listProcessing) }
 
         return@coroutineScope RetriableMultiResult.allFailed(RetriableFailure(retry))
     }
 
-    val (succeeded, failed) = intermediateList.map { item -> async { runCatching { listProcessing(item) } } to item }
+    val (succeeded, failed) = intermediateList.map { item ->
+        val asyncProcess = async {
+            runCatching { listProcessing(item) }
+                .onFailure { Log.w("RetriableMultiResult", "Failed to construct multi result for item $item", it) }
+        }
+
+        asyncProcess to item
+    }
         .partition { (itemResult, _) -> itemResult.await().isSuccess }
 
     val retryFailure = if (failed.isNotEmpty()) {

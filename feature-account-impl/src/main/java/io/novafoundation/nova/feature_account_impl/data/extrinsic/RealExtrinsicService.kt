@@ -44,7 +44,7 @@ class RealExtrinsicService(
     private val extrinsicSplitter: ExtrinsicSplitter,
 ) : ExtrinsicService {
 
-    override suspend fun submitMultiExtrinsicWithSelectedWalletAwaingInclusion(
+    override suspend fun submitMultiExtrinsicWithSelectedWalletAwaitingInclusion(
         chain: Chain,
         formExtrinsic: FormMultiExtrinsicWithOrigin
     ): RetriableMultiResult<ExtrinsicStatus.InBlock> {
