@@ -40,7 +40,7 @@ suspend fun <T, I> runMultiCatching(
         return@coroutineScope RetriableMultiResult.allFailed(RetriableFailure(retry))
     }
 
-    val (succeeded, failed) = intermediateList.map { item -> async { runCatching {  listProcessing(item) } } to item }
+    val (succeeded, failed) = intermediateList.map { item -> async { runCatching { listProcessing(item) } } to item }
         .partition { (itemResult, _) -> itemResult.await().isSuccess }
 
     val retryFailure = if (failed.isNotEmpty()) {
