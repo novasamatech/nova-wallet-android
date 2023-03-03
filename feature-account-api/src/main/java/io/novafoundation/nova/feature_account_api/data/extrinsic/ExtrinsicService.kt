@@ -18,10 +18,10 @@ typealias FormMultiExtrinsic = suspend CallBuilder.() -> Unit
 
 interface ExtrinsicService {
 
-    suspend fun submitMultiExtrinsicWithSelectedWallet(
+    suspend fun submitMultiExtrinsicWithSelectedWalletAwaingInclusion(
         chain: Chain,
         formExtrinsic: FormMultiExtrinsicWithOrigin,
-    ): RetriableMultiResult<String>
+    ): RetriableMultiResult<ExtrinsicStatus.InBlock>
     suspend fun submitExtrinsicWithSelectedWallet(
         chain: Chain,
         formExtrinsic: FormExtrinsicWithOrigin,

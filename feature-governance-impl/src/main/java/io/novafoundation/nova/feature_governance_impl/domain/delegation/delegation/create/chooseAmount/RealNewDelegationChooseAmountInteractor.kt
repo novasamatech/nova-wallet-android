@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegatio
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
@@ -68,10 +69,10 @@ class RealNewDelegationChooseAmountInteractor(
         delegate: AccountId,
         tracks: Collection<TrackId>,
         shouldRemoveOtherTracks: Boolean,
-    ): RetriableMultiResult<String> {
+    ): RetriableMultiResult<ExtrinsicStatus.InBlock> {
         val (chain, governanceSource) = useSelectedGovernance()
 
-        return extrinsicService.submitMultiExtrinsicWithSelectedWallet(chain) { origin ->
+        return extrinsicService.submitMultiExtrinsicWithSelectedWalletAwaingInclusion(chain) { origin ->
             delegate(governanceSource, amount, conviction, delegate, origin, chain, tracks, shouldRemoveOtherTracks)
         }
     }

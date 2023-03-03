@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.domain.track.tracksByIdOf
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -28,7 +29,7 @@ interface RevokeDelegationsInteractor {
 
     suspend fun calculateFee(trackIds: Collection<TrackId>): Balance
 
-    suspend fun revokeDelegations(trackIds: Collection<TrackId>): RetriableMultiResult<String>
+    suspend fun revokeDelegations(trackIds: Collection<TrackId>): RetriableMultiResult<ExtrinsicStatus.InBlock>
 
     fun revokeDelegationDataFlow(trackIds: Collection<TrackId>): Flow<RevokeDelegationData>
 }
@@ -50,10 +51,10 @@ class RealRevokeDelegationsInteractor(
         }
     }
 
-    override suspend fun revokeDelegations(trackIds: Collection<TrackId>): RetriableMultiResult<String> {
+    override suspend fun revokeDelegations(trackIds: Collection<TrackId>): RetriableMultiResult<ExtrinsicStatus.InBlock> {
         val (chain, source) = useSelectedGovernance()
 
-        return extrinsicService.submitMultiExtrinsicWithSelectedWallet(chain) {
+        return extrinsicService.submitMultiExtrinsicWithSelectedWalletAwaingInclusion(chain) {
             revokeDelegations(source, trackIds)
         }
     }

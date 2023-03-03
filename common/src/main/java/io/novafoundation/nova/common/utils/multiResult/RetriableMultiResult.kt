@@ -1,6 +1,8 @@
 package io.novafoundation.nova.common.utils.multiResult
 
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult.RetriableFailure
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 class RetriableMultiResult<T>(val succeeded: List<T>, val failed: RetriableFailure<T>?) {
 
@@ -30,16 +32,16 @@ inline fun <T> RetriableMultiResult<T>.onAnyFailure(action: (failed: RetriableFa
 suspend fun <T, I> runMultiCatching(
     intermediateListLoading: suspend () -> List<I>,
     listProcessing: suspend (I) -> T
-): RetriableMultiResult<T> {
+): RetriableMultiResult<T> = coroutineScope {
     val intermediateList = runCatching { intermediateListLoading() }.getOrNull()
     if (intermediateList == null) {
         val retry = suspend { runMultiCatching(intermediateListLoading, listProcessing) }
 
-        return RetriableMultiResult.allFailed(RetriableFailure(retry))
+        return@coroutineScope RetriableMultiResult.allFailed(RetriableFailure(retry))
     }
 
-    val (succeeded, failed) = intermediateList.map { item -> runCatching { listProcessing(item) } to item }
-        .partition { (itemResult, _) -> itemResult.isSuccess }
+    val (succeeded, failed) = intermediateList.map { item -> async { runCatching {  listProcessing(item) } } to item }
+        .partition { (itemResult, _) -> itemResult.await().isSuccess }
 
     val retryFailure = if (failed.isNotEmpty()) {
         val failedItems = failed.map { it.second }
@@ -50,7 +52,7 @@ suspend fun <T, I> runMultiCatching(
         null
     }
 
-    val successResults = succeeded.map { it.first.getOrThrow() }
+    val successResults = succeeded.map { it.first.await().getOrThrow() }
 
-    return RetriableMultiResult(successResults, retryFailure)
+    RetriableMultiResult(successResults, retryFailure)
 }

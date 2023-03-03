@@ -31,6 +31,8 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrins
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import java.math.BigInteger
 
 class RealExtrinsicService(
@@ -42,10 +44,17 @@ class RealExtrinsicService(
     private val extrinsicSplitter: ExtrinsicSplitter,
 ) : ExtrinsicService {
 
-    override suspend fun submitMultiExtrinsicWithSelectedWallet(chain: Chain, formExtrinsic: FormMultiExtrinsicWithOrigin): RetriableMultiResult<String> {
+    override suspend fun submitMultiExtrinsicWithSelectedWalletAwaingInclusion(
+        chain: Chain,
+        formExtrinsic: FormMultiExtrinsicWithOrigin
+    ): RetriableMultiResult<ExtrinsicStatus.InBlock> {
         return runMultiCatching(
             intermediateListLoading = { constructSplitExtrinsicsForSubmission(chain, formExtrinsic) },
-            listProcessing = { extrinsic -> rpcCalls.submitExtrinsic(chain.id, extrinsic) }
+            listProcessing = { extrinsic ->
+                rpcCalls.submitAndWatchExtrinsic(chain.id, extrinsic)
+                    .filterIsInstance<ExtrinsicStatus.InBlock>()
+                    .first()
+            }
         )
     }
 
