@@ -33,6 +33,8 @@ infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another)
 
 fun BigInteger.intSqrt() = sqrt(toDouble()).toLong().toBigInteger()
 
+operator fun BigInteger.times(double: Double): BigInteger = toBigDecimal().multiply(double.toBigDecimal()).toBigInteger()
+
 val BigDecimal.isZero: Boolean
     get() = signum() == 0
 

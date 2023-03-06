@@ -2,6 +2,7 @@ package io.novafoundation.nova.runtime.extrinsic.multi
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
+import io.novafoundation.nova.common.utils.times
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions
 import io.novafoundation.nova.runtime.extrinsic.FeeSigner
@@ -27,6 +28,7 @@ interface ExtrinsicSplitter {
 }
 
 private typealias CallWeightsByType = Map<String, Deferred<Weight>>
+private const val LEAVE_SOME_SPACE_MULTIPLIER = 0.8
 
 internal class RealExtrinsicSplitter(
     private val rpcCalls: RpcCalls,
@@ -36,7 +38,7 @@ internal class RealExtrinsicSplitter(
     override suspend fun split(callBuilder: CallBuilder, chain: Chain): SplitCalls = coroutineScope {
         val weightByCallId = estimateWeightByCallType(callBuilder, chain)
 
-        val blockLimit = blockLimitsRepository.maxWeightForNormalExtrinsics(chain.id)
+        val blockLimit = blockLimitsRepository.maxWeightForNormalExtrinsics(chain.id) * LEAVE_SOME_SPACE_MULTIPLIER
 
         callBuilder.splitCallsWith(weightByCallId, blockLimit)
     }
