@@ -21,7 +21,7 @@ fun mapDelegateStatsToPreviews(
     userDelegations: AccountIdKeyMap<List<Pair<Track, Voting.Delegating>>>,
 ): List<DelegatePreview> {
     val delegateStatsById = delegateStats.associateBy { it.accountId.intoKey() }
-    val allIds = delegateStatsById.keys + delegateMetadata.keys
+    val allIds = delegateStatsById.keys + delegateMetadata.keys + userDelegations.keys
 
     return allIds.map { accountId ->
         val stats = delegateStatsById[accountId]
