@@ -142,10 +142,10 @@
             </LinearLayout>
 
             <io.novafoundation.nova.feature_governance_impl.presentation.view.YourMultiVoteView
-                android:layout_width="match_parent"
                 android:id="@+id/referendumDetailsYourVote"
-                android:layout_marginBottom="12dp"
-                android:layout_height="wrap_content" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp" />
 
             <io.novafoundation.nova.feature_governance_impl.presentation.view.VotingStatusView
                 android:id="@+id/referendumDetailsVotingStatus"

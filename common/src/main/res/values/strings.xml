@@ -6,19 +6,17 @@
     <string name="select_ledger_location_enable_request_title">Please enable geo-location in device settings</string>
     <string name="select_ledger_location_enable_request_message">Nova needs location to be enabled to be able to perform bluetooth scanning to find your Ledger device</string>
 
+    <string name="common_some_tx_failed_title">Failed to submit some transactions</string>
+    <string name="common_some_tx_failed_message">There was an error while submitting some transactions. Do you want to retry?</string>
+
     <string name="delegate_search_placeholder_default">Search result will be displayed here</string>
     <string name="delegate_search_placeholder_empty">Address format is invalid. Make sure that address belongs to the right network</string>
     <string name="delegate_search_result_count">search results: %d</string>
     <string name="delegate_search_hint">Search by address or name</string>
 
-    <!--<string name="assets_balance_details_locks_democrac">Democracy</string>-->
-    <string name="assets_balance_details_locks_democrac_v1">Governance v1</string>
-    <string name="assets_balance_details_locks_democrac_v2">OpenGov</string>
+    <string name="assets_balance_details_locks_democrac_v1" translatable="false">Governance v1</string>
+    <string name="assets_balance_details_locks_democrac_v2" translatable="false">OpenGov</string>
 
-<!--
-    <string name="staking_reward_payouts_payout_all">Pay out all (%s)</string>
-    <string name="staking_pending_rewards_subtitle">You can pay them out yourself, when they are close to expire, but you will pay the fee</string>
--->
     <string name="staking_reward_payouts_payout_all">Pay out all (%s)</string>
     <string name="staking_pending_rewards_subtitle">You can pay them out yourself, when they are close to expire, but you will pay the fee</string>
 

@@ -19,7 +19,10 @@ class SubstrateApplicationConfig(
                 SubstrateApplicationConfig(chainId = Chain.Geneses.EDGEWARE, coin = 523, cla = 0x94u),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.KARURA, coin = 686, cla = 0x9au),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.ACALA, coin = 787, cla = 0x9bu),
-                SubstrateApplicationConfig(chainId = Chain.Geneses.NODLE_PARACHAIN, coin = 1003, cla = 0x98u)
+                SubstrateApplicationConfig(chainId = Chain.Geneses.NODLE_PARACHAIN, coin = 1003, cla = 0x98u),
+                SubstrateApplicationConfig(chainId = Chain.Geneses.POLYMESH, coin = 595, cla = 0x91u),
+                SubstrateApplicationConfig(chainId = Chain.Geneses.CENTRIFUGE, coin = 747, cla = 0x93u),
+                SubstrateApplicationConfig(chainId = Chain.Geneses.XX_NETWORK, coin = 1955, cla = 0xa3u),
             )
         }
 

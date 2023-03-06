@@ -80,6 +80,7 @@
                         android:id="@+id/revokeDelegationConfirmUndelegatingPeriod"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        app:titleEllipsisable="true"
                         app:titleIconStart="@drawable/ic_time_16"
                         app:title="@string/delegation_undelegating_period" />
 
@@ -92,6 +93,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp" />
+
             </LinearLayout>
         </ScrollView>
 
