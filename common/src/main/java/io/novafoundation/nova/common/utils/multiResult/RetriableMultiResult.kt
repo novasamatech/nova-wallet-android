@@ -1,7 +1,10 @@
 package io.novafoundation.nova.common.utils.multiResult
 
 import android.util.Log
+import io.novafoundation.nova.common.base.errors.CompoundException
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult.RetriableFailure
+import io.novafoundation.nova.common.utils.requireException
+import io.novafoundation.nova.common.utils.requireValue
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
@@ -9,7 +12,7 @@ class RetriableMultiResult<T>(val succeeded: List<T>, val failed: RetriableFailu
 
     companion object
 
-    class RetriableFailure<T>(val retry: suspend () -> RetriableMultiResult<T>, val error: Throwable? = null)
+    class RetriableFailure<T>(val retry: suspend () -> RetriableMultiResult<T>, val error: Throwable)
 }
 
 fun <T> RetriableMultiResult.Companion.allFailed(failed: RetriableFailure<T>) = RetriableMultiResult(emptyList(), failed)
@@ -34,14 +37,16 @@ suspend fun <T, I> runMultiCatching(
     intermediateListLoading: suspend () -> List<I>,
     listProcessing: suspend (I) -> T
 ): RetriableMultiResult<T> = coroutineScope {
-    val intermediateList = runCatching { intermediateListLoading() }
+    val intermediateListResult = runCatching { intermediateListLoading() }
         .onFailure { Log.w("RetriableMultiResult", "Failed to construct multi result list", it) }
-        .getOrNull()
-    if (intermediateList == null) {
+
+    if (intermediateListResult.isFailure) {
         val retry = suspend { runMultiCatching(intermediateListLoading, listProcessing) }
 
-        return@coroutineScope RetriableMultiResult.allFailed(RetriableFailure(retry))
+        return@coroutineScope RetriableMultiResult.allFailed(RetriableFailure(retry, intermediateListResult.requireException()))
     }
+
+    val intermediateList = intermediateListResult.requireValue()
 
     val (succeeded, failed) = intermediateList.map { item ->
         val asyncProcess = async {
@@ -55,9 +60,10 @@ suspend fun <T, I> runMultiCatching(
 
     val retryFailure = if (failed.isNotEmpty()) {
         val failedItems = failed.map { it.second }
+        val exception = CompoundException(failed.map { it.first.await().requireException() })
         val retry = suspend { runMultiCatching(intermediateListLoading = { failedItems }, listProcessing) }
 
-        RetriableFailure(retry)
+        RetriableFailure(retry, exception)
     } else {
         null
     }

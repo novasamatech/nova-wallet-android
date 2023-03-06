@@ -2,6 +2,7 @@ package io.novafoundation.nova.common.utils.multiResult
 
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.base.errors.shouldIgnore
 import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -47,6 +48,8 @@ private class PartialRetriableMixinImpl(
         progressConsumer: ProgressConsumer?,
         onRetryCancelled: () -> Unit,
     ) {
+        if (shouldIgnore(failure.error)) return
+
         val onRetry = { retrySubmission(failure, onSuccess, progressConsumer, onRetryCancelled) }
 
         retryEvent.value = RetryPayload(
