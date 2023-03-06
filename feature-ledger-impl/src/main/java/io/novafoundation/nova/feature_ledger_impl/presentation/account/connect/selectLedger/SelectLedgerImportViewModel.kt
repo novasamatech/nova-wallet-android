@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.event
+import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
@@ -21,12 +22,14 @@ class SelectLedgerImportViewModel(
     discoveryService: LedgerDeviceDiscoveryService,
     permissionsAsker: PermissionsAsker.Presentation,
     bluetoothManager: BluetoothManager,
+    locationManager: LocationManager,
     resourceManager: ResourceManager,
     chainRegistry: ChainRegistry,
 ) : SelectLedgerViewModel(
     discoveryService = discoveryService,
     permissionsAsker = permissionsAsker,
     bluetoothManager = bluetoothManager,
+    locationManager = locationManager,
     router = router,
     resourceManager = resourceManager,
     chainRegistry = chainRegistry,

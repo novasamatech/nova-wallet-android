@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.MutableSharedState
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
+import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
@@ -35,6 +36,8 @@ interface LedgerFeatureDependencies {
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     val bluetoothManager: BluetoothManager
+
+    val locationManager: LocationManager
 
     val permissionAskerFactory: PermissionsAskerFactory
 

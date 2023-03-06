@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.MutableSharedState
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.chainId
 import io.novafoundation.nova.common.utils.getOrThrow
+import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -66,6 +67,7 @@ class SignLedgerModule {
         discoveryService: LedgerDeviceDiscoveryService,
         permissionsAsker: PermissionsAsker.Presentation,
         bluetoothManager: BluetoothManager,
+        locationManager: LocationManager,
         router: LedgerRouter,
         resourceManager: ResourceManager,
         chainRegistry: ChainRegistry,
@@ -82,6 +84,7 @@ class SignLedgerModule {
             discoveryService = discoveryService,
             permissionsAsker = permissionsAsker,
             bluetoothManager = bluetoothManager,
+            locationManager = locationManager,
             router = router,
             resourceManager = resourceManager,
             chainRegistry = chainRegistry,

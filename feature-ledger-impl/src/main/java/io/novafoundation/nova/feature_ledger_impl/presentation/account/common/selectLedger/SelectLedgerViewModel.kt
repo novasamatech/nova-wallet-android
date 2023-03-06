@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.s
 
 import android.Manifest
 import android.os.Build
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.navigation.ReturnableRouter
@@ -11,6 +12,7 @@ import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.stateMachine.StateMachine
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
@@ -27,6 +29,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.se
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.DevicesFoundState
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.DiscoveringState
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.NoBluetoothState
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.NoLocationState
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.SelectLedgerState
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.WaitingForPermissionsState
 import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.ble.BleScanFailed
@@ -44,6 +47,7 @@ abstract class SelectLedgerViewModel(
     private val discoveryService: LedgerDeviceDiscoveryService,
     private val permissionsAsker: PermissionsAsker.Presentation,
     private val bluetoothManager: BluetoothManager,
+    private val locationManager: LocationManager,
     private val router: ReturnableRouter,
     private val resourceManager: ResourceManager,
     private val payload: SelectLedgerPayload,
@@ -63,12 +67,16 @@ abstract class SelectLedgerViewModel(
 
     override val ledgerMessageCommands = MutableLiveData<Event<LedgerMessageCommand>>()
 
+    private val _showRequestLocationDialog = MutableLiveData<Boolean>()
+    val showRequestLocationDialog: LiveData<Boolean> = _showRequestLocationDialog
+
     init {
         requirePermissions()
 
         handleSideEffects()
 
         emitInitialBluetoothState()
+        locationStateChanged()
     }
 
     abstract suspend fun verifyConnection(device: LedgerDevice)
@@ -93,10 +101,23 @@ abstract class SelectLedgerViewModel(
     }
 
     fun bluetoothStateChanged(state: BluetoothState) {
+        val isLocationEnabled = locationManager.isLocationEnabled()
         when (state) {
-            BluetoothState.ON -> stateMachine.onEvent(SelectLedgerEvent.BluetoothEnabled)
+            BluetoothState.ON -> stateMachine.onEvent(SelectLedgerEvent.BluetoothEnabled(isLocationEnabled))
             BluetoothState.OFF -> stateMachine.onEvent(SelectLedgerEvent.BluetoothDisabled)
         }
+    }
+
+    fun locationStateChanged() {
+        val isBluetoothEnabled = bluetoothManager.isBluetoothEnabled()
+        when (locationManager.isLocationEnabled()) {
+            true -> stateMachine.onEvent(SelectLedgerEvent.LocationEnabled(isBluetoothEnabled))
+            false -> stateMachine.onEvent(SelectLedgerEvent.LocationDisabled)
+        }
+    }
+
+    fun enableLocation() {
+        locationManager.enableLocation()
     }
 
     private fun emitInitialBluetoothState() {
@@ -127,12 +148,20 @@ abstract class SelectLedgerViewModel(
         when (effect) {
             SideEffect.EnableBluetooth -> bluetoothManager.enableBluetooth()
 
+            SideEffect.EnableLocation -> {
+                requestLocation()
+            }
+
             is SideEffect.PresentLedgerFailure -> launch { handleLedgerError(effect.reason, effect.device) }
 
             is SideEffect.VerifyConnection -> performConnectionVerification(effect.device)
 
             SideEffect.StartDiscovery -> startDeviceDiscovery()
         }
+    }
+
+    private fun requestLocation() {
+        _showRequestLocationDialog.value = true
     }
 
     private fun startDeviceDiscovery() {
@@ -174,6 +203,7 @@ abstract class SelectLedgerViewModel(
             is DiscoveringState -> emptyList()
             is NoBluetoothState -> emptyList()
             is WaitingForPermissionsState -> emptyList()
+            is NoLocationState -> emptyList()
         }
     }
 

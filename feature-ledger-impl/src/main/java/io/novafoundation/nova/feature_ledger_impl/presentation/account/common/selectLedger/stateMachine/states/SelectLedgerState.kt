@@ -11,6 +11,11 @@ sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffec
         emitSideEffect(SideEffect.EnableBluetooth)
     }
 
+    protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.locationDisabled() {
+        emitState(NoLocationState())
+        emitSideEffect(SideEffect.EnableLocation)
+    }
+
     protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.startDiscovery() {
         emitState(DiscoveringState())
         emitSideEffect(SideEffect.StartDiscovery)

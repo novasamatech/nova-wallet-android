@@ -31,6 +31,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
+import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
@@ -130,6 +131,8 @@ interface CommonApi {
     val permissionsAskerFactory: PermissionsAskerFactory
 
     val bluetoothManager: BluetoothManager
+
+    val locationManager: LocationManager
 
     val listChooserMixinFactory: ListChooserMixin.Factory
 }
