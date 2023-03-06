@@ -10,11 +10,11 @@ class DelegateListModel(
     val name: String,
     val type: DelegateTypeModel?,
     val description: String?,
-    val stats: DelegateStatsModel,
+    val stats: DelegateStatsModel?,
     val delegation: YourDelegationInfo?
 ) {
 
-    class YourDelegationInfo(
+    data class YourDelegationInfo(
         val firstTrack: TrackModel,
         val otherTracksCount: String?,
         val votes: VoteModel?,

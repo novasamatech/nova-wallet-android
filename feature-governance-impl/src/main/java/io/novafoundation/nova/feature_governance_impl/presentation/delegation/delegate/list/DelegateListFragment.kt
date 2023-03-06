@@ -9,7 +9,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.PlaceholderAdapter
-import io.novafoundation.nova.common.presentation.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.common.view.input.chooser.setupListChooserMixinBottomSheet
@@ -51,6 +51,7 @@ class DelegateListFragment :
 
         delegateListToolbar.applyStatusBarInsets()
         delegateListToolbar.setHomeButtonListener { viewModel.backClicked() }
+        delegateListToolbar.setRightActionClickListener { viewModel.openSearch() }
     }
 
     override fun inject() {
@@ -79,7 +80,7 @@ class DelegateListFragment :
             bannerAdapter.showBanner(it)
         }
 
-        viewModel.delegateModels.observe {
+        viewModel.delegateModels.observeWhenVisible {
             when (it) {
                 is ExtendedLoadingState.Error -> {}
                 is ExtendedLoadingState.Loaded -> {

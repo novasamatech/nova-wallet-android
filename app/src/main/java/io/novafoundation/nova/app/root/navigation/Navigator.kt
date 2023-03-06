@@ -450,8 +450,13 @@ class Navigator(
     override fun nonCancellableVerify() {
         val currentDestination = navController?.currentDestination
 
+        if (currentDestination?.id == R.id.splashFragment) {
+            return
+        }
+
         val action = PinCodeAction.CheckAfterInactivity(BackDelayedNavigation, ToolbarConfiguration())
         val bundle = PincodeFragment.getPinCodeBundle(action)
+
         if (currentDestination?.id == R.id.pincodeFragment) {
             val currentBackStackEntry = navController!!.currentBackStackEntry
             val arguments = currentBackStackEntry!!.arguments!!.getParcelableCompat<PinCodeAction>(PincodeFragment.KEY_PINCODE_ACTION)

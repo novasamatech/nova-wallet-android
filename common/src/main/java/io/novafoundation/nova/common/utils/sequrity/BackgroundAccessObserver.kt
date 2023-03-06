@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
@@ -32,7 +32,9 @@ class BackgroundAccessObserver(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 
-    private val _stateFlow = MutableStateFlow(State.NOTHING)
+    private var currentState = State.NOTHING
+
+    private val _stateFlow = MutableSharedFlow<State>()
 
     val requestAccessFlow: Flow<State> = _stateFlow
         .filter { it == State.REQUEST_ACCESS }
@@ -42,7 +44,7 @@ class BackgroundAccessObserver(
     }
 
     fun onAccessed() {
-        _stateFlow.value = State.NOTHING
+        changeState(State.NOTHING)
         preferences.removeField(PREFS_ON_PAUSE_TIME)
     }
 
@@ -60,17 +62,14 @@ class BackgroundAccessObserver(
         val onPauseTime = preferences.getLong(PREFS_ON_PAUSE_TIME, -1)
         val difference = elapsedTime - onPauseTime
         if (onPauseTime >= 0 && difference > accessTimeInBackground) {
-            notifyEveryone()
+            changeState(State.REQUEST_ACCESS)
         }
     }
 
-    private fun notifyEveryone() {
+    private fun changeState(state: State) {
         launch {
-            if (_stateFlow.value == State.REQUEST_ACCESS) {
-                _stateFlow.emit(State.REQUEST_ACCESS)
-            } else {
-                _stateFlow.value = State.REQUEST_ACCESS
-            }
+            currentState = state
+            _stateFlow.emit(currentState)
         }
     }
 }

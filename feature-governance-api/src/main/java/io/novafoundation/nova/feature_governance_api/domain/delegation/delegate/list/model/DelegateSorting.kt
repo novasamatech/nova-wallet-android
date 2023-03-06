@@ -6,8 +6,8 @@ enum class DelegateSorting {
 
 fun DelegateSorting.delegateComparator(): Comparator<DelegatePreview> {
     return when (this) {
-        DelegateSorting.DELEGATIONS -> compareByDescending { it.stats.delegationsCount }
-        DelegateSorting.DELEGATED_VOTES -> compareByDescending { it.stats.delegatedVotes }
-        DelegateSorting.VOTING_ACTIVITY -> compareByDescending { it.stats.recentVotes }
+        DelegateSorting.DELEGATIONS -> compareByDescending { it.stats?.delegationsCount }
+        DelegateSorting.DELEGATED_VOTES -> compareByDescending { it.stats?.delegatedVotes }
+        DelegateSorting.VOTING_ACTIVITY -> compareByDescending { it.stats?.recentVotes }
     }
 }

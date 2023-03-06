@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:background="@color/secondary_screen_background">
+
+    <LinearLayout
+        android:id="@+id/delegateSearchNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/solid_navigation_background"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <io.novafoundation.nova.common.view.Toolbar
+            android:id="@+id/delegateSearchToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:contentBackground="@color/solid_navigation_background"
+            app:dividerVisible="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:titleText="@string/common_search" />
+
+        <io.novafoundation.nova.common.view.SearchView
+            android:id="@+id/delegateSearchField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:hint="@string/delegate_search_hint" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/navigation_divider" />
+
+    </LinearLayout>
+
+    <io.novafoundation.nova.common.view.PlaceholderView
+        android:id="@+id/delegateSearchPlaceholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="32dp"
+        android:text="@string/delegate_search_placeholder_default"
+        app:image="@drawable/ic_placeholder"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/delegateSearchNavigation"
+        app:placeholderBackgroundStyle="no_background" />
+
+    <ProgressBar
+        android:id="@+id/delegateSearchProgressBar"
+        style="@style/Widget.Nova.ProgressBar.Indeterminate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/delegateSearchNavigation"
+        tools:visibility="visible" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/delegateSearchList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:visibility="gone"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/delegateSearchNavigation"
+        tools:itemCount="1"
+        tools:listitem="@layout/item_delegate"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

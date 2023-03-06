@@ -11,13 +11,15 @@ import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.constraintlayout.widget.Group
 import coil.ImageLoader
 import coil.load
 import coil.transform.RoundedCornersTransformation
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.presentation.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.getAccentColor
 import io.novafoundation.nova.common.utils.getEnum
@@ -31,6 +33,7 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
+import kotlinx.android.synthetic.main.view_table_cell.view.barrier
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellContent
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellImage
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellTitle
@@ -89,6 +92,7 @@ open class TableCellView @JvmOverloads constructor(
         View.inflate(context, R.layout.view_table_cell, this)
 
         setBackgroundResource(R.drawable.bg_primary_list_item)
+        minHeight = 44.dp(context)
 
         attrs?.let { applyAttributes(it) }
     }
@@ -169,6 +173,23 @@ open class TableCellView @JvmOverloads constructor(
         }
     }
 
+    fun setTitleEllipsisable(ellipsisable: Boolean) {
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(this)
+
+        if (ellipsisable) {
+            constraintSet.connect(tableCellTitle.id, ConstraintSet.END, barrier.id, ConstraintSet.START, 16.dp(context))
+            constraintSet.clear(tableCellValuePrimary.id, ConstraintSet.START)
+            constraintSet.constrainedWidth(tableCellTitle.id, true)
+            constraintSet.setHorizontalBias(tableCellTitle.id, 0f)
+        } else {
+            constraintSet.clear(tableCellTitle.id, ConstraintSet.END)
+            constraintSet.connect(tableCellValuePrimary.id, ConstraintSet.START, tableCellTitle.id, ConstraintSet.END, 16.dp(context))
+            constraintSet.constrainedWidth(tableCellTitle.id, false)
+        }
+        constraintSet.applyTo(this)
+    }
+
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.TableCellView) { typedArray ->
         val titleText = typedArray.getString(R.styleable.TableCellView_title)
         setTitle(titleText)
@@ -200,6 +221,9 @@ open class TableCellView @JvmOverloads constructor(
 
         val secondaryValueTextAppearance = typedArray.getResourceIdOrNull(R.styleable.TableCellView_secondaryValueTextAppearance)
         secondaryValueTextAppearance?.let(valueSecondary::setTextAppearance)
+
+        val titleEllipsisable = typedArray.getBoolean(R.styleable.TableCellView_titleEllipsisable, false)
+        setTitleEllipsisable(titleEllipsisable)
     }
 }
 

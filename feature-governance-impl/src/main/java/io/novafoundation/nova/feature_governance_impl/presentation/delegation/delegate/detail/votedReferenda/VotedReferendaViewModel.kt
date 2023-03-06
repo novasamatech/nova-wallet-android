@@ -48,7 +48,7 @@ class VotedReferendaViewModel(
         .shareWhileSubscribed()
 
     fun openReferendum(referendum: ReferendumModel) {
-        val payload = ReferendumDetailsPayload(referendum.id.value)
+        val payload = ReferendumDetailsPayload(referendum.id.value, allowVoting = false)
         governanceRouter.openReferendum(payload)
     }
 

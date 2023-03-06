@@ -19,6 +19,17 @@
     <string name="staking_alert_rebag_title">Staking improvements</string>
     <string name="staking_alert_rebag_message">Having outdated position in the queue of stake assignment to a validator may suspend your rewards</string>
 
+    <string name="delegate_search_placeholder_default">Search result will be displayed here</string>
+    <string name="delegate_search_placeholder_empty">Address format is invalid. Make sure that address belongs to the right network</string>
+    <string name="delegate_search_result_count">search results: %d</string>
+    <string name="delegate_search_hint">Search by address or name</string>
+
+    <string name="assets_balance_details_locks_democrac_v1" translatable="false">Governance v1</string>
+    <string name="assets_balance_details_locks_democrac_v2" translatable="false">OpenGov</string>
+
+    <string name="staking_reward_payouts_payout_all">Pay out all (%s)</string>
+    <string name="staking_pending_rewards_subtitle">You can pay them out yourself, when they are close to expire, but you will pay the fee</string>
+
     <string name="add_delegation_missing_account_message">You should add %s account to the wallet in order to delegate</string>
 
     <string name="referendum_vote_abstain">Abstain</string>
@@ -467,7 +478,6 @@
     <string name="assets_select_send_your_wallets">Your wallets</string>
 
     <string name="assets_balance_details_locks_staking">Staking</string>
-    <string name="assets_balance_details_locks_democrac">Democracy</string>
     <string name="assets_balance_details_locks_vesting">Vesting</string>
     <string name="assets_balance_details_locks_phrelect">Elections</string>
 
@@ -705,7 +715,6 @@
     <string name="staking_set_controller_subtitle">Select another account as a controller to delegate staking management operations to it</string>
 
     <string name="staking_pending_rewards_title">Rewards are paid every 2–3 days by validators</string>
-    <string name="staking_pending_rewards_subtitle">You can payout them by yourself, when they are close to expire, but you will pay the fee</string>
 
     <string name="common_how_it_works">How it works</string>
     <string name="staking_payout">Payout</string>
@@ -1171,7 +1180,6 @@
 
     <string name="staking_reward_payouts_empty_rewards">Perfect! All rewards are paid.</string>
     <string name="staking_reward_payouts_empty_rewards_v2_2_0">Awesome! You have no unpaid rewards</string>
-    <string name="staking_reward_payouts_payout_all">Payout all (%s)</string>
     <string name="staking_reward_payouts_title">Pending rewards</string>
     <string name="staking_reward_payouts_title_v2_2_0">Unpaid rewards</string>
     <string name="staking_rewards_apy">Rewards (APY)</string>

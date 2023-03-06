@@ -10,7 +10,7 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 data class DelegatePreview(
     override val accountId: AccountId,
-    val stats: Stats,
+    val stats: Stats?,
     override val metadata: Metadata?,
     override val onChainIdentity: OnChainIdentity?,
     val userDelegations: Map<Track, Voting.Delegating>
@@ -28,8 +28,4 @@ data class DelegatePreview(
 
 fun DelegatePreview.hasMetadata(): Boolean {
     return metadata != null
-}
-
-fun DelegatePreview.hasUserDelegations(): Boolean {
-    return userDelegations.isNotEmpty()
 }
