@@ -65,6 +65,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.mixin.identity.R
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
+import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
@@ -82,12 +83,16 @@ class AccountFeatureModule {
         accountRepository: AccountRepository,
         rpcCalls: RpcCalls,
         extrinsicBuilderFactory: ExtrinsicBuilderFactory,
-        signerProvider: SignerProvider
+        chainRegistry: ChainRegistry,
+        signerProvider: SignerProvider,
+        extrinsicSplitter: ExtrinsicSplitter
     ): ExtrinsicService = RealExtrinsicService(
         rpcCalls,
+        chainRegistry,
         accountRepository,
         extrinsicBuilderFactory,
-        signerProvider
+        signerProvider,
+        extrinsicSplitter,
     )
 
     @Provides

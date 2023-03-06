@@ -11,10 +11,10 @@ import io.novafoundation.nova.feature_governance_api.data.network.offchain.model
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateStats
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.vote.UserVote
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
 interface DelegationsRepository {
 
@@ -53,14 +53,14 @@ interface DelegationsRepository {
         recentVotesBlockThreshold: BlockNumber?
     ): Map<ReferendumId, UserVote.Direct>?
 
-    suspend fun ExtrinsicBuilder.delegate(
+    suspend fun CallBuilder.delegate(
         delegate: AccountId,
         trackId: TrackId,
         amount: Balance,
         conviction: Conviction
     )
 
-    suspend fun ExtrinsicBuilder.undelegate(trackId: TrackId)
+    suspend fun CallBuilder.undelegate(trackId: TrackId)
 }
 
 suspend fun DelegationsRepository.getDelegatesMetadataOrEmpty(chain: Chain): List<DelegateMetadata> {

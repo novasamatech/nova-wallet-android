@@ -44,6 +44,8 @@ import io.novafoundation.nova.common.resources.ResourceManagerImpl
 import io.novafoundation.nova.common.sequrity.RealSafeModeService
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
+import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
@@ -263,4 +265,10 @@ class CommonModule {
     ): SafeModeService {
         return RealSafeModeService(contextManager, preferences)
     }
+
+    @Provides
+    @ApplicationScope
+    fun providePartialRetriableMixinFactory(
+        resourceManager: ResourceManager
+    ): PartialRetriableMixin.Factory = RealPartialRetriableMixinFactory(resourceManager)
 }

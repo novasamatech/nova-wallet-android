@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="common_some_tx_failed_title">Failed to submit some transactions</string>
+    <string name="common_some_tx_failed_message">There was an error while submitting some transactions. Do you want to retry?</string>
+
     <string name="delegate_search_placeholder_default">Search result will be displayed here</string>
     <string name="delegate_search_placeholder_empty">Address format is invalid. Make sure that address belongs to the right network</string>
     <string name="delegate_search_result_count">search results: %d</string>

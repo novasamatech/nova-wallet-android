@@ -8,16 +8,17 @@ import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
+import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.setVoteModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateLabelState
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.setAmountChangeModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.list.TrackListBottomSheet
-import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.setVoteModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_new_delegation_confirm.newDelegationConfirmAmount
 import kotlinx.android.synthetic.main.fragment_new_delegation_confirm.newDelegationConfirmConfirm
@@ -72,6 +73,7 @@ class NewDelegationConfirmFragment : BaseFragment<NewDelegationConfirmViewModel>
     }
 
     override fun subscribe(viewModel: NewDelegationConfirmViewModel) {
+        observeRetries(viewModel.partialRetriableMixin)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
         observeHints(viewModel.hintsMixin, newDelegationConfirmHints)

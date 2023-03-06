@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.storage.source.query
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
+import io.novafoundation.nova.common.data.network.runtime.binding.fromByteArrayOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.ComponentHolder
@@ -9,6 +10,7 @@ import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilderImpl
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
+import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Constant
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import jp.co.soramitsu.fearless_utils.runtime.metadata.splitKey
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
@@ -163,6 +165,12 @@ abstract class BaseStorageQueryContext(
                 valueTransform = { key -> values[key]?.let { valueType.fromHex(runtime, it) } }
             )
         }
+    }
+
+    override suspend fun <V> Constant.getAs(binding: DynamicInstanceBinder<V>): V {
+        val rawValue = type!!.fromByteArrayOrIncompatible(value, runtime)
+
+        return binding(rawValue)
     }
 
     private fun StorageEntry.storageKeyWith(keyArguments: Array<out Any?>): String {

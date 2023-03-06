@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -20,12 +21,12 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.ChooseDelegationAmountValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm.NewDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm.NewDelegationConfirmViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
@@ -55,6 +56,7 @@ class NewDelegationConfirmModule {
         tracksUseCase: TracksUseCase,
         delegateFormatters: DelegateMappers,
         delegateLabelUseCase: DelegateLabelUseCase,
+        partialRetriableMixinFactory: PartialRetriableMixin.Factory
     ): ViewModel {
         return NewDelegationConfirmViewModel(
             router = router,
@@ -75,7 +77,8 @@ class NewDelegationConfirmModule {
             votersFormatter = votersFormatter,
             tracksUseCase = tracksUseCase,
             delegateFormatters = delegateFormatters,
-            delegateLabelUseCase = delegateLabelUseCase
+            delegateLabelUseCase = delegateLabelUseCase,
+            partialRetriableMixinFactory = partialRetriableMixinFactory
         )
     }
 
