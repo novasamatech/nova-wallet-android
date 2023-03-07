@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.Parachai
 import io.novafoundation.nova.feature_staking_impl.di.staking.unbond.StakingUnbondModule
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.di.RebagComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.di.ConfirmStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.di.ConfirmNominationsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
@@ -126,6 +127,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun selectRewardDestinationFactory(): SelectRewardDestinationComponent.Factory
 
     fun confirmRewardDestinationFactory(): ConfirmRewardDestinationComponent.Factory
+
+    fun rebagComponentFractory(): RebagComponent.Factory
 
     // parachain staking
 

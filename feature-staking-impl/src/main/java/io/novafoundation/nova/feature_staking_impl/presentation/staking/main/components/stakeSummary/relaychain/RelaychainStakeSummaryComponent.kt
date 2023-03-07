@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.model.NominatorStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.NominatorStatus.Inactive.Reason
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakeSummary
@@ -22,13 +23,13 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
 
 class RelaychainStakeSummaryComponentFactory(
     private val stakingInteractor: StakingInteractor,
     private val resourceManager: ResourceManager,
+    private val stakingSharedComputation: StakingSharedComputation,
 ) {
 
     fun create(
@@ -38,20 +39,23 @@ class RelaychainStakeSummaryComponentFactory(
         stakingInteractor = stakingInteractor,
         resourceManager = resourceManager,
         assetWithChain = assetWithChain,
-        hostContext = hostContext
+        hostContext = hostContext,
+        stakingSharedComputation = stakingSharedComputation,
     )
 }
 
 private class RelaychainStakeSummaryComponent(
     private val stakingInteractor: StakingInteractor,
+    private val stakingSharedComputation: StakingSharedComputation,
     private val assetWithChain: ChainWithAsset,
     private val hostContext: ComponentHostContext,
     private val resourceManager: ResourceManager,
 ) : BaseStakeSummaryComponent(hostContext.scope) {
 
-    val selectedAccountStakingStateFlow = hostContext.selectedAccount.flatMapLatest {
-        stakingInteractor.selectedAccountStakingStateFlow(it, assetWithChain)
-    }.shareInBackground()
+    private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
+        assetWithChain = assetWithChain,
+        scope = hostContext.scope
+    )
 
     override val state: Flow<StakeSummaryState?> = selectedAccountStakingStateFlow.transformLatest { stakingState ->
         when (stakingState) {
@@ -65,8 +69,8 @@ private class RelaychainStakeSummaryComponent(
         .shareInBackground()
 
     private suspend fun nominatorState(
-        stakingState: StakingState.Stash.Nominator
-    ): Flow<StakeSummaryState> = stakeSummaryState(stakingInteractor.observeNominatorSummary(stakingState)) { status ->
+        stakingState: StakingState.Stash.Nominator,
+    ): Flow<StakeSummaryState> = stakeSummaryState(stakingInteractor.observeNominatorSummary(stakingState, hostContext.scope)) { status ->
         when (status) {
             NominatorStatus.Active -> StakeStatusModel.Active(
                 details = string(R.string.staking_nominator_status_alert_active_title) to
@@ -94,7 +98,7 @@ private class RelaychainStakeSummaryComponent(
 
     private suspend fun validatorState(
         stakingState: StakingState.Stash.Validator
-    ): Flow<StakeSummaryState> = stakeSummaryState(stakingInteractor.observeValidatorSummary(stakingState)) { status ->
+    ): Flow<StakeSummaryState> = stakeSummaryState(stakingInteractor.observeValidatorSummary(stakingState, hostContext.scope)) { status ->
         when (status) {
             ValidatorStatus.ACTIVE -> StakeStatusModel.Active(
                 details = string(R.string.staking_nominator_status_alert_active_title) to
@@ -110,7 +114,7 @@ private class RelaychainStakeSummaryComponent(
 
     private suspend fun neitherState(
         stakingState: StakingState.Stash.None
-    ): Flow<StakeSummaryState> = stakeSummaryState(stakingInteractor.observeStashSummary(stakingState)) { status ->
+    ): Flow<StakeSummaryState> = stakeSummaryState(stakingInteractor.observeStashSummary(stakingState, hostContext.scope)) { status ->
         when (status) {
             StashNoneStatus.INACTIVE -> StakeStatusModel.Inactive(
                 details = string(R.string.staking_nominator_status_alert_inactive_title) to

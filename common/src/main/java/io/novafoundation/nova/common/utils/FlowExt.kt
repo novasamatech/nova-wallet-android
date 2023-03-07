@@ -56,6 +56,16 @@ fun <T> Flow<T>.withLoading(): Flow<LoadingState<T>> {
         .onStart { emit(LoadingState.Loading()) }
 }
 
+fun <T> Flow<T>.withItemScope(parentScope: CoroutineScope): Flow<Pair<T, CoroutineScope>> {
+    var currentScope: CoroutineScope? = null
+
+    return map {
+        currentScope?.cancel()
+        currentScope = parentScope.childScope(supervised = true)
+        it to requireNotNull(currentScope)
+    }
+}
+
 /**
  * Modifies flow so that it firstly emits [ExtendedLoadingState.Loading] state.
  * Then emits each element from upstream wrapped into [ExtendedLoadingState.Loaded] state.

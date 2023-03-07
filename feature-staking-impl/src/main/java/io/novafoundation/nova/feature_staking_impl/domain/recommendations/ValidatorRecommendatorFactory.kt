@@ -25,7 +25,7 @@ class ValidatorRecommendatorFactory(
     private suspend fun loadValidators(scope: CoroutineScope) = computationalCache.useCache(ELECTED_VALIDATORS_CACHE, scope) {
         val (chain, chainAsset) = sharedState.chainAndAsset()
 
-        validatorProvider.getValidators(chain, chainAsset, ValidatorSource.Elected)
+        validatorProvider.getValidators(chain, chainAsset, ValidatorSource.Elected, scope)
     }
 
     suspend fun create(scope: CoroutineScope): ValidatorRecommendator = withContext(Dispatchers.IO) {

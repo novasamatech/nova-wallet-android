@@ -56,7 +56,7 @@ class ConfirmPayoutViewModel(
     private val assetFlow = interactor.currentAssetFlow()
         .share()
 
-    private val stakingStateFlow = interactor.selectedAccountStakingStateFlow()
+    private val stakingStateFlow = interactor.selectedAccountStakingStateFlow(viewModelScope)
         .filterIsInstance<StakingState.Stash>()
         .share()
 
