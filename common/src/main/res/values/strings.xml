@@ -3,18 +3,13 @@
     <string name="common_some_tx_failed_title">Failed to submit some transactions</string>
     <string name="common_some_tx_failed_message">There was an error while submitting some transactions. Do you want to retry?</string>
 
-<!--    <string name="staking_setup_amount_too_low">Can\'t stake less than minimal value (%s)</string>-->
     <string name="staking_setup_amount_too_low">You cannot stake less than the network minimum value (%s)</string>
 
     <string name="staking_setup_amount_less_than_recommended">The recommended minimum stake to consistently receive rewards is %s.</string>
 
     <string name="staking_alert_bond_more_title">Stake more tokens</string>
-<!--    <string name="staking_alert_bond_more_title">Bond more tokens.</string>-->
-
-    <!--    <string name="staking_bonded_format">Bonded: %s</string>-->
 
     <string name="staking_alert_bond_more_message">Your stake is less then minimum of %s.\nHaving stake less than minimum increases chances of staking to not generate rewards</string>
-<!--    <string name="staking_alert_bond_more_message">Staking is currently inactive.\nCurrent minimal stake is %s.</string>-->
 
     <string name="staking_rebag_current_bag">Current queue slot</string>
     <string name="staking_rebag_new_bag">New queue slot</string>
