@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="common_some_tx_failed_title">Failed to submit some transactions</string>
+    <string name="common_some_tx_failed_message">There was an error while submitting some transactions. Do you want to retry?</string>
+
 <!--    <string name="staking_setup_amount_too_low">Can\'t stake less than minimal value (%s)</string>-->
     <string name="staking_setup_amount_too_low">You cannot stake less than the network minimum value (%s)</string>
 

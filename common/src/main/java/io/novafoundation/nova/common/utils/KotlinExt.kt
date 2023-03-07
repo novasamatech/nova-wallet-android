@@ -33,6 +33,8 @@ infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another)
 
 fun BigInteger.intSqrt() = sqrt(toDouble()).toLong().toBigInteger()
 
+operator fun BigInteger.times(double: Double): BigInteger = toBigDecimal().multiply(double.toBigDecimal()).toBigInteger()
+
 val BigDecimal.isZero: Boolean
     get() = signum() == 0
 
@@ -61,6 +63,8 @@ fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fold(BigInteger.ZERO) { acc, element ->
     acc + extractor(element)
 }
+
+fun Iterable<BigInteger>.sum() = sumOf { it }
 
 suspend operator fun <T> Deferred<T>.invoke() = await()
 

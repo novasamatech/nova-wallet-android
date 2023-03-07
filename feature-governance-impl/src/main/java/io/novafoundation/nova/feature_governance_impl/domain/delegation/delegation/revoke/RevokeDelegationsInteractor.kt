@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.revoke
 
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdOfSelectedMetaAccountIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
@@ -18,18 +18,18 @@ import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.domain.track.tracksByIdOf
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
+import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.state.selectedOption
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.flow.Flow
 
 interface RevokeDelegationsInteractor {
 
     suspend fun calculateFee(trackIds: Collection<TrackId>): Balance
 
-    suspend fun revokeDelegations(trackIds: Collection<TrackId>): Result<ExtrinsicStatus.InBlock>
+    suspend fun revokeDelegations(trackIds: Collection<TrackId>): RetriableMultiResult<ExtrinsicStatus.InBlock>
 
     fun revokeDelegationDataFlow(trackIds: Collection<TrackId>): Flow<RevokeDelegationData>
 }
@@ -46,15 +46,15 @@ class RealRevokeDelegationsInteractor(
     override suspend fun calculateFee(trackIds: Collection<TrackId>): Balance {
         val (chain, source) = useSelectedGovernance()
 
-        return extrinsicService.estimateFee(chain) {
+        return extrinsicService.estimateMultiFee(chain) {
             revokeDelegations(source, trackIds)
         }
     }
 
-    override suspend fun revokeDelegations(trackIds: Collection<TrackId>): Result<ExtrinsicStatus.InBlock> {
+    override suspend fun revokeDelegations(trackIds: Collection<TrackId>): RetriableMultiResult<ExtrinsicStatus.InBlock> {
         val (chain, source) = useSelectedGovernance()
 
-        return extrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(chain) {
+        return extrinsicService.submitMultiExtrinsicWithSelectedWalletAwaitingInclusion(chain) {
             revokeDelegations(source, trackIds)
         }
     }
@@ -85,7 +85,7 @@ class RealRevokeDelegationsInteractor(
         }
     }
 
-    private suspend fun ExtrinsicBuilder.revokeDelegations(
+    private suspend fun CallBuilder.revokeDelegations(
         source: GovernanceSource,
         trackIds: Collection<TrackId>
     ) {

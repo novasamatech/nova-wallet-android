@@ -77,6 +77,7 @@ fun Any?.castToList(): List<*> {
 inline fun <reified R> Struct.Instance.getTyped(key: String) = get<R>(key) ?: incompatible()
 
 fun Struct.Instance.getList(key: String) = get<List<*>>(key) ?: incompatible()
+fun Struct.Instance.getStruct(key: String) = get<Struct.Instance>(key) ?: incompatible()
 
 inline fun <T> bindOrNull(binder: () -> T): T? = runCatching(binder).getOrNull()
 

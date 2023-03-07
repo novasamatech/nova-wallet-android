@@ -10,10 +10,10 @@ import io.novafoundation.nova.feature_governance_api.data.network.offchain.model
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.vote.UserVote
 import io.novafoundation.nova.feature_governance_api.data.repository.DelegationsRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
 class UnsupportedDelegationsRepository : DelegationsRepository {
 
@@ -61,11 +61,11 @@ class UnsupportedDelegationsRepository : DelegationsRepository {
         return null
     }
 
-    override suspend fun ExtrinsicBuilder.delegate(delegate: AccountId, trackId: TrackId, amount: Balance, conviction: Conviction) {
+    override suspend fun CallBuilder.delegate(delegate: AccountId, trackId: TrackId, amount: Balance, conviction: Conviction) {
         error("Unsupported")
     }
 
-    override suspend fun ExtrinsicBuilder.undelegate(trackId: TrackId) {
+    override suspend fun CallBuilder.undelegate(trackId: TrackId) {
         error("Unsupported")
     }
 }

@@ -34,6 +34,7 @@ import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
+import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
@@ -123,4 +124,6 @@ interface AccountFeatureDependencies {
 
     @Named(REMOTE_STORAGE_SOURCE)
     fun remoteStorageSource(): StorageDataSource
+
+    val extrinsicSplitter: ExtrinsicSplitter
 }

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseAmount
 
+import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
@@ -28,5 +29,5 @@ interface NewDelegationChooseAmountInteractor {
         delegate: AccountId,
         tracks: Collection<TrackId>,
         shouldRemoveOtherTracks: Boolean,
-    ): Result<ExtrinsicStatus.InBlock>
+    ): RetriableMultiResult<ExtrinsicStatus.InBlock>
 }

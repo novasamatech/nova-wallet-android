@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.firstLoaded
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
@@ -25,7 +26,6 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegati
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.revoke.validations.RevokeDelegationValidationPayload
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.revoke.validations.RevokeDelegationValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.revoke.validations.handleRevokeDelegationValidationFailure
-import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.formatDelegationsOverviewOrNull
@@ -61,13 +61,15 @@ class RevokeDelegationConfirmViewModel(
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
     private val resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
-    private val tracksUseCase: TracksUseCase,
     private val delegateFormatters: DelegateMappers,
     private val delegateLabelUseCase: DelegateLabelUseCase,
+    private val partialRetriableMixinFactory: PartialRetriableMixin.Factory
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     WithFeeLoaderMixin,
     ExternalActions by externalActions {
+
+    val partialRetriableMixin = partialRetriableMixinFactory.create(this)
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -176,12 +178,14 @@ class RevokeDelegationConfirmViewModel(
             interactor.revokeDelegations(payload.trackIds)
         }
 
-        result.onSuccess {
-            showMessage(resourceManager.getString(R.string.common_transaction_submitted))
-            router.backToYourDelegations()
-        }
-            .onFailure(::showError)
-
-        _showNextProgress.value = false
+        partialRetriableMixin.handleMultiResult(
+            multiResult = result,
+            onSuccess = {
+                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                router.backToYourDelegations()
+            },
+            progressConsumer = _showNextProgress.progressConsumer(),
+            onRetryCancelled = { router.backToYourDelegations() }
+        )
     }
 }

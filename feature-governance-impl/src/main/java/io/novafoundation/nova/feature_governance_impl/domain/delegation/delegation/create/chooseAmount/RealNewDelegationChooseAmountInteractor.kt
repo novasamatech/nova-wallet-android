@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdOfSelectedMetaAccountIn
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
@@ -17,13 +17,13 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
+import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.state.selectedOption
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -58,7 +58,7 @@ class RealNewDelegationChooseAmountInteractor(
         val (chain, governanceSource) = useSelectedGovernance()
         val origin = accountRepository.requireIdOfSelectedMetaAccountIn(chain)
 
-        return extrinsicService.estimateFee(chain) {
+        return extrinsicService.estimateMultiFee(chain) {
             delegate(governanceSource, amount, conviction, delegate, origin, chain, tracks, shouldRemoveOtherTracks)
         }
     }
@@ -69,15 +69,15 @@ class RealNewDelegationChooseAmountInteractor(
         delegate: AccountId,
         tracks: Collection<TrackId>,
         shouldRemoveOtherTracks: Boolean,
-    ): Result<ExtrinsicStatus.InBlock> {
+    ): RetriableMultiResult<ExtrinsicStatus.InBlock> {
         val (chain, governanceSource) = useSelectedGovernance()
 
-        return extrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(chain) { origin ->
+        return extrinsicService.submitMultiExtrinsicWithSelectedWalletAwaitingInclusion(chain) { origin ->
             delegate(governanceSource, amount, conviction, delegate, origin, chain, tracks, shouldRemoveOtherTracks)
         }
     }
 
-    private suspend fun ExtrinsicBuilder.delegate(
+    private suspend fun CallBuilder.delegate(
         governanceSource: GovernanceSource,
         amount: Balance,
         conviction: Conviction,
