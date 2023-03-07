@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="common_no_app_to_handle_intent">No suitable app found on device to handle this intent</string>
+
     <string name="common_some_tx_failed_title">Failed to submit some transactions</string>
     <string name="common_some_tx_failed_message">There was an error while submitting some transactions. Do you want to retry?</string>
 
