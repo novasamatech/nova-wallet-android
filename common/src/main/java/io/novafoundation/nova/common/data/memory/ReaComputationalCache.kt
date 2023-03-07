@@ -1,5 +1,7 @@
 package io.novafoundation.nova.common.data.memory
 
+import android.util.Log
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invokeOnCompletion
@@ -19,7 +21,7 @@ import kotlinx.coroutines.withContext
 private typealias Awaitable<T> = suspend () -> T
 private typealias AwaitableConstructor<T> = suspend CoroutineScope.() -> Awaitable<T>
 
-internal class RealComputationalCache : ComputationalCache {
+internal class RealComputationalCache : ComputationalCache, CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
     private class Entry(
         val dependents: MutableSet<CoroutineScope>,
@@ -35,12 +37,10 @@ internal class RealComputationalCache : ComputationalCache {
         scope: CoroutineScope,
         computation: suspend CoroutineScope.() -> T
     ): T = withContext(Dispatchers.Default) {
-        mutex.withLock {
-            useCacheInternal(key, scope) {
-                val deferred = async { computation() }
+        useCacheInternal(key, scope) {
+            val deferred = async { computation() }
 
-                return@useCacheInternal { deferred.await() }
-            }
+            return@useCacheInternal { deferred.await() }
         }
     }
 
@@ -50,19 +50,17 @@ internal class RealComputationalCache : ComputationalCache {
         flowLazy: suspend () -> Flow<T>
     ): Flow<T> {
         return flowOfAll {
-            mutex.withLock {
-                useCacheInternal(key, scope) {
-                    val inner = singleReplaySharedFlow<T>()
+            useCacheInternal(key, scope) {
+                val inner = singleReplaySharedFlow<T>()
 
-                    launch {
-                        flowLazy()
-                            .onEach { inner.emit(it) }
-                            .inBackground()
-                            .launchIn(this)
-                    }
-
-                    return@useCacheInternal { inner }
+                launch {
+                    flowLazy()
+                        .onEach { inner.emit(it) }
+                        .inBackground()
+                        .launchIn(this)
                 }
+
+                return@useCacheInternal { inner }
             }
         }
     }
@@ -73,29 +71,43 @@ internal class RealComputationalCache : ComputationalCache {
         scope: CoroutineScope,
         cachedAction: AwaitableConstructor<T>
     ): T {
-        val awaitable = if (key in memory) {
-            val entry = memory.getValue(key)
+        val awaitable = mutex.withLock {
+            if (key in memory) {
+                Log.d(LOG_TAG, "Key $key requested - already present")
 
-            entry.dependents += scope
+                val entry = memory.getValue(key)
 
-            entry.awaitable
-        } else {
-            val aggregateScope = CoroutineScope(Dispatchers.Default)
-            val awaitable = cachedAction(aggregateScope)
+                entry.dependents += scope
 
-            memory[key] = Entry(dependents = mutableSetOf(scope), aggregateScope, awaitable)
+                entry.awaitable
+            } else {
+                Log.d(LOG_TAG, "Key $key requested - creating new operation")
 
-            awaitable
+                val aggregateScope = CoroutineScope(Dispatchers.Default)
+                val awaitable = cachedAction(aggregateScope)
+
+                memory[key] = Entry(dependents = mutableSetOf(scope), aggregateScope, awaitable)
+
+                awaitable
+            }
         }
 
         scope.invokeOnCompletion {
-            memory[key]?.let { entry ->
-                entry.dependents -= scope
+            this@RealComputationalCache.launch {
+                mutex.withLock {
+                    memory[key]?.let { entry ->
+                        entry.dependents -= scope
 
-                if (entry.dependents.isEmpty()) {
-                    memory.remove(key)
+                        if (entry.dependents.isEmpty()) {
+                            Log.d(this@RealComputationalCache.LOG_TAG, "Key $key - last scope cancelled")
 
-                    entry.aggregateScope.cancel()
+                            memory.remove(key)
+
+                            entry.aggregateScope.cancel()
+                        } else {
+                            Log.d(this@RealComputationalCache.LOG_TAG, "Key $key - scope cancelled, ${entry.dependents.size} remaining")
+                        }
+                    }
                 }
             }
         }

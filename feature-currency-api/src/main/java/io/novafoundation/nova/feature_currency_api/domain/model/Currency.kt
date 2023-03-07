@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_currency_api.domain.model
 
-class Currency(
+data class Currency(
     val code: String,
     val name: String,
     val symbol: String?,

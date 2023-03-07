@@ -21,7 +21,11 @@ import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
+import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.LocalBagListRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.RealParasRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealSessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
@@ -38,6 +42,7 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.Su
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.payout.PayoutInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
@@ -158,6 +163,36 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideStakingSharedComputation(
+        computationalCache: ComputationalCache,
+        stakingRepository: StakingRepository,
+        rewardCalculatorFactory: RewardCalculatorFactory,
+        accountRepository: AccountRepository,
+        bagListRepository: BagListRepository,
+        totalIssuanceRepository: TotalIssuanceRepository,
+    ) = StakingSharedComputation(
+        stakingRepository = stakingRepository,
+        computationalCache = computationalCache,
+        rewardCalculatorFactory = rewardCalculatorFactory,
+        accountRepository = accountRepository,
+        bagListRepository = bagListRepository,
+        totalIssuanceRepository = totalIssuanceRepository
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideBagListRepository(
+        @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
+    ): BagListRepository = LocalBagListRepository(localStorageSource)
+
+    @Provides
+    @FeatureScope
+    fun provideParasRepository(
+        @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
+    ): ParasRepository = RealParasRepository(localStorageSource)
+
+    @Provides
+    @FeatureScope
     fun provideStakingInteractor(
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
@@ -169,6 +204,9 @@ class StakingFeatureModule {
         stakingSharedState: StakingSharedState,
         assetUseCase: AssetUseCase,
         factory: EraTimeCalculatorFactory,
+        stakingSharedComputation: StakingSharedComputation,
+        bagListRepository: BagListRepository,
+        totalIssuanceRepository: TotalIssuanceRepository,
     ) = StakingInteractor(
         walletRepository,
         accountRepository,
@@ -179,7 +217,10 @@ class StakingFeatureModule {
         stakingSharedState,
         payoutRepository,
         assetUseCase,
-        factory
+        factory,
+        stakingSharedComputation,
+        bagListRepository,
+        totalIssuanceRepository
     )
 
     @Provides
@@ -223,13 +264,17 @@ class StakingFeatureModule {
     fun provideAlertsInteractor(
         stakingRepository: StakingRepository,
         stakingConstantsRepository: StakingConstantsRepository,
-        sharedState: StakingSharedState,
         walletRepository: WalletRepository,
+        bagListRepository: BagListRepository,
+        totalIssuanceRepository: TotalIssuanceRepository,
+        stakingSharedComputation: StakingSharedComputation,
     ) = AlertsInteractor(
         stakingRepository,
         stakingConstantsRepository,
-        sharedState,
-        walletRepository
+        walletRepository,
+        stakingSharedComputation,
+        bagListRepository,
+        totalIssuanceRepository
     )
 
     @Provides
@@ -237,8 +282,9 @@ class StakingFeatureModule {
     fun provideRewardCalculatorFactory(
         repository: StakingRepository,
         totalIssuanceRepository: TotalIssuanceRepository,
-        sharedState: StakingSharedState
-    ) = RewardCalculatorFactory(repository, totalIssuanceRepository, sharedState)
+        stakingSharedComputation: dagger.Lazy<StakingSharedComputation>,
+        parasRepository: ParasRepository,
+    ) = RewardCalculatorFactory(repository, totalIssuanceRepository, stakingSharedComputation, parasRepository)
 
     @Provides
     @FeatureScope
@@ -255,11 +301,13 @@ class StakingFeatureModule {
         identityRepository: OnChainIdentityRepository,
         rewardCalculatorFactory: RewardCalculatorFactory,
         stakingConstantsRepository: StakingConstantsRepository,
+        stakingSharedComputation: StakingSharedComputation
     ) = ValidatorProvider(
         stakingRepository,
         identityRepository,
         rewardCalculatorFactory,
-        stakingConstantsRepository
+        stakingConstantsRepository,
+        stakingSharedComputation
     )
 
     @Provides
@@ -390,13 +438,15 @@ class StakingFeatureModule {
         stakingConstantsRepository: StakingConstantsRepository,
         validatorProvider: ValidatorProvider,
         stahingSharedState: StakingSharedState,
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
+        stakingSharedComputation: StakingSharedComputation
     ) = CurrentValidatorsInteractor(
         stakingRepository,
         stakingConstantsRepository,
         validatorProvider,
         stahingSharedState,
-        accountRepository
+        accountRepository,
+        stakingSharedComputation,
     )
 
     @Provides

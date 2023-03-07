@@ -5,6 +5,20 @@
     <string name="common_some_tx_failed_title">Failed to submit some transactions</string>
     <string name="common_some_tx_failed_message">There was an error while submitting some transactions. Do you want to retry?</string>
 
+    <string name="staking_setup_amount_too_low">You cannot stake less than the network minimum value (%s)</string>
+
+    <string name="staking_setup_amount_less_than_recommended">The recommended minimum stake to consistently receive rewards is %s.</string>
+
+    <string name="staking_alert_bond_more_title">Stake more tokens</string>
+
+    <string name="staking_alert_bond_more_message">Your stake is less then minimum of %s.\nHaving stake less than minimum increases chances of staking to not generate rewards</string>
+
+    <string name="staking_rebag_current_bag">Current queue slot</string>
+    <string name="staking_rebag_new_bag">New queue slot</string>
+
+    <string name="staking_alert_rebag_title">Staking improvements</string>
+    <string name="staking_alert_rebag_message">Having outdated position in the queue of stake assignment to a validator may suspend your rewards</string>
+
     <string name="delegate_search_placeholder_default">Search result will be displayed here</string>
     <string name="delegate_search_placeholder_empty">Address format is invalid. Make sure that address belongs to the right network</string>
     <string name="delegate_search_result_count">search results: %d</string>
@@ -1073,8 +1087,6 @@
     <string name="staking_about">About staking</string>
     <string name="staking_account_is_used_as_controller">Selected account is already in use as controller</string>
     <string name="staking_add_controller">Add controller account %s to the application to perform this action.</string>
-    <string name="staking_alert_bond_more_message">Staking is currently inactive.\nCurrent minimal stake is %s.</string>
-    <string name="staking_alert_bond_more_title">Bond more tokens.</string>
     <string name="staking_alert_change_validators">Change your validators.</string>
     <string name="staking_alert_no_alerts_now">Everything is fine now. Alerts will appear here.</string>
     <string name="staking_alert_redeem_title">Redeem unstaked tokens</string>
@@ -1086,7 +1098,6 @@
     <string name="staking_balance_title">Staking balance</string>
     <string name="staking_balance_title_v2_2_0">Balance</string>
     <string name="staking_bond_more_v1_9_0">Stake more</string>
-    <string name="staking_bonded_format">Bonded: %s</string>
     <string name="staking_bonded_inactive">You are neither nominating nor validating</string>
     <string name="staking_confirm_nominations" formatted="false">%s of %s</string>
     <string name="staking_confirm_selected_validators">Selected validators</string>
@@ -1179,7 +1190,6 @@
     <string name="staking_selected_validators_mask">Validators (%d)</string>
     <string name="staking_set_validators_message">Validators are not selected</string>
     <string name="staking_set_validators_title">Select validators to start staking</string>
-    <string name="staking_setup_amount_too_low">Can\'t stake less than minimal value (%s)</string>
     <string name="staking_setup_restake">Restake</string>
     <string name="staking_setup_restake_v2_2_0">Restake rewards</string>
     <string name="staking_setup_reward_destination_section_title">How to use your rewards?</string>

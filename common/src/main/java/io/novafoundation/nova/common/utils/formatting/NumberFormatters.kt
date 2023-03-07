@@ -65,8 +65,8 @@ private val trillionAbbreviation = NumberAbbreviation(
 
 private val defaultNumberFormatter = defaultNumberFormatter()
 
-fun BigDecimal.format(): String {
-    return defaultNumberFormatter.format(this)
+fun BigDecimal.format(roundingMode: RoundingMode = RoundingMode.FLOOR): String {
+    return defaultNumberFormatter.format(this, roundingMode)
 }
 
 fun Int.format(): String {
@@ -135,7 +135,7 @@ fun parseDateISO_8601_NoMs(value: String): Date? {
     return runCatching { dateTimeFormatISO_8601_NoMs.parse(value) }.getOrNull()
 }
 
-fun decimalFormatterFor(pattern: String): DecimalFormat {
+fun decimalFormatterFor(pattern: String, roundingMode: RoundingMode): DecimalFormat {
     return DecimalFormat(pattern).apply {
         val symbols = decimalFormatSymbols
 
@@ -144,7 +144,7 @@ fun decimalFormatterFor(pattern: String): DecimalFormat {
 
         decimalFormatSymbols = symbols
 
-        this.roundingMode = RoundingMode.FLOOR
+        this.roundingMode = roundingMode
         decimalFormatSymbols = decimalFormatSymbols
     }
 }

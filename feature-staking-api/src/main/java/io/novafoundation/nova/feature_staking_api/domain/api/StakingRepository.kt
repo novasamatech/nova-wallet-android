@@ -13,8 +13,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import java.math.BigInteger
+
+typealias ExposuresWithEraIndex = Pair<AccountIdMap<Exposure>, EraIndex>
 
 interface StakingRepository {
 
@@ -58,10 +59,8 @@ interface StakingRepository {
 
     suspend fun nominatorsCount(chainId: ChainId): BigInteger?
 
-    fun electedExposuresInActiveEra(chainId: ChainId): Flow<Map<String, Exposure>>
+    fun electedExposuresInActiveEra(chainId: ChainId): Flow<ExposuresWithEraIndex>
 }
-
-suspend fun StakingRepository.getActiveElectedValidatorsExposures(chainId: ChainId) = electedExposuresInActiveEra(chainId).first()
 
 suspend fun StakingRepository.historicalEras(chainId: ChainId): List<BigInteger> {
     val activeEra = getActiveEraIndex(chainId).toInt()

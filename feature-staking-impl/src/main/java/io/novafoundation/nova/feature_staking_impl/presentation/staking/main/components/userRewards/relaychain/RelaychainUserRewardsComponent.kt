@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.BaseRewardComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsComponent
@@ -14,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.transformLatest
 
 class RelaychainUserRewardsComponentFactory(
     private val stakingInteractor: StakingInteractor,
+    private val stakingSharedComputation: StakingSharedComputation,
 ) {
 
     fun create(
@@ -30,20 +31,23 @@ class RelaychainUserRewardsComponentFactory(
     ): UserRewardsComponent = RelaychainUserRewardsComponent(
         stakingInteractor = stakingInteractor,
         assetWithChain = assetWithChain,
-        hostContext = hostContext
+        hostContext = hostContext,
+        stakingSharedComputation = stakingSharedComputation,
     )
 }
 
 private class RelaychainUserRewardsComponent(
     private val stakingInteractor: StakingInteractor,
+    private val stakingSharedComputation: StakingSharedComputation,
 
     private val assetWithChain: ChainWithAsset,
     private val hostContext: ComponentHostContext,
 ) : BaseRewardComponent(hostContext) {
 
-    val selectedAccountStakingStateFlow = hostContext.selectedAccount.flatMapLatest {
-        stakingInteractor.selectedAccountStakingStateFlow(it, assetWithChain)
-    }.shareInBackground()
+    private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
+        assetWithChain = assetWithChain,
+        scope = hostContext.scope
+    )
 
     override val state: Flow<UserRewardsState?> = selectedAccountStakingStateFlow.transformLatest { stakingState ->
         if (stakingState is StakingState.Stash) {

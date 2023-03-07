@@ -1,16 +1,31 @@
 package io.novafoundation.nova.feature_staking_impl.domain
 
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
+import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListLocator
+import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListScoreConverter
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
 
-fun isNominationActive(
+enum class NominationStatus {
+    NOT_PRESENT, OVERSUBSCRIBED, ACTIVE
+}
+
+val NominationStatus.isActive: Boolean
+    get() = this == NominationStatus.ACTIVE
+
+val NominationStatus.isOversubscribed: Boolean
+    get() = this == NominationStatus.OVERSUBSCRIBED
+
+fun nominationStatus(
     stashId: AccountId,
     exposures: Collection<Exposure>,
     rewardedNominatorsPerValidator: Int
-): Boolean {
+): NominationStatus {
     val comparator = { accountId: IndividualExposure ->
         accountId.who.contentEquals(stashId)
     }
@@ -18,8 +33,13 @@ fun isNominationActive(
     val validatorsWithOurStake = exposures.filter { exposure ->
         exposure.others.any(comparator)
     }
+    if (validatorsWithOurStake.isEmpty()) {
+        return NominationStatus.NOT_PRESENT
+    }
 
-    return validatorsWithOurStake.any { it.willAccountBeRewarded(stashId, rewardedNominatorsPerValidator) }
+    val willBeRewarded = validatorsWithOurStake.any { it.willAccountBeRewarded(stashId, rewardedNominatorsPerValidator) }
+
+    return if (willBeRewarded) NominationStatus.ACTIVE else NominationStatus.OVERSUBSCRIBED
 }
 
 fun Exposure.willAccountBeRewarded(
@@ -42,17 +62,32 @@ fun Exposure.willAccountBeRewarded(
 fun minimumStake(
     exposures: Collection<Exposure>,
     minimumNominatorBond: BigInteger,
+    bagListLocator: BagListLocator?,
+    bagListScoreConverter: BagListScoreConverter,
+    bagListSize: BigInteger?,
+    maxElectingVoters: BigInteger?
 ): BigInteger {
-    val stakeByNominator = exposures
-        .map(Exposure::others)
-        .flatten()
-        .fold(mutableMapOf<String, BigInteger>()) { acc, individualExposure ->
-            val currentExposure = acc.getOrDefault(individualExposure.who.toHexString(), BigInteger.ZERO)
+    if (bagListSize != null && maxElectingVoters != null && bagListSize < maxElectingVoters) return minimumNominatorBond
 
-            acc[individualExposure.who.toHexString()] = currentExposure + individualExposure.value
+    val stakeByNominator = exposures
+        .fold(mutableMapOf<AccountIdKey, BigInteger>()) { acc, exposure ->
+            exposure.others.forEach { individualExposure ->
+                val key = individualExposure.who.intoKey()
+                val currentExposure = acc.getOrDefault(key, BigInteger.ZERO)
+                acc[key] = currentExposure + individualExposure.value
+            }
 
             acc
         }
 
-    return stakeByNominator.values.minOrNull()!!.coerceAtLeast(minimumNominatorBond)
+    val minElectedStake = stakeByNominator.values.minOrNull().orZero().coerceAtLeast(minimumNominatorBond)
+
+    if (bagListLocator == null) return minElectedStake
+
+    val lastElectedBag = bagListLocator.bagBoundaries(bagListScoreConverter.scoreOf(minElectedStake))
+
+    val nextBagThreshold = bagListScoreConverter.balanceOf(lastElectedBag.endInclusive)
+    val epsilon = Balance.ONE
+
+    return nextBagThreshold + epsilon
 }

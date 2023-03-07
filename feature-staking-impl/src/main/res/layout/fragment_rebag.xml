@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:background="@color/secondary_screen_background">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/rebagToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:titleText="@string/staking_alert_rebag_title" />
+
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.extrinsic.GenericExtrinsicInformationView
+        android:id="@+id/rebagExtrinsicInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp" />
+
+    <io.novafoundation.nova.common.view.TableView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp">
+
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/rebagCurrentBag"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/staking_rebag_current_bag" />
+
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/rebagNewBag"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/staking_rebag_new_bag" />
+
+    </io.novafoundation.nova.common.view.TableView>
+
+    <io.novafoundation.nova.common.mixin.hints.HintsView
+        android:id="@+id/rebagHints"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/rebagConfirm"
+        style="@style/Widget.Nova.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/common_confirm"
+        app:size="large" />
+</LinearLayout>

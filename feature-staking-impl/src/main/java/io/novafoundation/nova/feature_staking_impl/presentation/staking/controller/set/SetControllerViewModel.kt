@@ -59,7 +59,7 @@ class SetControllerViewModel(
     ExternalActions by externalActions,
     Validatable by validationExecutor {
 
-    private val accountStakingFlow = stakingInteractor.selectedAccountStakingStateFlow()
+    private val accountStakingFlow = stakingInteractor.selectedAccountStakingStateFlow(viewModelScope)
         .filterIsInstance<StakingState.Stash>()
         .shareInBackground()
 
