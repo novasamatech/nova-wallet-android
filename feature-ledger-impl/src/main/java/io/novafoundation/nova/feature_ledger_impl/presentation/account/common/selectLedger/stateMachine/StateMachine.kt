@@ -19,11 +19,11 @@ sealed class SelectLedgerEvent {
 
     class DiscoveredDevicesListChanged(val newDevices: List<LedgerDevice>) : SelectLedgerEvent()
 
-    class BluetoothEnabled(val isLocationEnabled: Boolean) : SelectLedgerEvent()
+    object BluetoothEnabled : SelectLedgerEvent()
 
     object BluetoothDisabled : SelectLedgerEvent()
 
-    class LocationEnabled(val isBluetoothEnabled: Boolean) : SelectLedgerEvent()
+    object LocationEnabled : SelectLedgerEvent()
 
     object LocationDisabled : SelectLedgerEvent()
 

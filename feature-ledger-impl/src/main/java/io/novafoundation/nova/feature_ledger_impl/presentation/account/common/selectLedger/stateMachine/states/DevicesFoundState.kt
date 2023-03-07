@@ -3,11 +3,7 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.s
 import io.novafoundation.nova.common.utils.stateMachine.StateMachine
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent.BluetoothDisabled
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent.LocationDisabled
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent.DeviceChosen
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent.DiscoveredDevicesListChanged
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent.VerificationFailed
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent.*
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SideEffect
 
 data class DevicesFoundState(
@@ -26,7 +22,7 @@ data class DevicesFoundState(
                 emitSideEffect(SideEffect.PresentLedgerFailure(event.reason, device))
             }
 
-            is SelectLedgerEvent.ConnectionVerified -> verifyingDevice?.let {
+            is ConnectionVerified -> verifyingDevice?.let {
                 emitState(DevicesFoundState(devices = devices, verifyingDevice = null))
             }
 
