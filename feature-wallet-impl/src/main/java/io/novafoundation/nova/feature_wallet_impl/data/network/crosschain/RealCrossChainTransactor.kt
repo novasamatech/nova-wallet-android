@@ -151,7 +151,7 @@ class RealCrossChainTransactor(
         callName: String
     ) {
         val lowestMultiLocationVersion = palletXcmRepository.lowestPresentMultiLocationVersion(assetTransfer.originChain.id)
-        val lowestMultiAssetVersion = palletXcmRepository.lowestPresentMultiLocationVersion(assetTransfer.originChain.id)
+        val lowestMultiAssetVersion = palletXcmRepository.lowestPresentMultiAssetVersion(assetTransfer.originChain.id)
 
         val multiAsset = configuration.multiAssetFor(assetTransfer, crossChainFee)
 
