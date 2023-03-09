@@ -14,8 +14,8 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.hasAmountFor
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.isAye
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votedFor
 import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.convictionVotingRemoveVote
@@ -136,7 +136,7 @@ class GovV2ConvictionVotingRepository(
         }
 
         return allVotings.votersFor(referendumId)
-            .filter { it.vote.hasAmountFor(type) }
+            .filter { it.vote.votedFor(type) }
     }
 
     override fun ExtrinsicBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable) {
@@ -171,7 +171,7 @@ class GovV2ConvictionVotingRepository(
 
     private fun mapVoterFromRemote(voter: ReferendumVoterRemote, chain: Chain, expectedType: VoteType): ReferendumVoter? {
         val accountVote = mapMultiVoteRemoteToAccountVote(voter)
-        if (!accountVote.hasAmountFor(expectedType)) return null
+        if (!accountVote.votedFor(expectedType)) return null
 
         val delegators = voter.delegatorVotes.nodes
 

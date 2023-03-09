@@ -8,7 +8,9 @@ sealed class SetupStakingValidationFailure {
 
     object NotEnoughStakeable : SetupStakingValidationFailure()
 
-    class TooSmallAmount(val threshold: BigDecimal) : SetupStakingValidationFailure()
+    class AmountLessThanAllowed(val threshold: BigDecimal) : SetupStakingValidationFailure()
+
+    class AmountLessThanRecommended(val threshold: BigDecimal) : SetupStakingValidationFailure()
 
     object MaxNominatorsReached : SetupStakingValidationFailure()
 }

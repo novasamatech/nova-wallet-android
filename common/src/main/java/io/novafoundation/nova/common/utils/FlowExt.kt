@@ -6,9 +6,9 @@ import android.widget.RadioGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.novafoundation.nova.common.presentation.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.isModifiable
 import io.novafoundation.nova.common.utils.input.modifyInput
@@ -54,6 +54,16 @@ inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = 
 fun <T> Flow<T>.withLoading(): Flow<LoadingState<T>> {
     return map<T, LoadingState<T>> { LoadingState.Loaded(it) }
         .onStart { emit(LoadingState.Loading()) }
+}
+
+fun <T> Flow<T>.withItemScope(parentScope: CoroutineScope): Flow<Pair<T, CoroutineScope>> {
+    var currentScope: CoroutineScope? = null
+
+    return map {
+        currentScope?.cancel()
+        currentScope = parentScope.childScope(supervised = true)
+        it to requireNotNull(currentScope)
+    }
 }
 
 /**

@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.co
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.PlaceholderAdapter
-import io.novafoundation.nova.common.presentation.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.ReferendaListAdapter
 import kotlinx.coroutines.flow.Flow

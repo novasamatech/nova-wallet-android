@@ -5,13 +5,14 @@ import io.novafoundation.nova.common.list.emptyGroupedList
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
-import io.novafoundation.nova.feature_staking_api.domain.api.getActiveElectedValidatorsExposures
 import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
 import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidator
 import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidator.Status
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEra
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
 import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.ChangeStackingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.controllerAccountAccess
@@ -19,6 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorPr
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorSource
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -30,10 +32,12 @@ class CurrentValidatorsInteractor(
     private val validatorProvider: ValidatorProvider,
     private val stakingSharedState: StakingSharedState,
     private val accountRepository: AccountRepository,
+    private val stakingSharedComputation: StakingSharedComputation,
 ) {
 
     suspend fun nominatedValidatorsFlow(
         nominatorState: StakingState.Stash,
+        scope: CoroutineScope,
     ): Flow<GroupedList<Status.Group, NominatedValidator>> {
         if (nominatorState !is StakingState.Stash.Nominator) {
             return flowOf(emptyGroupedList())
@@ -45,7 +49,7 @@ class CurrentValidatorsInteractor(
         return stakingRepository.observeActiveEraIndex(chainId).map { activeEra ->
             val stashId = nominatorState.stashId
 
-            val exposures = stakingRepository.getActiveElectedValidatorsExposures(chainId)
+            val exposures = stakingSharedComputation.electedExposuresInActiveEra(chainId, scope)
 
             val activeNominations = exposures.mapValues { (_, exposure) ->
                 exposure.others.firstOrNull { it.who.contentEquals(stashId) }
@@ -61,7 +65,7 @@ class CurrentValidatorsInteractor(
                 chain = chain,
                 chainAsset = chainAsset,
                 source = ValidatorSource.Custom(nominatedValidatorIds.toList()),
-                cachedExposures = exposures
+                scope = scope
             )
                 .map { validator ->
                     val userIndividualExposure = activeNominations[validator.accountIdHex]

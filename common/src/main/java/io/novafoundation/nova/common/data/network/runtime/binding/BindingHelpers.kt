@@ -38,6 +38,12 @@ inline fun <reified T> Any?.cast(): T {
     return this as? T ?: incompatible()
 }
 
+inline fun <reified T> Any?.nullableCast(): T? {
+    if (this == null) return null
+
+    return this as? T ?: incompatible()
+}
+
 inline fun <reified T> Any?.castOrNull(): T? {
     return this as? T
 }
@@ -71,6 +77,7 @@ fun Any?.castToList(): List<*> {
 inline fun <reified R> Struct.Instance.getTyped(key: String) = get<R>(key) ?: incompatible()
 
 fun Struct.Instance.getList(key: String) = get<List<*>>(key) ?: incompatible()
+fun Struct.Instance.getStruct(key: String) = get<Struct.Instance>(key) ?: incompatible()
 
 inline fun <T> bindOrNull(binder: () -> T): T? = runCatching(binder).getOrNull()
 

@@ -2,6 +2,7 @@ package io.novafoundation.nova.runtime.network.rpc
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.bindWeight
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.calls.FeeCalculationRequest
@@ -141,6 +142,9 @@ class RpcCalls(
     private fun bindPartialFee(decoded: Any?): FeeResponse {
         val asStruct = decoded.castToStruct()
 
-        return FeeResponse(bindNumber(asStruct["partialFee"]))
+        return FeeResponse(
+            partialFee = bindNumber(asStruct["partialFee"]),
+            weight = bindWeight(asStruct["weight"])
+        )
     }
 }

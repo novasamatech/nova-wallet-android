@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.core.storage.StorageCache
@@ -116,4 +117,6 @@ interface GovernanceFeatureDependencies {
     val listChooserMixinFactory: ListChooserMixin.Factory
 
     val identityMixinFactory: IdentityMixin.Factory
+
+    val partialRetriableMixinFactory: PartialRetriableMixin.Factory
 }

@@ -37,7 +37,7 @@ class DelegateBannerAdapter(
         if (showBanner != show) {
             showBanner = show
             if (show) {
-                notifyItemInserted(1)
+                notifyItemInserted(0)
             } else {
                 notifyItemRemoved(0)
             }

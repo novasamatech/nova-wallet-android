@@ -26,6 +26,7 @@ import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateDescription
 import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateIcon
 import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateRecentVotes
 import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateRecentVotesLabel
+import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateStatsGroup
 import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateTitle
 import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateType
 import kotlinx.android.synthetic.main.item_delegate.view.itemDelegateVotedBlock
@@ -85,10 +86,13 @@ class DelegateViewHolder(
         itemDelegateIcon.setDelegateIcon(icon = model.icon, imageLoader = imageLoader, squareCornerRadiusDp = 8)
         itemDelegateTitle.text = model.name
         itemDelegateDescription.setTextOrHide(model.description)
-        itemDelegateDelegations.text = model.stats.delegations
-        itemDelegateDelegatedVotes.text = model.stats.delegatedVotes
-        itemDelegateRecentVotes.text = model.stats.recentVotes.value
-        itemDelegateRecentVotesLabel.text = model.stats.recentVotes.label
+        itemDelegateStatsGroup.isVisible = model.stats != null
+        if (model.stats != null) {
+            itemDelegateDelegations.text = model.stats.delegations
+            itemDelegateDelegatedVotes.text = model.stats.delegatedVotes
+            itemDelegateRecentVotes.text = model.stats.recentVotes.value
+            itemDelegateRecentVotesLabel.text = model.stats.recentVotes.label
+        }
         itemDelegateType.setDelegateTypeModel(model.type)
 
         val delegation = model.delegation

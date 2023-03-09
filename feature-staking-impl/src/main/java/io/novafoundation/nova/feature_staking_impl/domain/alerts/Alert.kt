@@ -19,4 +19,6 @@ sealed class Alert {
     object WaitingForNextEra : Alert()
 
     object SetValidators : Alert()
+
+    object Rebag : Alert()
 }

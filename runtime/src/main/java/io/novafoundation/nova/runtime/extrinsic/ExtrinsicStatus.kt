@@ -31,7 +31,7 @@ fun SubscriptionChange.asExtrinsicStatus(extrinsicHash: String): ExtrinsicStatus
             STATUS_FINALITY_TIMEOUT in result -> ExtrinsicStatus.Finalized(extractBlockHash(result, STATUS_FINALITY_TIMEOUT), extrinsicHash)
             else -> ExtrinsicStatus.Other(extrinsicHash)
         }
-        else -> unknownStructure()
+        else -> ExtrinsicStatus.Other(extrinsicHash)
     }
 }
 

@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.ComponentHolder
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
+import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Constant
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import kotlinx.coroutines.flow.Flow
 
@@ -87,6 +88,8 @@ interface StorageQueryContext {
         keyExtractor = { it.component1<Any?>() as K },
         binding = binding
     )
+
+    suspend fun <V> Constant.getAs(binding: DynamicInstanceBinder<V>): V
 }
 
 fun Map<StorageEntry, Map<StorageKeyComponents, Any?>>.singleValueOf(storageEntry: StorageEntry) = getValue(storageEntry).values.first()

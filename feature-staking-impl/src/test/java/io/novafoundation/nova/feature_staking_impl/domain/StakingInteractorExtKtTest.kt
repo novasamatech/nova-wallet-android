@@ -43,28 +43,28 @@ class StakingInteractorExtKtTest {
     }
 
     @Test
-    fun `should report not-active if stash is not in any validators nominations`() {
-        runIsActiveTest(expected = false, who = byteArrayOf(4), maxRewarded = 3)
+    fun `should report NOT_PRESENT if stash is not in any validators nominations`() {
+        runIsActiveTest(expected = NominationStatus.NOT_PRESENT, who = byteArrayOf(4), maxRewarded = 3)
     }
 
     @Test
-    fun `active if at least one stake portion is not in oversubscribed section of validator`() {
+    fun `should report ACTIVE if at least one stake portion is not in oversubscribed section of validator`() {
         // 1 is in oversubscribed section for first validator, but not for the second
-        runIsActiveTest(expected = true,  who = byteArrayOf(1), maxRewarded = 2)
+        runIsActiveTest(expected = NominationStatus.ACTIVE,  who = byteArrayOf(1), maxRewarded = 2)
     }
 
     @Test
-    fun `not active if all stake portions are in oversubscribed section of validator`() {
-        runIsActiveTest(expected = false, who =  byteArrayOf(1), maxRewarded = 1)
+    fun `should report OVERSUBSCRIBED if all stake portions are in oversubscribed section of validator`() {
+        runIsActiveTest(expected = NominationStatus.OVERSUBSCRIBED, who =  byteArrayOf(1), maxRewarded = 1)
     }
 
     @Test
-    fun `active if all stake portions are not in oversubscribed section of validator`() {
-        runIsActiveTest(expected = true, who =  byteArrayOf(3), maxRewarded = 1)
+    fun `should report ACTIVE if all stake portions are not in oversubscribed section of validator`() {
+        runIsActiveTest(expected = NominationStatus.ACTIVE, who =  byteArrayOf(3), maxRewarded = 1)
     }
 
-    private fun runIsActiveTest(expected: Boolean, who: ByteArray, maxRewarded: Int) {
-        val actual = isNominationActive(who, exposures, maxRewarded)
+    private fun runIsActiveTest(expected: NominationStatus, who: ByteArray, maxRewarded: Int) {
+        val actual = nominationStatus(who, exposures, maxRewarded)
 
         assertEquals(expected, actual)
     }

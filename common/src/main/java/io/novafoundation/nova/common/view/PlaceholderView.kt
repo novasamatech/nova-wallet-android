@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
@@ -62,5 +63,9 @@ class PlaceholderView @JvmOverloads constructor(
 
     fun setText(text: String) {
         viewPlaceholderText.text = text
+    }
+
+    fun setText(@StringRes textRes: Int) {
+        viewPlaceholderText.setText(textRes)
     }
 }

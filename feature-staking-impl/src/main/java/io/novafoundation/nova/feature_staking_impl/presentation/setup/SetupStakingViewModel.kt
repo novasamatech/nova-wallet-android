@@ -15,8 +15,8 @@ import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapRewardDestinationModelToRewardDestination
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.stakeable
-import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.setup.SetupStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure
@@ -29,6 +29,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.validatio
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -38,7 +40,6 @@ import java.math.BigDecimal
 class SetupStakingViewModel(
     private val router: StakingRouter,
     private val interactor: StakingInteractor,
-    private val rewardCalculatorFactory: RewardCalculatorFactory,
     private val resourceManager: ResourceManager,
     private val setupStakingInteractor: SetupStakingInteractor,
     private val validationSystem: ValidationSystem<SetupStakingPayload, SetupStakingValidationFailure>,
@@ -46,6 +47,8 @@ class SetupStakingViewModel(
     private val validationExecutor: ValidationExecutor,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val rewardDestinationMixin: RewardDestinationMixin.Presentation,
+    private val selectedAssetSharedState: SingleAssetSharedState,
+    private val stakingSharedComputation: StakingSharedComputation,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
     Retriable,
@@ -61,7 +64,12 @@ class SetupStakingViewModel(
     private val assetFlow = interactor.currentAssetFlow()
         .share()
 
-    private val rewardCalculator = viewModelScope.async { rewardCalculatorFactory.create() }
+    private val rewardCalculator = viewModelScope.async {
+        stakingSharedComputation.rewardCalculator(
+            chainAsset = selectedAssetSharedState.chainAsset(),
+            scope = viewModelScope
+        )
+    }
 
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,

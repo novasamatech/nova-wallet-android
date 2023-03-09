@@ -78,7 +78,7 @@ class ConfirmStakingViewModel(
         else -> null
     }
 
-    private val stashFlow = interactor.selectedAccountStakingStateFlow()
+    private val stashFlow = interactor.selectedAccountStakingStateFlow(viewModelScope)
         .filterIsInstance<StakingState.Stash>()
         .inBackground()
         .share()

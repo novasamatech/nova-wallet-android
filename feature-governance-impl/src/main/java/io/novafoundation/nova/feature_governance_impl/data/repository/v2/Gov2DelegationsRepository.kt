@@ -35,13 +35,13 @@ import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.externalApi
+import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi.GovernanceDelegations
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.mapConvictionFromString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
 class Gov2DelegationsRepository(
     private val delegationsSubqueryApi: DelegationsSubqueryApi,
@@ -154,11 +154,11 @@ class Gov2DelegationsRepository(
         }
     }
 
-    override suspend fun ExtrinsicBuilder.delegate(delegate: AccountId, trackId: TrackId, amount: Balance, conviction: Conviction) {
+    override suspend fun CallBuilder.delegate(delegate: AccountId, trackId: TrackId, amount: Balance, conviction: Conviction) {
         convictionVotingDelegate(delegate, trackId, amount, conviction)
     }
 
-    override suspend fun ExtrinsicBuilder.undelegate(trackId: TrackId) {
+    override suspend fun CallBuilder.undelegate(trackId: TrackId) {
         convictionVotingUndelegate(trackId)
     }
 

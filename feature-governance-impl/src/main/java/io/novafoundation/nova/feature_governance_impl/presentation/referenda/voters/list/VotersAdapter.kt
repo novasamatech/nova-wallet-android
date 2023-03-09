@@ -68,7 +68,7 @@ class VotersAdapter(
     }
 }
 
-private object MnemonicPayloadGenerator : PayloadGenerator<ExpandableVoterRVItem>(ExpandableVoterRVItem::isExpanded)
+private object VoterPayloadGenerator : PayloadGenerator<ExpandableVoterRVItem>(ExpandableVoterRVItem::isExpanded)
 
 private class DiffCallback : BaseGroupedDiffCallback<ExpandableVoterRVItem, DelegatorVoterRVItem>(ExpandableVoterRVItem::class.java) {
     override fun areGroupItemsTheSame(oldItem: ExpandableVoterRVItem, newItem: ExpandableVoterRVItem): Boolean {
@@ -88,7 +88,7 @@ private class DiffCallback : BaseGroupedDiffCallback<ExpandableVoterRVItem, Dele
     }
 
     override fun getGroupChangePayload(oldItem: ExpandableVoterRVItem, newItem: ExpandableVoterRVItem): Any? {
-        return MnemonicPayloadGenerator.diff(oldItem, newItem)
+        return VoterPayloadGenerator.diff(oldItem, newItem)
     }
 }
 

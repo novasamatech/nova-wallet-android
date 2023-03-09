@@ -86,8 +86,8 @@ class RealDelegateMappers(
             ),
             type = mapDelegateTypeToUi(delegatePreview.metadata?.accountType),
             description = delegatePreview.metadata?.shortDescription,
-            stats = formatDelegationStats(delegatePreview.stats, chainWithAsset.asset),
-            delegation = mapDelegation(delegatePreview.userDelegations, chainWithAsset.asset)
+            stats = delegatePreview.stats?.let { formatDelegationStats(it, chainWithAsset.asset) },
+            delegation = delegatePreview.userDelegations?.let { mapDelegation(it, chainWithAsset.asset) }
         )
     }
 

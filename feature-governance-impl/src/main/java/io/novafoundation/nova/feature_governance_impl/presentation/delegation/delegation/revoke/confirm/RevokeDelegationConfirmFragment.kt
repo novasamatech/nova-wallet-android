@@ -8,6 +8,7 @@ import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
+import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.common.view.showLoadingValue
@@ -69,6 +70,7 @@ class RevokeDelegationConfirmFragment : BaseFragment<RevokeDelegationConfirmView
     }
 
     override fun subscribe(viewModel: RevokeDelegationConfirmViewModel) {
+        observeRetries(viewModel.partialRetriableMixin)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
         observeHints(viewModel.hintsMixin, revokeDelegationConfirmHints)

@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.domain.model
 
 import java.math.BigInteger
 
-class Asset(
+data class Asset(
     val token: Token,
 
     // Non-reserved part of the balance. There may still be restrictions on

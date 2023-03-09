@@ -35,6 +35,8 @@ infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another)
 
 fun BigInteger.intSqrt() = sqrt(toDouble()).toLong().toBigInteger()
 
+operator fun BigInteger.times(double: Double): BigInteger = toBigDecimal().multiply(double.toBigDecimal()).toBigInteger()
+
 val BigDecimal.isZero: Boolean
     get() = signum() == 0
 
@@ -46,6 +48,10 @@ val BigDecimal.isNonNegative: Boolean
 
 val BigInteger.isZero: Boolean
     get() = signum() == 0
+
+inline fun <T : Comparable<T>, R : Comparable<R>> ClosedRange<T>.map(mapper: (T) -> R): ClosedRange<R> {
+    return mapper(start)..mapper(endInclusive)
+}
 
 fun BigInteger?.orZero(): BigInteger = this ?: BigInteger.ZERO
 fun BigDecimal?.orZero(): BigDecimal = this ?: 0.toBigDecimal()
@@ -59,6 +65,8 @@ fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fold(BigInteger.ZERO) { acc, element ->
     acc + extractor(element)
 }
+
+fun Iterable<BigInteger>.sum() = sumOf { it }
 
 suspend operator fun <T> Deferred<T>.invoke() = await()
 

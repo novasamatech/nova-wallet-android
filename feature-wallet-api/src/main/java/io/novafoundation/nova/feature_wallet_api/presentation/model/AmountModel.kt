@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.RoundingMode
 
 data class AmountModel(
     val token: String,
@@ -22,10 +23,12 @@ fun mapAmountToAmountModel(
     amountInPlanks: BigInteger,
     asset: Asset,
     includeAssetTicker: Boolean = true,
+    roundingMode: RoundingMode = RoundingMode.FLOOR
 ): AmountModel = mapAmountToAmountModel(
     amount = asset.token.amountFromPlanks(amountInPlanks),
     asset = asset,
-    includeAssetTicker = includeAssetTicker
+    includeAssetTicker = includeAssetTicker,
+    roundingMode = roundingMode
 )
 
 fun mapAmountToAmountModel(
@@ -42,18 +45,19 @@ fun mapAmountToAmountModel(
     includeZeroFiat: Boolean = true,
     includeAssetTicker: Boolean = true,
     tokenAmountSign: AmountSign = AmountSign.NONE,
+    roundingMode: RoundingMode = RoundingMode.FLOOR
 ): AmountModel {
     val fiatAmount = token.priceOf(amount)
 
     val unsignedTokenAmount = if (includeAssetTicker) {
-        amount.formatTokenAmount(token.configuration)
+        amount.formatTokenAmount(token.configuration, roundingMode)
     } else {
-        amount.format()
+        amount.format(roundingMode)
     }
 
     return AmountModel(
         token = tokenAmountSign.signSymbol + unsignedTokenAmount,
-        fiat = fiatAmount.takeIf { it != BigDecimal.ZERO || includeZeroFiat }?.formatAsCurrency(token.currency)
+        fiat = fiatAmount.takeIf { it != BigDecimal.ZERO || includeZeroFiat }?.formatAsCurrency(token.currency, roundingMode)
     )
 }
 
@@ -62,13 +66,15 @@ fun mapAmountToAmountModel(
     asset: Asset,
     includeZeroFiat: Boolean = true,
     includeAssetTicker: Boolean = true,
-    tokenAmountSign: AmountSign = AmountSign.NONE
+    tokenAmountSign: AmountSign = AmountSign.NONE,
+    roundingMode: RoundingMode = RoundingMode.FLOOR
 ): AmountModel = mapAmountToAmountModel(
     amount = amount,
     token = asset.token,
     includeZeroFiat = includeZeroFiat,
     includeAssetTicker = includeAssetTicker,
-    tokenAmountSign = tokenAmountSign
+    tokenAmountSign = tokenAmountSign,
+    roundingMode = roundingMode
 )
 
 fun Asset.transferableAmountModel() = mapAmountToAmountModel(transferable, this)
