@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.getOrThrow
 import io.novafoundation.nova.common.utils.invoke
+import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
@@ -59,11 +60,13 @@ class SignLedgerViewModel(
     discoveryService: LedgerDeviceDiscoveryService,
     permissionsAsker: PermissionsAsker.Presentation,
     bluetoothManager: BluetoothManager,
+    locationManager: LocationManager,
     chainRegistry: ChainRegistry,
 ) : SelectLedgerViewModel(
     discoveryService = discoveryService,
     permissionsAsker = permissionsAsker,
     bluetoothManager = bluetoothManager,
+    locationManager = locationManager,
     router = router,
     resourceManager = resourceManager,
     chainRegistry = chainRegistry,

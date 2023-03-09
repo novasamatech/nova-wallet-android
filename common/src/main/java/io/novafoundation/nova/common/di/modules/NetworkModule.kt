@@ -19,6 +19,8 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.bluetooth.RealBluetoothManager
+import io.novafoundation.nova.common.utils.location.LocationManager
+import io.novafoundation.nova.common.utils.location.RealLocationManager
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import jp.co.soramitsu.fearless_utils.wsrpc.logging.Logger
 import jp.co.soramitsu.fearless_utils.wsrpc.recovery.Reconnector
@@ -136,4 +138,10 @@ class NetworkModule {
     fun provideBluetoothManager(
         contextManager: ContextManager
     ): BluetoothManager = RealBluetoothManager(contextManager)
+
+    @Provides
+    @ApplicationScope
+    fun provideLocationManager(
+        contextManager: ContextManager
+    ): LocationManager = RealLocationManager(contextManager)
 }

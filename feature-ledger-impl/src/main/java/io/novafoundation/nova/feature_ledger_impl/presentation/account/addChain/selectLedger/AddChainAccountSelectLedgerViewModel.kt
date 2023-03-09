@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.event
+import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
@@ -22,6 +23,7 @@ class AddChainAccountSelectLedgerViewModel(
     discoveryService: LedgerDeviceDiscoveryService,
     permissionsAsker: PermissionsAsker.Presentation,
     bluetoothManager: BluetoothManager,
+    locationManager: LocationManager,
     resourceManager: ResourceManager,
     chainRegistry: ChainRegistry,
     selectLedgerPayload: SelectLedgerPayload,
@@ -29,6 +31,7 @@ class AddChainAccountSelectLedgerViewModel(
     discoveryService = discoveryService,
     permissionsAsker = permissionsAsker,
     bluetoothManager = bluetoothManager,
+    locationManager = locationManager,
     router = router,
     resourceManager = resourceManager,
     chainRegistry = chainRegistry,

@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.location.LocationManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.permissions.setupPermissionAsker
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
@@ -49,6 +51,16 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
         }
     }
 
+    private val locationStateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+
+        override fun onReceive(context: Context?, intent: Intent) {
+            val action = intent.action
+            if (action != null && action == LocationManager.PROVIDERS_CHANGED_ACTION) {
+                viewModel.locationStateChanged()
+            }
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_select_ledger, container, false)
     }
@@ -70,6 +82,15 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
             selectLedgerProgress.setVisible(it.isEmpty())
         }
 
+        viewModel.showRequestLocationDialog.observe {
+            dialog(requireContext(), R.style.AccentPositiveAlertDialogTheme) {
+                setTitle(R.string.select_ledger_location_enable_request_title)
+                setMessage(getString(R.string.select_ledger_location_enable_request_message))
+                setPositiveButton(R.string.common_enable) { _, _ -> viewModel.enableLocation() }
+                setNegativeButton(R.string.common_cancel, null)
+            }
+        }
+
         viewModel.hints.observe(selectLedgerHints::setText)
 
         setupPermissionAsker(viewModel)
@@ -80,15 +101,31 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
         super.onCreate(savedInstanceState)
 
         enableBluetoothConnectivityTracker()
+        enableLocationStateTracker()
     }
 
     override fun onDestroy() {
         super.onDestroy()
 
         disableBluetoothConnectivityTracker()
+        disableLocationStateTracker()
     }
 
     protected fun payload() = argument<SelectLedgerPayload>(PAYLOAD_KEY)
+
+    private fun enableLocationStateTracker() {
+        val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+
+        requireActivity().registerReceiver(locationStateReceiver, filter)
+    }
+
+    private fun disableLocationStateTracker() {
+        try {
+            requireActivity().unregisterReceiver(locationStateReceiver)
+        } catch (e: IllegalArgumentException) {
+            // Receiver not registered
+        }
+    }
 
     private fun enableBluetoothConnectivityTracker() {
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)

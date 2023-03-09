@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
+import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
@@ -47,6 +48,7 @@ class AddChainAccountSelectLedgerModule {
         discoveryService: LedgerDeviceDiscoveryService,
         permissionsAsker: PermissionsAsker.Presentation,
         bluetoothManager: BluetoothManager,
+        locationManager: LocationManager,
         router: LedgerRouter,
         resourceManager: ResourceManager,
         chainRegistry: ChainRegistry,
@@ -57,6 +59,7 @@ class AddChainAccountSelectLedgerModule {
             discoveryService = discoveryService,
             permissionsAsker = permissionsAsker,
             bluetoothManager = bluetoothManager,
+            locationManager = locationManager,
             router = router,
             resourceManager = resourceManager,
             chainRegistry = chainRegistry,

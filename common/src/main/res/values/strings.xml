@@ -2,6 +2,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
     <string name="common_no_app_to_handle_intent">No suitable app found on device to handle this intent</string>
 
+   <!-- <string name="account_ledger_import_start_step_3">Allow Nova Wallet to <font color='#FFFFFF'>access Bluetooth</font></string>-->
+    <string name="account_ledger_import_start_step_3">Allow Nova Wallet to <font color='#FFFFFF'>access Bluetooth and Location</font></string>
+
+    <string name="select_ledger_location_enable_request_title">Please enable geo-location in device settings</string>
+    <string name="select_ledger_location_enable_request_message">Nova needs location to be enabled to be able to perform bluetooth scanning to find your Ledger device</string>
+
     <string name="common_some_tx_failed_title">Failed to submit some transactions</string>
     <string name="common_some_tx_failed_message">There was an error while submitting some transactions. Do you want to retry?</string>
 
@@ -464,7 +470,6 @@
     <string name="account_ledger_import_start_guide">Ledger’s official Bluetooth Connection Guide</string>
 
     <string name="account_ledger_import_start_step_4"><font color='#FFFFFF'>Select account</font> to add to wallet</string>
-    <string name="account_ledger_import_start_step_3">Allow Nova Wallet to <font color='#FFFFFF'>access Bluetooth</font></string>
     <string name="account_ledger_import_start_step_2"><font color='#FFFFFF'>Open the network app</font> on your Ledger device</string>
     <string name="account_ledger_import_start_step_1">Make sure <font color='#FFFFFF'>Network app is installed</font> to your Ledger device using Ledger Live app</string>
 
