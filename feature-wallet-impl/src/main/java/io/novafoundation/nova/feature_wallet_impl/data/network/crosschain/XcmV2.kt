@@ -67,13 +67,13 @@ sealed class VersionedMultiLocation {
 fun XcmMultiAssets.versioned(lowestAllowedVersion: XcmVersion?) = when {
     lowestAllowedVersion == null -> VersionedMultiAssets.V2(this) // try out best with latest known version
     lowestAllowedVersion <= XcmVersion.V1 -> VersionedMultiAssets.V1(this)
-    else ->  VersionedMultiAssets.V2(this)
+    else -> VersionedMultiAssets.V2(this)
 }
 
 fun MultiLocation.versioned(lowestAllowedVersion: XcmVersion?) = when {
     lowestAllowedVersion == null -> VersionedMultiLocation.V2(this) // try out best with latest known version
     lowestAllowedVersion <= XcmVersion.V1 -> VersionedMultiLocation.V1(this)
-    else ->  VersionedMultiLocation.V2(this)
+    else -> VersionedMultiLocation.V2(this)
 }
 
 class XcmMultiAsset(

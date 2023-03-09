@@ -133,9 +133,9 @@ fun WeightLimit.toV1EncodableInstance() = when (this) {
     WeightLimit.Unlimited -> DictEnum.Entry("Unlimited", null)
 }
 
-fun WeightLimit.toVersionedEncodableInstance(runtimeSnapshot: RuntimeSnapshot) = when(this) {
-    is WeightLimit.Limited ->  DictEnum.Entry("Limited", runtimeSnapshot.prepareWeightForEncoding(weight))
-    WeightLimit.Unlimited ->  DictEnum.Entry("Unlimited", null)
+fun WeightLimit.toVersionedEncodableInstance(runtimeSnapshot: RuntimeSnapshot) = when (this) {
+    is WeightLimit.Limited -> DictEnum.Entry("Limited", runtimeSnapshot.prepareWeightForEncoding(weight))
+    WeightLimit.Unlimited -> DictEnum.Entry("Unlimited", null)
 }
 
 private fun XcmMultiAssetFilter.toEncodableInstance() = when (this) {

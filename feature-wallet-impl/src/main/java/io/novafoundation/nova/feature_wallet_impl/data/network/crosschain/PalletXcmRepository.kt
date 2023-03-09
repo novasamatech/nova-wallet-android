@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
-
 import io.novafoundation.nova.common.utils.enumValueOfOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -20,7 +19,7 @@ interface PalletXcmRepository {
 
 class RealPalletXcmRepository(
     private val remoteStorageDataSource: StorageDataSource,
-): PalletXcmRepository {
+) : PalletXcmRepository {
 
     override suspend fun lowestPresentMultiLocationVersion(chainId: ChainId): XcmVersion? {
         return lowestPresentXcmTypeVersion(chainId, "xcm.VersionedMultiLocation")
