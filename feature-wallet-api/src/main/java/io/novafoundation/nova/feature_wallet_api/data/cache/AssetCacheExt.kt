@@ -20,7 +20,6 @@ suspend fun AssetCache.updateAsset(
     accountInfo: AccountInfo,
 ) = updateAsset(accountId, chainAsset, nativeBalanceUpdater(accountInfo))
 
-
 suspend fun AssetCache.updateNonLockableAsset(
     metaId: Long,
     chainAsset: Chain.Asset,
@@ -30,7 +29,6 @@ suspend fun AssetCache.updateNonLockableAsset(
         it.copy(freeInPlanks = assetBalance, frozenInPlanks = Balance.ZERO, reservedInPlanks = Balance.ZERO)
     }
 }
-
 
 private fun nativeBalanceUpdater(accountInfo: AccountInfo) = { asset: AssetLocal ->
     val data = accountInfo.data
