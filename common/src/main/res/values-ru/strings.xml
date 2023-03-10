@@ -294,6 +294,8 @@
     <string name="common_signature_invalid">Неверная подпись</string>
     <string name="common_skip">Пропустить</string>
     <string name="common_skip_process">Пропустить</string>
+    <string name="common_some_tx_failed_message">Произошла ошибка при отправке некоторых транзакций. Вы хотите повторить попытку?</string>
+    <string name="common_some_tx_failed_title">Не удалось отправить некоторые транзакции</string>
     <string name="common_sort_by">Сортировка по</string>
     <string name="common_status">Статус</string>
     <string name="common_substrate_address">Substrate адрес</string>
