@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovern
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateFiltering
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateSorting
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 interface DelegateListInteractor {
@@ -14,10 +15,12 @@ interface DelegateListInteractor {
 
     suspend fun getDelegates(
         governanceOption: SupportedGovernanceOption,
+        scope: CoroutineScope
     ): Flow<List<DelegatePreview>>
 
     suspend fun getUserDelegates(
         governanceOption: SupportedGovernanceOption,
+        scope: CoroutineScope
     ): Flow<List<DelegatePreview>>
 
     suspend fun applySortingAndFiltering(

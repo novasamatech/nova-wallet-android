@@ -22,7 +22,7 @@ class YourDelegationsViewModel(
 ) : BaseViewModel() {
 
     private val delegatesFlow = governanceSharedState.selectedOption
-        .withLoadingShared { interactor.getUserDelegates(it) }
+        .withLoadingShared { interactor.getUserDelegates(it, this) }
         .mapLoading { interactor.applySorting(DelegateSorting.DELEGATIONS, it) }
 
     val delegateModels = delegatesFlow.mapLoading { delegates ->

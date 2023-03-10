@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRou
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.main.DelegateDetailsPayload
 import io.novafoundation.nova.runtime.state.chainAndAsset
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -50,7 +51,7 @@ class DelegateListViewModel(
         .shareInBackground()
 
     private val delegatesFlow = governanceSharedState.selectedOption
-        .withLoadingShared { interactor.getDelegates(it) }
+        .withLoadingShared { interactor.getDelegates(it, this) }
 
     private val sortedAndFilteredDelegates = combine(
         sortingMixin.selectedValue,
