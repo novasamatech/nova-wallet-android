@@ -23,7 +23,7 @@ class WeightDeserizalier : JsonDeserializer<Weight> {
             // weight v1
             json is JsonPrimitive -> json.asLong.toBigInteger()
             // weight v2
-            json is JsonObject -> json["refTime"].asLong.toBigInteger()
+            json is JsonObject -> json["ref_time"].asLong.toBigInteger()
 
             else -> error("Unsupported weight type")
         }
