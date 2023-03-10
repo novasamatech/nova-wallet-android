@@ -211,8 +211,8 @@ fun Chain.Asset.requireOrml(): Type.Orml {
     return type
 }
 
-fun Chain.Asset.requireErc20(): Type.Evm {
-    require(type is Type.Evm)
+fun Chain.Asset.requireErc20(): Type.EvmErc20 {
+    require(type is Type.EvmErc20)
 
     return type
 }

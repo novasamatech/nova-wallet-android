@@ -81,9 +81,11 @@ data class Chain(
                 val transfersEnabled: Boolean,
             ) : Type()
 
-            data class Evm(
+            data class EvmErc20(
                 val contractAddress: String
             ) : Type()
+
+            object EvmNative: Type()
 
             object Unsupported : Type()
         }
