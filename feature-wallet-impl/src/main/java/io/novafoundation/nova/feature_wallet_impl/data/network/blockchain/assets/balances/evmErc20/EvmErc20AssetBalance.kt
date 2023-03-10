@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evm
+package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evmErc20
 
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
@@ -37,7 +37,7 @@ import java.math.BigInteger
 
 private const val BATCH_ID = "EvmAssetBalance.InitialBalance"
 
-class EvmAssetBalance(
+class EvmErc20AssetBalance(
     private val chainRegistry: ChainRegistry,
     private val assetCache: AssetCache,
     private val erc20Standard: Erc20Standard,
@@ -55,7 +55,7 @@ class EvmAssetBalance(
     }
 
     override suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
-        return false
+        return true
     }
 
     override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {

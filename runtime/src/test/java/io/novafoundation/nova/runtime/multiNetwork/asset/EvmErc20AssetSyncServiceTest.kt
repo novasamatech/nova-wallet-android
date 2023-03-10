@@ -23,7 +23,7 @@ import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
-class EvmAssetSyncServiceTest {
+class EvmErc20AssetSyncServiceTest {
 
     private val chainId = "chainId"
     private val contractAddress = "0xc748673057861a797275CD8A068AbB95A902e8de"

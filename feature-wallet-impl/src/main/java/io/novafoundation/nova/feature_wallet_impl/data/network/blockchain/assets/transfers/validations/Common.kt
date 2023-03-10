@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBal
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validAddress
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
 import java.math.BigDecimal
 
 fun AssetTransfersValidationSystemBuilder.positiveAmount() = positiveAmount(
@@ -93,9 +94,9 @@ private suspend fun AssetSourceRegistry.existentialDeposit(chain: Chain, asset: 
 }
 
 private fun Chain.Asset.existentialDepositError(amount: BigDecimal): WillRemoveAccount = when (type) {
-    Chain.Asset.Type.Native -> WillRemoveAccount.WillBurnDust
-    is Chain.Asset.Type.Orml -> WillRemoveAccount.WillBurnDust
-    is Chain.Asset.Type.Statemine -> WillRemoveAccount.WillTransferDust(amount)
-    is Chain.Asset.Type.Evm -> WillRemoveAccount.WillBurnDust
-    Chain.Asset.Type.Unsupported -> throw IllegalArgumentException("Unsupported")
+    is Type.Native -> WillRemoveAccount.WillBurnDust
+    is Type.Orml -> WillRemoveAccount.WillBurnDust
+    is Type.Statemine -> WillRemoveAccount.WillTransferDust(amount)
+    is Type.EvmErc20, is Type.EvmNative -> WillRemoveAccount.WillBurnDust
+    Type.Unsupported -> throw IllegalArgumentException("Unsupported")
 }

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.evm
+package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.evmErc20
 
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
@@ -20,7 +20,7 @@ import kotlin.time.Duration.Companion.seconds
 private const val FIRST_PAGE_INDEX = 1
 private const val SECOND_PAGE_INDEX = 2
 
-class EvmAssetHistory(
+class EvmErc20AssetHistory(
     private val etherscanTransactionsApi: EtherscanTransactionsApi,
 ) : AssetHistory {
 
