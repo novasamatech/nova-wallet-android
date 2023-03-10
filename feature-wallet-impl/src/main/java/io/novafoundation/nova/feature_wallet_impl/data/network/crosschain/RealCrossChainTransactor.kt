@@ -38,7 +38,8 @@ class RealCrossChainTransactor(
     private val weigher: CrossChainWeigher,
     private val extrinsicService: ExtrinsicService,
     private val assetSourceRegistry: AssetSourceRegistry,
-    private val phishingValidationFactory: PhishingValidationFactory
+    private val phishingValidationFactory: PhishingValidationFactory,
+    private val palletXcmRepository: PalletXcmRepository,
 ) : CrossChainTransactor {
 
     override val validationSystem: AssetTransfersValidationSystem = ValidationSystem {
@@ -105,7 +106,7 @@ class RealCrossChainTransactor(
             callName = "transfer_multiasset",
             arguments = mapOf(
                 "asset" to VersionedMultiAsset.V1(multiAsset).toEncodableInstance(),
-                "dest" to fullDestinationLocation.versioned().toEncodableInstance(),
+                "dest" to VersionedMultiLocation.V1(fullDestinationLocation).toEncodableInstance(),
 
                 // depending on the version of the pallet, only one of weights arguments going to be encoded
                 "dest_weight" to destWeightEncodable(requiredDestWeight),
@@ -149,17 +150,20 @@ class RealCrossChainTransactor(
         crossChainFee: BigInteger,
         callName: String
     ) {
+        val lowestMultiLocationVersion = palletXcmRepository.lowestPresentMultiLocationVersion(assetTransfer.originChain.id)
+        val lowestMultiAssetVersion = palletXcmRepository.lowestPresentMultiAssetVersion(assetTransfer.originChain.id)
+
         val multiAsset = configuration.multiAssetFor(assetTransfer, crossChainFee)
 
         call(
             moduleName = runtime.metadata.xcmPalletName(),
             callName = callName,
             arguments = mapOf(
-                "dest" to configuration.destinationChainLocation.versioned().toEncodableInstance(),
-                "beneficiary" to assetTransfer.beneficiaryLocation().versioned().toEncodableInstance(),
-                "assets" to VersionedMultiAssets.V1(listOf(multiAsset)).toEncodableInstance(),
+                "dest" to configuration.destinationChainLocation.versioned(lowestMultiLocationVersion).toEncodableInstance(),
+                "beneficiary" to assetTransfer.beneficiaryLocation().versioned(lowestMultiLocationVersion).toEncodableInstance(),
+                "assets" to listOf(multiAsset).versioned(lowestMultiAssetVersion).toEncodableInstance(),
                 "fee_asset_item" to BigInteger.ZERO,
-                "weight_limit" to WeightLimit.Limited(weigher.estimateRequiredDestWeight(configuration)).toEncodableInstance()
+                "weight_limit" to WeightLimit.Limited(weigher.estimateRequiredDestWeight(configuration)).toVersionedEncodableInstance(runtime)
             )
         )
     }

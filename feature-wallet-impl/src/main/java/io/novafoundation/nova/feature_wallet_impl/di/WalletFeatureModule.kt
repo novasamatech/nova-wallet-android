@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateS
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
+import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
@@ -41,10 +42,11 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.Substr
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.BalancesUpdateSystem
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.PaymentUpdaterFactory
-import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainConfigApi
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.PalletXcmRepository
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCrossChainTransactor
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCrossChainWeigher
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealPalletXcmRepository
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealBalanceLocksRepository
@@ -215,12 +217,25 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideXcmPalletRepository(
+        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource
+    ): PalletXcmRepository = RealPalletXcmRepository(storageDataSource)
+
+    @Provides
+    @FeatureScope
     fun provideCrossChainTransactor(
         weigher: CrossChainWeigher,
         extrinsicService: ExtrinsicService,
         assetSourceRegistry: AssetSourceRegistry,
-        phishingValidationFactory: PhishingValidationFactory
-    ): CrossChainTransactor = RealCrossChainTransactor(weigher, extrinsicService, assetSourceRegistry, phishingValidationFactory)
+        phishingValidationFactory: PhishingValidationFactory,
+        palletXcmRepository: PalletXcmRepository,
+    ): CrossChainTransactor = RealCrossChainTransactor(
+        weigher = weigher,
+        extrinsicService = extrinsicService,
+        assetSourceRegistry = assetSourceRegistry,
+        phishingValidationFactory = phishingValidationFactory,
+        palletXcmRepository = palletXcmRepository
+    )
 
     @Provides
     @FeatureScope

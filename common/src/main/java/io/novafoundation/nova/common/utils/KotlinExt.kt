@@ -26,6 +26,8 @@ fun BigDecimal.percentageToFraction() = this.divide(PERCENTAGE_MULTIPLIER, MathC
 
 infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
 
+inline fun <reified E : Enum<E>> enumValueOfOrNull(raw: String): E? = runCatching { enumValueOf<E>(raw) }.getOrNull()
+
 /**
  * Compares two BigDecimals taking into account only values but not scale unlike `==` operator
  */

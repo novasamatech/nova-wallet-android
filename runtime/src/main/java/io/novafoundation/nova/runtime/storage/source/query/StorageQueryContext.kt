@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.storage.source.query
 import io.novafoundation.nova.common.utils.ComponentHolder
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Constant
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import kotlinx.coroutines.flow.Flow
@@ -76,6 +77,8 @@ interface StorageQueryContext {
         keyExtractor = { it },
         binding = binding
     )
+
+    suspend fun Module.palletVersionOrThrow(): Int
 
     suspend fun <K, V> StorageEntry.singleArgumentEntries(
         keysArguments: Collection<K>,
