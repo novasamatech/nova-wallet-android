@@ -6,6 +6,7 @@ import io.novafoundation.nova.core.updater.EthereumSharedRequestsBuilder
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
+import io.novafoundation.nova.feature_wallet_api.data.cache.updateNonLockableAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
@@ -90,7 +91,7 @@ class EvmErc20AssetBalance(
 
         return subscriptionBuilder.erc20BalanceFlow(address, ethereumApi, chainAsset, initialBalanceAsync)
             .map { balanceUpdate ->
-                updateAsset(metaAccount.id, chainAsset, balanceUpdate.newBalance)
+                assetCache.updateNonLockableAsset(metaAccount.id, chainAsset, balanceUpdate.newBalance)
 
                 if (balanceUpdate.cause != null) {
                     BalanceSyncUpdate.CauseFetched(balanceUpdate.cause)
@@ -98,16 +99,6 @@ class EvmErc20AssetBalance(
                     BalanceSyncUpdate.NoCause
                 }
             }
-    }
-
-    private suspend fun updateAsset(
-        metaId: Long,
-        chainAsset: Chain.Asset,
-        newBalance: Balance
-    ) {
-        assetCache.updateAsset(metaId, chainAsset) {
-            it.copy(freeInPlanks = newBalance)
-        }
     }
 
     private fun EthereumSharedRequestsBuilder.erc20BalanceFlow(
