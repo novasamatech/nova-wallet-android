@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evnNative.EvmNativeAssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.evmNative.EvmNativeAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.evmNative.EvmNativeAssetTransfers
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import javax.inject.Qualifier
 
 @Qualifier
@@ -21,7 +22,8 @@ class EvmNativeAssetsModule {
     @FeatureScope
     fun provideBalance(
         assetCache: AssetCache,
-    ) = EvmNativeAssetBalance(assetCache)
+        chainRegistry: ChainRegistry,
+    ) = EvmNativeAssetBalance(assetCache, chainRegistry)
 
     @Provides
     @FeatureScope
