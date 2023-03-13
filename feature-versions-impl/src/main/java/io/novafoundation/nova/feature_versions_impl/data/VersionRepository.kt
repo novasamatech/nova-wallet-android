@@ -1,8 +1,5 @@
 package io.novafoundation.nova.feature_versions_impl.data
 
-import android.content.Context
-import android.content.pm.PackageManager.PackageInfoFlags
-import android.os.Build
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotification
 import io.novafoundation.nova.feature_versions_api.domain.Version
@@ -32,7 +29,7 @@ interface VersionRepository {
 }
 
 class RealVersionRepository(
-    private val context: Context,
+    private val appVersionProvider: AppVersionProvider,
     private val preferences: Preferences,
     private val versionsFetcher: VersionsFetcher
 ) : VersionRepository {
@@ -58,10 +55,30 @@ class RealVersionRepository(
     }
 
     override suspend fun hasImportantUpdates(): Boolean {
-        val checkpointVersion = getRecentVersionCheckpoint() ?: currentVersion
-        return syncAndGetVersions()
-            .filterNot { it.value.severity == REMOTE_SEVERITY_NORMAL }
-            .any { checkpointVersion < it.key || it.value.severity == REMOTE_SEVERITY_CRITICAL }
+        val appVersion = currentVersion
+        val lastSkippedVersion = getRecentVersionCheckpoint()
+
+        return syncAndGetVersions().any { it.shouldPresentUpdate(appVersion, lastSkippedVersion) }
+    }
+
+    private fun Map.Entry<Version, VersionResponse>.shouldPresentUpdate(
+        appVersion: Version,
+        latestSkippedVersion: Version?,
+    ): Boolean {
+        val (updateVersion, updateInfo) = this
+
+        val alreadyUpdated = appVersion >= updateVersion
+        if (alreadyUpdated) return false
+
+        val notImportantUpdate = updateInfo.severity == REMOTE_SEVERITY_NORMAL
+        if (notImportantUpdate) return false
+
+        val hasSkippedThisUpdate = latestSkippedVersion != null && latestSkippedVersion >= updateVersion
+        val canBypassSkip = updateInfo.severity == REMOTE_SEVERITY_CRITICAL
+
+        if (hasSkippedThisUpdate && !canBypassSkip) return false
+
+        return true
     }
 
     override suspend fun getNewUpdateNotifications(): List<UpdateNotification> {
@@ -114,12 +131,7 @@ class RealVersionRepository(
 
     @Suppress("DEPRECATION")
     private fun getAppVersion(): Version {
-        val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.packageManager.getPackageInfo(context.packageName, PackageInfoFlags.of(0))
-        } else {
-            context.packageManager.getPackageInfo(context.packageName, 0)
-        }
-        return packageInfo.versionName.toVersion()
+        return appVersionProvider.getCurrentVersionName().toVersion()
     }
 
     private fun String.toVersion(): Version {
