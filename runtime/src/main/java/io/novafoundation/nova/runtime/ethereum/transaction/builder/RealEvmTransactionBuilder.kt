@@ -117,7 +117,7 @@ private class EvmContractCallBuilder(
 
 private sealed class EvmTransactionData {
 
-    class NativeTransfer(val amount: BalanceOf, val recipientAddress: String): EvmTransactionData()
+    class NativeTransfer(val amount: BalanceOf, val recipientAddress: String) : EvmTransactionData()
 
     class ContractCall(val contractAddress: String, val function: EvmFunction) : EvmTransactionData()
 }
