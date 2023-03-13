@@ -34,7 +34,7 @@ class EvmNativeAssetsModule {
 
     @Provides
     @FeatureScope
-    fun provideHistory() = EvmNativeAssetHistory()
+    fun provideHistory(chainRegistry: ChainRegistry) = EvmNativeAssetHistory(chainRegistry)
 
     @Provides
     @EvmNativeAssets
