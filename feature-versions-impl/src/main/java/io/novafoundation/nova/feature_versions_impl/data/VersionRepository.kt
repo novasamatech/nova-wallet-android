@@ -40,7 +40,7 @@ class RealVersionRepository(
 
     private val mutex = Mutex(false)
 
-    private val currentVersion = getAppVersion()
+    private val appVersion = getAppVersion()
 
     private var versions = mapOf<Version, VersionResponse>()
 
@@ -55,7 +55,6 @@ class RealVersionRepository(
     }
 
     override suspend fun hasImportantUpdates(): Boolean {
-        val appVersion = currentVersion
         val lastSkippedVersion = getRecentVersionCheckpoint()
 
         return syncAndGetVersions().any { it.shouldPresentUpdate(appVersion, lastSkippedVersion) }
@@ -83,7 +82,7 @@ class RealVersionRepository(
 
     override suspend fun getNewUpdateNotifications(): List<UpdateNotification> {
         return syncAndGetVersions()
-            .filter { currentVersion < it.key }
+            .filter { appVersion < it.key }
             .map { getChangelogAsync(it.key, it.value) }
             .awaitAll()
             .filterNotNull()
