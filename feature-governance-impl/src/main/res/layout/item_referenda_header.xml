@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
     android:orientation="vertical">
 
     <io.novafoundation.nova.feature_wallet_api.presentation.view.AssetSelectorView
@@ -16,13 +18,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksView
+    <LinearLayout
         android:id="@+id/governanceLocksHeader"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="4dp"
-        android:visibility="gone" />
+        tools:background="@color/block_background"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:layout_height="wrap_content" >
+
+        <io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/governanceLocksLocked"
+            app:governanceLocksView_icon="@drawable/ic_lock_closed_outline"
+            app:governanceLocksView_label="@string/wallet_balance_locked"
+            tools:visibility="visible"
+            android:visibility="gone" />
+
+        <io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksView
+            android:layout_width="match_parent"
+            android:id="@+id/governanceLocksDelegations"
+            android:layout_height="wrap_content"
+            app:governanceLocksView_icon="@drawable/ic_delegate_outline"
+            app:governanceLocksView_label="@string/delegation_add_delegation"
+            />
+    </LinearLayout>
+
+
 
 </LinearLayout>

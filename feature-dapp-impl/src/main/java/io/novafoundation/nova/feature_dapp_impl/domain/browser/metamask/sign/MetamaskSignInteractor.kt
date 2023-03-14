@@ -185,7 +185,8 @@ class MetamaskSignInteractor(
                 available = { validationPayload ->
                     validationPayload.convertingToAmount { ethereumApi.getAccountBalance(payload.originAddress) }
                 },
-                error = { _, _ -> NotEnoughBalanceToPayFees }
+                error = { _, _ -> NotEnoughBalanceToPayFees },
+                skippable = true
             )
         }
     }

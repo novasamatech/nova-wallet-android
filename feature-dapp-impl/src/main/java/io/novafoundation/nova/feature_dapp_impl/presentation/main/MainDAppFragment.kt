@@ -38,11 +38,10 @@ class MainDAppFragment :
     private val dappsShimmering by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.layout_dapps_shimmering) }
 
     private val categoriesAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        val horizontalPadding = 16.dp
         NestedAdapter(
             DappCategoriesAdapter(this),
             RecyclerView.HORIZONTAL,
-            padding = Rect(horizontalPadding, 0, horizontalPadding, 0)
+            paddingInDp = Rect(16, 0, 16, 0)
         )
     }
 

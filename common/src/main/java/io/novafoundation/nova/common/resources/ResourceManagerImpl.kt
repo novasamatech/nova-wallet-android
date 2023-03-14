@@ -83,8 +83,6 @@ class ResourceManagerImpl(
     }
 
     override fun formatDuration(duration: Duration, estimated: Boolean): String {
-        if (duration == Duration.ZERO) return "0"
-
         return duration.format(
             estimated = estimated,
             context = contextManager.getApplicationContext(),

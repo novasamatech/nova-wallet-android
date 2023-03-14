@@ -4,6 +4,5 @@
     android:id="@+id/itemNestedList"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_primary_list_item"
     android:clipToPadding="false"
     android:overScrollMode="never" />

@@ -174,7 +174,8 @@ class PolkadotJsSignInteractor(
 
                 asset.transferable
             },
-            error = { _, _ -> ConfirmDAppOperationValidationFailure.NotEnoughBalanceToPayFees }
+            error = { _, _ -> ConfirmDAppOperationValidationFailure.NotEnoughBalanceToPayFees },
+            skippable = true
         )
     }
 

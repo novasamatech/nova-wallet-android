@@ -44,11 +44,15 @@ import io.novafoundation.nova.common.resources.ResourceManagerImpl
 import io.novafoundation.nova.common.sequrity.RealSafeModeService
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
+import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
+import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
+import io.novafoundation.nova.common.view.input.chooser.RealListChooserMixinFactory
 import jp.co.soramitsu.fearless_utils.encrypt.Signer
 import jp.co.soramitsu.fearless_utils.icon.IconGenerator
 import java.security.SecureRandom
@@ -249,10 +253,22 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
+    fun provideListChooserMixinFactory(
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+    ): ListChooserMixin.Factory = RealListChooserMixinFactory(actionAwaitableMixinFactory)
+
+    @Provides
+    @ApplicationScope
     fun provideSafeModeService(
         contextManager: ContextManager,
         preferences: Preferences
     ): SafeModeService {
         return RealSafeModeService(contextManager, preferences)
     }
+
+    @Provides
+    @ApplicationScope
+    fun providePartialRetriableMixinFactory(
+        resourceManager: ResourceManager
+    ): PartialRetriableMixin.Factory = RealPartialRetriableMixinFactory(resourceManager)
 }

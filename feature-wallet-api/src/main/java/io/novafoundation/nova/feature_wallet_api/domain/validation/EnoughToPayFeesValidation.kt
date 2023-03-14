@@ -21,6 +21,7 @@ class EnoughToPayFeesValidation<P, E>(
     private val feeExtractor: AmountProducer<P>,
     private val availableBalanceProducer: AmountProducer<P>,
     private val errorProducer: (P, availableToPayFees: BigDecimal) -> E,
+    private val skippable: Boolean = false,
     private val extraAmountExtractor: AmountProducer<P> = { BigDecimal.ZERO },
 ) : Validation<P, E> {
 
@@ -36,7 +37,9 @@ class EnoughToPayFeesValidation<P, E>(
         } else {
             val availableToPayFees = (available - amount).coerceAtLeast(BigDecimal.ZERO)
 
-            ValidationStatus.NotValid(DefaultFailureLevel.ERROR, errorProducer(value, availableToPayFees))
+            val failureLevel = if (skippable) DefaultFailureLevel.WARNING else DefaultFailureLevel.ERROR
+
+            ValidationStatus.NotValid(failureLevel, errorProducer(value, availableToPayFees))
         }
     }
 }
@@ -45,12 +48,14 @@ fun <P, E> ValidationSystemBuilder<P, E>.sufficientBalance(
     fee: AmountProducer<P> = { BigDecimal.ZERO },
     amount: AmountProducer<P> = { BigDecimal.ZERO },
     available: AmountProducer<P>,
-    error: (P, availableToPayFees: BigDecimal) -> E
+    error: (P, availableToPayFees: BigDecimal) -> E,
+    skippable: Boolean = false
 ) = validate(
     EnoughToPayFeesValidation(
         feeExtractor = fee,
         extraAmountExtractor = amount,
         errorProducer = error,
+        skippable = skippable,
         availableBalanceProducer = available
     )
 )

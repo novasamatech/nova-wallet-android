@@ -3,16 +3,21 @@ package io.novafoundation.nova.common.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.getStringOrThrow
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
+import com.google.android.material.card.MaterialCardView
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
+import kotlinx.android.synthetic.main.view_advertisement_card.view.advertisementCardBackground
 import kotlinx.android.synthetic.main.view_advertisement_card.view.advertisementCardButton
+import kotlinx.android.synthetic.main.view_advertisement_card.view.advertisementCardClose
 import kotlinx.android.synthetic.main.view_advertisement_card.view.advertisementCardImage
 import kotlinx.android.synthetic.main.view_advertisement_card.view.advertisementCardLearnMoreArrow
 import kotlinx.android.synthetic.main.view_advertisement_card.view.advertisementCardLearnMoreContent
@@ -24,13 +29,18 @@ class AdvertisementCard @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : ConstraintLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
+) : MaterialCardView(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
     val action: PrimaryButton
         get() = advertisementCardButton
 
     init {
         View.inflate(context, R.layout.view_advertisement_card, this)
+
+        cardElevation = 0f
+        radius = 12f.dpF(context)
+        strokeWidth = 1.dp(context)
+        strokeColor = context.getColor(R.color.container_border)
 
         attrs?.let(::applyAttrs)
 
@@ -45,6 +55,10 @@ class AdvertisementCard @JvmOverloads constructor(
     fun setOnLearnMoreClickedListener(onClicked: (View) -> Unit) {
         advertisementCardLearnMoreArrow.setOnClickListener(onClicked)
         advertisementCardLearnMoreContent.setOnClickListener(onClicked)
+    }
+
+    fun setOnCloseClickListener(listener: OnClickListener?) {
+        advertisementCardClose.setOnClickListener(listener)
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.AdvertisementCard) {
@@ -63,5 +77,11 @@ class AdvertisementCard @JvmOverloads constructor(
 
         val image = it.getDrawable(R.styleable.AdvertisementCard_image)
         advertisementCardImage.setImageDrawable(image)
+
+        val bannerBackground = it.getDrawable(R.styleable.AdvertisementCard_advertisementCardBackground)
+        advertisementCardBackground.background = bannerBackground
+
+        val showClose = it.getBoolean(R.styleable.AdvertisementCard_showClose, false)
+        advertisementCardClose.isVisible = showClose
     }
 }

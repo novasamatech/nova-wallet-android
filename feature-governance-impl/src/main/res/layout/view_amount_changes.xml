@@ -87,11 +87,18 @@
         tools:text="1 day"
         tools:textColor="@color/button_text_accent" />
 
+
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/valueBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="left"
         app:constraint_referenced_ids="valueChangesFrom, valueChangesDifference" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/valueChangesFromGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="valueChangesFrom,valueChangesArrow" />
 
 </merge>

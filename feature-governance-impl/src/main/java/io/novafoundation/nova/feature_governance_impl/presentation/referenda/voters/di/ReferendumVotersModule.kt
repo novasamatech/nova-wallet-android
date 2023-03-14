@@ -7,19 +7,32 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ReferendumVotersInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersViewModel
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.RealDelegateMappers
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ReferendumVotersModule {
+
+    @Provides
+    @CachingDelegateMappers
+    fun provideDelegateMappers(
+        resourceManager: ResourceManager,
+        @Caching addressIconGenerator: AddressIconGenerator,
+        trackFormatter: TrackFormatter,
+        votersFormatter: VotersFormatter
+    ): DelegateMappers = RealDelegateMappers(resourceManager, addressIconGenerator, trackFormatter, votersFormatter)
 
     @Provides
     @IntoMap
@@ -29,20 +42,20 @@ class ReferendumVotersModule {
         router: GovernanceRouter,
         governanceSharedState: GovernanceSharedState,
         externalAction: ExternalActions.Presentation,
-        addressIconGenerator: AddressIconGenerator,
-        identityProviderFactory: GovernanceIdentityProviderFactory,
         referendumVotersInteractor: ReferendumVotersInteractor,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        votersFormatter: VotersFormatter,
+        @CachingDelegateMappers delegateMappers: DelegateMappers
     ): ViewModel {
         return ReferendumVotersViewModel(
-            payload,
-            router,
-            governanceSharedState,
-            externalAction,
-            addressIconGenerator,
-            identityProviderFactory,
-            referendumVotersInteractor,
-            resourceManager
+            payload = payload,
+            router = router,
+            governanceSharedState = governanceSharedState,
+            externalActions = externalAction,
+            referendumVotersInteractor = referendumVotersInteractor,
+            resourceManager = resourceManager,
+            votersFormatter = votersFormatter,
+            delegateMappers = delegateMappers
         )
     }
 

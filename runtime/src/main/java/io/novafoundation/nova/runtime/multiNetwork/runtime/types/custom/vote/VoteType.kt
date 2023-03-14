@@ -22,6 +22,10 @@ enum class Conviction {
     Locked6x
 }
 
+fun mapConvictionFromString(conviction: String): Conviction {
+    return Conviction.values().first { it.name == conviction }
+}
+
 private const val AYE_MASK = 0b1000_0000.toByte()
 private const val VOTE_MASK = 0b0111_1111.toByte()
 

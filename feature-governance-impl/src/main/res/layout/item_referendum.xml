@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/itemCrowdloanGroup"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
@@ -11,22 +10,22 @@
     android:paddingVertical="16dp"
     tools:background="@color/block_background">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp">
+        android:layout_marginHorizontal="16dp"
+        android:gravity="top"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/itemReferendumStatus"
             style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
             android:includeFontPadding="false"
+            android:lines="1"
             android:textColor="@color/text_primary"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Passing" />
+            tools:text="Passings" />
 
         <TextView
             android:id="@+id/itemReferendumTimeEstimate"
@@ -34,18 +33,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_weight="1"
             android:ellipsize="end"
             android:gravity="end"
             android:includeFontPadding="false"
-            android:maxLines="2"
             android:textColor="@color/text_secondary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/itemReferendumStatus"
-            app:layout_constraintTop_toTopOf="parent"
             tools:text="Approve in 3:59:59" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/itemReferendumName"
@@ -88,47 +83,17 @@
         android:clipToPadding="false"
         android:paddingHorizontal="16dp" />
 
-    <FrameLayout
-        android:id="@+id/itemReferendumYourVoiceGroup"
+    <View
+        android:id="@+id/itermReferendumDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:background="@color/divider" />
+
+    <io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.view.YourMultiVotePreviewView
+        android:id="@+id/itemReferendumYourVote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="12dp">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/divider" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp">
-
-            <TextView
-                android:id="@+id/itemReferendumYourVoteType"
-                style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/bg_chip"
-                android:includeFontPadding="false"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4.5dp"
-                android:textColor="@color/chip_text"
-                tools:text="AYE" />
-
-            <TextView
-                android:id="@+id/itemReferendumYourVoteDetails"
-                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="6dp"
-                android:includeFontPadding="false"
-                android:textColor="@color/text_secondary"
-                tools:text="To pass: 50%" />
-
-        </LinearLayout>
-    </FrameLayout>
+        android:layout_marginHorizontal="16dp" />
 </LinearLayout>

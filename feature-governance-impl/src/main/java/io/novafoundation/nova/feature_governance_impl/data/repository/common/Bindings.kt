@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.data.repository.common
 
+import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindByteArray
+import io.novafoundation.nova.common.data.network.runtime.binding.bindCollectionEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
@@ -15,6 +17,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Tally
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
+import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Vote
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
@@ -83,12 +86,29 @@ fun bindVoting(decoded: Any): Voting {
             val delegating = decoded.value.castToStruct()
 
             val balance = bindNumber(delegating["balance"])
+            val target = bindAccountId(delegating["target"])
+            val conviction = bindConvictionEnum(delegating["conviction"])
             val prior = bindPriorLock(delegating["prior"])
 
-            Voting.Delegating(balance, prior)
+            Voting.Delegating(balance, target, conviction, prior)
         }
 
         else -> incompatible()
+    }
+}
+
+fun bindConvictionEnum(decoded: Any?): Conviction {
+    return bindCollectionEnum(decoded) { name ->
+        when (name) {
+            "None" -> Conviction.None
+            "Locked1x" -> Conviction.Locked1x
+            "Locked2x" -> Conviction.Locked2x
+            "Locked3x" -> Conviction.Locked3x
+            "Locked4x" -> Conviction.Locked4x
+            "Locked5x" -> Conviction.Locked5x
+            "Locked6x" -> Conviction.Locked6x
+            else -> incompatible()
+        }
     }
 }
 
@@ -110,6 +130,25 @@ private fun bindAccountVote(decoded: Any?): AccountVote {
             AccountVote.Standard(
                 vote = bindVote(standardVote["vote"]),
                 balance = bindNumber(standardVote["balance"])
+            )
+        }
+
+        "Split" -> {
+            val splitVote = decoded.value.castToStruct()
+
+            AccountVote.Split(
+                aye = bindNumber(splitVote["aye"]),
+                nay = bindNumber(splitVote["nay"])
+            )
+        }
+
+        "SplitAbstain" -> {
+            val splitVote = decoded.value.castToStruct()
+
+            AccountVote.SplitAbstain(
+                aye = bindNumber(splitVote["aye"]),
+                nay = bindNumber(splitVote["nay"]),
+                abstain = bindNumber(splitVote["abstain"])
             )
         }
 

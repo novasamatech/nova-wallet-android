@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:parentTag="io.novafoundation.nova.common.view.TableView"
+    tools:title="@string/identity_title">
+
+    <io.novafoundation.nova.common.view.TableCellView
+        android:id="@+id/viewIdentityLegalName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="@string/identity_legal_name_title" />
+
+    <io.novafoundation.nova.common.view.TableCellView
+        android:id="@+id/viewIdentityEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryValueStyle="link"
+        app:title="@string/identity_email_title" />
+
+    <io.novafoundation.nova.common.view.TableCellView
+        android:id="@+id/viewIdentityWeb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryValueStyle="link"
+        app:title="@string/identity_web_title" />
+
+    <io.novafoundation.nova.common.view.TableCellView
+        android:id="@+id/viewIdentityTwitter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryValueStyle="link"
+        app:title="@string/settings_twitter" />
+
+    <io.novafoundation.nova.common.view.TableCellView
+        android:id="@+id/viewIdentityElementName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="@string/identity_riot_name_title" />
+</merge>

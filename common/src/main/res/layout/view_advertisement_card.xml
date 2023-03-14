@@ -4,95 +4,120 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/container_border"
+    app:strokeWidth="1dp"
     tools:paddingBottom="16dp"
-    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+    tools:parentTag="com.google.android.material.card.MaterialCardView">
 
-    <ImageView
-        android:id="@+id/advertisementCardImage"
-        android:layout_width="60dp"
-        android:layout_height="100dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/advertisementCardTitle" />
-
-    <TextView
-        android:id="@+id/advertisementCardTitle"
-        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/advertisementCardBackground"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toStartOf="@id/advertisementCardImage"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:textColor="@color/text_primary"
-        tools:text="Rewards are paid every 2-3 days by validators" />
+        android:paddingBottom="16dp">
 
-    <TextView
-        android:id="@+id/advertisementCardSubTitle"
-        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:paddingBottom="4dp"
-        android:textColor="@color/text_secondary"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toStartOf="@id/advertisementCardImage"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="@+id/advertisementCardTitle"
-        app:layout_constraintTop_toBottomOf="@+id/advertisementCardTitle"
-        tools:text="You can payout them by yourself, when they are close to expire, but you will pay the fee" />
+        <ImageView
+            android:id="@+id/advertisementCardImage"
+            android:layout_width="60dp"
+            android:layout_height="100dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/advertisementCardTitle" />
 
-    <TextView
-        android:id="@+id/advertisementCardLearnMoreContent"
-        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawablePadding="5dp"
-        android:includeFontPadding="false"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:textColor="?attr/colorAccent"
-        app:drawableStartCompat="@drawable/ic_info_cicrle_filled_16"
-        app:drawableTint="?attr/colorAccent"
-        app:layout_constraintStart_toStartOf="@+id/advertisementCardSubTitle"
-        app:layout_constraintTop_toBottomOf="@+id/advertisementCardSubTitle"
-        tools:text="@string/common_how_it_works" />
+        <TextView
+            android:id="@+id/advertisementCardTitle"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:textColor="@color/text_primary"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toStartOf="@id/advertisementCardImage"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Rewards are paid every 2-3 days by validators" />
 
-    <ImageView
-        android:id="@+id/advertisementCardLearnMoreArrow"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:src="@drawable/ic_chevron_right"
-        app:layout_constraintBottom_toBottomOf="@+id/advertisementCardLearnMoreContent"
-        app:layout_constraintStart_toEndOf="@+id/advertisementCardLearnMoreContent"
-        app:layout_constraintTop_toTopOf="@+id/advertisementCardLearnMoreContent"
-        app:tint="?attr/colorAccent" />
+        <TextView
+            android:id="@+id/advertisementCardSubTitle"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:paddingBottom="4dp"
+            android:textColor="@color/text_secondary"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toStartOf="@id/advertisementCardImage"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="@+id/advertisementCardTitle"
+            app:layout_constraintTop_toBottomOf="@+id/advertisementCardTitle"
+            tools:text="You can payout them by yourself, when they are close to expire, but you will pay the fee" />
 
-    <androidx.constraintlayout.widget.Group
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/advertisementCardLearnMoreGroup"
-        android:visibility="gone"
-        app:constraint_referenced_ids="advertisementCardLearnMoreArrow,advertisementCardLearnMoreContent"
-        tools:visibility="visible" />
+        <TextView
+            android:id="@+id/advertisementCardLearnMoreContent"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="5dp"
+            android:includeFontPadding="false"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:textColor="@color/button_text_accent"
+            app:drawableStartCompat="@drawable/ic_info_cicrle_filled_16"
+            app:drawableTint="@color/icon_accent"
+            app:layout_constraintStart_toStartOf="@+id/advertisementCardSubTitle"
+            app:layout_constraintTop_toBottomOf="@+id/advertisementCardSubTitle"
+            tools:text="@string/common_how_it_works" />
 
-    <io.novafoundation.nova.common.view.PrimaryButton
-        android:layout_width="0dp"
-        android:id="@+id/advertisementCardButton"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        app:appearance="primaryTransparent"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/advertisementCardLearnMoreContent"
-        app:layout_goneMarginTop="16dp"
-        tools:text="@string/common_continue"
-        tools:visibility="visible" />
+        <ImageView
+            android:id="@+id/advertisementCardLearnMoreArrow"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_chevron_right"
+            app:layout_constraintBottom_toBottomOf="@+id/advertisementCardLearnMoreContent"
+            app:layout_constraintStart_toEndOf="@+id/advertisementCardLearnMoreContent"
+            app:layout_constraintTop_toTopOf="@+id/advertisementCardLearnMoreContent"
+            app:tint="@color/icon_accent" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/advertisementCardLearnMoreGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="advertisementCardLearnMoreArrow,advertisementCardLearnMoreContent"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/advertisementCardClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:padding="12dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_close_circle_translucent"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/advertisementCardButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:visibility="gone"
+            app:appearance="primaryTransparent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/advertisementCardLearnMoreContent"
+            app:layout_goneMarginTop="16dp"
+            tools:text="@string/common_continue"
+            tools:visibility="visible" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </merge>

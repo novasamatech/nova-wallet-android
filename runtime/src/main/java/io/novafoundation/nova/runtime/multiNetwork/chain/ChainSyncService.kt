@@ -8,11 +8,11 @@ import io.novafoundation.nova.core_db.dao.FullAssetIdLocal
 import io.novafoundation.nova.core_db.ext.fullId
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal.Companion.ENABLED_DEFAULT_BOOL
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapExternalApisToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteAssetToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteChainToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteExplorersToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteNodesToLocal
-import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteTransferApisToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,7 +30,7 @@ class ChainSyncService(
             .filter { it.source == AssetSourceLocal.DEFAULT }
         val oldNodes = localChainsJoinedInfo.flatMap { it.nodes }
         val oldExplorers = localChainsJoinedInfo.flatMap { it.explorers }
-        val oldTransferApis = localChainsJoinedInfo.flatMap { it.transferHistoryApis }
+        val oldExternalApis = localChainsJoinedInfo.flatMap { it.externalApis }
 
         val associatedOldAssets = oldAssets.associateBy { it.fullId() }
 
@@ -43,22 +43,22 @@ class ChainSyncService(
                 mapRemoteAssetToLocal(chain, it, gson, oldAsset?.enabled ?: ENABLED_DEFAULT_BOOL)
             }
         }
-        val newNodes = remoteChains.flatMap { mapRemoteNodesToLocal(it) }
-        val newExplorers = remoteChains.flatMap { mapRemoteExplorersToLocal(it) }
-        val newTransferApis = remoteChains.flatMap { mapRemoteTransferApisToLocal(it) }
+        val newNodes = remoteChains.flatMap(::mapRemoteNodesToLocal)
+        val newExplorers = remoteChains.flatMap(::mapRemoteExplorersToLocal)
+        val newExternalApis = remoteChains.flatMap(::mapExternalApisToLocal)
 
         val chainsDiff = CollectionDiffer.findDiff(newChains, oldChains, forceUseNewItems = false)
         val assetDiff = CollectionDiffer.findDiff(newAssets, oldAssets, forceUseNewItems = false)
         val nodesDiff = CollectionDiffer.findDiff(newNodes, oldNodes, forceUseNewItems = false)
         val explorersDiff = CollectionDiffer.findDiff(newExplorers, oldExplorers, forceUseNewItems = false)
-        val transferApisDiff = CollectionDiffer.findDiff(newTransferApis, oldTransferApis, forceUseNewItems = false)
+        val externalApisDiff = CollectionDiffer.findDiff(newExternalApis, oldExternalApis, forceUseNewItems = false)
 
         chainDao.applyDiff(
             chainDiff = chainsDiff,
             assetsDiff = assetDiff,
             nodesDiff = nodesDiff,
             explorersDiff = explorersDiff,
-            transferApisDiff = transferApisDiff
+            externalApisDiff = externalApisDiff
         )
     }
 }

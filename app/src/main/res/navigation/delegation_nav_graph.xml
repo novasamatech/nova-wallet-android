@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/delegation_nav_graph"
+    app:startDestination="@id/delegateListFragment">
+
+    <include app:graph="@navigation/delegation_details_nav_graph" />
+
+    <fragment
+        android:id="@+id/delegateListFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list.DelegateListFragment"
+        android:label="DelegateListFragment"
+        tools:layout="@layout/fragment_delegate_list">
+
+        <action
+            android:id="@+id/action_delegateListFragment_to_delegateDetailsFragment"
+            app:destination="@id/delegation_details_nav_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_delegateListFragment_to_delegateSearchFragment"
+            app:destination="@id/delegateSearchFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/delegateSearchFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.search.DelegateSearchFragment"
+        android:label="DelegateSearchFragment"
+        tools:layout="@layout/fragment_delegate_search">
+
+        <action
+            android:id="@+id/action_delegateSearchFragment_to_delegateDetailsFragment"
+            app:destination="@id/delegation_details_nav_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+</navigation>

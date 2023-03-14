@@ -73,7 +73,7 @@ dependencies {
     api fearlessLibDep
 
     implementation coroutinesDep
-    implementation liveDataKtxDep
+    api liveDataKtxDep
     implementation lifeCycleKtxDep
 
     implementation viewModelKtxDep

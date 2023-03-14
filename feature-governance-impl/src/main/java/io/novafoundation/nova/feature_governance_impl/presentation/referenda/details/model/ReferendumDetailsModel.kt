@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.timeline.TimelineLayout
 import io.novafoundation.nova.feature_governance_impl.presentation.view.VotersModel
-import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVoteModel
+import io.novafoundation.nova.feature_governance_impl.presentation.view.YourMultiVoteModel
 
 class ReferendumDetailsModel(
     val track: ReferendumTrackModel?,
@@ -15,7 +15,7 @@ class ReferendumDetailsModel(
     val description: ShortenedTextModel?,
     val voting: ReferendumVotingModel?,
     val statusModel: ReferendumStatusModel,
-    val yourVote: YourVoteModel?,
+    val yourVote: YourMultiVoteModel?,
     val ayeVoters: VotersModel?,
     val nayVoters: VotersModel?,
     val timeEstimation: ReferendumTimeEstimation?,

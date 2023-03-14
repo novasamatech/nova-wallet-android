@@ -14,6 +14,8 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicSerializers
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.extrinsic.RealExtrinsicValidityUseCase
+import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
+import io.novafoundation.nova.runtime.extrinsic.multi.RealExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.DbRuntimeVersionsRepository
@@ -21,8 +23,10 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepo
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RemoteEventsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import io.novafoundation.nova.runtime.repository.BlockLimitsRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
+import io.novafoundation.nova.runtime.repository.RealBlockLimitsRepository
 import io.novafoundation.nova.runtime.repository.RealParachainInfoRepository
 import io.novafoundation.nova.runtime.repository.RealTotalIssuanceRepository
 import io.novafoundation.nova.runtime.repository.RemoteTimestampRepository
@@ -150,4 +154,17 @@ class RuntimeModule {
     fun provideTotalIssuanceRepository(
         @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
     ): TotalIssuanceRepository = RealTotalIssuanceRepository(localStorageSource)
+
+    @Provides
+    @ApplicationScope
+    fun provideBlockLimitsRepository(
+        @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
+    ): BlockLimitsRepository = RealBlockLimitsRepository(localStorageSource)
+
+    @Provides
+    @ApplicationScope
+    fun provideExtrinsicSplitter(
+        rpcCalls: RpcCalls,
+        blockLimitsRepository: BlockLimitsRepository,
+    ): ExtrinsicSplitter = RealExtrinsicSplitter(rpcCalls, blockLimitsRepository)
 }

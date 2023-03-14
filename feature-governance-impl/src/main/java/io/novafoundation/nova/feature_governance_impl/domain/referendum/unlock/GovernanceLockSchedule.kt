@@ -15,7 +15,14 @@ class GovernanceLocksOverview(
 
         class Claimable(val amount: Balance, val actions: List<ClaimSchedule.ClaimAction>) : Lock()
 
-        class Pending(val amount: Balance, val timer: TimerValue) : Lock()
+        class Pending(val amount: Balance, val claimTime: ClaimTime) : Lock()
+    }
+
+    sealed class ClaimTime {
+
+        class At(val timer: TimerValue) : ClaimTime()
+
+        object UntilAction : ClaimTime()
     }
 }
 

@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
@@ -24,19 +26,25 @@ class Web3WebViewClientFactory(
     fun create(
         webView: WebView,
         extensionStore: ExtensionsStore,
-        onPageChangedListener: OnPageChangedListener
+        onPageChangedListener: OnPageChangedListener,
+        pageCallback: PageCallback
     ): Web3WebViewClient {
-        return Web3WebViewClient(injectors, extensionStore, webView, onPageChangedListener)
+        return Web3WebViewClient(injectors, extensionStore, webView, onPageChangedListener, pageCallback)
     }
 }
 
 typealias OnPageChangedListener = (url: String, title: String?) -> Unit
 
+interface PageCallback {
+    fun handleBrowserIntent(intent: Intent)
+}
+
 class Web3WebViewClient(
     private val injectors: List<Web3Injector>,
     private val extensionStore: ExtensionsStore,
     private val webView: WebView,
-    private val onPageChangedListener: OnPageChangedListener
+    private val onPageChangedListener: OnPageChangedListener,
+    private val pageCallback: PageCallback
 ) : WebViewClient() {
 
     var desktopMode: Boolean = false
@@ -51,6 +59,18 @@ class Web3WebViewClient(
 
     fun initialInject() {
         injectors.forEach { it.initialInject(webView, extensionStore) }
+    }
+
+    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+        val url = request.url
+
+        if (url.scheme != "http" && url.scheme != "https") {
+            val tel = Intent(Intent.ACTION_VIEW, url)
+            pageCallback.handleBrowserIntent(tel)
+            return true
+        }
+
+        return super.shouldOverrideUrlLoading(view, request)
     }
 
     override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {

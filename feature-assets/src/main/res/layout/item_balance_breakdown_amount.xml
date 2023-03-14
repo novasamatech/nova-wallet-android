@@ -8,5 +8,5 @@
     android:paddingEnd="16dp"
     app:dividerVisible="false"
     app:primaryValueTextAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote.Primary"
-    app:secondaryValueTextAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1.Tertiary"
-    app:titleValueTextAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote.Tertiary" />
+    app:secondaryValueTextAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
+    app:titleValueTextAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary" />

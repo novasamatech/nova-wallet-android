@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    tools:background="@android:color/black">
+
+    <io.novafoundation.nova.common.view.input.chooser.ListChooserView
+        android:id="@+id/itemDelegateListFilters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="16dp"
+        app:listChooserView_label="@string/delegations_filter"
+        tools:listChooserView_value="All accounts" />
+
+
+    <io.novafoundation.nova.common.view.input.chooser.ListChooserView
+        android:id="@+id/itemDelegateListSorting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="16dp"
+        app:listChooserView_label="@string/common_sort_by"
+        tools:listChooserView_value="Delegations" />
+
+</FrameLayout>

@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
@@ -41,12 +42,14 @@ class ReferendumDetailsModule {
         referendaConstructor: ReferendaConstructor,
         preImageSizer: PreImageSizer,
         @ExtrinsicSerialization callFormatter: Gson,
+        identityRepository: OnChainIdentityRepository,
     ): ReferendumDetailsInteractor = RealReferendumDetailsInteractor(
         preImageParsers = callParsers,
         governanceSourceRegistry = governanceSourceRegistry,
         chainStateRepository = chainStateRepository,
         referendaConstructor = referendaConstructor,
         preImageSizer = preImageSizer,
-        callFormatter = callFormatter
+        callFormatter = callFormatter,
+        identityRepository = identityRepository,
     )
 }

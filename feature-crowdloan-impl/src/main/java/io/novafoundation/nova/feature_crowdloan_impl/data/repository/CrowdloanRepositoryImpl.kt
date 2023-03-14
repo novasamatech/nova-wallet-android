@@ -15,18 +15,19 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.LeasePeriodT
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.parachain.ParachainMetadataApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.parachain.mapParachainMetadataRemoteToParachainMetadata
+import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import java.math.BigInteger
 
 class CrowdloanRepositoryImpl(
     private val remoteStorage: StorageDataSource,
@@ -69,7 +70,7 @@ class CrowdloanRepositoryImpl(
 
     override suspend fun getParachainMetadata(chain: Chain): Map<ParaId, ParachainMetadata> {
         return withContext(Dispatchers.Default) {
-            chain.externalApi?.crowdloans?.let { section ->
+            chain.externalApi<Chain.ExternalApi.Crowdloans>()?.let { section ->
                 parachainMetadataApi.getParachainMetadata(section.url)
                     .associateBy { it.paraid }
                     .mapValues { (_, remoteMetadata) -> mapParachainMetadataRemoteToParachainMetadata(remoteMetadata) }

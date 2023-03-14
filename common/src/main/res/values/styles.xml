@@ -95,7 +95,15 @@
         <item name="android:textSize">12sp</item>
     </style>
 
-    <style name="TextAppearance.NovaFoundation.Regular.Caption1.Tertiary" parent="TextAppearance.NovaFoundation.Regular.Caption1">
+    <style name="TextAppearance.NovaFoundation.Regular.Caption1.Secondary">
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Regular.Caption2">
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Regular.Caption2.Secondary">
         <item name="android:textColor">@color/text_secondary</item>
     </style>
 
@@ -118,16 +126,20 @@
         <item name="lineHeight">18sp</item>
     </style>
 
-    <style name="TextAppearance.NovaFoundation.Regular.Footnote.Primary" parent="TextAppearance.NovaFoundation.Regular.Footnote">
+    <style name="TextAppearance.NovaFoundation.Regular.Footnote.Primary">
         <item name="android:textColor">@color/text_primary</item>
     </style>
 
-    <style name="TextAppearance.NovaFoundation.Regular.Footnote.Tertiary" parent="TextAppearance.NovaFoundation.Regular.Footnote">
+    <style name="TextAppearance.NovaFoundation.Regular.Footnote.Secondary">
         <item name="android:textColor">@color/text_secondary</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.SubHeadline">
         <item name="android:textSize">?attr/textSizeSubHeadline</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Regular.SubHeadline.Primary">
+        <item name="android:textColor">@color/text_primary</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.Title3" parent="TextAppearance.NovaFoundation.Regular">

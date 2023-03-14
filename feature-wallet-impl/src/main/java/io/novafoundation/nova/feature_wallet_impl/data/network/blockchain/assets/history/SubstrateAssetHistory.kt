@@ -12,10 +12,8 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.model.request.Sub
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi.Section
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi.TransferHistoryApi
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi.TransferHistoryApi.AssetType
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 abstract class SubstrateAssetHistory(
@@ -43,8 +41,8 @@ abstract class SubstrateAssetHistory(
     ): DataPage<Operation> {
         val substrateTransfersApi = chain.substrateTransfersApi()
 
-        return when (substrateTransfersApi?.apiType) {
-            Section.Type.SUBQUERY -> getOperationsSubQuery(
+        return if (substrateTransfersApi != null) {
+            getOperationsSubQuery(
                 pageSize = pageSize,
                 pageOffset = pageOffset,
                 filters = filters,
@@ -53,21 +51,20 @@ abstract class SubstrateAssetHistory(
                 chainAsset = chainAsset,
                 chain = chain
             )
-            else -> DataPage.empty()
+        } else {
+            DataPage.empty()
         }
     }
 
     override suspend fun getSyncedPageOffset(accountId: AccountId, chain: Chain, chainAsset: Chain.Asset): PageOffset {
         val substrateTransfersApi = chain.substrateTransfersApi()
 
-        return when (substrateTransfersApi?.apiType) {
-            Section.Type.SUBQUERY -> {
-                val cursor = cursorStorage.awaitCursor(chain.id, chainAsset.id, accountId)
+        return if (substrateTransfersApi != null) {
+            val cursor = cursorStorage.awaitCursor(chain.id, chainAsset.id, accountId)
 
-                PageOffset.CursorOrFull(cursor)
-            }
-
-            else -> PageOffset.FullData
+            PageOffset.CursorOrFull(cursor)
+        } else {
+            PageOffset.FullData
         }
     }
 
@@ -103,9 +100,7 @@ abstract class SubstrateAssetHistory(
         return DataPage(newPageOffset, operations)
     }
 
-    private fun Chain.substrateTransfersApi(): TransferHistoryApi? {
-        return externalApi?.history?.firstOrNull {
-            it.assetType == AssetType.SUBSTRATE
-        }
+    private fun Chain.substrateTransfersApi(): Chain.ExternalApi.Transfers.Substrate? {
+        return externalApi()
     }
 }

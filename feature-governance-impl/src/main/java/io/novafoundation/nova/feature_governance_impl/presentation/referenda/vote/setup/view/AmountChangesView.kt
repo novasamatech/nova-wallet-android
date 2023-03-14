@@ -8,16 +8,17 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.useAttributes
-import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.model.AmountChangeModel
 import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesDifference
 import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesFrom
+import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesFromGroup
 import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesIcon
 import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesTitle
 import kotlinx.android.synthetic.main.view_amount_changes.view.valueChangesTo
@@ -38,8 +39,13 @@ class AmountChangesView @JvmOverloads constructor(
         attrs?.let { applyAttributes(it) }
     }
 
-    fun setFrom(value: String) {
-        valueChangesFrom.text = value
+    fun setFrom(value: String?) {
+        if (value != null) {
+            valueChangesFrom.text = value
+            valueChangesFromGroup.makeVisible()
+        } else {
+            valueChangesFromGroup.makeGone()
+        }
     }
 
     fun setTo(value: String) {

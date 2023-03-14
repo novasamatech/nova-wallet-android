@@ -60,7 +60,6 @@ class PinCodeViewModel(
             is PinCodeAction.Create -> {
                 currentState = ScreenState.Creating
             }
-            is PinCodeAction.CheckAfterInactivity,
             is PinCodeAction.Check -> {
                 currentState = ScreenState.Checking
                 _showFingerPrintEvent.value = Event(Unit)
@@ -167,8 +166,7 @@ class PinCodeViewModel(
     private fun authSuccess() {
         when (pinCodeAction) {
             is PinCodeAction.Create -> router.openAfterPinCode(pinCodeAction.delayedNavigation)
-            is PinCodeAction.Check -> router.openAfterPinCode(pinCodeAction.delayedNavigation)
-            is PinCodeAction.CheckAfterInactivity -> {
+            is PinCodeAction.Check -> {
                 backgroundAccessObserver.onAccessed()
                 router.openAfterPinCode(pinCodeAction.delayedNavigation)
             }

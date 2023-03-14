@@ -8,7 +8,9 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumVoter
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votedFor
 import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.democracyRemoveVote
@@ -20,6 +22,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -75,8 +78,12 @@ class GovV1ConvictionVotingRepository(
         }
     }
 
-    override suspend fun votersOf(referendumId: ReferendumId, chainId: ChainId): List<ReferendumVoter> {
-        val allVotings = remoteStorageSource.query(chainId) {
+    override suspend fun votingFor(accountId: AccountId, chainId: ChainId, trackIds: Collection<TrackId>): Map<TrackId, Voting> {
+        unsupported()
+    }
+
+    override suspend fun votersOf(referendumId: ReferendumId, chain: Chain, type: VoteType): List<ReferendumVoter> {
+        val allVotings = remoteStorageSource.query(chain.id) {
             runtime.metadata.democracy().storage("VotingOf").entries(
                 keyExtractor = { it },
                 binding = { decoded, _ -> bindVoting(decoded!!) }
@@ -84,13 +91,14 @@ class GovV1ConvictionVotingRepository(
         }
 
         return allVotings.votersFor(referendumId)
+            .filter { it.vote.votedFor(type) }
     }
 
     override fun ExtrinsicBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable) {
         claimable.actions.forEach { claimAction ->
             when (claimAction) {
                 is ClaimSchedule.ClaimAction.RemoveVote -> {
-                    democracyRemoveVote(claimAction.referendumId)
+                    removeVote(claimAction.trackId, claimAction.referendumId)
                 }
 
                 is ClaimSchedule.ClaimAction.Unlock -> {
@@ -104,11 +112,19 @@ class GovV1ConvictionVotingRepository(
         democracyVote(referendumId, vote)
     }
 
+    override fun ExtrinsicBuilder.removeVote(trackId: TrackId, referendumId: ReferendumId) {
+        democracyRemoveVote(referendumId)
+    }
+
     private fun <T> T?.associatedWithTrack(): Map<TrackId, T> {
         return if (this != null) {
             mapOf(DemocracyTrackId to this)
         } else {
             emptyMap()
         }
+    }
+
+    private fun unsupported(): Nothing {
+        error("Unsupported operation for Governance 1 voting")
     }
 }

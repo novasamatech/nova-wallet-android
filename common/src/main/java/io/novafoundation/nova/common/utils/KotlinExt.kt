@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.math.BigDecimal
@@ -32,6 +33,8 @@ infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another)
 
 fun BigInteger.intSqrt() = sqrt(toDouble()).toLong().toBigInteger()
 
+operator fun BigInteger.times(double: Double): BigInteger = toBigDecimal().multiply(double.toBigDecimal()).toBigInteger()
+
 val BigDecimal.isZero: Boolean
     get() = signum() == 0
 
@@ -57,9 +60,11 @@ inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fol
     acc + extractor(element)
 }
 
+fun Iterable<BigInteger>.sum() = sumOf { it }
+
 suspend operator fun <T> Deferred<T>.invoke() = await()
 
-inline fun <T> List<T>.sumByBigDecimal(extractor: (T) -> BigDecimal) = fold(BigDecimal.ZERO) { acc, element ->
+inline fun <T> Iterable<T>.sumByBigDecimal(extractor: (T) -> BigDecimal) = fold(BigDecimal.ZERO) { acc, element ->
     acc + extractor(element)
 }
 
@@ -122,6 +127,10 @@ fun <T> List<T>.cycle(): Sequence<T> {
     var i = 0
 
     return generateSequence { this[i++ % this.size] }
+}
+
+inline fun <reified R> List<*>.findIsInstanceOrNull(): R? {
+    return find { it is R } as? R
 }
 
 inline fun <T> CoroutineScope.lazyAsync(context: CoroutineContext = EmptyCoroutineContext, crossinline producer: suspend () -> T) = lazy {
@@ -238,3 +247,11 @@ operator fun ByteArray.compareTo(other: ByteArray): Int {
 }
 
 fun ByteArrayComparator() = Comparator<ByteArray> { a, b -> a.compareTo(b) }
+
+inline fun CoroutineScope.withChildScope(action: CoroutineScope.() -> Unit) {
+    val childScope = childScope()
+
+    action(childScope)
+
+    childScope.cancel()
+}

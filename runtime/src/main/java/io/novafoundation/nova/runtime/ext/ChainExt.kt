@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.emptyEthereumAccountId
+import io.novafoundation.nova.common.utils.findIsInstanceOrNull
 import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -41,8 +42,9 @@ val Chain.isSubstrateBased
 val Chain.commissionAsset
     get() = utilityAsset
 
-val Chain.ExternalApi.GovernanceSection.polkassemblyParameters
-    get() = parameters as? Chain.ExternalApi.GovernanceSection.Parameters.Polkassembly
+inline fun <reified T : Chain.ExternalApi> Chain.externalApi(): T? {
+    return externalApis.findIsInstanceOrNull<T>()
+}
 
 val Chain.Asset.isUtilityAsset: Boolean
     get() = id == 0
@@ -183,6 +185,11 @@ object ChainGeneses {
 
     const val MOONBEAM = "fe58ea77779b7abda7da4ec526d14db9b1e9cd40a217c34892af80a9b332b76d"
     const val MOONRIVER = "401a1f9dca3da46f5c4091016c8a2f26dcea05865116b286f60f668207d1474b"
+
+    const val POLYMESH = "6fbd74e5e1d0a61d52ccfe9d4adaed16dd3a7caa37c6bc4d0c2fa12e8b2f4063"
+    const val CENTRIFUGE = "b3db41421702df9a7fcac62b53ffeac85f7853cc4e689e0b93aeb3db18c09d82"
+
+    const val XX_NETWORK = "50dd5d206917bf10502c68fb4d18a59fc8aa31586f4e8856b493e43544aa82aa"
 }
 
 val Chain.Companion.Geneses

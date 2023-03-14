@@ -17,15 +17,15 @@ sealed class PinCodeAction(open val toolbarConfiguration: ToolbarConfiguration) 
 
     @Parcelize
     open class Check(
-        val delayedNavigation: DelayedNavigation,
+        open val delayedNavigation: DelayedNavigation,
         override val toolbarConfiguration: ToolbarConfiguration
     ) : PinCodeAction(toolbarConfiguration)
 
     @Parcelize
     class CheckAfterInactivity(
-        val delayedNavigation: DelayedNavigation,
+        override val delayedNavigation: DelayedNavigation,
         override val toolbarConfiguration: ToolbarConfiguration
-    ) : PinCodeAction(toolbarConfiguration)
+    ) : Check(delayedNavigation, toolbarConfiguration)
 
     @Parcelize
     object Change :

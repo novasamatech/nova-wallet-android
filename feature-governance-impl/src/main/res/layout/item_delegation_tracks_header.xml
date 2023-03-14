@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="8dp"
+    tools:background="@color/secondary_screen_background">
+
+    <TextView
+        android:id="@+id/selectDelegationTracksTitle"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:paddingBottom="8dp"
+        android:text="@string/select_delegation_tracks_add_title"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/selectDelegationTracksDescription"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:text="@string/select_delegation_tracks_description"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintTop_toBottomOf="@id/selectDelegationTracksTitle" />
+
+    <TextView
+        android:id="@+id/selectDelegationTracksAvailableTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/select_delegation_tracks_available_tracks"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/selectDelegationTracksDescription" />
+
+    <ImageView
+        android:id="@+id/itemDelegationTracksUnavailableTracksLeftIcon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginEnd="4dp"
+        android:src="@drawable/ic_info_cicrle_filled_16"
+        app:layout_constraintBottom_toBottomOf="@+id/itemDelegationTracksUnavailableTracksText"
+        app:layout_constraintEnd_toStartOf="@+id/itemDelegationTracksUnavailableTracksText"
+        app:layout_constraintTop_toTopOf="@+id/itemDelegationTracksUnavailableTracksText"
+        app:tint="@color/icon_accent" />
+
+    <io.novafoundation.nova.common.view.ReadMoreView
+        android:id="@+id/itemDelegationTracksUnavailableTracksText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center_vertical"
+        android:text="@string/select_delegation_tracks_unavailable_tracks"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/selectDelegationTracksDescription" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/itemDelegationTracksUnavailableTracks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="itemDelegationTracksUnavailableTracksText,itemDelegationTracksUnavailableTracksLeftIcon" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/itemDelegationTracksDescriptionGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="selectDelegationTracksDescription, selectDelegationTracksAvailableTitle" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

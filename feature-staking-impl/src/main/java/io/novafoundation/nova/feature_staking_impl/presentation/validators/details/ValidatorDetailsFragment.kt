@@ -14,10 +14,10 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.addAfter
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.utils.sendEmailIntent
 import io.novafoundation.nova.common.view.AlertView
-import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.setModelOrHide
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.setupIdentityMixin
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
@@ -28,11 +28,6 @@ import kotlinx.android.synthetic.main.fragment_validator_details.validatorAccoun
 import kotlinx.android.synthetic.main.fragment_validator_details.validatorDetailsContainer
 import kotlinx.android.synthetic.main.fragment_validator_details.validatorDetailsToolbar
 import kotlinx.android.synthetic.main.fragment_validator_details.validatorIdentity
-import kotlinx.android.synthetic.main.fragment_validator_details.validatorIdentityElementName
-import kotlinx.android.synthetic.main.fragment_validator_details.validatorIdentityEmail
-import kotlinx.android.synthetic.main.fragment_validator_details.validatorIdentityLegalName
-import kotlinx.android.synthetic.main.fragment_validator_details.validatorIdentityTwitter
-import kotlinx.android.synthetic.main.fragment_validator_details.validatorIdentityWeb
 import kotlinx.android.synthetic.main.fragment_validator_details.validatorStakingEstimatedReward
 import kotlinx.android.synthetic.main.fragment_validator_details.validatorStakingMinimumStake
 import kotlinx.android.synthetic.main.fragment_validator_details.validatorStakingStakers
@@ -68,10 +63,6 @@ class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
 
         validatorStakingTotalStake.setOnClickListener { viewModel.totalStakeClicked() }
 
-        validatorIdentityEmail.setOnClickListener { viewModel.emailClicked() }
-        validatorIdentityWeb.setOnClickListener { viewModel.webClicked() }
-        validatorIdentityTwitter.setOnClickListener { viewModel.twitterClicked() }
-
         validatorAccountInfo.setOnClickListener { viewModel.accountActionsClicked() }
     }
 
@@ -87,6 +78,7 @@ class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
 
     override fun subscribe(viewModel: ValidatorDetailsViewModel) {
         setupExternalActions(viewModel)
+        setupIdentityMixin(viewModel.identityMixin, validatorIdentity)
 
         viewModel.stakeTargetDetails.observe { validator ->
             with(validator.stake) {
@@ -105,19 +97,7 @@ class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
                 }
             }
 
-            if (validator.identity == null) {
-                validatorIdentity.makeGone()
-            } else {
-                validatorIdentity.makeVisible()
-
-                with(validator.identity) {
-                    validatorIdentityLegalName.showValueOrHide(legal)
-                    validatorIdentityEmail.showValueOrHide(email)
-                    validatorIdentityTwitter.showValueOrHide(twitter)
-                    validatorIdentityElementName.showValueOrHide(riot)
-                    validatorIdentityWeb.showValueOrHide(web)
-                }
-            }
+            validatorIdentity.setModelOrHide(validator.identity)
 
             validatorAccountInfo.setAddressModel(validator.addressModel)
         }
@@ -127,10 +107,6 @@ class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel>() {
 
             val alertViews = alerts.map(::createAlertView)
             validatorDetailsContainer.addAfter(validatorAccountInfo, alertViews)
-        }
-
-        viewModel.openEmailEvent.observeEvent {
-            requireContext().sendEmailIntent(it)
         }
 
         viewModel.totalStakeEvent.observeEvent {

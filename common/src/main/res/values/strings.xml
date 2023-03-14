@@ -1,5 +1,131 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="common_some_tx_failed_title">Failed to submit some transactions</string>
+    <string name="common_some_tx_failed_message">There was an error while submitting some transactions. Do you want to retry?</string>
+
+    <string name="delegate_search_placeholder_default">Search result will be displayed here</string>
+    <string name="delegate_search_placeholder_empty">Address format is invalid. Make sure that address belongs to the right network</string>
+    <string name="delegate_search_result_count">search results: %d</string>
+    <string name="delegate_search_hint">Search by address or name</string>
+
+    <string name="assets_balance_details_locks_democrac_v1" translatable="false">Governance v1</string>
+    <string name="assets_balance_details_locks_democrac_v2" translatable="false">OpenGov</string>
+
+    <string name="staking_reward_payouts_payout_all">Pay out all (%s)</string>
+    <string name="staking_pending_rewards_subtitle">You can pay them out yourself, when they are close to expire, but you will pay the fee</string>
+
+    <string name="add_delegation_missing_account_message">You should add %s account to the wallet in order to delegate</string>
+
+    <string name="referendum_vote_abstain">Abstain</string>
+
+    <string name="delegation_revoke_hint_unlock">After the undelegating period has expired, you will need to unlock your tokens.</string>
+
+    <string name="delegation_edit_delegation">Edit delegation</string>
+    <string name="delegation_revoke_delegation">Revoke delegation</string>
+
+    <string name="select_delegation_tracks_add_title">Select tracks to add delegation</string>
+    <string name="select_delegation_tracks_revoke_title">Select tracks to revoke your delegation</string>
+    <string name="select_delegation_tracks_edit_title">Select tracks to edit delegation</string>
+
+    <string name="common_revoke">Revoke</string>
+
+    <string name="referendum_track_root">Main agenda</string>
+    <string name="referendum_whitelisted_caller">Fellowship: whitelist</string>
+    <string name="referendum_staking_admin">Staking</string>
+    <string name="referendum_track_treasurer">Treasury: any</string>
+    <string name="referendum_track_lease_admin">Governance: lease</string>
+    <string name="referendum_track_fellowship_admin">Fellowship: admin</string>
+    <string name="referendum_track_general_admin">Governance: registrar</string>
+    <string name="referendum_track_auction_admin">Crowdloans</string>
+    <string name="referendum_track_referendum_canceller">Governance: canceller</string>
+    <string name="referendum_track_referendum_killer">Governance: killer</string>
+    <string name="referendum_track_small_tipper">Treasury: small tips</string>
+    <string name="referendum_track_big_tipper">Treasury: big tips</string>
+    <string name="referendum_track_small_spender">Treasury: small spend</string>
+    <string name="referendum_track_medium_spender">Treasury: medium spend</string>
+    <string name="referendum_track_big_spender">Treasury: big spend</string>
+
+    <string name="delegation_referendum_vote">Your votes: %s via %s</string>
+    <string name="delegation_referendum_details_vote">Your votes via %s</string>
+
+    <string name="delegation_delegate">Delegate</string>
+    <string name="delegation_your_delegation">Your delegation</string>
+
+    <string name="delegation_delegate_hint_vote">Your votes will automatically vote alongside your delegates\' vote</string>
+    <string name="delegation_delegate_hint_unlock">Undelegating period will start after you revoke a delegation</string>
+
+    <string name="delegation_error_self_delegate_title">Cannot delegate to yourself</string>
+    <string name="delegation_error_self_delegate_message">You cannot delegate to yourself, please choose different address</string>
+
+    <string name="delegation_undelegating_period">Undelegating period</string>
+
+    <string name="delegation_multi_track_format">Across %s tracks</string>
+
+    <string name="delegation_remove_votes">Remove votes</string>
+    <string name="delegation_tracks">Tracks</string>
+
+    <string name="common_element_and_more_format">%s (+%s more)</string>
+
+    <string name="delegation_all_votes">Voted for all time</string>
+    <string name="delegation_delegate_info">Delegate info</string>
+
+    <string name="referendum_voted_referenda">Voted referenda</string>
+
+    <string name="referendum_other_votes">%s votes by %s</string>
+
+    <string name="delegation_your_delegations">Your delegations</string>
+
+    <string name="delegation_list_banner_title">Are you a Delegate?</string>
+    <string name="delegation_list_banner_description">Tell us more about yourself so Nova users get to know you better</string>
+    <string name="delegation_list_describe_yourself_action">Describe yourself</string>
+
+    <string name="common_sort_by">Sort by</string>
+
+    <string name="delegation_delegate_filter_all">All accounts</string>
+    <string name="delegation_delegate_filter_organizations">Organizations</string>
+    <string name="delegation_delegate_filter_individuals">Individuals</string>
+
+    <string name="delegation_add_delegation">Add delegation</string>
+
+    <string name="delegation_delegate_type_organization">Organization</string>
+    <string name="delegation_delegate_type_individual">Individual</string>
+
+    <string name="delegation_delegations">Delegations</string>
+    <string name="delegation_delegated_votes">Delegated votes</string>
+    <string name="delegation_recent_votes_format">Voted last %s</string>
+
+    <string name="delegation_sorting_delegations">Delegations</string>
+    <string name="delegation_sorting_delegated_votes">Delegated votes</string>
+    <string name="delegation_sorting_recent_votes_format">Voted last %s</string>
+
+    <string name="select_delegation_tracks_available_tracks">Available tracks</string>
+    <string name="select_delegation_tracks_unavailable_tracks">Unavailable tracks</string>
+    <string name="select_delegation_tracks_description">Please select the tracks in which you would like to delegate your voting power.</string>
+
+    <string name="delegation_tracks_all_preset">Select all</string>
+    <string name="delegation_tracks_treasury_preset">Treasury</string>
+    <string name="delegation_tracks_governance_preset">Governance</string>
+    <string name="delegation_tracks_fellowship_preset" translatable="false">Fellowship</string>
+
+    <string name="delegation_tracks_disabled_apply_button_text">Select at least 1 track...</string>
+    <string name="delegation_tracks_empty_list_placeholder">No tracks are available to delegate</string>
+
+    <string name="remove_votes_suggestion_title">Remove history of your votes?</string>
+    <plurals name="remove_votes_suggestion_description">
+        <item quantity="one" formatted="true">You have previously voted in referendums in %d track. In order to make this track available for delegation, you need to remove your existing votes.</item>
+        <item quantity="other" formatted="true">You have previously voted in referendums in %d tracks. In order to make these tracks available for delegation, you need to remove your existing votes.</item>
+    </plurals>
+
+    <string name="remove_votes_suggestion_button_text">Remove votes</string>
+
+    <string name="unavailable_tracks_title">Unavailable tracks</string>
+    <string name="unavailable_tracks_button_text">Remove votes in order to delegate in these tracks</string>
+
+    <string name="unavailable_tracks_voted_group">Tracks which you have existing votes in</string>
+    <string name="unavailable_tracks_delegated_group">Tracks that you have already delegated votes to</string>
+    <string name="delegate_more_tracks" translatable="false">+%d</string>
+
+    <string name="delegations_filter">Show</string>
 
     <string name="update_notification_item_version">Version %s</string>
 
@@ -81,7 +207,6 @@
 
     <string name="assets_manage_tokens_title">Manage tokens</string>
     <string name="assets_manage_tokens_all_networks">All networks</string>
-    <string name="assets_manage_tokens_partial_networks">%s (+%s more)</string>
 
     <string name="common_no_app_to_handle_import_intent">File import application not found on device. Please install it and try again</string>
 
@@ -174,22 +299,6 @@
     <string name="referendum_status_time_reject_in">Reject in %s</string>
     <string name="referendum_status_time_approve_in">Approve in %s</string>
     <string name="referendum_status_time_execute_in">Execute in %s</string>
-
-    <string name="referendum_track_root">main agenda</string>
-    <string name="referendum_whitelisted_caller">fellowship: whitelist</string>
-    <string name="referendum_staking_admin">staking</string>
-    <string name="referendum_track_treasurer">Treasury: ANY</string>
-    <string name="referendum_track_lease_admin">Governance: lease</string>
-    <string name="referendum_track_fellowship_admin">fellowship: admin</string>
-    <string name="referendum_track_general_admin">governance: registrar</string>
-    <string name="referendum_track_auction_admin">crowdloans</string>
-    <string name="referendum_track_referendum_canceller">governance: canceller</string>
-    <string name="referendum_track_referendum_killer">governance: killer</string>
-    <string name="referendum_track_small_tipper">Treasury: small tips</string>
-    <string name="referendum_track_big_tipper">Treasury: big tips</string>
-    <string name="referendum_track_small_spender">Treasury: Small spend</string>
-    <string name="referendum_track_medium_spender">Treasury: medium spend</string>
-    <string name="referendum_track_big_spender">Treasury: big spend</string>
 
     <string name="referendum_vote_aye">Aye</string>
     <string name="referendum_vote_nay">Nay</string>
@@ -353,7 +462,6 @@
     <string name="assets_select_send_your_wallets">Your wallets</string>
 
     <string name="assets_balance_details_locks_staking">Staking</string>
-    <string name="assets_balance_details_locks_democrac">Democracy</string>
     <string name="assets_balance_details_locks_vesting">Vesting</string>
     <string name="assets_balance_details_locks_phrelect">Elections</string>
 
@@ -591,7 +699,6 @@
     <string name="staking_set_controller_subtitle">Select another account as a controller to delegate staking management operations to it</string>
 
     <string name="staking_pending_rewards_title">Rewards are paid every 2–3 days by validators</string>
-    <string name="staking_pending_rewards_subtitle">You can payout them by yourself, when they are close to expire, but you will pay the fee</string>
 
     <string name="common_how_it_works">How it works</string>
     <string name="staking_payout">Payout</string>
@@ -1060,7 +1167,6 @@
 
     <string name="staking_reward_payouts_empty_rewards">Perfect! All rewards are paid.</string>
     <string name="staking_reward_payouts_empty_rewards_v2_2_0">Awesome! You have no unpaid rewards</string>
-    <string name="staking_reward_payouts_payout_all">Payout all (%s)</string>
     <string name="staking_reward_payouts_title">Pending rewards</string>
     <string name="staking_reward_payouts_title_v2_2_0">Unpaid rewards</string>
     <string name="staking_rewards_apy">Rewards (APY)</string>

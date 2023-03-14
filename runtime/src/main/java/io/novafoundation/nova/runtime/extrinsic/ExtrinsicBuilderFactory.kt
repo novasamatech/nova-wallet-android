@@ -24,9 +24,7 @@ class ExtrinsicBuilderFactory(
     suspend fun createForFee(
         chain: Chain,
     ): ExtrinsicBuilder {
-        val signer = FeeSigner(chain)
-
-        return create(chain, signer, signer.accountId())
+        return createMultiForFee(chain).first()
     }
 
     /**
@@ -37,25 +35,48 @@ class ExtrinsicBuilderFactory(
         signer: Signer,
         accountId: AccountId,
     ): ExtrinsicBuilder {
+        return createMulti(chain, signer, accountId).first()
+    }
+
+    suspend fun createMultiForFee(
+        chain: Chain,
+    ): Sequence<ExtrinsicBuilder> {
+        val signer = FeeSigner(chain)
+
+        return createMulti(chain, signer, signer.accountId())
+    }
+
+    suspend fun createMulti(
+        chain: Chain,
+        signer: Signer,
+        accountId: AccountId,
+    ): Sequence<ExtrinsicBuilder> {
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val accountAddress = chain.addressOf(accountId)
 
-        val nonce = rpcCalls.getNonce(chain.id, accountAddress)
         val runtimeVersion = rpcCalls.getRuntimeVersion(chain.id)
         val mortality = mortalityConstructor.constructMortality(chain.id)
 
-        return ExtrinsicBuilder(
-            tip = chain.additional?.defaultTip.orZero(),
-            runtime = runtime,
-            nonce = nonce,
-            runtimeVersion = runtimeVersion,
-            genesisHash = chain.genesisHash.fromHex(),
-            blockHash = mortality.blockHash.fromHex(),
-            era = mortality.era,
-            customSignedExtensions = CustomSignedExtensions.extensionsWithValues(runtime),
-            signer = signer,
-            accountId = accountId
-        )
+        var nonce = rpcCalls.getNonce(chain.id, accountAddress)
+
+        return generateSequence {
+            val newElement = ExtrinsicBuilder(
+                tip = chain.additional?.defaultTip.orZero(),
+                runtime = runtime,
+                nonce = nonce,
+                runtimeVersion = runtimeVersion,
+                genesisHash = chain.genesisHash.fromHex(),
+                blockHash = mortality.blockHash.fromHex(),
+                era = mortality.era,
+                customSignedExtensions = CustomSignedExtensions.extensionsWithValues(runtime),
+                signer = signer,
+                accountId = accountId
+            )
+
+            nonce++
+
+            newElement
+        }
     }
 }

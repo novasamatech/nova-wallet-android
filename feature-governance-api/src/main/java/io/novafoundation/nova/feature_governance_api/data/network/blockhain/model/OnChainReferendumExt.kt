@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.divideToDecimal
+import io.novafoundation.nova.common.utils.filterValuesIsInstance
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting.Approval
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -68,6 +69,16 @@ fun Map<TrackId, Voting>.flattenCastingVotes(): Map<ReferendumId, AccountVote> {
             is Voting.Delegating -> emptyList()
         }
     }.toMap()
+}
+
+fun Map<TrackId, Voting>.delegations(to: AccountId? = null): Map<TrackId, Voting.Delegating> {
+    val onlyDelegations = filterValuesIsInstance<TrackId, Voting.Delegating>()
+
+    return if (to != null) {
+        onlyDelegations.filterValues { it.target.contentEquals(to) }
+    } else {
+        onlyDelegations
+    }
 }
 
 val OnChainReferendumStatus.Ongoing.proposer: AccountId?

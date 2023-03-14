@@ -15,4 +15,8 @@ interface DialogExtensions {
             dialogInterface.dismiss()
         }
     }
+
+    fun View.dismissOnClick() {
+        setOnClickListener { dialogInterface.dismiss() }
+    }
 }

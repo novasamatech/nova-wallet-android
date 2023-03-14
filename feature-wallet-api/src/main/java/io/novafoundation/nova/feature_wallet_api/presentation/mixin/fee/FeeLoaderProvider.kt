@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
 import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -12,6 +13,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -91,6 +93,12 @@ class FeeLoaderProvider(
                 resourceManager.getString(R.string.fee_not_yet_loaded_message)
             )
         }
+    }
+
+    override suspend fun awaitFee(): BigDecimal {
+        return feeLiveData.asFlow()
+            .filterIsInstance<FeeStatus.Loaded>()
+            .first().feeModel.fee
     }
 
     override fun requireOptionalFee(

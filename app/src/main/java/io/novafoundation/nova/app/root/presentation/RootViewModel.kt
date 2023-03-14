@@ -55,6 +55,7 @@ class RootViewModel(
 
     private fun checkForUpdates() {
         launch {
+            updateNotificationsInteractor.loadVersions()
             updateNotificationsInteractor.waitPermissionToUpdate()
             if (updateNotificationsInteractor.hasImportantUpdates()) {
                 rootRouter.openUpdateNotifications()
