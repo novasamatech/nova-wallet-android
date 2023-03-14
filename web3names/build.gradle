@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
+    namespace 'io.novafoundation.nova.web3names'
     compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
@@ -10,24 +11,12 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/chains/v8/chains_dev.json\""
-        buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/assets/evm/v1/assets_dev.json\""
-
-        buildConfigField "String", "TEST_CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/tests/chains_for_testBalance.json\""
     }
 
     buildTypes {
-        debug {
-
-        }
-
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
-            buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/chains/v8/chains.json\""
-            buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/assets/evm/v1/assets.json\""
         }
     }
 
@@ -41,11 +30,8 @@ dependencies {
 
     implementation project(":common")
     implementation project(":core-db")
-
+    implementation project(":runtime")
     implementation project(":core-api")
-
-    implementation gsonDep
-    implementation fearlessLibDep
 
     implementation kotlinDep
 
@@ -57,8 +43,6 @@ dependencies {
     kapt daggerKapt
 
     testImplementation project(':test-shared')
-
-    implementation lifeCycleKtxDep
 
     androidTestImplementation androidTestRunnerDep
     androidTestImplementation androidTestRulesDep
