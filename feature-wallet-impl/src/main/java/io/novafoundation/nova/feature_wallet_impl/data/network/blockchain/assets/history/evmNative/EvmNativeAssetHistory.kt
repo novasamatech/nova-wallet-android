@@ -1,15 +1,22 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.evmNative
 
-import io.novafoundation.nova.common.data.model.DataPage
-import io.novafoundation.nova.common.data.model.PageOffset
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.ethereumAddressToAccountId
 import io.novafoundation.nova.common.utils.removeHexPrefix
+import io.novafoundation.nova.common.utils.splitSnakeOrCamelCase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
+import io.novafoundation.nova.feature_wallet_impl.R
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.EvmAssetHistory
+import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanTransactionsApi
+import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanNormalTxResponse
+import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.feeUsed
+import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.isTransfer
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.ethereumApi
@@ -19,11 +26,37 @@ import org.web3j.protocol.core.methods.response.EthBlock
 import org.web3j.protocol.core.methods.response.EthBlock.TransactionResult
 import org.web3j.protocol.core.methods.response.Transaction
 import org.web3j.protocol.core.methods.response.TransactionReceipt
+import java.math.BigInteger
 import kotlin.jvm.optionals.getOrNull
+import kotlin.time.Duration.Companion.seconds
 
 class EvmNativeAssetHistory(
     private val chainRegistry: ChainRegistry,
-) : AssetHistory {
+    private val etherscanTransactionsApi: EtherscanTransactionsApi,
+    private val resourceManager: ResourceManager,
+) : EvmAssetHistory() {
+
+    override suspend fun fetchEtherscanOperations(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId,
+        apiUrl: String,
+        page: Int,
+        pageSize: Int,
+    ): List<Operation> {
+        val accountAddress = chain.addressOf(accountId)
+
+        val response = etherscanTransactionsApi.getNormalTxsHistory(
+            baseUrl = apiUrl,
+            accountAddress = accountAddress,
+            pageNumber = page,
+            pageSize = pageSize,
+            chainId = chain.id
+        )
+
+        return response.result
+            .map { mapRemoteNormalTxToOperation(it, chainAsset, accountAddress) }
+    }
 
     @OptIn(ExperimentalStdlibApi::class)
     @Suppress("UNCHECKED_CAST")
@@ -62,34 +95,8 @@ class EvmNativeAssetHistory(
         return setOf(TransactionFilter.TRANSFER, TransactionFilter.EXTRINSIC)
     }
 
-    override suspend fun additionalFirstPageSync(
-        chain: Chain,
-        chainAsset: Chain.Asset,
-        accountId: AccountId,
-        page: DataPage<Operation>
-    ) {
-        // TODO Evm native asset tx history
-    }
-
-    override suspend fun getOperations(
-        pageSize: Int,
-        pageOffset: PageOffset.Loadable,
-        filters: Set<TransactionFilter>,
-        accountId: AccountId,
-        chain: Chain,
-        chainAsset: Chain.Asset
-    ): DataPage<Operation> {
-        // TODO Evm native asset tx history
-        return DataPage.empty()
-    }
-
-    override suspend fun getSyncedPageOffset(accountId: AccountId, chain: Chain, chainAsset: Chain.Asset): PageOffset {
-        // TODO Evm native asset tx history
-        return PageOffset.FullData
-    }
-
     private fun TransactionReceipt?.extrinsicStatus(): ExtrinsicStatus {
-        return when(this?.isStatusOK){
+        return when (this?.isStatusOK) {
             true -> ExtrinsicStatus.SUCCESS
             false -> ExtrinsicStatus.FAILURE
             null -> ExtrinsicStatus.UNKNOWN
@@ -102,5 +109,75 @@ class EvmNativeAssetHistory(
 
     private fun String.ethAccountIdMatches(other: AccountId): Boolean {
         return ethereumAddressToAccountId().contentEquals(other)
+    }
+
+    private fun mapRemoteNormalTxToOperation(
+        remote: EtherscanNormalTxResponse,
+        chainAsset: Chain.Asset,
+        accountAddress: String,
+    ): Operation {
+        val type = if (remote.isTransfer) {
+            mapNativeTransferToTransfer(remote, accountAddress)
+        } else {
+            mapContractCallToExtrinsic(remote)
+        }
+
+        return Operation(
+            id = remote.hash,
+            address = accountAddress,
+            type = type,
+            time = remote.timeStamp.seconds.inWholeMilliseconds,
+            chainAsset = chainAsset
+        )
+    }
+
+    private fun mapNativeTransferToTransfer(
+        remote: EtherscanNormalTxResponse,
+        accountAddress: String,
+    ): Operation.Type.Transfer {
+        return Operation.Type.Transfer(
+            hash = remote.hash,
+            myAddress = accountAddress,
+            amount = remote.value,
+            receiver = remote.to,
+            sender = remote.from,
+            status = remote.operationStatus(),
+            fee = remote.feeUsed,
+        )
+    }
+
+    private fun mapContractCallToExtrinsic(
+        remote: EtherscanNormalTxResponse,
+    ): Operation.Type.Extrinsic {
+        return Operation.Type.Extrinsic(
+            hash = remote.hash,
+            module = resourceManager.getString(R.string.ethereum_contract_call),
+            call = remote.formattedCall(),
+            status = remote.operationStatus(),
+            fee = remote.feeUsed,
+        )
+    }
+
+    private fun EtherscanNormalTxResponse.formattedCall(): String {
+        return if (functionName.isNotEmpty()) {
+            val withoutArguments = functionName.split("(").first()
+            withoutArguments.callToCapitalizedWords()
+        } else {
+            to
+        }
+    }
+
+    private fun EtherscanNormalTxResponse.operationStatus(): Operation.Status {
+        return if (txReceiptStatus == BigInteger.ONE) {
+            Operation.Status.COMPLETED
+        } else {
+            Operation.Status.FAILED
+        }
+    }
+
+    private fun String.callToCapitalizedWords(): String {
+        val split = splitSnakeOrCamelCase()
+
+        return split.joinToString(separator = " ") { it.capitalize() }
     }
 }

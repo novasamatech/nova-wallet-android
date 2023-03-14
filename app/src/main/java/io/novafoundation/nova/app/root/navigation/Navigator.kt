@@ -48,6 +48,8 @@ import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.Ma
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.RewardDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer.TransferDetailFragment
+import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterFragment
+import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.ConfirmContributeFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
@@ -347,9 +349,10 @@ class Navigator(
         navController?.navigate(R.id.open_validator_details, ValidatorDetailsFragment.getBundle(payload))
     }
 
-    override fun openFilter() {
-        navController?.navigate(R.id.action_mainFragment_to_filterFragment)
-    }
+    override fun openFilter(payload: TransactionHistoryFilterPayload) = performNavigation(
+        actionId = R.id.action_mainFragment_to_filterFragment,
+        args = TransactionHistoryFilterFragment.getBundle(payload)
+    )
 
     override fun openSend(assetPayload: AssetPayload, initialRecipientAddress: String?) {
         val extras = SelectSendFragment.getBundle(assetPayload, initialRecipientAddress)

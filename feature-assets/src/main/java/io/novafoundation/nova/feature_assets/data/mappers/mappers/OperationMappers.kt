@@ -66,13 +66,6 @@ private fun mapStatusToStatusAppearance(status: Operation.Status): OperationStat
     }
 }
 
-private val CAMEL_CASE_REGEX = "(?<=[a-z])(?=[A-Z])".toRegex()
-
-private fun String.camelCaseToCapitalizedWords() = CAMEL_CASE_REGEX.split(this).joinToString(separator = " ") { it.capitalize() }
-
-private fun Operation.Type.Extrinsic.formattedCall() = call.camelCaseToCapitalizedWords()
-private fun Operation.Type.Extrinsic.formattedModule() = module.camelCaseToCapitalizedWords()
-
 @DrawableRes
 private fun transferDirectionIcon(isIncome: Boolean): Int {
     return if (isIncome) R.drawable.ic_arrow_down else R.drawable.ic_arrow_up
@@ -133,10 +126,10 @@ suspend fun mapOperationToOperationModel(
                     formattedTime = formattedTime,
                     amount = formatFee(chainAsset, operationType),
                     amountColorRes = amountColor,
-                    header = operationType.formattedCall(),
+                    header = operationType.call,
                     statusAppearance = statusAppearance,
                     operationIcon = operation.chainAsset.iconUrl?.asIcon() ?: R.drawable.ic_nova.asIcon(),
-                    subHeader = operationType.formattedModule()
+                    subHeader = operationType.module
                 )
             }
         }
@@ -197,8 +190,8 @@ suspend fun mapOperationToParcel(
                     time = time,
                     originAddress = address,
                     hash = operationType.hash,
-                    module = operationType.formattedModule(),
-                    call = operationType.formattedCall(),
+                    module = operationType.module,
+                    call = operationType.call,
                     fee = formatFee(chainAsset, operationType),
                     statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus)
                 )

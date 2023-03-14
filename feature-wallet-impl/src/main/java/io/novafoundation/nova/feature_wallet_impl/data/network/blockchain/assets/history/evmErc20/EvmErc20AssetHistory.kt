@@ -1,28 +1,43 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.evmErc20
 
-import io.novafoundation.nova.common.data.model.DataPage
-import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.EvmAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanTransactionsApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanAccountTransfer
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.feeUsed
 import io.novafoundation.nova.runtime.ext.addressOf
-import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.ext.requireErc20
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlin.time.Duration.Companion.seconds
 
-private const val FIRST_PAGE_INDEX = 1
-private const val SECOND_PAGE_INDEX = 2
-
 class EvmErc20AssetHistory(
     private val etherscanTransactionsApi: EtherscanTransactionsApi,
-) : AssetHistory {
+) : EvmAssetHistory() {
+    override suspend fun fetchEtherscanOperations(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId,
+        apiUrl: String,
+        page: Int,
+        pageSize: Int,
+    ): List<Operation> {
+        val erc20Config = chainAsset.requireErc20()
+        val accountAddress = chain.addressOf(accountId)
+
+        val response = etherscanTransactionsApi.getErc20Transfers(
+            baseUrl = apiUrl,
+            contractAddress = erc20Config.contractAddress,
+            accountAddress = accountAddress,
+            pageNumber = page,
+            pageSize = pageSize,
+            chainId = chain.id
+        )
+
+        return response.result.map { mapRemoteTransferToOperation(it, chainAsset, accountAddress) }
+    }
 
     override suspend fun fetchOperationsForBalanceChange(
         chain: Chain,
@@ -36,88 +51,6 @@ class EvmErc20AssetHistory(
 
     override fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter> {
         return setOf(TransactionFilter.TRANSFER)
-    }
-
-    override suspend fun additionalFirstPageSync(
-        chain: Chain,
-        chainAsset: Chain.Asset,
-        accountId: AccountId,
-        page: DataPage<Operation>
-    ) {
-        // we don't need anything extra
-    }
-
-    override suspend fun getOperations(
-        pageSize: Int,
-        pageOffset: PageOffset.Loadable,
-        filters: Set<TransactionFilter>,
-        accountId: AccountId,
-        chain: Chain,
-        chainAsset: Chain.Asset
-    ): DataPage<Operation> {
-        val evmTransfersApi = chain.evmTransfersApi()
-
-        return if (evmTransfersApi != null) {
-            getOperationsEtherscan(
-                pageSize = pageSize,
-                pageOffset = pageOffset,
-                accountId = accountId,
-                chain = chain,
-                chainAsset = chainAsset,
-                apiUrl = evmTransfersApi.url
-            )
-        } else {
-            DataPage.empty()
-        }
-    }
-
-    override suspend fun getSyncedPageOffset(accountId: AccountId, chain: Chain, chainAsset: Chain.Asset): PageOffset {
-        val evmTransfersApi = chain.evmTransfersApi()
-
-        return if (evmTransfersApi != null) {
-            PageOffset.Loadable.PageNumber(page = SECOND_PAGE_INDEX)
-        } else {
-            PageOffset.FullData
-        }
-    }
-
-    private fun Chain.evmTransfersApi(): ExternalApi.Transfers.Evm? {
-        return externalApi()
-    }
-
-    private suspend fun getOperationsEtherscan(
-        pageSize: Int,
-        pageOffset: PageOffset.Loadable,
-        accountId: AccountId,
-        chain: Chain,
-        chainAsset: Chain.Asset,
-        apiUrl: String
-    ): DataPage<Operation> {
-        val page = when (pageOffset) {
-            PageOffset.Loadable.FirstPage -> FIRST_PAGE_INDEX
-            is PageOffset.Loadable.PageNumber -> pageOffset.page
-            else -> error("Etherscan requires page number pagination")
-        }
-        val erc20Config = chainAsset.requireErc20()
-        val accountAddress = chain.addressOf(accountId)
-
-        val response = etherscanTransactionsApi.getOperationsHistory(
-            baseUrl = apiUrl,
-            contractAddress = erc20Config.contractAddress,
-            accountAddress = accountAddress,
-            pageNumber = page,
-            pageSize = pageSize,
-            chainId = chain.id
-        )
-
-        val operations = response.result.map { mapRemoteTransferToOperation(it, chainAsset, accountAddress) }
-        val newPageOffset = if (response.result.size < pageSize) {
-            PageOffset.FullData
-        } else {
-            PageOffset.Loadable.PageNumber(page + 1)
-        }
-
-        return DataPage(newPageOffset, operations)
     }
 
     private fun mapRemoteTransferToOperation(

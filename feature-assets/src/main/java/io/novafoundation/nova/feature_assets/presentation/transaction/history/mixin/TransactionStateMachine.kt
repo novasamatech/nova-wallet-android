@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 
 object TransactionStateMachine {
 
-    const val PAGE_SIZE = 100
+    const val PAGE_SIZE = 25
     private const val SCROLL_OFFSET = PAGE_SIZE / 2
 
     sealed class State(
@@ -147,38 +147,70 @@ object TransactionStateMachine {
                     is State.EmptyProgress -> {
                         when {
                             action.loadedWith != state.usedFilters -> state // not relevant anymore page has arrived, still loading
-                            page.isEmpty() -> State.Empty(
+
+                            nextPageOffset is PageOffset.FullData && page.isEmpty() -> State.Empty(
                                 allAvailableFilters = state.allAvailableFilters,
                                 usedFilters = state.usedFilters
                             )
-                            nextPageOffset is PageOffset.Loadable -> State.Data(
-                                nextPageOffset = nextPageOffset,
+
+                            nextPageOffset is PageOffset.FullData && page.isNotEmpty() -> State.FullData(
                                 data = page,
                                 allAvailableFilters = state.allAvailableFilters,
                                 usedFilters = state.usedFilters
                             )
-                            else -> State.FullData(
-                                data = page,
-                                allAvailableFilters = state.allAvailableFilters,
-                                usedFilters = state.usedFilters
-                            )
+
+                            nextPageOffset is PageOffset.Loadable -> {
+                                // we didn't load enough items but can load more -> trigger next page automatically
+                                if (page.items.size < PAGE_SIZE) {
+                                    sideEffectListener(SideEffect.LoadPage(nextPageOffset, state.usedFilters))
+
+                                    State.NewPageProgress(
+                                        nextPageOffset = nextPageOffset,
+                                        data = page,
+                                        allAvailableFilters = state.allAvailableFilters,
+                                        usedFilters = state.usedFilters
+                                    )
+                                } else {
+                                    State.Data(
+                                        nextPageOffset = nextPageOffset,
+                                        data = page,
+                                        allAvailableFilters = state.allAvailableFilters,
+                                        usedFilters = state.usedFilters
+                                    )
+                                }
+                            }
+
+                            else -> error("Checked all cases of sealed class PageOffset QED")
                         }
                     }
 
                     is State.NewPageProgress -> {
-                        when {
-                            page.isEmpty() -> State.FullData(
-                                data = state.data,
-                                allAvailableFilters = state.allAvailableFilters,
-                                usedFilters = state.usedFilters
-                            )
-                            nextPageOffset is PageOffset.Loadable -> State.Data(
-                                nextPageOffset = nextPageOffset,
-                                data = state.data + page,
-                                allAvailableFilters = state.allAvailableFilters,
-                                usedFilters = state.usedFilters
-                            )
-                            else -> State.FullData(
+                        when(nextPageOffset) {
+                            is PageOffset.Loadable -> {
+                                val newData = state.data + page
+
+                                // we want to load at least one complete page without user scrolling
+                                // we also don't wont to stop loading if no relevant items were fetched
+                                if (newData.size < PAGE_SIZE || page.isEmpty()) {
+                                    sideEffectListener(SideEffect.LoadPage(nextPageOffset, state.usedFilters))
+
+                                    State.NewPageProgress(
+                                        nextPageOffset = nextPageOffset,
+                                        data = newData,
+                                        allAvailableFilters = state.allAvailableFilters,
+                                        usedFilters = state.usedFilters
+                                    )
+                                } else {
+                                    State.Data(
+                                        nextPageOffset = nextPageOffset,
+                                        data = newData,
+                                        allAvailableFilters = state.allAvailableFilters,
+                                        usedFilters = state.usedFilters
+                                    )
+                                }
+                            }
+
+                            PageOffset.FullData -> State.FullData(
                                 data = state.data + page,
                                 allAvailableFilters = state.allAvailableFilters,
                                 usedFilters = state.usedFilters

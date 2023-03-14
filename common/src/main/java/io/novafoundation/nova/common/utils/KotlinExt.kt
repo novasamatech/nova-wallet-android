@@ -159,6 +159,20 @@ fun String.formatNamed(vararg values: Pair<String, String>) = formatNamed(values
 
 fun String.capitalize() = this.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
 
+private const val CAMEL_CASE_REGEX_STRING = "(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])" // https://stackoverflow.com/a/7599674
+private val CAMEL_CASE_REGEX = CAMEL_CASE_REGEX_STRING.toRegex()
+
+private const val SNAKE_CASE_REGEX_STRING = "_"
+fun String.splitCamelCase() = CAMEL_CASE_REGEX.split(this)
+
+fun String.splitSnakeCase() = split(SNAKE_CASE_REGEX_STRING)
+
+fun String.splitSnakeOrCamelCase() = if (contains(SNAKE_CASE_REGEX_STRING)) {
+    splitSnakeCase()
+} else {
+    splitCamelCase()
+}
+
 /**
  * Replaces all parts in form of '{name}' to the corresponding value from values using 'name' as a key.
  *
