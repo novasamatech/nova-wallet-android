@@ -7,4 +7,4 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class TransactionHistoryFilterPayload(
     val assetPayload: AssetPayload,
-): Parcelable
+) : Parcelable

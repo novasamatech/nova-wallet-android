@@ -12,7 +12,7 @@ class EtherscanNormalTxResponse(
     val value: BigInteger,
     val input: String,
     val functionName: String,
-    @SerializedName("txreceipt_status" )val txReceiptStatus: BigInteger,
+    @SerializedName("txreceipt_status")val txReceiptStatus: BigInteger,
     override val gasPrice: BigInteger,
     override val gasUsed: BigInteger,
 ) : WithEvmFee

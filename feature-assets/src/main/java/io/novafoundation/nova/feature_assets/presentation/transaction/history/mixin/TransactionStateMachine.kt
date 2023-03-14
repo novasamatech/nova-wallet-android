@@ -185,7 +185,7 @@ object TransactionStateMachine {
                     }
 
                     is State.NewPageProgress -> {
-                        when(nextPageOffset) {
+                        when (nextPageOffset) {
                             is PageOffset.Loadable -> {
                                 val newData = state.data + page
 

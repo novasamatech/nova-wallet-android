@@ -51,13 +51,12 @@ data class Operation(
     }
 }
 
-
 fun Operation.Type.satisfies(filters: Set<TransactionFilter>): Boolean {
     return matchingTransactionFilter() in filters
 }
 
 private fun Operation.Type.matchingTransactionFilter(): TransactionFilter {
-    return when(this) {
+    return when (this) {
         is Operation.Type.Extrinsic -> TransactionFilter.EXTRINSIC
         is Operation.Type.Reward -> TransactionFilter.REWARD
         is Operation.Type.Transfer -> TransactionFilter.TRANSFER

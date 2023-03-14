@@ -10,4 +10,4 @@ class EtherscanAccountTransfer(
     val value: BigInteger,
     override val gasPrice: BigInteger,
     override val gasUsed: BigInteger,
-): WithEvmFee
+) : WithEvmFee

@@ -27,7 +27,7 @@ class HistoryFiltersProviderFactory(
         chainId: ChainId,
         chainAssetId: ChainAssetId,
     ): HistoryFiltersProvider {
-        val key = "$FILTERS__PROVIDER_TAG:${chainId}:${chainAssetId}"
+        val key = "$FILTERS__PROVIDER_TAG:$chainId:$chainAssetId"
 
         return computationalCache.useCache(key, scope) {
             val chainAsset = chainRegistry.asset(chainId, chainAssetId)
