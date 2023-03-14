@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.search.RealDelegateSearchInteractor
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.DelegatesSharedComputation
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.search.DelegateSearchViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -25,9 +26,11 @@ class DelegateSearchModule {
     fun provideDelegateListInteractor(
         delegateCommonRepository: DelegateCommonRepository,
         identityRepository: OnChainIdentityRepository,
+        delegatesSharedComputation: DelegatesSharedComputation
     ): DelegateSearchInteractor = RealDelegateSearchInteractor(
         identityRepository = identityRepository,
-        delegateCommonRepository = delegateCommonRepository
+        delegateCommonRepository = delegateCommonRepository,
+        delegatesSharedComputation = delegatesSharedComputation
     )
 
     @Provides
