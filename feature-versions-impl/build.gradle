@@ -64,5 +64,5 @@ dependencies {
     implementation lifecycleDep
     kapt lifecycleKapt
 
-    testImplementation jUnitDep
+    testImplementation project(":test-shared")
 }
