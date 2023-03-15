@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.ethereum
 
+import android.util.Log
 import io.reactivex.Observable
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import jp.co.soramitsu.fearless_utils.wsrpc.request.DeliveryType
@@ -45,11 +46,15 @@ fun SocketService.executeBatchRequestAsFuture(
         }
 
         override fun onNext(response: List<RpcResponse>) {
+            if (response.size <= 2) {
+                Log.d("RX", "executeBatchRequestAsFuture: Received USDT batch response")
+            }
+
             future.complete(response)
         }
     }
 
-    future.cancellable = executeBatchRequest(requests, deliveryType, callback)
+    future.cancellable = executeAccumulatingBatchRequest(requests, deliveryType, callback)
 
     return future
 }
