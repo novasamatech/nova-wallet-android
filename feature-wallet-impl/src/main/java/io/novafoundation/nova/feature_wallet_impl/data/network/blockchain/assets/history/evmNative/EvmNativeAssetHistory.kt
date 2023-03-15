@@ -1,14 +1,12 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.evmNative
 
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.ethereumAddressToAccountId
 import io.novafoundation.nova.common.utils.removeHexPrefix
-import io.novafoundation.nova.common.utils.splitSnakeOrCamelCase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
-import io.novafoundation.nova.feature_wallet_impl.R
+import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.EvmAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanTransactionsApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanNormalTxResponse
@@ -151,33 +149,19 @@ class EvmNativeAssetHistory(
     ): Operation.Type.Extrinsic {
         return Operation.Type.Extrinsic(
             hash = remote.hash,
-            module = resourceManager.getString(R.string.ethereum_contract_call),
-            call = remote.formattedCall(),
+            content = Content.ContractCall(
+                contractAddress = remote.to,
+                function = remote.functionName,
+            ),
             status = remote.operationStatus(),
             fee = remote.feeUsed,
         )
     }
-
-    private fun EtherscanNormalTxResponse.formattedCall(): String {
-        return if (functionName.isNotEmpty()) {
-            val withoutArguments = functionName.split("(").first()
-            withoutArguments.callToCapitalizedWords()
-        } else {
-            to
-        }
-    }
-
     private fun EtherscanNormalTxResponse.operationStatus(): Operation.Status {
         return if (txReceiptStatus == BigInteger.ONE) {
             Operation.Status.COMPLETED
         } else {
             Operation.Status.FAILED
         }
-    }
-
-    private fun String.callToCapitalizedWords(): String {
-        val split = splitSnakeOrCamelCase()
-
-        return split.joinToString(separator = " ") { it.capitalize() }
     }
 }

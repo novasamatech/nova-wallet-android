@@ -21,4 +21,10 @@ class OperationConverters {
 
     @TypeConverter
     fun toOperationType(ordinal: Int) = OperationLocal.Type.values()[ordinal]
+
+    @TypeConverter
+    fun fromExtrinsicContentType(type: OperationLocal.ExtrinsicContentType) = type.name
+
+    @TypeConverter
+    fun toExtrinsicContentType(name: String): OperationLocal.ExtrinsicContentType = enumValueOf(name)
 }

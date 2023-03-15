@@ -16,11 +16,18 @@ data class Operation(
 
         data class Extrinsic(
             val hash: String,
-            val module: String,
-            val call: String,
+            val content: Content,
             val fee: BigInteger,
             val status: Status,
-        ) : Type()
+        ) : Type() {
+
+            sealed class Content {
+
+                class SubstrateCall(val module: String, val call: String): Content()
+
+                class ContractCall(val contractAddress: String, val function: String?): Content()
+            }
+        }
 
         data class Reward(
             val amount: BigInteger,

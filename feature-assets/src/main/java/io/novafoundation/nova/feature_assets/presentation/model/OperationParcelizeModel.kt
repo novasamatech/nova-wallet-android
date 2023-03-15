@@ -28,8 +28,8 @@ sealed class OperationParcelizeModel : Parcelable {
         val time: Long,
         val originAddress: String,
         val hash: String,
-        val module: String,
-        val call: String,
+        val subHeader: String,
+        val header: String,
         val fee: String,
         val statusAppearance: OperationStatusAppearance,
     ) : Parcelable, OperationParcelizeModel()

@@ -2,13 +2,16 @@ package io.novafoundation.nova.feature_assets.data.mappers.mappers
 
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.images.asIcon
+import io.novafoundation.nova.common.utils.splitSnakeOrCamelCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationStatusAppearance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
+import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
@@ -71,6 +74,37 @@ private fun transferDirectionIcon(isIncome: Boolean): Int {
     return if (isIncome) R.drawable.ic_arrow_down else R.drawable.ic_arrow_up
 }
 
+private fun String.itemToCapitalizedWords(): String {
+    val split = splitSnakeOrCamelCase()
+
+    return split.joinToString(separator = " ") { it.capitalize() }
+}
+
+private fun mapExtrinsicContentToHeaderAndSubHeader(extrinsicContent: Content, resourceManager: ResourceManager) : Pair<String, String> {
+    return when(extrinsicContent) {
+        is Content.ContractCall -> {
+            val header = if (extrinsicContent.function != null) {
+                val withoutArguments = extrinsicContent.function!!.split("(").first()
+
+                withoutArguments.itemToCapitalizedWords()
+            } else {
+                extrinsicContent.contractAddress
+            }
+
+            val subHeader = resourceManager.getString(R.string.ethereum_contract_call)
+
+            header to subHeader
+        }
+
+        is Content.SubstrateCall -> {
+            val header = extrinsicContent.call.itemToCapitalizedWords()
+            val subHeader = extrinsicContent.module.itemToCapitalizedWords()
+
+            header to subHeader
+        }
+    }
+}
+
 suspend fun mapOperationToOperationModel(
     chain: Chain,
     operation: Operation,
@@ -120,16 +154,17 @@ suspend fun mapOperationToOperationModel(
 
             is Operation.Type.Extrinsic -> {
                 val amountColor = if (operationType.status == Operation.Status.FAILED) R.color.text_secondary else R.color.text_primary
+                val (header, subHeader) = mapExtrinsicContentToHeaderAndSubHeader(operationType.content, resourceManager)
 
                 OperationModel(
                     id = id,
                     formattedTime = formattedTime,
                     amount = formatFee(chainAsset, operationType),
                     amountColorRes = amountColor,
-                    header = operationType.call,
+                    header = header,
+                    subHeader = subHeader,
                     statusAppearance = statusAppearance,
-                    operationIcon = operation.chainAsset.iconUrl?.asIcon() ?: R.drawable.ic_nova.asIcon(),
-                    subHeader = operationType.module
+                    operationIcon = operation.chainAsset.iconUrl?.asIcon() ?: R.drawable.ic_nova.asIcon()
                 )
             }
         }
@@ -184,14 +219,16 @@ suspend fun mapOperationToParcel(
             }
 
             is Operation.Type.Extrinsic -> {
+                val (header, subHeader) = mapExtrinsicContentToHeaderAndSubHeader(operationType.content, resourceManager)
+
                 OperationParcelizeModel.Extrinsic(
                     chainId = chainAsset.chainId,
                     chainAssetId = chainAsset.id,
                     time = time,
                     originAddress = address,
                     hash = operationType.hash,
-                    module = operationType.module,
-                    call = operationType.call,
+                    header = header,
+                    subHeader = subHeader,
                     fee = formatFee(chainAsset, operationType),
                     statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus)
                 )
