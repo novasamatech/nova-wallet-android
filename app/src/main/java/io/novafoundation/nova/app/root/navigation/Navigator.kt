@@ -95,7 +95,8 @@ object BackDelayedNavigation : DelayedNavigation
 
 class Navigator(
     private val navigationHolder: NavigationHolder,
-) : SplashRouter,
+) : BaseNavigator(navigationHolder),
+    SplashRouter,
     OnboardingRouter,
     AccountRouter,
     AssetsRouter,
@@ -483,6 +484,8 @@ class Navigator(
 
         navController?.navigate(R.id.action_open_account_details, extras)
     }
+
+    override fun openRebag() = performNavigation(R.id.action_mainFragment_to_rebag)
 
     override fun openNodeDetails(nodeId: Int) {
         navController?.navigate(R.id.action_nodesFragment_to_nodeDetailsFragment, NodeDetailsFragment.getBundle(nodeId))

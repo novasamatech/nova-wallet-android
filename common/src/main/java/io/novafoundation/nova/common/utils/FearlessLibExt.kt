@@ -154,6 +154,8 @@ fun Module.constantOrNull(name: String) = constants[name]
 
 fun RuntimeMetadata.staking() = module(Modules.STAKING)
 
+fun RuntimeMetadata.voterListOrNull() = moduleOrNull(Modules.VOTER_LIST)
+
 fun RuntimeMetadata.system() = module(Modules.SYSTEM)
 
 fun RuntimeMetadata.balances() = module(Modules.BALANCES)
@@ -186,6 +188,7 @@ fun RuntimeMetadata.identity() = module(Modules.IDENTITY)
 fun RuntimeMetadata.automationTime() = module(Modules.AUTOMATION_TIME)
 
 fun RuntimeMetadata.parachainInfoOrNull() = moduleOrNull(Modules.PARACHAIN_INFO)
+fun RuntimeMetadata.parasOrNull() = moduleOrNull(Modules.PARAS)
 
 fun RuntimeMetadata.referenda() = module(Modules.REFERENDA)
 
@@ -197,15 +200,16 @@ fun RuntimeMetadata.scheduler() = module(Modules.SCHEDULER)
 
 fun RuntimeMetadata.treasury() = module(Modules.TREASURY)
 
-fun RuntimeMetadata.preImage() = module(Modules.PREIMAGE)
+fun RuntimeMetadata.electionProviderMultiPhaseOrNull() = moduleOrNull(Modules.ELECTION_PROVIDER_MULTI_PHASE)
 
-fun RuntimeMetadata.xTokens() = module(Modules.X_TOKENS)
+fun RuntimeMetadata.preImage() = module(Modules.PREIMAGE)
 
 fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
     return options.first(::hasModule)
 }
 
 fun RuntimeMetadata.xcmPalletName() = firstExistingModule("XcmPallet", "PolkadotXcm")
+fun RuntimeMetadata.xcmPallet() = module(firstExistingModule("XcmPallet", "PolkadotXcm"))
 
 fun StorageEntry.splitKeyToComponents(runtime: RuntimeSnapshot, key: String): ComponentHolder {
     return ComponentHolder(splitKey(runtime, key))
@@ -268,6 +272,8 @@ object Modules {
     const val IDENTITY = "Identity"
 
     const val PARACHAIN_INFO = "ParachainInfo"
+    const val PARAS = "Paras"
+
     const val X_TOKENS = "XTokens"
 
     const val AUTOMATION_TIME = "AutomationTime"
@@ -282,4 +288,8 @@ object Modules {
     const val PREIMAGE = "Preimage"
 
     const val DEMOCRACY = "Democracy"
+
+    const val VOTER_LIST = "VoterList"
+
+    const val ELECTION_PROVIDER_MULTI_PHASE = "ElectionProviderMultiPhase"
 }

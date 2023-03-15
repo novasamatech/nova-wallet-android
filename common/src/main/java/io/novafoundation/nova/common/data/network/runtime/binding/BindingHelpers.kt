@@ -38,6 +38,12 @@ inline fun <reified T> Any?.cast(): T {
     return this as? T ?: incompatible()
 }
 
+inline fun <reified T> Any?.nullableCast(): T? {
+    if (this == null) return null
+
+    return this as? T ?: incompatible()
+}
+
 inline fun <reified T> Any?.castOrNull(): T? {
     return this as? T
 }

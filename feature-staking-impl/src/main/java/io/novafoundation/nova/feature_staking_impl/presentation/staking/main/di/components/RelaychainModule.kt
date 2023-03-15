@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_BOND_MORE
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_REBOND
@@ -31,14 +31,14 @@ class RelaychainModule {
     @Provides
     @ScreenScope
     fun provideRelaychainAlertsComponentFactory(
-        stakingInteractor: StakingInteractor,
+        stakingSharedComputation: StakingSharedComputation,
         alertsInteractor: AlertsInteractor,
         resourceManager: ResourceManager,
         @Named(SYSTEM_MANAGE_STAKING_REDEEM) redeemValidationSystem: StakeActionsValidationSystem,
         @Named(SYSTEM_MANAGE_STAKING_BOND_MORE) bondMoreValidationSystem: StakeActionsValidationSystem,
         router: StakingRouter,
     ) = RelaychainAlertsComponentFactory(
-        stakingInteractor = stakingInteractor,
+        stakingSharedComputation = stakingSharedComputation,
         alertsInteractor = alertsInteractor,
         resourceManager = resourceManager,
         redeemValidationSystem = redeemValidationSystem,
@@ -51,20 +51,22 @@ class RelaychainModule {
     fun provideRelaychainNetworkInfoComponentFactory(
         stakingInteractor: StakingInteractor,
         resourceManager: ResourceManager,
+        stakingSharedComputation: StakingSharedComputation,
     ) = RelaychainNetworkInfoComponentFactory(
         stakingInteractor = stakingInteractor,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        stakingSharedComputation = stakingSharedComputation,
     )
 
     @Provides
     @ScreenScope
     fun provideRelaychainStakeActionsComponentFactory(
-        stakingInteractor: StakingInteractor,
+        stakingSharedComputation: StakingSharedComputation,
         resourceManager: ResourceManager,
         stakeActionsValidations: Map<@JvmSuppressWildcards String, StakeActionsValidationSystem>,
         router: StakingRouter,
     ) = RelaychainStakeActionsComponentFactory(
-        stakingInteractor = stakingInteractor,
+        stakingSharedComputation = stakingSharedComputation,
         resourceManager = resourceManager,
         stakeActionsValidations = stakeActionsValidations,
         router = router
@@ -75,29 +77,29 @@ class RelaychainModule {
     fun provideRelaychainStakeSummaryComponentFactory(
         stakingInteractor: StakingInteractor,
         resourceManager: ResourceManager,
+        stakingSharedComputation: StakingSharedComputation,
     ) = RelaychainStakeSummaryComponentFactory(
         stakingInteractor = stakingInteractor,
         resourceManager = resourceManager,
+        stakingSharedComputation = stakingSharedComputation,
     )
 
     @Provides
     @ScreenScope
     fun provideRelaychainStartStakingComponentFactory(
-        stakingInteractor: StakingInteractor,
+        stakingSharedComputation: StakingSharedComputation,
         setupStakingSharedState: SetupStakingSharedState,
-        rewardCalculatorFactory: RewardCalculatorFactory,
         resourceManager: ResourceManager,
         router: StakingRouter,
         validationSystem: WelcomeStakingValidationSystem,
         validationExecutor: ValidationExecutor,
     ) = RelaychainStartStakingComponentFactory(
-        stakingInteractor = stakingInteractor,
         setupStakingSharedState = setupStakingSharedState,
-        rewardCalculatorFactory = rewardCalculatorFactory,
         resourceManager = resourceManager,
         router = router,
         validationSystem = validationSystem,
-        validationExecutor = validationExecutor
+        validationExecutor = validationExecutor,
+        stakingSharedComputation = stakingSharedComputation
     )
 
     @Provides
@@ -109,7 +111,7 @@ class RelaychainModule {
         @Named(SYSTEM_MANAGE_STAKING_REBOND) rebondValidationSystem: StakeActionsValidationSystem,
         @Named(SYSTEM_MANAGE_STAKING_REDEEM) redeemValidationSystem: StakeActionsValidationSystem,
         router: StakingRouter,
-        stakingInteractor: StakingInteractor,
+        stakingSharedComputation: StakingSharedComputation,
     ) = RelaychainUnbondingComponentFactory(
         unbondInteractor = unbondInteractor,
         validationExecutor = validationExecutor,
@@ -117,14 +119,16 @@ class RelaychainModule {
         rebondValidationSystem = rebondValidationSystem,
         redeemValidationSystem = redeemValidationSystem,
         router = router,
-        stakingInteractor = stakingInteractor
+        stakingSharedComputation = stakingSharedComputation,
     )
 
     @Provides
     @ScreenScope
     fun provideRelaychainUserRewardsComponentFactory(
         stakingInteractor: StakingInteractor,
+        stakingSharedComputation: StakingSharedComputation,
     ) = RelaychainUserRewardsComponentFactory(
-        stakingInteractor = stakingInteractor
+        stakingInteractor = stakingInteractor,
+        stakingSharedComputation = stakingSharedComputation,
     )
 }

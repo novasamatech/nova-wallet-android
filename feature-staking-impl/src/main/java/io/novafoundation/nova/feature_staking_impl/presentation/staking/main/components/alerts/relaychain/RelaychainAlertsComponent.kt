@@ -9,10 +9,10 @@ import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.Alert
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.Alert.ChangeValidators.Reason
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -33,21 +33,22 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 class RelaychainAlertsComponentFactory(
-    private val stakingInteractor: StakingInteractor,
     private val alertsInteractor: AlertsInteractor,
     private val resourceManager: ResourceManager,
     private val redeemValidationSystem: StakeActionsValidationSystem,
     private val bondMoreValidationSystem: StakeActionsValidationSystem,
     private val router: StakingRouter,
+    private val stakingSharedComputation: StakingSharedComputation,
 ) {
 
     fun create(
         assetWithChain: ChainWithAsset,
         hostContext: ComponentHostContext,
     ): AlertsComponent = RelaychainAlertsComponent(
-        stakingInteractor = stakingInteractor,
+        stakingSharedComputation = stakingSharedComputation,
         resourceManager = resourceManager,
         alertsInteractor = alertsInteractor,
         redeemValidationSystem = redeemValidationSystem,
@@ -60,9 +61,9 @@ class RelaychainAlertsComponentFactory(
 }
 
 private class RelaychainAlertsComponent(
-    private val stakingInteractor: StakingInteractor,
     private val alertsInteractor: AlertsInteractor,
     private val resourceManager: ResourceManager,
+    private val stakingSharedComputation: StakingSharedComputation,
 
     private val hostContext: ComponentHostContext,
     private val assetWithChain: ChainWithAsset,
@@ -74,14 +75,15 @@ private class RelaychainAlertsComponent(
     CoroutineScope by hostContext.scope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
 
-    private val selectedAccountStakingStateFlow = hostContext.selectedAccount.flatMapLatest {
-        stakingInteractor.selectedAccountStakingStateFlow(it, assetWithChain)
-    }.shareInBackground()
+    private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
+        assetWithChain = assetWithChain,
+        scope = hostContext.scope
+    )
 
     override val events = MutableLiveData<Event<AlertsEvent>>()
 
     override val state: Flow<AlertsState?> = selectedAccountStakingStateFlow.flatMapLatest {
-        alertsInteractor.getAlertsFlow(it)
+        alertsInteractor.getAlertsFlow(it, hostContext.scope)
     }
         .mapList { mapAlertToAlertModel(it) }
         .withLoading()
@@ -108,17 +110,17 @@ private class RelaychainAlertsComponent(
             is Alert.RedeemTokens -> {
                 AlertModel(
                     resourceManager.getString(R.string.staking_alert_redeem_title),
-                    formatAlertTokenAmount(alert.amount, alert.token),
+                    formatAlertTokenAmount(alert.amount, alert.token, RoundingMode.FLOOR),
                     AlertModel.Type.CallToAction(::redeemAlertClicked)
                 )
             }
 
             is Alert.BondMoreTokens -> {
-                val existentialDepositDisplay = formatAlertTokenAmount(alert.minimalStake, alert.token)
+                val minStakeFormatted = formatAlertTokenAmount(alert.minimalStake, alert.token, RoundingMode.CEILING)
 
                 AlertModel(
                     resourceManager.getString(R.string.staking_alert_bond_more_title),
-                    resourceManager.getString(R.string.staking_alert_bond_more_message, existentialDepositDisplay),
+                    resourceManager.getString(R.string.staking_alert_bond_more_message, minStakeFormatted),
                     AlertModel.Type.CallToAction(::bondMoreAlertClicked)
                 )
             }
@@ -133,19 +135,22 @@ private class RelaychainAlertsComponent(
                 resourceManager.getString(R.string.staking_set_validators_message),
                 AlertModel.Type.CallToAction { router.openCurrentValidators() }
             )
+            Alert.Rebag -> AlertModel(
+                resourceManager.getString(R.string.staking_alert_rebag_title),
+                resourceManager.getString(R.string.staking_alert_rebag_message),
+                AlertModel.Type.CallToAction { router.openRebag() }
+            )
         }
     }
 
-    private fun formatAlertTokenAmount(amount: BigDecimal, token: Token): String {
+    private fun formatAlertTokenAmount(amount: BigDecimal, token: Token, roundingMode: RoundingMode): String {
         val formattedFiat = token.priceOf(amount).formatAsCurrency(token.currency)
-        val formattedAmount = amount.formatTokenAmount(token.configuration)
+        val formattedAmount = amount.formatTokenAmount(token.configuration, roundingMode)
 
         return buildString {
             append(formattedAmount)
 
-            formattedFiat.let {
-                append(" ($it)")
-            }
+            append(" ($formattedFiat)")
         }
     }
 

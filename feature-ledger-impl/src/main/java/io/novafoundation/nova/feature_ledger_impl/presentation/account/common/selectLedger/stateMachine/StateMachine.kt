@@ -6,6 +6,8 @@ sealed class SideEffect {
 
     object EnableBluetooth : SideEffect()
 
+    object EnableLocation : SideEffect()
+
     class PresentLedgerFailure(val reason: Throwable, val device: LedgerDevice) : SideEffect()
 
     class VerifyConnection(val device: LedgerDevice) : SideEffect()
@@ -20,6 +22,10 @@ sealed class SelectLedgerEvent {
     object BluetoothEnabled : SelectLedgerEvent()
 
     object BluetoothDisabled : SelectLedgerEvent()
+
+    object LocationEnabled : SelectLedgerEvent()
+
+    object LocationDisabled : SelectLedgerEvent()
 
     class DeviceChosen(val device: LedgerDevice) : SelectLedgerEvent()
 

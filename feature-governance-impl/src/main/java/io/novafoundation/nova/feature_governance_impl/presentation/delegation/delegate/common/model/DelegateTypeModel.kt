@@ -54,9 +54,12 @@ fun ImageView.setDelegateIcon(
     imageLoader: ImageLoader,
     squareCornerRadiusDp: Int
 ) {
+    val strokeWidthDp = 0.5f
+    val borderPadding = strokeWidthDp.dp(context)
+        .coerceAtLeast(1)
+    setPadding(borderPadding)
+
     if (icon.shape == DelegateIcon.IconShape.SQUARE) {
-        val strokeWidthDp = 0.5f
-        setPadding(strokeWidthDp.dp(context).coerceAtLeast(1))
         background = context.getRoundedCornerDrawable(
             null,
             R.color.container_border,
@@ -64,7 +67,7 @@ fun ImageView.setDelegateIcon(
             strokeSizeInDp = strokeWidthDp
         )
     } else {
-        background = null
+        setBackgroundResource(R.drawable.bg_induvidual_circle_border)
     }
 
     setIcon(icon.icon, imageLoader) {

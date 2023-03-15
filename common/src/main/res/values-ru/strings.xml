@@ -73,7 +73,7 @@
     <string name="account_ledger_import_start_guide">Инструкция по подключению Ledger</string>
     <string name="account_ledger_import_start_step_1">Удостоверьтесь, что <font color="#FFFFFF">приложение Сети установлено</font> на Ваше устройство Ledger, используя приложение Ledger Live</string>
     <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Откройте приложение Сети</font> на Вашем Ledger устройстве</string>
-    <string name="account_ledger_import_start_step_3">Разрешите Nova Wallet <font color="#FFFFFF">доступ к Bluetooth</font></string>
+    <string name="account_ledger_import_start_step_3">Разрешите Nova Wallet <font color="#FFFFFF">доступ к Bluetooth и Гео-локации</font></string>
     <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Выберите аккаунт</font> для добавления в кошелёк</string>
     <string name="account_ledger_import_start_title">Подключите Ledger Nano X</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
@@ -262,6 +262,7 @@
     <string name="common_next">Далее</string>
     <string name="common_no">Нет</string>
     <string name="common_no_app_to_handle_import_intent">Приложение для импорта файлов не найдено на устройстве. Пожалуйста, установите его и повторите попытку</string>
+    <string name="common_no_app_to_handle_intent">На устройстве не найдено подходящего приложения для обработки данного действия</string>
     <string name="common_no_changes">Нет изменений</string>
     <string name="common_no_screenshot_message_v2_2_0">Мы собираемся показать вашу мнемонику. Убедитесь, что никто не видит ваш экран и не делайте скриншотов - к ним могут получить доступ вредоносные программы</string>
     <string name="common_not_enough_funds_message">К сожалению, у вас недостаточно средств для оплаты сетевого сбора.</string>
@@ -448,7 +449,7 @@
     <string name="delegation_remove_votes">Удалить голоса</string>
     <string name="delegation_revoke_delegation">Отменить делегацию</string>
     <string name="delegation_revoke_hint_unlock">После истечения периода выхода из делегации не забудьте разблокировать токены</string>
-    <string name="delegation_sorting_delegated_votes">Всем голосам</string>
+    <string name="delegation_sorting_delegated_votes">Голосам делегаторов</string>
     <string name="delegation_sorting_delegations">Делегациям</string>
     <string name="delegation_sorting_recent_votes_format">Голосам за %s</string>
     <string name="delegation_tracks">Треки</string>
@@ -546,7 +547,7 @@
     <string name="parachain_staking_change_collator">Смена коллатора</string>
     <string name="parachain_staking_collator_cannot_bond_more">Невозможно добавить стейк в выбранного коллатора</string>
     <string name="parachain_staking_manage_collators">Управление коллаторами</string>
-    <string name="parachain_staking_not_active_collator_message">Выбранный коллатор намерен прекратить участие в стекинге.</string>
+    <string name="parachain_staking_not_active_collator_message">Выбранный коллатор намерен прекратить участие в стейкинге.</string>
     <string name="parachain_staking_pending_revoke_message">Вы не можете добавить стейк в коллатора, для которого вы разблокируете все токены.</string>
     <string name="parachain_staking_unbond_no_rewards">Ваш стейк будет меньше минимального (%s) для этого коллатора.</string>
     <string name="parachain_staking_unstake_all">Оставшийся стейк опустится ниже минимального значения сети (%s) и также будет добавлен к сумме вывода</string>
@@ -688,6 +689,8 @@
     <string name="select_delegation_tracks_edit_title">Выберите треки для изменения делегации</string>
     <string name="select_delegation_tracks_revoke_title">Выберите треки для отмены делегации</string>
     <string name="select_delegation_tracks_unavailable_tracks">Недоступные треки</string>
+    <string name="select_ledger_location_enable_request_message">Nova нуждается в включении местоположения, чтобы иметь возможность выполнять сканирование Bluetooth для поиска вашего устройства Ledger</string>
+    <string name="select_ledger_location_enable_request_title">Пожалуйста, включите геолокацию в настройках устройства</string>
     <string name="settings_community">Сообщество</string>
     <string name="settings_email">Написать разработчикам</string>
     <string name="settings_general">Основные</string>
@@ -706,10 +709,12 @@
     <string name="staking_account_is_used_as_controller">Выбранный аккаунт уже используется в качестве контроллера.</string>
     <string name="staking_active_delegators">Активные делегаторы</string>
     <string name="staking_add_controller">Чтобы выполнить это действие, добавьте контроллер аккаунт %s в приложение</string>
-    <string name="staking_alert_bond_more_message">В настоящее время стейкинг неактивен. \nТекущая минимальная ставка %s .</string>
+    <string name="staking_alert_bond_more_message">Ваш стейк меньше минимума %s.\nСтейк меньше минимума, уменьшает шансы получить вознаграждение</string>
     <string name="staking_alert_bond_more_title">Застейкайте ещё токенов</string>
     <string name="staking_alert_change_validators">Смените своих валидаторов.</string>
     <string name="staking_alert_no_alerts_now">Сейчас всё хорошо. Здесь будут появляться предупреждения.</string>
+    <string name="staking_alert_rebag_message">Устаревшая позиция в очереди назначения стейка валидатору может приостановить получение вознаграждений</string>
+    <string name="staking_alert_rebag_title">Улучшения стейкинга</string>
     <string name="staking_alert_redeem_title">Заберите токены после вывода</string>
     <string name="staking_alert_start_next_era_message">Пожалуйста, дождитесь начала следующей эры.</string>
     <string name="staking_alert_title">Предупреждения</string>
@@ -717,7 +722,6 @@
     <string name="staking_balance_title">Баланс стейкинга</string>
     <string name="staking_balance_title_v2_2_0">Баланс</string>
     <string name="staking_bond_more_v1_9_0">Застейкать ещё</string>
-    <string name="staking_bonded_format">Застейкано: %s</string>
     <string name="staking_bonded_inactive">Вы не номинируете и не валидируете</string>
     <string name="staking_change_controller">Сменить контроллер</string>
     <string name="staking_change_validators">Сменить валидаторов</string>
@@ -771,7 +775,7 @@
     <string name="staking_max_nominators_reached_message">Достигнуто максимальное количество номинаторов</string>
     <string name="staking_max_nominators_reached_title">Невозможно начать стейкинг</string>
     <string name="staking_min_stake">Мин. стейк</string>
-    <string name="staking_missing_account_message">Вы должны добавить %s аккаунт в кошелек для того, чтобы начать стекинг</string>
+    <string name="staking_missing_account_message">Вы должны добавить %s аккаунт в кошелек для того, чтобы начать стейкинг</string>
     <string name="staking_month_period_title">Eжемесячно</string>
     <string name="staking_nominated">Номинировано:</string>
     <string name="staking_nominations_rewarded_format">%s вознаграждены</string>
@@ -813,7 +817,7 @@
     <string name="staking_parachain_your_collators_active">Ваш стейк назначен следующим коллаторам</string>
     <string name="staking_parachain_your_collators_elected">Активные коллаторы, не производящие вам наград</string>
     <string name="staking_parachain_your_collators_inactive">Коллаторы, не имеющие достаточного стейка для избрания сетью</string>
-    <string name="staking_parachain_your_collators_waiting">Коллаторы, стекинг в которых начнется в следующем раунде</string>
+    <string name="staking_parachain_your_collators_waiting">Коллаторы, стейкинг в которых начнется в следующем раунде</string>
     <string name="staking_parachain_your_collators_waiting_title">Ожидающие (%s)</string>
     <string name="staking_payout">Выплата</string>
     <string name="staking_payout_expired">Срок выплаты истёк</string>
@@ -825,6 +829,8 @@
     </plurals>
     <string name="staking_pending_rewards_subtitle">Вы можете выплатить их самостоятельно, когда они близки к истечению, но вы заплатите комиссию</string>
     <string name="staking_pending_rewards_title">Вознаграждения выплачиваются каждые 2–3 дня валидаторами</string>
+    <string name="staking_rebag_current_bag">Текущий слот очереди</string>
+    <string name="staking_rebag_new_bag">Новый слот очереди</string>
     <string name="staking_rebond">Вернуть в стейк</string>
     <string name="staking_rebond_all">Всё, что выводится из стейка</string>
     <string name="staking_rebond_counted_next_era_hint">Возвращенные токены будут учитываться со следующей эры</string>
@@ -864,12 +870,13 @@
     <string name="staking_select_recommended">Выбрать рекомендованных</string>
     <string name="staking_selected_validators_count_v1.9.1" formatted="false">выбрано %d (макс. %d)</string>
     <string name="staking_selected_validators_mask">Валидаторы (%d)</string>
-    <string name="staking_set_controller_subtitle">Выберите другой аккаунт в качестве контроллера, чтобы делегировать ему операции по управлению стекингом</string>
-    <string name="staking_set_controller_title">Улучшите безопасность стекинга</string>
+    <string name="staking_set_controller_subtitle">Выберите другой аккаунт в качестве контроллера, чтобы делегировать ему операции по управлению стейкингом</string>
+    <string name="staking_set_controller_title">Улучшите безопасность стейкинга</string>
     <string name="staking_set_validators">Установить валидаторов</string>
     <string name="staking_set_validators_message">Валидаторы не выбраны</string>
     <string name="staking_set_validators_title">Выберите валидаторов для начала стейкинга</string>
-    <string name="staking_setup_amount_too_low">Нельзя застейкать меньше минимального значения (%s)</string>
+    <string name="staking_setup_amount_less_than_recommended">Рекомендуемый минимальный стейк для постоянного получения вознаграждений составляет %s.</string>
+    <string name="staking_setup_amount_too_low">Вы не можете застейкать меньше минимального значения сети (%s)</string>
     <string name="staking_setup_amount_too_low_strict">Минимальный стейк должен быть больше чем %s</string>
     <string name="staking_setup_restake">Увеличения стейка</string>
     <string name="staking_setup_restake_v2_2_0">Увеличивать стейк</string>
@@ -878,7 +885,7 @@
     <string name="staking_setup_reward_payout_account">Аккаунт для выплат</string>
     <string name="staking_slash">Слэш</string>
     <string name="staking_stake_format">Застейкать %s</string>
-    <string name="staking_staking_period">Время стекинга</string>
+    <string name="staking_staking_period">Время стейкинга</string>
     <string name="staking_start_change_validators_custom_subtitle">Вы должны доверять своим валидаторам, чтобы они действовали грамотно и честно. Принятие решения исключительно на основе их текущей прибыльности может привести к снижению прибыли или даже потере средств.</string>
     <string name="staking_start_change_validators_custom_subtitle_v2_2_0">Тщательно выбирайте своих валидаторов, чтобы они действовали профессионально и честно. Принятие решения исключительно на основе прибыльности может привести к уменьшению наград или даже потере стейка</string>
     <string name="staking_start_change_validators_custom_title">Стейкинг с выбранными валидаторами</string>

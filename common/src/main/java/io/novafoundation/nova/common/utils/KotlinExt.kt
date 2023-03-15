@@ -26,6 +26,8 @@ fun BigDecimal.percentageToFraction() = this.divide(PERCENTAGE_MULTIPLIER, MathC
 
 infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
 
+inline fun <reified E : Enum<E>> enumValueOfOrNull(raw: String): E? = runCatching { enumValueOf<E>(raw) }.getOrNull()
+
 /**
  * Compares two BigDecimals taking into account only values but not scale unlike `==` operator
  */
@@ -46,6 +48,10 @@ val BigDecimal.isNonNegative: Boolean
 
 val BigInteger.isZero: Boolean
     get() = signum() == 0
+
+inline fun <T : Comparable<T>, R : Comparable<R>> ClosedRange<T>.map(mapper: (T) -> R): ClosedRange<R> {
+    return mapper(start)..mapper(endInclusive)
+}
 
 fun BigInteger?.orZero(): BigInteger = this ?: BigInteger.ZERO
 fun BigDecimal?.orZero(): BigDecimal = this ?: 0.toBigDecimal()
