@@ -1,9 +1,7 @@
 package io.novafoundation.nova.runtime.ethereum.contract.base
 
-import android.util.Log
 import io.novafoundation.nova.runtime.ethereum.contract.base.caller.ContractCaller
 import io.novafoundation.nova.runtime.ethereum.contract.base.caller.ethCallSuspend
-import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.future.asDeferred
 import org.web3j.abi.FunctionEncoder
@@ -50,10 +48,6 @@ open class CallableContract(
         function: Function,
         extractResult: (T) -> R
     ): R {
-        if (contractAddress.lowercase().requireHexPrefix() == "0xdac17f958d2ee523a2206206994597c13d831ec7") {
-            Log.d("RX", "Processing eth call response for USDT")
-        }
-
         assertCallNotReverted(ethCall)
 
         val args = FunctionReturnDecoder.decode(ethCall.value, function.outputParameters)

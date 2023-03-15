@@ -1,12 +1,10 @@
 package io.novafoundation.nova.runtime.ethereum.subscribtion
 
-import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
-import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService.ResponseListener
 import kotlinx.coroutines.CoroutineScope
@@ -22,8 +20,6 @@ import org.web3j.protocol.core.BatchRequest
 import org.web3j.protocol.core.BatchResponse
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.Response
-import org.web3j.protocol.core.methods.request.Transaction
-import org.web3j.protocol.core.methods.response.EthCall
 import org.web3j.protocol.websocket.events.LogNotification
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -52,10 +48,6 @@ class EthereumRequestsAggregator private constructor(
     }
 
     fun executeBatches(scope: CoroutineScope, web3Api: Web3Api) {
-        if (batches.isNotEmpty()) {
-            Log.d("RX", "Executing batches")
-        }
-
         batches.forEach { pendingBatchRequest ->
             scope.async {
                 val batch = web3Api.newBatch().apply {
@@ -83,23 +75,13 @@ class EthereumRequestsAggregator private constructor(
     ): Result<BatchResponse> {
         return runCatching { batch.sendAsync().asDeferred().await() }
             .onSuccess { batchResponse ->
-                if (batchResponse.responses.size == 1) {
-                    Log.d("RX", "Got batch response for USDT request")
-                }
-
                 batchResponse.responses.onEach { response ->
                     val callback = pendingBatchRequest.callbacks[response.id.toInt()] ?: return@onEach
-
-                    if (batchResponse.responses.size == 1) {
-                        Log.d("RX", "Found batch callback for USDT")
-                    }
 
                     callback.cast<BatchCallback<Any?>>().onNext(response)
                 }
             }
             .onFailure { error ->
-                Log.d("RX", "Failed to execute batch", error)
-
                 pendingBatchRequest.callbacks.values.forEach {
                     it.onError(error)
                 }
@@ -154,14 +136,6 @@ class EthereumRequestsAggregator private constructor(
             val batch = batches.getOrPut(batchId, ::PendingBatchRequestBuilder)
 
             val callback = BatchCallback<T>()
-
-            if (request.method == "eth_call") {
-                val tx = request.params.first() as Transaction
-
-                if (tx.to.lowercase().requireHexPrefix() == "0xdac17f958d2ee523a2206206994597c13d831ec7") {
-                    Log.d("RX", "Registering batch request for USDT")
-                }
-            }
 
             batch.requests += request
             batch.callbacks[request.id.toInt()] = callback
@@ -248,10 +222,6 @@ private class BatchCallback<R> : ResponseListener<R> {
     }
 
     override fun onNext(response: R) {
-        if (response is EthCall && response.result == "0x00000000000000000000000000000000000000000000000000000006259ed87f") {
-            Log.d("RX", "Calling batch callback for USDT")
-        }
-
         future.complete(response)
     }
 }
