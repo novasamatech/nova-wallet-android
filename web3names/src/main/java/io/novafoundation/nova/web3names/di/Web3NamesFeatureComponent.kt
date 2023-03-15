@@ -24,5 +24,5 @@ abstract class Web3NamesFeatureComponent : Web3NamesApi {
             RuntimeApi::class
         ]
     )
-    interface RuntimeDependenciesComponent : Web3NamesDependencies
+    interface Web3NamesDependenciesComponent : Web3NamesDependencies
 }

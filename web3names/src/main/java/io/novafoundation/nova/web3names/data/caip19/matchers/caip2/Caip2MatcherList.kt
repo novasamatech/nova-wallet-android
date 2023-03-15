@@ -1,6 +1,6 @@
-package io.novafoundation.nova.web3names.domain.caip19.matchers.caip2
+package io.novafoundation.nova.web3names.data.caip19.matchers.caip2
 
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.Caip2Identifier
+import io.novafoundation.nova.web3names.data.caip19.identifiers.Caip2Identifier
 
 class Caip2MatcherList(private val matchers: List<Caip2Matcher>) : Caip2Matcher {
 

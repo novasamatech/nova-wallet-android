@@ -11,6 +11,8 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "KILT_CHAIN_ID", "\"411f057b9107718c9624d6aa4a3f23c1653898297f3d4d529d9bb6511a39dd21\""
     }
 
     buildTypes {

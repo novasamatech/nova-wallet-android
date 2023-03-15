@@ -1,4 +1,4 @@
-package io.novafoundation.nova.web3names.domain.caip19
+package io.novafoundation.nova.web3names.data.caip19
 
 fun String.splitToNamespaces(): Pair<String, String> {
     val (chainNamespace, tokenNamespace) = split("/")

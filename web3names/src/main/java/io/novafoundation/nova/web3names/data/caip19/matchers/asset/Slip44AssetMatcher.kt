@@ -1,6 +1,6 @@
-package io.novafoundation.nova.web3names.domain.caip19.matchers.asset
+package io.novafoundation.nova.web3names.data.caip19.matchers.asset
 
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.AssetIdentifier
+import io.novafoundation.nova.web3names.data.caip19.identifiers.AssetIdentifier
 
 class Slip44AssetMatcher(
     private val assetSlip44CoinCode: Int,

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.web3names.domain.caip19.identifiers
+package io.novafoundation.nova.web3names.data.caip19.identifiers
 
 const val SLIP44 = "slip44"
 const val ERC20 = "erc20"

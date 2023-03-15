@@ -1,13 +1,13 @@
-package io.novafoundation.nova.web3names.domain.caip19
+package io.novafoundation.nova.web3names.data.caip19
 
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.AssetIdentifier
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.Caip19Identifier
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.Caip2Identifier
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.EIP155
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.ERC20
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.NotSupportedIdentifierException
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.POLKADOT
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.SLIP44
+import io.novafoundation.nova.web3names.data.caip19.identifiers.AssetIdentifier
+import io.novafoundation.nova.web3names.data.caip19.identifiers.Caip19Identifier
+import io.novafoundation.nova.web3names.data.caip19.identifiers.Caip2Identifier
+import io.novafoundation.nova.web3names.data.caip19.identifiers.EIP155
+import io.novafoundation.nova.web3names.data.caip19.identifiers.ERC20
+import io.novafoundation.nova.web3names.data.caip19.identifiers.NotSupportedIdentifierException
+import io.novafoundation.nova.web3names.data.caip19.identifiers.POLKADOT
+import io.novafoundation.nova.web3names.data.caip19.identifiers.SLIP44
 
 class Caip19Parser {
 
