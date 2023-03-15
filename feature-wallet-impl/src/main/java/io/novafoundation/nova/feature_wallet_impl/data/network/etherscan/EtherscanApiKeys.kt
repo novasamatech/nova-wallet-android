@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.etherscan
 
 import io.novafoundation.nova.feature_wallet_impl.BuildConfig
-import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.Ids
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
