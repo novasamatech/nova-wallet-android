@@ -44,6 +44,10 @@ class EvmErc20AssetTransfers(
         }
     }
 
+    override suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean {
+        return true
+    }
+
     private fun EvmTransactionBuilder.transfer(transfer: AssetTransfer) {
         val erc20 = transfer.originChainAsset.requireErc20()
         val recipient = transfer.originChain.accountIdOrDefault(transfer.recipient)
@@ -51,9 +55,5 @@ class EvmErc20AssetTransfers(
         contractCall(erc20.contractAddress, erc20Standard) {
             transfer(recipient = recipient, amount = transfer.amountInPlanks)
         }
-    }
-
-    override suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean {
-        return true
     }
 }

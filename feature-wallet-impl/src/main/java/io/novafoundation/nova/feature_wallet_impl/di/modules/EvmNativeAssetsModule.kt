@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.di.modules
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.StaticAssetSource
@@ -27,7 +28,9 @@ class EvmNativeAssetsModule {
 
     @Provides
     @FeatureScope
-    fun provideTransfers() = EvmNativeAssetTransfers()
+    fun provideTransfers(
+        evmTransactionService: EvmTransactionService
+    ) = EvmNativeAssetTransfers(evmTransactionService)
 
     @Provides
     @FeatureScope
