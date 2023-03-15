@@ -197,8 +197,19 @@ object ChainGeneses {
     const val XX_NETWORK = "50dd5d206917bf10502c68fb4d18a59fc8aa31586f4e8856b493e43544aa82aa"
 }
 
+object ChainIds {
+
+    const val ETHEREUM = "eip155:1"
+
+    const val MOONBEAM = ChainGeneses.MOONBEAM
+    const val MOONRIVER = ChainGeneses.MOONRIVER
+}
+
 val Chain.Companion.Geneses
     get() = ChainGeneses
+
+val Chain.Companion.Ids
+    get() = ChainIds
 
 fun Chain.Asset.requireStatemine(): Type.Statemine {
     require(type is Type.Statemine)
