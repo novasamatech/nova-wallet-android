@@ -31,7 +31,7 @@ val AddExtrinsicContentField_37_38 = object : Migration(37, 38) {
             `extrinsicContent_call` TEXT,
             PRIMARY KEY(`id`, `address`, `chainId`, `chainAssetId`)
             )
-        """.trimIndent()
+            """.trimIndent()
         )
     }
 }

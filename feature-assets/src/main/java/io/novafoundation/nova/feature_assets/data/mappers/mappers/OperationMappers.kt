@@ -80,8 +80,8 @@ private fun String.itemToCapitalizedWords(): String {
     return split.joinToString(separator = " ") { it.capitalize() }
 }
 
-private fun mapExtrinsicContentToHeaderAndSubHeader(extrinsicContent: Content, resourceManager: ResourceManager) : Pair<String, String> {
-    return when(extrinsicContent) {
+private fun mapExtrinsicContentToHeaderAndSubHeader(extrinsicContent: Content, resourceManager: ResourceManager): Pair<String, String> {
+    return when (extrinsicContent) {
         is Content.ContractCall -> {
             val header = if (extrinsicContent.function != null) {
                 val withoutArguments = extrinsicContent.function!!.split("(").first()

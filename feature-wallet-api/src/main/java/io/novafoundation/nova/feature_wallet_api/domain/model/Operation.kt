@@ -23,9 +23,9 @@ data class Operation(
 
             sealed class Content {
 
-                class SubstrateCall(val module: String, val call: String): Content()
+                class SubstrateCall(val module: String, val call: String) : Content()
 
-                class ContractCall(val contractAddress: String, val function: String?): Content()
+                class ContractCall(val contractAddress: String, val function: String?) : Content()
             }
         }
 
