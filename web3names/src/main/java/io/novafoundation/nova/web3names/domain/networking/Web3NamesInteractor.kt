@@ -27,7 +27,6 @@ class RealWeb3NamesInteractor(
 
     private fun parseToWeb3Name(raw: String): Result<String> {
         return runCatching {
-
             val (web3NameKey, web3NameValue) = raw.split(":", limit = 2)
 
             if (web3NameKey.trim() == "w3n") {

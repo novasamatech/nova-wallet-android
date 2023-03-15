@@ -4,7 +4,6 @@ import io.novafoundation.nova.web3names.data.endpoints.model.TransferRecipientRe
 import retrofit2.http.GET
 import retrofit2.http.Url
 
-
 interface TransferRecipientsApi {
 
     @GET

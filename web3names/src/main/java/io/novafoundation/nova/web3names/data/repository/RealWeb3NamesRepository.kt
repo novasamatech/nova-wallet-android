@@ -16,7 +16,6 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 
-
 class ServiceEndpoint(
     val serviceTypes: List<String>,
     val urls: List<String>
