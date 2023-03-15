@@ -3,7 +3,7 @@ package io.novafoundation.nova.runtime.extrinsic.multi
 import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.common.utils.times
-import io.novafoundation.nova.runtime.ext.genesisHash
+import io.novafoundation.nova.runtime.ext.requireGenesisHash
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions
 import io.novafoundation.nova.runtime.extrinsic.FeeSigner
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -92,7 +92,7 @@ internal class RealExtrinsicSplitter(
 
     private suspend fun wrapInFakeExtrinsic(call: GenericCall.Instance, runtime: RuntimeSnapshot, chain: Chain): String {
         val signer = FeeSigner(chain)
-        val genesisHash = chain.genesisHash.fromHex()
+        val genesisHash = chain.requireGenesisHash().fromHex()
 
         return ExtrinsicBuilder(
             tip = BalanceOf.ZERO,

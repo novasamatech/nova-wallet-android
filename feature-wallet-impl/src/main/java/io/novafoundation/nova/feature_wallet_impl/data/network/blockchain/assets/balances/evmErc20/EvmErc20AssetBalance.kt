@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evmErc20
 
+import android.util.Log
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
 import io.novafoundation.nova.core.updater.EthereumSharedRequestsBuilder
@@ -114,11 +115,19 @@ class EvmErc20AssetBalance(
                 .balanceOfAsync(account)
                 .await()
 
+            if (contractAddress == "0xdac17f958d2ee523a2206206994597c13d831ec7") {
+                Log.d("RX", "Got Ethereum USDT balance update: $newBalance")
+            }
+
             Erc20BalanceUpdate(newBalance, cause = erc20Transfer)
         }
 
         return flow {
             val initialBalance = initialBalanceAsync.await()
+
+            if (contractAddress == "0xdac17f958d2ee523a2206206994597c13d831ec7") {
+                Log.d("RX", "Got Ethereum USDT balance update: $initialBalance")
+            }
 
             emit(Erc20BalanceUpdate(initialBalance, cause = null))
 

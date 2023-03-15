@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala
 import io.novafoundation.nova.feature_crowdloan_impl.BuildConfig
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.addressOf
-import io.novafoundation.nova.runtime.ext.genesisHash
+import io.novafoundation.nova.runtime.ext.requireGenesisHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import retrofit2.http.Body
@@ -28,10 +28,10 @@ interface AcalaApi {
             Chain.Geneses.ROCOCO_ACALA to authHeader(BuildConfig.ACALA_TEST_AUTH_TOKEN)
         )
 
-        fun getAuthHeader(chain: Chain) = AUTH_BY_GENESIS[chain.genesisHash]
+        fun getAuthHeader(chain: Chain) = AUTH_BY_GENESIS[chain.requireGenesisHash()]
             ?: notSupportedChain(chain)
 
-        fun getBaseUrl(chain: Chain) = URL_BY_GENESIS[chain.genesisHash]
+        fun getBaseUrl(chain: Chain) = URL_BY_GENESIS[chain.requireGenesisHash()]
             ?: notSupportedChain(chain)
 
         private fun notSupportedChain(chain: Chain): Nothing {

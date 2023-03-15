@@ -51,6 +51,7 @@ import io.novafoundation.nova.core_db.migrations.AddGovernanceNetworkToExternalA
 import io.novafoundation.nova.core_db.migrations.AddLocks_22_23
 import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
+import io.novafoundation.nova.core_db.migrations.AddRuntimeFlagToChains_36_37
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AddSourceToLocalAsset_28_29
 import io.novafoundation.nova.core_db.migrations.AddTransferApisTable_29_30
@@ -98,7 +99,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 36,
+    version = 37,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -167,7 +168,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddSourceToLocalAsset_28_29, AddTransferApisTable_29_30, AddEnabledColumnToChainAssets_30_31)
                     .addMigrations(FixBrokenForeignKeys_31_32, AddVersioningToGovernanceDapps_32_33)
                     .addMigrations(AddGovernanceNetworkToExternalApi_33_34, AddBrowserHostSettings_34_35)
-                    .addMigrations(ExtractExternalApiToSeparateTable_35_36)
+                    .addMigrations(ExtractExternalApiToSeparateTable_35_36, AddRuntimeFlagToChains_36_37)
                     .build()
             }
             return instance!!

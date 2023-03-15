@@ -15,6 +15,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAccountId
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumPublicKey
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.isValid
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 import jp.co.soramitsu.fearless_utils.extensions.toAddress
@@ -58,8 +59,12 @@ fun Chain.Asset.unifiedSymbol(): String {
 val Chain.Asset.disabled: Boolean
     get() = !enabled
 
-val Chain.genesisHash: String
-    get() = id
+val Chain.genesisHash: String?
+    get() = id.takeIf {
+        runCatching { it.fromHex() }.isSuccess
+    }
+
+fun Chain.requireGenesisHash() = requireNotNull(genesisHash)
 
 fun Chain.addressOf(accountId: ByteArray): String {
     return if (isEthereumBased) {
