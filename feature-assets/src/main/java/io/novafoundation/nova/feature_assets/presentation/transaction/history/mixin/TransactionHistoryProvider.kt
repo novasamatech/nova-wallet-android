@@ -62,7 +62,11 @@ class TransactionHistoryProvider(
     }
 
     private val historyFiltersProviderAsync by lazyAsync {
-        historyFiltersProviderFactory.get(scope = this)
+        historyFiltersProviderFactory.get(
+            scope = this,
+            chainId = chainId,
+            chainAssetId = assetId
+        )
     }
 
     override val state = domainState.map(::mapOperationHistoryStateToUi)

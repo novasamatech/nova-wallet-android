@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.onDestroy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.time.Duration
@@ -103,7 +104,12 @@ fun TextView.stopTimer() {
 }
 
 fun <K> CompoundButton.bindFromMap(key: K, map: Map<out K, MutableStateFlow<Boolean>>, lifecycleScope: LifecycleCoroutineScope) {
-    val source = map[key] ?: error("Cannot find $key source")
+    val source = map[key]
+
+    if (source == null) {
+        makeGone()
+        return
+    }
 
     bindTo(source, lifecycleScope)
 }

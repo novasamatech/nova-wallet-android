@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_wallet_impl.data.mappers
 
+import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.nullIfEmpty
+import io.novafoundation.nova.common.utils.splitCamelCase
 import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_impl.data.network.model.response.SubqueryHistoryElementResponse
@@ -147,8 +149,8 @@ fun mapNodeToOperation(
         node.extrinsic != null -> with(node.extrinsic) {
             Operation.Type.Extrinsic(
                 hash = node.extrinsicHash,
-                module = module,
-                call = call,
+                module = module.camelCaseToCapitalizedWords(),
+                call = call.camelCaseToCapitalizedWords(),
                 fee = fee,
                 status = Operation.Status.fromSuccess(success)
             )
@@ -189,3 +191,5 @@ fun mapNodeToOperation(
         chainAsset = tokenType,
     )
 }
+
+private fun String.camelCaseToCapitalizedWords() = splitCamelCase().joinToString(separator = " ") { it.capitalize() }

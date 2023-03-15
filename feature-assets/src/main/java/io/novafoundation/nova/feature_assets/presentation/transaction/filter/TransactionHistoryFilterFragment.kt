@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -21,6 +22,12 @@ import kotlinx.android.synthetic.main.fragment_transactions_filter.transactionsF
 import kotlinx.android.synthetic.main.fragment_transactions_filter.transactionsFilterToolbar
 
 class TransactionHistoryFilterFragment : BaseFragment<TransactionHistoryFilterViewModel>() {
+
+    companion object {
+
+        private const val PAYLOAD_KEY = "TransactionHistoryFilterFragment.Payload"
+        fun getBundle(payload: TransactionHistoryFilterPayload) = bundleOf(PAYLOAD_KEY to payload)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,7 +54,7 @@ class TransactionHistoryFilterFragment : BaseFragment<TransactionHistoryFilterVi
             requireContext(),
             AssetsFeatureApi::class.java
         ).transactionHistoryComponentFactory()
-            .create(this)
+            .create(this, argument(PAYLOAD_KEY))
             .inject(this)
     }
 

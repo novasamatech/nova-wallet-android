@@ -8,9 +8,6 @@ class EtherscanAccountTransfer(
     val from: String,
     val to: String,
     val value: BigInteger,
-    val gasPrice: BigInteger,
-    val gasUsed: BigInteger,
-)
-
-val EtherscanAccountTransfer.feeUsed
-    get() = gasUsed * gasPrice
+    override val gasPrice: BigInteger,
+    override val gasUsed: BigInteger,
+) : WithEvmFee

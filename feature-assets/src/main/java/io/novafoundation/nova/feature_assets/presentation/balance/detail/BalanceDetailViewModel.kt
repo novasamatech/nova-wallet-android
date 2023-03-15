@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
+import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
@@ -119,7 +120,8 @@ class BalanceDetailViewModel(
     }
 
     fun filterClicked() {
-        router.openFilter()
+        val payload = TransactionHistoryFilterPayload(assetPayload)
+        router.openFilter(payload)
     }
 
     fun sync() {

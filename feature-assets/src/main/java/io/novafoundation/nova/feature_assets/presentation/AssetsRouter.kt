@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_assets.presentation.model.OperationParceli
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
+import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
 
 interface AssetsRouter {
 
@@ -12,7 +13,7 @@ interface AssetsRouter {
 
     fun back()
 
-    fun openFilter()
+    fun openFilter(payload: TransactionHistoryFilterPayload)
 
     fun openSend(assetPayload: AssetPayload, initialRecipientAddress: String? = null)
 
