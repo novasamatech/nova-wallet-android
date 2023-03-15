@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapOperationLocal
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapOperationToOperationLocalDb
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.hash.isPositive
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -35,7 +36,7 @@ class RealTransactionHistoryRepository(
         val historySource = historySourceFor(chainAsset)
         val accountAddress = chain.addressOf(accountId)
 
-        val dataPage = historySource.getOperations(pageSize, PageOffset.Loadable.FirstPage, filters, accountId, chain, chainAsset)
+        val dataPage = historySource.getSafeOperations(pageSize, PageOffset.Loadable.FirstPage, filters, accountId, chain, chainAsset)
         historySource.additionalFirstPageSync(chain, chainAsset, accountId, dataPage)
 
         val localOperations = dataPage.map { mapOperationToOperationLocalDb(it, chainAsset, OperationLocal.Source.REMOTE) }
@@ -53,7 +54,7 @@ class RealTransactionHistoryRepository(
     ): DataPage<Operation> = withContext(Dispatchers.Default) {
         val historySource = historySourceFor(chainAsset)
 
-        historySource.getOperations(
+        historySource.getSafeOperations(
             pageSize = pageSize,
             pageOffset = pageOffset,
             filters = filters,
@@ -83,4 +84,28 @@ class RealTransactionHistoryRepository(
     }
 
     private fun historySourceFor(chainAsset: Chain.Asset): AssetHistory = assetSourceRegistry.sourceFor(chainAsset).history
+
+    private suspend fun AssetHistory.getSafeOperations(
+        pageSize: Int,
+        pageOffset: PageOffset.Loadable,
+        filters: Set<TransactionFilter>,
+        accountId: AccountId,
+        chain: Chain,
+        chainAsset: Chain.Asset
+    ): DataPage<Operation> {
+        val nonFiltered = getOperations(pageSize, pageOffset, filters, accountId, chain, chainAsset)
+        val filtered = nonFiltered.filter { it.isSafe() }
+
+        return DataPage(nonFiltered.nextOffset, items = filtered)
+    }
+
+    private fun Operation.isSafe(): Boolean {
+        val txType = type
+
+        return if (txType is Operation.Type.Transfer) {
+            txType.amount.isPositive()
+        } else {
+            true
+        }
+    }
 }
