@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.data.mappers.mappers
+package io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin
 
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -105,7 +105,7 @@ private fun mapExtrinsicContentToHeaderAndSubHeader(extrinsicContent: Content, r
     }
 }
 
-suspend fun mapOperationToOperationModel(
+fun mapOperationToOperationModel(
     chain: Chain,
     operation: Operation,
     nameIdentifier: AddressDisplayUseCase.Identifier,
