@@ -11,7 +11,7 @@ import io.novafoundation.nova.web3names.domain.caip19.matchers.asset.Erc20AssetM
 import io.novafoundation.nova.web3names.domain.caip19.matchers.asset.Slip44AssetMatcher
 import io.novafoundation.nova.web3names.domain.caip19.matchers.asset.UnsupportedAssetMatcher
 import io.novafoundation.nova.web3names.domain.caip19.matchers.caip2.Caip2MatcherList
-import io.novafoundation.nova.web3names.domain.caip19.matchers.caip2.EthereumCaip2Matcher
+import io.novafoundation.nova.web3names.domain.caip19.matchers.caip2.Eip155Matcher
 import io.novafoundation.nova.web3names.domain.caip19.matchers.caip2.SubstrateCaip2Matcher
 
 interface Caip19MatcherFactory {
@@ -22,10 +22,10 @@ interface Caip19MatcherFactory {
 class RealCaip19MatcherFactory(private val slip44CoinRepository: Slip44CoinRepository) : Caip19MatcherFactory {
 
     override fun getCaip19Matcher(chain: Chain, chainAsset: Chain.Asset): Caip19Matcher {
-        val coip2Matcher = getCaip2Matcher(chain)
+        val caip2Matcher = getCaip2Matcher(chain)
         val assetNamespaceMatcher = getAssetNamespaceMatcher(chainAsset)
 
-        return Caip19Matcher(coip2Matcher, assetNamespaceMatcher)
+        return Caip19Matcher(caip2Matcher, assetNamespaceMatcher)
     }
 
     private fun getCaip2Matcher(chain: Chain): Caip2Matcher {
@@ -33,13 +33,12 @@ class RealCaip19MatcherFactory(private val slip44CoinRepository: Slip44CoinRepos
             add(SubstrateCaip2Matcher(chain))
 
             if (chain.isEthereumBased) {
-                add(EthereumCaip2Matcher(chain))
+                add(Eip155Matcher(chain))
             }
         }
         return Caip2MatcherList(matchers)
     }
 
-    // TODO: support native evm
     private fun getAssetNamespaceMatcher(chainAsset: Chain.Asset): AssetMatcher {
         return when (chainAsset.type) {
             is Evm -> Erc20AssetMatcher(chainAsset)

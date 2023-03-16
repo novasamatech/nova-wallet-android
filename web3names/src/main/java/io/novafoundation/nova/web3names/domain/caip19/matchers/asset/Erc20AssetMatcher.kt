@@ -7,7 +7,6 @@ import io.novafoundation.nova.web3names.domain.caip19.identifiers.AssetIdentifie
 
 class Erc20AssetMatcher(private val chainAsset: Chain.Asset) : AssetMatcher {
 
-    // TODO support native EVM
     override fun match(assetIdentifier: AssetIdentifier): Boolean {
         val chainAssetType = chainAsset.type
         return assetIdentifier is Erc20 &&

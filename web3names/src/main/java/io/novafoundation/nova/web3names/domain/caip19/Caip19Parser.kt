@@ -38,4 +38,14 @@ class Caip19Parser {
             else -> throw NotSupportedIdentifierException()
         }
     }
+
+    private fun String.splitToNamespaces(): Pair<String, String> {
+        val (chainNamespace, tokenNamespace) = split("/")
+        return Pair(chainNamespace, tokenNamespace)
+    }
+
+    private fun String.toNamespaceAndReference(): Pair<String, String> {
+        val (namespaceName, namespaceReference) = split(":")
+        return Pair(namespaceName, namespaceReference)
+    }
 }
