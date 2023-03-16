@@ -12,7 +12,8 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "KILT_CHAIN_ID", "\"411f057b9107718c9624d6aa4a3f23c1653898297f3d4d529d9bb6511a39dd21\""
+        //TODO: change chainId to kilt
+        buildConfigField "String", "KILT_CHAIN_ID", "\"a0c6e3bac382b316a68bca7141af1fba507207594c761076847ce358aeedcc21\""
     }
 
     buildTypes {

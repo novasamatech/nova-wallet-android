@@ -30,7 +30,7 @@ class Web3NamesModule {
         // TODO stub
         return object : Slip44CoinRepository {
             override fun getCoinCode(chainAsset: Chain.Asset): Int {
-                TODO("Not yet implemented")
+                return 354
             }
         }
     }
