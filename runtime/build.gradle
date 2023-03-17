@@ -26,8 +26,8 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/chains/v8/chains.json\""
-            buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/assets/evm/v1/assets.json\""
+            buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/chains/v9/chains.json\""
+            buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/assets/evm/v2/assets.json\""
         }
     }
 

@@ -49,7 +49,7 @@ fun SocketService.executeBatchRequestAsFuture(
         }
     }
 
-    future.cancellable = executeBatchRequest(requests, deliveryType, callback)
+    future.cancellable = executeAccumulatingBatchRequest(requests, deliveryType, callback)
 
     return future
 }

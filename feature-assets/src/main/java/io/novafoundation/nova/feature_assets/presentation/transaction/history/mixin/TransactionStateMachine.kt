@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 
 object TransactionStateMachine {
 
-    const val PAGE_SIZE = 25
+    const val PAGE_SIZE = 100
     private const val SCROLL_OFFSET = PAGE_SIZE / 2
 
     sealed class State(
@@ -103,13 +103,27 @@ object TransactionStateMachine {
                             state
                         }
                     }
-                    action.newPage.isEmpty() -> State.Empty(state.allAvailableFilters, state.usedFilters)
-                    nextOffset is PageOffset.Loadable -> State.Data(
-                        nextPageOffset = nextOffset,
-                        data = action.newPage,
-                        allAvailableFilters = state.allAvailableFilters,
-                        usedFilters = state.usedFilters
-                    )
+
+                    nextOffset is PageOffset.Loadable -> {
+                        if (action.newPage.size < PAGE_SIZE) {
+                            // cache page doesn't have enough items but we can load them
+                            sideEffectListener(SideEffect.LoadPage(nextPageOffset = nextOffset, state.usedFilters))
+
+                            if (action.newPage.isEmpty()) {
+                                State.EmptyProgress(state.allAvailableFilters, state.usedFilters)
+                            } else {
+                                State.NewPageProgress(nextOffset, action.newPage, state.allAvailableFilters, state.usedFilters)
+                            }
+                        } else {
+                            // cache page has enough items so we wont load next page automatically
+                            if (action.newPage.isEmpty()) {
+                                State.Empty(state.allAvailableFilters, state.usedFilters)
+                            } else {
+                                State.Data(nextOffset, action.newPage, state.allAvailableFilters, state.usedFilters)
+                            }
+                        }
+                    }
+
                     else -> State.FullData(
                         data = action.newPage,
                         allAvailableFilters = state.allAvailableFilters,

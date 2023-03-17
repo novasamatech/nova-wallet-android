@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV1.Rmrk
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.RmrkV2NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.UniquesNftProvider
 import io.novafoundation.nova.runtime.ext.Geneses
-import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class NftProvidersRegistry(
@@ -18,7 +17,7 @@ class NftProvidersRegistry(
     private val kusamaProviders = listOf(rmrkV1NftProvider, rmrkV2NftProvider)
 
     fun get(chain: Chain): List<NftProvider> {
-        return when (chain.genesisHash) {
+        return when (chain.id) {
             Chain.Geneses.STATEMINE -> statemineProviders
             Chain.Geneses.KUSAMA -> kusamaProviders
             else -> emptyList()

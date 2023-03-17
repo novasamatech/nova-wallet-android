@@ -2,6 +2,7 @@ package io.novafoundation.nova.runtime.ethereum
 
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
+import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
@@ -47,8 +48,8 @@ internal class RealWeb3Api(
         return map { topic ->
             when (topic) {
                 Topic.Any -> null
-                is Topic.AnyOf -> topic.values
-                is Topic.Single -> topic.value
+                is Topic.AnyOf -> topic.values.map { it.requireHexPrefix() }
+                is Topic.Single -> topic.value.requireHexPrefix()
             }
         }
     }

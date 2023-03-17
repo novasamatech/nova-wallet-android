@@ -14,6 +14,7 @@ import org.web3j.abi.datatypes.Function as EvmFunction
 class RealEvmTransactionBuilder : EvmTransactionBuilder {
 
     private var transactionData: EvmTransactionData? = null
+
     override fun nativeTransfer(amount: BalanceOf, recipient: AccountId) {
         transactionData = EvmTransactionData.NativeTransfer(amount, recipient.ethereumAccountIdToAddress())
     }

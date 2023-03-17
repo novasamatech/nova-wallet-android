@@ -28,6 +28,7 @@ data class Chain(
     val types: Types?,
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
+    val hasSubstrateRuntime: Boolean,
     val hasCrowdloans: Boolean,
     val governance: List<Governance>,
     val parentId: String?,
