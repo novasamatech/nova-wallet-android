@@ -11,9 +11,6 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        //TODO: change chainId to kilt
-        buildConfigField "String", "KILT_CHAIN_ID", "\"a0c6e3bac382b316a68bca7141af1fba507207594c761076847ce358aeedcc21\""
     }
 
     buildTypes {

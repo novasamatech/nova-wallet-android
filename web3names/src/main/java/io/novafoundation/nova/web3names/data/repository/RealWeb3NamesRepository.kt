@@ -16,6 +16,8 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 
+private const val TRANSFER_ASSETS_PROVIDER_DID_SERVICE_TYPE = "KiltTransferAssetRecipientV1"
+
 class ServiceEndpoint(
     val serviceTypes: List<String>,
     val urls: List<String>
@@ -54,7 +56,7 @@ class RealWeb3NamesRepository(
                 .entries(
                     accountId,
                     keyExtractor = { it },
-                    binding = { a, _ -> bindEndpoint(a) }
+                    binding = { data, _ -> bindEndpoint(data) }
                 )
         }
 
@@ -79,7 +81,7 @@ class RealWeb3NamesRepository(
 
     private fun List<ServiceEndpoint>.firstKiltTransferAssetRecipientV1Endpoint(): ServiceEndpoint? {
         return firstOrNull {
-            it.serviceTypes.contains("KiltTransferAssetRecipientV1")
+            it.serviceTypes.contains(TRANSFER_ASSETS_PROVIDER_DID_SERVICE_TYPE)
         }
     }
 
@@ -88,12 +90,9 @@ class RealWeb3NamesRepository(
         val caip19Matcher = caip19MatcherFactory.getCaip19Matcher(chain, chainAsset)
 
         val chainRecipients = recipients.filterKeys {
-            val caip19Identifier = caip19Parser.parseCaip19(it).getOrNull()
-            if (caip19Identifier == null) {
-                false
-            } else {
-                caip19Matcher.match(caip19Identifier)
-            }
+            val caip19Identifier = caip19Parser.parseCaip19(it).getOrNull() ?: return@filterKeys false
+
+            caip19Matcher.match(caip19Identifier)
         }
 
         return chainRecipients.flatMap { it.value }

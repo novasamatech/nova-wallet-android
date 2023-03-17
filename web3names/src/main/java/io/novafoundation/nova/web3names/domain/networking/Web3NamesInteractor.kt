@@ -19,9 +19,10 @@ class RealWeb3NamesInteractor(
         return parseToWeb3Name(raw).isSuccess
     }
 
+    // TODO return Result<?>
     override suspend fun queryAccountsByWeb3Name(web3Name: String, chain: Chain, chainAsset: Chain.Asset): List<Web3NameAccount> {
         require(isValidWeb3Name(web3Name))
-        
+
         val web3NameNoPrefix = parseToWeb3Name(web3Name).getOrThrow()
 
         return web3NamesRepository.queryWeb3NameAccount(web3NameNoPrefix, chain, chainAsset)

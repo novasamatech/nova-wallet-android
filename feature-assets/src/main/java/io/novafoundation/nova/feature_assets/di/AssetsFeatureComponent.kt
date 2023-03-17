@@ -30,7 +30,6 @@ import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.web3names.di.Web3NamesApi
-import io.novafoundation.nova.web3names.di.Web3NamesModule
 
 @Component(
     dependencies = [

@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.web3names.BuildConfig
 import io.novafoundation.nova.web3names.data.caip19.Caip19MatcherFactory
 import io.novafoundation.nova.web3names.data.caip19.Caip19Parser
 import io.novafoundation.nova.web3names.data.caip19.RealCaip19MatcherFactory
@@ -52,7 +51,8 @@ class Web3NamesModule {
     @Provides
     @FeatureScope
     fun provideWeb4NamesServiceChainIdProvider(): Web3NamesServiceChainIdProvider {
-        return RealWeb3NamesServiceChainIdProvider(BuildConfig.KILT_CHAIN_ID)
+        // TODO change to ChainGeneses.KILT
+        return RealWeb3NamesServiceChainIdProvider("a0c6e3bac382b316a68bca7141af1fba507207594c761076847ce358aeedcc21")
     }
 
     @Provides
