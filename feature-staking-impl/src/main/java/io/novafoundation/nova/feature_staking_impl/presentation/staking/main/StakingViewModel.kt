@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_staking_impl.domain.common.stakeable
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.AlertsComponentFactory
@@ -39,7 +38,7 @@ class StakingViewModel(
 
     val assetSelectorMixin = assetSelectorMixinFactory.create(
         scope = this,
-        amountProvider = Asset::stakeable
+        amountProvider = Asset::transferable
     )
 
     private val selectedAccountFlow = selectedAccountUseCase.selectedMetaAccountFlow()
