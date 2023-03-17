@@ -709,7 +709,7 @@
     <string name="staking_account_is_used_as_controller">Выбранный аккаунт уже используется в качестве контроллера.</string>
     <string name="staking_active_delegators">Активные делегаторы</string>
     <string name="staking_add_controller">Чтобы выполнить это действие, добавьте контроллер аккаунт %s в приложение</string>
-    <string name="staking_alert_bond_more_message">Ваш стейк меньше минимума %s.\nСтейк меньше минимума, уменьшает шансы получить вознаграждение</string>
+    <string name="staking_alert_bond_more_message">Ваш стейк меньше минимума %s.\nСтейк меньше минимума уменьшает шансы получить вознаграждение</string>
     <string name="staking_alert_bond_more_title">Застейкайте ещё токенов</string>
     <string name="staking_alert_change_validators">Смените своих валидаторов.</string>
     <string name="staking_alert_no_alerts_now">Сейчас всё хорошо. Здесь будут появляться предупреждения.</string>
