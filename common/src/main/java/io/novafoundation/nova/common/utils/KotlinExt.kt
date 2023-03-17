@@ -107,6 +107,16 @@ inline fun <K, V> Map<K, V?>.filterNotNull(): Map<K, V> {
     return filterValues { it != null } as Map<K, V>
 }
 
+inline fun <T, R> Array<T>.tryFindNonNull(transform: (T) -> R?): R? {
+    for (item in this) {
+        val transformed = transform(item)
+
+        if (transformed != null) return transformed
+    }
+
+    return null
+}
+
 fun String.bigIntegerFromHex() = removeHexPrefix().toBigInteger(16)
 fun String.intFromHex() = removeHexPrefix().toInt(16)
 
