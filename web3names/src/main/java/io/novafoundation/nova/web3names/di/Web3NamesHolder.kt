@@ -13,7 +13,7 @@ class Web3NamesHolder @Inject constructor(
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
-        val dbDependencies = DaggerWeb3NamesFeatureComponent_RuntimeDependenciesComponent.builder()
+        val dbDependencies = DaggerWeb3NamesFeatureComponent_Web3NamesDependenciesComponent.builder()
             .commonApi(commonApi())
             .dbApi(getFeature(DbApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))

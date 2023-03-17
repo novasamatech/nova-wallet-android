@@ -1,9 +1,9 @@
-package io.novafoundation.nova.web3names.domain.caip19.matchers.asset
+package io.novafoundation.nova.web3names.data.caip19.matchers.asset
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type.Evm
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.AssetIdentifier
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.AssetIdentifier.Erc20
+import io.novafoundation.nova.web3names.data.caip19.identifiers.AssetIdentifier
+import io.novafoundation.nova.web3names.data.caip19.identifiers.AssetIdentifier.Erc20
 
 class Erc20AssetMatcher(private val chainAsset: Chain.Asset) : AssetMatcher {
 

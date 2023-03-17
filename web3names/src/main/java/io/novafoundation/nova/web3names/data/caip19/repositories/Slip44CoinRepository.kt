@@ -1,4 +1,4 @@
-package io.novafoundation.nova.web3names.domain.caip19.repositories
+package io.novafoundation.nova.web3names.data.caip19.repositories
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 

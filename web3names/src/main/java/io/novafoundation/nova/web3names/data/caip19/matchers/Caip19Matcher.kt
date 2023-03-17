@@ -1,8 +1,8 @@
-package io.novafoundation.nova.web3names.domain.caip19.matchers
+package io.novafoundation.nova.web3names.data.caip19.matchers
 
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.Caip19Identifier
-import io.novafoundation.nova.web3names.domain.caip19.matchers.asset.AssetMatcher
-import io.novafoundation.nova.web3names.domain.caip19.matchers.caip2.Caip2Matcher
+import io.novafoundation.nova.web3names.data.caip19.identifiers.Caip19Identifier
+import io.novafoundation.nova.web3names.data.caip19.matchers.asset.AssetMatcher
+import io.novafoundation.nova.web3names.data.caip19.matchers.caip2.Caip2Matcher
 
 class Caip19Matcher(
     private val caip2Matcher: Caip2Matcher,

@@ -1,9 +1,9 @@
-package io.novafoundation.nova.web3names.domain.caip19.matchers.caip2
+package io.novafoundation.nova.web3names.data.caip19.matchers.caip2
 
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.Caip2Identifier
+import io.novafoundation.nova.web3names.data.caip19.identifiers.Caip2Identifier
 
 class SubstrateCaip2Matcher(private val chain: Chain) : Caip2Matcher {
 

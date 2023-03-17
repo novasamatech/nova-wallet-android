@@ -54,12 +54,15 @@ import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import jp.co.soramitsu.fearless_utils.encrypt.Signer
 import jp.co.soramitsu.fearless_utils.icon.IconGenerator
 import jp.co.soramitsu.fearless_utils.wsrpc.logging.Logger
 import javax.inject.Named
 
 interface AssetsFeatureDependencies {
+
+    fun web3NamesInteractor(): Web3NamesInteractor
 
     fun contributionsInteractor(): ContributionsInteractor
 

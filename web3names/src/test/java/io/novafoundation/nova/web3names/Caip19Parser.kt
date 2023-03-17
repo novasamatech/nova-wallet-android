@@ -1,14 +1,14 @@
 package io.novafoundation.nova.web3names
 
 import io.novafoundation.nova.common.utils.requireValue
-import io.novafoundation.nova.web3names.domain.caip19.Caip19Parser
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.AssetIdentifier
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.Caip19Identifier
-import io.novafoundation.nova.web3names.domain.caip19.identifiers.Caip2Identifier
+import io.novafoundation.nova.web3names.data.caip19.Caip19Parser
+import io.novafoundation.nova.web3names.data.caip19.identifiers.AssetIdentifier
+import io.novafoundation.nova.web3names.data.caip19.identifiers.Caip19Identifier
+import io.novafoundation.nova.web3names.data.caip19.identifiers.Caip2Identifier
 import org.junit.Test
 import org.junit.Assert.assertTrue
 
-class Caip19Parser {
+class Caip19ParserTest {
 
     private val parser = Caip19Parser()
 
