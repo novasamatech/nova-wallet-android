@@ -24,4 +24,4 @@ include ':feature-governance-impl'
 include ':feature-vote'
 include ':feature-versions-impl'
 include ':feature-versions-api'
-
+include ':web3names'
