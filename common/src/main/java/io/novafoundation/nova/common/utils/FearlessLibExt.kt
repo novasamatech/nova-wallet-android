@@ -154,14 +154,15 @@ fun Module.constantOrNull(name: String) = constants[name]
 
 fun RuntimeMetadata.staking() = module(Modules.STAKING)
 
-fun RuntimeMetadata.voterListOrNull() = moduleOrNull(Modules.VOTER_LIST)
+fun RuntimeMetadata.voterListOrNull() = firstExistingModuleOrNull(Modules.VOTER_LIST, Modules.BAG_LIST)
+fun RuntimeMetadata.voterListName(): String = requireNotNull(voterListOrNull()).name
 
 fun RuntimeMetadata.system() = module(Modules.SYSTEM)
 
 fun RuntimeMetadata.balances() = module(Modules.BALANCES)
 
 fun RuntimeMetadata.tokens() = module(Modules.TOKENS)
-fun RuntimeMetadata.tokensOrNull() = moduleOrNull(Modules.TOKENS)
+
 fun RuntimeMetadata.currencies() = module(Modules.CURRENCIES)
 fun RuntimeMetadata.currenciesOrNull() = moduleOrNull(Modules.CURRENCIES)
 fun RuntimeMetadata.crowdloan() = module(Modules.CROWDLOAN)
@@ -204,12 +205,15 @@ fun RuntimeMetadata.electionProviderMultiPhaseOrNull() = moduleOrNull(Modules.EL
 
 fun RuntimeMetadata.preImage() = module(Modules.PREIMAGE)
 
-fun RuntimeMetadata.firstExistingModule(vararg options: String): String {
+fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
 }
 
-fun RuntimeMetadata.xcmPalletName() = firstExistingModule("XcmPallet", "PolkadotXcm")
-fun RuntimeMetadata.xcmPallet() = module(firstExistingModule("XcmPallet", "PolkadotXcm"))
+fun RuntimeMetadata.firstExistingModuleOrNull(vararg options: String): Module? {
+    return options.tryFindNonNull { moduleOrNull(it) }
+}
+
+fun RuntimeMetadata.xcmPalletName() = firstExistingModuleName("XcmPallet", "PolkadotXcm")
 
 fun StorageEntry.splitKeyToComponents(runtime: RuntimeSnapshot, key: String): ComponentHolder {
     return ComponentHolder(splitKey(runtime, key))
@@ -229,7 +233,9 @@ private fun cropSeedTo32Bytes(seedResult: SeedFactory.Result): SeedFactory.Resul
     return SeedFactory.Result(seed = seedResult.seed.copyOfRange(0, 32), seedResult.mnemonic)
 }
 
-fun GenericCall.Instance.oneOf(vararg functionCandidates: MetadataFunction): Boolean = functionCandidates.any { function == it }
+fun GenericCall.Instance.oneOf(vararg functionCandidates: MetadataFunction?): Boolean {
+    return functionCandidates.any { candidate -> candidate != null && function == candidate }
+}
 fun GenericCall.Instance.instanceOf(functionCandidate: MetadataFunction): Boolean = function == functionCandidate
 
 fun GenericCall.Instance.instanceOf(moduleName: String, callName: String): Boolean = moduleName == module.name && callName == function.name
@@ -290,6 +296,7 @@ object Modules {
     const val DEMOCRACY = "Democracy"
 
     const val VOTER_LIST = "VoterList"
+    const val BAG_LIST = "BagsList"
 
     const val ELECTION_PROVIDER_MULTI_PHASE = "ElectionProviderMultiPhase"
 }

@@ -151,7 +151,7 @@ class RealCrossChainTransactor(
         callName: String
     ) {
         val lowestMultiLocationVersion = palletXcmRepository.lowestPresentMultiLocationVersion(assetTransfer.originChain.id)
-        val lowestMultiAssetVersion = palletXcmRepository.lowestPresentMultiAssetVersion(assetTransfer.originChain.id)
+        val lowestMultiAssetsVersion = palletXcmRepository.lowestPresentMultiAssetsVersion(assetTransfer.originChain.id)
 
         val multiAsset = configuration.multiAssetFor(assetTransfer, crossChainFee)
 
@@ -161,7 +161,7 @@ class RealCrossChainTransactor(
             arguments = mapOf(
                 "dest" to configuration.destinationChainLocation.versioned(lowestMultiLocationVersion).toEncodableInstance(),
                 "beneficiary" to assetTransfer.beneficiaryLocation().versioned(lowestMultiLocationVersion).toEncodableInstance(),
-                "assets" to listOf(multiAsset).versioned(lowestMultiAssetVersion).toEncodableInstance(),
+                "assets" to listOf(multiAsset).versioned(lowestMultiAssetsVersion).toEncodableInstance(),
                 "fee_asset_item" to BigInteger.ZERO,
                 "weight_limit" to WeightLimit.Limited(weigher.estimateRequiredDestWeight(configuration)).toVersionedEncodableInstance(runtime)
             )

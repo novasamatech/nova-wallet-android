@@ -50,7 +50,7 @@ class DelegateListViewModel(
         .shareInBackground()
 
     private val delegatesFlow = governanceSharedState.selectedOption
-        .withLoadingShared { interactor.getDelegates(it) }
+        .withLoadingShared { interactor.getDelegates(it, this) }
 
     private val sortedAndFilteredDelegates = combine(
         sortingMixin.selectedValue,
