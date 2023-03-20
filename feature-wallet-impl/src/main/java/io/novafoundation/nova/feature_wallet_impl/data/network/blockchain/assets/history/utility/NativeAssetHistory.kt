@@ -19,6 +19,7 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import jp.co.soramitsu.fearless_utils.runtime.metadata.call
+import jp.co.soramitsu.fearless_utils.runtime.metadata.callOrNull
 
 class NativeAssetHistory(
     private val chainRegistry: ChainRegistry,
@@ -60,7 +61,7 @@ class NativeAssetHistory(
 
         return oneOf(
             balances.call("transfer"),
-            balances.call("transfer_keep_alive")
+            balances.callOrNull("transfer_keep_alive")
         )
     }
 }
