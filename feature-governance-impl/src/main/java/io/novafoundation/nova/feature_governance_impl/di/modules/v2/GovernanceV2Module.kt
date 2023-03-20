@@ -6,8 +6,8 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
-import io.novafoundation.nova.feature_governance_impl.data.offchain.polkassembly.v2.PolkassemblyV2ReferendaDataSource
-import io.novafoundation.nova.feature_governance_impl.data.offchain.subsquare.v2.SubSquareV2ReferendaDataSource
+import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.polkassembly.v2.PolkassemblyV2ReferendaDataSource
+import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.subsquare.v2.SubSquareV2ReferendaDataSource
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.metadata.DelegateMetadataApi
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.DelegationsSubqueryApi
 import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer

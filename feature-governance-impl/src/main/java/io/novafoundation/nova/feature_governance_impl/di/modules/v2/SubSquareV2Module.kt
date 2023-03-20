@@ -4,8 +4,8 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.feature_governance_impl.data.offchain.subsquare.v2.SubSquareV2Api
-import io.novafoundation.nova.feature_governance_impl.data.offchain.subsquare.v2.SubSquareV2ReferendaDataSource
+import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.subsquare.v2.SubSquareV2Api
+import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.subsquare.v2.SubSquareV2ReferendaDataSource
 
 @Module
 class SubSquareV2Module {

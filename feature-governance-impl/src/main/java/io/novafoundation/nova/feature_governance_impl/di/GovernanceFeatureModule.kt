@@ -22,8 +22,8 @@ import io.novafoundation.nova.feature_governance_impl.data.repository.RealTreasu
 import io.novafoundation.nova.feature_governance_impl.data.source.RealGovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceDAppsModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceUpdatersModule
-import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV1
-import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV1Module
+import io.novafoundation.nova.feature_governance_impl.di.modules.v1.GovernanceV1
+import io.novafoundation.nova.feature_governance_impl.di.modules.v1.GovernanceV1Module
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.DelegateModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumDetailsModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumListModule

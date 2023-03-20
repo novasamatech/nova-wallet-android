@@ -4,8 +4,8 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.feature_governance_impl.data.offchain.polkassembly.v2.PolkassemblyV2Api
-import io.novafoundation.nova.feature_governance_impl.data.offchain.polkassembly.v2.PolkassemblyV2ReferendaDataSource
+import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.polkassembly.v2.PolkassemblyV2Api
+import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.polkassembly.v2.PolkassemblyV2ReferendaDataSource
 
 @Module
 class PolkassemblyV2Module {
