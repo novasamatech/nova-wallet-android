@@ -1,6 +1,6 @@
-package io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.subsquare.v2.response
+package io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.subsquare.v1.response
 
-class ReferendumDetailsV2Response(
+class ReferendumDetailsV1Response(
     val title: String?,
     val content: String?,
     val author: Author?,
@@ -13,7 +13,7 @@ class ReferendumDetailsV2Response(
 
     class Status(
         val indexer: IndexerState,
-        val name: String
+        val method: String
     )
 
     class IndexerState(
