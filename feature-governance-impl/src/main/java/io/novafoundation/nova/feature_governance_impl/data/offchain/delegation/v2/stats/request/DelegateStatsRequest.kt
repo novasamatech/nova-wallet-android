@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.request
+package io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 

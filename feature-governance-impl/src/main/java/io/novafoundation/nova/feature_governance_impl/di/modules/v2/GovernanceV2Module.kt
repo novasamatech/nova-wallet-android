@@ -8,8 +8,8 @@ import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.polkassembly.v2.PolkassemblyV2ReferendaDataSource
 import io.novafoundation.nova.feature_governance_impl.data.offchain.referendum.subsquare.v2.SubSquareV2ReferendaDataSource
-import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.metadata.DelegateMetadataApi
-import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.DelegationsSubqueryApi
+import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.metadata.DelegateMetadataApi
+import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.DelegationsSubqueryApi
 import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
 import io.novafoundation.nova.feature_governance_impl.data.repository.MultiSourceOffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2DelegationsRepository

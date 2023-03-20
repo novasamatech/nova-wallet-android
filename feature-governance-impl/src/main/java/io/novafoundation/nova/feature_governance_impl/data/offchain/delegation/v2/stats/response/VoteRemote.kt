@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.response
+package io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response
 
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance

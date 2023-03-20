@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.metadata.response
+package io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.metadata.response
 
 class DelegateMetadataRemote(
     val address: String,

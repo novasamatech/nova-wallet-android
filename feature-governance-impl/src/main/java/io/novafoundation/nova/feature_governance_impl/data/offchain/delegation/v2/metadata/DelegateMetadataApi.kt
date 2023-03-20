@@ -1,6 +1,6 @@
-package io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.metadata
+package io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.metadata
 
-import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.metadata.response.DelegateMetadataRemote
+import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.metadata.response.DelegateMetadataRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import retrofit2.http.GET
 import retrofit2.http.Path
