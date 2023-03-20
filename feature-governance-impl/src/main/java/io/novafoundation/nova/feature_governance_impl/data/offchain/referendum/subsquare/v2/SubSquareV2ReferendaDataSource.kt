@@ -60,7 +60,6 @@ class SubSquareV2ReferendaDataSource(
             else -> null
         }
 
-
         return timelineState?.let {
             ReferendumTimeline.Entry(timelineState, status.indexer.blockTime)
         }

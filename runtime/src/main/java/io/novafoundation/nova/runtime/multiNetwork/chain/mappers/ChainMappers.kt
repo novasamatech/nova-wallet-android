@@ -156,7 +156,7 @@ private fun mapTransferApiFromLocal(local: ChainExternalApiLocal, gson: Gson): E
 private class GovernanceReferendaParameters(val network: String?)
 
 private fun mapGovernanceReferendaApiFromLocal(local: ChainExternalApiLocal, gson: Gson): ExternalApi.GovernanceReferenda? {
-    val source = when(local.sourceType) {
+    val source = when (local.sourceType) {
         SourceType.SUBSQUARE -> ExternalApi.GovernanceReferenda.Source.SubSquare
 
         SourceType.POLKASSEMBLY -> {

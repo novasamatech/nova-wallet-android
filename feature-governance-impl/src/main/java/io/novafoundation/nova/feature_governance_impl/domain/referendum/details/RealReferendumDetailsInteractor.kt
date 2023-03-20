@@ -228,14 +228,14 @@ class RealReferendumDetailsInteractor(
         return (this + another).distinctBy { it.state }
     }
 
-    private fun OffChainReferendumDetails?.pastTimeLine(currentStatus: ReferendumStatus) : List<ReferendumTimeline.Entry> {
+    private fun OffChainReferendumDetails?.pastTimeLine(currentStatus: ReferendumStatus): List<ReferendumTimeline.Entry> {
         return this?.timeLine?.let { timeLine ->
             timeLine.filter { it.state.isPastStateAt(currentStatus) }
         }.orEmpty()
     }
 
-    private fun State.isPastStateAt(currentStatus: ReferendumStatus) : Boolean {
-        return when(this) {
+    private fun State.isPastStateAt(currentStatus: ReferendumStatus): Boolean {
+        return when (this) {
             // When currentStatus is Approved we will display it as a current status so no extra entry should be present in the past timeline
             State.APPROVED -> currentStatus is ReferendumStatus.Executed
             else -> true

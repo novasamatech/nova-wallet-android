@@ -47,7 +47,6 @@ class GovernanceV2Module {
         delegateSubqueryApi: DelegationsSubqueryApi
     ) = GovV2ConvictionVotingRepository(storageSource, chainRegistry, delegateSubqueryApi)
 
-
     @Provides
     @GovernanceV2
     @FeatureScope
