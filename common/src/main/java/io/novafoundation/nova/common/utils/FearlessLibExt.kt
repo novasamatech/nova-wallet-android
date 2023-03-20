@@ -233,7 +233,7 @@ private fun cropSeedTo32Bytes(seedResult: SeedFactory.Result): SeedFactory.Resul
     return SeedFactory.Result(seed = seedResult.seed.copyOfRange(0, 32), seedResult.mnemonic)
 }
 
-fun GenericCall.Instance.oneOf(vararg functionCandidates: MetadataFunction): Boolean = functionCandidates.any { function == it }
+fun GenericCall.Instance.oneOf(vararg functionCandidates: MetadataFunction?): Boolean = functionCandidates.any { candidate -> candidate != null && function == candidate }
 fun GenericCall.Instance.instanceOf(functionCandidate: MetadataFunction): Boolean = function == functionCandidate
 
 fun GenericCall.Instance.instanceOf(moduleName: String, callName: String): Boolean = moduleName == module.name && callName == function.name
