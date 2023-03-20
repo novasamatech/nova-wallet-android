@@ -20,6 +20,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -114,7 +115,7 @@ class SendInteractor(
 
                 ChainWithAsset(chain, asset)
             }
-        }
+        }.catch { emit(emptyList()) }
     }
 
     fun validationSystemFor(transfer: AssetTransfer) = if (transfer.isCrossChain) {
