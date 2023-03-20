@@ -124,6 +124,11 @@ object TransactionStateMachine {
                         }
                     }
 
+                    action.newPage.isEmpty() -> State.Empty(
+                        allAvailableFilters = state.allAvailableFilters,
+                        usedFilters = state.usedFilters
+                    )
+
                     else -> State.FullData(
                         data = action.newPage,
                         allAvailableFilters = state.allAvailableFilters,
@@ -178,12 +183,19 @@ object TransactionStateMachine {
                                 if (page.items.size < PAGE_SIZE) {
                                     sideEffectListener(SideEffect.LoadPage(nextPageOffset, state.usedFilters))
 
-                                    State.NewPageProgress(
-                                        nextPageOffset = nextPageOffset,
-                                        data = page,
-                                        allAvailableFilters = state.allAvailableFilters,
-                                        usedFilters = state.usedFilters
-                                    )
+                                    if (page.items.isEmpty()) {
+                                        State.EmptyProgress(
+                                            allAvailableFilters = state.allAvailableFilters,
+                                            usedFilters = state.usedFilters
+                                        )
+                                    } else {
+                                        State.NewPageProgress(
+                                            nextPageOffset = nextPageOffset,
+                                            data = page,
+                                            allAvailableFilters = state.allAvailableFilters,
+                                            usedFilters = state.usedFilters
+                                        )
+                                    }
                                 } else {
                                     State.Data(
                                         nextPageOffset = nextPageOffset,
