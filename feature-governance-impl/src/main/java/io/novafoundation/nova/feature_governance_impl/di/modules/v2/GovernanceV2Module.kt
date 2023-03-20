@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.di.modules
+package io.novafoundation.nova.feature_governance_impl.di.modules.v2
 
 import dagger.Module
 import dagger.Provides
@@ -6,12 +6,13 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
+import io.novafoundation.nova.feature_governance_impl.data.offchain.polkassembly.v2.PolkassemblyV2ReferendaDataSource
+import io.novafoundation.nova.feature_governance_impl.data.offchain.subsquare.v2.SubSquareV2ReferendaDataSource
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.metadata.DelegateMetadataApi
 import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.delegation.stats.DelegationsSubqueryApi
-import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.PolkassemblyV2Api
 import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
+import io.novafoundation.nova.feature_governance_impl.data.repository.MultiSourceOffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2DelegationsRepository
-import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2OffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.Gov2PreImageRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.GovV2ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.v2.GovV2DAppsRepository
@@ -27,7 +28,7 @@ import javax.inject.Qualifier
 @Qualifier
 annotation class GovernanceV2
 
-@Module
+@Module(includes = [PolkassemblyV2Module::class, SubSquareV2Module::class])
 class GovernanceV2Module {
 
     @Provides
@@ -46,13 +47,17 @@ class GovernanceV2Module {
         delegateSubqueryApi: DelegationsSubqueryApi
     ) = GovV2ConvictionVotingRepository(storageSource, chainRegistry, delegateSubqueryApi)
 
-    @Provides
-    @FeatureScope
-    fun providePolkassemblyApi(apiCreator: NetworkApiCreator) = apiCreator.create(PolkassemblyV2Api::class.java)
 
     @Provides
+    @GovernanceV2
     @FeatureScope
-    fun provideOffChainInfoRepository(polkassemblyV2Api: PolkassemblyV2Api) = Gov2OffChainReferendaInfoRepository(polkassemblyV2Api)
+    fun provideOffChainInfoRepository(
+        polkassemblyV2ReferendaDataSource: PolkassemblyV2ReferendaDataSource,
+        subSquareV2ReferendaDataSource: SubSquareV2ReferendaDataSource
+    ) = MultiSourceOffChainReferendaInfoRepository(
+        subSquareReferendaDataSource = subSquareV2ReferendaDataSource,
+        polkassemblyReferendaDataSource = polkassemblyV2ReferendaDataSource
+    )
 
     @Provides
     @FeatureScope
@@ -92,7 +97,7 @@ class GovernanceV2Module {
     fun provideGovernanceSource(
         referendaRepository: GovV2OnChainReferendaRepository,
         convictionVotingRepository: GovV2ConvictionVotingRepository,
-        offChainInfoRepository: Gov2OffChainReferendaInfoRepository,
+        @GovernanceV2 offChainInfoRepository: MultiSourceOffChainReferendaInfoRepository,
         preImageRepository: Gov2PreImageRepository,
         governanceV2DappsRepository: GovV2DAppsRepository,
         delegationsRepository: Gov2DelegationsRepository,

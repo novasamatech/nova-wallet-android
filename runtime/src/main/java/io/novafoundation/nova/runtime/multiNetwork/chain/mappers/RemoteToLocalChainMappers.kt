@@ -140,6 +140,7 @@ private fun mapSourceTypeRemoteToLocal(sourceType: String): SourceType = when (s
     "github" -> SourceType.GITHUB
     "polkassembly" -> SourceType.POLKASSEMBLY
     "etherscan" -> SourceType.ETHERSCAN
+    "subsquare" -> SourceType.SUBSQUARE
     else -> SourceType.UNKNOWN
 }
 

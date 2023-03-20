@@ -1,44 +1,34 @@
-package io.novafoundation.nova.feature_governance_impl.data.repository.v2
+package io.novafoundation.nova.feature_governance_impl.data.offchain.polkassembly.v2
 
 import io.novafoundation.nova.common.utils.formatting.parseDateISO_8601
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumDetails
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumPreview
-import io.novafoundation.nova.feature_governance_api.data.repository.OffChainReferendaInfoRepository
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline
-import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.PolkassemblyV2Api
-import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.request.ReferendumDetailsV2Request
-import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.request.ReferendumPreviewV2Request
-import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.response.ReferendaPreviewV2Response
-import io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.response.ReferendumDetailsV2Response
-import io.novafoundation.nova.runtime.ext.externalApi
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.feature_governance_impl.data.offchain.OffChainReferendaDataSource
+import io.novafoundation.nova.feature_governance_impl.data.offchain.polkassembly.v2.request.ReferendumDetailsV2Request
+import io.novafoundation.nova.feature_governance_impl.data.offchain.polkassembly.v2.request.ReferendumPreviewV2Request
+import io.novafoundation.nova.feature_governance_impl.data.offchain.polkassembly.v2.response.ReferendaPreviewV2Response
+import io.novafoundation.nova.feature_governance_impl.data.offchain.polkassembly.v2.response.ReferendumDetailsV2Response
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi.GovernanceReferenda.Source
 
-class Gov2OffChainReferendaInfoRepository(
+class PolkassemblyV2ReferendaDataSource(
     private val polkassemblyApi: PolkassemblyV2Api
-) : OffChainReferendaInfoRepository {
+) : OffChainReferendaDataSource<Source.Polkassembly> {
 
-    override suspend fun referendumPreviews(chain: Chain): List<OffChainReferendumPreview> {
-        return runCatching {
-            val url = chain.polkassemblyUrlOrNull() ?: return emptyList()
+    override suspend fun referendumPreviews(baseUrl: String, options: Source.Polkassembly): List<OffChainReferendumPreview> {
+        val request = ReferendumPreviewV2Request()
+        val response = polkassemblyApi.getReferendumPreviews(baseUrl, request)
 
-            val request = ReferendumPreviewV2Request()
-            val response = polkassemblyApi.getReferendumPreviews(url, request)
-
-            response.data.posts.map(::mapPolkassemblyPostToPreview)
-        }.getOrDefault(emptyList())
+        return response.data.posts.map(::mapPolkassemblyPostToPreview)
     }
 
-    override suspend fun referendumDetails(referendumId: ReferendumId, chain: Chain): OffChainReferendumDetails? {
-        return runCatching {
-            val url = chain.polkassemblyUrlOrNull() ?: return null
+    override suspend fun referendumDetails(referendumId: ReferendumId, baseUrl: String, options: Source.Polkassembly): OffChainReferendumDetails? {
+        val request = ReferendumDetailsV2Request(referendumId.value)
+        val response = polkassemblyApi.getReferendumDetails(baseUrl, request)
+        val referendumDetails = response.data.posts.firstOrNull()
 
-            val request = ReferendumDetailsV2Request(referendumId.value)
-            val response = polkassemblyApi.getReferendumDetails(url, request)
-            val referendumDetails = response.data.posts.firstOrNull()
-
-            referendumDetails?.let(::mapPolkassemblyPostToDetails)
-        }.getOrNull()
+        return referendumDetails?.let(::mapPolkassemblyPostToDetails)
     }
 
     private fun mapPolkassemblyPostToPreview(post: ReferendaPreviewV2Response.Post): OffChainReferendumPreview {
@@ -61,7 +51,7 @@ class Gov2OffChainReferendaInfoRepository(
             description = post.content,
             proposerAddress = null,
             proposerName = post.author.username,
-            pastTimeline = timeline
+            timeLine = timeline
         )
     }
 
@@ -83,9 +73,5 @@ class Gov2OffChainReferendaInfoRepository(
         return timelineState?.let {
             ReferendumTimeline.Entry(timelineState, statusDate?.time)
         }
-    }
-
-    private fun Chain.polkassemblyUrlOrNull(): String? {
-        return externalApi<Chain.ExternalApi.GovernanceReferenda>()?.url
     }
 }

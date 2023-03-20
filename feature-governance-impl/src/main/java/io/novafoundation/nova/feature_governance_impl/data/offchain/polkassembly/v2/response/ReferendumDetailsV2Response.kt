@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.response
+package io.novafoundation.nova.feature_governance_impl.data.offchain.polkassembly.v2.response
 
 import com.google.gson.annotations.SerializedName
 import java.math.BigInteger

@@ -30,7 +30,7 @@ data class ChainExternalApiLocal(
 ) : Identifiable {
 
     enum class SourceType {
-        SUBQUERY, GITHUB, POLKASSEMBLY, ETHERSCAN,
+        SUBQUERY, GITHUB, POLKASSEMBLY, ETHERSCAN, SUBSQUARE,
         UNKNOWN
     }
 

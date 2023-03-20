@@ -4,8 +4,8 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.details.R
 
 class OffChainReferendumDetails(
     val title: String?,
-    val description: String,
+    val description: String?,
     val proposerName: String?,
     val proposerAddress: String?,
-    val pastTimeline: List<ReferendumTimeline.Entry>?
+    val timeLine: List<ReferendumTimeline.Entry>?
 )

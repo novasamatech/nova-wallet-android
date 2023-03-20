@@ -131,11 +131,13 @@ data class Chain(
 
         class Staking(url: String) : ExternalApi(url)
 
-        class GovernanceReferenda(url: String, val source: Source.Polkassembly) : ExternalApi(url) {
+        class GovernanceReferenda(url: String, val source: Source) : ExternalApi(url) {
 
             sealed class Source {
 
                 class Polkassembly(val network: String?) : Source()
+
+                object SubSquare : Source()
             }
         }
 

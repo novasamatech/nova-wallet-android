@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.data.offchain.v2.referendum.request
+package io.novafoundation.nova.feature_governance_impl.data.offchain.polkassembly.v2.request
 
 import java.math.BigInteger
 

@@ -19,12 +19,12 @@ import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class Gov1OffChainReferendaInfoRepository(
-    private val polkassemblyApi: PolkassemblyV1Api
+    private val polkassemblyApi: PolkassemblyV1Api,
 ) : OffChainReferendaInfoRepository {
 
     override suspend fun referendumPreviews(chain: Chain): List<OffChainReferendumPreview> = runCatching {
         val externalApi = chain.externalApi<Chain.ExternalApi.GovernanceReferenda>() ?: return emptyList()
-        val polkassemblyNetwork = externalApi.source.network
+        val polkassemblyNetwork = TODO()
 
         return if (polkassemblyNetwork == null) {
             referendaRelaychainRequest(externalApi.url)
@@ -51,7 +51,7 @@ class Gov1OffChainReferendaInfoRepository(
 
     override suspend fun referendumDetails(referendumId: ReferendumId, chain: Chain): OffChainReferendumDetails? = runCatching {
         val externalApi = chain.externalApi<Chain.ExternalApi.GovernanceReferenda>() ?: return null
-        val polkassemblyNetwork = externalApi.source.network
+        val polkassemblyNetwork = TODO()
 
         val referendumDetails = if (polkassemblyNetwork == null) {
             detailsRelaychain(externalApi.url, referendumId)
@@ -102,7 +102,7 @@ class Gov1OffChainReferendaInfoRepository(
             description = post.content,
             proposerName = null, // author of the post on PA might not be equal to on-chain submitter so we want to be safe here
             proposerAddress = post.onchainLink?.proposerAddress,
-            pastTimeline = timeline
+            timeLine = timeline
         )
     }
 
