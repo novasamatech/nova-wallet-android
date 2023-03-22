@@ -207,7 +207,7 @@ private fun mapExternalApiLocalToExternalApi(externalApiLocal: ChainExternalApiL
 fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
     val nodes = chainLocal.getSortedNodes().map {
         Chain.Node(
-            url = it.url,
+            unformattedUrl = it.url,
             name = it.name,
             chainId = it.chainId,
             orderId = it.orderId
