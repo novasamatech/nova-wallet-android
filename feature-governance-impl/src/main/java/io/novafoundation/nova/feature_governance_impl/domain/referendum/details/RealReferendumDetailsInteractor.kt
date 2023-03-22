@@ -33,6 +33,8 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.details.R
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetails
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline
+import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumTimeline.State
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
 import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
@@ -96,13 +98,15 @@ class RealReferendumDetailsInteractor(
 
         val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
         val tracksById = governanceSource.referenda.getTracksById(chain.id)
-        val offChainInfo = governanceSource.offChainInfo.referendumDetails(referendumId, chain)
         val electorate = governanceSource.referenda.electorate(chain.id)
+
+        val offChainInfo = governanceSource.offChainInfo.referendumDetails(referendumId, chain)
 
         return combine(
             governanceSource.referenda.onChainReferendumFlow(chain.id, referendumId),
             chainStateRepository.currentBlockNumberFlow(chain.id)
         ) { onChainReferendum, currentBlockNumber ->
+
             val preImage = governanceSource.preImageRepository.preImageOf(onChainReferendum.proposal(), chain.id)
             val track = onChainReferendum.track()?.let(tracksById::get)
 
@@ -149,7 +153,7 @@ class RealReferendumDetailsInteractor(
                 voting = voting,
                 timeline = ReferendumTimeline(
                     currentStatus = currentStatus,
-                    pastEntries = offChainInfo?.pastTimeline ?: referendaConstructor.constructPastTimeline(
+                    pastEntries = offChainInfo.pastTimeLine(currentStatus) mergeWith referendaConstructor.constructPastTimeline(
                         chain = chain,
                         onChainReferendum = onChainReferendum,
                         calculatedStatus = currentStatus,
@@ -217,6 +221,24 @@ class RealReferendumDetailsInteractor(
                 accountId = it,
                 offChainNickname = offChainReferendumDetails?.proposerName
             )
+        }
+    }
+
+    private infix fun List<ReferendumTimeline.Entry>.mergeWith(another: List<ReferendumTimeline.Entry>): List<ReferendumTimeline.Entry> {
+        return (this + another).distinctBy { it.state }
+    }
+
+    private fun OffChainReferendumDetails?.pastTimeLine(currentStatus: ReferendumStatus): List<ReferendumTimeline.Entry> {
+        return this?.timeLine?.let { timeLine ->
+            timeLine.filter { it.state.isPastStateAt(currentStatus) }
+        }.orEmpty()
+    }
+
+    private fun State.isPastStateAt(currentStatus: ReferendumStatus): Boolean {
+        return when (this) {
+            // When currentStatus is Approved we will display it as a current status so no extra entry should be present in the past timeline
+            State.APPROVED -> currentStatus is ReferendumStatus.Executed
+            else -> true
         }
     }
 }
