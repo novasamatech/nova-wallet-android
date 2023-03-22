@@ -103,7 +103,7 @@ class ChainConnection internal constructor(
         socketService.stop()
     }
 
-    private fun Chain.Node.formattedUrl() : String? {
+    private fun Chain.Node.formattedUrl(): String? {
         return runCatching { unformattedUrl.formatNamed(connectionSecrets) }.getOrNull()
     }
 
