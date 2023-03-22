@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.evm
+package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.evmErc20
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
@@ -18,7 +18,7 @@ import io.novafoundation.nova.runtime.ext.requireErc20
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
-class EvmAssetTransfers(
+class EvmErc20AssetTransfers(
     private val evmTransactionService: EvmTransactionService,
     private val erc20Standard: Erc20Standard
 ) : AssetTransfers {
@@ -44,6 +44,10 @@ class EvmAssetTransfers(
         }
     }
 
+    override suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean {
+        return true
+    }
+
     private fun EvmTransactionBuilder.transfer(transfer: AssetTransfer) {
         val erc20 = transfer.originChainAsset.requireErc20()
         val recipient = transfer.originChain.accountIdOrDefault(transfer.recipient)
@@ -51,9 +55,5 @@ class EvmAssetTransfers(
         contractCall(erc20.contractAddress, erc20Standard) {
             transfer(recipient = recipient, amount = transfer.amountInPlanks)
         }
-    }
-
-    override suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean {
-        return true
     }
 }

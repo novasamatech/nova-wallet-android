@@ -81,8 +81,8 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
             extrinsicDetailAmount.setTextColorRes(statusAppearance.amountTint)
 
             extrinsicDetailToolbar.setTitle(time.formatDateTime())
-            extrinsicDetailModule.showValue(module)
-            extrinsicDetailCall.showValue(call)
+            extrinsicDetailModule.showValue(subHeader)
+            extrinsicDetailCall.showValue(header)
 
             extrinsicDetailAmount.text = fee
         }

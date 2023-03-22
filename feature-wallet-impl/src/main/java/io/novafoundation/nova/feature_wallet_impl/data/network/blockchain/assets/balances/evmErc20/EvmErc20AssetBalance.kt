@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evm
+package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evmErc20
 
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
@@ -6,6 +6,7 @@ import io.novafoundation.nova.core.updater.EthereumSharedRequestsBuilder
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
+import io.novafoundation.nova.feature_wallet_api.data.cache.updateNonLockableAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
@@ -37,7 +38,7 @@ import java.math.BigInteger
 
 private const val BATCH_ID = "EvmAssetBalance.InitialBalance"
 
-class EvmAssetBalance(
+class EvmErc20AssetBalance(
     private val chainRegistry: ChainRegistry,
     private val assetCache: AssetCache,
     private val erc20Standard: Erc20Standard,
@@ -55,7 +56,7 @@ class EvmAssetBalance(
     }
 
     override suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
-        return false
+        return true
     }
 
     override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
@@ -90,7 +91,7 @@ class EvmAssetBalance(
 
         return subscriptionBuilder.erc20BalanceFlow(address, ethereumApi, chainAsset, initialBalanceAsync)
             .map { balanceUpdate ->
-                updateAsset(metaAccount.id, chainAsset, balanceUpdate.newBalance)
+                assetCache.updateNonLockableAsset(metaAccount.id, chainAsset, balanceUpdate.newBalance)
 
                 if (balanceUpdate.cause != null) {
                     BalanceSyncUpdate.CauseFetched(balanceUpdate.cause)
@@ -98,16 +99,6 @@ class EvmAssetBalance(
                     BalanceSyncUpdate.NoCause
                 }
             }
-    }
-
-    private suspend fun updateAsset(
-        metaId: Long,
-        chainAsset: Chain.Asset,
-        newBalance: Balance
-    ) {
-        assetCache.updateAsset(metaId, chainAsset) {
-            it.copy(freeInPlanks = newBalance)
-        }
     }
 
     private fun EthereumSharedRequestsBuilder.erc20BalanceFlow(

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model
 
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
@@ -15,11 +16,18 @@ data class Operation(
 
         data class Extrinsic(
             val hash: String,
-            val module: String,
-            val call: String,
+            val content: Content,
             val fee: BigInteger,
             val status: Status,
-        ) : Type()
+        ) : Type() {
+
+            sealed class Content {
+
+                class SubstrateCall(val module: String, val call: String) : Content()
+
+                class ContractCall(val contractAddress: String, val function: String?) : Content()
+            }
+        }
 
         data class Reward(
             val amount: BigInteger,
@@ -47,5 +55,17 @@ data class Operation(
                 return if (success) COMPLETED else FAILED
             }
         }
+    }
+}
+
+fun Operation.Type.satisfies(filters: Set<TransactionFilter>): Boolean {
+    return matchingTransactionFilter() in filters
+}
+
+private fun Operation.Type.matchingTransactionFilter(): TransactionFilter {
+    return when (this) {
+        is Operation.Type.Extrinsic -> TransactionFilter.EXTRINSIC
+        is Operation.Type.Reward -> TransactionFilter.REWARD
+        is Operation.Type.Transfer -> TransactionFilter.TRANSFER
     }
 }

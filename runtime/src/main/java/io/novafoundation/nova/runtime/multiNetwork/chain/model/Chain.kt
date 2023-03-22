@@ -28,6 +28,7 @@ data class Chain(
     val types: Types?,
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
+    val hasSubstrateRuntime: Boolean,
     val hasCrowdloans: Boolean,
     val governance: List<Governance>,
     val parentId: String?,
@@ -81,9 +82,11 @@ data class Chain(
                 val transfersEnabled: Boolean,
             ) : Type()
 
-            data class Evm(
+            data class EvmErc20(
                 val contractAddress: String
             ) : Type()
+
+            object EvmNative : Type()
 
             object Unsupported : Type()
         }

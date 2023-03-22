@@ -2,7 +2,7 @@ package io.novafoundation.nova.runtime.extrinsic
 
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.runtime.ext.addressOf
-import io.novafoundation.nova.runtime.ext.genesisHash
+import io.novafoundation.nova.runtime.ext.requireGenesisHash
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -66,7 +66,7 @@ class ExtrinsicBuilderFactory(
                 runtime = runtime,
                 nonce = nonce,
                 runtimeVersion = runtimeVersion,
-                genesisHash = chain.genesisHash.fromHex(),
+                genesisHash = chain.requireGenesisHash().fromHex(),
                 blockHash = mortality.blockHash.fromHex(),
                 era = mortality.era,
                 customSignedExtensions = CustomSignedExtensions.extensionsWithValues(runtime),

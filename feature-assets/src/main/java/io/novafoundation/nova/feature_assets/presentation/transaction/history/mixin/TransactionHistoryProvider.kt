@@ -9,8 +9,6 @@ import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
-import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapOperationToOperationModel
-import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapOperationToParcel
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
@@ -62,7 +60,11 @@ class TransactionHistoryProvider(
     }
 
     private val historyFiltersProviderAsync by lazyAsync {
-        historyFiltersProviderFactory.get(scope = this)
+        historyFiltersProviderFactory.get(
+            scope = this,
+            chainId = chainId,
+            chainAssetId = assetId
+        )
     }
 
     override val state = domainState.map(::mapOperationHistoryStateToUi)

@@ -2,6 +2,7 @@ package io.novafoundation.nova.runtime.ethereum
 
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
+import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
@@ -10,6 +11,7 @@ import org.web3j.protocol.Web3jService
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.methods.response.EthSubscribe
 import org.web3j.protocol.websocket.events.LogNotification
+import org.web3j.protocol.websocket.events.NewHeadsNotification
 
 fun Web3Api(web3jService: Web3jService): Web3Api = RealWeb3Api(web3jService)
 fun Web3Api(socketService: SocketService): Web3Api = RealWeb3Api(WebSocketWeb3jService(socketService))
@@ -18,6 +20,7 @@ internal class RealWeb3Api(
     private val web3jService: Web3jService,
     private val delegate: Web3j = Web3j.build(web3jService)
 ) : Web3Api, Web3j by delegate {
+    override fun newHeadsFlow(): Flow<NewHeadsNotification> = newHeadsNotifications().asFlow()
 
     override fun logsNotifications(addresses: List<String>, topics: List<Topic>): Flow<LogNotification> {
         val logParams = createLogParams(addresses, topics)
@@ -45,8 +48,8 @@ internal class RealWeb3Api(
         return map { topic ->
             when (topic) {
                 Topic.Any -> null
-                is Topic.AnyOf -> topic.values
-                is Topic.Single -> topic.value
+                is Topic.AnyOf -> topic.values.map { it.requireHexPrefix() }
+                is Topic.Single -> topic.value.requireHexPrefix()
             }
         }
     }

@@ -2,15 +2,20 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common
 
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.toListWithHeaders
+import io.novafoundation.nova.common.utils.formatting.formatAsChange
+import io.novafoundation.nova.common.utils.isNonNegative
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_assets.data.mappers.mappers.mapTokenToTokenModel
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.AssetGroupUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_assets.presentation.model.TokenModel
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import java.math.BigDecimal
 
 fun GroupedList<AssetGroup, AssetWithOffChainBalance>.mapGroupedAssetsToUi(
     currency: Currency,
@@ -18,6 +23,25 @@ fun GroupedList<AssetGroup, AssetWithOffChainBalance>.mapGroupedAssetsToUi(
     return mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup, currency) }
         .mapValues { (_, assets) -> mapAssetsToAssetModels(assets) }
         .toListWithHeaders()
+}
+
+fun mapTokenToTokenModel(token: Token): TokenModel {
+    return with(token) {
+        val rateChange = token.recentRateChange
+
+        val changeColorRes = when {
+            rateChange == null -> R.color.text_secondary
+            rateChange.isNonNegative -> R.color.text_positive
+            else -> R.color.text_negative
+        }
+
+        TokenModel(
+            configuration = configuration,
+            rate = (rate ?: BigDecimal.ZERO).formatAsCurrency(token.currency),
+            recentRateChange = (recentRateChange ?: BigDecimal.ZERO).formatAsChange(),
+            rateChangeColorRes = changeColorRes
+        )
+    }
 }
 
 private fun mapAssetsToAssetModels(

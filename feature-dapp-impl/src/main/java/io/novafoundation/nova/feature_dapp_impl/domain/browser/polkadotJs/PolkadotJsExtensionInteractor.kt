@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateA
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAccount
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedMetadataKnown
 import io.novafoundation.nova.runtime.ext.addressOf
-import io.novafoundation.nova.runtime.ext.genesisHash
+import io.novafoundation.nova.runtime.ext.requireGenesisHash
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
@@ -37,7 +37,7 @@ class PolkadotJsExtensionInteractor(
 
             InjectedAccount(
                 address = chain.addressOf(chainAccount.accountId),
-                genesisHash = chain.genesisHash.requireHexPrefix(),
+                genesisHash = chain.requireGenesisHash().requireHexPrefix(),
                 name = "${metaAccount.name} (${chain.name})",
                 encryption = chainAccount.cryptoType?.let(::mapCryptoTypeToEncryption)
             )

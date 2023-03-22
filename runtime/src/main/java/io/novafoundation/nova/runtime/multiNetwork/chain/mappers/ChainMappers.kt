@@ -41,7 +41,8 @@ private const val ASSET_STATEMINE = "statemine"
 private const val ASSET_ORML = "orml"
 private const val ASSET_UNSUPPORTED = "unsupported"
 
-private const val ASSET_EVM = "evm"
+private const val ASSET_EVM_ERC20 = "evm"
+private const val ASSET_EVM_NATIVE = "evmNative"
 
 private const val STATEMINE_EXTRAS_ID = "assetId"
 private const val STATEMINE_EXTRAS_PALLET_NAME = "palletName"
@@ -64,12 +65,14 @@ private inline fun unsupportedOnError(creator: () -> Chain.Asset.Type): Chain.As
 private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?>?): Chain.Asset.Type = unsupportedOnError {
     when (type) {
         null, ASSET_NATIVE -> Chain.Asset.Type.Native
+
         ASSET_STATEMINE -> {
             val id = typeExtras?.get(STATEMINE_EXTRAS_ID)?.asGsonParsedNumberOrNull()
             val palletName = typeExtras?.get(STATEMINE_EXTRAS_PALLET_NAME) as String?
 
             Chain.Asset.Type.Statemine(id!!, palletName)
         }
+
         ASSET_ORML -> {
             Chain.Asset.Type.Orml(
                 currencyIdScale = typeExtras!![ORML_EXTRAS_CURRENCY_ID_SCALE] as String,
@@ -78,30 +81,39 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
                 transfersEnabled = typeExtras[ORML_EXTRAS_TRANSFERS_ENABLED] as Boolean? ?: ORML_TRANSFERS_ENABLED_DEFAULT,
             )
         }
-        ASSET_EVM -> {
-            Chain.Asset.Type.Evm(
+
+        ASSET_EVM_ERC20 -> {
+            Chain.Asset.Type.EvmErc20(
                 contractAddress = typeExtras!![EVM_EXTRAS_CONTRACT_ADDRESS] as String
             )
         }
+
+        ASSET_EVM_NATIVE -> Chain.Asset.Type.EvmNative
+
         else -> Chain.Asset.Type.Unsupported
     }
 }
 
 fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any?>?> = when (type) {
     is Chain.Asset.Type.Native -> ASSET_NATIVE to null
+
     is Chain.Asset.Type.Statemine -> ASSET_STATEMINE to mapOf(
         STATEMINE_EXTRAS_ID to type.id.toString(),
         STATEMINE_EXTRAS_PALLET_NAME to type.palletName
     )
+
     is Chain.Asset.Type.Orml -> ASSET_ORML to mapOf(
         ORML_EXTRAS_CURRENCY_ID_SCALE to type.currencyIdScale,
         ORML_EXTRAS_CURRENCY_TYPE to type.currencyIdType,
         ORML_EXTRAS_EXISTENTIAL_DEPOSIT to type.existentialDeposit.toString(),
         ORML_EXTRAS_TRANSFERS_ENABLED to type.transfersEnabled
     )
-    is Chain.Asset.Type.Evm -> ASSET_EVM to mapOf(
+
+    is Chain.Asset.Type.EvmErc20 -> ASSET_EVM_ERC20 to mapOf(
         EVM_EXTRAS_CONTRACT_ADDRESS to type.contractAddress
     )
+
+    is Chain.Asset.Type.EvmNative -> ASSET_EVM_NATIVE to null
 
     Chain.Asset.Type.Unsupported -> ASSET_UNSUPPORTED to null
 }
@@ -244,6 +256,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             isEthereumBased = isEthereumBased,
             isTestNet = isTestNet,
             hasCrowdloans = hasCrowdloans,
+            hasSubstrateRuntime = hasSubstrateRuntime,
             governance = mapGovernanceListFromLocal(governance),
             additional = additional
         )
