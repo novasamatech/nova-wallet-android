@@ -156,12 +156,18 @@ private fun mapTransferApiFromLocal(local: ChainExternalApiLocal, gson: Gson): E
 private class GovernanceReferendaParameters(val network: String?)
 
 private fun mapGovernanceReferendaApiFromLocal(local: ChainExternalApiLocal, gson: Gson): ExternalApi.GovernanceReferenda? {
-    return local.ensureSourceType(SourceType.POLKASSEMBLY) {
-        val parameters = local.parsedParameters<GovernanceReferendaParameters>(gson)
-        val source = ExternalApi.GovernanceReferenda.Source.Polkassembly(parameters?.network)
+    val source = when (local.sourceType) {
+        SourceType.SUBSQUARE -> ExternalApi.GovernanceReferenda.Source.SubSquare
 
-        ExternalApi.GovernanceReferenda(local.url, source)
+        SourceType.POLKASSEMBLY -> {
+            val parameters = local.parsedParameters<GovernanceReferendaParameters>(gson)
+            ExternalApi.GovernanceReferenda.Source.Polkassembly(parameters?.network)
+        }
+
+        else -> return null
     }
+
+    return ExternalApi.GovernanceReferenda(local.url, source)
 }
 
 private fun mapExternalApiLocalToExternalApi(externalApiLocal: ChainExternalApiLocal, gson: Gson): ExternalApi? = runCatching {
