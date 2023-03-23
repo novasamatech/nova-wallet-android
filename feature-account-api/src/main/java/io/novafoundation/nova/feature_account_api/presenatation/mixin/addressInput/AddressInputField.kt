@@ -46,8 +46,8 @@ class AddressInputField @JvmOverloads constructor(
 
         View.inflate(context, R.layout.view_address_input, this)
 
-        addressInputW3NAddress.setDrawableStart(R.drawable.ic_checkmark_circle_16, tint = R.color.icon_positive)
-        addressInputW3NAddress.setDrawableEnd(R.drawable.ic_info_cicrle_filled_16, tint = R.color.icon_secondary)
+        addressInputW3NAddress.setDrawableStart(R.drawable.ic_checkmark_circle_16, tint = R.color.icon_positive, paddingInDp = 4)
+        addressInputW3NAddress.setDrawableEnd(R.drawable.ic_info_cicrle_filled_16, tint = R.color.icon_secondary, paddingInDp = 4)
 
         setAddStatesFromChildren(true)
 

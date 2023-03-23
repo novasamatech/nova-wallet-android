@@ -103,7 +103,7 @@ private fun BaseFragment<*>.setupExternalAccountsBottomSheet(
 
         val bottomSheet = ExternalAccountsBottomSheet(
             requireContext(),
-            getString(R.string.web3names_identifiers_sheet_title, chainName.first(), externalIdentifier),
+            getString(R.string.web3names_identifiers_sheet_title, chainName, externalIdentifier),
             DynamicListBottomSheet.Payload(externalAccounts.accounts, externalAccounts.selected)
         ) { bottomSheet, account ->
             if (mixin.isValidExternalAccount(account)) {
