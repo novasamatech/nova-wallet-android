@@ -74,7 +74,7 @@ class AddressInputField @JvmOverloads constructor(
 
         when {
             externalAccount != null -> {
-                addressInputW3NAddress.text = externalAccount.address.toShortAddressFormat()
+                addressInputW3NAddress.text = externalAccount.addressWithDescription(context)
                 setIdenticonState(externalAccount.icon)
                 addressInputW3NAddress.makeVisible()
                 addressInputW3NProgress.makeInvisible()

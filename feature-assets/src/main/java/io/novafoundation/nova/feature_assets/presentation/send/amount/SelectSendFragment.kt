@@ -54,7 +54,7 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
     ) = layoutInflater.inflate(R.layout.fragment_select_send, container, false)
 
     override fun initViews() {
-        chooseAmountContainer.applyStatusBarInsets()
+        chooseAmountContainer.applyStatusBarInsets(false)
         selectSendNext.prepareForProgress(viewLifecycleOwner)
         selectSendNext.setOnClickListener { viewModel.nextClicked() }
 

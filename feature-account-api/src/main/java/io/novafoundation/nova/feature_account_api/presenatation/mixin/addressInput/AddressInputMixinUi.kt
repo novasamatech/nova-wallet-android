@@ -51,7 +51,7 @@ private fun BaseFragment<*>.setupExternalAccountsCallback(
         }
     }
 
-    lifecycle.setKeyboardVisibilityListener(requireView()) { keyboardVisible ->
+    lifecycle.setKeyboardVisibilityListener(inputField) { keyboardVisible ->
         if (!keyboardVisible && inputField.content.hasFocus()) {
             mixin.onKeyboardGone()
         }

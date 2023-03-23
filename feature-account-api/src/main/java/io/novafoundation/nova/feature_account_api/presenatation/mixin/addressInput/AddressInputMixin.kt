@@ -48,11 +48,4 @@ class ExternalAccountsWithSelected(
     val selected: ExternalAccount?
 )
 
-class ExternalAccount(
-    val accountId: AccountId?,
-    val address: String,
-    val description: String?,
-    val icon: AddressInputState.IdenticonState
-)
-
 suspend fun AddressInputMixin.isAddressValid(input: String) = getInputSpec().isValidAddress(input)
