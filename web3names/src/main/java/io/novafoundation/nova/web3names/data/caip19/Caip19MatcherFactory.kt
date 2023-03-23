@@ -16,13 +16,13 @@ import io.novafoundation.nova.web3names.data.caip19.matchers.caip2.SubstrateCaip
 
 interface Caip19MatcherFactory {
 
-    fun getCaip19Matcher(chain: Chain, chainAsset: Chain.Asset): Caip19Matcher
+    suspend fun getCaip19Matcher(chain: Chain, chainAsset: Chain.Asset): Caip19Matcher
 }
 
 class RealCaip19MatcherFactory(private val slip44CoinRepository: Slip44CoinRepository) :
     Caip19MatcherFactory {
 
-    override fun getCaip19Matcher(chain: Chain, chainAsset: Chain.Asset): Caip19Matcher {
+    override suspend fun getCaip19Matcher(chain: Chain, chainAsset: Chain.Asset): Caip19Matcher {
         val caip2Matcher = getCaip2Matcher(chain)
         val assetNamespaceMatcher = getAssetNamespaceMatcher(chainAsset)
 
@@ -40,14 +40,13 @@ class RealCaip19MatcherFactory(private val slip44CoinRepository: Slip44CoinRepos
         return Caip2MatcherList(matchers)
     }
 
-    private fun getAssetNamespaceMatcher(chainAsset: Chain.Asset): AssetMatcher {
+    private suspend fun getAssetNamespaceMatcher(chainAsset: Chain.Asset): AssetMatcher {
         return when (chainAsset.type) {
             is Evm -> Erc20AssetMatcher(chainAsset)
             Unsupported -> UnsupportedAssetMatcher()
-            else -> {
-                val cointCode = slip44CoinRepository.getCoinCode(chainAsset)
-                Slip44AssetMatcher(cointCode)
-            }
+            else -> slip44CoinRepository.getCoinCode(chainAsset)
+                ?.let { Slip44AssetMatcher(it) }
+                ?: UnsupportedAssetMatcher()
         }
     }
 }

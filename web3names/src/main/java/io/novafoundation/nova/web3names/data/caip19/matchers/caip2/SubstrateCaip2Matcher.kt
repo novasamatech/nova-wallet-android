@@ -9,6 +9,6 @@ class SubstrateCaip2Matcher(private val chain: Chain) : Caip2Matcher {
 
     override fun match(caip2Identifier: Caip2Identifier): Boolean {
         return caip2Identifier is Caip2Identifier.Polkadot &&
-            caip2Identifier.genesisHash.removeHexPrefix() == chain.id.removeHexPrefix()
+            chain.id.removeHexPrefix().startsWith(caip2Identifier.genesisHash.removeHexPrefix())
     }
 }
