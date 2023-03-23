@@ -105,8 +105,8 @@ class EvmNativeAssetHistory(
         return from.ethAccountIdMatches(accountId) || to.ethAccountIdMatches(accountId)
     }
 
-    private fun String.ethAccountIdMatches(other: AccountId): Boolean {
-        return ethereumAddressToAccountId().contentEquals(other)
+    private fun String?.ethAccountIdMatches(other: AccountId): Boolean {
+        return other.contentEquals(this?.ethereumAddressToAccountId())
     }
 
     private fun mapRemoteNormalTxToOperation(
