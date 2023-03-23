@@ -4,13 +4,12 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class ExtrinsicContentParcel(val blocks: List<Block>): Parcelable {
+class ExtrinsicContentParcel(val blocks: List<Block>) : Parcelable {
 
     @Parcelize
-    class Block(val entries: List<BlockEntry>): Parcelable
+    class Block(val entries: List<BlockEntry>) : Parcelable
 
-
-    sealed class BlockEntry: Parcelable {
+    sealed class BlockEntry : Parcelable {
 
         @Parcelize
         class TransactionId(val hash: String) : BlockEntry()
@@ -19,7 +18,7 @@ class ExtrinsicContentParcel(val blocks: List<Block>): Parcelable {
         class Address(val label: String, val address: String) : BlockEntry()
 
         @Parcelize
-        class LabeledValue(val label: String, val value: String): BlockEntry()
+        class LabeledValue(val label: String, val value: String) : BlockEntry()
     }
 }
 
@@ -60,7 +59,7 @@ private class RealExtrinsicContentParcelBuilder : ExtrinsicContentParcelBuilder 
     }
 }
 
-private class BlockBuilder: ExtrinsicContentParcelBuilder.BlockBuilder {
+private class BlockBuilder : ExtrinsicContentParcelBuilder.BlockBuilder {
 
     private val entries = mutableListOf<ExtrinsicContentParcel.BlockEntry>()
 
@@ -76,8 +75,7 @@ private class BlockBuilder: ExtrinsicContentParcelBuilder.BlockBuilder {
         entries += ExtrinsicContentParcel.BlockEntry.LabeledValue(label, value)
     }
 
-    fun build() : ExtrinsicContentParcel.Block {
+    fun build(): ExtrinsicContentParcel.Block {
         return ExtrinsicContentParcel.Block(entries)
     }
 }
-

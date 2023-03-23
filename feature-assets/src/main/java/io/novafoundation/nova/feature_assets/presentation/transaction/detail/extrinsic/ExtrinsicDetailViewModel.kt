@@ -86,7 +86,7 @@ class ExtrinsicDetailViewModel(
     }
 
     private suspend fun mapBlockEntryFromParcel(blockEntry: ExtrinsicContentParcel.BlockEntry): ExtrinsicContentModel.BlockEntry {
-        return when(blockEntry) {
+        return when (blockEntry) {
             is ExtrinsicContentParcel.BlockEntry.Address -> ExtrinsicContentModel.BlockEntry.Address(
                 label = blockEntry.label,
                 addressModel = getIcon(blockEntry.address),
@@ -95,7 +95,7 @@ class ExtrinsicDetailViewModel(
                 label = blockEntry.label,
                 value = blockEntry.value
             )
-            is ExtrinsicContentParcel.BlockEntry.TransactionId ->ExtrinsicContentModel.BlockEntry.TransactionId(
+            is ExtrinsicContentParcel.BlockEntry.TransactionId -> ExtrinsicContentModel.BlockEntry.TransactionId(
                 label = resourceManager.getString(R.string.common_transaction_id),
                 hash = blockEntry.hash
             )

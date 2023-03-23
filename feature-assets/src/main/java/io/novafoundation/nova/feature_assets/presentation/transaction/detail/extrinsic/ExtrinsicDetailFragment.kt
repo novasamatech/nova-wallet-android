@@ -117,7 +117,7 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
     }
 
     private fun TableView.blockEntry(entry: BlockEntry) {
-        when(entry) {
+        when (entry) {
             is BlockEntry.Address -> address(entry)
             is BlockEntry.LabeledValue -> labeledValue(entry)
             is BlockEntry.TransactionId -> transactionId(entry)

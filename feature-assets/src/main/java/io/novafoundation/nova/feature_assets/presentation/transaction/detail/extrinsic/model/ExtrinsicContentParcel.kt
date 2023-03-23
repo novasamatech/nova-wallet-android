@@ -12,6 +12,6 @@ class ExtrinsicContentModel(val blocks: List<Block>) {
 
         class Address(val label: String, val addressModel: AddressModel) : BlockEntry()
 
-        class LabeledValue(val label: String, val value: String): BlockEntry()
+        class LabeledValue(val label: String, val value: String) : BlockEntry()
     }
 }
