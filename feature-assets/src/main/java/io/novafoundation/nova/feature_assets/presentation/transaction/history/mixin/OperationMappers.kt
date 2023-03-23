@@ -140,9 +140,9 @@ private fun substrateCallUi(
     block {
         transactionId(txHash)
 
-        value(resourceManager.getString(R.string.common_module), content.module)
+        value(resourceManager.getString(R.string.common_module), content.module.itemToCapitalizedWords())
 
-        value(resourceManager.getString(R.string.common_call), content.call)
+        value(resourceManager.getString(R.string.common_call), content.call.itemToCapitalizedWords())
     }
 }
 
