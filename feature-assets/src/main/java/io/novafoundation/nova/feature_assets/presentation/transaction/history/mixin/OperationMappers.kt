@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.common.utils.splitSnakeOrCamelCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.presentation.model.ExtrinsicContentParcel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationStatusAppearance
@@ -83,14 +84,7 @@ private fun String.itemToCapitalizedWords(): String {
 private fun mapExtrinsicContentToHeaderAndSubHeader(extrinsicContent: Content, resourceManager: ResourceManager): Pair<String, String> {
     return when (extrinsicContent) {
         is Content.ContractCall -> {
-            val header = if (extrinsicContent.function != null) {
-                val withoutArguments = extrinsicContent.function!!.split("(").first()
-
-                withoutArguments.itemToCapitalizedWords()
-            } else {
-                extrinsicContent.contractAddress
-            }
-
+            val header = formatContractFunctionName(extrinsicContent) ?: extrinsicContent.contractAddress
             val subHeader = resourceManager.getString(R.string.ethereum_contract_call)
 
             header to subHeader
@@ -102,6 +96,53 @@ private fun mapExtrinsicContentToHeaderAndSubHeader(extrinsicContent: Content, r
 
             header to subHeader
         }
+    }
+}
+
+private fun formatContractFunctionName(extrinsicContent: Content.ContractCall): String? {
+    return extrinsicContent.function?.let { function ->
+        val withoutArguments = function.split("(").first()
+
+        withoutArguments.itemToCapitalizedWords()
+    }
+}
+
+private fun mapExtrinsicContentToParcel(extrinsic: Operation.Type.Extrinsic, resourceManager: ResourceManager): ExtrinsicContentParcel {
+    return when (val content = extrinsic.content) {
+        is Content.ContractCall -> contractCallUi(content, extrinsic.hash, resourceManager)
+        is Content.SubstrateCall -> substrateCallUi(content, extrinsic.hash, resourceManager)
+    }
+}
+
+private fun contractCallUi(
+    content: Content.ContractCall,
+    txHash: String,
+    resourceManager: ResourceManager
+) = ExtrinsicContentParcel {
+    block {
+        address(resourceManager.getString(R.string.ethereum_contract), content.contractAddress)
+
+        formatContractFunctionName(content)?.let { function ->
+            value(resourceManager.getString(R.string.ethereum_function), function)
+        }
+    }
+
+    block {
+        transactionId(txHash)
+    }
+}
+
+private fun substrateCallUi(
+    content: Content.SubstrateCall,
+    txHash: String,
+    resourceManager: ResourceManager
+) = ExtrinsicContentParcel {
+    block {
+        transactionId(txHash)
+
+        value(resourceManager.getString(R.string.common_module), content.module.itemToCapitalizedWords())
+
+        value(resourceManager.getString(R.string.common_call), content.call.itemToCapitalizedWords())
     }
 }
 
@@ -219,16 +260,12 @@ suspend fun mapOperationToParcel(
             }
 
             is Operation.Type.Extrinsic -> {
-                val (header, subHeader) = mapExtrinsicContentToHeaderAndSubHeader(operationType.content, resourceManager)
-
                 OperationParcelizeModel.Extrinsic(
                     chainId = chainAsset.chainId,
                     chainAssetId = chainAsset.id,
                     time = time,
                     originAddress = address,
-                    hash = operationType.hash,
-                    header = header,
-                    subHeader = subHeader,
+                    content = mapExtrinsicContentToParcel(operationType, resourceManager),
                     fee = formatFee(chainAsset, operationType),
                     statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus)
                 )

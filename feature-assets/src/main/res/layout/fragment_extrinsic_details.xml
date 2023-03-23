@@ -23,6 +23,7 @@
         android:layout_weight="1">
 
         <LinearLayout
+            android:id="@+id/extrinsicContentContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
@@ -79,35 +80,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:title="@string/common_network" />
-            </io.novafoundation.nova.common.view.TableView>
-
-            <io.novafoundation.nova.common.view.TableView
-                android:id="@+id/extrinsicDetailTxSection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginEnd="16dp">
-
-                <io.novafoundation.nova.common.view.TableCellView
-                    android:id="@+id/extrinsicDetailHash"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
-                    app:primaryValueIconTint="@color/icon_secondary"
-                    app:title="@string/common_transaction_id" />
-
-                <io.novafoundation.nova.common.view.TableCellView
-                    android:id="@+id/extrinsicDetailModule"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:title="@string/common_module" />
-
-                <io.novafoundation.nova.common.view.TableCellView
-                    android:id="@+id/extrinsicDetailCall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:title="@string/common_call" />
             </io.novafoundation.nova.common.view.TableView>
         </LinearLayout>
     </ScrollView>
