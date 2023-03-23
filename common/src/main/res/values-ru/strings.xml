@@ -466,6 +466,9 @@
     <string name="ecdsa_selection_title">ECDSA</string>
     <string name="ed25519_selection_subtitle">ed25519 (альтернативный)</string>
     <string name="ed25519_selection_title">Edwards</string>
+    <string name="ethereum_contract">Контракт</string>
+    <string name="ethereum_contract_call">Вызов контракта</string>
+    <string name="ethereum_function">Функция</string>
     <string name="export_json_password_confirm">Подтверждение пароля</string>
     <string name="export_json_password_match_error">Пароли не совпадают</string>
     <string name="export_json_password_new">Новый пароль</string>
