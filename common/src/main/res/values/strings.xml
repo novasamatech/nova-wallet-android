@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="ethereum_function">Function</string>
+    <string name="ethereum_contract">Contract</string>
     <string name="ethereum_contract_call">Contract call</string>
 
     <string name="common_no_app_to_handle_intent">No suitable app found on device to handle this intent</string>

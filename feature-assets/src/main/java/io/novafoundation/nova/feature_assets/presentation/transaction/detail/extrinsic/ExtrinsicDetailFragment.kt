@@ -3,11 +3,15 @@ package io.novafoundation.nova.feature_assets.presentation.transaction.detail.ex
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.view.TableCellView
+import io.novafoundation.nova.common.view.TableView
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_account_api.view.showAddress
@@ -17,11 +21,11 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.showOperationStatus
+import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.model.ExtrinsicContentModel
+import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.model.ExtrinsicContentModel.BlockEntry
+import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicContentContainer
 import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailAmount
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailCall
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailHash
 import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailIcon
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailModule
 import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailNetwork
 import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailSender
 import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailStatus
@@ -50,10 +54,6 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
     override fun initViews() {
         extrinsicDetailToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        extrinsicDetailHash.setOnClickListener {
-            viewModel.extrinsicClicked()
-        }
-
         extrinsicDetailSender.setOnClickListener {
             viewModel.fromAddressClicked()
         }
@@ -75,17 +75,15 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
         setupExternalActions(viewModel)
 
         with(viewModel.operation) {
-            extrinsicDetailHash.showValue(hash)
-
             extrinsicDetailStatus.showOperationStatus(statusAppearance)
             extrinsicDetailAmount.setTextColorRes(statusAppearance.amountTint)
 
             extrinsicDetailToolbar.setTitle(time.formatDateTime())
-            extrinsicDetailModule.showValue(subHeader)
-            extrinsicDetailCall.showValue(header)
 
             extrinsicDetailAmount.text = fee
         }
+
+        viewModel.content.observe(::showExtrinsicContent)
 
         viewModel.senderAddressModelFlow.observe(extrinsicDetailSender::showAddress)
 
@@ -94,5 +92,76 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
         viewModel.operationIcon.observe {
             extrinsicDetailIcon.loadTokenIcon(it, imageLoader)
         }
+    }
+
+    private fun showExtrinsicContent(content: ExtrinsicContentModel) {
+        content.blocks.forEach { block ->
+            createBlock {
+                block.entries.forEach { entry ->
+                    blockEntry(entry)
+                }
+            }
+        }
+    }
+
+    private fun createBlock(builder: TableView.() -> Unit) {
+        val block = TableView(requireContext()).apply {
+            layoutParams = ViewGroup.MarginLayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
+                setMargins(16.dp, 12.dp, 16.dp, 0)
+            }
+        }
+
+        block.apply(builder)
+
+        extrinsicContentContainer.addView(block)
+    }
+
+    private fun TableView.blockEntry(entry: BlockEntry) {
+        when(entry) {
+            is BlockEntry.Address -> address(entry)
+            is BlockEntry.LabeledValue -> labeledValue(entry)
+            is BlockEntry.TransactionId -> transactionId(entry)
+        }
+    }
+
+    private fun TableView.transactionId(transactionId: BlockEntry.TransactionId) {
+        createEntry {
+            setTitle(transactionId.label)
+            showValue(transactionId.hash)
+
+            clickable { viewModel.transactionIdClicked(transactionId.hash) }
+        }
+    }
+
+    private fun TableView.address(address: BlockEntry.Address) {
+        createEntry {
+            setTitle(address.label)
+            showAddress(address.addressModel)
+
+            clickable { viewModel.addressClicked(address.addressModel.address) }
+        }
+    }
+
+    private fun TableView.labeledValue(labeledValue: BlockEntry.LabeledValue) {
+        createEntry {
+            setTitle(labeledValue.label)
+            showValue(labeledValue.value)
+        }
+    }
+
+    private fun TableView.createEntry(builder: TableCellView.() -> Unit) {
+        val block = TableCellView(requireContext()).apply {
+            layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
+        }
+
+        block.apply(builder)
+
+        addView(block)
+    }
+
+    private inline fun TableCellView.clickable(crossinline onClick: () -> Unit) {
+        setPrimaryValueIcon(R.drawable.ic_info_cicrle_filled_16)
+
+        setOnClickListener { onClick() }
     }
 }

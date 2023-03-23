@@ -27,9 +27,7 @@ sealed class OperationParcelizeModel : Parcelable {
         val chainAssetId: ChainAssetId,
         val time: Long,
         val originAddress: String,
-        val hash: String,
-        val subHeader: String,
-        val header: String,
+        val content: ExtrinsicContentParcel,
         val fee: String,
         val statusAppearance: OperationStatusAppearance,
     ) : Parcelable, OperationParcelizeModel()

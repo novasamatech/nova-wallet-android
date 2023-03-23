@@ -42,7 +42,11 @@ open class TableView @JvmOverloads constructor(
     init {
         orientation = VERTICAL
 
-        attrs?.let(::applyAttributes)
+        if (attrs != null) {
+            attrs.let(::applyAttributes)
+        } else {
+            noAttrsInit()
+        }
 
         if (showBackground) {
             background = getRoundedCornerDrawable(R.color.block_background)
@@ -95,6 +99,10 @@ open class TableView @JvmOverloads constructor(
         }
 
         addView(title, 0)
+    }
+
+    private fun noAttrsInit() {
+        setTitle(null)
     }
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.TableView) {
