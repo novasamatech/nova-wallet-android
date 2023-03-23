@@ -112,7 +112,7 @@ private fun BaseFragment<*>.setupExternalAccountsBottomSheet(
             } else {
                 showErrorWithTitle(
                     getString(R.string.web3names_invalid_recepient_title),
-                    getString(R.string.web3names_select_invalid_recepient_message, chainName)
+                    getString(R.string.common_validation_invalid_address_message, chainName)
                 )
             }
         }
