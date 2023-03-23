@@ -102,12 +102,12 @@ data class Chain(
 
     data class Node(
         val chainId: ChainId,
-        val url: String,
+        val unformattedUrl: String,
         val name: String,
         val orderId: Int,
     ) : Identifiable {
 
-        override val identifier: String = "$chainId:$url"
+        override val identifier: String = "$chainId:$unformattedUrl"
     }
 
     data class Explorer(
