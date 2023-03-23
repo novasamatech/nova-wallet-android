@@ -10,7 +10,6 @@ import androidx.core.view.isVisible
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.loadedNothing
-import io.novafoundation.nova.common.presentation.toShortAddressFormat
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeInvisible
 import io.novafoundation.nova.common.utils.makeVisible
