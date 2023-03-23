@@ -11,6 +11,7 @@ import androidx.annotation.ColorInt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob

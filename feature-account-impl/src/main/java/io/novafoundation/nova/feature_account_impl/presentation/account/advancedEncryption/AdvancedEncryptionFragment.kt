@@ -123,7 +123,7 @@ class AdvancedEncryptionFragment : BaseFragment<AdvancedEncryptionViewModel>() {
         EncryptionTypeChooserBottomSheetDialog(
             context = context,
             payload = payload,
-            onClicked = viewModel::substrateEncryptionChanged
+            onClicked = { _, item -> viewModel.substrateEncryptionChanged(item) }
         ).show()
     }
 }

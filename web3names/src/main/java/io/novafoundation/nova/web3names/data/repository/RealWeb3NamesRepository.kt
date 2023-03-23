@@ -3,13 +3,14 @@ package io.novafoundation.nova.web3names.data.repository
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindString
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
-import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.data.caip19.Caip19MatcherFactory
 import io.novafoundation.nova.web3names.data.caip19.Caip19Parser
 import io.novafoundation.nova.web3names.data.endpoints.TransferRecipientsApi
 import io.novafoundation.nova.web3names.data.provider.Web3NamesServiceChainIdProvider
+import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException
 import io.novafoundation.nova.web3names.domain.models.Web3NameAccount
 import io.novafoundation.nova.web3names.domain.repository.Web3NamesRepository
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -31,13 +32,19 @@ class RealWeb3NamesRepository(
     private val caip19Parser: Caip19Parser
 ) : Web3NamesRepository {
 
-    override suspend fun queryWeb3NameAccount(web3Name: String, chain: Chain, chainAsset: Chain.Asset): List<Web3NameAccount> {
-        val owner = getWeb3NameAccountOwner(web3Name) ?: return emptyList()
-        val serviceEndpoints = getDidServiceEndpoints(owner)
-        val transferRecipientEndpoint = serviceEndpoints.firstKiltTransferAssetRecipientV1Endpoint() ?: return emptyList()
-        val transferRecipientUrl = transferRecipientEndpoint.urls.first()
+    override suspend fun queryWeb3NameAccount(web3Name: String, chain: Chain, chainAsset: Chain.Asset): Result<List<Web3NameAccount>> {
+        return runCatching {
+            val owner = getWeb3NameAccountOwner(web3Name) ?: return@runCatching emptyList()
+            val serviceEndpoints = getDidServiceEndpoints(owner)
+            val transferRecipientEndpoint = serviceEndpoints.firstKiltTransferAssetRecipientV1Endpoint() ?: return@runCatching emptyList()
+            val transferRecipientUrl = transferRecipientEndpoint.urls.first()
 
-        return getChainRecipients(transferRecipientUrl, chain, chainAsset)
+            getChainRecipients(transferRecipientUrl, chain, chainAsset)
+        }
+    }
+
+    override fun isValidWeb3NameAccount(web3NameAccount: Web3NameAccount): Boolean {
+        return web3NameAccount.accountId != null
     }
 
     private suspend fun getWeb3NameAccountOwner(web3Name: String): AccountId? {
@@ -95,7 +102,17 @@ class RealWeb3NamesRepository(
             caip19Matcher.match(caip19Identifier)
         }
 
-        return chainRecipients.flatMap { it.value }
-            .map { Web3NameAccount(chain.accountIdOf(it.account), it.description) }
+        if (chainRecipients.isEmpty()) {
+            throw Web3NamesException.ChainProviderNotFoundException()
+        }
+
+        val web3NameAccounts = chainRecipients.flatMap { it.value }
+            .map { Web3NameAccount(chain.accountIdOrNull(it.account), it.account, it.description) }
+
+        if (web3NameAccounts.all { !isValidWeb3NameAccount(it) }) {
+            throw Web3NamesException.ValidAccountNotFoundException()
+        }
+
+        return web3NameAccounts
     }
 }

@@ -45,7 +45,7 @@ class SelectCrossChainDestinationBottomSheet(
     }
 
     override fun itemClicked(chainWithAsset: ChainWithAsset) {
-        onSelected(chainWithAsset)
+        onSelected(this, chainWithAsset)
         dismiss()
     }
 }

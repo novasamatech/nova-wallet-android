@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheet
 import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetRightAction
 import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetTitle
 
-typealias ClickHandler<T> = (T) -> Unit
+typealias ClickHandler<T> = (BaseDynamicListBottomSheet, T) -> Unit
 
 class ReferentialEqualityDiffCallBack<T> : DiffUtil.ItemCallback<T>() {
 
@@ -76,6 +76,7 @@ abstract class DynamicListBottomSheet<T>(
     private val diffCallback: DiffUtil.ItemCallback<T>,
     private val onClicked: ClickHandler<T>?,
     private val onCancel: (() -> Unit)? = null,
+    private val overrideDismissing: Boolean = false
 ) : BaseDynamicListBottomSheet(context), DynamicListSheetAdapter.Handler<T> {
 
     open class Payload<out T>(val data: List<T>, val selected: T? = null)
@@ -97,8 +98,10 @@ abstract class DynamicListBottomSheet<T>(
     abstract fun holderCreator(): HolderCreator<T>
 
     override fun itemClicked(item: T) {
-        onClicked?.invoke(item)
+        onClicked?.invoke(this, item)
 
-        dismiss()
+        if (!overrideDismissing) {
+            dismiss()
+        }
     }
 }

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_primary_list_item"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingEnd="16dp"
+    tools:background="@color/secondary_screen_background">
+
+    <ImageView
+        android:id="@+id/externalAccountIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginVertical="8dp"
+        android:layout_marginStart="16dp"
+        tools:src="@color/icon_accent" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="5dp"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/externalAccountIdentifierTitle"
+            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:ellipsize="end"
+            android:lines="1"
+            android:textColor="@color/text_primary"
+            tools:text="🏡 Home" />
+
+        <TextView
+            android:id="@+id/externalAccountIdentifierSubtitle"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:ellipsize="middle"
+            android:lines="1"
+            android:textColor="@color/text_secondary"
+            tools:text="4o7m5DDh2PpU...KitjHcxRiE7eQuTJ" />
+
+    </LinearLayout>
+
+    <RadioButton
+        android:id="@+id/externalAccountIdentifierIsSelected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:button="@null"
+        android:clickable="false"
+        android:drawableRight="?android:attr/listChoiceIndicatorSingle"
+        android:focusableInTouchMode="false" />
+
+</LinearLayout>
