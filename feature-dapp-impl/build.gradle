@@ -21,7 +21,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/dapps/dapps.json\""
+            buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/dapps/dapps_full.json\""
         }
     }
 
