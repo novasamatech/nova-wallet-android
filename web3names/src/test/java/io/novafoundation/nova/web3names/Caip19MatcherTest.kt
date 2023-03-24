@@ -32,7 +32,7 @@ class Caip19MatcherTest {
     private lateinit var chainAsset: Chain.Asset
 
     @Test
-    fun `polkadot slip44 should match`() {
+    suspend fun `polkadot slip44 should match`() {
         mockChain(chainId = substrateChainId, isEthereumBased = false)
         mockAsset(type = Chain.Asset.Type.Native)
         val identifier = getIdentifier("polkadot:$substrateChainId/slip44:$cointType")
@@ -41,7 +41,7 @@ class Caip19MatcherTest {
     }
 
     @Test
-    fun `polkadot slip44 should not match`() {
+    suspend fun `polkadot slip44 should not match`() {
         mockChain(chainId = "eip155:1", isEthereumBased = true)
         mockAsset(type = Chain.Asset.Type.Evm("0x0"))
         val identifier = getIdentifier("polkadot:${this.substrateChainId}/slip44:$cointType")
@@ -50,7 +50,7 @@ class Caip19MatcherTest {
     }
 
     @Test
-    fun `eip155 erc20 should match`() {
+    suspend fun `eip155 erc20 should match`() {
         mockChain(chainId = ethereumChainId, isEthereumBased = true)
         mockAsset(type = Chain.Asset.Type.Evm("0x0"))
         val identifier = getIdentifier("$ethereumChainId/erc20:0x0")
@@ -59,7 +59,7 @@ class Caip19MatcherTest {
     }
 
     @Test
-    fun `eip155 erc20 wrong coinType`() {
+    suspend fun `eip155 erc20 wrong coinType`() {
         mockChain(chainId = ethereumChainId, isEthereumBased = true)
         mockAsset(type = Chain.Asset.Type.Evm("0x0"))
         val identifier = getIdentifier("eip155:3/erc20:0x0")
@@ -68,7 +68,7 @@ class Caip19MatcherTest {
     }
 
     @Test
-    fun `eip155 erc20 should not match`() {
+    suspend fun `eip155 erc20 should not match`() {
         mockChain(chainId = substrateChainId, isEthereumBased = false)
         mockAsset(type = Chain.Asset.Type.Native)
         val identifier = getIdentifier("eip155:$cointType/erc20:0x0")
@@ -78,7 +78,7 @@ class Caip19MatcherTest {
 
     private fun getSlip44CoinRepository(): Slip44CoinRepository {
         return object : Slip44CoinRepository {
-            override fun getCoinCode(chainAsset: Chain.Asset): Int {
+            override suspend fun getCoinCode(chainAsset: Chain.Asset): Int {
                 return cointType
             }
         }

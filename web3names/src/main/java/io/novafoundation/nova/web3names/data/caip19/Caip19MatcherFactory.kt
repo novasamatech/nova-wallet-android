@@ -44,8 +44,7 @@ class RealCaip19MatcherFactory(private val slip44CoinRepository: Slip44CoinRepos
         return when (chainAsset.type) {
             is Evm -> Erc20AssetMatcher(chainAsset)
             Unsupported -> UnsupportedAssetMatcher()
-            else -> slip44CoinRepository.getCoinCode(chainAsset)
-                ?.let { Slip44AssetMatcher(it) }
+            else -> slip44CoinRepository.getCoinCode(chainAsset)?.let(::Slip44AssetMatcher)
                 ?: UnsupportedAssetMatcher()
         }
     }
