@@ -35,10 +35,10 @@ class CreateWatchWalletViewModel(
         create(
             inputSpecProvider = substrateInputSpec(),
             myselfBehaviorProvider = noMyself(),
-            accountIdentifierProvider = null,
             errorDisplayer = this@CreateWatchWalletViewModel::showError,
             showAccountEvent = null,
-            coroutineScope = this@CreateWatchWalletViewModel
+            coroutineScope = this@CreateWatchWalletViewModel,
+            inputFlowProvider = createInputFlowProvider()
         )
     }
 
@@ -46,10 +46,10 @@ class CreateWatchWalletViewModel(
         create(
             inputSpecProvider = evmInputSpec(),
             myselfBehaviorProvider = noMyself(),
-            accountIdentifierProvider = null,
             errorDisplayer = this@CreateWatchWalletViewModel::showError,
             showAccountEvent = null,
-            coroutineScope = this@CreateWatchWalletViewModel
+            coroutineScope = this@CreateWatchWalletViewModel,
+            inputFlowProvider = createInputFlowProvider()
         )
     }
 

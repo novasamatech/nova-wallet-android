@@ -9,6 +9,6 @@
 
         <attr name="android:hint" />
 
-        <attr name="externalAccountIdentifiers" format="boolean"/>
+        <attr name="hasExternalAccountIdentifiers" format="boolean"/>
     </declare-styleable>
 </resources>

@@ -8,8 +8,6 @@ import android.widget.LinearLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.domain.dataOrNull
-import io.novafoundation.nova.common.domain.loadedNothing
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeInvisible
 import io.novafoundation.nova.common.utils.makeVisible
@@ -59,31 +57,28 @@ class AddressInputField @JvmOverloads constructor(
     fun setState(state: AddressInputState) {
         setIdenticonState(state.iconState)
 
-        setExternalAccount(loadedNothing())
         addressInputScan.setVisible(state.scanShown)
         addressInputPaste.setVisible(state.pasteShown)
         addressInputClear.setVisible(state.clearShown)
         addressInputMyself.setVisible(state.myselfShown)
     }
 
-    fun setExternalAccount(externalAccountLoadingState: ExtendedLoadingState<ExternalAccount?>) {
+    fun setExternalAccount(externalAccountState: ExtendedLoadingState<ExternalAccount?>) {
         if (addressInputW3NContainer.isGone) return
 
-        val externalAccount = externalAccountLoadingState.dataOrNull
-
         when {
-            externalAccount != null -> {
+            externalAccountState is ExtendedLoadingState.Loaded && externalAccountState.data != null -> {
+                val externalAccount = externalAccountState.data!!
                 addressInputW3NAddress.text = externalAccount.addressWithDescription(context)
                 setIdenticonState(externalAccount.icon)
                 addressInputW3NAddress.makeVisible()
                 addressInputW3NProgress.makeInvisible()
             }
-            externalAccountLoadingState is ExtendedLoadingState.Loading -> {
+            externalAccountState is ExtendedLoadingState.Loading -> {
                 addressInputW3NAddress.makeInvisible()
                 addressInputW3NProgress.makeVisible()
             }
-            externalAccountLoadingState is ExtendedLoadingState.Error -> {}
-            else -> {
+            externalAccountState is ExtendedLoadingState.Loaded && externalAccountState.data == null -> {
                 addressInputW3NAddress.text = null
                 addressInputW3NAddress.makeInvisible()
                 addressInputW3NProgress.makeInvisible()
@@ -138,9 +133,9 @@ class AddressInputField @JvmOverloads constructor(
         val hint = it.getString(R.styleable.AddressInputField_android_hint)
         hint?.let { content.hint = hint }
 
-        val externalAccountIdentifiers = it.getBoolean(R.styleable.AddressInputField_externalAccountIdentifiers, false)
-        addressInputW3NContainer.isVisible = externalAccountIdentifiers
-        if (externalAccountIdentifiers) {
+        val hasExternalAccountIdentifiers = it.getBoolean(R.styleable.AddressInputField_hasExternalAccountIdentifiers, false)
+        addressInputW3NContainer.isVisible = hasExternalAccountIdentifiers
+        if (hasExternalAccountIdentifiers) {
             addressInputW3NAddress.background = getRoundedCornerDrawable(cornerSizeDp = 6)
                 .withRippleMask(getRippleMask(cornerSizeDp = 6))
         }

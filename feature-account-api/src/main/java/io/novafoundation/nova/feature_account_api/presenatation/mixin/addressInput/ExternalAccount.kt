@@ -9,6 +9,8 @@ class ExternalAccount(
     val accountId: AccountId?,
     val address: String,
     val description: String?,
+    val addressWithDescription: String,
+    val isValid: Boolean,
     val icon: AddressInputState.IdenticonState
 )
 

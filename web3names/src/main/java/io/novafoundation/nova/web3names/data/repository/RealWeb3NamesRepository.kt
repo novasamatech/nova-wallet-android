@@ -3,6 +3,7 @@ package io.novafoundation.nova.web3names.data.repository
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindString
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.common.utils.mapFailure
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -11,6 +12,7 @@ import io.novafoundation.nova.web3names.data.caip19.Caip19Parser
 import io.novafoundation.nova.web3names.data.endpoints.TransferRecipientsApi
 import io.novafoundation.nova.web3names.data.provider.Web3NamesServiceChainIdProvider
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException
+import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.ChainProviderNotFoundException
 import io.novafoundation.nova.web3names.domain.models.Web3NameAccount
 import io.novafoundation.nova.web3names.domain.repository.Web3NamesRepository
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -34,17 +36,19 @@ class RealWeb3NamesRepository(
 
     override suspend fun queryWeb3NameAccount(web3Name: String, chain: Chain, chainAsset: Chain.Asset): Result<List<Web3NameAccount>> {
         return runCatching {
-            val owner = getWeb3NameAccountOwner(web3Name) ?: return@runCatching emptyList()
+            val owner = getWeb3NameAccountOwner(web3Name) ?: throw ChainProviderNotFoundException(web3Name)
             val serviceEndpoints = getDidServiceEndpoints(owner)
-            val transferRecipientEndpoint = serviceEndpoints.firstKiltTransferAssetRecipientV1Endpoint() ?: return@runCatching emptyList()
+            val transferRecipientEndpoint = serviceEndpoints.firstKiltTransferAssetRecipientV1Endpoint() ?: throw ChainProviderNotFoundException(web3Name)
             val transferRecipientUrl = transferRecipientEndpoint.urls.first()
 
-            getChainRecipients(transferRecipientUrl, chain, chainAsset)
+            getChainRecipients(web3Name, transferRecipientUrl, chain, chainAsset)
+        }.mapFailure {
+            if (it !is Web3NamesException) {
+                Web3NamesException.UnknownException(chain.name)
+            } else {
+                it
+            }
         }
-    }
-
-    override fun isValidWeb3NameAccount(web3NameAccount: Web3NameAccount): Boolean {
-        return web3NameAccount.accountId != null
     }
 
     private suspend fun getWeb3NameAccountOwner(web3Name: String): AccountId? {
@@ -92,7 +96,7 @@ class RealWeb3NamesRepository(
         }
     }
 
-    private suspend fun getChainRecipients(url: String, chain: Chain, chainAsset: Chain.Asset): List<Web3NameAccount> {
+    private suspend fun getChainRecipients(w3nIdentifier: String, url: String, chain: Chain, chainAsset: Chain.Asset): List<Web3NameAccount> {
         val recipients = transferRecipientApi.getTransferRecipients(url)
         val caip19Matcher = caip19MatcherFactory.getCaip19Matcher(chain, chainAsset)
 
@@ -103,14 +107,22 @@ class RealWeb3NamesRepository(
         }
 
         if (chainRecipients.isEmpty()) {
-            throw Web3NamesException.ChainProviderNotFoundException()
+            throw ChainProviderNotFoundException(w3nIdentifier)
         }
 
         val web3NameAccounts = chainRecipients.flatMap { it.value }
-            .map { Web3NameAccount(chain.accountIdOrNull(it.account), it.account, it.description) }
+            .map {
+                val accountId = chain.accountIdOrNull(it.account)
+                Web3NameAccount(
+                    chain.accountIdOrNull(it.account),
+                    it.account,
+                    isValid = accountId != null,
+                    it.description
+                )
+            }
 
-        if (web3NameAccounts.all { !isValidWeb3NameAccount(it) }) {
-            throw Web3NamesException.ValidAccountNotFoundException()
+        if (web3NameAccounts.all { !it.isValid }) {
+            throw Web3NamesException.ValidAccountNotFoundException(w3nIdentifier, chain.name)
         }
 
         return web3NameAccounts

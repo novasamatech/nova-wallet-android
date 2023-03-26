@@ -24,7 +24,7 @@ class ExternalAccountsBottomSheet(
     private val title: String,
     payload: Payload<ExternalAccount>,
     onClicked: ClickHandler<ExternalAccount>
-) : DynamicListBottomSheet<ExternalAccount>(context, payload, AccountDiffCallback, onClicked, overrideDismissing = true) {
+) : DynamicListBottomSheet<ExternalAccount>(context, payload, AccountDiffCallback, onClicked, dismissOnClick = false) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

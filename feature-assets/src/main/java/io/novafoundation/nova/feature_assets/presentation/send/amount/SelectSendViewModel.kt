@@ -58,7 +58,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
-import kotlinx.coroutines.flow.Flow
 
 class SelectSendViewModel(
     private val interactor: WalletInteractor,
@@ -86,18 +85,24 @@ class SelectSendViewModel(
 
     private val destinationChainWithAsset = singleReplaySharedFlow<ChainWithAsset>()
 
-    val destinationChainName: Flow<String> = destinationChainWithAsset.map { it.chain.name }
-
     val addressInputMixin = with(addressInputMixinFactory) {
         val destinationChain = destinationChainWithAsset.map { it.chain }
         val inputSpec = singleChainInputSpec(destinationChain)
+        val inputFlowProvider = createInputFlowProvider()
+        val accountIdentifierProvider = accountIdentifierProvider(
+            destinationChainFlow = destinationChainWithAsset,
+            inputSpecProvider = inputSpec,
+            coroutineScope = this@SelectSendViewModel,
+            inputFlowProvider = inputFlowProvider
+        )
         create(
             inputSpecProvider = singleChainInputSpec(destinationChain),
             myselfBehaviorProvider = crossChainOnlyMyself(originChain, destinationChain),
-            accountIdentifierProvider = accountIdentifierProvider(destinationChainWithAsset, inputSpec, this@SelectSendViewModel),
+            accountIdentifierProvider = accountIdentifierProvider,
             errorDisplayer = this@SelectSendViewModel::showError,
             showAccountEvent = this@SelectSendViewModel::showAccountDetails,
-            coroutineScope = this@SelectSendViewModel
+            coroutineScope = this@SelectSendViewModel,
+            inputFlowProvider = inputFlowProvider
         )
     }
 

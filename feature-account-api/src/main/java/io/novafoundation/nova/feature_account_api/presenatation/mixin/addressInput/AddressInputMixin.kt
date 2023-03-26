@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput
 
+import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.inputSpec.AddressInputSpec
 import kotlinx.coroutines.flow.Flow
@@ -13,9 +14,9 @@ interface AddressInputMixin {
 
     val state: Flow<AddressInputState>
 
-    val showExternalAccountsFlow: Flow<ExternalAccountsWithSelected>
+    val externalIdentifierEventLiveData: LiveData<AccountIdentifierProvider.Event>
 
-    val selectedExternalIdentifierFlow: Flow<ExtendedLoadingState<ExternalAccount?>>
+    val selectedExternalAccountFlow: Flow<ExtendedLoadingState<ExternalAccount?>>
 
     fun pasteClicked()
 
@@ -27,24 +28,13 @@ interface AddressInputMixin {
 
     fun selectedExternalAddressClicked()
 
-    fun onInputFocusChanged()
-
-    fun onKeyboardGone()
+    fun loadExternalIdentifiers()
 
     fun selectExternalAccount(it: ExternalAccount)
 
-    fun getExternalAccountIdentifier(): String?
-
     suspend fun getAddress(): String
-
-    fun isValidExternalAccount(externalAccount: ExternalAccount): Boolean
 
     fun clearExtendedAccount()
 }
-
-class ExternalAccountsWithSelected(
-    val accounts: List<ExternalAccount>,
-    val selected: ExternalAccount?
-)
 
 suspend fun AddressInputMixin.isAddressValid(input: String) = getInputSpec().isValidAddress(input)

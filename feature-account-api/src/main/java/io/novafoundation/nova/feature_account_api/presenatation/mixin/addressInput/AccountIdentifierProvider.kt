@@ -1,10 +1,15 @@
 package io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.domain.emitError
 import io.novafoundation.nova.common.domain.emitLoaded
 import io.novafoundation.nova.common.domain.emitLoading
 import io.novafoundation.nova.common.domain.loadedNothing
+import io.novafoundation.nova.common.presentation.toShortAddressFormat
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.R
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AccountIdentifierProvider.Event.ShowBottomSheetEvent
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.inputSpec.AddressInputSpecProvider
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.web3names.domain.models.Web3NameAccount
@@ -12,103 +17,108 @@ import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 interface AccountIdentifierProvider {
 
-    val externalAccountsFlow: Flow<List<ExternalAccount>>
-
     val selectedExternalAccountFlow: Flow<ExtendedLoadingState<ExternalAccount?>>
 
-    fun init(inputFlow: Flow<String>)
+    val eventsLiveData: LiveData<Event>
 
-    fun selectExternalAccount(identifier: ExternalAccount?)
+    fun selectExternalAccount(account: ExternalAccount?)
 
-    fun isCorrectIdentifier(raw: String): Boolean
+    fun isIdentifierValid(raw: String): Boolean
 
     fun loadExternalAccounts(raw: String)
 
-    fun getIdentifier(): String?
+    sealed interface Event {
 
-    fun getSelectedExternalAccount(): ExternalAccount?
+        class ShowBottomSheetEvent(
+            val identifier: String,
+            val chainName: String,
+            val externalAccounts: List<ExternalAccount>,
+            val selectedAccount: ExternalAccount?
+        ) : Event
 
-    fun isValidExternalAccount(externalAccount: ExternalAccount): Boolean
+        class ErrorEvent(val exception: Throwable) : Event
+    }
+}
+
+class EmptyAccountIdentifierProvider : AccountIdentifierProvider {
+
+    override val selectedExternalAccountFlow: Flow<ExtendedLoadingState<ExternalAccount?>> = flowOf(loadedNothing())
+
+    override val eventsLiveData: LiveData<AccountIdentifierProvider.Event> = MutableLiveData()
+
+    override fun selectExternalAccount(account: ExternalAccount?) {
+        // empty implementation
+    }
+
+    override fun loadExternalAccounts(raw: String) {
+        // empty implementation
+    }
+
+    override fun isIdentifierValid(raw: String) = false
 }
 
 class Web3NameIdentifierProvider(
     private val web3NameInteractor: Web3NamesInteractor,
     private val destinationChain: Flow<ChainWithAsset>,
     private val addressInputSpecProvider: AddressInputSpecProvider,
-    private val coroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope,
+    private val inputFlowProvider: InputFlowProvider,
+    private val resourceManager: ResourceManager
 ) : AccountIdentifierProvider,
     CoroutineScope by coroutineScope {
 
-    private var enteredIdentifier: String? = null
-    private var selectedExternalAccount: ExternalAccount? = null
+    private val _selectedExternalAccountFlow = MutableStateFlow<ExternalAccount?>(null)
+    private val _externalAccountsLoadingFlow = MutableStateFlow(false)
 
-    override val externalAccountsFlow = MutableStateFlow<List<ExternalAccount>>(listOf())
+    override val selectedExternalAccountFlow = combineTransform<ExternalAccount?, Boolean, ExtendedLoadingState<ExternalAccount?>>(
+        _selectedExternalAccountFlow,
+        _externalAccountsLoadingFlow
+    ) { selectedAccount, isLoading ->
+        if (isLoading) {
+            emitLoading()
+        } else {
+            emitLoaded(selectedAccount)
+        }
+    }
 
-    override val selectedExternalAccountFlow = MutableStateFlow<ExtendedLoadingState<ExternalAccount?>>(loadedNothing())
+    override val eventsLiveData = MutableLiveData<AccountIdentifierProvider.Event>()
 
-    override fun init(inputFlow: Flow<String>) {
-        inputFlow.onEach {
-            selectedExternalAccount = null
-            enteredIdentifier = null
-            selectedExternalAccountFlow.value = loadedNothing()
-            externalAccountsFlow.value = emptyList()
+    init {
+        inputFlowProvider.inputFlow.onEach {
+            _selectedExternalAccountFlow.value = null
         }.launchIn(this)
     }
 
     override fun selectExternalAccount(account: ExternalAccount?) {
-        launch {
-            if (account == null) {
-                enteredIdentifier = null
-                externalAccountsFlow.value = emptyList()
-            }
-            selectedExternalAccount = account
-            selectedExternalAccountFlow.emitLoaded(account)
-        }
+        _selectedExternalAccountFlow.value = account
     }
 
-    override fun isCorrectIdentifier(raw: String): Boolean {
+    override fun isIdentifierValid(raw: String): Boolean {
         return web3NameInteractor.isValidWeb3Name(raw)
     }
 
     override fun loadExternalAccounts(raw: String) {
+        if (!web3NameInteractor.isValidWeb3Name(raw)) return
+
         launch {
-            if (web3NameInteractor.isValidWeb3Name(raw)) {
-                enteredIdentifier = raw
+            startLoading()
 
-                startLoading()
+            val chain = destinationChain.first().chain
+            getExternalAccounts(raw)
+                .onSuccess { onExternalAccountsLoaded(raw, chain.name, it) }
+                .onFailure { onError(it) }
 
-                getExternalAccounts(raw)
-                    .onSuccess { onExternalAccountsLoaded(it) }
-                    .onFailure { selectedExternalAccountFlow.emitError(it) }
-
-                stopLoading()
-            }
+            stopLoading()
         }
-    }
-
-    override fun getIdentifier(): String? {
-        return enteredIdentifier
-    }
-
-    override fun getSelectedExternalAccount(): ExternalAccount? {
-        return selectedExternalAccount
-    }
-
-    override fun isValidExternalAccount(externalAccount: ExternalAccount): Boolean {
-        return web3NameInteractor.isValidWeb3NameAccount(
-            Web3NameAccount(
-                externalAccount.accountId,
-                externalAccount.address,
-                externalAccount.description
-            )
-        )
     }
 
     private suspend fun getExternalAccounts(raw: String): Result<List<ExternalAccount>> {
@@ -120,28 +130,48 @@ class Web3NameIdentifierProvider(
         return web3NameInteractor.queryAccountsByWeb3Name(raw, chain, asset).map { accounts ->
             accounts.map {
                 ExternalAccount(
-                    it.accountId,
-                    it.address,
-                    it.description,
-                    inputSpec.generateIcon(it.address).toIdenticonState()
+                    accountId = it.accountId,
+                    address = it.address,
+                    description = it.description,
+                    addressWithDescription = resourceManager.addressWithDescription(it),
+                    isValid = it.isValid,
+                    icon = inputSpec.generateIcon(it.address).toIdenticonState()
                 )
             }
         }
     }
 
-    private suspend fun startLoading() {
-        selectedExternalAccountFlow.emitLoading()
-    }
-
-    private suspend fun stopLoading() {
-        selectedExternalAccountFlow.emitLoaded(selectedExternalAccount)
-    }
-
-    private fun onExternalAccountsLoaded(externalAccounts: List<ExternalAccount>) {
-        externalAccountsFlow.value = externalAccounts
-
-        if (externalAccounts.size == 1) {
-            selectedExternalAccount = externalAccounts.first()
+    fun ResourceManager.addressWithDescription(w3nAccount: Web3NameAccount): String {
+        val description = w3nAccount.description
+        return if (description != null) {
+            return getString(R.string.web3names_address_with_description, w3nAccount.address.toShortAddressFormat(), description)
+        } else {
+            w3nAccount.address.toShortAddressFormat()
         }
+    }
+
+    private fun startLoading() {
+        _externalAccountsLoadingFlow.value = true
+    }
+
+    private fun stopLoading() {
+        _externalAccountsLoadingFlow.value = false
+    }
+
+    private fun onExternalAccountsLoaded(w3nIdentifier: String, chainName: String, externalAccounts: List<ExternalAccount>) {
+        if (externalAccounts.size == 1) {
+            _selectedExternalAccountFlow.value = externalAccounts.first()
+        } else if (externalAccounts.size > 1) {
+            eventsLiveData.value = ShowBottomSheetEvent(
+                web3NameInteractor.removePrefix(w3nIdentifier),
+                chainName,
+                externalAccounts,
+                _selectedExternalAccountFlow.value
+            )
+        }
+    }
+
+    private fun onError(throwable: Throwable) {
+        eventsLiveData.value = AccountIdentifierProvider.Event.ErrorEvent(throwable)
     }
 }

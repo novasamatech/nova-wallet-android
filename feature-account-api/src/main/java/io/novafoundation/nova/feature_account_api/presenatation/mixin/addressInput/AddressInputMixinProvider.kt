@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_api.presenatation.mixin.addressIn
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.domain.dataOrNull
-import io.novafoundation.nova.common.domain.loadedNothing
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
@@ -29,12 +28,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -51,10 +46,11 @@ class AddressInputMixinFactory(
     fun create(
         inputSpecProvider: AddressInputSpecProvider,
         myselfBehaviorProvider: MyselfBehaviorProvider,
-        accountIdentifierProvider: AccountIdentifierProvider?,
         errorDisplayer: (cause: String) -> Unit,
         showAccountEvent: ((address: String) -> Unit)?,
-        coroutineScope: CoroutineScope
+        coroutineScope: CoroutineScope,
+        inputFlowProvider: InputFlowProvider,
+        accountIdentifierProvider: AccountIdentifierProvider = EmptyAccountIdentifierProvider(),
     ): AddressInputMixin = AddressInputMixinProvider(
         specProvider = inputSpecProvider,
         myselfBehaviorProvider = myselfBehaviorProvider,
@@ -65,6 +61,7 @@ class AddressInputMixinFactory(
         errorDisplayer = errorDisplayer,
         coroutineScope = coroutineScope,
         accountIdentifierProvider = accountIdentifierProvider,
+        inputFlowProvider = inputFlowProvider,
         showAddressEventCallback = showAccountEvent
     )
 
@@ -92,15 +89,22 @@ class AddressInputMixinFactory(
         destinationChain = destinationChainFlow
     )
 
+    fun createInputFlowProvider(): InputFlowProvider {
+        return RealInputFlowProvider()
+    }
+
     fun accountIdentifierProvider(
         destinationChainFlow: Flow<ChainWithAsset>,
         inputSpecProvider: AddressInputSpecProvider,
-        coroutineScope: CoroutineScope
+        coroutineScope: CoroutineScope,
+        inputFlowProvider: InputFlowProvider
     ): AccountIdentifierProvider = Web3NameIdentifierProvider(
         web3NameInteractor = web3NamesInteractor,
         destinationChain = destinationChainFlow,
         addressInputSpecProvider = inputSpecProvider,
-        coroutineScope = coroutineScope
+        coroutineScope = coroutineScope,
+        inputFlowProvider = inputFlowProvider,
+        resourceManager = resourceManager
     )
 
     fun noMyself(): MyselfBehaviorProvider = NoMyselfBehaviorProvider()
@@ -114,8 +118,9 @@ class AddressInputMixinProvider(
     private val qrSharingFactory: MultiChainQrSharingFactory,
     private val resourceManager: ResourceManager,
     private val errorDisplayer: (error: String) -> Unit,
-    private val accountIdentifierProvider: AccountIdentifierProvider?,
     private val showAddressEventCallback: ((address: String) -> Unit)?,
+    private val inputFlowProvider: InputFlowProvider,
+    private val accountIdentifierProvider: AccountIdentifierProvider = EmptyAccountIdentifierProvider(),
     coroutineScope: CoroutineScope,
 ) : AddressInputMixin,
     CoroutineScope by coroutineScope,
@@ -125,13 +130,11 @@ class AddressInputMixinProvider(
         .inBackground()
         .share()
 
-    override val inputFlow = MutableStateFlow("")
+    override val inputFlow = inputFlowProvider.inputFlow
 
-    override val showExternalAccountsFlow = accountIdentifierProvider?.externalAccountsFlow
-        ?.map { ExternalAccountsWithSelected(it, accountIdentifierProvider.getSelectedExternalAccount()) }
-        ?: emptyFlow()
+    override val externalIdentifierEventLiveData = accountIdentifierProvider.eventsLiveData
 
-    override val selectedExternalIdentifierFlow = accountIdentifierProvider?.selectedExternalAccountFlow ?: flowOf(loadedNothing())
+    override val selectedExternalAccountFlow = accountIdentifierProvider.selectedExternalAccountFlow
 
     override val state = combine(
         myselfBehaviorProvider.behavior,
@@ -140,10 +143,6 @@ class AddressInputMixinProvider(
         clipboardFlow,
         ::createState
     ).shareInBackground()
-
-    init {
-        accountIdentifierProvider?.init(inputFlow)
-    }
 
     override suspend fun getInputSpec(): AddressInputSpec {
         return specProvider.spec.first()
@@ -154,7 +153,7 @@ class AddressInputMixinProvider(
             inputFlow.value = withContext(Dispatchers.IO) {
                 clipboardManager.getTextOrNull().orEmpty()
             }
-            accountIdentifierProvider?.loadExternalAccounts(inputFlow.value)
+            accountIdentifierProvider.loadExternalAccounts(inputFlow.value)
         }
     }
 
@@ -185,43 +184,31 @@ class AddressInputMixinProvider(
     }
 
     override fun selectedExternalAddressClicked() {
-        showAddressEventCallback?.let {
-            val selectedAccount = accountIdentifierProvider?.getSelectedExternalAccount() ?: return
-            if (accountIdentifierProvider.isValidExternalAccount(selectedAccount)) {
+        if (showAddressEventCallback == null) return
+
+        launch {
+            val selectedAccount = selectedExternalAccountFlow.first().dataOrNull
+            if (selectedAccount != null && selectedAccount.isValid) {
                 showAddressEventCallback.invoke(selectedAccount.address)
             }
         }
     }
 
-    override fun onInputFocusChanged() {
-        coroutineScope.launch {
-            accountIdentifierProvider?.loadExternalAccounts(inputFlow.value)
-        }
-    }
-
-    override fun onKeyboardGone() {
-        accountIdentifierProvider?.loadExternalAccounts(inputFlow.value)
+    override fun loadExternalIdentifiers() {
+        accountIdentifierProvider.loadExternalAccounts(inputFlow.value)
     }
 
     override fun selectExternalAccount(it: ExternalAccount) {
-        accountIdentifierProvider?.selectExternalAccount(it)
-    }
-
-    override fun getExternalAccountIdentifier(): String? {
-        return accountIdentifierProvider?.getIdentifier()
+        accountIdentifierProvider.selectExternalAccount(it)
     }
 
     override suspend fun getAddress(): String {
-        val externalAddress = selectedExternalIdentifierFlow.first().dataOrNull?.address
+        val externalAddress = selectedExternalAccountFlow.first().dataOrNull?.address
         return externalAddress ?: inputFlow.value
     }
 
-    override fun isValidExternalAccount(externalAccount: ExternalAccount): Boolean {
-        return accountIdentifierProvider?.isValidExternalAccount(externalAccount) ?: false
-    }
-
     override fun clearExtendedAccount() {
-        accountIdentifierProvider?.selectExternalAccount(null)
+        accountIdentifierProvider.selectExternalAccount(null)
     }
 
     private suspend fun createState(
