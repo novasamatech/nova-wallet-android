@@ -115,6 +115,8 @@ class Web3NameIdentifierProvider(
     override fun loadExternalAccounts(raw: String) {
         if (!web3NameInteractor.isValidWeb3Name(raw)) return
 
+        cancelLoadingJob()
+        
         externalAccountsLoadingJob = launch {
             try {
                 startLoading()
