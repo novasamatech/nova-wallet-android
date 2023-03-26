@@ -9,12 +9,16 @@ import io.novafoundation.nova.common.domain.loadedNothing
 import io.novafoundation.nova.common.presentation.toShortAddressFormat
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.R
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AccountIdentifierProvider.Event.ErrorEvent
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AccountIdentifierProvider.Event.ShowBottomSheetEvent
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.inputSpec.AddressInputSpecProvider
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
+import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException
 import io.novafoundation.nova.web3names.domain.models.Web3NameAccount
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combineTransform
@@ -76,6 +80,7 @@ class Web3NameIdentifierProvider(
 ) : AccountIdentifierProvider,
     CoroutineScope by coroutineScope {
 
+    private var externalAccountsLoadingJob: Job? = null
     private val _selectedExternalAccountFlow = MutableStateFlow<ExternalAccount?>(null)
     private val _externalAccountsLoadingFlow = MutableStateFlow(false)
 
@@ -95,6 +100,7 @@ class Web3NameIdentifierProvider(
     init {
         inputFlowProvider.inputFlow.onEach {
             _selectedExternalAccountFlow.value = null
+            cancelLoadingJob()
         }.launchIn(this)
     }
 
@@ -109,26 +115,30 @@ class Web3NameIdentifierProvider(
     override fun loadExternalAccounts(raw: String) {
         if (!web3NameInteractor.isValidWeb3Name(raw)) return
 
-        launch {
-            startLoading()
+        externalAccountsLoadingJob = launch {
+            try {
+                startLoading()
 
-            val chain = destinationChain.first().chain
-            getExternalAccounts(raw)
-                .onSuccess { onExternalAccountsLoaded(raw, chain.name, it) }
-                .onFailure { onError(it) }
+                val chain = destinationChain.first().chain
+                runCatching { getExternalAccounts(raw) }
+                    .onSuccess { onExternalAccountsLoaded(raw, chain.name, it) }
+                    .onFailure { onError(it, chain.name) }
 
-            stopLoading()
+                stopLoading()
+            } catch (_: CancellationException) {
+                // Just skip
+            }
         }
     }
 
-    private suspend fun getExternalAccounts(raw: String): Result<List<ExternalAccount>> {
+    private suspend fun getExternalAccounts(raw: String): List<ExternalAccount> {
         val inputSpec = addressInputSpecProvider.spec.first()
         val chainWithAsset = destinationChain.first()
         val chain = chainWithAsset.chain
         val asset = chainWithAsset.asset
 
-        return web3NameInteractor.queryAccountsByWeb3Name(raw, chain, asset).map { accounts ->
-            accounts.map {
+        return web3NameInteractor.queryAccountsByWeb3Name(raw, chain, asset)
+            .map {
                 ExternalAccount(
                     accountId = it.accountId,
                     address = it.address,
@@ -138,7 +148,6 @@ class Web3NameIdentifierProvider(
                     icon = inputSpec.generateIcon(it.address).toIdenticonState()
                 )
             }
-        }
     }
 
     fun ResourceManager.addressWithDescription(w3nAccount: Web3NameAccount): String {
@@ -156,6 +165,12 @@ class Web3NameIdentifierProvider(
 
     private fun stopLoading() {
         _externalAccountsLoadingFlow.value = false
+        externalAccountsLoadingJob = null
+    }
+
+    private fun cancelLoadingJob() {
+        externalAccountsLoadingJob?.cancel()
+        stopLoading()
     }
 
     private fun onExternalAccountsLoaded(w3nIdentifier: String, chainName: String, externalAccounts: List<ExternalAccount>) {
@@ -171,7 +186,13 @@ class Web3NameIdentifierProvider(
         }
     }
 
-    private fun onError(throwable: Throwable) {
-        eventsLiveData.value = AccountIdentifierProvider.Event.ErrorEvent(throwable)
+    private fun onError(throwable: Throwable, chainName: String) {
+        if (throwable is CancellationException) return
+
+        if (throwable !is Web3NamesException) {
+            eventsLiveData.value = ErrorEvent(Web3NamesException.UnknownException(chainName))
+        } else {
+            eventsLiveData.value = ErrorEvent(throwable)
+        }
     }
 }

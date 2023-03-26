@@ -3,7 +3,6 @@ package io.novafoundation.nova.web3names.data.repository
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindString
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
-import io.novafoundation.nova.common.utils.mapFailure
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -34,21 +33,13 @@ class RealWeb3NamesRepository(
     private val caip19Parser: Caip19Parser
 ) : Web3NamesRepository {
 
-    override suspend fun queryWeb3NameAccount(web3Name: String, chain: Chain, chainAsset: Chain.Asset): Result<List<Web3NameAccount>> {
-        return runCatching {
-            val owner = getWeb3NameAccountOwner(web3Name) ?: throw ChainProviderNotFoundException(web3Name)
-            val serviceEndpoints = getDidServiceEndpoints(owner)
-            val transferRecipientEndpoint = serviceEndpoints.firstKiltTransferAssetRecipientV1Endpoint() ?: throw ChainProviderNotFoundException(web3Name)
-            val transferRecipientUrl = transferRecipientEndpoint.urls.first()
+    override suspend fun queryWeb3NameAccount(web3Name: String, chain: Chain, chainAsset: Chain.Asset): List<Web3NameAccount> {
+        val owner = getWeb3NameAccountOwner(web3Name) ?: throw ChainProviderNotFoundException(web3Name)
+        val serviceEndpoints = getDidServiceEndpoints(owner)
+        val transferRecipientEndpoint = serviceEndpoints.firstKiltTransferAssetRecipientV1Endpoint() ?: throw ChainProviderNotFoundException(web3Name)
+        val transferRecipientUrl = transferRecipientEndpoint.urls.first()
 
-            getChainRecipients(web3Name, transferRecipientUrl, chain, chainAsset)
-        }.mapFailure {
-            if (it !is Web3NamesException) {
-                Web3NamesException.UnknownException(chain.name)
-            } else {
-                it
-            }
-        }
+        return getChainRecipients(web3Name, transferRecipientUrl, chain, chainAsset)
     }
 
     private suspend fun getWeb3NameAccountOwner(web3Name: String): AccountId? {
