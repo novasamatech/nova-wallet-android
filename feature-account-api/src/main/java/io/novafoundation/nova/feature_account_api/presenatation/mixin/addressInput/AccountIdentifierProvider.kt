@@ -116,7 +116,7 @@ class Web3NameIdentifierProvider(
         if (!web3NameInteractor.isValidWeb3Name(raw)) return
 
         cancelLoadingJob()
-        
+
         externalAccountsLoadingJob = launch {
             try {
                 startLoading()
