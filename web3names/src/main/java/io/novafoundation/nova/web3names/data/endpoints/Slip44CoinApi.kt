@@ -6,6 +6,6 @@ import retrofit2.http.Url
 
 interface Slip44CoinApi {
 
-    @GET()
+    @GET
     suspend fun getSlip44Coins(@Url() url: String): List<Slip44CoinRemote>
 }
