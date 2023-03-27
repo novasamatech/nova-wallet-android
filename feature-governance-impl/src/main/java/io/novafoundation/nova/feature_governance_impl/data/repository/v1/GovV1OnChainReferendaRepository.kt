@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.data.repository.v1
 
 import android.util.Log
-import io.novafoundation.nova.common.address.getValue
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
@@ -16,6 +15,7 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.democracy
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.numberConstant
+import io.novafoundation.nova.common.utils.padEnd
 import io.novafoundation.nova.common.utils.scheduler
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ConfirmingSource
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.DecidingStatus
@@ -137,9 +137,12 @@ class GovV1OnChainReferendaRepository(
                 }
             }.toMap()
 
-            runtime.metadata.scheduler().storage("Lookup").entries(
+            // We do not extract referendumId as a key here since we request multiple keys per each referendumId (pre- and post- v4 migration)
+            // Thus, we should firstly filter out null values from map.
+            // Otherwise key candidate that resulted in null value may shadow another which resulted in value and we will loose that value
+            val schedulerKeysBySchedulerKey = runtime.metadata.scheduler().storage("Lookup").entries(
                 keysArguments = referendaIdBySchedulerId.keys.map { schedulerIdKey -> listOf(schedulerIdKey.value) },
-                keyExtractor = { (schedulerId: ByteArray) -> referendaIdBySchedulerId.getValue(schedulerId) },
+                keyExtractor = { (schedulerId: ByteArray) -> schedulerId.intoKey() },
                 binding = { decoded, _ ->
                     decoded?.let {
                         val (blockNumber, _) = decoded.castToList()
@@ -148,6 +151,8 @@ class GovV1OnChainReferendaRepository(
                     }
                 }
             ).filterNotNull()
+
+            schedulerKeysBySchedulerKey.mapKeys { (schedulerKey, _) -> referendaIdBySchedulerId.getValue(schedulerKey) }
         }
     }
 
@@ -236,7 +241,7 @@ class GovV1OnChainReferendaRepository(
         return if (oldId.size > SCHEDULER_KEY_BOUND) {
             oldId.blake2b256().pad(SCHEDULER_KEY_BOUND, padding = 0)
         } else {
-            oldId.pad(SCHEDULER_KEY_BOUND, padding = 0)
+            oldId.padEnd(SCHEDULER_KEY_BOUND, padding = 0)
         }
     }
 
