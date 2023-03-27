@@ -43,6 +43,8 @@ dependencies {
     implementation daggerDep
     kapt daggerKapt
 
+    implementation multibaseDep
+
     testImplementation project(':test-shared')
 
     androidTestImplementation androidTestRunnerDep
