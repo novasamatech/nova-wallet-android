@@ -19,6 +19,7 @@ import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.R
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.ExternalAccount
 import kotlinx.android.synthetic.main.view_address_input.view.addressInputAddress
 import kotlinx.android.synthetic.main.view_address_input.view.addressInputClear
 import kotlinx.android.synthetic.main.view_address_input.view.addressInputField
@@ -67,17 +68,18 @@ class AddressInputField @JvmOverloads constructor(
         if (addressInputW3NContainer.isGone) return
 
         when {
-            externalAccountState is ExtendedLoadingState.Loaded && externalAccountState.data != null -> {
-                val externalAccount = externalAccountState.data!!
-                addressInputW3NAddress.text = externalAccount.addressWithDescription(context)
-                setIdenticonState(externalAccount.icon)
-                addressInputW3NAddress.makeVisible()
-                addressInputW3NProgress.makeInvisible()
-            }
             externalAccountState is ExtendedLoadingState.Loading -> {
                 addressInputW3NAddress.makeInvisible()
                 addressInputW3NProgress.makeVisible()
             }
+
+            externalAccountState is ExtendedLoadingState.Loaded && externalAccountState.data != null -> {
+                val externalAccount = externalAccountState.data!!
+                addressInputW3NAddress.text = externalAccount.addressWithDescription
+                addressInputW3NAddress.makeVisible()
+                addressInputW3NProgress.makeInvisible()
+            }
+
             externalAccountState is ExtendedLoadingState.Loaded && externalAccountState.data == null -> {
                 addressInputW3NAddress.text = null
                 addressInputW3NAddress.makeInvisible()

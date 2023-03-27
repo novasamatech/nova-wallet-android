@@ -32,11 +32,9 @@ class ChangeWatchAccountViewModel(
     val chainAddressMixin = with(addressInputMixinFactory) {
         create(
             inputSpecProvider = singleChainInputSpec(chain),
-            myselfBehaviorProvider = noMyself(),
             errorDisplayer = this@ChangeWatchAccountViewModel::showError,
             showAccountEvent = null,
             coroutineScope = this@ChangeWatchAccountViewModel,
-            inputFlowProvider = createInputFlowProvider()
         )
     }
 

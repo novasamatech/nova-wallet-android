@@ -9,8 +9,8 @@ import io.novafoundation.nova.common.utils.keyboard.setKeyboardVisibilityListene
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.account.external.ExternalAccountsBottomSheet
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AccountIdentifierProvider.Event.ErrorEvent
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AccountIdentifierProvider.Event.ShowBottomSheetEvent
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.AccountIdentifierProvider.Event.ErrorEvent
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.AccountIdentifierProvider.Event.ShowBottomSheetEvent
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException
 
 fun BaseFragment<*>.setupAddressInput(
@@ -93,8 +93,7 @@ private fun BaseFragment<*>.showExternalAccountsBottomSheet(
 }
 
 private fun BaseFragment<*>.handleError(event: ErrorEvent) {
-    val exception = event.exception
-    val titleAndMessage = when (exception) {
+    val titleAndMessage = when (val exception = event.exception) {
         is Web3NamesException.ChainProviderNotFoundException -> {
             getString(R.string.web3names_invalid_recepient_title) to getString(R.string.web3names_recepient_not_found_message, exception.identifier)
         }

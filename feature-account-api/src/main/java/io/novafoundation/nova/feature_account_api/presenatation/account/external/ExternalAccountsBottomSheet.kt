@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSh
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputState
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.ExternalAccount
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.ExternalAccount
 import kotlinx.android.synthetic.main.item_external_account_identifier.view.externalAccountIcon
 import kotlinx.android.synthetic.main.item_external_account_identifier.view.externalAccountIdentifierIsSelected
 import kotlinx.android.synthetic.main.item_external_account_identifier.view.externalAccountIdentifierSubtitle

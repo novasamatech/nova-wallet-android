@@ -88,21 +88,18 @@ class SelectSendViewModel(
     val addressInputMixin = with(addressInputMixinFactory) {
         val destinationChain = destinationChainWithAsset.map { it.chain }
         val inputSpec = singleChainInputSpec(destinationChain)
-        val inputFlowProvider = createInputFlowProvider()
-        val accountIdentifierProvider = accountIdentifierProvider(
-            destinationChainFlow = destinationChainWithAsset,
-            inputSpecProvider = inputSpec,
-            coroutineScope = this@SelectSendViewModel,
-            inputFlowProvider = inputFlowProvider
-        )
+
         create(
             inputSpecProvider = singleChainInputSpec(destinationChain),
             myselfBehaviorProvider = crossChainOnlyMyself(originChain, destinationChain),
-            accountIdentifierProvider = accountIdentifierProvider,
+            accountIdentifierProvider = web3nIdentifiers(
+                destinationChainFlow = destinationChainWithAsset,
+                inputSpecProvider = inputSpec,
+                coroutineScope = this@SelectSendViewModel,
+            ),
             errorDisplayer = this@SelectSendViewModel::showError,
             showAccountEvent = this@SelectSendViewModel::showAccountDetails,
             coroutineScope = this@SelectSendViewModel,
-            inputFlowProvider = inputFlowProvider
         )
     }
 
