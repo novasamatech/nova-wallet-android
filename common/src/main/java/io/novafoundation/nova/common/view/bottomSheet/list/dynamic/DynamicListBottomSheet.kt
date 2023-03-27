@@ -76,7 +76,7 @@ abstract class DynamicListBottomSheet<T>(
     private val diffCallback: DiffUtil.ItemCallback<T>,
     private val onClicked: ClickHandler<T>?,
     private val onCancel: (() -> Unit)? = null,
-    private val overrideDismissing: Boolean = false
+    private val dismissOnClick: Boolean = true
 ) : BaseDynamicListBottomSheet(context), DynamicListSheetAdapter.Handler<T> {
 
     open class Payload<out T>(val data: List<T>, val selected: T? = null)
@@ -100,7 +100,7 @@ abstract class DynamicListBottomSheet<T>(
     override fun itemClicked(item: T) {
         onClicked?.invoke(this, item)
 
-        if (!overrideDismissing) {
+        if (dismissOnClick) {
             dismiss()
         }
     }

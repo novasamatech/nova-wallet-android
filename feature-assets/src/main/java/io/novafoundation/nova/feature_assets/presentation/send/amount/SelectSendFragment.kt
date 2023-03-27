@@ -91,7 +91,7 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
 
         setupAmountChooser(viewModel.amountChooserMixin, selectSendAmount)
         setupAddressInput(viewModel.addressInputMixin, selectSendRecipient)
-        setupExternalAccounts(viewModel.addressInputMixin, selectSendRecipient, viewModel.destinationChainName)
+        setupExternalAccounts(viewModel.addressInputMixin, selectSendRecipient)
 
         viewModel.chooseDestinationChain.awaitableActionLiveData.observeEvent {
             SelectCrossChainDestinationBottomSheet(
