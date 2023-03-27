@@ -7,6 +7,8 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
+import io.novafoundation.nova.feature_versions_impl.data.AppVersionProvider
+import io.novafoundation.nova.feature_versions_impl.data.PackageManagerAppVersionProvider
 import io.novafoundation.nova.feature_versions_impl.data.RealVersionRepository
 import io.novafoundation.nova.feature_versions_impl.data.VersionRepository
 import io.novafoundation.nova.feature_versions_impl.data.VersionsFetcher
@@ -21,11 +23,14 @@ class VersionsFeatureModule {
     ) = networkApiCreator.create(VersionsFetcher::class.java)
 
     @Provides
+    fun provideAppVersionProvider(context: Context): AppVersionProvider = PackageManagerAppVersionProvider(context)
+
+    @Provides
     fun provideVersionService(
-        context: Context,
+        appVersionProvider: AppVersionProvider,
         preferences: Preferences,
         versionsFetcher: VersionsFetcher
-    ): VersionRepository = RealVersionRepository(context, preferences, versionsFetcher)
+    ): VersionRepository = RealVersionRepository(appVersionProvider, preferences, versionsFetcher)
 
     @Provides
     @FeatureScope

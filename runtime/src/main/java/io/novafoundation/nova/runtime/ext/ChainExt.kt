@@ -15,6 +15,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAccountId
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumPublicKey
+import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.isValid
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 import jp.co.soramitsu.fearless_utils.extensions.toAddress
@@ -58,8 +59,12 @@ fun Chain.Asset.unifiedSymbol(): String {
 val Chain.Asset.disabled: Boolean
     get() = !enabled
 
-val Chain.genesisHash: String
-    get() = id
+val Chain.genesisHash: String?
+    get() = id.takeIf {
+        runCatching { it.fromHex() }.isSuccess
+    }
+
+fun Chain.requireGenesisHash() = requireNotNull(genesisHash)
 
 fun Chain.addressOf(accountId: ByteArray): String {
     return if (isEthereumBased) {
@@ -195,8 +200,19 @@ object ChainGeneses {
     const val KILT_TESTNET = "a0c6e3bac382b316a68bca7141af1fba507207594c761076847ce358aeedcc21"
 }
 
+object ChainIds {
+
+    const val ETHEREUM = "eip155:1"
+
+    const val MOONBEAM = ChainGeneses.MOONBEAM
+    const val MOONRIVER = ChainGeneses.MOONRIVER
+}
+
 val Chain.Companion.Geneses
     get() = ChainGeneses
+
+val Chain.Companion.Ids
+    get() = ChainIds
 
 fun Chain.Asset.requireStatemine(): Type.Statemine {
     require(type is Type.Statemine)
@@ -214,8 +230,8 @@ fun Chain.Asset.requireOrml(): Type.Orml {
     return type
 }
 
-fun Chain.Asset.requireErc20(): Type.Evm {
-    require(type is Type.Evm)
+fun Chain.Asset.requireErc20(): Type.EvmErc20 {
+    require(type is Type.EvmErc20)
 
     return type
 }

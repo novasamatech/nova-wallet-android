@@ -4,6 +4,7 @@ class EvmRpcException(val type: Type, message: String) : Throwable("${type.name}
 
     enum class Type(val code: Int?) {
         EXECUTION_REVERTED(-32603),
+        INVALID_INPUT(-32000),
         UNKNOWN(null);
 
         companion object {

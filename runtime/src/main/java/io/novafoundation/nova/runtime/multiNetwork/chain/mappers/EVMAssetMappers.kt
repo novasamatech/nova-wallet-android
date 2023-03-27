@@ -16,7 +16,7 @@ fun mapEVMAssetRemoteToLocalAssets(evmAssetRemote: EVMAssetRemote, gson: Gson): 
     return evmAssetRemote.instances.map {
         val assetId = chainAssetIdOfErc20Token(it.contractAddress)
 
-        val domainType = Chain.Asset.Type.Evm(it.contractAddress)
+        val domainType = Chain.Asset.Type.EvmErc20(it.contractAddress)
         val (type, typeExtras) = mapChainAssetTypeToRaw(domainType)
 
         ChainAssetLocal(

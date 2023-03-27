@@ -151,7 +151,8 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
 
         val chain = kusama()
         val delegates = interactor.getDelegates(
-            governanceOption = supportedGovernanceOption(chain, Chain.Governance.V2)
+            governanceOption = supportedGovernanceOption(chain, Chain.Governance.V2),
+            scope = this
         )
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, delegates.toString())
     }

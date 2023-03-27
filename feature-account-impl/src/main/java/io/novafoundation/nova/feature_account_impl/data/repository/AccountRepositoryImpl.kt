@@ -219,7 +219,7 @@ class AccountRepositoryImpl(
                 password = password,
                 name = metaAccount.name,
                 multiChainEncryption = metaAccount.multiChainEncryptionIn(chain)!!,
-                genesisHash = chain.genesisHash,
+                genesisHash = chain.genesisHash.orEmpty(),
                 address = address
             )
         }

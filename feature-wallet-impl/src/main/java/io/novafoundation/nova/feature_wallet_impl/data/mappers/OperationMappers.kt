@@ -2,7 +2,10 @@ package io.novafoundation.nova.feature_wallet_impl.data.mappers
 
 import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.core_db.model.OperationLocal
+import io.novafoundation.nova.core_db.model.OperationLocal.ExtrinsicContentType
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
+import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type
+import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
 import io.novafoundation.nova.feature_wallet_impl.data.network.model.response.SubqueryHistoryElementResponse
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlin.time.ExperimentalTime
@@ -20,37 +23,67 @@ private fun mapOperationStatusLocalToOperationStatus(status: OperationLocal.Stat
     OperationLocal.Status.FAILED -> Operation.Status.FAILED
 }
 
-private val Operation.Type.operationAmount
+private val Type.operationAmount
     get() = when (this) {
-        is Operation.Type.Extrinsic -> null
-        is Operation.Type.Reward -> amount
-        is Operation.Type.Transfer -> amount
+        is Type.Extrinsic -> null
+        is Type.Reward -> amount
+        is Type.Transfer -> amount
     }
 
-private val Operation.Type.operationStatus
+private val Type.operationStatus
     get() = when (this) {
-        is Operation.Type.Extrinsic -> status
-        is Operation.Type.Reward -> Operation.Status.COMPLETED
-        is Operation.Type.Transfer -> status
+        is Type.Extrinsic -> status
+        is Type.Reward -> Operation.Status.COMPLETED
+        is Type.Transfer -> status
     }
 
-private val Operation.Type.operationFee
+private val Type.operationFee
     get() = when (this) {
-        is Operation.Type.Extrinsic -> fee
-        is Operation.Type.Reward -> null
-        is Operation.Type.Transfer -> fee
+        is Type.Extrinsic -> fee
+        is Type.Reward -> null
+        is Type.Transfer -> fee
     }
 
-private val Operation.Type.hash
+private val Type.hash
     get() = when (this) {
-        is Operation.Type.Extrinsic -> hash
-        is Operation.Type.Transfer -> hash
-        is Operation.Type.Reward -> null
+        is Type.Extrinsic -> hash
+        is Type.Transfer -> hash
+        is Type.Reward -> null
     }
 
-private fun Operation.rewardOrNull() = type as? Operation.Type.Reward
-private fun Operation.transferOrNull() = type as? Operation.Type.Transfer
-private fun Operation.extrinsicOrNull() = type as? Operation.Type.Extrinsic
+private fun Operation.rewardOrNull() = type as? Type.Reward
+private fun Operation.transferOrNull() = type as? Type.Transfer
+private fun Operation.extrinsicOrNull() = type as? Type.Extrinsic
+
+private fun mapExtrinsicContentToLocal(content: Content): OperationLocal.ExtrinsicContent {
+    return when (content) {
+        is Content.SubstrateCall -> OperationLocal.ExtrinsicContent(
+            type = ExtrinsicContentType.SUBSTRATE_CALL,
+            module = content.module,
+            call = content.call
+        )
+
+        is Content.ContractCall -> OperationLocal.ExtrinsicContent(
+            type = ExtrinsicContentType.SMART_CONTRACT_CALL,
+            module = content.contractAddress,
+            call = content.function
+        )
+    }
+}
+
+private fun mapExtrinsicContentFromLocal(content: OperationLocal.ExtrinsicContent): Content {
+    return when (content.type) {
+        ExtrinsicContentType.SUBSTRATE_CALL -> Content.SubstrateCall(
+            module = content.module!!,
+            call = content.call!!
+        )
+
+        ExtrinsicContentType.SMART_CONTRACT_CALL -> Content.ContractCall(
+            contractAddress = content.module!!,
+            function = content.call
+        )
+    }
+}
 
 fun mapOperationToOperationLocalDb(
     operation: Operation,
@@ -58,9 +91,9 @@ fun mapOperationToOperationLocalDb(
     source: OperationLocal.Source,
 ): OperationLocal {
     val typeLocal = when (operation.type) {
-        is Operation.Type.Transfer -> OperationLocal.Type.TRANSFER
-        is Operation.Type.Reward -> OperationLocal.Type.REWARD
-        is Operation.Type.Extrinsic -> OperationLocal.Type.EXTRINSIC
+        is Type.Transfer -> OperationLocal.Type.TRANSFER
+        is Type.Reward -> OperationLocal.Type.REWARD
+        is Type.Extrinsic -> OperationLocal.Type.EXTRINSIC
     }
 
     return with(operation) {
@@ -70,8 +103,7 @@ fun mapOperationToOperationLocalDb(
             time = time,
             chainId = chainAsset.chainId,
             chainAssetId = chainAsset.id,
-            module = extrinsicOrNull()?.module,
-            call = extrinsicOrNull()?.call,
+            extrinsicContent = operation.extrinsicOrNull()?.content?.let(::mapExtrinsicContentToLocal),
             amount = type.operationAmount,
             fee = type.operationFee,
             status = mapOperationStatusToOperationLocalStatus(type.operationStatus),
@@ -93,15 +125,14 @@ fun mapOperationLocalToOperation(
 ): Operation {
     with(operationLocal) {
         val operationType = when (operationType) {
-            OperationLocal.Type.EXTRINSIC -> Operation.Type.Extrinsic(
+            OperationLocal.Type.EXTRINSIC -> Type.Extrinsic(
                 hash = hash!!,
-                module = module!!,
-                call = call!!,
+                content = mapExtrinsicContentFromLocal(operationLocal.extrinsicContent!!),
                 fee = fee!!,
                 status = mapOperationStatusLocalToOperationStatus(status)
             )
 
-            OperationLocal.Type.TRANSFER -> Operation.Type.Transfer(
+            OperationLocal.Type.TRANSFER -> Type.Transfer(
                 myAddress = address,
                 amount = amount!!,
                 receiver = receiver!!,
@@ -111,7 +142,7 @@ fun mapOperationLocalToOperation(
                 hash = hash
             )
 
-            OperationLocal.Type.REWARD -> Operation.Type.Reward(
+            OperationLocal.Type.REWARD -> Type.Reward(
                 amount = amount!!,
                 isReward = isReward!!,
                 era = era!!,
@@ -134,9 +165,9 @@ fun mapNodeToOperation(
     node: SubqueryHistoryElementResponse.Query.HistoryElements.Node,
     tokenType: Chain.Asset,
 ): Operation {
-    val type: Operation.Type = when {
+    val type: Type = when {
         node.reward != null -> with(node.reward) {
-            Operation.Type.Reward(
+            Type.Reward(
                 amount = amount,
                 era = era,
                 isReward = isReward,
@@ -145,17 +176,16 @@ fun mapNodeToOperation(
         }
 
         node.extrinsic != null -> with(node.extrinsic) {
-            Operation.Type.Extrinsic(
+            Type.Extrinsic(
                 hash = node.extrinsicHash,
-                module = module,
-                call = call,
+                content = Content.SubstrateCall(module, call),
                 fee = fee,
                 status = Operation.Status.fromSuccess(success)
             )
         }
 
         node.transfer != null -> with(node.transfer) {
-            Operation.Type.Transfer(
+            Type.Transfer(
                 myAddress = node.address,
                 amount = amount,
                 receiver = to,
@@ -167,7 +197,7 @@ fun mapNodeToOperation(
         }
 
         node.assetTransfer != null -> with(node.assetTransfer) {
-            Operation.Type.Transfer(
+            Type.Transfer(
                 myAddress = node.address,
                 amount = amount,
                 receiver = to,

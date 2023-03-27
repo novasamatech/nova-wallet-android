@@ -73,7 +73,7 @@
     <string name="account_ledger_import_start_guide">Инструкция по подключению Ledger</string>
     <string name="account_ledger_import_start_step_1">Удостоверьтесь, что <font color="#FFFFFF">приложение Сети установлено</font> на Ваше устройство Ledger, используя приложение Ledger Live</string>
     <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Откройте приложение Сети</font> на Вашем Ledger устройстве</string>
-    <string name="account_ledger_import_start_step_3">Разрешите Nova Wallet <font color="#FFFFFF">доступ к Bluetooth</font></string>
+    <string name="account_ledger_import_start_step_3">Разрешите Nova Wallet <font color="#FFFFFF">доступ к Bluetooth и Гео-локации</font></string>
     <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Выберите аккаунт</font> для добавления в кошелёк</string>
     <string name="account_ledger_import_start_title">Подключите Ledger Nano X</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
@@ -262,6 +262,7 @@
     <string name="common_next">Далее</string>
     <string name="common_no">Нет</string>
     <string name="common_no_app_to_handle_import_intent">Приложение для импорта файлов не найдено на устройстве. Пожалуйста, установите его и повторите попытку</string>
+    <string name="common_no_app_to_handle_intent">На устройстве не найдено подходящего приложения для обработки данного действия</string>
     <string name="common_no_changes">Нет изменений</string>
     <string name="common_no_screenshot_message_v2_2_0">Мы собираемся показать вашу мнемонику. Убедитесь, что никто не видит ваш экран и не делайте скриншотов - к ним могут получить доступ вредоносные программы</string>
     <string name="common_not_enough_funds_message">К сожалению, у вас недостаточно средств для оплаты сетевого сбора.</string>
@@ -448,7 +449,7 @@
     <string name="delegation_remove_votes">Удалить голоса</string>
     <string name="delegation_revoke_delegation">Отменить делегацию</string>
     <string name="delegation_revoke_hint_unlock">После истечения периода выхода из делегации не забудьте разблокировать токены</string>
-    <string name="delegation_sorting_delegated_votes">Всем голосам</string>
+    <string name="delegation_sorting_delegated_votes">Голосам делегаторов</string>
     <string name="delegation_sorting_delegations">Делегациям</string>
     <string name="delegation_sorting_recent_votes_format">Голосам за %s</string>
     <string name="delegation_tracks">Треки</string>
@@ -465,6 +466,9 @@
     <string name="ecdsa_selection_title">ECDSA</string>
     <string name="ed25519_selection_subtitle">ed25519 (альтернативный)</string>
     <string name="ed25519_selection_title">Edwards</string>
+    <string name="ethereum_contract">Контракт</string>
+    <string name="ethereum_contract_call">Вызов контракта</string>
+    <string name="ethereum_function">Функция</string>
     <string name="export_json_password_confirm">Подтверждение пароля</string>
     <string name="export_json_password_match_error">Пароли не совпадают</string>
     <string name="export_json_password_new">Новый пароль</string>
@@ -688,6 +692,8 @@
     <string name="select_delegation_tracks_edit_title">Выберите треки для изменения делегации</string>
     <string name="select_delegation_tracks_revoke_title">Выберите треки для отмены делегации</string>
     <string name="select_delegation_tracks_unavailable_tracks">Недоступные треки</string>
+    <string name="select_ledger_location_enable_request_message">Nova нуждается в включении местоположения, чтобы иметь возможность выполнять сканирование Bluetooth для поиска вашего устройства Ledger</string>
+    <string name="select_ledger_location_enable_request_title">Пожалуйста, включите геолокацию в настройках устройства</string>
     <string name="settings_community">Сообщество</string>
     <string name="settings_email">Написать разработчикам</string>
     <string name="settings_general">Основные</string>
@@ -706,7 +712,7 @@
     <string name="staking_account_is_used_as_controller">Выбранный аккаунт уже используется в качестве контроллера.</string>
     <string name="staking_active_delegators">Активные делегаторы</string>
     <string name="staking_add_controller">Чтобы выполнить это действие, добавьте контроллер аккаунт %s в приложение</string>
-    <string name="staking_alert_bond_more_message">Ваш стейк меньше минимума %s.\nСтейк меньше минимума, уменьшает шансы получить вознаграждение</string>
+    <string name="staking_alert_bond_more_message">Ваш стейк меньше минимума %s.\nСтейк меньше минимума уменьшает шансы получить вознаграждение</string>
     <string name="staking_alert_bond_more_title">Застейкайте ещё токенов</string>
     <string name="staking_alert_change_validators">Смените своих валидаторов.</string>
     <string name="staking_alert_no_alerts_now">Сейчас всё хорошо. Здесь будут появляться предупреждения.</string>

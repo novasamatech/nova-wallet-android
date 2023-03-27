@@ -36,7 +36,7 @@ class DelegateSearchViewModel(
     val query = MutableStateFlow("")
 
     private val searchResult = governanceSharedState.selectedOption
-        .flatMapLatest { interactor.searchDelegates(query, it) }
+        .flatMapLatest { interactor.searchDelegates(query, it, this) }
         .distinctUntilChanged()
         .inBackground()
         .shareWhileSubscribed()

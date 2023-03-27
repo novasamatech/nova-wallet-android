@@ -114,7 +114,7 @@ class PaymentUpdater(
 
                     operationDao.insertAll(localOperations)
                 }.onFailure {
-                    Log.e(LOG_TAG, "Failed to retrieve transactions from block (${chain.name}.${chainAsset.symbol}): ${it.message}")
+                    Log.e(LOG_TAG, "Failed to retrieve transactions from block (${chain.name}.${chainAsset.symbol})", it)
                 }
 
             is BalanceSyncUpdate.CauseFetched -> {

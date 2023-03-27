@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdI
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.runtime.ethereum.EvmRpcException
 import io.novafoundation.nova.runtime.ethereum.EvmRpcException.Type.EXECUTION_REVERTED
+import io.novafoundation.nova.runtime.ethereum.EvmRpcException.Type.INVALID_INPUT
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -111,7 +112,7 @@ internal class RealEvmTransactionService(
     private suspend fun Web3Api.gasLimitOrDefault(tx: Transaction): BigInteger = try {
         ethEstimateGas(tx).sendSuspend().amountUsed
     } catch (e: EvmRpcException) {
-        if (e.type == EXECUTION_REVERTED) {
+        if (e.type == EXECUTION_REVERTED || e.type == INVALID_INPUT) {
             // user supplied incorrect parameters but still fallback to default fee
             DefaultGasProvider.GAS_LIMIT
         } else {

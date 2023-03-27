@@ -28,6 +28,7 @@ data class Chain(
     val types: Types?,
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
+    val hasSubstrateRuntime: Boolean,
     val hasCrowdloans: Boolean,
     val governance: List<Governance>,
     val parentId: String?,
@@ -81,9 +82,11 @@ data class Chain(
                 val transfersEnabled: Boolean,
             ) : Type()
 
-            data class Evm(
+            data class EvmErc20(
                 val contractAddress: String
             ) : Type()
+
+            object EvmNative : Type()
 
             object Unsupported : Type()
         }
@@ -99,12 +102,12 @@ data class Chain(
 
     data class Node(
         val chainId: ChainId,
-        val url: String,
+        val unformattedUrl: String,
         val name: String,
         val orderId: Int,
     ) : Identifiable {
 
-        override val identifier: String = "$chainId:$url"
+        override val identifier: String = "$chainId:$unformattedUrl"
     }
 
     data class Explorer(
@@ -131,11 +134,13 @@ data class Chain(
 
         class Staking(url: String) : ExternalApi(url)
 
-        class GovernanceReferenda(url: String, val source: Source.Polkassembly) : ExternalApi(url) {
+        class GovernanceReferenda(url: String, val source: Source) : ExternalApi(url) {
 
             sealed class Source {
 
                 class Polkassembly(val network: String?) : Source()
+
+                object SubSquare : Source()
             }
         }
 

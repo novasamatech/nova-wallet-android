@@ -16,6 +16,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnectionFactory
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionPool
+import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFactory
@@ -114,14 +115,20 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
+    fun provideConnectionSecrets(): ConnectionSecrets = ConnectionSecrets.default()
+
+    @Provides
+    @ApplicationScope
     fun provideChainConnectionFactory(
         socketProvider: Provider<SocketService>,
         externalRequirementsFlow: MutableStateFlow<ChainConnection.ExternalRequirement>,
         nodeAutobalancer: NodeAutobalancer,
+        connectionSecrets: ConnectionSecrets,
     ) = ChainConnectionFactory(
         externalRequirementsFlow,
         nodeAutobalancer,
-        socketProvider
+        socketProvider,
+        connectionSecrets
     )
 
     @Provides

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.core_db.model.chain
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -17,10 +18,17 @@ data class ChainLocal(
     val prefix: Int,
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
+    @ColumnInfo(defaultValue = "1")
+    val hasSubstrateRuntime: Boolean,
     val hasCrowdloans: Boolean,
     val governance: String,
     val additional: String?,
 ) : Identifiable {
+
+    object Default {
+
+        const val HAS_SUBSTRATE_RUNTIME = 1
+    }
 
     @Ignore
     override val identifier: String = id
