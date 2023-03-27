@@ -19,7 +19,7 @@ fun BaseFragment<*>.setupUnbondingComponent(component: UnbondingComponent, view:
                 ChooseStakedStakeTargetsBottomSheet(
                     context = requireContext(),
                     payload = it.value.payload,
-                    stakedCollatorSelected = it.value.onSuccess,
+                    stakedCollatorSelected = { _, item -> it.value.onSuccess(item) },
                     onCancel = it.value.onCancel,
                     newStakeTargetClicked = null,
                     selectionStyle = SelectionStyle.Arrow

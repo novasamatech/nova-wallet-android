@@ -11,7 +11,9 @@ import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupAddressInput
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupExternalAccounts
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
@@ -52,8 +54,7 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
     ) = layoutInflater.inflate(R.layout.fragment_select_send, container, false)
 
     override fun initViews() {
-        chooseAmountContainer.applyStatusBarInsets()
-
+        chooseAmountContainer.applyStatusBarInsets(false)
         selectSendNext.prepareForProgress(viewLifecycleOwner)
         selectSendNext.setOnClickListener { viewModel.nextClicked() }
 
@@ -81,6 +82,8 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
     }
 
     override fun subscribe(viewModel: SelectSendViewModel) {
+        setupExternalActions(viewModel)
+
         observeValidations(viewModel)
 
         setupFeeLoading(viewModel.originFeeMixin, selectSendOriginFee)
@@ -88,12 +91,13 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
 
         setupAmountChooser(viewModel.amountChooserMixin, selectSendAmount)
         setupAddressInput(viewModel.addressInputMixin, selectSendRecipient)
+        setupExternalAccounts(viewModel.addressInputMixin, selectSendRecipient)
 
         viewModel.chooseDestinationChain.awaitableActionLiveData.observeEvent {
             SelectCrossChainDestinationBottomSheet(
                 context = requireContext(),
                 payload = it.payload,
-                onSelected = it.onSuccess,
+                onSelected = { _, item -> it.onSuccess(item) },
                 onCancelled = it.onCancel
             ).show()
         }

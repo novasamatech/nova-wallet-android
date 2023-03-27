@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="common_unknown_error_title">Unknown error</string>
+    <string name="common_unknown_error_message">Something went wrong. Please try again later.</string>
+    <string name="web3names_address_with_description">%s (%s)</string>
+    <string name="web3names_invalid_recepient_title">Invalid recipient</string>
+    <string name="web3names_service_unavailable_title">Error resolving w3n</string>
+    <string name="web3names_service_unavailable_message">%1$s w3n services are unavailable. Try again later or enter the %1$s address manually</string>
+    <string name="web3names_recepient_not_found_message">w3n:%s not found</string>
+    <string name="web3names_no_valid_recepient_found_message">No valid address was found for w3n:%s on the %s network</string>
+    <string name="web3names_identifiers_sheet_title">%s addresses for w3n:%s</string>
+
     <string name="common_no_app_to_handle_intent">No suitable app found on device to handle this intent</string>
 
    <!-- <string name="account_ledger_import_start_step_3">Allow Nova Wallet to <font color='#FFFFFF'>access Bluetooth</font></string>-->

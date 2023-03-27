@@ -89,7 +89,7 @@ class SetupYieldBoostFragment : BaseFragment<SetupYieldBoostViewModel>() {
             ChooseStakedStakeTargetsBottomSheet(
                 context = requireContext(),
                 payload = action.payload,
-                stakedCollatorSelected = { action.onSuccess(it) },
+                stakedCollatorSelected = { _, item -> action.onSuccess(item) },
                 onCancel = action.onCancel,
                 newStakeTargetClicked = null
             ).show()

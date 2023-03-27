@@ -4,87 +4,130 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/input_background"
     tools:gravity="center_vertical"
-    tools:orientation="horizontal"
+    tools:orientation="vertical"
     tools:parentTag="android.widget.LinearLayout">
 
-    <ImageView
-        android:id="@+id/addressInputIdenticon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="13dp"
-        android:layout_marginBottom="13dp"
-        tools:src="@drawable/ic_identicon_placeholder" />
-
-    <EditText
-        android:id="@+id/addressInputAddress"
-        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_marginEnd="16dp"
-        android:layout_weight="1"
-        android:background="@null"
-        android:hint="@string/common_address"
-        android:includeFontPadding="false"
-        android:paddingStart="12dp"
-        android:paddingTop="9dp"
-        android:paddingEnd="12dp"
-        android:paddingBottom="9dp"
-        android:singleLine="true"
-        android:textColor="@color/text_primary"
-        android:textColorHint="@color/hint_text" />
-
-    <TextView
-        android:id="@+id/addressInputMyself"
-        style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/addressInputField"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:paddingStart="12dp"
-        android:paddingTop="6dp"
-        android:paddingRight="12dp"
-        android:paddingBottom="8dp"
-        android:text="@string/wallet_send_myself"
-        android:textColor="@color/button_text_accent"
-        tools:background="@color/button_background_secondary" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        tools:background="@color/input_background">
 
-    <TextView
-        android:id="@+id/addressInputPaste"
-        style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
-        android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/addressInputIdenticon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginBottom="13dp"
+            tools:src="@drawable/ic_identicon_placeholder" />
+
+        <EditText
+            android:id="@+id/addressInputAddress"
+            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="@string/common_address"
+            android:includeFontPadding="false"
+            android:paddingStart="12dp"
+            android:paddingTop="9dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="9dp"
+            android:singleLine="true"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/hint_text" />
+
+        <TextView
+            android:id="@+id/addressInputMyself"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:paddingStart="12dp"
+            android:paddingTop="6dp"
+            android:paddingRight="12dp"
+            android:paddingBottom="8dp"
+            android:text="@string/wallet_send_myself"
+            android:textColor="@color/button_text_accent"
+            tools:background="@color/button_background_secondary" />
+
+        <TextView
+            android:id="@+id/addressInputPaste"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:paddingStart="12dp"
+            android:paddingTop="6dp"
+            android:paddingRight="12dp"
+            android:paddingBottom="8dp"
+            android:text="@string/common_paste"
+            android:textColor="@color/button_text_accent"
+            tools:background="@color/button_background_secondary" />
+
+        <ImageView
+            android:id="@+id/addressInputScan"
+            android:layout_width="36dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="12dp"
+            android:paddingStart="8dp"
+            android:paddingTop="6dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="6dp"
+            android:src="@drawable/ic_scan"
+            app:tint="@color/icon_accent"
+            tools:background="@color/divider" />
+
+        <ImageView
+            android:id="@+id/addressInputClear"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_close_circle"
+            android:visibility="gone"
+            app:tint="@color/icon_secondary"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/addressInputW3NContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:paddingStart="12dp"
-        android:paddingTop="6dp"
-        android:paddingRight="12dp"
-        android:paddingBottom="8dp"
-        android:text="@string/common_paste"
-        android:textColor="@color/button_text_accent"
-        tools:background="@color/button_background_secondary" />
+        android:layout_marginEnd="64dp">
 
-    <ImageView
-        android:id="@+id/addressInputScan"
-        android:layout_width="36dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="12dp"
-        android:paddingStart="8dp"
-        android:paddingTop="6dp"
-        android:paddingRight="8dp"
-        android:paddingBottom="6dp"
-        android:src="@drawable/ic_scan"
-        app:tint="@color/icon_accent"
-        tools:background="@color/divider" />
+        <ProgressBar
+            android:id="@+id/addressInputW3NProgress"
+            style="@style/Widget.Nova.ProgressBar.Indeterminate"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:visibility="invisible"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/searchCustomValidatorAccounts"
+            app:layout_constraintVertical_bias="0.4" />
 
-    <ImageView
-        android:id="@+id/addressInputClear"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_close_circle"
-        android:visibility="gone"
-        app:tint="@color/icon_secondary"
-        tools:visibility="visible" />
+        <TextView
+            android:id="@+id/addressInputW3NAddress"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:paddingVertical="4dp"
+            android:layout_marginTop="4dp"
+            android:lines="1"
+            android:ellipsize="middle"
+            android:textColor="@color/text_positive"
+            tools:text="4a7m5...SFb32"/>
+
+    </FrameLayout>
 </merge>

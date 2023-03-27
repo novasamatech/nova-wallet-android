@@ -9,23 +9,31 @@ interface Web3NamesInteractor {
 
     fun isValidWeb3Name(raw: String): Boolean
 
-    suspend fun queryAccountsByWeb3Name(web3Name: String, chain: Chain, chainAsset: Chain.Asset): List<Web3NameAccount>
+    suspend fun queryAccountsByWeb3Name(w3nIdentifier: String, chain: Chain, chainAsset: Chain.Asset): List<Web3NameAccount>
+
+    abstract fun removePrefix(w3nIdentifier: String): String
 }
 
 class RealWeb3NamesInteractor(
     private val web3NamesRepository: Web3NamesRepository
 ) : Web3NamesInteractor {
+
     override fun isValidWeb3Name(raw: String): Boolean {
         return parseToWeb3Name(raw).isSuccess
     }
 
-    // TODO return Result<?>
-    override suspend fun queryAccountsByWeb3Name(web3Name: String, chain: Chain, chainAsset: Chain.Asset): List<Web3NameAccount> {
-        require(isValidWeb3Name(web3Name))
+    override suspend fun queryAccountsByWeb3Name(w3nIdentifier: String, chain: Chain, chainAsset: Chain.Asset): List<Web3NameAccount> {
+        require(isValidWeb3Name(w3nIdentifier))
 
-        val web3NameNoPrefix = parseToWeb3Name(web3Name).getOrThrow()
+        val web3NameNoPrefix = parseToWeb3Name(w3nIdentifier).getOrThrow()
 
         return web3NamesRepository.queryWeb3NameAccount(web3NameNoPrefix, chain, chainAsset)
+    }
+
+    override fun removePrefix(w3nIdentifier: String): String {
+        require(isValidWeb3Name(w3nIdentifier))
+
+        return parseToWeb3Name(w3nIdentifier).getOrThrow()
     }
 
     private fun parseToWeb3Name(raw: String): Result<String> {
