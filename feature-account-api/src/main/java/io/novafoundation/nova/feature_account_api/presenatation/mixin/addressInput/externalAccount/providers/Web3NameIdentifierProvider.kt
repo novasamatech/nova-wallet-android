@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException
 import io.novafoundation.nova.web3names.domain.models.Web3NameAccount
+import io.novafoundation.nova.web3names.domain.models.isValid
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
