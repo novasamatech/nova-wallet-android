@@ -78,6 +78,13 @@ inline fun <reified T> Any?.castOrNull(): T? {
     return this as? T
 }
 
+fun ByteArray.padEnd(expectedSize: Int, padding: Byte = 0): ByteArray {
+    if (size >= expectedSize) return this
+
+    val padded = ByteArray(expectedSize) { padding }
+    return copyInto(padded)
+}
+
 fun <K, V> Map<K, V>.reversed() = HashMap<V, K>().also { newMap ->
     entries.forEach { newMap[it.value] = it.key }
 }
