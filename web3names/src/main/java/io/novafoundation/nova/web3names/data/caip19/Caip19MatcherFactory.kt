@@ -1,7 +1,7 @@
 package io.novafoundation.nova.web3names.data.caip19
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type.Evm
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type.EvmErc20
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type.Unsupported
 import io.novafoundation.nova.web3names.data.caip19.matchers.Caip19Matcher
 import io.novafoundation.nova.web3names.data.caip19.matchers.asset.AssetMatcher
@@ -41,8 +41,8 @@ class RealCaip19MatcherFactory(private val slip44CoinRepository: Slip44CoinRepos
     }
 
     private suspend fun getAssetNamespaceMatcher(chainAsset: Chain.Asset): AssetMatcher {
-        return when (chainAsset.type) {
-            is Evm -> Erc20AssetMatcher(chainAsset)
+        return when (val assetType = chainAsset.type) {
+            is EvmErc20 -> Erc20AssetMatcher(assetType.contractAddress)
 
             Unsupported -> UnsupportedAssetMatcher()
 
