@@ -17,15 +17,12 @@ class RealSlip44CoinRepository(
 ) : Slip44CoinRepository {
 
     private var slip44Coins: Map<String, Slip44CoinRemote> = emptyMap()
-
     private val mutex = Mutex()
 
-    override suspend fun getCoinCode(chainAsset: Chain.Asset): Int? {
-        mutex.withLock {
-            if (slip44Coins.isEmpty()) {
-                slip44Coins = slip44Api.getSlip44Coins(slip44CoinsUrl)
-                    .associateBy { it.symbol }
-            }
+    override suspend fun getCoinCode(chainAsset: Chain.Asset): Int? = mutex.withLock {
+        if (slip44Coins.isEmpty()) {
+            slip44Coins = slip44Api.getSlip44Coins(slip44CoinsUrl)
+                .associateBy { it.symbol }
         }
 
         return slip44Coins[chainAsset.symbol]
