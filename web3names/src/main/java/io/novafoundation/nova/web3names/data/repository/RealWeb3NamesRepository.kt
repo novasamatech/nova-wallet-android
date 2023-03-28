@@ -109,7 +109,7 @@ class RealWeb3NamesRepository(
         }
 
         if (matchingRecipients.isEmpty()) {
-            throw ChainProviderNotFoundException(w3nIdentifier)
+            throw Web3NamesException.ValidAccountNotFoundException(w3nIdentifier, chain.name)
         }
 
         val web3NameAccounts = matchingRecipients.flatMap { (_, chainRecipients) -> chainRecipients }
