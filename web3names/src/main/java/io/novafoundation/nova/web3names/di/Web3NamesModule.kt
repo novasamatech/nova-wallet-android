@@ -1,5 +1,6 @@
 package io.novafoundation.nova.web3names.di
 
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -16,12 +17,14 @@ import io.novafoundation.nova.web3names.data.caip19.repositories.RealSlip44CoinR
 import io.novafoundation.nova.web3names.data.caip19.repositories.Slip44CoinRepository
 import io.novafoundation.nova.web3names.data.endpoints.Slip44CoinApi
 import io.novafoundation.nova.web3names.data.endpoints.TransferRecipientsApi
+import io.novafoundation.nova.web3names.data.integrity.RealWe3NamesIntegrityVerifier
+import io.novafoundation.nova.web3names.data.integrity.Web3NamesIntegrityVerifier
 import io.novafoundation.nova.web3names.data.provider.RealWeb3NamesServiceChainIdProvider
 import io.novafoundation.nova.web3names.data.provider.Web3NamesServiceChainIdProvider
 import io.novafoundation.nova.web3names.data.repository.RealWeb3NamesRepository
+import io.novafoundation.nova.web3names.data.repository.Web3NamesRepository
 import io.novafoundation.nova.web3names.domain.networking.RealWeb3NamesInteractor
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
-import io.novafoundation.nova.web3names.domain.repository.Web3NamesRepository
 import javax.inject.Named
 
 @Module
@@ -78,19 +81,29 @@ class Web3NamesModule {
 
     @Provides
     @FeatureScope
+    fun provideWe3NamesIntegrityVerifier(): Web3NamesIntegrityVerifier {
+        return RealWe3NamesIntegrityVerifier()
+    }
+
+    @Provides
+    @FeatureScope
     fun provideWeb3NamesRepository(
         @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
         web3NamesServiceChainIdProvider: Web3NamesServiceChainIdProvider,
         transferRecipientApi: TransferRecipientsApi,
         caip19MatcherFactory: Caip19MatcherFactory,
-        caip19Parser: Caip19Parser
+        caip19Parser: Caip19Parser,
+        we3NamesIntegrityVerifier: Web3NamesIntegrityVerifier,
+        gson: Gson,
     ): Web3NamesRepository {
         return RealWeb3NamesRepository(
             storageDataSource,
             web3NamesServiceChainIdProvider,
             transferRecipientApi,
             caip19MatcherFactory,
-            caip19Parser
+            caip19Parser,
+            we3NamesIntegrityVerifier,
+            gson
         )
     }
 

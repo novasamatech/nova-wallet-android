@@ -1,9 +1,9 @@
 package io.novafoundation.nova.web3names.domain.networking
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.web3names.data.repository.Web3NamesRepository
 import io.novafoundation.nova.web3names.domain.exceptions.ParseWeb3NameException
 import io.novafoundation.nova.web3names.domain.models.Web3NameAccount
-import io.novafoundation.nova.web3names.domain.repository.Web3NamesRepository
 
 interface Web3NamesInteractor {
 
@@ -11,7 +11,7 @@ interface Web3NamesInteractor {
 
     suspend fun queryAccountsByWeb3Name(w3nIdentifier: String, chain: Chain, chainAsset: Chain.Asset): List<Web3NameAccount>
 
-    abstract fun removePrefix(w3nIdentifier: String): String
+    fun removePrefix(w3nIdentifier: String): String
 }
 
 class RealWeb3NamesInteractor(
