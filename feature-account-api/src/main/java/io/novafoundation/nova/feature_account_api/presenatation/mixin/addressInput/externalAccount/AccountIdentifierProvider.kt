@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_api.presenatation.mixin.addressIn
 
 import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException
 import kotlinx.coroutines.flow.Flow
 
 interface AccountIdentifierProvider {
@@ -25,7 +26,7 @@ interface AccountIdentifierProvider {
             val selectedAccount: ExternalAccount?
         ) : Event
 
-        class ErrorEvent(val exception: Throwable) : Event
+        class ErrorEvent(val exception: Web3NamesException) : Event
     }
 
     fun interface Factory {

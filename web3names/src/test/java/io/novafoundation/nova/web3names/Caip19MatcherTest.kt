@@ -44,7 +44,7 @@ class Caip19MatcherTest {
     @Test
     fun `polkadot slip44 should not match`() = runBlocking {
         mockChain(chainId = "eip155:1", isEthereumBased = true)
-        mockAsset(type = Chain.Asset.Type.Evm("0x0"))
+        mockAsset(type = Chain.Asset.Type.EvmErc20("0x0"))
         val identifier = getIdentifier("polkadot:${substrateChainId}/slip44:$cointType")
         val matcher = caip19MatcherFactory.getCaip19Matcher(chain, chainAsset)
         assertFalse(matcher.match(identifier))
@@ -53,7 +53,7 @@ class Caip19MatcherTest {
     @Test
     fun `eip155 erc20 should match`() = runBlocking {
         mockChain(chainId = ethereumChainId, isEthereumBased = true)
-        mockAsset(type = Chain.Asset.Type.Evm("0x0"))
+        mockAsset(type = Chain.Asset.Type.EvmErc20("0x0"))
         val identifier = getIdentifier("$ethereumChainId/erc20:0x0")
         val matcher = caip19MatcherFactory.getCaip19Matcher(chain, chainAsset)
         assertTrue(matcher.match(identifier))
@@ -62,7 +62,7 @@ class Caip19MatcherTest {
     @Test
     fun `eip155 erc20 wrong coinType`() = runBlocking {
         mockChain(chainId = ethereumChainId, isEthereumBased = true)
-        mockAsset(type = Chain.Asset.Type.Evm("0x0"))
+        mockAsset(type = Chain.Asset.Type.EvmErc20("0x0"))
         val identifier = getIdentifier("eip155:3/erc20:0x0")
         val matcher = caip19MatcherFactory.getCaip19Matcher(chain, chainAsset)
         assertFalse(matcher.match(identifier))

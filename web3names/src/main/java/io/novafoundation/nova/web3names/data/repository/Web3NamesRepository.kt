@@ -1,4 +1,4 @@
-package io.novafoundation.nova.web3names.domain.repository
+package io.novafoundation.nova.web3names.data.repository
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.web3names.domain.models.Web3NameAccount

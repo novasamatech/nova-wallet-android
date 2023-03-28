@@ -1,9 +1,16 @@
 package io.novafoundation.nova.web3names.domain.exceptions
 
-sealed class Web3NamesException : Exception() {
-    class ChainProviderNotFoundException(val identifier: String) : Web3NamesException()
+import jp.co.soramitsu.fearless_utils.extensions.requirePrefix
 
-    class ValidAccountNotFoundException(val identifier: String, val chainName: String) : Web3NamesException()
+sealed class Web3NamesException(identifier: String) : Exception() {
 
-    class UnknownException(val chainName: String) : Web3NamesException()
+    val web3Name: String = identifier.requirePrefix("w3n:")
+
+    class ChainProviderNotFoundException(identifier: String) : Web3NamesException(identifier)
+
+    class IntegrityCheckFailed(identifier: String) : Web3NamesException(identifier)
+
+    class ValidAccountNotFoundException(identifier: String, val chainName: String) : Web3NamesException(identifier)
+
+    class UnknownException(web3NameInput: String, val chainName: String) : Web3NamesException(web3NameInput)
 }
