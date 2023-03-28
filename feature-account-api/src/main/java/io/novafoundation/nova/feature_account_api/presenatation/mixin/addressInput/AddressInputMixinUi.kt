@@ -95,20 +95,30 @@ private fun BaseFragment<*>.showExternalAccountsBottomSheet(
 private fun BaseFragment<*>.handleError(event: ErrorEvent) {
     val titleAndMessage = when (val exception = event.exception) {
         is Web3NamesException.ChainProviderNotFoundException -> {
-            getString(R.string.web3names_invalid_recepient_title) to getString(R.string.web3names_recepient_not_found_message, exception.identifier)
+            getString(R.string.web3names_invalid_recepient_title) to getString(R.string.web3names_recepient_not_found_message, exception.web3Name)
         }
+
         is Web3NamesException.ValidAccountNotFoundException -> {
             getString(R.string.web3names_invalid_recepient_title) to getString(
                 R.string.web3names_no_valid_recepient_found_message,
-                exception.identifier,
+                exception.web3Name,
                 exception.chainName
             )
         }
-        is Web3NamesException.UnknownException -> getString(R.string.web3names_service_unavailable_title) to getString(
-            R.string.web3names_service_unavailable_message,
-            exception.chainName
-        )
-        else -> getString(R.string.common_unknown_error_title) to getString(R.string.common_unknown_error_message)
+
+        is Web3NamesException.IntegrityCheckFailed -> {
+            getString(R.string.web3names_integrity_check_failed_title) to getString(
+                R.string.web3names_integrity_check_failed_message,
+                exception.web3Name
+            )
+        }
+
+        is Web3NamesException.UnknownException -> {
+            getString(R.string.web3names_service_unavailable_title) to getString(
+                R.string.web3names_service_unavailable_message,
+                exception.chainName
+            )
+        }
     }
 
     showErrorWithTitle(

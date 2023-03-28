@@ -84,7 +84,7 @@ class RealWeb3NamesRepository(
         val recipientsContent = transferRecipientApi.getTransferRecipientsRaw(url)
 
         if (!web3NamesIntegrityVerifier.verifyIntegrity(serviceEndpointId = endpoint.id, serviceEndpointContent = recipientsContent)) {
-            throw IntegrityCheckFailed()
+            throw IntegrityCheckFailed(w3nIdentifier)
         }
 
         return parseRecipients(recipientsContent)

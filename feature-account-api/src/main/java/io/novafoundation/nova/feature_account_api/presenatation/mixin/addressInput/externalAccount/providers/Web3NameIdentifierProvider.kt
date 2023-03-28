@@ -84,7 +84,7 @@ class Web3NameIdentifierProvider(
                 val chain = destinationChain.first().chain
                 runCatching { getExternalAccounts(raw) }
                     .onSuccess { onExternalAccountsLoaded(raw, chain.name, it) }
-                    .onFailure { onError(it, chain.name) }
+                    .onFailure { onError(it, chain.name, raw) }
 
                 stopLoading()
             } catch (_: CancellationException) {
@@ -148,11 +148,11 @@ class Web3NameIdentifierProvider(
         }
     }
 
-    private fun onError(throwable: Throwable, chainName: String) {
+    private fun onError(throwable: Throwable, chainName: String, web3NameInput: String) {
         if (throwable is CancellationException) return
 
         if (throwable !is Web3NamesException) {
-            eventsLiveData.value = ErrorEvent(Web3NamesException.UnknownException(chainName))
+            eventsLiveData.value = ErrorEvent(Web3NamesException.UnknownException(web3NameInput, chainName))
         } else {
             eventsLiveData.value = ErrorEvent(throwable)
         }
