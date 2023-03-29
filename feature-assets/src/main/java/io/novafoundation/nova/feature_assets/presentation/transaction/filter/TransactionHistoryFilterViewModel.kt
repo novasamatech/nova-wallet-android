@@ -18,11 +18,16 @@ import kotlinx.coroutines.launch
 
 class TransactionHistoryFilterViewModel(
     private val router: AssetsRouter,
-    private val historyFiltersProviderFactory: HistoryFiltersProviderFactory
+    private val historyFiltersProviderFactory: HistoryFiltersProviderFactory,
+    private val payload: TransactionHistoryFilterPayload,
 ) : BaseViewModel() {
 
     private val historyFiltersProvider by lazyAsync {
-        historyFiltersProviderFactory.get(scope = viewModelScope)
+        historyFiltersProviderFactory.get(
+            scope = viewModelScope,
+            chainId = payload.assetPayload.chainId,
+            chainAssetId = payload.assetPayload.chainAssetId
+        )
     }
 
     private val initialFiltersFlow = flow { emit(historyFiltersProvider().currentFilters()) }
@@ -34,7 +39,7 @@ class TransactionHistoryFilterViewModel(
 
     private val modifiedFilters = flow {
         val inner = combine(filtersEnabledMap().values) {
-            historyFiltersProvider().allFilters.filterToSet {
+            historyFiltersProvider().allAvailableFilters.filterToSet {
                 filtersEnabledMap().checkEnabled(it)
             }
         }
@@ -72,7 +77,11 @@ class TransactionHistoryFilterViewModel(
         router.back()
     }
 
-    private suspend fun createFilterEnabledMap() = historyFiltersProvider().allFilters.associateWith { MutableStateFlow(true) }
+    private suspend fun createFilterEnabledMap(): Map<TransactionFilter, MutableStateFlow<Boolean>> {
+        return historyFiltersProvider()
+            .allAvailableFilters
+            .associateWith { MutableStateFlow(true) }
+    }
 
     fun applyClicked() {
         viewModelScope.launch {

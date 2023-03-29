@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_assets.domain.tokens.add.CoinGeckoLinkPars
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -118,8 +119,10 @@ class AssetsFeatureModule {
     @Provides
     @FeatureScope
     fun provideHistoryFiltersProviderFactory(
-        computationalCache: ComputationalCache
-    ) = HistoryFiltersProviderFactory(computationalCache)
+        computationalCache: ComputationalCache,
+        assetSourceRegistry: AssetSourceRegistry,
+        chainRegistry: ChainRegistry,
+    ) = HistoryFiltersProviderFactory(computationalCache, assetSourceRegistry, chainRegistry)
 
     @Provides
     @FeatureScope

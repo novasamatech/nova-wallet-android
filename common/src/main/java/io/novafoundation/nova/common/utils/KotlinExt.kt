@@ -107,6 +107,16 @@ inline fun <K, V> Map<K, V?>.filterNotNull(): Map<K, V> {
     return filterValues { it != null } as Map<K, V>
 }
 
+inline fun <T, R> Array<T>.tryFindNonNull(transform: (T) -> R?): R? {
+    for (item in this) {
+        val transformed = transform(item)
+
+        if (transformed != null) return transformed
+    }
+
+    return null
+}
+
 fun String.bigIntegerFromHex() = removeHexPrefix().toBigInteger(16)
 fun String.intFromHex() = removeHexPrefix().toInt(16)
 
@@ -158,6 +168,20 @@ private val NAMED_PATTERN_REGEX = "\\{([a-zA-z]+)\\}".toRegex()
 fun String.formatNamed(vararg values: Pair<String, String>) = formatNamed(values.toMap())
 
 fun String.capitalize() = this.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+
+private const val CAMEL_CASE_REGEX_STRING = "(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])" // https://stackoverflow.com/a/7599674
+private val CAMEL_CASE_REGEX = CAMEL_CASE_REGEX_STRING.toRegex()
+
+private const val SNAKE_CASE_REGEX_STRING = "_"
+fun String.splitCamelCase() = CAMEL_CASE_REGEX.split(this)
+
+fun String.splitSnakeCase() = split(SNAKE_CASE_REGEX_STRING)
+
+fun String.splitSnakeOrCamelCase() = if (contains(SNAKE_CASE_REGEX_STRING)) {
+    splitSnakeCase()
+} else {
+    splitCamelCase()
+}
 
 /**
  * Replaces all parts in form of '{name}' to the corresponding value from values using 'name' as a key.

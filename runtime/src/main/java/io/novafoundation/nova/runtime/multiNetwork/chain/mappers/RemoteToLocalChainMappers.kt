@@ -16,6 +16,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemot
 private const val ETHEREUM_OPTION = "ethereumBased"
 private const val CROWDLOAN_OPTION = "crowdloans"
 private const val TESTNET_OPTION = "testnet"
+private const val NO_SUBSTRATE_RUNTIME = "noSubstrateRuntime"
+
 private const val CHAIN_ADDITIONAL_TIP = "defaultTip"
 
 fun mapRemoteChainToLocal(
@@ -48,6 +50,7 @@ fun mapRemoteChainToLocal(
             isEthereumBased = ETHEREUM_OPTION in optionsOrEmpty,
             isTestNet = TESTNET_OPTION in optionsOrEmpty,
             hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty,
+            hasSubstrateRuntime = NO_SUBSTRATE_RUNTIME !in optionsOrEmpty,
             governance = mapGovernanceRemoteOptionsToLocal(optionsOrEmpty),
             additional = gson.toJson(additional),
         )
@@ -140,6 +143,7 @@ private fun mapSourceTypeRemoteToLocal(sourceType: String): SourceType = when (s
     "github" -> SourceType.GITHUB
     "polkassembly" -> SourceType.POLKASSEMBLY
     "etherscan" -> SourceType.ETHERSCAN
+    "subsquare" -> SourceType.SUBSQUARE
     else -> SourceType.UNKNOWN
 }
 

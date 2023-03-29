@@ -1,7 +1,6 @@
 package io.novafoundation.nova.runtime.ethereum
 
 import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import jp.co.soramitsu.fearless_utils.wsrpc.request.DeliveryType
 import jp.co.soramitsu.fearless_utils.wsrpc.request.base.RpcRequest
@@ -50,7 +49,7 @@ fun SocketService.executeBatchRequestAsFuture(
         }
     }
 
-    future.cancellable = executeBatchRequest(requests, deliveryType, callback)
+    future.cancellable = executeAccumulatingBatchRequest(requests, deliveryType, callback)
 
     return future
 }
@@ -59,21 +58,21 @@ fun SocketService.subscribeAsObservable(
     request: RpcRequest,
     unsubscribeMethod: String
 ): Observable<SubscriptionChange> {
-    val subject = BehaviorSubject.create<SubscriptionChange>()
+    return Observable.create { emitter ->
+        val callback = object : SocketService.ResponseListener<SubscriptionChange> {
+            override fun onError(throwable: Throwable) {
+                emitter.tryOnError(throwable)
+            }
 
-    val callback = object : SocketService.ResponseListener<SubscriptionChange> {
-        override fun onError(throwable: Throwable) {
-            subject.onError(throwable)
+            override fun onNext(response: SubscriptionChange) {
+                emitter.onNext(response)
+            }
         }
 
-        override fun onNext(response: SubscriptionChange) {
-            subject.onNext(response)
-        }
+        val cancellable = subscribe(request, callback, unsubscribeMethod)
+
+        emitter.setCancellable(cancellable::cancel)
     }
-
-    val cancellable = subscribe(request, callback, unsubscribeMethod)
-
-    return subject.doOnDispose { cancellable.cancel() }
 }
 
 private class RequestCancellableFuture<T> : CompletableFuture<T>() {

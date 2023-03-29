@@ -7,16 +7,17 @@ import jp.co.soramitsu.fearless_utils.encrypt.qr.formats.SubstrateQrFormat
 class MultiChainQrSharingFactory {
 
     fun create(addressValidator: (String) -> Boolean): QrSharing {
-        val mainFormat = SubstrateQrFormat()
+        val substrateFormat = SubstrateQrFormat()
+        val onlyAddressFormat = AddressQrFormat(addressValidator)
 
         val formats = listOf(
-            mainFormat,
-            AddressQrFormat(addressValidator)
+            substrateFormat,
+            onlyAddressFormat
         )
 
         return QrSharing(
             decodingFormats = formats,
-            encodingFormat = mainFormat
+            encodingFormat = onlyAddressFormat
         )
     }
 }

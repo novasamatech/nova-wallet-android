@@ -1,5 +1,8 @@
 package io.novafoundation.nova.runtime.ethereum.transaction.builder
 
+import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
+import io.novafoundation.nova.common.utils.ethereumAccountIdToAddress
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import org.web3j.abi.FunctionEncoder
 import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.Type
@@ -11,6 +14,10 @@ import org.web3j.abi.datatypes.Function as EvmFunction
 class RealEvmTransactionBuilder : EvmTransactionBuilder {
 
     private var transactionData: EvmTransactionData? = null
+
+    override fun nativeTransfer(amount: BalanceOf, recipient: AccountId) {
+        transactionData = EvmTransactionData.NativeTransfer(amount, recipient.ethereumAccountIdToAddress())
+    }
 
     override fun contractCall(contractAddress: String, builder: EvmTransactionBuilder.EvmContractCallBuilder.() -> Unit) {
         transactionData = EvmContractCallBuilder(contractAddress)
@@ -33,6 +40,17 @@ class RealEvmTransactionBuilder : EvmTransactionBuilder {
                     data
                 )
             }
+
+            is EvmTransactionData.NativeTransfer -> {
+                Transaction.createEtherTransaction(
+                    originAddress,
+                    null,
+                    null,
+                    null,
+                    txData.recipientAddress,
+                    txData.amount
+                )
+            }
         }
     }
 
@@ -52,6 +70,16 @@ class RealEvmTransactionBuilder : EvmTransactionBuilder {
                     txData.contractAddress,
                     null,
                     data
+                )
+            }
+
+            is EvmTransactionData.NativeTransfer -> {
+                RawTransaction.createEtherTransaction(
+                    nonce,
+                    gasPrice,
+                    gasLimit,
+                    txData.recipientAddress,
+                    txData.amount
                 )
             }
         }
@@ -89,6 +117,8 @@ private class EvmContractCallBuilder(
 }
 
 private sealed class EvmTransactionData {
+
+    class NativeTransfer(val amount: BalanceOf, val recipientAddress: String) : EvmTransactionData()
 
     class ContractCall(val contractAddress: String, val function: EvmFunction) : EvmTransactionData()
 }

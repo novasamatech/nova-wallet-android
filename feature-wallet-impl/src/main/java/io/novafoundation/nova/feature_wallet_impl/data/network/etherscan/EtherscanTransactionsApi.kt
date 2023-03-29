@@ -1,12 +1,13 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.etherscan
 
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanAccountTransfer
+import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanNormalTxResponse
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanResponse
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 interface EtherscanTransactionsApi {
 
-    suspend fun getOperationsHistory(
+    suspend fun getErc20Transfers(
         chainId: ChainId,
         baseUrl: String,
         contractAddress: String,
@@ -14,6 +15,14 @@ interface EtherscanTransactionsApi {
         pageNumber: Int,
         pageSize: Int
     ): EtherscanResponse<List<EtherscanAccountTransfer>>
+
+    suspend fun getNormalTxsHistory(
+        chainId: ChainId,
+        baseUrl: String,
+        accountAddress: String,
+        pageNumber: Int,
+        pageSize: Int
+    ): EtherscanResponse<List<EtherscanNormalTxResponse>>
 }
 
 class RealEtherscanTransactionsApi(
@@ -21,7 +30,7 @@ class RealEtherscanTransactionsApi(
     private val apiKeys: EtherscanApiKeys
 ) : EtherscanTransactionsApi {
 
-    override suspend fun getOperationsHistory(
+    override suspend fun getErc20Transfers(
         chainId: ChainId,
         baseUrl: String,
         contractAddress: String,
@@ -31,9 +40,27 @@ class RealEtherscanTransactionsApi(
     ): EtherscanResponse<List<EtherscanAccountTransfer>> {
         val apiKey = apiKeys.keyFor(chainId)
 
-        return retrofitApi.getOperationsHistory(
+        return retrofitApi.getErc20Transfers(
             baseUrl = baseUrl,
             contractAddress = contractAddress,
+            accountAddress = accountAddress,
+            pageNumber = pageNumber,
+            pageSize = pageSize,
+            apiKey = apiKey
+        )
+    }
+
+    override suspend fun getNormalTxsHistory(
+        chainId: ChainId,
+        baseUrl: String,
+        accountAddress: String,
+        pageNumber: Int,
+        pageSize: Int
+    ): EtherscanResponse<List<EtherscanNormalTxResponse>> {
+        val apiKey = apiKeys.keyFor(chainId)
+
+        return retrofitApi.getNormalTxsHistory(
+            baseUrl = baseUrl,
             accountAddress = accountAddress,
             pageNumber = pageNumber,
             pageSize = pageSize,

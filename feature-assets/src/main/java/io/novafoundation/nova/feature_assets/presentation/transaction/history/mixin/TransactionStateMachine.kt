@@ -103,13 +103,32 @@ object TransactionStateMachine {
                             state
                         }
                     }
-                    action.newPage.isEmpty() -> State.Empty(state.allAvailableFilters, state.usedFilters)
-                    nextOffset is PageOffset.Loadable -> State.Data(
-                        nextPageOffset = nextOffset,
-                        data = action.newPage,
+
+                    nextOffset is PageOffset.Loadable -> {
+                        if (action.newPage.size < PAGE_SIZE) {
+                            // cache page doesn't have enough items but we can load them
+                            sideEffectListener(SideEffect.LoadPage(nextPageOffset = nextOffset, state.usedFilters))
+
+                            if (action.newPage.isEmpty()) {
+                                State.EmptyProgress(state.allAvailableFilters, state.usedFilters)
+                            } else {
+                                State.NewPageProgress(nextOffset, action.newPage, state.allAvailableFilters, state.usedFilters)
+                            }
+                        } else {
+                            // cache page has enough items so we wont load next page automatically
+                            if (action.newPage.isEmpty()) {
+                                State.Empty(state.allAvailableFilters, state.usedFilters)
+                            } else {
+                                State.Data(nextOffset, action.newPage, state.allAvailableFilters, state.usedFilters)
+                            }
+                        }
+                    }
+
+                    action.newPage.isEmpty() -> State.Empty(
                         allAvailableFilters = state.allAvailableFilters,
                         usedFilters = state.usedFilters
                     )
+
                     else -> State.FullData(
                         data = action.newPage,
                         allAvailableFilters = state.allAvailableFilters,
@@ -147,38 +166,77 @@ object TransactionStateMachine {
                     is State.EmptyProgress -> {
                         when {
                             action.loadedWith != state.usedFilters -> state // not relevant anymore page has arrived, still loading
-                            page.isEmpty() -> State.Empty(
+
+                            nextPageOffset is PageOffset.FullData && page.isEmpty() -> State.Empty(
                                 allAvailableFilters = state.allAvailableFilters,
                                 usedFilters = state.usedFilters
                             )
-                            nextPageOffset is PageOffset.Loadable -> State.Data(
-                                nextPageOffset = nextPageOffset,
+
+                            nextPageOffset is PageOffset.FullData && page.isNotEmpty() -> State.FullData(
                                 data = page,
                                 allAvailableFilters = state.allAvailableFilters,
                                 usedFilters = state.usedFilters
                             )
-                            else -> State.FullData(
-                                data = page,
-                                allAvailableFilters = state.allAvailableFilters,
-                                usedFilters = state.usedFilters
-                            )
+
+                            nextPageOffset is PageOffset.Loadable -> {
+                                // we didn't load enough items but can load more -> trigger next page automatically
+                                if (page.items.size < PAGE_SIZE) {
+                                    sideEffectListener(SideEffect.LoadPage(nextPageOffset, state.usedFilters))
+
+                                    if (page.items.isEmpty()) {
+                                        State.EmptyProgress(
+                                            allAvailableFilters = state.allAvailableFilters,
+                                            usedFilters = state.usedFilters
+                                        )
+                                    } else {
+                                        State.NewPageProgress(
+                                            nextPageOffset = nextPageOffset,
+                                            data = page,
+                                            allAvailableFilters = state.allAvailableFilters,
+                                            usedFilters = state.usedFilters
+                                        )
+                                    }
+                                } else {
+                                    State.Data(
+                                        nextPageOffset = nextPageOffset,
+                                        data = page,
+                                        allAvailableFilters = state.allAvailableFilters,
+                                        usedFilters = state.usedFilters
+                                    )
+                                }
+                            }
+
+                            else -> error("Checked all cases of sealed class PageOffset QED")
                         }
                     }
 
                     is State.NewPageProgress -> {
-                        when {
-                            page.isEmpty() -> State.FullData(
-                                data = state.data,
-                                allAvailableFilters = state.allAvailableFilters,
-                                usedFilters = state.usedFilters
-                            )
-                            nextPageOffset is PageOffset.Loadable -> State.Data(
-                                nextPageOffset = nextPageOffset,
-                                data = state.data + page,
-                                allAvailableFilters = state.allAvailableFilters,
-                                usedFilters = state.usedFilters
-                            )
-                            else -> State.FullData(
+                        when (nextPageOffset) {
+                            is PageOffset.Loadable -> {
+                                val newData = state.data + page
+
+                                // we want to load at least one complete page without user scrolling
+                                // we also don't wont to stop loading if no relevant items were fetched
+                                if (newData.size < PAGE_SIZE || page.isEmpty()) {
+                                    sideEffectListener(SideEffect.LoadPage(nextPageOffset, state.usedFilters))
+
+                                    State.NewPageProgress(
+                                        nextPageOffset = nextPageOffset,
+                                        data = newData,
+                                        allAvailableFilters = state.allAvailableFilters,
+                                        usedFilters = state.usedFilters
+                                    )
+                                } else {
+                                    State.Data(
+                                        nextPageOffset = nextPageOffset,
+                                        data = newData,
+                                        allAvailableFilters = state.allAvailableFilters,
+                                        usedFilters = state.usedFilters
+                                    )
+                                }
+                            }
+
+                            PageOffset.FullData -> State.FullData(
                                 data = state.data + page,
                                 allAvailableFilters = state.allAvailableFilters,
                                 usedFilters = state.usedFilters

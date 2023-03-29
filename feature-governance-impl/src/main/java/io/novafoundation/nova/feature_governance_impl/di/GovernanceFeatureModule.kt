@@ -3,9 +3,11 @@ package io.novafoundation.nova.feature_governance_impl.di
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
@@ -20,16 +22,17 @@ import io.novafoundation.nova.feature_governance_impl.data.repository.RealTreasu
 import io.novafoundation.nova.feature_governance_impl.data.source.RealGovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceDAppsModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceUpdatersModule
-import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV1
-import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV1Module
-import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV2
-import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceV2Module
+import io.novafoundation.nova.feature_governance_impl.di.modules.v1.GovernanceV1
+import io.novafoundation.nova.feature_governance_impl.di.modules.v1.GovernanceV1Module
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.DelegateModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumDetailsModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumListModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumUnlockModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumVoteModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumVotersModule
+import io.novafoundation.nova.feature_governance_impl.di.modules.v2.GovernanceV2
+import io.novafoundation.nova.feature_governance_impl.di.modules.v2.GovernanceV2Module
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.repository.DelegateCommonRepository
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.RealReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
@@ -41,12 +44,13 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.convic
 import io.novafoundation.nova.feature_governance_impl.presentation.common.conviction.RealConvictionValuesProvider
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.LocksFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.RealLocksFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.RealVotersFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.DelegatesSharedComputation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.RealReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.RealTrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.RealVotersFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
@@ -77,6 +81,20 @@ import javax.inject.Named
     ]
 )
 class GovernanceFeatureModule {
+
+    @Provides
+    @FeatureScope
+    fun provideDelegatesSharedComputation(
+        computationalCache: ComputationalCache,
+        delegateCommonRepository: DelegateCommonRepository,
+        chainStateRepository: ChainStateRepository,
+        identityRepository: OnChainIdentityRepository
+    ) = DelegatesSharedComputation(
+        computationalCache,
+        delegateCommonRepository,
+        chainStateRepository,
+        identityRepository
+    )
 
     @Provides
     @FeatureScope

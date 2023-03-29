@@ -1,5 +1,6 @@
 package io.novafoundation.nova.core_db.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import java.math.BigInteger
 
@@ -16,8 +17,8 @@ data class OperationLocal(
     val status: Status,
     val source: Source,
     val operationType: Type,
-    val module: String? = null,
-    val call: String? = null,
+    @Embedded(prefix = "extrinsicContent_")
+    val extrinsicContent: ExtrinsicContent? = null,
     val amount: BigInteger? = null,
     val sender: String? = null,
     val receiver: String? = null,
@@ -38,6 +39,16 @@ data class OperationLocal(
     enum class Status {
         PENDING, COMPLETED, FAILED
     }
+
+    enum class ExtrinsicContentType {
+        SUBSTRATE_CALL, SMART_CONTRACT_CALL
+    }
+
+    class ExtrinsicContent(
+        val type: ExtrinsicContentType,
+        val module: String? = null,
+        val call: String? = null,
+    )
 
     companion object {
 

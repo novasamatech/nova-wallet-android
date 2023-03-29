@@ -67,23 +67,8 @@ class ChainRegistry(
         .mapList { mapChainLocalToChain(it, gson) }
         .diffed()
         .map { diff ->
-            diff.removed.forEach {
-                val chainId = it.id
-
-                runtimeProviderPool.removeRuntimeProvider(chainId)
-                runtimeSubscriptionPool.removeSubscription(chainId)
-                runtimeSyncService.unregisterChain(chainId)
-                connectionPool.removeConnection(chainId)
-            }
-
-            diff.newOrUpdated.forEach { chain ->
-                val connection = connectionPool.setupConnection(chain)
-
-                runtimeProviderPool.setupRuntimeProvider(chain)
-                runtimeSyncService.registerChain(chain, connection)
-                runtimeSubscriptionPool.setupRuntimeSubscription(chain, connection)
-                runtimeProviderPool.setupRuntimeProvider(chain)
-            }
+            diff.removed.forEach { unregisterChain(it.id) }
+            diff.newOrUpdated.forEach { chain -> registerChain(chain) }
 
             diff.all
         }
@@ -110,6 +95,23 @@ class ChainRegistry(
     fun getRuntimeProvider(chainId: String) = runtimeProviderPool.getRuntimeProvider(chainId.removeHexPrefix())
 
     suspend fun getChain(chainId: String): Chain = chainsById.first().getValue(chainId.removeHexPrefix())
+
+    private fun unregisterChain(chainId: ChainId) {
+        runtimeProviderPool.removeRuntimeProvider(chainId)
+        runtimeSubscriptionPool.removeSubscription(chainId)
+        runtimeSyncService.unregisterChain(chainId)
+        connectionPool.removeConnection(chainId)
+    }
+
+    private suspend fun registerChain(chain: Chain) {
+        val connection = connectionPool.setupConnection(chain)
+
+        if (chain.hasSubstrateRuntime) {
+            runtimeProviderPool.setupRuntimeProvider(chain)
+            runtimeSyncService.registerChain(chain, connection)
+            runtimeSubscriptionPool.setupRuntimeSubscription(chain, connection)
+        }
+    }
 }
 
 suspend fun ChainRegistry.getChainOrNull(chainId: String): Chain? {

@@ -12,12 +12,14 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.search.DelegateSearchInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.mapDelegateStatsToPreviews
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.repository.DelegateCommonRepository
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.DelegatesSharedComputation
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.isValidAddress
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.GenericSingleAssetSharedState
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -28,14 +30,16 @@ import kotlinx.coroutines.flow.onStart
 class RealDelegateSearchInteractor(
     private val identityRepository: OnChainIdentityRepository,
     private val delegateCommonRepository: DelegateCommonRepository,
+    private val delegatesSharedComputation: DelegatesSharedComputation
 ) : DelegateSearchInteractor {
 
     override suspend fun searchDelegates(
         queryFlow: Flow<String>,
-        selectedOption: GenericSingleAssetSharedState.SupportedAssetOption<GovernanceAdditionalState>
+        selectedOption: GenericSingleAssetSharedState.SupportedAssetOption<GovernanceAdditionalState>,
+        scope: CoroutineScope
     ): Flow<ExtendedLoadingState<List<DelegatePreview>>> {
         val chain = selectedOption.assetWithChain.chain
-        return combineTransform(queryFlow, getDelegates(selectedOption)) { query, delegates ->
+        return combineTransform(queryFlow, delegatesSharedComputation.delegates(selectedOption, scope)) { query, delegates ->
             if (query.isEmpty()) {
                 emitLoaded(emptyList<DelegatePreview>())
                 return@combineTransform

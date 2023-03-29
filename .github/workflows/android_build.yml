@@ -39,6 +39,10 @@ on:
         required: true
       EHTERSCAN_API_KEY_MOONRIVER:
         required: true
+      EHTERSCAN_API_KEY_ETHEREUM:
+        required: true
+      INFURA_API_KEY:
+        required: true
       # Special secrets for signing:
       CI_MARKET_KEYSTORE_PASS:
         required: false
@@ -72,6 +76,8 @@ env:
   MERCURYO_TEST_SECRET: ${{ secrets.MERCURYO_TEST_SECRET }}
   EHTERSCAN_API_KEY_MOONBEAM: ${{ secrets.EHTERSCAN_API_KEY_MOONBEAM }}
   EHTERSCAN_API_KEY_MOONRIVER: ${{ secrets.EHTERSCAN_API_KEY_MOONRIVER }}
+  EHTERSCAN_API_KEY_ETHEREUM: ${{ secrets.EHTERSCAN_API_KEY_ETHEREUM }}
+  INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
 
   CI_MARKET_KEYSTORE_PASS: ${{ secrets.CI_MARKET_KEYSTORE_PASS }}
   CI_MARKET_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_MARKET_KEYSTORE_KEY_ALIAS }}

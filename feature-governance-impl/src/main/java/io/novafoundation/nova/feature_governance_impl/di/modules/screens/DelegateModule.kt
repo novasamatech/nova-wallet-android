@@ -39,6 +39,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.RealDelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.DelegatesSharedComputation
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
@@ -64,15 +65,11 @@ class DelegateModule {
     @Provides
     @FeatureScope
     fun provideDelegateListInteractor(
-        chainStateRepository: ChainStateRepository,
-        identityRepository: OnChainIdentityRepository,
         delegationBannerService: DelegationBannerRepository,
-        delegateCommonRepository: DelegateCommonRepository
+        delegatesSharedComputation: DelegatesSharedComputation
     ): DelegateListInteractor = RealDelegateListInteractor(
-        delegateCommonRepository = delegateCommonRepository,
-        chainStateRepository = chainStateRepository,
-        identityRepository = identityRepository,
-        delegationBannerService = delegationBannerService
+        delegationBannerService = delegationBannerService,
+        delegatesSharedComputation = delegatesSharedComputation
     )
 
     @Provides

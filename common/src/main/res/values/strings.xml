@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="ethereum_function">Function</string>
+    <string name="ethereum_contract">Contract</string>
+    <string name="ethereum_contract_call">Contract call</string>
+
     <string name="common_no_app_to_handle_intent">No suitable app found on device to handle this intent</string>
 
     <string name="account_ledger_import_start_step_3">Allow Nova Wallet to <font color='#FFFFFF'>access Bluetooth and Location</font></string>
@@ -16,7 +20,7 @@
 
     <string name="staking_alert_bond_more_title">Stake more tokens</string>
 
-    <string name="staking_alert_bond_more_message">Your stake is less then minimum of %s.\nHaving stake less than minimum increases chances of staking to not generate rewards</string>
+    <string name="staking_alert_bond_more_message">Your stake is less than minimum of %s.\nHaving stake less than minimum increases chances of staking to not generate rewards</string>
 
     <string name="staking_rebag_current_bag">Current queue slot</string>
     <string name="staking_rebag_new_bag">New queue slot</string>

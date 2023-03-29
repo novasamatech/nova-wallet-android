@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls
 
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindMultiAddress
+import io.novafoundation.nova.common.utils.voterListName
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindRewardDestination
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -112,7 +113,7 @@ fun ExtrinsicBuilder.setPayee(rewardDestination: RewardDestination): ExtrinsicBu
 
 fun ExtrinsicBuilder.rebag(dislocated: AccountId): ExtrinsicBuilder {
     return call(
-        moduleName = "VoterList",
+        moduleName = runtime.metadata.voterListName(),
         callName = "rebag",
         arguments = mapOf(
             "dislocated" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, dislocated)
