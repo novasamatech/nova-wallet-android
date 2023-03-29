@@ -10,9 +10,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
-import io.novafoundation.nova.runtime.ethereum.EvmRpcException
-import io.novafoundation.nova.runtime.ethereum.EvmRpcException.Type.EXECUTION_REVERTED
-import io.novafoundation.nova.runtime.ethereum.EvmRpcException.Type.INVALID_INPUT
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -29,7 +26,6 @@ import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.rlp.RlpEncoder
 import org.web3j.rlp.RlpList
-import org.web3j.tx.gas.DefaultGasProvider
 import java.math.BigInteger
 
 internal class RealEvmTransactionService(
@@ -41,6 +37,7 @@ internal class RealEvmTransactionService(
     override suspend fun calculateFee(
         chainId: ChainId,
         origin: TransactionOrigin,
+        fallbackGasLimit: BigInteger,
         building: EvmTransactionBuilding
     ): BigInteger {
         val web3Api = chainRegistry.ethereumApi(chainId)
@@ -54,12 +51,13 @@ internal class RealEvmTransactionService(
 
         val gasPrice = web3Api.gasPrice()
 
-        return gasPrice * web3Api.gasLimitOrDefault(txForFee)
+        return gasPrice * web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
     }
 
     override suspend fun transact(
         chainId: ChainId,
         origin: TransactionOrigin,
+        fallbackGasLimit: BigInteger,
         building: EvmTransactionBuilding
     ): Result<TransactionHash> = runCatching {
         val chain = chainRegistry.getChain(chainId)
@@ -71,7 +69,7 @@ internal class RealEvmTransactionService(
         val txForFee = txBuilder.buildForFee(submittingAddress)
 
         val gasPrice = web3Api.gasPrice()
-        val gasLimit = web3Api.gasLimitOrDefault(txForFee)
+        val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
         val nonce = web3Api.getNonce(submittingAddress)
 
         val txForSign = txBuilder.buildForSign(nonce = nonce, gasPrice = gasPrice, gasLimit = gasLimit)
@@ -109,16 +107,9 @@ internal class RealEvmTransactionService(
 
     private suspend fun Web3Api.gasPrice(): BigInteger = ethGasPrice().sendSuspend().gasPrice
 
-    private suspend fun Web3Api.gasLimitOrDefault(tx: Transaction): BigInteger = try {
+    private suspend fun Web3Api.gasLimitOrDefault(tx: Transaction, default: BigInteger): BigInteger = kotlin.runCatching {
         ethEstimateGas(tx).sendSuspend().amountUsed
-    } catch (e: EvmRpcException) {
-        if (e.type == EXECUTION_REVERTED || e.type == INVALID_INPUT) {
-            // user supplied incorrect parameters but still fallback to default fee
-            DefaultGasProvider.GAS_LIMIT
-        } else {
-            throw e
-        }
-    }
+    }.getOrDefault(default)
 
     private fun SignatureWrapper.toSignatureData(): Sign.SignatureData {
         require(this is SignatureWrapper.Ecdsa)
