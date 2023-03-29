@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
+import io.novafoundation.nova.runtime.ethereum.EvmRpcException
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -107,9 +108,11 @@ internal class RealEvmTransactionService(
 
     private suspend fun Web3Api.gasPrice(): BigInteger = ethGasPrice().sendSuspend().gasPrice
 
-    private suspend fun Web3Api.gasLimitOrDefault(tx: Transaction, default: BigInteger): BigInteger = kotlin.runCatching {
+    private suspend fun Web3Api.gasLimitOrDefault(tx: Transaction, default: BigInteger): BigInteger = try {
         ethEstimateGas(tx).sendSuspend().amountUsed
-    }.getOrDefault(default)
+    } catch (rpcException: EvmRpcException) {
+        default
+    }
 
     private fun SignatureWrapper.toSignatureData(): Sign.SignatureData {
         require(this is SignatureWrapper.Ecdsa)
