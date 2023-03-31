@@ -18,7 +18,6 @@ import io.novafoundation.nova.runtime.ext.requireErc20
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
-
 // a conservative upper limit. Usually transfer takes around 30-50k
 private val ERC_20_UPPER_GAS_LIMIT = 200_000.toBigInteger()
 
