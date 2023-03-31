@@ -207,7 +207,7 @@ private fun mapExternalApiLocalToExternalApi(externalApiLocal: ChainExternalApiL
 }.getOrNull()
 
 private fun mapNodeSelectionFromLocal(local: NodeSelectionStrategyLocal): NodeSelectionStrategy {
-    return when(local) {
+    return when (local) {
         NodeSelectionStrategyLocal.ROUND_ROBIN -> NodeSelectionStrategy.ROUND_ROBIN
         NodeSelectionStrategyLocal.UNIFORM -> NodeSelectionStrategy.UNIFORM
         NodeSelectionStrategyLocal.UNKNOWN -> NodeSelectionStrategy.ROUND_ROBIN

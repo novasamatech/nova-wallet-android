@@ -15,7 +15,7 @@ class AutoBalanceStrategyProvider {
     }
 
     private fun strategyFor(config: NodeSelectionStrategy): AutoBalanceStrategy {
-        return when(config) {
+        return when (config) {
             NodeSelectionStrategy.ROUND_ROBIN -> roundRobin
             NodeSelectionStrategy.UNIFORM -> uniform
         }

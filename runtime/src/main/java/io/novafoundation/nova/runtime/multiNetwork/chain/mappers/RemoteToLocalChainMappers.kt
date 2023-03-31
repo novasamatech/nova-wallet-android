@@ -62,7 +62,7 @@ fun mapRemoteChainToLocal(
 }
 
 fun mapNodeSelectionStrategyToLocal(remote: String?): NodeSelectionStrategyLocal {
-    return when(remote) {
+    return when (remote) {
         null, "roundRobin" -> NodeSelectionStrategyLocal.ROUND_ROBIN
         "uniform" -> NodeSelectionStrategyLocal.UNIFORM
         else -> NodeSelectionStrategyLocal.ROUND_ROBIN

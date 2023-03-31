@@ -4,7 +4,6 @@ import androidx.room.TypeConverter
 import io.novafoundation.nova.common.utils.enumValueOfOrNull
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.NodeSelectionStrategyLocal
 
-
 class ChainConverters {
 
     @TypeConverter
