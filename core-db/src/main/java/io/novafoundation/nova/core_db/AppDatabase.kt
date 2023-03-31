@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import io.novafoundation.nova.core_db.converters.AssetSourceConverter
+import io.novafoundation.nova.core_db.converters.ChainConverters
 import io.novafoundation.nova.core_db.converters.CryptoTypeConverters
 import io.novafoundation.nova.core_db.converters.CurrencyConverters
 import io.novafoundation.nova.core_db.converters.ExternalApiConverters
@@ -52,6 +53,7 @@ import io.novafoundation.nova.core_db.migrations.AddGovernanceNetworkToExternalA
 import io.novafoundation.nova.core_db.migrations.AddLocks_22_23
 import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
+import io.novafoundation.nova.core_db.migrations.AddNodeSelectionStrategyField_38_39
 import io.novafoundation.nova.core_db.migrations.AddRuntimeFlagToChains_36_37
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AddSourceToLocalAsset_28_29
@@ -100,7 +102,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 38,
+    version = 39,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -139,7 +141,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
     MetaAccountTypeConverters::class,
     CurrencyConverters::class,
     AssetSourceConverter::class,
-    ExternalApiConverters::class
+    ExternalApiConverters::class,
+    ChainConverters::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -170,7 +173,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(FixBrokenForeignKeys_31_32, AddVersioningToGovernanceDapps_32_33)
                     .addMigrations(AddGovernanceNetworkToExternalApi_33_34, AddBrowserHostSettings_34_35)
                     .addMigrations(ExtractExternalApiToSeparateTable_35_36, AddRuntimeFlagToChains_36_37)
-                    .addMigrations(AddExtrinsicContentField_37_38)
+                    .addMigrations(AddExtrinsicContentField_37_38, AddNodeSelectionStrategyField_38_39)
                     .build()
             }
             return instance!!

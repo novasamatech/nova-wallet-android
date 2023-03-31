@@ -84,8 +84,7 @@ class ChainConnection internal constructor(
         chainId = chain.id,
         changeConnectionEventFlow = nodeChangeSignal,
         availableNodesFlow = availableNodes,
-        scope = this
-    )
+    ).shareIn(scope = this, started = SharingStarted.Eagerly, replay = 1)
 
     suspend fun setup() {
         socketService.setInterceptor(this)
@@ -114,7 +113,7 @@ class ChainConnection internal constructor(
             .launchIn(this)
     }
 
-    fun considerUpdateNodes(nodes: List<Chain.Node>) {
+    fun considerUpdateNodes(nodes: Chain.Nodes) {
         availableNodes.value = nodes
     }
 
