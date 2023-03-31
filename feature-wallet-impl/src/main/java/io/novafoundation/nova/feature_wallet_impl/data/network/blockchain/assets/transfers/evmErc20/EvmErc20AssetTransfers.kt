@@ -18,6 +18,9 @@ import io.novafoundation.nova.runtime.ext.requireErc20
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
+// a conservative upper limit. Usually transfer takes around 30-50k
+private val ERC_20_UPPER_GAS_LIMIT = 200_000.toBigInteger()
+
 class EvmErc20AssetTransfers(
     private val evmTransactionService: EvmTransactionService,
     private val erc20Standard: Erc20Standard
@@ -28,18 +31,18 @@ class EvmErc20AssetTransfers(
 
         positiveAmount()
 
-        sufficientTransferableBalanceToPayOriginFee()
         sufficientBalanceInUsedAsset()
+        sufficientTransferableBalanceToPayOriginFee()
     }
 
     override suspend fun calculateFee(transfer: AssetTransfer): BigInteger {
-        return evmTransactionService.calculateFee(transfer.originChain.id) {
+        return evmTransactionService.calculateFee(transfer.originChain.id, fallbackGasLimit = ERC_20_UPPER_GAS_LIMIT) {
             transfer(transfer)
         }
     }
 
     override suspend fun performTransfer(transfer: AssetTransfer): Result<String> {
-        return evmTransactionService.transact(transfer.originChain.id) {
+        return evmTransactionService.transact(transfer.originChain.id, fallbackGasLimit = ERC_20_UPPER_GAS_LIMIT) {
             transfer(transfer)
         }
     }
