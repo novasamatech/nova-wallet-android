@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.state_machine.TransactionStateMachine.Action
 
 object OnFiltersChangedStateProvider : TransactionStateMachine.StateProvider<Action.FiltersChanged> {
+
     override fun getState(
         action: Action.FiltersChanged,
         state: TransactionStateMachine.State,
