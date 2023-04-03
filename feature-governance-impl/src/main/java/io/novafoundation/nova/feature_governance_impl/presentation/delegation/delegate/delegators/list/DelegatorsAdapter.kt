@@ -55,7 +55,7 @@ class DelegatorHolder(
     fun bind(item: VoterModel) = with(containerView) {
         setOnClickListener { eventHandler.onVoterClick(item) }
         itemDelegatorImage.setImageDrawable(item.addressModel.image)
-        itemDelegatorAddress.text = item.addressModel.address
+        itemDelegatorAddress.text = item.addressModel.nameOrAddress
         itemDelegatorVotesCount.text = item.vote.votesCount
         itemDelegatorVotesCountDetails.text = item.vote.votesCountDetails
     }

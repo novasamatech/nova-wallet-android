@@ -15,6 +15,9 @@ import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
+// native coin transfer has a fixed fee
+private val NATIVE_COIN_TRANSFER_GAS_LIMIT = 21_000.toBigInteger()
+
 class EvmNativeAssetTransfers(
     private val evmTransactionService: EvmTransactionService,
 ) : AssetTransfers {
@@ -24,18 +27,18 @@ class EvmNativeAssetTransfers(
 
         positiveAmount()
 
-        sufficientTransferableBalanceToPayOriginFee()
         sufficientBalanceInUsedAsset()
+        sufficientTransferableBalanceToPayOriginFee()
     }
 
     override suspend fun calculateFee(transfer: AssetTransfer): BigInteger {
-        return evmTransactionService.calculateFee(transfer.originChain.id) {
+        return evmTransactionService.calculateFee(transfer.originChain.id, fallbackGasLimit = NATIVE_COIN_TRANSFER_GAS_LIMIT) {
             nativeTransfer(transfer)
         }
     }
 
     override suspend fun performTransfer(transfer: AssetTransfer): Result<String> {
-        return evmTransactionService.transact(transfer.originChain.id) {
+        return evmTransactionService.transact(transfer.originChain.id, fallbackGasLimit = NATIVE_COIN_TRANSFER_GAS_LIMIT) {
             nativeTransfer(transfer)
         }
     }

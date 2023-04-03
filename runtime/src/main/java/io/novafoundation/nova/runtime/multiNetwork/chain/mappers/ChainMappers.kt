@@ -11,11 +11,13 @@ import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.ApiType
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.SourceType
+import io.novafoundation.nova.core_db.model.chain.ChainLocal.NodeSelectionStrategyLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderArguments
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Nodes.NodeSelectionStrategy
 
 fun mapStakingTypeToLocal(stakingType: Chain.Asset.StakingType): String = stakingType.name
 private fun mapStakingTypeFromLocal(stakingTypeLocal: String): Chain.Asset.StakingType = enumValueOf(stakingTypeLocal)
@@ -204,6 +206,14 @@ private fun mapExternalApiLocalToExternalApi(externalApiLocal: ChainExternalApiL
     }
 }.getOrNull()
 
+private fun mapNodeSelectionFromLocal(local: NodeSelectionStrategyLocal): NodeSelectionStrategy {
+    return when (local) {
+        NodeSelectionStrategyLocal.ROUND_ROBIN -> NodeSelectionStrategy.ROUND_ROBIN
+        NodeSelectionStrategyLocal.UNIFORM -> NodeSelectionStrategy.UNIFORM
+        NodeSelectionStrategyLocal.UNKNOWN -> NodeSelectionStrategy.ROUND_ROBIN
+    }
+}
+
 fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
     val nodes = chainLocal.getSortedNodes().map {
         Chain.Node(
@@ -213,6 +223,10 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             orderId = it.orderId
         )
     }
+    val nodesConfig = Chain.Nodes(
+        nodeSelectionStrategy = mapNodeSelectionFromLocal(chainLocal.chain.nodeSelectionStrategy),
+        nodes = nodes
+    )
 
     val assets = chainLocal.assets.map { mapChainAssetLocalToAsset(it, gson) }
 
@@ -248,7 +262,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             name = name,
             assets = assets,
             types = types,
-            nodes = nodes,
+            nodes = nodesConfig,
             explorers = explorers,
             icon = icon,
             externalApis = externalApis,

@@ -8,6 +8,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.ApiType
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.SourceType
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
+import io.novafoundation.nova.core_db.model.chain.ChainLocal.NodeSelectionStrategyLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainAssetRemote
@@ -53,10 +54,19 @@ fun mapRemoteChainToLocal(
             hasSubstrateRuntime = NO_SUBSTRATE_RUNTIME !in optionsOrEmpty,
             governance = mapGovernanceRemoteOptionsToLocal(optionsOrEmpty),
             additional = gson.toJson(additional),
+            nodeSelectionStrategy = mapNodeSelectionStrategyToLocal(nodeSelectionStrategy)
         )
     }
 
     return chainLocal
+}
+
+fun mapNodeSelectionStrategyToLocal(remote: String?): NodeSelectionStrategyLocal {
+    return when (remote) {
+        null, "roundRobin" -> NodeSelectionStrategyLocal.ROUND_ROBIN
+        "uniform" -> NodeSelectionStrategyLocal.UNIFORM
+        else -> NodeSelectionStrategyLocal.UNKNOWN
+    }
 }
 
 fun mapGovernanceListToLocal(governance: List<Chain.Governance>) = governance.joinToString(separator = ",", transform = Chain.Governance::name)
