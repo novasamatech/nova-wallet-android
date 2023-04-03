@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.multiNetwork.connection.autobalance
 
 import io.novafoundation.nova.common.utils.second
+import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.RoundRobinStrategy
@@ -8,7 +9,6 @@ import io.novafoundation.nova.test_shared.CoroutineTest
 import io.novafoundation.nova.test_shared.any
 import io.novafoundation.nova.test_shared.whenever
 import jp.co.soramitsu.fearless_utils.wsrpc.state.SocketStateMachine
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -33,19 +33,21 @@ class NodeAutobalancerTest : CoroutineTest() {
     lateinit var autobalancer: NodeAutobalancer
 
     private val nodes = generateNodes()
+    private val nodeSelectionStrategy = Chain.Nodes.NodeSelectionStrategy.ROUND_ROBIN
 
-    private val nodesFlow = MutableStateFlow(nodes)
-    private val stateFlow = MutableStateFlow<SocketStateMachine.State>(SocketStateMachine.State.Disconnected)
+    private val nodesFlow = MutableStateFlow(Chain.Nodes(nodeSelectionStrategy, nodes))
+    private val stateFlow = singleReplaySharedFlow<Unit>()
 
     @Before
     fun setup() {
         autobalancer = NodeAutobalancer(strategyProvider)
-        whenever(strategyProvider.strategyFlowFor(any())).thenReturn(flowOf(RoundRobinStrategy()))
+        whenever(strategyProvider.strategyFlowFor(any(), nodeSelectionStrategy))
+            .thenReturn(flowOf(RoundRobinStrategy()))
     }
 
     @Test
     fun shouldSelectInitialNode() = runCoroutineTest {
-        val nodeFlow = nodeFlow(this)
+        val nodeFlow = nodeFlow()
 
         val initial = nodeFlow.first()
 
@@ -54,16 +56,16 @@ class NodeAutobalancerTest : CoroutineTest() {
 
     @Test
     fun shouldSelectNodeOnReconnectState() = runCoroutineTest {
-        val nodeFlow = nodeFlow(this)
-        stateFlow.emit(triggerState(attempt = 4))
+        val nodeFlow = nodeFlow()
+        stateFlow.emit(Unit)
 
         assertEquals(nodes.second(), nodeFlow.first())
     }
 
     @Test
     fun shouldNotAutobalanceIfNotEnoughAttempts() = runCoroutineTest {
-        val nodeFlow = nodeFlow(this)
-        stateFlow.emit(triggerState(attempt = 3))
+        val nodeFlow = nodeFlow()
+        stateFlow.emit(Unit)
 
         assertEquals(nodes.first(), nodeFlow.first())
     }
@@ -72,11 +74,10 @@ class NodeAutobalancerTest : CoroutineTest() {
         Chain.Node(unformattedUrl = it.toString(), name = it.toString(), chainId = "test", orderId = 0)
     }
 
-    private fun nodeFlow(scope: CoroutineScope) = autobalancer.balancingNodeFlow(
+    private fun nodeFlow() = autobalancer.balancingNodeFlow(
         chainId = "test",
-        socketStateFlow = stateFlow,
-        availableNodesFlow = nodesFlow,
-        scope = scope
+        changeConnectionEventFlow = stateFlow,
+        availableNodesFlow = nodesFlow
     )
 
     private fun triggerState(attempt: Int) = SocketStateMachine.State.WaitingForReconnect(
