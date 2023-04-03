@@ -14,6 +14,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteAssetT
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteChainToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteExplorersToLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapRemoteNodesToLocal
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainAssetRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainExplorerRemote
@@ -85,7 +86,8 @@ class ChainSyncServiceTest {
                 "event"
             )
         ),
-        additional = emptyMap()
+        additional = emptyMap(),
+        nodeSelectionStrategy = null
     )
 
     private val gson = Gson()
