@@ -117,6 +117,16 @@ data class Chain(
         val orderId: Int,
     ) : Identifiable {
 
+        enum class ConnectionType {
+            HTTPS, WSS, UNKNOWN
+        }
+
+        val connectionType = when {
+            unformattedUrl.startsWith("wss://") -> ConnectionType.WSS
+            unformattedUrl.startsWith("https://") -> ConnectionType.HTTPS
+            else -> ConnectionType.UNKNOWN
+        }
+
         override val identifier: String = "$chainId:$unformattedUrl"
     }
 
