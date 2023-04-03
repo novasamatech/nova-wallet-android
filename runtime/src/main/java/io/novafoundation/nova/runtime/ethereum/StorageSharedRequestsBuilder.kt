@@ -7,6 +7,11 @@ import io.novafoundation.nova.core.ethereum.log.Topic
 import io.novafoundation.nova.core.model.StorageChange
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.runtime.ethereum.subscribtion.EthereumRequestsAggregator
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.awaitEthereumApi
+import io.novafoundation.nova.runtime.multiNetwork.awaitSocket
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Node.ConnectionType
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.StorageSubscriptionMultiplexer
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.subscribeUsing
@@ -21,22 +26,27 @@ import org.web3j.protocol.websocket.events.LogNotification
 import java.util.concurrent.CompletableFuture
 import kotlin.coroutines.CoroutineContext
 
+class StorageSharedRequestsBuilderFactory(
+    private val chainRegistry: ChainRegistry,
+) {
+
+    suspend fun create(chainId: ChainId): StorageSharedRequestsBuilder {
+        val substrateProxy = StorageSubscriptionMultiplexer.Builder()
+        val ethereumProxy = EthereumRequestsAggregator.Builder()
+
+        val substrateSocket = chainRegistry.awaitSocket(chainId)
+        val wssEthereumApi = chainRegistry.awaitEthereumApi(chainId, ConnectionType.WSS)
+
+        return StorageSharedRequestsBuilder(substrateSocket, substrateProxy, ethereumProxy, wssEthereumApi)
+    }
+}
+
 class StorageSharedRequestsBuilder(
     override val socketService: SocketService,
     private val substrateProxy: StorageSubscriptionMultiplexer.Builder,
     private val ethereumProxy: EthereumRequestsAggregator.Builder,
-    override val web3Api: Web3Api = Web3Api(socketService),
+    override val wssEthereumApiIfSupported: Web3Api?,
 ) : SharedRequestsBuilder {
-
-    companion object {
-
-        fun create(socketService: SocketService): StorageSharedRequestsBuilder {
-            val substrateProxy = StorageSubscriptionMultiplexer.Builder()
-            val ethereumProxy = EthereumRequestsAggregator.Builder()
-
-            return StorageSharedRequestsBuilder(socketService, substrateProxy, ethereumProxy)
-        }
-    }
 
     override fun subscribe(key: String): Flow<StorageChange> {
         return substrateProxy.subscribe(key)
@@ -54,11 +64,14 @@ class StorageSharedRequestsBuilder(
     fun subscribe(coroutineScope: CoroutineScope) {
         val ethereumRequestsAggregator = ethereumProxy.build()
 
-        ethereumRequestsAggregator.subscribeUsing(web3Api)
-            .inBackground()
-            .launchIn(coroutineScope)
+        wssEthereumApiIfSupported?.let { web3Api ->
+            ethereumRequestsAggregator.subscribeUsing(web3Api)
+                .inBackground()
+                .launchIn(coroutineScope)
 
-        ethereumRequestsAggregator.executeBatches(coroutineScope, web3Api)
+            // TODO use https api
+            ethereumRequestsAggregator.executeBatches(coroutineScope, web3Api)
+        }
 
         val cancellable = socketService.subscribeUsing(substrateProxy.build())
         if (cancellable != null) {

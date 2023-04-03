@@ -7,8 +7,6 @@ import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core_db.dao.ChainDao
-import io.novafoundation.nova.runtime.ethereum.Web3Api
-import io.novafoundation.nova.runtime.ethereum.WebSocketWeb3jService
 import io.novafoundation.nova.runtime.multiNetwork.asset.EvmAssetsSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainLocalToChain
@@ -17,6 +15,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionPool
+import io.novafoundation.nova.runtime.multiNetwork.connection.Web3ApiPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProvider
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSubscriptionPool
@@ -60,6 +59,7 @@ class ChainRegistry(
     private val evmAssetsSyncService: EvmAssetsSyncService,
     private val baseTypeSynchronizer: BaseTypeSynchronizer,
     private val runtimeSyncService: RuntimeSyncService,
+    private val web3ApiPool: Web3ApiPool,
     private val gson: Gson
 ) : CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
@@ -94,6 +94,10 @@ class ChainRegistry(
 
     fun getRuntimeProvider(chainId: String) = runtimeProviderPool.getRuntimeProvider(chainId.removeHexPrefix())
 
+    fun getEthereumApi(chainId: String, connectionType: Chain.Node.ConnectionType): Web3Api? {
+        return web3ApiPool.getWeb3Api(chainId, connectionType)
+    }
+
     suspend fun getChain(chainId: String): Chain = chainsById.first().getValue(chainId.removeHexPrefix())
 
     private fun unregisterChain(chainId: ChainId) {
@@ -110,6 +114,10 @@ class ChainRegistry(
             runtimeProviderPool.setupRuntimeProvider(chain)
             runtimeSyncService.registerChain(chain, connection)
             runtimeSubscriptionPool.setupRuntimeSubscription(chain, connection)
+        }
+
+        if (chain.isEthereumBased) {
+            web3ApiPool.setupWssApi(chain.id, connection.socketService)
         }
     }
 }
@@ -157,15 +165,21 @@ suspend fun ChainRegistry.awaitSocket(chainId: String): SocketService {
     return getSocket(chainId)
 }
 
+suspend fun ChainRegistry.awaitEthereumApi(chainId: String, connectionType: Chain.Node.ConnectionType): Web3Api? {
+    awaitChains()
+
+    return getEthereumApi(chainId, connectionType)
+}
+
+suspend fun ChainRegistry.awaitEthereumApiOrThrow(chainId: String, connectionType: Chain.Node.ConnectionType): Web3Api {
+    return requireNotNull(awaitEthereumApi(chainId, connectionType)) {
+        "Ethereum Api is not found for chain $chainId and connection type ${connectionType.name}"
+    }
+}
+
 suspend fun ChainRegistry.chainsById(): ChainsById = ChainsById(chainsById.first())
 
 fun ChainRegistry.getService(chainId: String) = ChainService(
     runtimeProvider = getRuntimeProvider(chainId),
     connection = getConnection(chainId)
 )
-
-suspend fun ChainRegistry.ethereumApi(chainId: String): Web3Api {
-    val socket = awaitSocket(chainId)
-
-    return Web3Api(WebSocketWeb3jService(socket))
-}

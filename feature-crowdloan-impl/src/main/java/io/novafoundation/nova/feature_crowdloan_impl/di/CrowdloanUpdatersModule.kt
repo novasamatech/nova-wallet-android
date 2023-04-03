@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
 import io.novafoundation.nova.runtime.network.updaters.ConstantSingleChainUpdateSystem
@@ -27,11 +28,13 @@ class CrowdloanUpdatersModule {
         chainRegistry: ChainRegistry,
         crowdloanSharedState: CrowdloanSharedState,
         blockNumberUpdater: BlockNumberUpdater,
+        storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     ): UpdateSystem = ConstantSingleChainUpdateSystem(
         updaters = listOf(
             blockNumberUpdater
         ),
         chainRegistry = chainRegistry,
-        singleAssetSharedState = crowdloanSharedState
+        singleAssetSharedState = crowdloanSharedState,
+        storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory
     )
 }

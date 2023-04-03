@@ -10,8 +10,9 @@ import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.runtime.ethereum.contract.base.querySingle
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.awaitEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.ethereumApi
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Node.ConnectionType
 
 class EvmTokenContractValidation<P, E>(
     private val ethereumAddressFormat: EthereumAddressFormat,
@@ -33,7 +34,8 @@ class EvmTokenContractValidation<P, E>(
     }
 
     private suspend fun isTokenContract(value: P): Boolean {
-        val ethApi = chainRegistry.ethereumApi(chain(value).id)
+        // TODO use HTTPS
+        val ethApi = chainRegistry.awaitEthereumApiOrThrow(chain(value).id, ConnectionType.WSS)
         return try {
             erc20Standard.querySingle(address(value), ethApi)
                 .totalSupply()

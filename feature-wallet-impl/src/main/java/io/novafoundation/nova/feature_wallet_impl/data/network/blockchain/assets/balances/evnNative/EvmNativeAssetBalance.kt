@@ -11,8 +11,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.awaitEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.ethereumApi
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -49,7 +49,8 @@ class EvmNativeAssetBalance(
     }
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
-        val ethereumApi = chainRegistry.ethereumApi(chain.id)
+        // TODO use HTTPS
+        val ethereumApi = chainRegistry.awaitEthereumApiOrThrow(chain.id, Chain.Node.ConnectionType.WSS)
 
         return ethereumApi.getLatestNativeBalance(chain.addressOf(accountId))
     }
@@ -61,7 +62,9 @@ class EvmNativeAssetBalance(
         accountId: AccountId,
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<BalanceSyncUpdate> {
-        val ethereumApi = chainRegistry.ethereumApi(chain.id)
+        // TODO use HTTPS for eth_getBalance
+        val ethereumApi = chainRegistry.awaitEthereumApiOrThrow(chain.id, Chain.Node.ConnectionType.WSS)
+
         val address = chain.addressOf(accountId)
 
         return ethereumApi.balanceSyncUpdateFlow(address).map { balanceUpdate ->

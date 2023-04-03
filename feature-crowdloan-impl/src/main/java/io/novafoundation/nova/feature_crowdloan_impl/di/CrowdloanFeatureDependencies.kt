@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
@@ -93,4 +94,6 @@ interface CrowdloanFeatureDependencies {
     val parachainInfoRepository: ParachainInfoRepository
 
     val signerProvider: SignerProvider
+
+    val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
 }
