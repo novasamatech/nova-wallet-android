@@ -20,7 +20,7 @@ class Web3ApiPool(private val web3ApiFactory: Web3ApiFactory) {
     }
 
     fun removeApis(chainId: String) {
-        ConnectionType.values().forEach {connectionType ->
+        ConnectionType.values().forEach { connectionType ->
             pool.remove(chainId to connectionType)
         }
     }
