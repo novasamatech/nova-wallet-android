@@ -12,7 +12,7 @@ object OnScrolledStateProvider : TransactionStateMachine.StateProvider<Action.Sc
         action: Action.Scrolled,
         state: State,
         sideEffectListener: (TransactionStateMachine.SideEffect) -> Unit
-    ): State  = when (state) {
+    ): State = when (state) {
         is State.Data -> {
             if (action.currentItemIndex >= state.data.size - SCROLL_OFFSET) {
                 sideEffectListener(TransactionStateMachine.SideEffect.LoadPage(state.nextPageOffset, state.usedFilters))
