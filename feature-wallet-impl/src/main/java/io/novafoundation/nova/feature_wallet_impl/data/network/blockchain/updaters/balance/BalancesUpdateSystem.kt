@@ -7,11 +7,10 @@ import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
-import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.subscribe
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -27,7 +26,8 @@ class BalancesUpdateSystem(
     private val chainRegistry: ChainRegistry,
     private val paymentUpdaterFactory: PaymentUpdaterFactory,
     private val balanceLocksUpdater: BalanceLocksUpdaterFactory,
-    private val accountUpdateScope: AccountUpdateScope
+    private val accountUpdateScope: AccountUpdateScope,
+    private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : UpdateSystem {
 
     override fun start(): Flow<Updater.SideEffect> {
@@ -41,8 +41,7 @@ class BalancesUpdateSystem(
 
     private suspend fun balanceChainUpdaters(chain: Chain): Flow<Updater.SideEffect> {
         return flow {
-            val socket = chainRegistry.getSocket(chain.id)
-            val subscriptionBuilder = StorageSharedRequestsBuilder.create(socket)
+            val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
 
             val updaters: List<Updater> = listOf(paymentUpdaterFactory.create(chain), balanceLocksUpdater.create(chain))
             val sideEffectFlows = updaters.map { updater ->

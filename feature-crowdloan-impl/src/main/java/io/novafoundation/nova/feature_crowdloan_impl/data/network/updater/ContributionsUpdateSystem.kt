@@ -9,10 +9,9 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdateSystemFactory
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdaterFactory
-import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.awaitSocket
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +26,8 @@ class RealContributionsUpdateSystemFactory(
     private val chainRegistry: ChainRegistry,
     private val accountUpdateScope: AccountUpdateScope,
     private val contributionsUpdaterFactory: ContributionsUpdaterFactory,
-    private val assetBalanceScopeFactory: AssetBalanceScopeFactory
+    private val assetBalanceScopeFactory: AssetBalanceScopeFactory,
+    private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : ContributionsUpdateSystemFactory {
 
     override fun create(): UpdateSystem {
@@ -35,7 +35,8 @@ class RealContributionsUpdateSystemFactory(
             chainRegistry,
             accountUpdateScope,
             contributionsUpdaterFactory,
-            assetBalanceScopeFactory
+            assetBalanceScopeFactory,
+            storageSharedRequestsBuilderFactory
         )
     }
 }
@@ -44,7 +45,8 @@ class ContributionsUpdateSystem(
     private val chainRegistry: ChainRegistry,
     private val accountUpdateScope: AccountUpdateScope,
     private val contributionsUpdaterFactory: ContributionsUpdaterFactory,
-    private val assetBalanceScopeFactory: AssetBalanceScopeFactory
+    private val assetBalanceScopeFactory: AssetBalanceScopeFactory,
+    private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : UpdateSystem {
 
     override fun start(): Flow<Updater.SideEffect> {
@@ -59,8 +61,7 @@ class ContributionsUpdateSystem(
 
     private fun run(chain: Chain, metaAccount: MetaAccount): Flow<Updater.SideEffect> {
         return flow {
-            val socket = chainRegistry.awaitSocket(chain.id)
-            val subscriptionBuilder = StorageSharedRequestsBuilder.create(socket)
+            val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
             val invalidationScope = assetBalanceScopeFactory.create(chain.utilityAsset, metaAccount)
             val updater = contributionsUpdaterFactory.create(chain, invalidationScope)
 

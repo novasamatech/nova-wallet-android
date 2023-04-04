@@ -14,9 +14,10 @@ import io.novafoundation.nova.runtime.ethereum.EvmRpcException
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.awaitEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Node.ConnectionType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.multiNetwork.ethereumApi
 import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
@@ -41,7 +42,8 @@ internal class RealEvmTransactionService(
         fallbackGasLimit: BigInteger,
         building: EvmTransactionBuilding
     ): BigInteger {
-        val web3Api = chainRegistry.ethereumApi(chainId)
+        // TODO use HTTPS
+        val web3Api = chainRegistry.awaitEthereumApiOrThrow(chainId, ConnectionType.WSS)
         val chain = chainRegistry.getChain(chainId)
 
         val submittingMetaAccount = findMetaAccountFor(origin)
@@ -65,7 +67,8 @@ internal class RealEvmTransactionService(
         val submittingMetaAccount = findMetaAccountFor(origin)
         val submittingAddress = submittingMetaAccount.requireAddressIn(chain)
 
-        val web3Api = chainRegistry.ethereumApi(chainId)
+        // TODO use HTTPS
+        val web3Api = chainRegistry.awaitEthereumApiOrThrow(chainId, ConnectionType.WSS)
         val txBuilder = EvmTransactionBuilder().apply(building)
         val txForFee = txBuilder.buildForFee(submittingAddress)
 

@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
+import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset.EvmAssetsSyncService
 import io.novafoundation.nova.runtime.multiNetwork.asset.remote.AssetFetcher
@@ -17,6 +18,7 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnectionFactory
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
+import io.novafoundation.nova.runtime.multiNetwork.connection.Web3ApiPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFactory
@@ -144,6 +146,14 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
+    fun provideWeb3ApiFactory() = Web3ApiFactory()
+
+    @Provides
+    @ApplicationScope
+    fun provideWeb3ApiPool(web3ApiFactory: Web3ApiFactory) = Web3ApiPool(web3ApiFactory)
+
+    @Provides
+    @ApplicationScope
     fun provideExternalRequirementsFlow() = MutableStateFlow(ChainConnection.ExternalRequirement.ALLOWED)
 
     @Provides
@@ -157,6 +167,7 @@ class ChainRegistryModule {
         evmAssetsSyncService: EvmAssetsSyncService,
         baseTypeSynchronizer: BaseTypeSynchronizer,
         runtimeSyncService: RuntimeSyncService,
+        web3ApiPool: Web3ApiPool,
         gson: Gson
     ) = ChainRegistry(
         runtimeProviderPool,
@@ -167,6 +178,7 @@ class ChainRegistryModule {
         evmAssetsSyncService,
         baseTypeSynchronizer,
         runtimeSyncService,
+        web3ApiPool,
         gson
     )
 }
