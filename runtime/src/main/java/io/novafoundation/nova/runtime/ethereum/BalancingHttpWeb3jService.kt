@@ -1,7 +1,10 @@
 package io.novafoundation.nova.runtime.ethereum;
 
+import android.util.Log
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
+import com.fasterxml.jackson.databind.node.ObjectNode
+import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.UpdatableNodes
@@ -124,28 +127,36 @@ class BalancingHttpWeb3jService(
     }
 
     private fun okhttp3.Response.parseBatchResponse(origin: BatchRequest): BatchResponse {
-        val parsedResponses = runCatching {
-            body?.let { origin.parseResponse(it.bytes()) }
-        }.getOrNull()
+        val bodyContent = body?.string()
+
+        val parsedResponseResult = runCatching {
+            origin.parseResponse(bodyContent!!)
+        }
+
+        val parsedResponses = parsedResponseResult.getOrNull()
 
         val rpcError = parsedResponses?.tryFindNonNull { it.error }
         if (rpcError != null) {
             throw EvmRpcException(rpcError.code, rpcError.message)
         }
 
-        if (!isSuccessful || parsedResponses == null) {
-            throw ClientConnectionException("Invalid response received: $code; ${body?.string()}")
+        if (isSuccessful && parsedResponseResult.isFailure) {
+            throw parsedResponseResult.requireException()
+        }
+
+        if (!isSuccessful) {
+            throw ClientConnectionException("Invalid response received: $code; $bodyContent")
         }
 
         return BatchResponse(origin.requests, parsedResponses)
     }
 
-    private fun BatchRequest.parseResponse(response: ByteArray): List<Response<*>> {
+    private fun BatchRequest.parseResponse(response: String): List<Response<*>> {
         val requestsById = requests.associateBy { it.id }
         val nodes = objectMapper.readTree(response) as ArrayNode
 
         return nodes.map { node ->
-            val id = node.asLong()
+            val id = (node as ObjectNode).get("id").asLong()
             val request = requestsById.getValue(id)
 
             objectMapper.treeToValue(node, request.responseType)
@@ -206,9 +217,13 @@ private class NodeSwitcher(
 
 private fun <T> NodeSwitcher.makeRetryingRequest(request: (url: String) -> T): T {
     while (true) {
+        val url = getCurrentNodeUrl()
+
         try {
-            return request(getCurrentNodeUrl())
-        } catch (_: Exception) {
+            return request(url)
+        } catch (e: Throwable) {
+            Log.w("Failed to execute request for url $url", e)
+
             markCurrentNodeNotAccessible()
 
             continue

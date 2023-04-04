@@ -16,7 +16,6 @@ import org.web3j.protocol.Web3jService
 import org.web3j.protocol.core.JsonRpc2_0Web3j
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.methods.response.EthSubscribe
-import org.web3j.protocol.http.HttpService
 import org.web3j.protocol.websocket.events.LogNotification
 import org.web3j.protocol.websocket.events.NewHeadsNotification
 import org.web3j.utils.Async
@@ -25,7 +24,7 @@ import java.util.concurrent.ScheduledExecutorService
 class Web3ApiFactory(
     private val requestExecutorService: ScheduledExecutorService = Async.defaultExecutorService(),
     private val connectionSecrets: ConnectionSecrets,
-    private val httpClient: OkHttpClient = HttpService.getOkHttpClientBuilder().build(),
+    private val httpClient: OkHttpClient,
     private val strategyProvider: AutoBalanceStrategyProvider,
 ) {
 

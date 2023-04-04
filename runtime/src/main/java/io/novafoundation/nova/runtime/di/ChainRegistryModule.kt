@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.di
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.FileProvider
@@ -30,6 +31,8 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.types.BaseTypeSynchro
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.TypesFetcher
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import kotlinx.coroutines.flow.MutableStateFlow
+import okhttp3.logging.HttpLoggingInterceptor
+import org.web3j.protocol.http.HttpService
 import javax.inject.Provider
 
 @Module
@@ -149,7 +152,18 @@ class ChainRegistryModule {
     fun provideWeb3ApiFactory(
         connectionSecrets: ConnectionSecrets,
         strategyProvider: AutoBalanceStrategyProvider,
-    ) = Web3ApiFactory(connectionSecrets = connectionSecrets, strategyProvider = strategyProvider)
+    ): Web3ApiFactory {
+        val builder = HttpService.getOkHttpClientBuilder()
+        builder.interceptors().clear() // getOkHttpClientBuilder() adds logging interceptor which doesn't log into LogCat
+
+        if (BuildConfig.DEBUG) {
+            builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+        }
+
+        val okHttpClient = builder.build()
+
+        return Web3ApiFactory(connectionSecrets = connectionSecrets, strategyProvider = strategyProvider, httpClient = okHttpClient)
+    }
 
     @Provides
     @ApplicationScope
