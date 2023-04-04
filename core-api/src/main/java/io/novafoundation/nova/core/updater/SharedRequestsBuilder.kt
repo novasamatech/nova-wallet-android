@@ -19,9 +19,9 @@ interface SubstrateSubscriptionBuilder {
 
 interface EthereumSharedRequestsBuilder {
 
-    val wssEthereumApi: Web3Api?
+    val callApi: Web3Api?
 
-    val httpsEthereumApi: Web3Api?
+    val subscriptionApi: Web3Api?
 
     fun <S, T : Response<*>> ethBatchRequestAsync(batchId: String, request: Request<S, T>): CompletableFuture<T>
 
@@ -32,11 +32,5 @@ val EthereumSharedRequestsBuilder.callApiOrThrow: Web3Api
     get() = requireNotNull(callApi) {
         "Chain doesn't have any ethereum apis available"
     }
-
-val EthereumSharedRequestsBuilder.callApi: Web3Api?
-    get() = httpsEthereumApi ?: wssEthereumApi
-
-val EthereumSharedRequestsBuilder.subscriptionApi: Web3Api?
-    get() = wssEthereumApi
 
 interface SharedRequestsBuilder : SubstrateSubscriptionBuilder, EthereumSharedRequestsBuilder

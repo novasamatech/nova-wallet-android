@@ -148,6 +148,7 @@ suspend fun ChainRegistry.asset(chainId: String, assetId: Int): Chain.Asset {
 
     return chain.assetsById.getValue(assetId)
 }
+
 suspend fun ChainRegistry.asset(fullChainAssetId: FullChainAssetId): Chain.Asset {
     return asset(fullChainAssetId.chainId, fullChainAssetId.assetId)
 }
@@ -185,9 +186,18 @@ suspend fun ChainRegistry.awaitSubscriptionEthereumApiOrThrow(chainId: String): 
     return awaitEthereumApiOrThrow(chainId, ConnectionType.WSS)
 }
 
+suspend fun ChainRegistry.awaitSubscriptionEthereumApi(chainId: String): Web3Api? {
+    return awaitEthereumApi(chainId, ConnectionType.WSS)
+}
+
 suspend fun ChainRegistry.awaitCallEthereumApiOrThrow(chainId: String): Web3Api {
     return awaitEthereumApi(chainId, ConnectionType.HTTPS)
         ?: awaitEthereumApiOrThrow(chainId, ConnectionType.WSS)
+}
+
+suspend fun ChainRegistry.awaitCallEthereumApi(chainId: String): Web3Api? {
+    return awaitEthereumApi(chainId, ConnectionType.HTTPS)
+        ?: awaitEthereumApi(chainId, ConnectionType.WSS)
 }
 
 suspend fun ChainRegistry.chainsById(): ChainsById = ChainsById(chainsById.first())
