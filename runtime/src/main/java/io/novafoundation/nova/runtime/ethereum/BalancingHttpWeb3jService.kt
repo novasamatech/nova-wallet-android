@@ -54,11 +54,18 @@ class BalancingHttpWeb3jService(
     override fun <T : Response<*>> send(request: Request<*, out Response<*>>, responseType: Class<T>): T {
         val payload: String = objectMapper.writeValueAsString(request)
 
-        return nodeSwitcher.makeRetryingRequest { url ->
+        val result = nodeSwitcher.makeRetryingRequest { url ->
             val call = createHttpCall(payload, url)
 
             call.execute().parseSingleResponse(responseType)
         }
+
+        val rpcError = result.error
+        if (rpcError != null) {
+            throw EvmRpcException(rpcError.code, rpcError.message)
+        }
+
+        return result
     }
 
     override fun <T : Response<*>> sendAsync(request: Request<*, out Response<*>>, responseType: Class<T>): CompletableFuture<T> {
@@ -72,11 +79,18 @@ class BalancingHttpWeb3jService(
 
         val payload = objectMapper.writeValueAsString(batchRequest.requests)
 
-        return nodeSwitcher.makeRetryingRequest { url ->
+        val result = nodeSwitcher.makeRetryingRequest { url ->
             val call = createHttpCall(payload, url)
 
             call.execute().parseBatchResponse(batchRequest)
         }
+
+        val rpcError = result.responses.tryFindNonNull { it.error }
+        if (rpcError != null) {
+            throw EvmRpcException(rpcError.code, rpcError.message)
+        }
+
+        return result
     }
 
     override fun sendBatchAsync(batchRequest: BatchRequest): CompletableFuture<BatchResponse> {
@@ -114,11 +128,6 @@ class BalancingHttpWeb3jService(
             }
         }.getOrNull()
 
-        val rpcError = parsedResponse?.error
-        if (rpcError != null) {
-            throw EvmRpcException(rpcError.code, rpcError.message)
-        }
-
         if (!isSuccessful || parsedResponse == null) {
             throw ClientConnectionException("Invalid response received: $code; ${body?.string()}")
         }
@@ -134,11 +143,6 @@ class BalancingHttpWeb3jService(
         }
 
         val parsedResponses = parsedResponseResult.getOrNull()
-
-        val rpcError = parsedResponses?.tryFindNonNull { it.error }
-        if (rpcError != null) {
-            throw EvmRpcException(rpcError.code, rpcError.message)
-        }
 
         if (isSuccessful && parsedResponseResult.isFailure) {
             throw parsedResponseResult.requireException()
