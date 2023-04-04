@@ -81,7 +81,7 @@ class StorageSharedRequestsBuilder(
                 .launchIn(coroutineScope)
         }
 
-        callApi?.let {web3Api ->
+        callApi?.let { web3Api ->
             ethereumRequestsAggregator.executeBatches(coroutineScope, web3Api)
         }
 

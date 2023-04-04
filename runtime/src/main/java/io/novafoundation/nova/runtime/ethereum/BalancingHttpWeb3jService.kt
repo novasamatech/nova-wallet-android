@@ -1,4 +1,4 @@
-package io.novafoundation.nova.runtime.ethereum;
+package io.novafoundation.nova.runtime.ethereum
 
 import android.util.Log
 import com.fasterxml.jackson.databind.ObjectMapper

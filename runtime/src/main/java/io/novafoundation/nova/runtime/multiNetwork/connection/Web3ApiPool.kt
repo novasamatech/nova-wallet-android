@@ -16,7 +16,6 @@ class Web3ApiPool(private val web3ApiFactory: Web3ApiFactory) {
 
     private val pool = ConcurrentHashMap<Web3ApiPoolKey, Web3ApiPoolValue>()
 
-
     fun getWeb3Api(chainId: String, connectionType: ConnectionType): Web3Api? = pool[chainId to connectionType]?.first
 
     fun setupWssApi(chainId: ChainId, socketService: SocketService): Web3Api {
