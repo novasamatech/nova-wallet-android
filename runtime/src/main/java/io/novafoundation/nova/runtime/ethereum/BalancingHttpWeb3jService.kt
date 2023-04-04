@@ -15,6 +15,7 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.saturateUrl
 import io.reactivex.Flowable
 import jp.co.soramitsu.fearless_utils.extensions.tryFindNonNull
 import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -27,6 +28,7 @@ import org.web3j.protocol.core.Response
 import org.web3j.protocol.exceptions.ClientConnectionException
 import org.web3j.protocol.http.HttpService
 import org.web3j.protocol.websocket.events.Notification
+import java.io.IOException
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
 
@@ -60,16 +62,17 @@ class BalancingHttpWeb3jService(
             call.execute().parseSingleResponse(responseType)
         }
 
-        val rpcError = result.error
-        if (rpcError != null) {
-            throw EvmRpcException(rpcError.code, rpcError.message)
-        }
-
-        return result
+        return result.throwOnRpcError()
     }
 
     override fun <T : Response<*>> sendAsync(request: Request<*, out Response<*>>, responseType: Class<T>): CompletableFuture<T> {
-        return CompletableFuture.supplyAsync({ send(request, responseType) }, executorService)
+        val payload: String = objectMapper.writeValueAsString(request)
+
+        return enqueueRetryingRequest(
+            payload = payload,
+            retriableProcessResponse = { response -> response.parseSingleResponse(responseType) },
+            nonRetriableProcessResponse = { it.throwOnRpcError() }
+        )
     }
 
     override fun sendBatch(batchRequest: BatchRequest): BatchResponse {
@@ -85,16 +88,17 @@ class BalancingHttpWeb3jService(
             call.execute().parseBatchResponse(batchRequest)
         }
 
-        val rpcError = result.responses.tryFindNonNull { it.error }
-        if (rpcError != null) {
-            throw EvmRpcException(rpcError.code, rpcError.message)
-        }
-
-        return result
+        return result.throwOnRpcError()
     }
 
     override fun sendBatchAsync(batchRequest: BatchRequest): CompletableFuture<BatchResponse> {
-        return CompletableFuture.supplyAsync({ sendBatch(batchRequest) }, executorService)
+        val payload: String = objectMapper.writeValueAsString(batchRequest.requests)
+
+        return enqueueRetryingRequest(
+            payload = payload,
+            retriableProcessResponse = { response -> response.parseBatchResponse(batchRequest) },
+            nonRetriableProcessResponse = { it.throwOnRpcError() }
+        )
     }
 
     override fun <T : Notification<*>?> subscribe(
@@ -109,6 +113,59 @@ class BalancingHttpWeb3jService(
         // nothing to close
     }
 
+    private fun <T> enqueueRetryingRequest(
+        payload: String,
+        retriableProcessResponse: (okhttp3.Response) -> T,
+        nonRetriableProcessResponse: (T) -> Unit
+    ): CompletableFuture<T> {
+        val completableFuture = CallCancellableFuture<T>()
+
+        enqueueRetryingRequest(completableFuture, payload, retriableProcessResponse, nonRetriableProcessResponse)
+
+        return completableFuture
+    }
+
+    private fun <T> enqueueRetryingRequest(
+        future: CallCancellableFuture<T>,
+        payload: String,
+        retriableProcessResponse: (okhttp3.Response) -> T,
+        nonRetriableProcessResponse: (T) -> Unit
+    ) {
+        val url = nodeSwitcher.getCurrentNodeUrl()
+
+        val call = createHttpCall(payload, url)
+        future.call = call
+
+        call.enqueue(object : Callback {
+
+            override fun onFailure(call: Call, e: IOException) {
+                if (future.isCancelled) return
+
+                nodeSwitcher.markCurrentNodeNotAccessible()
+                enqueueRetryingRequest(future, payload, retriableProcessResponse, nonRetriableProcessResponse)
+            }
+
+            override fun onResponse(call: Call, response: okhttp3.Response) {
+                if (future.isCancelled) return
+
+                try {
+                    val parsedResponse = retriableProcessResponse(response)
+
+                    try {
+                        nonRetriableProcessResponse(parsedResponse)
+
+                        future.complete(parsedResponse)
+                    } catch (e: Throwable) {
+                        future.completeExceptionally(e)
+                    }
+                } catch (_: Exception) {
+                    nodeSwitcher.markCurrentNodeNotAccessible()
+                    enqueueRetryingRequest(future, payload, retriableProcessResponse, nonRetriableProcessResponse)
+                }
+            }
+        })
+    }
+
     private fun createHttpCall(request: String, url: String): Call {
         val mediaType = HttpService.JSON_MEDIA_TYPE
         val requestBody: RequestBody = request.toRequestBody(mediaType)
@@ -119,6 +176,24 @@ class BalancingHttpWeb3jService(
             .build()
 
         return httpClient.newCall(httpRequest)
+    }
+
+    private fun <T : Response<*>> T.throwOnRpcError(): T {
+        val rpcError = error
+        if (rpcError != null) {
+            throw EvmRpcException(rpcError.code, rpcError.message)
+        }
+
+        return this
+    }
+
+    private fun BatchResponse.throwOnRpcError(): BatchResponse {
+        val rpcError = responses.tryFindNonNull { it.error }
+        if (rpcError != null) {
+            throw EvmRpcException(rpcError.code, rpcError.message)
+        }
+
+        return this
     }
 
     private fun <T : Response<*>> okhttp3.Response.parseSingleResponse(responseType: Class<T>): T {
@@ -232,5 +307,16 @@ private fun <T> NodeSwitcher.makeRetryingRequest(request: (url: String) -> T): T
 
             continue
         }
+    }
+}
+
+private class CallCancellableFuture<T> : CompletableFuture<T>() {
+
+    var call: Call? = null
+
+    override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
+        call?.cancel()
+
+        return super.cancel(mayInterruptIfRunning)
     }
 }
