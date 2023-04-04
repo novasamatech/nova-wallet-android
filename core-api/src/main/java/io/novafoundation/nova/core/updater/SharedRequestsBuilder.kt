@@ -19,16 +19,24 @@ interface SubstrateSubscriptionBuilder {
 
 interface EthereumSharedRequestsBuilder {
 
-    val wssEthereumApiIfSupported: Web3Api?
+    val wssEthereumApi: Web3Api?
+
+    val httpsEthereumApi: Web3Api?
 
     fun <S, T : Response<*>> ethBatchRequestAsync(batchId: String, request: Request<S, T>): CompletableFuture<T>
 
     fun subscribeEthLogs(address: String, topics: List<Topic>): Flow<LogNotification>
 }
 
-val EthereumSharedRequestsBuilder.wssEthereumApi: Web3Api
-    get() = requireNotNull(wssEthereumApiIfSupported) {
-        "EthereumSharedRequestsBuilder: wss ethereum api is not supported (chain is not ethereum based)"
+val EthereumSharedRequestsBuilder.callApiOrThrow: Web3Api
+    get() = requireNotNull(callApi) {
+        "Chain doesn't have any ethereum apis available"
     }
+
+val EthereumSharedRequestsBuilder.callApi: Web3Api?
+    get() = httpsEthereumApi ?: wssEthereumApi
+
+val EthereumSharedRequestsBuilder.subscriptionApi: Web3Api?
+    get() = wssEthereumApi
 
 interface SharedRequestsBuilder : SubstrateSubscriptionBuilder, EthereumSharedRequestsBuilder

@@ -2,15 +2,21 @@ package io.novafoundation.nova.runtime.ethereum
 
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
+import io.novafoundation.nova.runtime.multiNetwork.connection.UpdatableNodes
+import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
 import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
+import okhttp3.OkHttpClient
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.Web3jService
 import org.web3j.protocol.core.JsonRpc2_0Web3j
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.methods.response.EthSubscribe
+import org.web3j.protocol.http.HttpService
 import org.web3j.protocol.websocket.events.LogNotification
 import org.web3j.protocol.websocket.events.NewHeadsNotification
 import org.web3j.utils.Async
@@ -18,6 +24,9 @@ import java.util.concurrent.ScheduledExecutorService
 
 class Web3ApiFactory(
     private val requestExecutorService: ScheduledExecutorService = Async.defaultExecutorService(),
+    private val connectionSecrets: ConnectionSecrets,
+    private val httpClient: OkHttpClient = HttpService.getOkHttpClientBuilder().build(),
+    private val strategyProvider: AutoBalanceStrategyProvider,
 ) {
 
     fun createWss(socketService: SocketService): Web3Api {
@@ -27,6 +36,23 @@ class Web3ApiFactory(
             web3jService = web3jService,
             delegate = Web3j.build(web3jService, JsonRpc2_0Web3j.DEFAULT_BLOCK_TIME.toLong(), requestExecutorService)
         )
+    }
+
+    fun createHttps(chainNodes: Chain.Nodes): Pair<Web3Api, UpdatableNodes>  {
+        val service = BalancingHttpWeb3jService(
+            initialNodes = chainNodes,
+            connectionSecrets = connectionSecrets,
+            httpClient = httpClient,
+            strategyProvider = strategyProvider,
+            executorService = requestExecutorService
+        )
+
+        val api = RealWeb3Api(
+            web3jService = service,
+            delegate = Web3j.build(service, JsonRpc2_0Web3j.DEFAULT_BLOCK_TIME.toLong(), requestExecutorService)
+        )
+
+        return api to service
     }
 }
 

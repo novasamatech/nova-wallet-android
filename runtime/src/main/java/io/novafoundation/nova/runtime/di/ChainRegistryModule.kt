@@ -146,7 +146,10 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
-    fun provideWeb3ApiFactory() = Web3ApiFactory()
+    fun provideWeb3ApiFactory(
+        connectionSecrets: ConnectionSecrets,
+        strategyProvider: AutoBalanceStrategyProvider,
+    ) = Web3ApiFactory(connectionSecrets = connectionSecrets, strategyProvider = strategyProvider)
 
     @Provides
     @ApplicationScope

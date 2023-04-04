@@ -66,8 +66,8 @@ fun Chain.Nodes.wssNodes(): List<Chain.Node> {
     return nodes.filter { it.isWss }
 }
 
-fun Chain.Nodes.httpNodes(): List<Chain.Node> {
-    return nodes.filter { it.isHttps }
+fun Chain.Nodes.httpNodes(): Chain.Nodes {
+    return copy(nodes = nodes.filter { it.isHttps })
 }
 
 val Chain.Asset.disabled: Boolean

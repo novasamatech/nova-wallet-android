@@ -15,7 +15,7 @@ import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.awaitEthereumApiOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicStatus
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -62,8 +62,8 @@ class EvmNativeAssetHistory(
         blockHash: String,
         accountId: AccountId
     ): Result<List<TransferExtrinsic>> = runCatching {
-        // TODO use HTTPS
-        val ethereumApi = chainRegistry.awaitEthereumApiOrThrow(chain.id, Chain.Node.ConnectionType.WSS)
+        val ethereumApi = chainRegistry.awaitCallEthereumApiOrThrow(chain.id)
+
         val block = ethereumApi.ethGetBlockByHash(blockHash, true).sendSuspend()
         val txs = block.block.transactions as List<TransactionResult<EthBlock.TransactionObject>>
 

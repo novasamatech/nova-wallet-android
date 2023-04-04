@@ -2,7 +2,6 @@ package io.novafoundation.nova.runtime.multiNetwork.connection
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
-import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
@@ -110,11 +109,11 @@ class ChainConnection internal constructor(
     }
 
     private suspend fun observeCurrentNode() {
-        val firstNodeUrl = currentNode.first().formattedUrl() ?: return
+        val firstNodeUrl = connectionSecrets.saturateUrl(currentNode.first().unformattedUrl) ?: return
         socketService.start(firstNodeUrl, remainPaused = true)
 
         currentNode
-            .mapNotNull { node -> node.formattedUrl() }
+            .mapNotNull { node -> connectionSecrets.saturateUrl(node.unformattedUrl) }
             .filter { nodeUrl -> actualUrl() != nodeUrl }
             .onEach { nodeUrl -> socketService.switchUrl(nodeUrl) }
             .onEach { nodeUrl -> Log.d(this@ChainConnection.LOG_TAG, "Switching node in ${chain.name} to $nodeUrl") }
@@ -129,10 +128,6 @@ class ChainConnection internal constructor(
         cancel()
 
         socketService.stop()
-    }
-
-    private fun Chain.Node.formattedUrl(): String? {
-        return runCatching { unformattedUrl.formatNamed(connectionSecrets) }.getOrNull()
     }
 
     private suspend fun actualUrl(): String? {
