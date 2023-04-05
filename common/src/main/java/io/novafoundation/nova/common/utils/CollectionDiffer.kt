@@ -17,6 +17,8 @@ object CollectionDiffer {
         val all: List<T>
     ) {
         val newOrUpdated by lazy { updated + added }
+
+        val hasDifference = newOrUpdated.isNotEmpty() || removed.isNotEmpty()
     }
 
     fun <T : Identifiable> findDiff(

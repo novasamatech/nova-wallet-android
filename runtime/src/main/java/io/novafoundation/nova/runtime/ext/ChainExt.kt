@@ -247,6 +247,12 @@ fun Chain.Asset.requireErc20(): Type.EvmErc20 {
     return type
 }
 
+fun Chain.Asset.requireEquilibrium(): Type.Equilibrium {
+    require(type is Type.Equilibrium)
+
+    return type
+}
+
 fun Chain.Asset.ormlCurrencyId(runtime: RuntimeSnapshot): Any? {
     val ormlType = requireOrml()
 

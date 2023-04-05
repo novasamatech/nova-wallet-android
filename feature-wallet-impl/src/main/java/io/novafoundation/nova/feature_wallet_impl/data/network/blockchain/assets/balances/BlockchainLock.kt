@@ -41,3 +41,8 @@ suspend fun LockDao.updateLocks(locks: List<BlockchainLock>, metaId: Long, chain
     val balanceLocksLocal = locks.map { mapBlockchainLockToLocal(metaId, chainId, chainAssetId, it) }
     updateLocks(balanceLocksLocal, metaId, chainId, chainAssetId)
 }
+
+suspend fun LockDao.updateLock(lock: BlockchainLock, metaId: Long, chainId: ChainId, chainAssetId: ChainAssetId) {
+    val balanceLocksLocal = mapBlockchainLockToLocal(metaId, chainId, chainAssetId, lock)
+    updateLocks(listOf(balanceLocksLocal), metaId, chainId, chainAssetId)
+}
