@@ -1,6 +1,8 @@
 package io.novafoundation.nova.runtime.multiNetwork
 
+import android.util.Log
 import com.google.gson.Gson
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.diffed
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
@@ -83,10 +85,7 @@ class ChainRegistry(
         .shareIn(this, SharingStarted.Eagerly, replay = 1)
 
     init {
-        launch {
-            chainSyncService.syncUp()
-            evmAssetsSyncService.syncUp()
-        }
+        syncChainsAndAssets()
 
         baseTypeSynchronizer.sync()
     }
@@ -100,6 +99,17 @@ class ChainRegistry(
     }
 
     suspend fun getChain(chainId: String): Chain = chainsById.first().getValue(chainId.removeHexPrefix())
+
+    private fun syncChainsAndAssets() {
+        launch {
+            runCatching {
+                chainSyncService.syncUp()
+                evmAssetsSyncService.syncUp()
+            }.onFailure {
+                Log.e(LOG_TAG, "Failed to sync chains or assets", it)
+            }
+        }
+    }
 
     private fun unregisterChain(chainId: ChainId) {
         runtimeProviderPool.removeRuntimeProvider(chainId)
