@@ -40,7 +40,7 @@ class ValidatorExposureUpdater(
             .map { activeEraIndex -> runtime.eraStakersPrefixFor(activeEraIndex) }
             .filterNot { storageCache.isPrefixInCache(it, chainId) }
             .onEach { cleanupPreviousEras(runtime, chainId) }
-            .onEach { updateNominatorsForEra(it,socketService, chainId) }
+            .onEach { updateNominatorsForEra(it, socketService, chainId) }
             .flowOn(Dispatchers.IO)
             .noSideAffects()
     }
