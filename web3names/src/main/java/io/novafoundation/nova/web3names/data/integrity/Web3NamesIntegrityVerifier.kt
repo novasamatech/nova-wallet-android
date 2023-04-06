@@ -11,18 +11,10 @@ interface Web3NamesIntegrityVerifier {
 class RealWe3NamesIntegrityVerifier : Web3NamesIntegrityVerifier {
 
     override fun verifyIntegrity(serviceEndpointId: String, serviceEndpointContent: String): Boolean = runCatching {
-        val multiBaseEncodedHash = extractServiceEndpointHash(serviceEndpointId)
-        val expectedHash = Multibase.decode(multiBaseEncodedHash)
+        val expectedHash = Multibase.decode(serviceEndpointId)
 
         val actualHash = serviceEndpointContent.encodeToByteArray().blake2b256()
 
         expectedHash.contentEquals(actualHash)
     }.getOrDefault(false)
-
-    private fun extractServiceEndpointHash(endpointId: String): String {
-        // serviceEndpoint supposed to be an uri with hash stored in the fragment
-        val (_, hash) = endpointId.split("#", limit = 2)
-
-        return hash
-    }
 }

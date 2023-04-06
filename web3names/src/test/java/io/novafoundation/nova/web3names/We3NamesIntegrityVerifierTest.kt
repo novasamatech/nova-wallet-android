@@ -10,19 +10,19 @@ class We3NamesIntegrityVerifierTest {
 
     @Test
     fun `should accept valid id matching resource hash`() = runTest(
-        endpointId = "did:kilt:4pqDzaWi3w7TzYzGnQDyrasK6UnyNnW6JQvWRrq6r8HzNNGy#Uc1JU0UF9iDfjaRkgHCFG2Rc5jki-cuhlgbEQcjN6-g0=",
+        endpointId = "Uc1JU0UF9iDfjaRkgHCFG2Rc5jki-cuhlgbEQcjN6-g0=",
         expectedOutcome = true,
     )
 
     @Test
     fun `should reject valid id not matching resource hash`() {
         runTest(
-            endpointId = "did:kilt:4pqDzaWi3w7TzYzGnQDyrasK6UnyNnW6JQvWRrq6r8HzNNGy#Uinvalid-hash=",
+            endpointId = "Uinvalid-hash=",
             expectedOutcome = false,
         )
 
         runTest(
-            endpointId = "did:kilt:4pqDzaWi3w7TzYzGnQDyrasK6UnyNnW6JQvWRrq6r8HzNNGy#Uc1JU0UF9iDfjaRkgHCFG2Rc5jki-cuhlgbEQcjN6-g0=",
+            endpointId = "Uc1JU0UF9iDfjaRkgHCFG2Rc5jki-cuhlgbEQcjN6-g0=",
             resource = "changed resource",
             expectedOutcome = false,
         )
