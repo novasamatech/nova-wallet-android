@@ -9,7 +9,7 @@ import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.runtime.ethereum.subscribtion.EthereumRequestsAggregator
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApi
-import io.novafoundation.nova.runtime.multiNetwork.awaitSocket
+import io.novafoundation.nova.runtime.multiNetwork.awaitSocketOrNull
 import io.novafoundation.nova.runtime.multiNetwork.awaitSubscriptionEthereumApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
@@ -34,13 +34,13 @@ class StorageSharedRequestsBuilderFactory(
         val substrateProxy = StorageSubscriptionMultiplexer.Builder()
         val ethereumProxy = EthereumRequestsAggregator.Builder()
 
-        val substrateSocket = chainRegistry.awaitSocket(chainId)
+        val rpcSocket = chainRegistry.awaitSocketOrNull(chainId)
 
         val subscriptionApi = chainRegistry.awaitSubscriptionEthereumApi(chainId)
         val callApi = chainRegistry.awaitCallEthereumApi(chainId)
 
         return StorageSharedRequestsBuilder(
-            socketService = substrateSocket,
+            socketService = rpcSocket,
             substrateProxy = substrateProxy,
             ethereumProxy = ethereumProxy,
             subscriptionApi = subscriptionApi,
@@ -50,7 +50,7 @@ class StorageSharedRequestsBuilderFactory(
 }
 
 class StorageSharedRequestsBuilder(
-    override val socketService: SocketService,
+    override val socketService: SocketService?,
     private val substrateProxy: StorageSubscriptionMultiplexer.Builder,
     private val ethereumProxy: EthereumRequestsAggregator.Builder,
     override val subscriptionApi: Web3Api?,
@@ -83,7 +83,8 @@ class StorageSharedRequestsBuilder(
             ethereumRequestsAggregator.executeBatches(coroutineScope, web3Api)
         }
 
-        val cancellable = socketService.subscribeUsing(substrateProxy.build())
+        val cancellable = socketService?.subscribeUsing(substrateProxy.build())
+
         if (cancellable != null) {
             coroutineScope.invokeOnCompletion { cancellable.cancel() }
         }

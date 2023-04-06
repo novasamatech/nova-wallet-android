@@ -1,6 +1,8 @@
 package io.novafoundation.nova.runtime.multiNetwork
 
+import android.util.Log
 import com.google.gson.Gson
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.diffed
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
@@ -83,15 +85,14 @@ class ChainRegistry(
         .shareIn(this, SharingStarted.Eagerly, replay = 1)
 
     init {
-        launch {
-            chainSyncService.syncUp()
-            evmAssetsSyncService.syncUp()
-        }
+        syncChainsAndAssets()
 
         baseTypeSynchronizer.sync()
     }
 
-    fun getConnection(chainId: String) = connectionPool.getConnection(chainId.removeHexPrefix())
+    fun getConnection(chainId: String): ChainConnection = connectionPool.getConnection(chainId.removeHexPrefix())
+
+    fun getConnectionOrNull(chainId: String): ChainConnection? = connectionPool.getConnectionOrNull(chainId.removeHexPrefix())
 
     fun getRuntimeProvider(chainId: String) = runtimeProviderPool.getRuntimeProvider(chainId.removeHexPrefix())
 
@@ -100,6 +101,17 @@ class ChainRegistry(
     }
 
     suspend fun getChain(chainId: String): Chain = chainsById.first().getValue(chainId.removeHexPrefix())
+
+    private fun syncChainsAndAssets() {
+        launch {
+            runCatching {
+                chainSyncService.syncUp()
+                evmAssetsSyncService.syncUp()
+            }.onFailure {
+                Log.e(LOG_TAG, "Failed to sync chains or assets", it)
+            }
+        }
+    }
 
     private fun unregisterChain(chainId: ChainId) {
         runtimeProviderPool.removeRuntimeProvider(chainId)
@@ -158,7 +170,9 @@ suspend inline fun ChainRegistry.findChains(predicate: (Chain) -> Boolean): List
 
 suspend fun ChainRegistry.getRuntime(chainId: String) = getRuntimeProvider(chainId).get()
 
-fun ChainRegistry.getSocket(chainId: String) = getConnection(chainId).socketService
+fun ChainRegistry.getSocket(chainId: String): SocketService = getConnection(chainId).socketService
+
+fun ChainRegistry.getSocketOrNull(chainId: String): SocketService? = getConnectionOrNull(chainId)?.socketService
 
 suspend fun ChainRegistry.awaitChains() {
     chainsById.first()
@@ -168,6 +182,12 @@ suspend fun ChainRegistry.awaitSocket(chainId: String): SocketService {
     awaitChains()
 
     return getSocket(chainId)
+}
+
+suspend fun ChainRegistry.awaitSocketOrNull(chainId: String): SocketService? {
+    awaitChains()
+
+    return getSocketOrNull(chainId)
 }
 
 suspend fun ChainRegistry.awaitEthereumApi(chainId: String, connectionType: ConnectionType): Web3Api? {
