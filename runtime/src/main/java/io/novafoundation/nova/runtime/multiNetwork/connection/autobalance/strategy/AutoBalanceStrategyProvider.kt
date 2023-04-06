@@ -13,8 +13,7 @@ class AutoBalanceStrategyProvider {
     fun strategyFlowFor(chainId: ChainId, default: NodeSelectionStrategy): Flow<AutoBalanceStrategy> {
         return flowOf { strategyFor(default) }
     }
-
-    private fun strategyFor(config: NodeSelectionStrategy): AutoBalanceStrategy {
+    fun strategyFor(config: NodeSelectionStrategy): AutoBalanceStrategy {
         return when (config) {
             NodeSelectionStrategy.ROUND_ROBIN -> roundRobin
             NodeSelectionStrategy.UNIFORM -> uniform

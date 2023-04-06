@@ -11,6 +11,7 @@ import io.novafoundation.nova.runtime.multiNetwork.asset.EvmAssetsSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapChainLocalToChain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Node.ConnectionType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
@@ -94,7 +95,7 @@ class ChainRegistry(
 
     fun getRuntimeProvider(chainId: String) = runtimeProviderPool.getRuntimeProvider(chainId.removeHexPrefix())
 
-    fun getEthereumApi(chainId: String, connectionType: Chain.Node.ConnectionType): Web3Api? {
+    fun getEthereumApi(chainId: String, connectionType: ConnectionType): Web3Api? {
         return web3ApiPool.getWeb3Api(chainId, connectionType)
     }
 
@@ -105,6 +106,8 @@ class ChainRegistry(
         runtimeSubscriptionPool.removeSubscription(chainId)
         runtimeSyncService.unregisterChain(chainId)
         connectionPool.removeConnection(chainId)
+
+        web3ApiPool.removeApis(chainId)
     }
 
     private suspend fun registerChain(chain: Chain) {
@@ -118,6 +121,7 @@ class ChainRegistry(
 
         if (chain.isEthereumBased) {
             web3ApiPool.setupWssApi(chain.id, connection.socketService)
+            web3ApiPool.setupHttpsApi(chain)
         }
     }
 }
@@ -144,6 +148,7 @@ suspend fun ChainRegistry.asset(chainId: String, assetId: Int): Chain.Asset {
 
     return chain.assetsById.getValue(assetId)
 }
+
 suspend fun ChainRegistry.asset(fullChainAssetId: FullChainAssetId): Chain.Asset {
     return asset(fullChainAssetId.chainId, fullChainAssetId.assetId)
 }
@@ -165,16 +170,34 @@ suspend fun ChainRegistry.awaitSocket(chainId: String): SocketService {
     return getSocket(chainId)
 }
 
-suspend fun ChainRegistry.awaitEthereumApi(chainId: String, connectionType: Chain.Node.ConnectionType): Web3Api? {
+suspend fun ChainRegistry.awaitEthereumApi(chainId: String, connectionType: ConnectionType): Web3Api? {
     awaitChains()
 
     return getEthereumApi(chainId, connectionType)
 }
 
-suspend fun ChainRegistry.awaitEthereumApiOrThrow(chainId: String, connectionType: Chain.Node.ConnectionType): Web3Api {
+suspend fun ChainRegistry.awaitEthereumApiOrThrow(chainId: String, connectionType: ConnectionType): Web3Api {
     return requireNotNull(awaitEthereumApi(chainId, connectionType)) {
         "Ethereum Api is not found for chain $chainId and connection type ${connectionType.name}"
     }
+}
+
+suspend fun ChainRegistry.awaitSubscriptionEthereumApiOrThrow(chainId: String): Web3Api {
+    return awaitEthereumApiOrThrow(chainId, ConnectionType.WSS)
+}
+
+suspend fun ChainRegistry.awaitSubscriptionEthereumApi(chainId: String): Web3Api? {
+    return awaitEthereumApi(chainId, ConnectionType.WSS)
+}
+
+suspend fun ChainRegistry.awaitCallEthereumApiOrThrow(chainId: String): Web3Api {
+    return awaitEthereumApi(chainId, ConnectionType.HTTPS)
+        ?: awaitEthereumApiOrThrow(chainId, ConnectionType.WSS)
+}
+
+suspend fun ChainRegistry.awaitCallEthereumApi(chainId: String): Web3Api? {
+    return awaitEthereumApi(chainId, ConnectionType.HTTPS)
+        ?: awaitEthereumApi(chainId, ConnectionType.WSS)
 }
 
 suspend fun ChainRegistry.chainsById(): ChainsById = ChainsById(chainsById.first())
