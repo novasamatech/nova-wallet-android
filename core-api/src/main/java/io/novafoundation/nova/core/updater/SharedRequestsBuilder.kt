@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture
 
 interface SubstrateSubscriptionBuilder {
 
-    val socketService: SocketService
+    val socketService: SocketService?
 
     fun subscribe(key: String): Flow<StorageChange>
 }

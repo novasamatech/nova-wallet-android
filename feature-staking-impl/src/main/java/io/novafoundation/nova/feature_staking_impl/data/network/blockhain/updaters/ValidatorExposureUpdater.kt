@@ -16,6 +16,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -30,6 +31,8 @@ class ValidatorExposureUpdater(
 ) : GlobalScopeUpdater, StakingUpdater {
 
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
+        val socketService = storageSubscriptionBuilder.socketService ?: return emptyFlow()
+
         val chainId = stakingSharedState.chainId()
         val runtime = chainRegistry.getRuntime(chainId)
 
@@ -37,7 +40,7 @@ class ValidatorExposureUpdater(
             .map { activeEraIndex -> runtime.eraStakersPrefixFor(activeEraIndex) }
             .filterNot { storageCache.isPrefixInCache(it, chainId) }
             .onEach { cleanupPreviousEras(runtime, chainId) }
-            .onEach { updateNominatorsForEra(it, storageSubscriptionBuilder.socketService, chainId) }
+            .onEach { updateNominatorsForEra(it,socketService, chainId) }
             .flowOn(Dispatchers.IO)
             .noSideAffects()
     }

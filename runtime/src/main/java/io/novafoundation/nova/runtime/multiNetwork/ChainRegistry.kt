@@ -90,7 +90,9 @@ class ChainRegistry(
         baseTypeSynchronizer.sync()
     }
 
-    fun getConnection(chainId: String) = connectionPool.getConnection(chainId.removeHexPrefix())
+    fun getConnection(chainId: String): ChainConnection = connectionPool.getConnection(chainId.removeHexPrefix())
+
+    fun getConnectionOrNull(chainId: String): ChainConnection? = connectionPool.getConnectionOrNull(chainId.removeHexPrefix())
 
     fun getRuntimeProvider(chainId: String) = runtimeProviderPool.getRuntimeProvider(chainId.removeHexPrefix())
 
@@ -168,7 +170,9 @@ suspend inline fun ChainRegistry.findChains(predicate: (Chain) -> Boolean): List
 
 suspend fun ChainRegistry.getRuntime(chainId: String) = getRuntimeProvider(chainId).get()
 
-fun ChainRegistry.getSocket(chainId: String) = getConnection(chainId).socketService
+fun ChainRegistry.getSocket(chainId: String): SocketService = getConnection(chainId).socketService
+
+fun ChainRegistry.getSocketOrNull(chainId: String): SocketService? = getConnectionOrNull(chainId)?.socketService
 
 suspend fun ChainRegistry.awaitChains() {
     chainsById.first()
@@ -178,6 +182,12 @@ suspend fun ChainRegistry.awaitSocket(chainId: String): SocketService {
     awaitChains()
 
     return getSocket(chainId)
+}
+
+suspend fun ChainRegistry.awaitSocketOrNull(chainId: String): SocketService? {
+    awaitChains()
+
+    return getSocketOrNull(chainId)
 }
 
 suspend fun ChainRegistry.awaitEthereumApi(chainId: String, connectionType: ConnectionType): Web3Api? {
