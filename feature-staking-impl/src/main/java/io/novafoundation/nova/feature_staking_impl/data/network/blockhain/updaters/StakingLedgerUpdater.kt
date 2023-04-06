@@ -61,7 +61,6 @@ class StakingLedgerUpdater(
         val (chain, chainAsset) = stakingSharedState.assetWithChain.first()
         if (chainAsset.disabled) return emptyFlow()
 
-
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val currentAccountId = scope.getAccount().accountIdIn(chain) ?: return emptyFlow()
