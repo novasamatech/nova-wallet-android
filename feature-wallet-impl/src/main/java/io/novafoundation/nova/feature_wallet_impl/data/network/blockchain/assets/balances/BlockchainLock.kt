@@ -4,7 +4,9 @@ import io.novafoundation.nova.common.data.network.runtime.binding.HelperBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindString
+import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.model.BalanceLockLocal
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -15,6 +17,19 @@ class BlockchainLock(
     val id: String,
     val amount: Balance
 )
+
+@HelperBinding
+fun bindEquilibriumBalanceLocks(dynamicInstance: Any?): List<BlockchainLock>? {
+    if (dynamicInstance == null) return null
+
+    return bindList(dynamicInstance) { items ->
+        val item = bindList(items) { it }
+        BlockchainLock(
+            bindString(item.first().cast()),
+            bindNumber(item.second().cast())
+        )
+    }
+}
 
 @HelperBinding
 fun bindBalanceLocks(dynamicInstance: Any?): List<BlockchainLock>? {

@@ -49,7 +49,6 @@ data class AssetLocal(
             redeemableInPlanks = BigInteger.ZERO,
             unbondingInPlanks = BigInteger.ZERO
         )
-
     }
 
     override val identifier: String

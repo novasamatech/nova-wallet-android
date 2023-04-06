@@ -8,6 +8,10 @@ interface Identifiable {
 fun <T : Identifiable> List<T>.findById(other: Identifiable?): T? = find { it.identifier == other?.identifier }
 fun <T : Identifiable> List<T>.findById(id: String): T? = find { it.identifier == id }
 
+fun CollectionDiffer.Diff<*>.hasDifference() = newOrUpdated.isNotEmpty() || removed.isNotEmpty()
+
+fun CollectionDiffer.Diff<*>.hasUpdated() = updated.isNotEmpty()
+
 object CollectionDiffer {
 
     data class Diff<T>(
@@ -18,7 +22,14 @@ object CollectionDiffer {
     ) {
         val newOrUpdated by lazy { updated + added }
 
-        val hasDifference = newOrUpdated.isNotEmpty() || removed.isNotEmpty()
+        companion object {
+            fun <T> empty() = CollectionDiffer.Diff<T>(
+                emptyList(),
+                emptyList(),
+                emptyList(),
+                emptyList()
+            )
+        }
     }
 
     fun <T : Identifiable> findDiff(

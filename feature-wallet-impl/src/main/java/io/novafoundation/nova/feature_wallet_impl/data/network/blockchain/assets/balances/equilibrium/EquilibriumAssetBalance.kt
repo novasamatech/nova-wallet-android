@@ -5,14 +5,16 @@ import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.HelperBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
+import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.getList
-import io.novafoundation.nova.common.data.network.runtime.binding.getStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
-import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.combine
+import io.novafoundation.nova.common.utils.decodeValue
+import io.novafoundation.nova.common.utils.hasUpdated
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -21,47 +23,45 @@ import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.model.AssetLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
-import io.novafoundation.nova.feature_wallet_api.data.cache.updateNonLockableAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.BlockchainLock
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLock
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.bindEquilibriumBalanceLocks
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.ext.requireEquilibrium
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import java.math.BigInteger
+import java.security.InvalidParameterException
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-
-
-private const val LOCK_ID = "locks"
 
 class EquilibriumAssetBalance(
     private val chainRegistry: ChainRegistry,
     private val assetCache: AssetCache,
-    private val substrateRemoteSource: SubstrateRemoteSource,
     private val lockDao: LockDao,
-    private val assetDao: AssetDao
+    private val assetDao: AssetDao,
+    private val remoteStorageSource: StorageDataSource,
 ) : AssetBalance {
 
-    private class BlockWithData<T>(val block: BlockHash, val data: T)
+    private class ReservedAssetBalanceWithBlock(val assetId: Int, val reservedBalance: BigInteger, val block: BlockHash)
 
-    private class ReservedAssetBalance(val assetId: Int, val reservedBalance: BigInteger)
+    private class FreeAssetBalancesWithBlock(val lock: BigInteger?, val assets: List<FreeAssetBalance>)
 
-    private class FreeAssetBalances(val assetId: Int, val balance: BigInteger)
+    private class FreeAssetBalance(val assetId: Int, val balance: BigInteger)
 
     override suspend fun startSyncingBalanceLocks(
         metaAccount: MetaAccount,
@@ -72,10 +72,15 @@ class EquilibriumAssetBalance(
     ): Flow<*> {
         if (!chainAsset.isUtilityAsset) return emptyFlow<Unit>()
 
-        val locks = BlockchainLock(LOCK_ID, assetBalances.locks)
-        lockDao.updateLock(locks, metaAccount.id, chain.id, chainAsset.id)
+        val runtime = chainRegistry.getRuntime(chain.id)
+        val storage = runtime.metadata.module("EqBalances").storage("Locked")
+        val key = storage.storageKey(runtime, accountId)
 
-        return emptyFlow<Unit>()
+        return subscriptionBuilder.subscribe(key)
+            .map { change ->
+                val balanceLocks = bindEquilibriumBalanceLocks(storage.decodeValue(change.value, runtime)).orEmpty()
+                lockDao.updateLocks(balanceLocks, metaAccount.id, chain.id, chainAsset.id)
+            }
     }
 
     override suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
@@ -83,11 +88,26 @@ class EquilibriumAssetBalance(
     }
 
     override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
-        TODO("Not yet implemented")
+        return BigInteger.ZERO
     }
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
-        TODO("Not yet implemented")
+        val assetBalances = remoteStorageSource.query(
+            chain.id,
+            keyBuilder = { it.getAccountStorage().storageKey(it, accountId) },
+            binding = { scale, runtimeSnapshot -> bindEquilibriumBalances(chain, scale, runtimeSnapshot) }
+        )
+
+        val onChainAssetId = chainAsset.requireEquilibrium().id
+        val reservedBalance = remoteStorageSource.query(
+            chain.id,
+            keyBuilder = { it.getReservedStorage().storageKey(it, accountId, onChainAssetId) },
+            binding = { scale, runtimeSnapshot -> bindReservedBalance(scale, runtimeSnapshot) }
+        )
+
+        val assetBalance = assetBalances.assets.firstOrNull { it.assetId == chainAsset.id }
+            ?.balance ?: BigInteger.ZERO
+        return assetBalance + reservedBalance
     }
 
     override suspend fun startSyncingBalance(
@@ -102,48 +122,44 @@ class EquilibriumAssetBalance(
         val assetBalancesFlow = subscriptionBuilder.subscribeOnSystemAccount(chain, accountId)
         val reservedBalanceFlow = subscriptionBuilder.subscribeOnReservedBalance(chain, accountId)
 
+        var oldBlockHash: String? = null
+
         return combine(assetBalancesFlow, reservedBalanceFlow) { assetBalancesWithBlock, reservedBalancesWithBlocks ->
-            val oldAssetsLocal = assetCache.getAssetsInChain(metaAccount.id, chain.id)
+            val assetBalances = assetBalancesWithBlock.second
+            val transferableByAssetId = assetBalances.assets.associateBy { it.assetId }
+            val reservedByAssetId = reservedBalancesWithBlocks.associateBy { it.assetId }
 
-            val assetBalanceBlock = assetBalancesWithBlock.block
-            val reservedBlocks = reservedBalancesWithBlocks.map { it.block }
-            
-            val assetBalances = assetBalancesWithBlock.data
-            val reservedBalances = reservedBalancesWithBlocks.map { it.data }
+            val locks = if (chainAsset.isUtilityAsset) assetBalances.lock else BigInteger.ZERO
 
-            val transferableByAssetId = assetBalances.associateBy { it.assetId }
-            val reservedByAssetId = reservedBalances.associateBy { it.assetId }
-
-            val newAssetsLocal = chain.assets.map {
+            val diff = assetCache.updateAssetsByChain(accountId, chain) { asset: Chain.Asset, _: MetaAccount ->
                 AssetLocal(
-                    it.id,
-                    it.chainId,
+                    asset.id,
+                    asset.chainId,
                     metaAccount.id,
-                    freeInPlanks = transferableByAssetId[it.id]?.balance ?: BigInteger.ZERO,
-                    reservedInPlanks = reservedByAssetId[it.id]?.reservedBalance ?: BigInteger.ZERO,
-                    frozenInPlanks = BigInteger.ZERO,
+                    freeInPlanks = transferableByAssetId[asset.id]?.balance.orZero(),
+                    reservedInPlanks = reservedByAssetId[asset.id]?.reservedBalance.orZero(),
+                    frozenInPlanks = locks.orZero(),
                     redeemableInPlanks = BigInteger.ZERO,
                     bondedInPlanks = BigInteger.ZERO,
                     unbondingInPlanks = BigInteger.ZERO
                 )
             }
 
-            val diff = CollectionDiffer.findDiff(newAssetsLocal, oldAssetsLocal, forceUseNewItems = false)
-            assetDao.insertAssets(diff.newOrUpdated)
-
-            if (diff.hasDifference) {
-                BalanceSyncUpdate.CauseFetchable(change.block)
+            val blockHash = assetBalancesWithBlock.first
+            if (diff.hasUpdated() && oldBlockHash != blockHash) {
+                oldBlockHash = blockHash
+                BalanceSyncUpdate.CauseFetchable(blockHash)
             } else {
                 BalanceSyncUpdate.NoCause
             }
         }
     }
 
-    private suspend fun SharedRequestsBuilder.subscribeOnSystemAccount(chain: Chain, accountId: AccountId): Flow<BlockWithData<List<FreeAssetBalances>>> {
+    private suspend fun SharedRequestsBuilder.subscribeOnSystemAccount(chain: Chain, accountId: AccountId): Flow<Pair<BlockHash, FreeAssetBalancesWithBlock>> {
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val key = try {
-            runtime.metadata.system().storage("Account").storageKey(runtime, accountId)
+            runtime.getAccountStorage().storageKey(runtime, accountId)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Failed to construct account storage key: ${e.message} in ${chain.name}")
 
@@ -151,74 +167,84 @@ class EquilibriumAssetBalance(
         }
 
         return subscribe(key)
-            .map {
-                val balances = bindEquilibriumBalances(chain, it.value, runtime)
-                BlockWithData(it.block, balances)
-            }
+            .map { it.block to bindEquilibriumBalances(chain, it.value, runtime) }
     }
 
-
-    private suspend fun SharedRequestsBuilder.subscribeOnReservedBalance(chain: Chain, accountId: AccountId): Flow<List<BlockWithData<ReservedAssetBalance>>> {
+    private suspend fun SharedRequestsBuilder.subscribeOnReservedBalance(chain: Chain, accountId: AccountId): Flow<List<ReservedAssetBalanceWithBlock>> {
         val runtime = chainRegistry.getRuntime(chain.id)
-        val storage = runtime.metadata
-            .module("EqBalances")
-            .storage("Reserved")
 
         return chain.assets
+            .filter { it.type is Chain.Asset.Type.Equilibrium }
             .map { asset ->
                 val equilibriumType = asset.requireEquilibrium()
 
                 val key = try {
-                    storage.storageKey(runtime, accountId, equilibriumType.id)
+                    runtime.getReservedStorage().storageKey(runtime, accountId, equilibriumType.id)
                 } catch (e: Exception) {
-                    Log.e(LOG_TAG, "Failed to construct account storage key: ${e.message} in ${chain.name}")
-                    return emptyFlow()
+                    Log.e(LOG_TAG, "Failed to construct key: ${e.message} in ${chain.name}")
+
+                    return@map flowOf(null)
                 }
 
                 subscribe(key)
-                    .map {
-                        val reservedBalance = ReservedAssetBalance(asset.id, bindReservedBalance(it.value, runtime, storage))
-                        BlockWithData(it.block, reservedBalance)
-                    }
+                    .map { ReservedAssetBalanceWithBlock(asset.id, bindReservedBalance(it.value, runtime), it.block) }
+                    .catch<ReservedAssetBalanceWithBlock?> { emit(null) }
             }.combine()
+            .map { it.filterNotNull() }
     }
 
-    private fun bindReservedBalance(raw: String?, runtime: RuntimeSnapshot, storage: StorageEntry): BigInteger {
-        val type = storage.returnType()
+    private fun bindReservedBalance(raw: String?, runtime: RuntimeSnapshot): BigInteger {
+        val type = runtime.getReservedStorage().returnType()
 
         return raw?.let { type.fromHexOrNull(runtime, it).cast<BigInteger>() } ?: BigInteger.ZERO
     }
 
     @UseCaseBinding
-    private fun bindEquilibriumBalances(chain: Chain, scale: String?, runtime: RuntimeSnapshot): List<FreeAssetBalances> {
-        if (scale == null) return emptyList()
+    private fun bindEquilibriumBalances(chain: Chain, scale: String?, runtime: RuntimeSnapshot): FreeAssetBalancesWithBlock {
+        if (scale == null) {
+            throw InvalidParameterException("Equilibrium balance sync error: StorageChange value is null")
+        }
 
-        val type = runtime.metadata.system().storage("Account").returnType()
+        val type = runtime.getAccountStorage().returnType()
+        val data = type.fromHexOrNull(runtime, scale)
+            .castToStruct()
+            .get<Any>("data").castToDictEnum()
+            .value
+            .castToStruct()
 
-        val v0Data = type.fromHexOrNull(runtime, scale)
-            .cast<Struct.Instance>()
-            .getStruct("data")
-            .getStruct("V0")
-
-        val balances = v0Data.getList("balance")
+        val lock = data.get<BigInteger>("lock")
+        val balances = data.getList("balance")
 
         val onChainAssetIdToAsset = chain.assets
             .associateBy { it.requireEquilibrium().id }
 
-        return balances.mapNotNull { assetBalance ->
-            val (onChainAssetId, balance) = bindAccountData(assetBalance.castToList())
+        val assetBalances = balances.mapNotNull { assetBalance ->
+            val (onChainAssetId, balance) = bindAssetBalance(assetBalance.castToList())
             val asset = onChainAssetIdToAsset[onChainAssetId]
 
-            asset?.let { FreeAssetBalances(it.id, balance) }
+            asset?.let { FreeAssetBalance(it.id, balance) }
         }
+
+        return FreeAssetBalancesWithBlock(lock, assetBalances)
     }
 
     @HelperBinding
-    private fun bindAccountData(dynamicInstance: List<Any?>): Pair<BigInteger, BigInteger> {
+    private fun bindAssetBalance(dynamicInstance: List<Any?>): Pair<BigInteger, BigInteger> {
         val onChainAssetId = dynamicInstance.first().cast<BigInteger>()
-        val balance = dynamicInstance.second().castToStruct()
-        val positiveBalance = balance.get<BigInteger>("Positive") ?: BigInteger.ZERO
+        val balance = dynamicInstance.second().castToDictEnum()
+        val amount = if (balance.name == "Positive") {
+            balance.value as BigInteger
+        } else {
+            BigInteger.ZERO
+        }
+        return onChainAssetId to amount
+    }
 
-        return onChainAssetId to positiveBalance
+    private fun RuntimeSnapshot.getAccountStorage(): StorageEntry {
+        return metadata.system().storage("Account")
+    }
+
+    private fun RuntimeSnapshot.getReservedStorage(): StorageEntry {
+        return metadata.module("EqBalances").storage("Reserved")
     }
 }
