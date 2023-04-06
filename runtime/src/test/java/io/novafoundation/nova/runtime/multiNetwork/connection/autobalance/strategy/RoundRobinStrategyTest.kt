@@ -8,46 +8,28 @@ class RoundRobinStrategyTest {
 
     private val strategy = RoundRobinStrategy()
 
-    @Test
-    fun `should select first node if current is not present in available`() = runTest(
-        current = createFakeNode("3"),
-        all = listOf(
-            createFakeNode("1"),
-            createFakeNode("2")
-        ),
-        expected = createFakeNode("1")
+    private val nodes = listOf(
+        createFakeNode("1"),
+        createFakeNode("2"),
+        createFakeNode("3")
     )
 
     @Test
-    fun `should select first node after last`() = runTest(
-        current = createFakeNode("3"),
-        all = listOf(
-            createFakeNode("1"),
-            createFakeNode("2"),
-            createFakeNode("3")
-        ),
-        expected = createFakeNode("1")
-    )
+    fun `collections should have the same sequence`() {
+        val iterator = strategy.generateNodeSequence(nodes)
+            .iterator()
+
+        nodes.forEach { assertEquals(it, iterator.next()) }
+    }
 
     @Test
-    fun `should select next node if not last`() = runTest(
-        current = createFakeNode("2"),
-        all = listOf(
-            createFakeNode("1"),
-            createFakeNode("2"),
-            createFakeNode("3")
-        ),
-        expected = createFakeNode("3")
-    )
+    fun `sequence should be looped`() {
+        val iterator = strategy.generateNodeSequence(nodes)
+            .iterator()
 
-    private fun runTest(
-        current: Chain.Node,
-        all: List<Chain.Node>,
-        expected: Chain.Node,
-    ) {
-        val nextActual = strategy.nextNode(current, all)
+        repeat(nodes.size) { iterator.next() }
 
-        assertEquals(expected, nextActual)
+        assertEquals(nodes.first(), iterator.next())
     }
 
     private fun createFakeNode(id: String) = Chain.Node(unformattedUrl = id, name = id, chainId = "test", orderId = 0)

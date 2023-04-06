@@ -8,17 +8,31 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.Web3jService
+import org.web3j.protocol.core.JsonRpc2_0Web3j
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.methods.response.EthSubscribe
 import org.web3j.protocol.websocket.events.LogNotification
 import org.web3j.protocol.websocket.events.NewHeadsNotification
+import org.web3j.utils.Async
+import java.util.concurrent.ScheduledExecutorService
 
-fun Web3Api(web3jService: Web3jService): Web3Api = RealWeb3Api(web3jService)
-fun Web3Api(socketService: SocketService): Web3Api = RealWeb3Api(WebSocketWeb3jService(socketService))
+class Web3ApiFactory(
+    private val requestExecutorService: ScheduledExecutorService = Async.defaultExecutorService(),
+) {
+
+    fun createWss(socketService: SocketService): Web3Api {
+        val web3jService = WebSocketWeb3jService(socketService)
+
+        return RealWeb3Api(
+            web3jService = web3jService,
+            delegate = Web3j.build(web3jService, JsonRpc2_0Web3j.DEFAULT_BLOCK_TIME.toLong(), requestExecutorService)
+        )
+    }
+}
 
 internal class RealWeb3Api(
     private val web3jService: Web3jService,
-    private val delegate: Web3j = Web3j.build(web3jService)
+    private val delegate: Web3j
 ) : Web3Api, Web3j by delegate {
     override fun newHeadsFlow(): Flow<NewHeadsNotification> = newHeadsNotifications().asFlow()
 

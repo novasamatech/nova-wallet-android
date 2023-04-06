@@ -58,6 +58,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.TokenRepositor
 import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
@@ -169,11 +170,13 @@ class WalletFeatureModule {
         paymentUpdaterFactory: PaymentUpdaterFactory,
         balanceLocksUpdater: BalanceLocksUpdaterFactory,
         accountUpdateScope: AccountUpdateScope,
+        storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     ): UpdateSystem = BalancesUpdateSystem(
         chainRegistry,
         paymentUpdaterFactory,
         balanceLocksUpdater,
         accountUpdateScope,
+        storageSharedRequestsBuilderFactory,
     )
 
     @Provides
