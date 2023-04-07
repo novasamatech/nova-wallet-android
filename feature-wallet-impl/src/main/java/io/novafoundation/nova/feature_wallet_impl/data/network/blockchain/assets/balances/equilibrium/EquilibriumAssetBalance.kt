@@ -4,6 +4,7 @@ import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.HelperBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.castToList
@@ -13,6 +14,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.returnType
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.common.utils.decodeValue
+import io.novafoundation.nova.common.utils.eqBalances
 import io.novafoundation.nova.common.utils.hasUpdated
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.second
@@ -73,7 +75,7 @@ class EquilibriumAssetBalance(
         if (!chainAsset.isUtilityAsset) return emptyFlow<Unit>()
 
         val runtime = chainRegistry.getRuntime(chain.id)
-        val storage = runtime.metadata.module("EqBalances").storage("Locked")
+        val storage = runtime.metadata.eqBalances().storage("Locked")
         val key = storage.storageKey(runtime, accountId)
 
         return subscriptionBuilder.subscribe(key)
@@ -105,8 +107,10 @@ class EquilibriumAssetBalance(
             binding = { scale, runtimeSnapshot -> bindReservedBalance(scale, runtimeSnapshot) }
         )
 
-        val assetBalance = assetBalances.assets.firstOrNull { it.assetId == chainAsset.id }
-            ?.balance ?: BigInteger.ZERO
+        val assetBalance = assetBalances.assets
+            .firstOrNull { it.assetId == chainAsset.id }
+            ?.balance
+            .orZero()
         return assetBalance + reservedBalance
     }
 
@@ -126,17 +130,17 @@ class EquilibriumAssetBalance(
 
         return combine(assetBalancesFlow, reservedBalanceFlow) { assetBalancesWithBlock, reservedBalancesWithBlocks ->
             val assetBalances = assetBalancesWithBlock.second
-            val transferableByAssetId = assetBalances.assets.associateBy { it.assetId }
+            val freeByAssetId = assetBalances.assets.associateBy { it.assetId }
             val reservedByAssetId = reservedBalancesWithBlocks.associateBy { it.assetId }
 
             val locks = if (chainAsset.isUtilityAsset) assetBalances.lock else BigInteger.ZERO
 
-            val diff = assetCache.updateAssetsByChain(accountId, chain) { asset: Chain.Asset, _: MetaAccount ->
+            val diff = assetCache.updateAssetsByChain(metaAccount, chain) { asset: Chain.Asset ->
                 AssetLocal(
                     asset.id,
                     asset.chainId,
                     metaAccount.id,
-                    freeInPlanks = transferableByAssetId[asset.id]?.balance.orZero(),
+                    freeInPlanks = freeByAssetId[asset.id]?.balance.orZero(),
                     reservedInPlanks = reservedByAssetId[asset.id]?.reservedBalance.orZero(),
                     frozenInPlanks = locks.orZero(),
                     redeemableInPlanks = BigInteger.ZERO,
@@ -202,7 +206,7 @@ class EquilibriumAssetBalance(
     @UseCaseBinding
     private fun bindEquilibriumBalances(chain: Chain, scale: String?, runtime: RuntimeSnapshot): FreeAssetBalancesWithBlock {
         if (scale == null) {
-            throw InvalidParameterException("Equilibrium balance sync error: StorageChange value is null")
+            return FreeAssetBalancesWithBlock(null, emptyList())
         }
 
         val type = runtime.getAccountStorage().returnType()
@@ -230,10 +234,10 @@ class EquilibriumAssetBalance(
 
     @HelperBinding
     private fun bindAssetBalance(dynamicInstance: List<Any?>): Pair<BigInteger, BigInteger> {
-        val onChainAssetId = dynamicInstance.first().cast<BigInteger>()
+        val onChainAssetId = bindNumber(dynamicInstance.first())
         val balance = dynamicInstance.second().castToDictEnum()
         val amount = if (balance.name == "Positive") {
-            balance.value as BigInteger
+            bindNumber(balance.value)
         } else {
             BigInteger.ZERO
         }
@@ -245,6 +249,6 @@ class EquilibriumAssetBalance(
     }
 
     private fun RuntimeSnapshot.getReservedStorage(): StorageEntry {
-        return metadata.module("EqBalances").storage("Reserved")
+        return metadata.eqBalances().storage("Reserved")
     }
 }

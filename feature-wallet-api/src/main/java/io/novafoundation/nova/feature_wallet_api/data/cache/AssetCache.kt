@@ -62,20 +62,15 @@ class AssetCache(
     }
 
     suspend fun updateAssetsByChain(
-        accountId: AccountId,
+        metaAccount: MetaAccount,
         chain: Chain,
-        builder: (Chain.Asset, MetaAccount) -> AssetLocal
+        builder: (Chain.Asset) -> AssetLocal
     ): CollectionDiffer.Diff<AssetLocal> = withContext(Dispatchers.IO) {
-        val applicableMetaAccount = accountRepository.findMetaAccount(accountId)
-        if (applicableMetaAccount != null) {
-            val oldAssetsLocal = getAssetsInChain(applicableMetaAccount.id, chain.id)
-            val newAssetsLocal = chain.assets.map { builder(it, applicableMetaAccount) }
-            val diff = CollectionDiffer.findDiff(newAssetsLocal, oldAssetsLocal, forceUseNewItems = false)
-            assetDao.insertAssets(diff.newOrUpdated)
-            diff
-        } else {
-            CollectionDiffer.Diff.empty()
-        }
+        val oldAssetsLocal = getAssetsInChain(metaAccount.id, chain.id)
+        val newAssetsLocal = chain.assets.map { builder(it) }
+        val diff = CollectionDiffer.findDiff(newAssetsLocal, oldAssetsLocal, forceUseNewItems = false)
+        assetDao.insertAssets(diff.newOrUpdated)
+        diff
     }
 
     suspend fun clearAssets(chainAssets: List<Chain.Asset>) = withContext(Dispatchers.IO) {

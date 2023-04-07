@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindString
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
+import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.core_db.dao.LockDao
@@ -23,7 +24,7 @@ fun bindEquilibriumBalanceLocks(dynamicInstance: Any?): List<BlockchainLock>? {
     if (dynamicInstance == null) return null
 
     return bindList(dynamicInstance) { items ->
-        val item = bindList(items) { it }
+        val item = items.castToList()
         BlockchainLock(
             bindString(item.first().cast()),
             bindNumber(item.second().cast())
