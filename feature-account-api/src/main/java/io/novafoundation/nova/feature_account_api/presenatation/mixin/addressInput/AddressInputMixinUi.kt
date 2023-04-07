@@ -60,7 +60,7 @@ private fun BaseFragment<*>.setupExternalAccountsCallback(
 private fun BaseFragment<*>.handleExternalAccountEvents(mixin: AddressInputMixin) {
     val singletonDialogHolder = SingletonDialogHolder<ExternalAccountsBottomSheet>()
 
-    mixin.externalIdentifierEventLiveData.observe {
+    mixin.externalIdentifierEventLiveData.observeEvent {
         when (it) {
             is ShowBottomSheetEvent -> showExternalAccountsBottomSheet(mixin, it, singletonDialogHolder)
             is ErrorEvent -> handleError(it)

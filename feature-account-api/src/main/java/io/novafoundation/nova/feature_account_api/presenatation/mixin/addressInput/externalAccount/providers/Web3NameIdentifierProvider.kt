@@ -7,6 +7,8 @@ import io.novafoundation.nova.common.domain.emitLoaded
 import io.novafoundation.nova.common.domain.emitLoading
 import io.novafoundation.nova.common.presentation.toShortAddressFormat
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.AccountIdentifierProvider
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.AccountIdentifierProvider.Event.ErrorEvent
@@ -55,7 +57,7 @@ class Web3NameIdentifierProvider(
         }
     }
 
-    override val eventsLiveData = MutableLiveData<AccountIdentifierProvider.Event>()
+    override val eventsLiveData = MutableLiveData<Event<AccountIdentifierProvider.Event>>()
 
     init {
         input.onEach {
@@ -144,7 +146,7 @@ class Web3NameIdentifierProvider(
                 chainName,
                 externalAccounts,
                 _selectedExternalAccountFlow.value
-            )
+            ).event()
         }
     }
 
@@ -152,9 +154,9 @@ class Web3NameIdentifierProvider(
         if (throwable is CancellationException) return
 
         if (throwable !is Web3NamesException) {
-            eventsLiveData.value = ErrorEvent(Web3NamesException.UnknownException(web3NameInput, chainName))
+            eventsLiveData.value = ErrorEvent(Web3NamesException.UnknownException(web3NameInput, chainName)).event()
         } else {
-            eventsLiveData.value = ErrorEvent(throwable)
+            eventsLiveData.value = ErrorEvent(throwable).event()
         }
     }
 }
