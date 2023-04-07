@@ -154,7 +154,7 @@ class AddressInputMixinProvider(
     ).shareInBackground()
 
     init {
-        resetInputOfInputSpecChange()
+        resetIdentifierInputOfSpecChange()
     }
 
     override suspend fun getInputSpec(): AddressInputSpec {
@@ -224,9 +224,13 @@ class AddressInputMixinProvider(
         accountIdentifierProvider.selectExternalAccount(null)
     }
 
-    private fun resetInputOfInputSpecChange() {
+    private fun resetIdentifierInputOfSpecChange() {
         specProvider.spec.onEach {
-            inputFlow.value = ""
+            val currentInput = inputFlow.value
+
+            if (accountIdentifierProvider.isIdentifierValid(currentInput)) {
+                inputFlow.value = ""
+            }
         }.launchIn(this)
     }
 
