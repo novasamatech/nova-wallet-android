@@ -67,14 +67,14 @@ class ContributionsUpdateSystem(
 
             kotlin.runCatching {
                 updater.listenForUpdates(subscriptionBuilder)
-                    .catch { logError(it) }
+                    .catch { logError(chain, it) }
             }.onSuccess { updaterFlow ->
                 emitAll(updaterFlow)
             }
-        }
+        }.catch { logError(chain, it) }
     }
 
-    private fun logError(exception: Throwable) {
-        Log.e(LOG_TAG, "Failed to run contributions updater: ${exception.message}", exception)
+    private fun logError(chain: Chain, exception: Throwable) {
+        Log.e(LOG_TAG, "Failed to run contributions updater for ${chain.name}", exception)
     }
 }

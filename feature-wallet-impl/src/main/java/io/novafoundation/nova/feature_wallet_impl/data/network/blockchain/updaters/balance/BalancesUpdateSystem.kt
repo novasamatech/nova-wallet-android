@@ -56,7 +56,7 @@ class BalancesUpdateSystem(
             val resultFlow = sideEffectFlows.merge()
 
             emitAll(resultFlow)
-        }
+        }.catch { logError(chain, it) }
     }
 
     private fun logError(chain: Chain, error: Throwable) {

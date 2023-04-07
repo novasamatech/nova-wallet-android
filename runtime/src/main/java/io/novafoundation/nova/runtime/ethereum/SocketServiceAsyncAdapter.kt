@@ -6,8 +6,7 @@ import jp.co.soramitsu.fearless_utils.wsrpc.request.DeliveryType
 import jp.co.soramitsu.fearless_utils.wsrpc.request.base.RpcRequest
 import jp.co.soramitsu.fearless_utils.wsrpc.response.RpcResponse
 import jp.co.soramitsu.fearless_utils.wsrpc.subscription.response.SubscriptionChange
-import kotlinx.coroutines.future.asDeferred
-import org.web3j.protocol.core.RemoteCall
+import kotlinx.coroutines.future.await
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.Response
 import java.util.concurrent.CompletableFuture
@@ -86,5 +85,4 @@ private class RequestCancellableFuture<T> : CompletableFuture<T>() {
     }
 }
 
-suspend fun <S, T : Response<*>> Request<S, T>.sendSuspend(): T = sendAsync().asDeferred().await()
-suspend fun <T> RemoteCall<T>.sendSuspend(): T = sendAsync().asDeferred().await()
+suspend fun <S, T : Response<*>> Request<S, T>.sendSuspend(): T = sendAsync().await()

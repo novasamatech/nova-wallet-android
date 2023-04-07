@@ -28,6 +28,8 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 
+private const val TRANSFER_CALL = "transfer"
+
 class EquilibriumAssetTransfers(
     chainRegistry: ChainRegistry,
     assetSourceRegistry: AssetSourceRegistry,
@@ -40,8 +42,8 @@ class EquilibriumAssetTransfers(
         get() = ValidationSystem {
             validAddress()
             positiveAmount()
-            sufficientBalanceInUsedAsset()
             sufficientTransferableBalanceToPayOriginFee()
+            sufficientBalanceInUsedAsset()
         }
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
@@ -52,7 +54,7 @@ class EquilibriumAssetTransfers(
 
         call(
             moduleName = Modules.EQ_BALANCES,
-            callName = "transfer",
+            callName = TRANSFER_CALL,
             arguments = mapOf(
                 "asset" to transfer.originChainAsset.requireEquilibrium().id,
                 "to" to accountId,
@@ -61,16 +63,22 @@ class EquilibriumAssetTransfers(
         )
     }
 
-    override suspend fun transferFunctions(chainAsset: Chain.Asset): List<Pair<String, String>> = emptyList()
+    override suspend fun transferFunctions(chainAsset: Chain.Asset): List<Pair<String, String>> {
+        return listOf(Modules.EQ_BALANCES to TRANSFER_CALL)
+    }
 
     override suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean {
         if (chainAsset.type !is Chain.Asset.Type.Equilibrium) return false
 
+        return queryIsTransferEnabledStorage(chainAsset) ?: super.areTransfersEnabled(chainAsset)
+    }
+
+    private suspend fun queryIsTransferEnabledStorage(chainAsset: Chain.Asset): Boolean? {
         return remoteStorageSource.query(
             chainAsset.chainId,
             keyBuilder = { it.getTransferEnabledStorage().storageKey() },
             binding = { scale, runtimeSnapshot ->
-                if (scale == null) return@query false
+                if (scale == null) return@query null
                 val returnType = runtimeSnapshot.getTransferEnabledStorage().returnType()
                 bindBoolean(returnType.fromHexOrNull(runtimeSnapshot, scale))
             }
