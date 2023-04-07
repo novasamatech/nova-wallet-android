@@ -52,5 +52,5 @@ data class AssetLocal(
     }
 
     override val identifier: String
-        get() = "$metaId$chainId$assetId"
+        get() = "$metaId:$chainId:$assetId"
 }
