@@ -45,7 +45,7 @@ class RealWeb3NamesRepository(
     override suspend fun queryWeb3NameAccount(web3Name: String, chain: Chain, chainAsset: Chain.Asset): List<Web3NameAccount> {
         val owner = getWeb3NameAccountOwner(web3Name) ?: throw ChainProviderNotFoundException(web3Name)
         val serviceEndpoints = getDidServiceEndpoints(owner)
-        val transferRecipientEndpoint = serviceEndpoints.firstTransferRecipientsEndpoint() ?: throw ChainProviderNotFoundException(web3Name)
+        val transferRecipientEndpoint = serviceEndpoints.lastTransferRecipientsEndpoint() ?: throw ChainProviderNotFoundException(web3Name)
 
         val recipients = getRecipientsByChain(web3Name, transferRecipientEndpoint)
 
@@ -144,7 +144,7 @@ class RealWeb3NamesRepository(
         return ServiceEndpoint(id, serviceTypes, urls)
     }
 
-    private fun List<ServiceEndpoint>.firstTransferRecipientsEndpoint(): ServiceEndpoint? {
-        return firstOrNull { TRANSFER_ASSETS_PROVIDER_DID_SERVICE_TYPE in it.serviceTypes }
+    private fun List<ServiceEndpoint>.lastTransferRecipientsEndpoint(): ServiceEndpoint? {
+        return lastOrNull { TRANSFER_ASSETS_PROVIDER_DID_SERVICE_TYPE in it.serviceTypes }
     }
 }
