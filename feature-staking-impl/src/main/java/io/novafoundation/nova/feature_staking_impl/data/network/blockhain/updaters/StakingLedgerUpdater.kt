@@ -64,6 +64,7 @@ class StakingLedgerUpdater(
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val currentAccountId = scope.getAccount().accountIdIn(chain) ?: return emptyFlow()
+        val socketService = storageSubscriptionBuilder.socketService ?: return emptyFlow()
 
         val key = runtime.metadata.staking().storage("Bonded").storageKey(runtime, currentAccountId)
 
@@ -72,7 +73,7 @@ class StakingLedgerUpdater(
                 // assume we're controller, if no controller found
                 val controllerId = change.value?.fromHex() ?: currentAccountId
 
-                subscribeToLedger(storageSubscriptionBuilder.socketService, runtime, chain.id, controllerId)
+                subscribeToLedger(socketService, runtime, chain.id, controllerId)
             }.onEach { ledgerWithController ->
                 updateAccountStaking(chain.id, chainAsset.id, currentAccountId, ledgerWithController)
 

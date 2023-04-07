@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evmErc20
 
-import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
 import io.novafoundation.nova.core.updater.EthereumSharedRequestsBuilder
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
+import io.novafoundation.nova.core.updater.callApiOrThrow
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.updateNonLockableAsset
@@ -18,9 +18,8 @@ import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.requireErc20
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.awaitEthereumApiOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Node.ConnectionType
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicStatus
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
@@ -67,8 +66,7 @@ class EvmErc20AssetBalance(
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
         val erc20Type = chainAsset.requireErc20()
-        // TODO use HTTPS
-        val ethereumApi = chainRegistry.awaitEthereumApiOrThrow(chain.id, ConnectionType.WSS)
+        val ethereumApi = chainRegistry.awaitCallEthereumApiOrThrow(chain.id)
         val accountAddress = chain.addressOf(accountId)
 
         return erc20Standard.querySingle(erc20Type.contractAddress, ethereumApi)
@@ -86,13 +84,11 @@ class EvmErc20AssetBalance(
         val address = chain.addressOf(accountId)
 
         val erc20Type = chainAsset.requireErc20()
-        // TODO use HTTPS
-        val ethereumApi = chainRegistry.awaitEthereumApiOrThrow(chain.id, ConnectionType.WSS)
 
         val initialBalanceAsync = erc20Standard.queryBatched(erc20Type.contractAddress, BATCH_ID, subscriptionBuilder)
             .balanceOfAsync(address)
 
-        return subscriptionBuilder.erc20BalanceFlow(address, ethereumApi, chainAsset, initialBalanceAsync)
+        return subscriptionBuilder.erc20BalanceFlow(address, chainAsset, initialBalanceAsync)
             .map { balanceUpdate ->
                 assetCache.updateNonLockableAsset(metaAccount.id, chainAsset, balanceUpdate.newBalance)
 
@@ -106,14 +102,13 @@ class EvmErc20AssetBalance(
 
     private fun EthereumSharedRequestsBuilder.erc20BalanceFlow(
         account: String,
-        web3Api: Web3Api,
         chainAsset: Chain.Asset,
         initialBalanceAsync: Deferred<BigInteger>
     ): Flow<Erc20BalanceUpdate> {
         val contractAddress = chainAsset.requireErc20().contractAddress
 
         val changes = accountErcTransfersFlow(account, contractAddress, chainAsset).map { erc20Transfer ->
-            val newBalance = erc20Standard.querySingle(contractAddress, web3Api)
+            val newBalance = erc20Standard.querySingle(contractAddress, callApiOrThrow)
                 .balanceOfAsync(account)
                 .await()
 
