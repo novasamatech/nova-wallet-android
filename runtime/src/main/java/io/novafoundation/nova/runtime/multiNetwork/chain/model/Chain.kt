@@ -20,7 +20,7 @@ data class Chain(
     val id: ChainId,
     val name: String,
     val assets: List<Asset>,
-    val nodes: List<Node>,
+    val nodes: Nodes,
     val explorers: List<Explorer>,
     val externalApis: List<ExternalApi>,
     val icon: String,
@@ -100,12 +100,32 @@ data class Chain(
         override val identifier = "$chainId:$id"
     }
 
+    data class Nodes(
+        val nodeSelectionStrategy: NodeSelectionStrategy,
+        val nodes: List<Node>,
+    ) {
+
+        enum class NodeSelectionStrategy {
+            ROUND_ROBIN, UNIFORM
+        }
+    }
+
     data class Node(
         val chainId: ChainId,
         val unformattedUrl: String,
         val name: String,
         val orderId: Int,
     ) : Identifiable {
+
+        enum class ConnectionType {
+            HTTPS, WSS, UNKNOWN
+        }
+
+        val connectionType = when {
+            unformattedUrl.startsWith("wss://") -> ConnectionType.WSS
+            unformattedUrl.startsWith("https://") -> ConnectionType.HTTPS
+            else -> ConnectionType.UNKNOWN
+        }
 
         override val identifier: String = "$chainId:$unformattedUrl"
     }

@@ -3,11 +3,13 @@ package io.novafoundation.nova.runtime.di
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
+import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset.EvmAssetsSyncService
 import io.novafoundation.nova.runtime.multiNetwork.asset.remote.AssetFetcher
@@ -17,6 +19,7 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnectionFactory
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
+import io.novafoundation.nova.runtime.multiNetwork.connection.Web3ApiPool
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFactory
@@ -28,6 +31,8 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.types.BaseTypeSynchro
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.TypesFetcher
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import kotlinx.coroutines.flow.MutableStateFlow
+import okhttp3.logging.HttpLoggingInterceptor
+import org.web3j.protocol.http.HttpService
 import javax.inject.Provider
 
 @Module
@@ -53,10 +58,11 @@ class ChainRegistryModule {
     @Provides
     @ApplicationScope
     fun provideAssetSyncService(
-        dao: ChainAssetDao,
+        chainAssetDao: ChainAssetDao,
+        chainDao: ChainDao,
         assetFetcher: AssetFetcher,
         gson: Gson
-    ) = EvmAssetsSyncService(dao, assetFetcher, gson)
+    ) = EvmAssetsSyncService(chainDao, chainAssetDao, assetFetcher, gson)
 
     @Provides
     @ApplicationScope
@@ -144,6 +150,28 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
+    fun provideWeb3ApiFactory(
+        connectionSecrets: ConnectionSecrets,
+        strategyProvider: AutoBalanceStrategyProvider,
+    ): Web3ApiFactory {
+        val builder = HttpService.getOkHttpClientBuilder()
+        builder.interceptors().clear() // getOkHttpClientBuilder() adds logging interceptor which doesn't log into LogCat
+
+        if (BuildConfig.DEBUG) {
+            builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+        }
+
+        val okHttpClient = builder.build()
+
+        return Web3ApiFactory(connectionSecrets = connectionSecrets, strategyProvider = strategyProvider, httpClient = okHttpClient)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideWeb3ApiPool(web3ApiFactory: Web3ApiFactory) = Web3ApiPool(web3ApiFactory)
+
+    @Provides
+    @ApplicationScope
     fun provideExternalRequirementsFlow() = MutableStateFlow(ChainConnection.ExternalRequirement.ALLOWED)
 
     @Provides
@@ -157,6 +185,7 @@ class ChainRegistryModule {
         evmAssetsSyncService: EvmAssetsSyncService,
         baseTypeSynchronizer: BaseTypeSynchronizer,
         runtimeSyncService: RuntimeSyncService,
+        web3ApiPool: Web3ApiPool,
         gson: Gson
     ) = ChainRegistry(
         runtimeProviderPool,
@@ -167,6 +196,7 @@ class ChainRegistryModule {
         evmAssetsSyncService,
         baseTypeSynchronizer,
         runtimeSyncService,
+        web3ApiPool,
         gson
     )
 }

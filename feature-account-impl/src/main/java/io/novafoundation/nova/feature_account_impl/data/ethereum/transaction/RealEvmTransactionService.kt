@@ -11,14 +11,12 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.runtime.ethereum.EvmRpcException
-import io.novafoundation.nova.runtime.ethereum.EvmRpcException.Type.EXECUTION_REVERTED
-import io.novafoundation.nova.runtime.ethereum.EvmRpcException.Type.INVALID_INPUT
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.multiNetwork.ethereumApi
 import jp.co.soramitsu.fearless_utils.encrypt.SignatureWrapper
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
@@ -29,7 +27,6 @@ import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.rlp.RlpEncoder
 import org.web3j.rlp.RlpList
-import org.web3j.tx.gas.DefaultGasProvider
 import java.math.BigInteger
 
 internal class RealEvmTransactionService(
@@ -41,9 +38,10 @@ internal class RealEvmTransactionService(
     override suspend fun calculateFee(
         chainId: ChainId,
         origin: TransactionOrigin,
+        fallbackGasLimit: BigInteger,
         building: EvmTransactionBuilding
     ): BigInteger {
-        val web3Api = chainRegistry.ethereumApi(chainId)
+        val web3Api = chainRegistry.awaitCallEthereumApiOrThrow(chainId)
         val chain = chainRegistry.getChain(chainId)
 
         val submittingMetaAccount = findMetaAccountFor(origin)
@@ -54,24 +52,25 @@ internal class RealEvmTransactionService(
 
         val gasPrice = web3Api.gasPrice()
 
-        return gasPrice * web3Api.gasLimitOrDefault(txForFee)
+        return gasPrice * web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
     }
 
     override suspend fun transact(
         chainId: ChainId,
         origin: TransactionOrigin,
+        fallbackGasLimit: BigInteger,
         building: EvmTransactionBuilding
     ): Result<TransactionHash> = runCatching {
         val chain = chainRegistry.getChain(chainId)
         val submittingMetaAccount = findMetaAccountFor(origin)
         val submittingAddress = submittingMetaAccount.requireAddressIn(chain)
 
-        val web3Api = chainRegistry.ethereumApi(chainId)
+        val web3Api = chainRegistry.awaitCallEthereumApiOrThrow(chainId)
         val txBuilder = EvmTransactionBuilder().apply(building)
         val txForFee = txBuilder.buildForFee(submittingAddress)
 
         val gasPrice = web3Api.gasPrice()
-        val gasLimit = web3Api.gasLimitOrDefault(txForFee)
+        val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
         val nonce = web3Api.getNonce(submittingAddress)
 
         val txForSign = txBuilder.buildForSign(nonce = nonce, gasPrice = gasPrice, gasLimit = gasLimit)
@@ -109,15 +108,10 @@ internal class RealEvmTransactionService(
 
     private suspend fun Web3Api.gasPrice(): BigInteger = ethGasPrice().sendSuspend().gasPrice
 
-    private suspend fun Web3Api.gasLimitOrDefault(tx: Transaction): BigInteger = try {
+    private suspend fun Web3Api.gasLimitOrDefault(tx: Transaction, default: BigInteger): BigInteger = try {
         ethEstimateGas(tx).sendSuspend().amountUsed
-    } catch (e: EvmRpcException) {
-        if (e.type == EXECUTION_REVERTED || e.type == INVALID_INPUT) {
-            // user supplied incorrect parameters but still fallback to default fee
-            DefaultGasProvider.GAS_LIMIT
-        } else {
-            throw e
-        }
+    } catch (rpcException: EvmRpcException) {
+        default
     }
 
     private fun SignatureWrapper.toSignatureData(): Sign.SignatureData {

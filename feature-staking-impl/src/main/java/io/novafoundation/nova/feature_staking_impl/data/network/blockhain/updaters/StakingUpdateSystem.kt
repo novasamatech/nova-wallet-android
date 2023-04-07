@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters
 
 import io.novafoundation.nova.core.updater.Updater
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
@@ -18,8 +19,9 @@ class StakingUpdateSystem(
     private val commonUpdaters: List<Updater>,
     private val turingExtraUpdaters: List<Updater>,
     chainRegistry: ChainRegistry,
-    singleAssetSharedState: SingleAssetSharedState
-) : SingleChainUpdateSystem(chainRegistry, singleAssetSharedState) {
+    singleAssetSharedState: SingleAssetSharedState,
+    storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
+) : SingleChainUpdateSystem(chainRegistry, singleAssetSharedState, storageSharedRequestsBuilderFactory) {
 
     override fun getUpdaters(chain: Chain, chainAsset: Chain.Asset): List<Updater> {
         return commonUpdaters + when (chainAsset.staking) {

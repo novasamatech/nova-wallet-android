@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.turing.T
 import io.novafoundation.nova.feature_staking_impl.di.staking.relaychain.Relaychain
 import io.novafoundation.nova.feature_staking_impl.di.staking.relaychain.RelaychainStakingUpdatersModule
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
 import io.novafoundation.nova.runtime.network.updaters.BlockTimeUpdater
@@ -41,14 +42,16 @@ class UpdatersModule {
         blockNumberUpdater: BlockNumberUpdater,
         totalIssuanceUpdater: TotalIssuanceUpdater,
         chainRegistry: ChainRegistry,
-        singleAssetSharedState: StakingSharedState
+        singleAssetSharedState: StakingSharedState,
+        storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     ) = StakingUpdateSystem(
         relaychainUpdaters = relaychainUpdaters,
         parachainUpdaters = parachainUpdaters,
         commonUpdaters = listOf(blockTimeUpdater, blockNumberUpdater, totalIssuanceUpdater),
         chainRegistry = chainRegistry,
         singleAssetSharedState = singleAssetSharedState,
-        turingExtraUpdaters = turingUpdaters
+        turingExtraUpdaters = turingUpdaters,
+        storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory
     )
 
     @Provides
