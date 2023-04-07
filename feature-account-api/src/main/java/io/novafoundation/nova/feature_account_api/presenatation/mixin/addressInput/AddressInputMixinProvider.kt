@@ -36,6 +36,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -151,6 +153,10 @@ class AddressInputMixinProvider(
         ::createState
     ).shareInBackground()
 
+    init {
+        resetInputOfInputSpecChange()
+    }
+
     override suspend fun getInputSpec(): AddressInputSpec {
         return specProvider.spec.first()
     }
@@ -216,6 +222,12 @@ class AddressInputMixinProvider(
 
     override fun clearExtendedAccount() {
         accountIdentifierProvider.selectExternalAccount(null)
+    }
+
+    private fun resetInputOfInputSpecChange() {
+        specProvider.spec.onEach {
+            inputFlow.value = ""
+        }.launchIn(this)
     }
 
     private suspend fun createState(
