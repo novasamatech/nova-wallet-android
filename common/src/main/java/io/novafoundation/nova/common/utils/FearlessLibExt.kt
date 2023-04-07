@@ -161,7 +161,7 @@ fun RuntimeMetadata.system() = module(Modules.SYSTEM)
 
 fun RuntimeMetadata.balances() = module(Modules.BALANCES)
 
-fun RuntimeMetadata.eqBalances() = module(Modules.BALANCES)
+fun RuntimeMetadata.eqBalances() = module(Modules.EQ_BALANCES)
 
 fun RuntimeMetadata.tokens() = module(Modules.TOKENS)
 
@@ -238,6 +238,7 @@ private fun cropSeedTo32Bytes(seedResult: SeedFactory.Result): SeedFactory.Resul
 fun GenericCall.Instance.oneOf(vararg functionCandidates: MetadataFunction?): Boolean {
     return functionCandidates.any { candidate -> candidate != null && function == candidate }
 }
+
 fun GenericCall.Instance.instanceOf(functionCandidate: MetadataFunction): Boolean = function == functionCandidate
 
 fun GenericCall.Instance.instanceOf(moduleName: String, callName: String): Boolean = moduleName == module.name && callName == function.name
