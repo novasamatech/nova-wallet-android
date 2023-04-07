@@ -15,13 +15,11 @@ class AccountData(
 )
 
 class AccountInfo(
-    val nonce: BigInteger,
     val data: AccountData,
 ) {
 
     companion object {
         fun empty() = AccountInfo(
-            nonce = BigInteger.ZERO,
             data = AccountData(
                 free = BigInteger.ZERO,
                 reserved = BigInteger.ZERO,
@@ -52,7 +50,6 @@ fun bindAccountInfo(scale: String, runtime: RuntimeSnapshot): AccountInfo {
     val dynamicInstance = type.fromHexOrNull(runtime, scale).cast<Struct.Instance>()
 
     return AccountInfo(
-        nonce = bindNonce(dynamicInstance["nonce"]),
         data = bindAccountData(dynamicInstance.getTyped("data"))
     )
 }
