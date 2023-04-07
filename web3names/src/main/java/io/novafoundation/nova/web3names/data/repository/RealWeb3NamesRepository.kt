@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindString
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.fromJson
-import io.novafoundation.nova.runtime.ext.accountIdOrNull
+import io.novafoundation.nova.runtime.ext.isValidAddress
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.data.caip19.Caip19MatcherFactory
@@ -18,7 +18,6 @@ import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.ChainProviderNotFoundException
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.IntegrityCheckFailed
 import io.novafoundation.nova.web3names.domain.models.Web3NameAccount
-import io.novafoundation.nova.web3names.domain.models.isValid
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
@@ -115,9 +114,9 @@ class RealWeb3NamesRepository(
         val web3NameAccounts = matchingRecipients.flatMap { (_, chainRecipients) -> chainRecipients }
             .map {
                 Web3NameAccount(
-                    accountId = chain.accountIdOrNull(it.account),
                     address = it.account,
-                    description = it.description
+                    description = it.description,
+                    isValid = chain.isValidAddress(it.account)
                 )
             }
 
