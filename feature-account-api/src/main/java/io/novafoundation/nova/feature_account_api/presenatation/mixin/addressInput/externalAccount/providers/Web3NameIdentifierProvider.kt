@@ -7,6 +7,8 @@ import io.novafoundation.nova.common.domain.emitLoaded
 import io.novafoundation.nova.common.domain.emitLoading
 import io.novafoundation.nova.common.presentation.toShortAddressFormat
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.AccountIdentifierProvider
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.AccountIdentifierProvider.Event.ErrorEvent
@@ -17,7 +19,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException
 import io.novafoundation.nova.web3names.domain.models.Web3NameAccount
-import io.novafoundation.nova.web3names.domain.models.isValid
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -55,7 +56,7 @@ class Web3NameIdentifierProvider(
         }
     }
 
-    override val eventsLiveData = MutableLiveData<AccountIdentifierProvider.Event>()
+    override val eventsLiveData = MutableLiveData<Event<AccountIdentifierProvider.Event>>()
 
     init {
         input.onEach {
@@ -102,7 +103,6 @@ class Web3NameIdentifierProvider(
         return web3NameInteractor.queryAccountsByWeb3Name(raw, chain, asset)
             .map {
                 ExternalAccount(
-                    accountId = it.accountId,
                     address = it.address,
                     description = it.description,
                     addressWithDescription = resourceManager.addressWithDescription(it),
@@ -144,7 +144,7 @@ class Web3NameIdentifierProvider(
                 chainName,
                 externalAccounts,
                 _selectedExternalAccountFlow.value
-            )
+            ).event()
         }
     }
 
@@ -152,9 +152,9 @@ class Web3NameIdentifierProvider(
         if (throwable is CancellationException) return
 
         if (throwable !is Web3NamesException) {
-            eventsLiveData.value = ErrorEvent(Web3NamesException.UnknownException(web3NameInput, chainName))
+            eventsLiveData.value = ErrorEvent(Web3NamesException.UnknownException(web3NameInput, chainName)).event()
         } else {
-            eventsLiveData.value = ErrorEvent(throwable)
+            eventsLiveData.value = ErrorEvent(throwable).event()
         }
     }
 }

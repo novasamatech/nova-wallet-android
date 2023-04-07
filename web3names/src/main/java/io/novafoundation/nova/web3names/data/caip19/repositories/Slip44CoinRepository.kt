@@ -1,5 +1,6 @@
 package io.novafoundation.nova.web3names.data.caip19.repositories
 
+import io.novafoundation.nova.runtime.ext.unifiedSymbol
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.web3names.data.endpoints.Slip44CoinApi
 import io.novafoundation.nova.web3names.data.endpoints.model.Slip44CoinRemote
@@ -25,7 +26,7 @@ class RealSlip44CoinRepository(
                 .associateBy { it.symbol }
         }
 
-        return slip44Coins[chainAsset.symbol]
+        return slip44Coins[chainAsset.unifiedSymbol()]
             ?.index
             ?.toIntOrNull()
     }

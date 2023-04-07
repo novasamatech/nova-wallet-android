@@ -4,12 +4,13 @@ import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException
 import kotlinx.coroutines.flow.Flow
+import io.novafoundation.nova.common.utils.Event as OneShotEvent
 
 interface AccountIdentifierProvider {
 
     val selectedExternalAccountFlow: Flow<ExtendedLoadingState<ExternalAccount?>>
 
-    val eventsLiveData: LiveData<Event>
+    val eventsLiveData: LiveData<OneShotEvent<Event>>
 
     fun selectExternalAccount(account: ExternalAccount?)
 
