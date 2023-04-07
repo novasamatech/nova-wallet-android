@@ -1,43 +1,68 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.equilibrium
 
-import io.novafoundation.nova.common.data.model.DataPage
-import io.novafoundation.nova.common.data.model.PageOffset
+import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdentifier
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.utils.eqBalances
+import io.novafoundation.nova.common.utils.instanceOf
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.filterOwn
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
-import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.SubstrateAssetHistory
+import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
+import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
+import io.novafoundation.nova.runtime.ext.isUtilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.status
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
+import jp.co.soramitsu.fearless_utils.runtime.metadata.call
 
-class EquilibriumAssetHistory : AssetHistory {
+class EquilibriumAssetHistory(
+    private val chainRegistry: ChainRegistry,
+    private val eventsRepository: EventsRepository,
+    walletOperationsApi: SubQueryOperationsApi,
+    cursorStorage: TransferCursorStorage,
+) : SubstrateAssetHistory(walletOperationsApi, cursorStorage) {
+
     override suspend fun fetchOperationsForBalanceChange(
         chain: Chain,
         chainAsset: Chain.Asset,
         blockHash: String,
         accountId: AccountId
-    ): Result<List<TransferExtrinsic>> {
-        return Result.success(emptyList())
+    ): Result<List<TransferExtrinsic>> = runCatching {
+        val runtime = chainRegistry.getRuntime(chain.id)
+        val extrinsicsWithEvents = eventsRepository.getExtrinsicsWithEvents(chain.id, blockHash)
+
+        extrinsicsWithEvents.filter { it.extrinsic.call.isTransfer(runtime) }
+            .map { extrinsicWithEvents ->
+                val extrinsic = extrinsicWithEvents.extrinsic
+
+                TransferExtrinsic(
+                    senderId = bindAccountIdentifier(extrinsic.signature!!.accountIdentifier),
+                    recipientId = bindAccountIdentifier(extrinsic.call.arguments["to"]),
+                    amountInPlanks = bindNumber(extrinsic.call.arguments["value"]),
+                    hash = extrinsicWithEvents.extrinsicHash,
+                    chainAsset = chainAsset,
+                    status = extrinsicWithEvents.status()
+                )
+            }.filterOwn(accountId)
     }
 
     override fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter> {
-        return emptySet()
+        return setOfNotNull(
+            TransactionFilter.TRANSFER,
+            TransactionFilter.REWARD.takeIf { asset.isUtilityAsset },
+            TransactionFilter.EXTRINSIC.takeIf { asset.isUtilityAsset }
+        )
     }
 
-    override suspend fun additionalFirstPageSync(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId, page: DataPage<Operation>) {
-    }
+    private fun GenericCall.Instance.isTransfer(runtime: RuntimeSnapshot): Boolean {
+        val balances = runtime.metadata.eqBalances()
 
-    override suspend fun getOperations(
-        pageSize: Int,
-        pageOffset: PageOffset.Loadable,
-        filters: Set<TransactionFilter>,
-        accountId: AccountId,
-        chain: Chain,
-        chainAsset: Chain.Asset
-    ): DataPage<Operation> {
-        return DataPage.empty()
-    }
-
-    override suspend fun getSyncedPageOffset(accountId: AccountId, chain: Chain, chainAsset: Chain.Asset): PageOffset {
-        return PageOffset.FullData
+        return instanceOf(balances.call("transfer"))
     }
 }
