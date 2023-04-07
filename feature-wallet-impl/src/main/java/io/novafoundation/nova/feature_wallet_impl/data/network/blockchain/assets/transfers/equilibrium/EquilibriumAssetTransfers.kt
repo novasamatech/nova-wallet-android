@@ -28,7 +28,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 
-private const val TRANSFER_STORAGE = "transfer"
+private const val TRANSFER_CALL = "transfer"
 
 class EquilibriumAssetTransfers(
     chainRegistry: ChainRegistry,
@@ -54,7 +54,7 @@ class EquilibriumAssetTransfers(
 
         call(
             moduleName = Modules.EQ_BALANCES,
-            callName = TRANSFER_STORAGE,
+            callName = TRANSFER_CALL,
             arguments = mapOf(
                 "asset" to transfer.originChainAsset.requireEquilibrium().id,
                 "to" to accountId,
@@ -64,7 +64,7 @@ class EquilibriumAssetTransfers(
     }
 
     override suspend fun transferFunctions(chainAsset: Chain.Asset): List<Pair<String, String>> {
-        return listOf(Modules.EQ_BALANCES to TRANSFER_STORAGE)
+        return listOf(Modules.EQ_BALANCES to TRANSFER_CALL)
     }
 
     override suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean {
