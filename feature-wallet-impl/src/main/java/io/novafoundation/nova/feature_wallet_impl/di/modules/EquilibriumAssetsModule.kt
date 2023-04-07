@@ -5,8 +5,11 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.LockDao
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.StaticAssetSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.equilibrium.EquilibriumAssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.equilibrium.EquilibriumAssetHistory
@@ -36,7 +39,14 @@ class EquilibriumAssetsModule {
 
     @Provides
     @FeatureScope
-    fun provideTransfers() = EquilibriumAssetTransfers()
+    fun provideTransfers(
+        chainRegistry: ChainRegistry,
+        assetSourceRegistry: AssetSourceRegistry,
+        extrinsicService: ExtrinsicService,
+        phishingValidationFactory: PhishingValidationFactory,
+        @Named(REMOTE_STORAGE_SOURCE)
+        remoteStorageSource: StorageDataSource
+    ) = EquilibriumAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory, remoteStorageSource)
 
     @Provides
     @FeatureScope
