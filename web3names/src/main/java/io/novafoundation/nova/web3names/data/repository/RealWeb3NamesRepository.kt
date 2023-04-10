@@ -14,9 +14,7 @@ import io.novafoundation.nova.web3names.data.endpoints.TransferRecipientsApi
 import io.novafoundation.nova.web3names.data.endpoints.model.TransferRecipientRemote
 import io.novafoundation.nova.web3names.data.integrity.Web3NamesIntegrityVerifier
 import io.novafoundation.nova.web3names.data.provider.Web3NamesServiceChainIdProvider
-import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException
-import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.ChainProviderNotFoundException
-import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.IntegrityCheckFailed
+import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.*
 import io.novafoundation.nova.web3names.domain.models.Web3NameAccount
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
@@ -45,9 +43,9 @@ class RealWeb3NamesRepository(
     override suspend fun queryWeb3NameAccount(web3Name: String, chain: Chain, chainAsset: Chain.Asset): List<Web3NameAccount> {
         val owner = getWeb3NameAccountOwner(web3Name) ?: throw ChainProviderNotFoundException(web3Name)
         val serviceEndpoints = getDidServiceEndpoints(owner)
-        val transferRecipientEndpoint = serviceEndpoints.firstTransferRecipientsEndpoint() ?: throw ChainProviderNotFoundException(web3Name)
+        val transferRecipientEndpoint = serviceEndpoints.firstTransferRecipientsEndpoint() ?: throw ValidAccountNotFoundException(web3Name, chain.name)
 
-        val recipients = getRecipientsByChain(web3Name, transferRecipientEndpoint)
+        val recipients = getRecipientsByChain(web3Name, transferRecipientEndpoint, chain)
 
         return findChainRecipients(recipients, web3Name, chain, chainAsset)
     }
@@ -78,8 +76,9 @@ class RealWeb3NamesRepository(
     private suspend fun getRecipientsByChain(
         w3nIdentifier: String,
         endpoint: ServiceEndpoint,
+        chain: Chain
     ): RecipientsByChain {
-        val url = endpoint.urls.firstOrNull() ?: throw ChainProviderNotFoundException(w3nIdentifier)
+        val url = endpoint.urls.firstOrNull() ?: throw ValidAccountNotFoundException(w3nIdentifier, chain.name)
         val recipientsContent = transferRecipientApi.getTransferRecipientsRaw(url)
 
         if (!web3NamesIntegrityVerifier.verifyIntegrity(serviceEndpointId = endpoint.id, serviceEndpointContent = recipientsContent)) {
@@ -108,7 +107,7 @@ class RealWeb3NamesRepository(
         }
 
         if (matchingRecipients.isEmpty()) {
-            throw Web3NamesException.ValidAccountNotFoundException(w3nIdentifier, chain.name)
+            throw ValidAccountNotFoundException(w3nIdentifier, chain.name)
         }
 
         val web3NameAccounts = matchingRecipients.flatMap { (_, chainRecipients) -> chainRecipients }
@@ -121,7 +120,7 @@ class RealWeb3NamesRepository(
             }
 
         if (web3NameAccounts.none(Web3NameAccount::isValid)) {
-            throw Web3NamesException.ValidAccountNotFoundException(w3nIdentifier, chain.name)
+            throw ValidAccountNotFoundException(w3nIdentifier, chain.name)
         }
 
         return web3NameAccounts
