@@ -32,8 +32,8 @@ fun BaseFragment<*>.setupExternalAccounts(
     inputField: AddressInputField
 ) {
     mixin.selectedExternalAccountFlow.observeWhenVisible { inputField.setExternalAccount(it) }
-    setupExternalAccountsCallback(mixin, inputField)
     handleExternalAccountEvents(mixin)
+    setupExternalAccountsCallback(mixin, inputField)
 }
 
 private fun BaseFragment<*>.setupExternalAccountsCallback(
@@ -50,11 +50,19 @@ private fun BaseFragment<*>.setupExternalAccountsCallback(
         }
     }
 
+    addInputKeyboardCallback(mixin, inputField)
+}
+
+fun BaseFragment<*>.addInputKeyboardCallback(mixin: AddressInputMixin, inputField: AddressInputField) {
     lifecycle.setKeyboardVisibilityListener(inputField) { keyboardVisible ->
         if (!keyboardVisible && inputField.content.hasFocus()) {
             mixin.loadExternalIdentifiers()
         }
     }
+}
+
+fun BaseFragment<*>.removeInputKeyboardCallback(inputField: AddressInputField) {
+    lifecycle.setKeyboardVisibilityListener(inputField, null)
 }
 
 private fun BaseFragment<*>.handleExternalAccountEvents(mixin: AddressInputMixin) {

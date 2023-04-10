@@ -27,7 +27,12 @@ fun View.showSoftKeyboard() {
     inputMethodManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
 }
 
-fun Lifecycle.setKeyboardVisibilityListener(view: View, callback: KeyboardVisibilityCallback) {
+fun Lifecycle.setKeyboardVisibilityListener(view: View, callback: KeyboardVisibilityCallback?) {
+    if (callback == null) {
+        ViewCompat.setOnApplyWindowInsetsListener(view, null)
+        return
+    }
+
     onDestroy {
         ViewCompat.setOnApplyWindowInsetsListener(view, null)
     }
