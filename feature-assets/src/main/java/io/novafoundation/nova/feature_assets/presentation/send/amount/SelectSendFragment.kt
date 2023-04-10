@@ -12,6 +12,8 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.addInputKeyboardCallback
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.removeInputKeyboardCallback
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupAddressInput
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupExternalAccounts
 import io.novafoundation.nova.feature_assets.R
@@ -94,12 +96,15 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
         setupExternalAccounts(viewModel.addressInputMixin, selectSendRecipient)
 
         viewModel.chooseDestinationChain.awaitableActionLiveData.observeEvent {
-            SelectCrossChainDestinationBottomSheet(
+            removeInputKeyboardCallback(selectSendRecipient)
+            val crossChainDestinationBottomSheet = SelectCrossChainDestinationBottomSheet(
                 context = requireContext(),
                 payload = it.payload,
                 onSelected = { _, item -> it.onSuccess(item) },
                 onCancelled = it.onCancel
-            ).show()
+            )
+            crossChainDestinationBottomSheet.setOnDismissListener { addInputKeyboardCallback(viewModel.addressInputMixin, selectSendRecipient) }
+            crossChainDestinationBottomSheet.show()
         }
 
         viewModel.isSelectAddressAvailable.observe {
