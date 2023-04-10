@@ -97,6 +97,7 @@ class SubqueryHistoryRequest(
             Asset.Type.Native -> hasType("transfer")
             is Asset.Type.Orml -> transferAssetHasId(assetType.currencyIdScale)
             is Asset.Type.Statemine -> transferAssetHasId(assetType.id.toString())
+            is Asset.Type.Equilibrium -> transferAssetHasId(assetType.id.toString())
             else -> throw IllegalArgumentException("Unsupported asset")
         }
     }
