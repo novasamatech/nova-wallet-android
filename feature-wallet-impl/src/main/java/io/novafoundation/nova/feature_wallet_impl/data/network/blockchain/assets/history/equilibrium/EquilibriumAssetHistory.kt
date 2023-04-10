@@ -55,7 +55,6 @@ class EquilibriumAssetHistory(
     override fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter> {
         return setOfNotNull(
             TransactionFilter.TRANSFER,
-            TransactionFilter.REWARD.takeIf { asset.isUtilityAsset },
             TransactionFilter.EXTRINSIC.takeIf { asset.isUtilityAsset }
         )
     }
