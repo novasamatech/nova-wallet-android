@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
+import io.novafoundation.nova.feature_dapp_impl.walletConnect.WalletConnectScanCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
@@ -19,6 +20,8 @@ class DAppFeatureHolder @Inject constructor(
     private val router: DAppRouter,
     private val signCommunicator: DAppSignCommunicator,
     private val searchCommunicator: DAppSearchCommunicator,
+    // TODO move to WC module
+    private val walletConnectScanCommunicator: WalletConnectScanCommunicator,
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -32,6 +35,6 @@ class DAppFeatureHolder @Inject constructor(
             .build()
 
         return DaggerDAppFeatureComponent.factory()
-            .create(router, signCommunicator, searchCommunicator, dApp)
+            .create(router, signCommunicator, searchCommunicator, walletConnectScanCommunicator, dApp)
     }
 }

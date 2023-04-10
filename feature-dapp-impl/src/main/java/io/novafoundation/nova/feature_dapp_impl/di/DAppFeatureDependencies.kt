@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
@@ -81,4 +82,6 @@ interface DAppFeatureDependencies {
     val validationExecutor: ValidationExecutor
 
     val signerProvider: SignerProvider
+
+    val permissionsAskerFactory: PermissionsAskerFactory
 }

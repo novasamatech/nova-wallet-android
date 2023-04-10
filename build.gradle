@@ -81,6 +81,14 @@ buildscript {
 
         markdownVersion = '4.6.2'
 
+        walletConnectCoreVersion = "1.13.0"
+        walletConnectWalletVersion = "1.6.0"
+
+        withoutTransitiveAndroidX = {
+            exclude group: "androidx.appcompat", module: "appcompat"
+            exclude group: "androidx.fragment", module: "fragment-ktx"
+        }
+
         coilDep = "io.coil-kt:coil:$coilVersion"
         coilSvg = "io.coil-kt:coil-svg:$coilVersion"
 
@@ -178,6 +186,9 @@ buildscript {
         markdownTables = "io.noties.markwon:ext-tables:$markdownVersion"
         markdownLinkify = "io.noties.markwon:linkify:$markdownVersion"
         markdownStrikethrough = "io.noties.markwon:ext-strikethrough:$markdownVersion"
+
+        walletConnectCoreDep = "com.walletconnect:android-core:$walletConnectCoreVersion"
+        walletConnectWalletDep = "com.walletconnect:web3wallet:$walletConnectWalletVersion"
     }
 
     repositories {

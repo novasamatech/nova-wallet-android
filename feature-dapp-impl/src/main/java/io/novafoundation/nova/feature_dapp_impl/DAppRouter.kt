@@ -1,8 +1,9 @@
 package io.novafoundation.nova.feature_dapp_impl
 
+import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
 
-interface DAppRouter {
+interface DAppRouter: ReturnableRouter {
 
     fun openChangeAccount()
 
@@ -15,6 +16,4 @@ interface DAppRouter {
     fun openExtrinsicDetails(extrinsicContent: String)
 
     fun openAuthorizedDApps()
-
-    fun back()
 }

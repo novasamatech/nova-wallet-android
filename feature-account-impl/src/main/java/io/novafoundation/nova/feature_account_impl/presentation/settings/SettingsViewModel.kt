@@ -144,6 +144,10 @@ class SettingsViewModel(
         router.openSwitchWallet()
     }
 
+    fun openWalletConnect() {
+        router.openWalletConnect()
+    }
+
     private fun openLink(link: String) {
         openBrowserEvent.value = link.event()
     }
