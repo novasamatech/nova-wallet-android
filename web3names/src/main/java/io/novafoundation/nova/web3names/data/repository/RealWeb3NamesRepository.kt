@@ -15,7 +15,6 @@ import io.novafoundation.nova.web3names.data.endpoints.TransferRecipientsApi
 import io.novafoundation.nova.web3names.data.endpoints.model.TransferRecipientRemote
 import io.novafoundation.nova.web3names.data.integrity.Web3NamesIntegrityVerifier
 import io.novafoundation.nova.web3names.data.provider.Web3NamesServiceChainIdProvider
-import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.*
 import io.novafoundation.nova.web3names.domain.models.Web3NameAccount
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
