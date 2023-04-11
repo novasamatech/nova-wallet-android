@@ -25,7 +25,14 @@ class NodeAutobalancer(
             autobalanceStrategyProvider.strategyFlowFor(chainId, nodesConfig.nodeSelectionStrategy).transform { strategy ->
                 Log.d(this@NodeAutobalancer.LOG_TAG, "Using ${nodesConfig.nodeSelectionStrategy} strategy for switching nodes in $chainId")
 
-                val nodeIterator = strategy.generateNodeSequence(nodesConfig.wssNodes()).iterator()
+                val wssNodes = nodesConfig.wssNodes()
+                if (wssNodes.isEmpty()) {
+                    Log.w(this@NodeAutobalancer.LOG_TAG, "No wss nodes available for chain $chainId")
+
+                    return@transform
+                }
+
+                val nodeIterator = strategy.generateNodeSequence(wssNodes).iterator()
 
                 emit(nodeIterator.next())
 
