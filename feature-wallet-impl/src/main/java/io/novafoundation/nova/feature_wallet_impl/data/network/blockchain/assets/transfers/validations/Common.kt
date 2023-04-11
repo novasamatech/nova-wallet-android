@@ -21,6 +21,7 @@ import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
 import java.math.BigDecimal
+import java.math.BigInteger
 
 fun AssetTransfersValidationSystemBuilder.positiveAmount() = positiveAmount(
     amount = { it.transfer.amount },
@@ -64,9 +65,9 @@ fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit(
 )
 
 fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOriginFee() = sufficientBalance(
-    fee = { it.originFee },
     available = { it.originCommissionAsset.transferable },
     amount = { it.sendingAmountInCommissionAsset },
+    fee = { it.originFee },
     error = { payload, availableToPayFees ->
         AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(
             chainAsset = payload.transfer.originChain.commissionAsset,
@@ -77,10 +78,10 @@ fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOrig
 )
 
 fun AssetTransfersValidationSystemBuilder.sufficientBalanceInUsedAsset() = sufficientBalance(
-    amount = { it.transfer.amount },
     available = { it.originUsedAsset.transferable },
-    error = { _, _ -> AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset },
-    fee = { it.originFeeInUsedAsset }
+    amount = { it.transfer.amount },
+    fee = { BigDecimal.ZERO },
+    error = { _, _ -> AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset }
 )
 
 private suspend fun AssetSourceRegistry.existentialDepositForUsedAsset(transfer: AssetTransfer): BigDecimal {
