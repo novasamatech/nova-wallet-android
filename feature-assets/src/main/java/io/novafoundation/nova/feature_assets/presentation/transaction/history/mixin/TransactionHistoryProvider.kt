@@ -15,8 +15,9 @@ import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi.State.ListState
-import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionStateMachine.Action
-import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionStateMachine.State
+import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.state_machine.TransactionStateMachine
+import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.state_machine.TransactionStateMachine.Action
+import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.state_machine.TransactionStateMachine.State
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.model.DayHeader
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
