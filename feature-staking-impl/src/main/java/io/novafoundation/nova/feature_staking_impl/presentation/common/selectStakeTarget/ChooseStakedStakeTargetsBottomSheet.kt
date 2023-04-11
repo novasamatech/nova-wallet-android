@@ -74,7 +74,7 @@ class ChooseStakedStakeTargetsBottomSheet<T : Identifiable>(
             val newCollatorAction = AccentActionView(context).apply {
                 layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
 
-                setDismissingClickListener { newStakeTargetClicked.invoke(Unit) }
+                setDismissingClickListener { newStakeTargetClicked.invoke(this@ChooseStakedStakeTargetsBottomSheet, Unit) }
 
                 setText(R.string.staking_parachain_new_collator)
                 setIcon(R.drawable.ic_add_circle)

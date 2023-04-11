@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionRequester
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -73,22 +74,32 @@ class SelectSendViewModel(
     private val addressInputMixinFactory: AddressInputMixinFactory,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
-    private val selectAddressRequester: SelectAddressForTransactionRequester
+    private val selectAddressRequester: SelectAddressForTransactionRequester,
+    private val externalActions: ExternalActions.Presentation
 ) : BaseViewModel(),
-    Validatable by validationExecutor {
+    Validatable by validationExecutor,
+    ExternalActions by externalActions {
 
     private val originChain by lazyAsync { chainRegistry.getChain(assetPayload.chainId) }
     private val originChainAsset by lazyAsync { chainRegistry.asset(assetPayload.chainId, assetPayload.chainAssetId) }
 
-    private val destinationChain = singleReplaySharedFlow<ChainWithAsset>()
+    private val destinationChainWithAsset = singleReplaySharedFlow<ChainWithAsset>()
 
     val addressInputMixin = with(addressInputMixinFactory) {
-        val destinationChain = destinationChain.map { it.chain }
+        val destinationChain = destinationChainWithAsset.map { it.chain }
+        val inputSpec = singleChainInputSpec(destinationChain)
+
         create(
             inputSpecProvider = singleChainInputSpec(destinationChain),
             myselfBehaviorProvider = crossChainOnlyMyself(originChain, destinationChain),
+            accountIdentifierProvider = web3nIdentifiers(
+                destinationChainFlow = destinationChainWithAsset,
+                inputSpecProvider = inputSpec,
+                coroutineScope = this@SelectSendViewModel,
+            ),
             errorDisplayer = this@SelectSendViewModel::showError,
-            coroutineScope = this@SelectSendViewModel
+            showAccountEvent = this@SelectSendViewModel::showAccountDetails,
+            coroutineScope = this@SelectSendViewModel,
         )
     }
 
@@ -100,14 +111,14 @@ class SelectSendViewModel(
         .onStart { emit(emptyList()) }
         .shareInBackground()
 
-    val isSelectAddressAvailable = destinationChain
+    val isSelectAddressAvailable = destinationChainWithAsset
         .map { metaAccountGroupingInteractor.hasAvailableMetaAccountsForDestination(assetPayload.chainId, it.chain.id) }
         .inBackground()
         .share()
 
     val transferDirectionModel = combine(
         availableCrossChainDestinations,
-        destinationChain,
+        destinationChainWithAsset,
         ::buildTransferDirectionModel
     ).shareInBackground()
 
@@ -149,6 +160,8 @@ class SelectSendViewModel(
     }
 
     init {
+        subscribeOnChangeDestination()
+
         subscribeOnSelectAddress()
 
         setInitialState()
@@ -163,9 +176,9 @@ class SelectSendViewModel(
             launch {
                 val payload = AssetTransferPayload(
                     transfer = buildTransfer(
-                        destination = destinationChain.first(),
+                        destination = destinationChainWithAsset.first(),
                         amount = amountChooserMixin.amount.first(),
-                        address = addressInputMixin.inputFlow.first()
+                        address = addressInputMixin.getAddress()
                     ),
                     originFee = originFee,
                     crossChainFee = crossChainFee,
@@ -199,22 +212,35 @@ class SelectSendViewModel(
         val payload = withContext(Dispatchers.Default) {
             SelectCrossChainDestinationBottomSheet.Payload(
                 destinations = buildDestinationsMap(destinations),
-                selectedChain = destinationChain.first().chain
+                selectedChain = destinationChainWithAsset.first().chain
             )
         }
 
         val newDestinationChain = chooseDestinationChain.awaitAction(payload)
 
-        destinationChain.emit(newDestinationChain)
+        destinationChainWithAsset.emit(newDestinationChain)
     }
 
     fun selectRecipientWallet() {
         launch {
             val selectedAddress = addressInputMixin.inputFlow.value
-            val currentDestination = destinationChain.first().chain
+            val currentDestination = destinationChainWithAsset.first().chain
             val request = SelectAddressForTransactionRequester.Request(assetPayload.chainId, currentDestination.id, selectedAddress)
             selectAddressRequester.openRequest(request)
         }
+    }
+
+    private fun showAccountDetails(address: String) {
+        launch {
+            val chain = destinationChainWithAsset.first().chain
+            externalActions.showExternalActions(ExternalActions.Type.Address(address), chain)
+        }
+    }
+
+    private fun subscribeOnChangeDestination() {
+        destinationChainWithAsset
+            .onEach { addressInputMixin.clearExtendedAccount() }
+            .launchIn(this)
     }
 
     private fun subscribeOnSelectAddress() {
@@ -228,7 +254,7 @@ class SelectSendViewModel(
     private fun setInitialState() = launch {
         initialRecipientAddress?.let { addressInputMixin.inputFlow.value = it }
 
-        destinationChain.emit(ChainWithAsset(originChain(), originChainAsset()))
+        destinationChainWithAsset.emit(ChainWithAsset(originChain(), originChainAsset()))
     }
 
     private fun syncCrossChainConfig() = launch {
@@ -245,7 +271,7 @@ class SelectSendViewModel(
     ) {
         connectWith(
             inputSource1 = amountChooserMixin.backPressuredAmount,
-            inputSource2 = destinationChain,
+            inputSource2 = destinationChainWithAsset,
             inputSource3 = addressInputMixin.inputFlow,
             scope = viewModelScope,
             feeConstructor = { amount, destinationChain, addressInput ->

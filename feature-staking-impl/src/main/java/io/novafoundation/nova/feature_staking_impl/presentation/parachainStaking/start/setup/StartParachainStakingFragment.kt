@@ -81,9 +81,9 @@ class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewMode
             ChooseStakedStakeTargetsBottomSheet(
                 context = requireContext(),
                 payload = action.payload,
-                stakedCollatorSelected = { action.onSuccess(ChooseCollatorResponse.Existing(it)) },
+                stakedCollatorSelected = { _, item -> action.onSuccess(ChooseCollatorResponse.Existing(item)) },
                 onCancel = action.onCancel,
-                newStakeTargetClicked = { action.onSuccess(ChooseCollatorResponse.New) }
+                newStakeTargetClicked = { _, _ -> action.onSuccess(ChooseCollatorResponse.New) }
             ).show()
         }
     }

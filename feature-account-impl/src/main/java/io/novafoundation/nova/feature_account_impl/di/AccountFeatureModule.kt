@@ -70,6 +70,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedDecoder
 import jp.co.soramitsu.fearless_utils.encrypt.json.JsonSeedEncoder
 import javax.inject.Named
@@ -280,14 +281,16 @@ class AccountFeatureModule {
         clipboardManager: ClipboardManager,
         multiChainQrSharingFactory: MultiChainQrSharingFactory,
         resourceManager: ResourceManager,
-        accountUseCase: SelectedAccountUseCase
+        accountUseCase: SelectedAccountUseCase,
+        web3NamesInteractor: Web3NamesInteractor
     ) = AddressInputMixinFactory(
         addressIconGenerator = addressIconGenerator,
         systemCallExecutor = systemCallExecutor,
         clipboardManager = clipboardManager,
         qrSharingFactory = multiChainQrSharingFactory,
         resourceManager = resourceManager,
-        accountUseCase = accountUseCase
+        accountUseCase = accountUseCase,
+        web3NamesInteractor = web3NamesInteractor
     )
 
     @Provides

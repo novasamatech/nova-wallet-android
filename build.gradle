@@ -32,6 +32,8 @@ buildscript {
 
         architectureComponentVersion = '2.2.0'
 
+        multibaseVersion = '1.1.1'
+
         retrofitVersion = '2.9.0'
         okhttpVersion = '3.8.0'
         gsonVersion = '2.8.2'
@@ -186,6 +188,8 @@ buildscript {
         markdownTables = "io.noties.markwon:ext-tables:$markdownVersion"
         markdownLinkify = "io.noties.markwon:linkify:$markdownVersion"
         markdownStrikethrough = "io.noties.markwon:ext-strikethrough:$markdownVersion"
+
+        multibaseDep = "com.github.multiformats:java-multibase:$multibaseVersion"
 
         walletConnectCoreDep = "com.walletconnect:android-core:$walletConnectCoreVersion"
         walletConnectWalletDep = "com.walletconnect:web3wallet:$walletConnectWalletVersion"

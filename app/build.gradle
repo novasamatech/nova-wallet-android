@@ -174,6 +174,7 @@ dependencies {
     implementation project(':feature-wallet-impl')
 
     implementation project(':runtime')
+    implementation project(':web3names')
 
     implementation project(':feature-staking-api')
     implementation project(':feature-staking-impl')
