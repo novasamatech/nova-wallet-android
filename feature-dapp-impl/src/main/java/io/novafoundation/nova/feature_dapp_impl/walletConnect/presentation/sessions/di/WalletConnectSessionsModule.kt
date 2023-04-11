@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_dapp_impl.walletConnect.presentation.sess
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
@@ -13,7 +14,10 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.WalletConnectScanCommunicator
+import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.session.KnownSessionRequestProcessor
+import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.session.RealKnownSessionRequestProcessor
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.session.RealWalletConnectSessionInteractor
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.session.WalletConnectSessionInteractor
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.presentation.sessions.WalletConnectSessionsViewModel
@@ -25,14 +29,20 @@ class WalletConnectSessionsModule {
 
     @Provides
     @ScreenScope
+    fun provideKnownRequestParser(gson: Gson): KnownSessionRequestProcessor = RealKnownSessionRequestProcessor(gson)
+
+    @Provides
+    @ScreenScope
     fun provideInteractor(
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        caip19MatcherFactory: Caip19MatcherFactory
+        caip19MatcherFactory: Caip19MatcherFactory,
+        knownSessionRequestProcessor: KnownSessionRequestProcessor
     ): WalletConnectSessionInteractor = RealWalletConnectSessionInteractor(
         accountRepository = accountRepository,
         chainRegistry = chainRegistry,
-        caip19MatcherFactory = caip19MatcherFactory
+        caip19MatcherFactory = caip19MatcherFactory,
+        sessionRequestParser = knownSessionRequestProcessor
     )
 
     @Provides
@@ -44,8 +54,9 @@ class WalletConnectSessionsModule {
         awaitableMixinFactory: ActionAwaitableMixin.Factory,
         walletUiUseCase: WalletUiUseCase,
         interactor: WalletConnectSessionInteractor,
+        dAppSignCommunicator: DAppSignCommunicator
     ): ViewModel {
-        return WalletConnectSessionsViewModel(router, communicator, awaitableMixinFactory, walletUiUseCase, interactor)
+        return WalletConnectSessionsViewModel(router, communicator, awaitableMixinFactory, walletUiUseCase, interactor, dAppSignCommunicator)
     }
 
     @Provides

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/ConfirmSignExtrinsicFragment"
+    android:id="@+id/external_sign_graph">
+
+    <fragment
+        android:id="@+id/ConfirmSignExtrinsicFragment"
+        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicFragment"
+        android:label="ConfirmSignExtrinsicFragment"
+        app:useAdd="true"
+        tools:layout="@layout/bottom_sheet_confirm_sign_extrinsic">
+
+        <action
+            android:id="@+id/action_ConfirmSignExtrinsicFragment_to_extrinsicDetailsFragment"
+            app:destination="@id/extrinsicDetailsFragment" />
+    </fragment>
+
+    <dialog
+        android:id="@+id/extrinsicDetailsFragment"
+        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.extrinsicDetails.DappExtrinsicDetailsFragment"
+        android:label="ExtrinsicDetailsFragment"
+        tools:layout="@layout/fragment_dapp_extrinsic_details" />
+</navigation>

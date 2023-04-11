@@ -94,7 +94,7 @@ class DAppSignExtrinsicFragment : BaseFragment<DAppSignViewModel>() {
         }
 
         viewModel.dAppInfo.observe {
-            confirmSignExtinsicIcon.showDAppIcon(it.metadata?.iconLink, imageLoader)
+            confirmSignExtinsicIcon.showDAppIcon(it?.metadata?.iconLink, imageLoader)
         }
 
         viewModel.performingOperationInProgress.observe { operationInProgress ->

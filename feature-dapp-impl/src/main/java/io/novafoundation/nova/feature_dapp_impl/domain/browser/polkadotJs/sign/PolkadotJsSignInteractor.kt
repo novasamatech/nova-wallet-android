@@ -44,6 +44,7 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Generic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.fromHex
+import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.fromUtf8
 import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.chain.RuntimeVersion
 import kotlinx.coroutines.Dispatchers
@@ -197,7 +198,11 @@ class PolkadotJsSignInteractor(
         // assumption - extension has access only to selected meta account
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val signer = signerProvider.signerFor(metaAccount)
-        val payload = SignerPayloadRaw.fromHex(signBytesPayload.data, substrateAccountId)
+        val payload = runCatching {
+            SignerPayloadRaw.fromHex(signBytesPayload.data, substrateAccountId)
+        }.getOrElse {
+            SignerPayloadRaw.fromUtf8(signBytesPayload.data, substrateAccountId)
+        }
 
         return signer.signRaw(payload).asHexString()
     }
