@@ -24,12 +24,13 @@ class AuthorizedDAppsInteractor(
 
     fun observeAuthorizedDApps(): Flow<List<AuthorizedDApp>> {
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
-            val dAppMetadatas = metadataRepository.getDAppMetadatas().associateBy(DappMetadata::baseUrl)
+            val catalog = metadataRepository.getDAppCatalog()
+            val dApps = catalog.dApps.associateBy(DappMetadata::baseUrl)
 
             web3Session.observeAuthorizationsFor(metaAccount.id)
                 .map { authorizations -> authorizations.filter { it.state == Authorization.State.ALLOWED } }
                 .mapList { authorization ->
-                    val metadata = dAppMetadatas[authorization.baseUrl]
+                    val metadata = dApps[authorization.baseUrl]
 
                     AuthorizedDApp(
                         baseUrl = authorization.baseUrl,
