@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.ethereum.contract.base.caller
 
 import io.novafoundation.nova.core.updater.EthereumSharedRequestsBuilder
+import io.novafoundation.nova.core.updater.callApiOrThrow
 import io.novafoundation.nova.runtime.ethereum.subscribtion.BatchId
 import org.web3j.protocol.core.DefaultBlockParameter
 import org.web3j.protocol.core.methods.request.Transaction
@@ -13,7 +14,7 @@ class BatchContractCaller(
 ) : ContractCaller {
 
     override fun ethCall(transaction: Transaction, defaultBlockParameter: DefaultBlockParameter): CompletableFuture<EthCall> {
-        val request = ethereumSharedRequestsBuilder.web3Api.ethCall(transaction, defaultBlockParameter)
+        val request = ethereumSharedRequestsBuilder.callApiOrThrow.ethCall(transaction, defaultBlockParameter)
 
         return ethereumSharedRequestsBuilder.ethBatchRequestAsync(batchId, request)
     }

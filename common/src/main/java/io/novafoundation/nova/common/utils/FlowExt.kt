@@ -401,6 +401,10 @@ inline fun <T> flowOfAll(crossinline producer: suspend () -> Flow<T>): Flow<T> =
     emitAll(producer())
 }
 
+inline fun <reified T> Iterable<Flow<T>>.combine(): Flow<List<T>> {
+    return combineIdentity(this)
+}
+
 inline fun <reified T> combineIdentity(flows: Iterable<Flow<T>>): Flow<List<T>> {
     return combine(flows) { it.toList() }
 }

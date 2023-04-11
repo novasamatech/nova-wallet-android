@@ -2,6 +2,7 @@ package io.novafoundation.nova.runtime.di
 
 import com.google.gson.Gson
 import io.novafoundation.nova.core.storage.StorageCache
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
@@ -71,4 +72,6 @@ interface RuntimeApi {
     val totalIssuanceRepository: TotalIssuanceRepository
 
     val extrinsicSplitter: ExtrinsicSplitter
+
+    val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
 }

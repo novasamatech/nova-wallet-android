@@ -88,6 +88,10 @@ data class Chain(
 
             object EvmNative : Type()
 
+            data class Equilibrium(
+                val id: BigInteger
+            ) : Type()
+
             object Unsupported : Type()
         }
 
@@ -116,6 +120,16 @@ data class Chain(
         val name: String,
         val orderId: Int,
     ) : Identifiable {
+
+        enum class ConnectionType {
+            HTTPS, WSS, UNKNOWN
+        }
+
+        val connectionType = when {
+            unformattedUrl.startsWith("wss://") -> ConnectionType.WSS
+            unformattedUrl.startsWith("https://") -> ConnectionType.HTTPS
+            else -> ConnectionType.UNKNOWN
+        }
 
         override val identifier: String = "$chainId:$unformattedUrl"
     }

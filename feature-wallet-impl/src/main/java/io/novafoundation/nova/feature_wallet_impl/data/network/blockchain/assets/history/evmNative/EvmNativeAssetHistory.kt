@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.evmNative
 
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.ethereumAddressToAccountId
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
@@ -16,8 +15,8 @@ import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.ethereumApi
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicStatus
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import org.web3j.protocol.core.methods.response.EthBlock
@@ -31,7 +30,6 @@ import kotlin.time.Duration.Companion.seconds
 class EvmNativeAssetHistory(
     private val chainRegistry: ChainRegistry,
     private val etherscanTransactionsApi: EtherscanTransactionsApi,
-    private val resourceManager: ResourceManager,
 ) : EvmAssetHistory() {
 
     override suspend fun fetchEtherscanOperations(
@@ -64,8 +62,9 @@ class EvmNativeAssetHistory(
         blockHash: String,
         accountId: AccountId
     ): Result<List<TransferExtrinsic>> = runCatching {
-        val web3Api = chainRegistry.ethereumApi(chain.id)
-        val block = web3Api.ethGetBlockByHash(blockHash, true).sendSuspend()
+        val ethereumApi = chainRegistry.awaitCallEthereumApiOrThrow(chain.id)
+
+        val block = ethereumApi.ethGetBlockByHash(blockHash, true).sendSuspend()
         val txs = block.block.transactions as List<TransactionResult<EthBlock.TransactionObject>>
 
         txs.mapNotNull {
@@ -76,7 +75,7 @@ class EvmNativeAssetHistory(
 
             if (!(isTransfer && relatesToUs)) return@mapNotNull null
 
-            val txReceipt = web3Api.ethGetTransactionReceipt(tx.hash).sendSuspend().transactionReceipt.getOrNull()
+            val txReceipt = ethereumApi.ethGetTransactionReceipt(tx.hash).sendSuspend().transactionReceipt.getOrNull()
 
             TransferExtrinsic(
                 senderId = chain.accountIdOf(tx.from),

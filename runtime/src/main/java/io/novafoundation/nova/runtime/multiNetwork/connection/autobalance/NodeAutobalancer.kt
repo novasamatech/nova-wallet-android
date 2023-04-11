@@ -2,6 +2,7 @@ package io.novafoundation.nova.runtime.multiNetwork.connection.autobalance
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.runtime.ext.wssNodes
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy.AutoBalanceStrategyProvider
@@ -24,7 +25,7 @@ class NodeAutobalancer(
             autobalanceStrategyProvider.strategyFlowFor(chainId, nodesConfig.nodeSelectionStrategy).transform { strategy ->
                 Log.d(this@NodeAutobalancer.LOG_TAG, "Using ${nodesConfig.nodeSelectionStrategy} strategy for switching nodes in $chainId")
 
-                val nodeIterator = strategy.generateNodeSequence(nodesConfig.nodes).iterator()
+                val nodeIterator = strategy.generateNodeSequence(nodesConfig.wssNodes()).iterator()
 
                 emit(nodeIterator.next())
 

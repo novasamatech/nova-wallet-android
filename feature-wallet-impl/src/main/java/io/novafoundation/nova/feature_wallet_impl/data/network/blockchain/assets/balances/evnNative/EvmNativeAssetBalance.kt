@@ -11,8 +11,9 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApiOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.awaitSubscriptionEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.ethereumApi
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -49,7 +50,7 @@ class EvmNativeAssetBalance(
     }
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
-        val ethereumApi = chainRegistry.ethereumApi(chain.id)
+        val ethereumApi = chainRegistry.awaitCallEthereumApiOrThrow(chain.id)
 
         return ethereumApi.getLatestNativeBalance(chain.addressOf(accountId))
     }
@@ -61,26 +62,32 @@ class EvmNativeAssetBalance(
         accountId: AccountId,
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<BalanceSyncUpdate> {
-        val ethereumApi = chainRegistry.ethereumApi(chain.id)
+        val subscriptionApi = chainRegistry.awaitSubscriptionEthereumApiOrThrow(chain.id)
+        val callApi = chainRegistry.awaitCallEthereumApiOrThrow(chain.id)
+
         val address = chain.addressOf(accountId)
 
-        return ethereumApi.balanceSyncUpdateFlow(address).map { balanceUpdate ->
+        return balanceSyncUpdateFlow(address, subscriptionApi, callApi).map { balanceUpdate ->
             assetCache.updateNonLockableAsset(metaAccount.id, chainAsset, balanceUpdate.newBalance)
 
             balanceUpdate.syncUpdate
         }
     }
 
-    private fun Web3Api.balanceSyncUpdateFlow(address: String): Flow<EvmNativeBalanceUpdate> {
+    private fun balanceSyncUpdateFlow(
+        address: String,
+        subscriptionApi: Web3Api,
+        callApi: Web3Api
+    ): Flow<EvmNativeBalanceUpdate> {
         return flow {
-            val initialBalance = getLatestNativeBalance(address)
+            val initialBalance = callApi.getLatestNativeBalance(address)
             emit(EvmNativeBalanceUpdate(initialBalance, BalanceSyncUpdate.NoCause))
 
             var currentBalance = initialBalance
 
-            val realtimeUpdates = newHeadsFlow().transform { newHead ->
+            val realtimeUpdates = subscriptionApi.newHeadsFlow().transform { newHead ->
                 val blockHash = newHead.params.result.hash
-                val newBalance = getLatestNativeBalance(address)
+                val newBalance = callApi.getLatestNativeBalance(address)
 
                 if (newBalance != currentBalance) {
                     currentBalance = newBalance

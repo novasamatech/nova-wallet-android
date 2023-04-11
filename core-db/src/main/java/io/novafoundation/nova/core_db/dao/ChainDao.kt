@@ -10,10 +10,10 @@ import androidx.room.Update
 import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
-import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import kotlinx.coroutines.flow.Flow
 
@@ -101,6 +101,10 @@ abstract class ChainDao {
     @Query("SELECT * FROM chains")
     @Transaction
     abstract suspend fun getJoinChainInfo(): List<JoinedChainInfo>
+
+    @Query("SELECT id FROM chains")
+    @Transaction
+    abstract suspend fun getAllChainIds(): List<String>
 
     @Query("SELECT * FROM chains")
     @Transaction

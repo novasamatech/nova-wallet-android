@@ -56,6 +56,20 @@ fun Chain.Asset.unifiedSymbol(): String {
     return symbol.removePrefix(MOONBEAM_XC_PREFIX)
 }
 
+val Chain.Node.isWss: Boolean
+    get() = connectionType == Chain.Node.ConnectionType.WSS
+
+val Chain.Node.isHttps: Boolean
+    get() = connectionType == Chain.Node.ConnectionType.HTTPS
+
+fun Chain.Nodes.wssNodes(): List<Chain.Node> {
+    return nodes.filter { it.isWss }
+}
+
+fun Chain.Nodes.httpNodes(): Chain.Nodes {
+    return copy(nodes = nodes.filter { it.isHttps })
+}
+
 val Chain.Asset.disabled: Boolean
     get() = !enabled
 
@@ -229,6 +243,12 @@ fun Chain.Asset.requireOrml(): Type.Orml {
 
 fun Chain.Asset.requireErc20(): Type.EvmErc20 {
     require(type is Type.EvmErc20)
+
+    return type
+}
+
+fun Chain.Asset.requireEquilibrium(): Type.Equilibrium {
+    require(type is Type.Equilibrium)
 
     return type
 }

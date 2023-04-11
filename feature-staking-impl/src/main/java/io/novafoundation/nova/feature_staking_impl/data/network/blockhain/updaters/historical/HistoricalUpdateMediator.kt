@@ -16,6 +16,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -43,6 +44,8 @@ class HistoricalUpdateMediator(
         val chainId = stakingSharedState.chainId()
         val runtime = chainRegistry.getRuntime(chainId)
 
+        val socketService = storageSubscriptionBuilder.socketService ?: return emptyFlow()
+
         return storageCache.observeActiveEraIndex(runtime, chainId)
             .map {
                 val allKeysNeeded = constructHistoricalKeys(chainId, runtime)
@@ -57,7 +60,7 @@ class HistoricalUpdateMediator(
                 val prefixes = historicalUpdaters.map { it.constructKeyPrefix(runtime) }
                 prefixes.onEach { storageCache.removeByPrefixExcept(prefixKey = it, fullKeyExceptions = allNeeded, chainId) }
 
-                bulkRetriever.fetchValuesToCache(storageSubscriptionBuilder.socketService, missing, storageCache, chainId)
+                bulkRetriever.fetchValuesToCache(socketService, missing, storageCache, chainId)
             }
             .noSideAffects()
     }
