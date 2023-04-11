@@ -10,13 +10,13 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.data.caip19.Caip19MatcherFactory
 import io.novafoundation.nova.web3names.data.caip19.Caip19Parser
+import io.novafoundation.nova.web3names.data.caip19.matchers.Caip19Matcher
 import io.novafoundation.nova.web3names.data.endpoints.TransferRecipientsApi
 import io.novafoundation.nova.web3names.data.endpoints.model.TransferRecipientRemote
 import io.novafoundation.nova.web3names.data.integrity.Web3NamesIntegrityVerifier
 import io.novafoundation.nova.web3names.data.provider.Web3NamesServiceChainIdProvider
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException
-import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.ChainProviderNotFoundException
-import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.IntegrityCheckFailed
+import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.*
 import io.novafoundation.nova.web3names.domain.models.Web3NameAccount
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
@@ -43,13 +43,16 @@ class RealWeb3NamesRepository(
 ) : Web3NamesRepository {
 
     override suspend fun queryWeb3NameAccount(web3Name: String, chain: Chain, chainAsset: Chain.Asset): List<Web3NameAccount> {
+        val caip19Matcher = caip19MatcherFactory.getCaip19Matcher(chain, chainAsset)
+        if (caip19Matcher.isUnsupported()) throw UnsupportedAsset(web3Name, chainAsset)
+
         val owner = getWeb3NameAccountOwner(web3Name) ?: throw ChainProviderNotFoundException(web3Name)
         val serviceEndpoints = getDidServiceEndpoints(owner)
         val transferRecipientEndpoint = serviceEndpoints.firstTransferRecipientsEndpoint() ?: throw ChainProviderNotFoundException(web3Name)
 
         val recipients = getRecipientsByChain(web3Name, transferRecipientEndpoint)
 
-        return findChainRecipients(recipients, web3Name, chain, chainAsset)
+        return findChainRecipients(recipients, web3Name, chain, caip19Matcher)
     }
 
     private suspend fun getWeb3NameAccountOwner(web3Name: String): AccountId? {
@@ -97,10 +100,8 @@ class RealWeb3NamesRepository(
         recipientsByChain: RecipientsByChain,
         w3nIdentifier: String,
         chain: Chain,
-        chainAsset: Chain.Asset
+        caip19Matcher: Caip19Matcher
     ): List<Web3NameAccount> {
-        val caip19Matcher = caip19MatcherFactory.getCaip19Matcher(chain, chainAsset)
-
         val matchingRecipients = recipientsByChain.filterKeys {
             val caip19Identifier = caip19Parser.parseCaip19(it).getOrNull() ?: return@filterKeys false
 
@@ -108,7 +109,7 @@ class RealWeb3NamesRepository(
         }
 
         if (matchingRecipients.isEmpty()) {
-            throw Web3NamesException.ValidAccountNotFoundException(w3nIdentifier, chain.name)
+            throw ValidAccountNotFoundException(w3nIdentifier, chain.name)
         }
 
         val web3NameAccounts = matchingRecipients.flatMap { (_, chainRecipients) -> chainRecipients }
@@ -121,7 +122,7 @@ class RealWeb3NamesRepository(
             }
 
         if (web3NameAccounts.none(Web3NameAccount::isValid)) {
-            throw Web3NamesException.ValidAccountNotFoundException(w3nIdentifier, chain.name)
+            throw ValidAccountNotFoundException(w3nIdentifier, chain.name)
         }
 
         return web3NameAccounts

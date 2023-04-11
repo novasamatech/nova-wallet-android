@@ -127,6 +127,12 @@ private fun BaseFragment<*>.handleError(event: ErrorEvent) {
                 exception.chainName
             )
         }
+        is Web3NamesException.UnsupportedAsset -> {
+            getString(R.string.web3names_unsupported_asset_title, exception.chainAsset.symbol) to getString(
+                R.string.web3names_unsupported_asset_message,
+                exception.chainAsset.symbol
+            )
+        }
     }
 
     showErrorWithTitle(
