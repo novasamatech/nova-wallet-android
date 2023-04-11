@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_dapp_impl.walletConnect.presentation.scan.
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.presentation.sessions.di.WalletConnectSessionsComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
+import io.novafoundation.nova.web3names.di.Web3NamesApi
 
 @Component(
     dependencies = [
@@ -74,7 +75,8 @@ interface DAppFeatureComponent : DAppFeatureApi {
             AccountFeatureApi::class,
             WalletFeatureApi::class,
             RuntimeApi::class,
-            CurrencyFeatureApi::class
+            CurrencyFeatureApi::class,
+            Web3NamesApi::class
         ]
     )
     interface DAppFeatureDependenciesComponent : DAppFeatureDependencies

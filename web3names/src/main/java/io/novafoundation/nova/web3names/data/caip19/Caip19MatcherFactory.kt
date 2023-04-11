@@ -1,8 +1,11 @@
 package io.novafoundation.nova.web3names.data.caip19
 
+import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type.EvmErc20
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type.Unsupported
+import io.novafoundation.nova.web3names.data.caip19.identifiers.Caip2Identifier
+import io.novafoundation.nova.web3names.data.caip19.identifiers.Caip2Namespace
 import io.novafoundation.nova.web3names.data.caip19.matchers.Caip19Matcher
 import io.novafoundation.nova.web3names.data.caip19.matchers.asset.AssetMatcher
 import io.novafoundation.nova.web3names.data.caip19.matchers.asset.Erc20AssetMatcher
@@ -17,6 +20,8 @@ import io.novafoundation.nova.web3names.data.caip19.repositories.Slip44CoinRepos
 interface Caip19MatcherFactory {
 
     suspend fun getCaip19Matcher(chain: Chain, chainAsset: Chain.Asset): Caip19Matcher
+
+    fun caip2Of(chain: Chain, preferredNamespace: Caip2Namespace): String?
 }
 
 class RealCaip19MatcherFactory(private val slip44CoinRepository: Slip44CoinRepository) :
@@ -27,6 +32,29 @@ class RealCaip19MatcherFactory(private val slip44CoinRepository: Slip44CoinRepos
         val assetNamespaceMatcher = getAssetNamespaceMatcher(chainAsset)
 
         return Caip19Matcher(caip2Matcher, assetNamespaceMatcher)
+    }
+
+    override fun caip2Of(chain: Chain, preferredNamespace: Caip2Namespace): String? {
+       return when {
+           chain.hasSubstrateRuntime && chain.isEthereumBased -> when(preferredNamespace) {
+               Caip2Namespace.EIP155 -> eipChain(chain.addressPrefix)
+               Caip2Namespace.POLKADOT -> polkadotChain(chain.genesisHash!!)
+           }
+
+           chain.hasSubstrateRuntime -> polkadotChain(chain.genesisHash!!)
+
+           chain.isEthereumBased -> eipChain(chain.addressPrefix)
+
+           else -> null
+       }
+    }
+
+    private fun polkadotChain(genesisHash: String): String {
+        return Caip2Identifier.Polkadot(genesisHash).namespaceWitId
+    }
+
+    private fun eipChain(eipChainId: Int): String {
+        return Caip2Identifier.Eip155(eipChainId.toBigInteger()).namespaceWitId
     }
 
     private fun getCaip2Matcher(chain: Chain): Caip2Matcher {
