@@ -28,7 +28,7 @@ class NodeAutobalancer(
                 val wssNodes = nodesConfig.wssNodes()
                 if (wssNodes.isEmpty()) {
                     Log.w(this@NodeAutobalancer.LOG_TAG, "No wss nodes available for chain $chainId")
-                    
+
                     return@transform
                 }
 
