@@ -2,7 +2,6 @@ package io.novafoundation.nova.runtime.multiNetwork.connection
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
-import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.NodeAutobalancer
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
@@ -26,6 +25,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Provider
 
 class ChainConnectionFactory(
@@ -94,27 +94,29 @@ class ChainConnection internal constructor(
         availableNodesFlow = availableNodes,
     ).shareIn(scope = this, started = SharingStarted.Eagerly, replay = 1)
 
-    suspend fun setup() {
+    fun setup() {
         socketService.setInterceptor(this)
 
-        observeCurrentNode()
+        launch {
+            observeCurrentNode()
 
-        externalRequirementFlow.onEach {
-            if (it == ExternalRequirement.ALLOWED) {
-                socketService.resume()
-            } else {
-                socketService.pause()
+            externalRequirementFlow.onEach {
+                if (it == ExternalRequirement.ALLOWED) {
+                    socketService.resume()
+                } else {
+                    socketService.pause()
+                }
             }
+                .launchIn(this)
         }
-            .launchIn(this)
     }
 
     private suspend fun observeCurrentNode() {
-        val firstNodeUrl = currentNode.first().formattedUrl() ?: return
+        val firstNodeUrl = connectionSecrets.saturateUrl(currentNode.first().unformattedUrl) ?: return
         socketService.start(firstNodeUrl, remainPaused = true)
 
         currentNode
-            .mapNotNull { node -> node.formattedUrl() }
+            .mapNotNull { node -> connectionSecrets.saturateUrl(node.unformattedUrl) }
             .filter { nodeUrl -> actualUrl() != nodeUrl }
             .onEach { nodeUrl -> socketService.switchUrl(nodeUrl) }
             .onEach { nodeUrl -> Log.d(this@ChainConnection.LOG_TAG, "Switching node in ${chain.name} to $nodeUrl") }
@@ -129,10 +131,6 @@ class ChainConnection internal constructor(
         cancel()
 
         socketService.stop()
-    }
-
-    private fun Chain.Node.formattedUrl(): String? {
-        return runCatching { unformattedUrl.formatNamed(connectionSecrets) }.getOrNull()
     }
 
     private suspend fun actualUrl(): String? {

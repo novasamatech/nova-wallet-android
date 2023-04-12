@@ -12,19 +12,25 @@ import java.util.concurrent.CompletableFuture
 
 interface SubstrateSubscriptionBuilder {
 
+    val socketService: SocketService?
+
     fun subscribe(key: String): Flow<StorageChange>
 }
 
 interface EthereumSharedRequestsBuilder {
 
-    val web3Api: Web3Api
+    val callApi: Web3Api?
+
+    val subscriptionApi: Web3Api?
 
     fun <S, T : Response<*>> ethBatchRequestAsync(batchId: String, request: Request<S, T>): CompletableFuture<T>
 
     fun subscribeEthLogs(address: String, topics: List<Topic>): Flow<LogNotification>
 }
 
-interface SharedRequestsBuilder : SubstrateSubscriptionBuilder, EthereumSharedRequestsBuilder {
+val EthereumSharedRequestsBuilder.callApiOrThrow: Web3Api
+    get() = requireNotNull(callApi) {
+        "Chain doesn't have any ethereum apis available"
+    }
 
-    val socketService: SocketService
-}
+interface SharedRequestsBuilder : SubstrateSubscriptionBuilder, EthereumSharedRequestsBuilder

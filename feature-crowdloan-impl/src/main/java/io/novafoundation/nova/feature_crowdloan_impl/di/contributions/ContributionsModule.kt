@@ -14,17 +14,18 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRep
 import io.novafoundation.nova.feature_crowdloan_api.data.source.contribution.ExternalContributionSource
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
-import io.novafoundation.nova.feature_crowdloan_impl.data.network.updater.RealContributionsUpdaterFactory
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.AcalaApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.parallel.ParallelApi
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.updater.AssetBalanceScopeFactory
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.updater.RealContributionsUpdateSystemFactory
+import io.novafoundation.nova.feature_crowdloan_impl.data.network.updater.RealContributionsUpdaterFactory
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.LiquidAcalaContributionSource
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.source.ParallelContributionSource
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.RealContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contributions.RealContributionsRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
@@ -105,12 +106,14 @@ class ContributionsModule {
         accountUpdateScope: AccountUpdateScope,
         contributionsUpdaterFactory: ContributionsUpdaterFactory,
         chainRegistry: ChainRegistry,
-        assetBalanceScopeFactory: AssetBalanceScopeFactory
+        assetBalanceScopeFactory: AssetBalanceScopeFactory,
+        storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     ): ContributionsUpdateSystemFactory = RealContributionsUpdateSystemFactory(
         chainRegistry = chainRegistry,
         accountUpdateScope = accountUpdateScope,
         contributionsUpdaterFactory = contributionsUpdaterFactory,
-        assetBalanceScopeFactory = assetBalanceScopeFactory
+        assetBalanceScopeFactory = assetBalanceScopeFactory,
+        storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory
     )
 
     @Provides

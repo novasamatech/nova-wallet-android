@@ -5,12 +5,11 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core.updater.Updater
-import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.subscribe
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -24,12 +23,12 @@ import kotlin.coroutines.coroutineContext
 abstract class SingleChainUpdateSystem(
     private val chainRegistry: ChainRegistry,
     private val singleAssetSharedState: SingleAssetSharedState,
+    private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : UpdateSystem {
 
     abstract fun getUpdaters(chain: Chain, chainAsset: Chain.Asset): List<Updater>
 
     override fun start(): Flow<Updater.SideEffect> = singleAssetSharedState.assetWithChain.flatMapLatest { (chain, chainAsset) ->
-        val socket = chainRegistry.getSocket(chain.id)
         val runtimeMetadata = chainRegistry.getRuntime(chain.id).metadata
 
         val logTag = this@SingleChainUpdateSystem.LOG_TAG
@@ -39,7 +38,7 @@ abstract class SingleChainUpdateSystem(
 
         val scopeFlows = updaters.groupBy(Updater::scope).map { (scope, scopeUpdaters) ->
             scope.invalidationFlow().flatMapLatest {
-                val subscriptionBuilder = StorageSharedRequestsBuilder.create(socket)
+                val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
 
                 val updatersFlow = scopeUpdaters
                     .filter { it.requiredModules.all(runtimeMetadata::hasModule) }
@@ -67,7 +66,8 @@ class ConstantSingleChainUpdateSystem(
     private val updaters: List<Updater>,
     chainRegistry: ChainRegistry,
     singleAssetSharedState: SingleAssetSharedState,
-) : SingleChainUpdateSystem(chainRegistry, singleAssetSharedState) {
+    storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
+) : SingleChainUpdateSystem(chainRegistry, singleAssetSharedState, storageSharedRequestsBuilderFactory) {
 
     override fun getUpdaters(chain: Chain, chainAsset: Chain.Asset): List<Updater> {
         return updaters

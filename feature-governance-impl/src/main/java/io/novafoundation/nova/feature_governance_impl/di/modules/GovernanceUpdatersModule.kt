@@ -7,6 +7,7 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
 import io.novafoundation.nova.runtime.network.updaters.BlockTimeUpdater
@@ -27,13 +28,14 @@ class GovernanceUpdatersModule {
         inactiveIssuanceUpdater: InactiveIssuanceUpdater,
         blockNumberUpdater: BlockNumberUpdater,
         blockTimeUpdater: BlockTimeUpdater,
-
         chainRegistry: ChainRegistry,
         singleAssetSharedState: GovernanceSharedState,
+        storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     ): UpdateSystem = ConstantSingleChainUpdateSystem(
         updaters = listOf(totalIssuanceUpdater, inactiveIssuanceUpdater, blockNumberUpdater, blockTimeUpdater),
         chainRegistry = chainRegistry,
-        singleAssetSharedState = singleAssetSharedState
+        singleAssetSharedState = singleAssetSharedState,
+        storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
     )
 
     @Provides

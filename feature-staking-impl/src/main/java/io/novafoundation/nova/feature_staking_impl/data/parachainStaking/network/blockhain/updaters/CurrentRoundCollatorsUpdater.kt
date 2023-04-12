@@ -17,6 +17,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -30,6 +31,8 @@ class CurrentRoundCollatorsUpdater(
 ) : GlobalScopeUpdater, ParachainStakingUpdater {
 
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
+        val socketService = storageSubscriptionBuilder.socketService ?: return emptyFlow()
+
         val chainId = stakingSharedState.chainId()
         val runtime = chainRegistry.getRuntime(chainId)
 
@@ -37,7 +40,7 @@ class CurrentRoundCollatorsUpdater(
             .map { runtime.collatorSnapshotPrefixFor(it.current) }
             .filterNot { storageCache.isPrefixInCache(it, chainId) }
             .onEach { cleanupPreviousRounds(runtime, chainId) }
-            .onEach { updateCollatorsPerRound(it, storageSubscriptionBuilder.socketService, chainId) }
+            .onEach { updateCollatorsPerRound(it, socketService, chainId) }
             .noSideAffects()
     }
 

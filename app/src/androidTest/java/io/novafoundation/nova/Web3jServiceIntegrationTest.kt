@@ -1,18 +1,17 @@
 package io.novafoundation.nova
 
 import android.util.Log
-import io.novafoundation.nova.runtime.ethereum.Web3Api
-import io.novafoundation.nova.runtime.ethereum.WebSocketWeb3jService
-import io.novafoundation.nova.runtime.ethereum.contract.base.querySingle
-import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Queries
-import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
-import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.ethereum.log.Topic
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.runtime.multiNetwork.awaitSocket
+import io.novafoundation.nova.runtime.ethereum.contract.base.querySingle
+import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Queries
+import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
+import io.novafoundation.nova.runtime.ethereum.sendSuspend
+import io.novafoundation.nova.runtime.multiNetwork.awaitEthereumApiOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
@@ -132,9 +131,7 @@ class Web3jServiceIntegrationTest : BaseIntegrationTest() {
 
     private suspend fun moonbeamWeb3j(): Web3Api {
         val moonbeamChainId = "fe58ea77779b7abda7da4ec526d14db9b1e9cd40a217c34892af80a9b332b76d"
-        val moonbeamSocket = chainRegistry.awaitSocket(moonbeamChainId)
-        val moonbeamService = WebSocketWeb3jService(moonbeamSocket)
 
-        return Web3Api(moonbeamService)
+        return chainRegistry.awaitEthereumApiOrThrow(moonbeamChainId, Chain.Node.ConnectionType.WSS)
     }
 }

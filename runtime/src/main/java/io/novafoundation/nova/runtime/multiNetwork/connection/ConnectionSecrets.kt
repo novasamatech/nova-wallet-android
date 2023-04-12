@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.connection
 
+import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.runtime.BuildConfig
 
 class ConnectionSecrets(private val secretsByName: Map<String, String>) : Map<String, String> by secretsByName {
@@ -14,4 +15,8 @@ class ConnectionSecrets(private val secretsByName: Map<String, String>) : Map<St
             )
         }
     }
+}
+
+fun ConnectionSecrets.saturateUrl(url: String): String? {
+    return runCatching { url.formatNamed(this) }.getOrNull()
 }
