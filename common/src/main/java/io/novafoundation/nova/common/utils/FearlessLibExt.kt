@@ -161,6 +161,8 @@ fun RuntimeMetadata.system() = module(Modules.SYSTEM)
 
 fun RuntimeMetadata.balances() = module(Modules.BALANCES)
 
+fun RuntimeMetadata.eqBalances() = module(Modules.EQ_BALANCES)
+
 fun RuntimeMetadata.tokens() = module(Modules.TOKENS)
 
 fun RuntimeMetadata.currencies() = module(Modules.CURRENCIES)
@@ -236,6 +238,7 @@ private fun cropSeedTo32Bytes(seedResult: SeedFactory.Result): SeedFactory.Resul
 fun GenericCall.Instance.oneOf(vararg functionCandidates: MetadataFunction?): Boolean {
     return functionCandidates.any { candidate -> candidate != null && function == candidate }
 }
+
 fun GenericCall.Instance.instanceOf(functionCandidate: MetadataFunction): Boolean = function == functionCandidate
 
 fun GenericCall.Instance.instanceOf(moduleName: String, callName: String): Boolean = moduleName == module.name && callName == function.name
@@ -257,6 +260,7 @@ object Modules {
     const val VESTING: String = "Vesting"
     const val STAKING = "Staking"
     const val BALANCES = "Balances"
+    const val EQ_BALANCES = "EqBalances"
     const val SYSTEM = "System"
     const val CROWDLOAN = "Crowdloan"
     const val BABE = "Babe"

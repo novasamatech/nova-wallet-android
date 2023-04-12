@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
         OrmlAssetsModule::class,
         EvmErc20AssetsModule::class,
         EvmNativeAssetsModule::class,
+        EquilibriumAssetsModule::class,
         UnsupportedAssetsModule::class
     ]
 )
@@ -28,6 +29,7 @@ class AssetsModule {
         @OrmlAssets orml: Lazy<AssetSource>,
         @EvmErc20Assets evmErc20: Lazy<AssetSource>,
         @EvmNativeAssets evmNative: Lazy<AssetSource>,
+        @EquilibriumAsset equilibrium: Lazy<AssetSource>,
         @UnsupportedAssets unsupported: AssetSource,
     ): AssetSourceRegistry = TypeBasedAssetSourceRegistry(
         nativeSource = native,
@@ -35,6 +37,7 @@ class AssetsModule {
         ormlSource = orml,
         evmErc20Source = evmErc20,
         evmNativeSource = evmNative,
+        equilibriumAssetSource = equilibrium,
         unsupportedBalanceSource = unsupported
     )
 }

@@ -71,8 +71,8 @@ abstract class BaseAssetTransfers(
 
         positiveAmount()
 
-        sufficientTransferableBalanceToPayOriginFee()
         sufficientBalanceInUsedAsset()
+        sufficientTransferableBalanceToPayOriginFee()
 
         sufficientCommissionBalanceToStayAboveED(assetSourceRegistry)
 

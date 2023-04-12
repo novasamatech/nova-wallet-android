@@ -88,6 +88,10 @@ data class Chain(
 
             object EvmNative : Type()
 
+            data class Equilibrium(
+                val id: BigInteger
+            ) : Type()
+
             object Unsupported : Type()
         }
 

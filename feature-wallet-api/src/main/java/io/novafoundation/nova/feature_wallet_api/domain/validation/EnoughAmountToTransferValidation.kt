@@ -17,7 +17,7 @@ interface NotEnoughToPayFeesError {
     val fee: BigDecimal
 }
 
-class EnoughToPayFeesValidation<P, E>(
+class EnoughAmountToTransferValidation<P, E>(
     private val feeExtractor: AmountProducer<P>,
     private val availableBalanceProducer: AmountProducer<P>,
     private val errorProducer: (P, availableToPayFees: BigDecimal) -> E,
@@ -51,7 +51,7 @@ fun <P, E> ValidationSystemBuilder<P, E>.sufficientBalance(
     error: (P, availableToPayFees: BigDecimal) -> E,
     skippable: Boolean = false
 ) = validate(
-    EnoughToPayFeesValidation(
+    EnoughAmountToTransferValidation(
         feeExtractor = fee,
         extraAmountExtractor = amount,
         errorProducer = error,
