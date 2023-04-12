@@ -14,8 +14,11 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.equilibrium.EquilibriumAssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.equilibrium.EquilibriumAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.equilibrium.EquilibriumAssetTransfers
+import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
+import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 import javax.inject.Qualifier
@@ -50,7 +53,12 @@ class EquilibriumAssetsModule {
 
     @Provides
     @FeatureScope
-    fun provideHistory() = EquilibriumAssetHistory()
+    fun provideHistory(
+        chainRegistry: ChainRegistry,
+        eventsRepository: EventsRepository,
+        subQueryOperationsApi: SubQueryOperationsApi,
+        cursorStorage: TransferCursorStorage
+    ) = EquilibriumAssetHistory(chainRegistry, eventsRepository, subQueryOperationsApi, cursorStorage)
 
     @Provides
     @EquilibriumAsset

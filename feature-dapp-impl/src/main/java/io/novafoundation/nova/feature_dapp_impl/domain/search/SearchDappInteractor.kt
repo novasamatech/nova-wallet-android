@@ -15,10 +15,10 @@ class SearchDappInteractor(
 ) {
 
     suspend fun searchDapps(query: String): GroupedList<DappSearchGroup, DappSearchResult> = withContext(Dispatchers.Default) {
-        val dAppMetadatas = dAppMetadataRepository.getDAppMetadatas()
+        val catalog = dAppMetadataRepository.getDAppCatalog()
         val favouriteDApps = favouritesDAppRepository.getFavourites()
 
-        val dAppByUrlMapping = buildUrlToDappMapping(dAppMetadatas, favouriteDApps)
+        val dAppByUrlMapping = buildUrlToDappMapping(catalog.dApps, favouriteDApps)
         val allDApps = dAppByUrlMapping.values
 
         val dappsGroupContent = allDApps.filter { query.isEmpty() || query.lowercase() in it.name.lowercase() }

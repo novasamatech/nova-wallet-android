@@ -42,8 +42,8 @@ class EquilibriumAssetTransfers(
         get() = ValidationSystem {
             validAddress()
             positiveAmount()
-            sufficientTransferableBalanceToPayOriginFee()
             sufficientBalanceInUsedAsset()
+            sufficientTransferableBalanceToPayOriginFee()
         }
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
