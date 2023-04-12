@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.WillRemoveAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeInUsedAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.sendingAmountInCommissionAsset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.AmountProducer
@@ -63,9 +64,9 @@ fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit(
 )
 
 fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOriginFee() = sufficientBalance(
+    fee = { it.originFee },
     available = { it.originCommissionAsset.transferable },
     amount = { it.sendingAmountInCommissionAsset },
-    fee = { it.originFee },
     error = { payload, availableToPayFees ->
         AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(
             chainAsset = payload.transfer.originChain.commissionAsset,
@@ -76,10 +77,10 @@ fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOrig
 )
 
 fun AssetTransfersValidationSystemBuilder.sufficientBalanceInUsedAsset() = sufficientBalance(
-    available = { it.originUsedAsset.transferable },
     amount = { it.transfer.amount },
-    fee = { BigDecimal.ZERO },
-    error = { _, _ -> AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset }
+    available = { it.originUsedAsset.transferable },
+    error = { _, _ -> AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset },
+    fee = { it.originFeeInUsedAsset }
 )
 
 private suspend fun AssetSourceRegistry.existentialDepositForUsedAsset(transfer: AssetTransfer): BigDecimal {
@@ -97,6 +98,5 @@ private fun Chain.Asset.existentialDepositError(amount: BigDecimal): WillRemoveA
     is Type.Orml -> WillRemoveAccount.WillBurnDust
     is Type.Statemine -> WillRemoveAccount.WillTransferDust(amount)
     is Type.EvmErc20, is Type.EvmNative -> WillRemoveAccount.WillBurnDust
-    is Type.Equilibrium -> WillRemoveAccount.WillBurnDust
     Type.Unsupported -> throw IllegalArgumentException("Unsupported")
 }

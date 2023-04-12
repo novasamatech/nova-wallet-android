@@ -2,9 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.domain.validations.controlle
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.validations.AccountIsNotControllerValidation
-import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughAmountToTransferValidation
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughToPayFeesValidation
 
-typealias SetControllerFeeValidation = EnoughAmountToTransferValidation<SetControllerValidationPayload, SetControllerValidationFailure>
+typealias SetControllerFeeValidation = EnoughToPayFeesValidation<SetControllerValidationPayload, SetControllerValidationFailure>
 typealias IsNotControllerAccountValidation = AccountIsNotControllerValidation<SetControllerValidationPayload, SetControllerValidationFailure>
 
 typealias SetControllerValidationSystem = ValidationSystem<SetControllerValidationPayload, SetControllerValidationFailure>

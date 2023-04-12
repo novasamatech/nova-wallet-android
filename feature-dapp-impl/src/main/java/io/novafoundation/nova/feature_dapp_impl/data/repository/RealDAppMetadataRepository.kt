@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.retryUntilDone
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.model.BrowserHostSettingsLocal
-import io.novafoundation.nova.feature_dapp_api.data.model.DappCatalog
 import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDAppMetadataResponseToDAppMetadatas
@@ -22,7 +21,7 @@ class RealDAppMetadataRepository(
     private val browserHostSettingsDao: BrowserHostSettingsDao
 ) : DAppMetadataRepository {
 
-    private val dappMetadatasFlow = MutableSharedFlow<DappCatalog>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val dappMetadatasFlow = MutableSharedFlow<List<DappMetadata>>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     override suspend fun syncDAppMetadatas() {
         val response = retryUntilDone { dappMetadataApi.getParachainMetadata(remoteApiUrl) }
@@ -32,28 +31,22 @@ class RealDAppMetadataRepository(
     }
 
     override suspend fun getDAppMetadata(baseUrl: String): DappMetadata? {
-        return dappMetadatasFlow.first()
-            .dApps
-            .find { it.baseUrl == baseUrl }
+        return dappMetadatasFlow.first().find { it.baseUrl == baseUrl }
     }
 
     override suspend fun findDAppMetadataByExactUrlMatch(fullUrl: String): DappMetadata? {
-        return dappMetadatasFlow.first()
-            .dApps
-            .find { it.url == fullUrl }
+        return dappMetadatasFlow.first().find { it.url == fullUrl }
     }
 
     override suspend fun findDAppMetadatasByBaseUrlMatch(baseUrl: String): List<DappMetadata> {
-        return dappMetadatasFlow.first()
-            .dApps
-            .filter { it.baseUrl == baseUrl }
+        return dappMetadatasFlow.first().filter { it.baseUrl == baseUrl }
     }
 
-    override suspend fun getDAppCatalog(): DappCatalog {
+    override suspend fun getDAppMetadatas(): List<DappMetadata> {
         return dappMetadatasFlow.first()
     }
 
-    override fun observeDAppCatalog(): Flow<DappCatalog> {
+    override fun observeDAppMetadatas(): Flow<List<DappMetadata>> {
         return dappMetadatasFlow
     }
 

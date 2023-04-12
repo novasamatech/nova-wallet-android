@@ -4,9 +4,9 @@ import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PositiveAmountValidation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.UnbondingRequestsLimitValidation
-import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughAmountToTransferValidation
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughToPayFeesValidation
 
-typealias UnbondFeeValidation = EnoughAmountToTransferValidation<UnbondValidationPayload, UnbondValidationFailure>
+typealias UnbondFeeValidation = EnoughToPayFeesValidation<UnbondValidationPayload, UnbondValidationFailure>
 typealias NotZeroUnbondValidation = PositiveAmountValidation<UnbondValidationPayload, UnbondValidationFailure>
 typealias UnbondLimitValidation = UnbondingRequestsLimitValidation<UnbondValidationPayload, UnbondValidationFailure>
 

@@ -3,7 +3,6 @@ package io.novafoundation.nova.core_db.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import java.math.BigInteger
 
@@ -32,7 +31,7 @@ data class AssetLocal(
     val bondedInPlanks: BigInteger,
     val redeemableInPlanks: BigInteger,
     val unbondingInPlanks: BigInteger,
-) : Identifiable {
+) {
     companion object {
         fun createEmpty(
             assetId: Int,
@@ -50,7 +49,4 @@ data class AssetLocal(
             unbondingInPlanks = BigInteger.ZERO
         )
     }
-
-    override val identifier: String
-        get() = "$metaId:$chainId:$assetId"
 }

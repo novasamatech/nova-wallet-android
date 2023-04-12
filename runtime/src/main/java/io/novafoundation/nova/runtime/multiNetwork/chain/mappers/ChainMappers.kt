@@ -46,9 +46,6 @@ private const val ASSET_UNSUPPORTED = "unsupported"
 private const val ASSET_EVM_ERC20 = "evm"
 private const val ASSET_EVM_NATIVE = "evmNative"
 
-private const val ASSET_EQUILIBRIUM = "equilibrium"
-private const val ASSET_EQUILIBRIUM_ON_CHAIN_ID = "assetId"
-
 private const val STATEMINE_EXTRAS_ID = "assetId"
 private const val STATEMINE_EXTRAS_PALLET_NAME = "palletName"
 
@@ -95,8 +92,6 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
 
         ASSET_EVM_NATIVE -> Chain.Asset.Type.EvmNative
 
-        ASSET_EQUILIBRIUM -> Chain.Asset.Type.Equilibrium((typeExtras!![ASSET_EQUILIBRIUM_ON_CHAIN_ID] as String).toBigInteger())
-
         else -> Chain.Asset.Type.Unsupported
     }
 }
@@ -121,10 +116,6 @@ fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any
     )
 
     is Chain.Asset.Type.EvmNative -> ASSET_EVM_NATIVE to null
-
-    is Chain.Asset.Type.Equilibrium -> ASSET_EQUILIBRIUM to mapOf(
-        ASSET_EQUILIBRIUM_ON_CHAIN_ID to type.id.toString()
-    )
 
     Chain.Asset.Type.Unsupported -> ASSET_UNSUPPORTED to null
 }

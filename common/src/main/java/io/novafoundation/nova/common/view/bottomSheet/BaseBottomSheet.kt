@@ -2,8 +2,6 @@ package io.novafoundation.nova.common.view.bottomSheet
 
 import android.content.Context
 import android.content.DialogInterface
-import android.os.Bundle
-import android.view.View
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -25,14 +23,6 @@ abstract class BaseBottomSheet(context: Context, style: Int = R.style.BottomShee
 
     final override val dialogInterface: DialogInterface
         get() = this
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        window?.decorView
-            ?.findViewById<View>(R.id.touch_outside)
-            ?.isFocusable = false
-    }
 
     init {
         backgroundAccessObserver = FeatureUtils.getCommonApi(context)

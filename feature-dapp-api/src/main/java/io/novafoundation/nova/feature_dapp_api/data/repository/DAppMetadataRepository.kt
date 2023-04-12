@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_dapp_api.data.repository
 
-import io.novafoundation.nova.feature_dapp_api.data.model.DappCatalog
 import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
 import kotlinx.coroutines.flow.Flow
 
@@ -14,7 +13,7 @@ interface DAppMetadataRepository {
 
     suspend fun findDAppMetadatasByBaseUrlMatch(baseUrl: String): List<DappMetadata>
 
-    suspend fun getDAppCatalog(): DappCatalog
+    suspend fun getDAppMetadatas(): List<DappMetadata>
 
-    fun observeDAppCatalog(): Flow<DappCatalog>
+    fun observeDAppMetadatas(): Flow<List<DappMetadata>>
 }
