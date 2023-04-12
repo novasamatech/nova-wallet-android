@@ -9,6 +9,8 @@
     <string name="web3names_integrity_check_failed_title">Integrity check failed</string>
     <string name="web3names_integrity_check_failed_message">Nova detected issues with integrity of information about %1$s addresses. Please contact owner of %1$s to resolve integrity issues.</string>
 
+    <string name="web3names_unsupported_asset_title">Token %s is not supported yet</string>
+    <string name="web3names_unsupported_asset_message">Nova can\'t resolve code for token %s</string>
     <string name="common_unknown_error_title">Unknown error</string>
     <string name="common_unknown_error_message">Something went wrong. Please try again later.</string>
     <string name="web3names_address_with_description">%s (%s)</string>

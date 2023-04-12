@@ -1,4 +1,3 @@
-
 package io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.providers
 
 import androidx.lifecycle.MutableLiveData
@@ -9,6 +8,7 @@ import io.novafoundation.nova.common.presentation.toShortAddressFormat
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
+import io.novafoundation.nova.common.utils.removeSpacing
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.AccountIdentifierProvider
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.AccountIdentifierProvider.Event.ErrorEvent
@@ -140,7 +140,7 @@ class Web3NameIdentifierProvider(
             _selectedExternalAccountFlow.value = externalAccounts.first()
         } else if (externalAccounts.size > 1) {
             eventsLiveData.value = ShowBottomSheetEvent(
-                web3NameInteractor.removePrefix(w3nIdentifier),
+                w3nIdentifier.removeSpacing(),
                 chainName,
                 externalAccounts,
                 _selectedExternalAccountFlow.value

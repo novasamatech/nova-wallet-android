@@ -1,5 +1,6 @@
 package io.novafoundation.nova.web3names.domain.exceptions
 
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.extensions.requirePrefix
 
 sealed class Web3NamesException(identifier: String) : Exception() {
@@ -13,4 +14,6 @@ sealed class Web3NamesException(identifier: String) : Exception() {
     class ValidAccountNotFoundException(identifier: String, val chainName: String) : Web3NamesException(identifier)
 
     class UnknownException(web3NameInput: String, val chainName: String) : Web3NamesException(web3NameInput)
+
+    class UnsupportedAsset(identifier: String, val chainAsset: Chain.Asset) : Web3NamesException(identifier)
 }
