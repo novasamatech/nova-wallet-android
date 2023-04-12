@@ -12,7 +12,7 @@ interface WalletConnectScanResponder : InterScreenResponder<WalletConnectScanCom
 interface WalletConnectScanCommunicator : WalletConnectScanRequester, WalletConnectScanResponder {
 
     @Parcelize
-    class Request: Parcelable
+    class Request : Parcelable
 
     @Parcelize
     class Response(val wcUri: String) : Parcelable

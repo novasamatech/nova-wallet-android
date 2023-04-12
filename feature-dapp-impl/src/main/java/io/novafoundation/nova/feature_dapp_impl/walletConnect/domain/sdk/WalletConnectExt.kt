@@ -35,11 +35,11 @@ fun Wallet.Model.SessionRequest.approved(result: String): Wallet.Params.SessionR
 
 class WalletConnectError(val code: Int, val message: String) {
 
-   companion object {
-       val REJECTED = WalletConnectError(5000, "Rejected by user")
+    companion object {
+        val REJECTED = WalletConnectError(5000, "Rejected by user")
 
-       val GENERAL_FAILURE = WalletConnectError(0, "Unknown error")
-   }
+        val GENERAL_FAILURE = WalletConnectError(0, "Unknown error")
+    }
 }
 
 fun Wallet.Model.SessionRequest.failed(error: WalletConnectError): Wallet.Params.SessionRequestResponse {

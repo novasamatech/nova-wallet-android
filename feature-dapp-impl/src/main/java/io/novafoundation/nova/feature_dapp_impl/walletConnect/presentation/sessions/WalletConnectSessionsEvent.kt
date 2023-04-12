@@ -12,43 +12,43 @@ import kotlinx.coroutines.flow.shareIn
 
 sealed class WalletConnectSessionsEvent {
 
-    data class SessionProposal(val proposal: Wallet.Model.SessionProposal): WalletConnectSessionsEvent()
+    data class SessionProposal(val proposal: Wallet.Model.SessionProposal) : WalletConnectSessionsEvent()
 
-    data class SessionRequest(val request: Wallet.Model.SessionRequest): WalletConnectSessionsEvent()
+    data class SessionRequest(val request: Wallet.Model.SessionRequest) : WalletConnectSessionsEvent()
 }
 
 fun Web3Wallet.sessionEventsFlow(scope: CoroutineScope): Flow<WalletConnectSessionsEvent> {
-   return callbackFlow {
-       setWalletDelegate(object : Web3Wallet.WalletDelegate {
+    return callbackFlow {
+        setWalletDelegate(object : Web3Wallet.WalletDelegate {
 
-           override fun onAuthRequest(authRequest: Wallet.Model.AuthRequest) {
-           }
+            override fun onAuthRequest(authRequest: Wallet.Model.AuthRequest) {
+            }
 
-           override fun onConnectionStateChange(state: Wallet.Model.ConnectionState) {
-           }
+            override fun onConnectionStateChange(state: Wallet.Model.ConnectionState) {
+            }
 
-           override fun onError(error: Wallet.Model.Error) {
-               Log.e("WalletConnect", "Wallet Connect error", error.throwable)
-           }
+            override fun onError(error: Wallet.Model.Error) {
+                Log.e("WalletConnect", "Wallet Connect error", error.throwable)
+            }
 
-           override fun onSessionDelete(sessionDelete: Wallet.Model.SessionDelete) {
-           }
+            override fun onSessionDelete(sessionDelete: Wallet.Model.SessionDelete) {
+            }
 
-           override fun onSessionProposal(sessionProposal: Wallet.Model.SessionProposal) {
-               channel.trySend(WalletConnectSessionsEvent.SessionProposal(sessionProposal))
-           }
+            override fun onSessionProposal(sessionProposal: Wallet.Model.SessionProposal) {
+                channel.trySend(WalletConnectSessionsEvent.SessionProposal(sessionProposal))
+            }
 
-           override fun onSessionRequest(sessionRequest: Wallet.Model.SessionRequest) {
-               channel.trySend(WalletConnectSessionsEvent.SessionRequest(sessionRequest))
-           }
+            override fun onSessionRequest(sessionRequest: Wallet.Model.SessionRequest) {
+                channel.trySend(WalletConnectSessionsEvent.SessionRequest(sessionRequest))
+            }
 
-           override fun onSessionSettleResponse(settleSessionResponse: Wallet.Model.SettledSessionResponse) {
-           }
+            override fun onSessionSettleResponse(settleSessionResponse: Wallet.Model.SettledSessionResponse) {
+            }
 
-           override fun onSessionUpdateResponse(sessionUpdateResponse: Wallet.Model.SessionUpdateResponse) {
-           }
-       })
+            override fun onSessionUpdateResponse(sessionUpdateResponse: Wallet.Model.SessionUpdateResponse) {
+            }
+        })
 
-       awaitClose { }
-   }.shareIn(scope, SharingStarted.Eagerly)
+        awaitClose { }
+    }.shareIn(scope, SharingStarted.Eagerly)
 }

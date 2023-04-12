@@ -52,7 +52,7 @@ class RealKnownSessionRequestProcessor(
         return KnownSessionRequest(request.id.toString(), params, sessionRequest)
     }
 
-    override fun prepareResponse(request: KnownSessionRequest, response: DAppSignCommunicator.Response) : SessionRequestResponse {
+    override fun prepareResponse(request: KnownSessionRequest, response: DAppSignCommunicator.Response): SessionRequestResponse {
         return when (response) {
             is DAppSignCommunicator.Response.Rejected -> request.sessionRequest.rejected()
 

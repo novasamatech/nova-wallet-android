@@ -35,18 +35,18 @@ class RealCaip19MatcherFactory(private val slip44CoinRepository: Slip44CoinRepos
     }
 
     override fun caip2Of(chain: Chain, preferredNamespace: Caip2Namespace): String? {
-       return when {
-           chain.hasSubstrateRuntime && chain.isEthereumBased -> when(preferredNamespace) {
-               Caip2Namespace.EIP155 -> eipChain(chain.addressPrefix)
-               Caip2Namespace.POLKADOT -> polkadotChain(chain.genesisHash!!)
-           }
+        return when {
+            chain.hasSubstrateRuntime && chain.isEthereumBased -> when (preferredNamespace) {
+                Caip2Namespace.EIP155 -> eipChain(chain.addressPrefix)
+                Caip2Namespace.POLKADOT -> polkadotChain(chain.genesisHash!!)
+            }
 
-           chain.hasSubstrateRuntime -> polkadotChain(chain.genesisHash!!)
+            chain.hasSubstrateRuntime -> polkadotChain(chain.genesisHash!!)
 
-           chain.isEthereumBased -> eipChain(chain.addressPrefix)
+            chain.isEthereumBased -> eipChain(chain.addressPrefix)
 
-           else -> null
-       }
+            else -> null
+        }
     }
 
     private fun polkadotChain(genesisHash: String): String {
