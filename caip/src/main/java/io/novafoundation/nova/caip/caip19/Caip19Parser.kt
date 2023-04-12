@@ -15,7 +15,7 @@ interface Caip19Parser {
 
 internal class RealCaip19Parser(
     private val caip2Parser: Caip2Parser,
-): Caip19Parser {
+) : Caip19Parser {
 
     override fun parseCaip19(caip19Identifier: String): Result<Caip19Identifier> = runCatching {
         val (chain, asset) = caip19Identifier.splitToNamespaces()

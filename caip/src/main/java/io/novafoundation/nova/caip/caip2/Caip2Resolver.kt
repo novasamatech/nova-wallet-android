@@ -10,7 +10,7 @@ interface Caip2Resolver {
     fun caip2Of(chain: Chain, preferredNamespace: Caip2Namespace): Caip2Identifier?
 }
 
-internal class RealCaip2Resolver: Caip2Resolver {
+internal class RealCaip2Resolver : Caip2Resolver {
 
     override fun caip2Of(chain: Chain, preferredNamespace: Caip2Namespace): Caip2Identifier? {
         return when {
