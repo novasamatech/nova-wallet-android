@@ -50,9 +50,9 @@ class RealWeb3NamesRepository(
 
         val owner = getWeb3NameAccountOwner(web3Name) ?: throw ChainProviderNotFoundException(web3Name)
         val serviceEndpoints = getDidServiceEndpoints(owner)
-        val transferRecipientEndpoint = serviceEndpoints.firstTransferRecipientsEndpoint() ?: throw ChainProviderNotFoundException(web3Name)
+        val transferRecipientEndpoint = serviceEndpoints.firstTransferRecipientsEndpoint() ?: throw ValidAccountNotFoundException(web3Name, chain.name)
 
-        val recipients = getRecipientsByChain(web3Name, transferRecipientEndpoint)
+        val recipients = getRecipientsByChain(web3Name, transferRecipientEndpoint, chain)
 
         return findChainRecipients(recipients, web3Name, chain, caip19Matcher)
     }
@@ -83,8 +83,9 @@ class RealWeb3NamesRepository(
     private suspend fun getRecipientsByChain(
         w3nIdentifier: String,
         endpoint: ServiceEndpoint,
+        chain: Chain
     ): RecipientsByChain {
-        val url = endpoint.urls.firstOrNull() ?: throw ChainProviderNotFoundException(w3nIdentifier)
+        val url = endpoint.urls.firstOrNull() ?: throw ValidAccountNotFoundException(w3nIdentifier, chain.name)
         val recipientsContent = transferRecipientApi.getTransferRecipientsRaw(url)
 
         if (!web3NamesIntegrityVerifier.verifyIntegrity(serviceEndpointId = endpoint.id, serviceEndpointContent = recipientsContent)) {
