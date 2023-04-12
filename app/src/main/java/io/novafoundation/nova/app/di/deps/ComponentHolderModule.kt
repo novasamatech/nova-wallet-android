@@ -7,6 +7,8 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.app.App
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootFeatureHolder
+import io.novafoundation.nova.caip.di.CaipApi
+import io.novafoundation.nova.caip.di.CaipFeatureHolder
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -159,4 +161,10 @@ interface ComponentHolderModule {
     @ClassKey(VersionsFeatureApi::class)
     @IntoMap
     fun provideVersionsFeature(holder: VersionsFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(CaipApi::class)
+    @IntoMap
+    fun provideCaipFeature(holder: CaipFeatureHolder): FeatureApiHolder
 }

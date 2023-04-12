@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.session
 import com.walletconnect.web3.wallet.client.Wallet
 import com.walletconnect.web3.wallet.client.Wallet.Model.SessionProposal
 import com.walletconnect.web3.wallet.client.Web3Wallet
+import io.novafoundation.nova.caip.caip2.Caip2Resolver
+import io.novafoundation.nova.caip.caip2.identifier.Caip2Namespace
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
@@ -13,8 +15,6 @@ import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.sdk.rejectS
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.sdk.rejected
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.sdk.respondSessionRequest
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.web3names.data.caip19.Caip19MatcherFactory
-import io.novafoundation.nova.web3names.data.caip19.identifiers.Caip2Namespace
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -33,7 +33,7 @@ interface WalletConnectSessionInteractor {
 class RealWalletConnectSessionInteractor(
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
-    private val caip19MatcherFactory: Caip19MatcherFactory,
+    private val caip2Resolver: Caip2Resolver,
     private val sessionRequestParser: KnownSessionRequestProcessor,
 ) : WalletConnectSessionInteractor {
 
@@ -49,7 +49,7 @@ class RealWalletConnectSessionInteractor(
             val namespace = Caip2Namespace.find(namespaceRaw) ?: return@mapValuesNotNull null
             val requestedChains = namespaceProposal.chains ?: return@mapValuesNotNull null
 
-            val chainByCaip2 = localChains.associateBy { caip19MatcherFactory.caip2Of(it, preferredNamespace = namespace) }
+            val chainByCaip2 = localChains.associateBy { chain -> caip2Resolver.caip2Of(chain, preferredNamespace = namespace)?.namespaceWitId }
 
             val supportedChainsWithAccounts = requestedChains.mapNotNull { requestedChain ->
                 val chain = chainByCaip2[requestedChain] ?: return@mapNotNull null
