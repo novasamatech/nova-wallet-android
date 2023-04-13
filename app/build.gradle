@@ -203,6 +203,9 @@ dependencies {
 
     implementation project(':caip')
 
+    implementation project(':feature-external-sign-api')
+    implementation project(':feature-external-sign-impl')
+
     implementation kotlinDep
 
     implementation androidDep

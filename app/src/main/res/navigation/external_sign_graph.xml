@@ -7,10 +7,10 @@
 
     <fragment
         android:id="@+id/ConfirmSignExtrinsicFragment"
-        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicFragment"
+        android:name="io.novafoundation.nova.feature_external_sign_impl.presentation.signExtrinsic.ExternalSignFragment"
         android:label="ConfirmSignExtrinsicFragment"
         app:useAdd="true"
-        tools:layout="@layout/bottom_sheet_confirm_sign_extrinsic">
+        tools:layout="@layout/fragment_confirm_sign_extrinsic">
 
         <action
             android:id="@+id/action_ConfirmSignExtrinsicFragment_to_extrinsicDetailsFragment"
@@ -19,7 +19,7 @@
 
     <dialog
         android:id="@+id/extrinsicDetailsFragment"
-        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.extrinsicDetails.DappExtrinsicDetailsFragment"
+        android:name="io.novafoundation.nova.feature_external_sign_impl.presentation.extrinsicDetails.ExternalExtrinsicDetailsFragment"
         android:label="ExtrinsicDetailsFragment"
         tools:layout="@layout/fragment_dapp_extrinsic_details" />
 </navigation>

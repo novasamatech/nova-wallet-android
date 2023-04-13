@@ -24,6 +24,8 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_currency_impl.di.CurrencyFeatureHolder
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureHolder
+import io.novafoundation.nova.feature_external_sign_api.di.ExternalSignFeatureApi
+import io.novafoundation.nova.feature_external_sign_impl.di.ExternalSignFeatureHolder
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureHolder
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
@@ -167,4 +169,10 @@ interface ComponentHolderModule {
     @ClassKey(CaipApi::class)
     @IntoMap
     fun provideCaipFeature(holder: CaipFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(ExternalSignFeatureApi::class)
+    @IntoMap
+    fun provideExternalSignFeature(holder: ExternalSignFeatureHolder): FeatureApiHolder
 }

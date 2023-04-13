@@ -8,12 +8,12 @@ import io.novafoundation.nova.caip.caip2.identifier.Caip2Namespace
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.sdk.approveSession
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.sdk.approved
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.sdk.rejectSession
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.sdk.rejected
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.sdk.respondSessionRequest
+import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -27,7 +27,7 @@ interface WalletConnectSessionInteractor {
 
     suspend fun parseSessionRequest(request: Wallet.Model.SessionRequest): Result<KnownSessionRequest>
 
-    suspend fun respondSessionRequest(request: KnownSessionRequest, result: DAppSignCommunicator.Response): Result<Unit>
+    suspend fun respondSessionRequest(request: KnownSessionRequest, result: ExternalSignCommunicator.Response): Result<Unit>
 }
 
 class RealWalletConnectSessionInteractor(
@@ -83,7 +83,7 @@ class RealWalletConnectSessionInteractor(
         }
     }
 
-    override suspend fun respondSessionRequest(request: KnownSessionRequest, result: DAppSignCommunicator.Response): Result<Unit> = runCatching {
+    override suspend fun respondSessionRequest(request: KnownSessionRequest, result: ExternalSignCommunicator.Response): Result<Unit> = runCatching {
         withContext(Dispatchers.Default) {
             val response = sessionRequestParser.prepareResponse(request, result)
 
