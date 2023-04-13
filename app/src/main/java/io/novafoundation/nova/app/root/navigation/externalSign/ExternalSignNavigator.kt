@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_external_sign_impl.presentation.extrinsicD
 
 class ExternalSignNavigator(
     navigationHolder: NavigationHolder
-): BaseNavigator(navigationHolder), ExternalSignRouter {
+) : BaseNavigator(navigationHolder), ExternalSignRouter {
 
     override fun openExtrinsicDetails(extrinsicContent: String) = performNavigation(
         actionId = R.id.action_ConfirmSignExtrinsicFragment_to_extrinsicDetailsFragment,

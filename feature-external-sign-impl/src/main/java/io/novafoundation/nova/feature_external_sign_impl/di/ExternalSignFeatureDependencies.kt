@@ -47,7 +47,6 @@ interface ExternalSignFeatureDependencies {
     @ExtrinsicSerialization
     fun extrinsicGson(): Gson
 
-
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     val walletUiUseCase: WalletUiUseCase

@@ -28,15 +28,14 @@ sealed class EvmSignPayload : Parcelable {
 }
 
 @Parcelize
-class EvmChainSource(val evmChainId: Int, val unknownChainOptions: UnknownChainOptions): Parcelable {
+class EvmChainSource(val evmChainId: Int, val unknownChainOptions: UnknownChainOptions) : Parcelable {
 
-    sealed class UnknownChainOptions : Parcelable  {
-
-        @Parcelize
-        object MustBeKnown: UnknownChainOptions()
+    sealed class UnknownChainOptions : Parcelable {
 
         @Parcelize
-        class WithFallBack(val evmChain: EvmChain): UnknownChainOptions()
+        object MustBeKnown : UnknownChainOptions()
+
+        @Parcelize
+        class WithFallBack(val evmChain: EvmChain) : UnknownChainOptions()
     }
 }
-

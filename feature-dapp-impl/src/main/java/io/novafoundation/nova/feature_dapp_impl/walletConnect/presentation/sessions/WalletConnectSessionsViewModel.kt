@@ -124,7 +124,7 @@ class WalletConnectSessionsViewModel(
         }
     }
 
-    private fun mapWalletConnectSessionToSignDAppMetadata(session: Wallet.Model.Session) : SigningDappMetadata? {
+    private fun mapWalletConnectSessionToSignDAppMetadata(session: Wallet.Model.Session): SigningDappMetadata? {
         return session.metaData?.run {
             SigningDappMetadata(
                 icon = icons.firstOrNull(),

@@ -16,7 +16,7 @@ class SigningDappMetadata(
     val icon: String?,
     val name: String?,
     val url: String
-): Parcelable
+) : Parcelable
 
 sealed interface ExternalSignRequest : Parcelable {
 
@@ -24,7 +24,6 @@ sealed interface ExternalSignRequest : Parcelable {
 
     @Parcelize
     class Polkadot(override val id: String, val payload: PolkadotSignPayload) : ExternalSignRequest
-
 
     @Parcelize
     class Evm(override val id: String, val payload: EvmSignPayload) : ExternalSignRequest

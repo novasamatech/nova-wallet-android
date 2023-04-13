@@ -52,8 +52,8 @@ fun mapRawPayloadToSignerPayloadRaw(
 }
 
 fun mapPolkadotJsSignerPayloadToPolkadotPayload(signerPayload: SignerPayload): PolkadotSignPayload {
-    return when(signerPayload) {
-        is SignerPayload.Json -> with(signerPayload){
+    return when (signerPayload) {
+        is SignerPayload.Json -> with(signerPayload) {
             PolkadotSignPayload.Json(
                 address = address,
                 blockHash = blockHash,
