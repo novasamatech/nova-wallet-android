@@ -69,7 +69,8 @@ class RealKnownSessionRequestProcessor(
             }
 
             is ExternalSignCommunicator.Response.SigningFailed -> request.sessionRequest.failed(
-                WalletConnectError.GENERAL_FAILURE)
+                WalletConnectError.GENERAL_FAILURE
+            )
         }
     }
 
