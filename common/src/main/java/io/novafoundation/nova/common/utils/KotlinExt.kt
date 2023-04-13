@@ -147,6 +147,8 @@ fun <T> Set<T>.toggle(item: T): Set<T> = if (item in this) {
 }
 
 fun <T> List<T>.cycle(): Sequence<T> {
+    if (isEmpty()) return emptySequence()
+
     var i = 0
 
     return generateSequence { this[i++ % this.size] }

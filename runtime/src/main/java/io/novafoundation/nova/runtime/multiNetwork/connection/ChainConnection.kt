@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Provider
 
 class ChainConnectionFactory(
@@ -93,19 +94,21 @@ class ChainConnection internal constructor(
         availableNodesFlow = availableNodes,
     ).shareIn(scope = this, started = SharingStarted.Eagerly, replay = 1)
 
-    suspend fun setup() {
+    fun setup() {
         socketService.setInterceptor(this)
 
-        observeCurrentNode()
+        launch {
+            observeCurrentNode()
 
-        externalRequirementFlow.onEach {
-            if (it == ExternalRequirement.ALLOWED) {
-                socketService.resume()
-            } else {
-                socketService.pause()
+            externalRequirementFlow.onEach {
+                if (it == ExternalRequirement.ALLOWED) {
+                    socketService.resume()
+                } else {
+                    socketService.pause()
+                }
             }
+                .launchIn(this)
         }
-            .launchIn(this)
     }
 
     private suspend fun observeCurrentNode() {
