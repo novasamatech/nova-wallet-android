@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_dapp_impl.di
 
 import dagger.BindsInstance
 import dagger.Component
-import io.novafoundation.nova.caip.di.CaipApi
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
@@ -16,9 +15,6 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.di.DAp
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.di.MainDAppComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.di.DAppSearchComponent
-import io.novafoundation.nova.feature_dapp_impl.walletConnect.WalletConnectScanCommunicator
-import io.novafoundation.nova.feature_dapp_impl.walletConnect.presentation.scan.di.WalletConnectScanComponent
-import io.novafoundation.nova.feature_dapp_impl.walletConnect.presentation.sessions.di.WalletConnectSessionsComponent
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -46,10 +42,6 @@ interface DAppFeatureComponent : DAppFeatureApi {
 
     fun authorizedDAppsComponentFactory(): AuthorizedDAppsComponent.Factory
 
-    fun walletConnectSessionsComponentFactory(): WalletConnectSessionsComponent.Factory
-
-    fun walletConnectScanComponentFactory(): WalletConnectScanComponent.Factory
-
     @Component.Factory
     interface Factory {
 
@@ -57,7 +49,6 @@ interface DAppFeatureComponent : DAppFeatureApi {
             @BindsInstance router: DAppRouter,
             @BindsInstance signCommunicator: ExternalSignCommunicator,
             @BindsInstance searchCommunicator: DAppSearchCommunicator,
-            @BindsInstance walletConnectScanCommunicator: WalletConnectScanCommunicator,
             deps: DAppFeatureDependencies
         ): DAppFeatureComponent
     }
@@ -70,7 +61,6 @@ interface DAppFeatureComponent : DAppFeatureApi {
             WalletFeatureApi::class,
             RuntimeApi::class,
             CurrencyFeatureApi::class,
-            CaipApi::class
         ]
     )
     interface DAppFeatureDependenciesComponent : DAppFeatureDependencies

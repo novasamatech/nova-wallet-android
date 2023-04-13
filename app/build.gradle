@@ -206,6 +206,9 @@ dependencies {
     implementation project(':feature-external-sign-api')
     implementation project(':feature-external-sign-impl')
 
+    implementation project(':feature-wallet-connect-api')
+    implementation project(':feature-wallet-connect-impl')
+
     implementation kotlinDep
 
     implementation androidDep

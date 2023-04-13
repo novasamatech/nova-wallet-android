@@ -6,6 +6,8 @@ apply from: '../tests.gradle'
 apply from: "../scripts/secrets.gradle"
 
 android {
+    namespace 'io.novafoundation.nova.feature_wallet_connect_impl'
+
     compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
@@ -13,18 +15,12 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-        buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/dapps/dapps_dev.json\""
-
-        buildConfigField "String", "WALLET_CONNECT_PROJECT_ID", readSecret("WALLET_CONNECT_PROJECT_ID")
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
-            buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/dapps/dapps_full.json\""
         }
     }
 
@@ -38,29 +34,15 @@ android {
     }
 }
 
-task actualizeJsScripts(type: Exec) {
-    workingDir "$rootDir/nova-wallet-dapp-js"
-
-    commandLine "yarn", "build"
-
-    doLast {
-        copy {
-            from "$rootDir/nova-wallet-dapp-js/dist/nova_min.js"
-            into "$rootDir/feature-dapp-impl/src/main/res/raw"
-        }
-    }
-}
-
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':core-db')
     implementation project(':common')
-    implementation project(':feature-onboarding-api')
     implementation project(':feature-account-api')
     implementation project(':feature-wallet-api')
-    implementation project(':feature-dapp-api')
-    implementation project(':feature-currency-api')
     implementation project(':feature-external-sign-api')
+    implementation project(':feature-currency-api')
+    implementation project(':feature-wallet-connect-api')
+    implementation project(':caip')
     implementation project(':runtime')
 
     implementation kotlinDep
