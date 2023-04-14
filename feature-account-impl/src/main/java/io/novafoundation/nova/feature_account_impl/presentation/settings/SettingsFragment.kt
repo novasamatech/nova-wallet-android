@@ -23,6 +23,8 @@ import kotlinx.android.synthetic.main.fragment_profile.settingsGithub
 import kotlinx.android.synthetic.main.fragment_profile.settingsLanguage
 import kotlinx.android.synthetic.main.fragment_profile.settingsNetworks
 import kotlinx.android.synthetic.main.fragment_profile.settingsPin
+import kotlinx.android.synthetic.main.fragment_profile.settingsPinCodeVerification
+import kotlinx.android.synthetic.main.fragment_profile.settingsPinCodeVerificationContainer
 import kotlinx.android.synthetic.main.fragment_profile.settingsPrivacy
 import kotlinx.android.synthetic.main.fragment_profile.settingsRateUs
 import kotlinx.android.synthetic.main.fragment_profile.settingsSafeModeContainer
@@ -66,6 +68,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         settingsEmail.setOnClickListener { viewModel.emailClicked() }
         settingsRateUs.setOnClickListener { viewModel.rateUsClicked() }
 
+        settingsPinCodeVerificationContainer.setOnClickListener { viewModel.changePincodeVerification() }
         settingsSafeModeContainer.setOnClickListener { viewModel.changeSafeMode() }
         settingsPin.setOnClickListener { viewModel.changePinCodeClicked() }
 
@@ -83,7 +86,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
     }
 
     override fun subscribe(viewModel: SettingsViewModel) {
-        setupSafeModeConfirmation(viewModel.safeModeAwaitableAction)
+        setupSettingsConfirmationDialog(viewModel.confirmationAwaitableAction)
         observeBrowserEvents(viewModel)
 
         viewModel.selectedWalletModel.observe {
@@ -99,6 +102,10 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
 
         viewModel.selectedLanguageFlow.observe {
             settingsLanguage.setValue(it.displayName)
+        }
+
+        viewModel.pinCodeVerificationStatus.observe {
+            settingsPinCodeVerification.isChecked = it
         }
 
         viewModel.safeModeStatus.observe {

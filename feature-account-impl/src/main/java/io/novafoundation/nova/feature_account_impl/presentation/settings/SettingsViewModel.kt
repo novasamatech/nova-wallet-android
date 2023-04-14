@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
@@ -34,10 +35,11 @@ class SettingsViewModel(
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val currencyInteractor: CurrencyInteractor,
     private val safeModeService: SafeModeService,
-    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val twoFactorVerificationService: TwoFactorVerificationService
 ) : BaseViewModel(), Browserable {
 
-    val safeModeAwaitableAction = actionAwaitableMixinFactory.confirmingAction<Unit>()
+    val confirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<SettingsConfirmationData>()
 
     val selectedWalletModel = selectedAccountUseCase.selectedWalletModelFlow()
         .shareInBackground()
@@ -60,6 +62,8 @@ class SettingsViewModel(
     }
         .inBackground()
         .share()
+
+    val pinCodeVerificationStatus = twoFactorVerificationService.stateFlow()
 
     val safeModeStatus = safeModeService.safeModeStatusFlow()
 
@@ -84,10 +88,30 @@ class SettingsViewModel(
         router.openLanguages()
     }
 
+    fun changePincodeVerification() {
+        launch {
+            if (!twoFactorVerificationService.isEnabled()) {
+                confirmationAwaitableAction.awaitAction(
+                    SettingsConfirmationData(
+                        R.string.settings_pin_code_verification_confirmation_title,
+                        R.string.settings_pin_code_verification_confirmation_message
+                    )
+                )
+            }
+
+            twoFactorVerificationService.toggle()
+        }
+    }
+
     fun changeSafeMode() {
         launch {
             if (!safeModeService.isSafeModeEnabled()) {
-                safeModeAwaitableAction.awaitAction()
+                confirmationAwaitableAction.awaitAction(
+                    SettingsConfirmationData(
+                        R.string.settings_safe_mode_confirmation_title,
+                        R.string.settings_safe_mode_confirmation_message
+                    )
+                )
             }
 
             safeModeService.toggleSafeMode()

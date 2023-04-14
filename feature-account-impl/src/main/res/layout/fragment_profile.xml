@@ -110,6 +110,30 @@
             android:layout_height="wrap_content">
 
             <FrameLayout
+                android:id="@+id/settingsPinCodeVerificationContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/settingsPinCodeVerification"
+                    style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:drawableStart="@drawable/approve_with_pin"
+                    android:drawablePadding="12dp"
+                    android:drawableTint="@color/icon_accent"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:minHeight="48dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="@string/profile_settings_pin_code_verification_title"
+                    android:textColor="@color/text_primary" />
+
+            </FrameLayout>
+
+            <FrameLayout
                 android:id="@+id/settingsSafeModeContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">

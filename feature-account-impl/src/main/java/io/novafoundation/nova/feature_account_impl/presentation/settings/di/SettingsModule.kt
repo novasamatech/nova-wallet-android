@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -35,6 +36,7 @@ class SettingsModule {
         currencyInteractor: CurrencyInteractor,
         safeModeService: SafeModeService,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        twoFactorVerificationService: TwoFactorVerificationService
     ): ViewModel {
         return SettingsViewModel(
             accountInteractor,
@@ -45,7 +47,8 @@ class SettingsModule {
             selectedAccountUseCase,
             currencyInteractor,
             safeModeService,
-            actionAwaitableMixinFactory
+            actionAwaitableMixinFactory,
+            twoFactorVerificationService
         )
     }
 

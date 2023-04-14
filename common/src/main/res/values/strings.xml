@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="settings_pin_code_verification_confirmation_title">Ask authentication for operation signing</string>
+    <string name="settings_pin_code_verification_confirmation_message">Each sign operation on wallets with key pair (created in nova wallet or imported) should require PIN verification before constructing signature</string>
+
+    <string name="profile_settings_pin_code_verification_title">Approve with PIN</string>
+
     <string name="ethereum_function">Function</string>
     <string name="ethereum_contract">Contract</string>
     <string name="ethereum_contract_call">Contract call</string>
@@ -137,8 +143,8 @@
 
     <string name="remove_votes_suggestion_title">Remove history of your votes?</string>
     <plurals name="remove_votes_suggestion_description">
-        <item quantity="one" formatted="true">You have previously voted in referendums in %d track. In order to make this track available for delegation, you need to remove your existing votes.</item>
-        <item quantity="other" formatted="true">You have previously voted in referendums in %d tracks. In order to make these tracks available for delegation, you need to remove your existing votes.</item>
+        <item formatted="true" quantity="one">You have previously voted in referendums in %d track. In order to make this track available for delegation, you need to remove your existing votes.</item>
+        <item formatted="true" quantity="other">You have previously voted in referendums in %d tracks. In order to make these tracks available for delegation, you need to remove your existing votes.</item>
     </plurals>
 
     <string name="remove_votes_suggestion_button_text">Remove votes</string>

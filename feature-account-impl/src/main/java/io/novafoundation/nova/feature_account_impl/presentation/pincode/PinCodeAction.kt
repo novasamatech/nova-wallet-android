@@ -28,6 +28,10 @@ sealed class PinCodeAction(open val toolbarConfiguration: ToolbarConfiguration) 
     ) : Check(delayedNavigation, toolbarConfiguration)
 
     @Parcelize
-    object Change :
-        PinCodeAction(ToolbarConfiguration(R.string.profile_pincode_change_title, true))
+    object Change : PinCodeAction(ToolbarConfiguration(R.string.profile_pincode_change_title, true))
+
+    @Parcelize
+    open class TwoFactorVerification(
+        open val delayedNavigation: DelayedNavigation
+    ) : PinCodeAction(ToolbarConfiguration(titleRes = null, backVisible = true))
 }
