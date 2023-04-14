@@ -1,0 +1,3 @@
+package io.novafoundation.nova.feature_external_sign_api.di
+
+interface ExternalSignFeatureApi

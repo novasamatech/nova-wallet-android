@@ -24,7 +24,8 @@ import io.novafoundation.nova.splash.SplashRouter
         GovernanceNavigationModule::class,
         WalletConnectNavigationModule::class,
         VoteNavigationModule::class,
-        VersionsNavigationModule::class
+        VersionsNavigationModule::class,
+        ExternalSignNavigationModule::class
     ]
 )
 class NavigationModule {

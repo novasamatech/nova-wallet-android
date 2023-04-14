@@ -13,7 +13,5 @@ interface DAppRouter : ReturnableRouter {
 
     fun openAddToFavourites(payload: AddToFavouritesPayload)
 
-    fun openExtrinsicDetails(extrinsicContent: String)
-
     fun openAuthorizedDApps()
 }

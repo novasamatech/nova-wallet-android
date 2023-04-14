@@ -10,8 +10,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.ConfirmAuthorizeBottomSheet
+import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import kotlinx.android.synthetic.main.fragment_wc_sessions.wcSessionsToolbar
 import javax.inject.Inject
 
@@ -44,14 +43,11 @@ class WalletConnectSessionsFragment : BaseFragment<WalletConnectSessionsViewMode
 
     override fun subscribe(viewModel: WalletConnectSessionsViewModel) {
         viewModel.authorizeDapp.awaitableActionLiveData.observeEvent { action ->
-            ConfirmAuthorizeBottomSheet(
+            AuthorizeDappBottomSheet(
                 context = requireContext(),
-                confirmation = DappPendingConfirmation(
-                    onConfirm = { action.onSuccess(true) },
-                    onDeny = { action.onSuccess(false) },
-                    onCancel = { action.onSuccess(false) },
-                    action = DappPendingConfirmation.Action.Authorize(action.payload)
-                ),
+                onConfirm = { action.onSuccess(true) },
+                onDeny = { action.onSuccess(false) },
+                payload = action.payload,
                 imageLoader = imageLoader
             ).show()
         }

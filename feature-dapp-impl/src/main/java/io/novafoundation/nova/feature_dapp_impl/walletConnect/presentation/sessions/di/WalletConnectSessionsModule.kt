@@ -15,13 +15,13 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.WalletConnectScanCommunicator
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.session.KnownSessionRequestProcessor
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.session.RealKnownSessionRequestProcessor
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.session.RealWalletConnectSessionInteractor
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.session.WalletConnectSessionInteractor
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.presentation.sessions.WalletConnectSessionsViewModel
+import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -54,7 +54,7 @@ class WalletConnectSessionsModule {
         awaitableMixinFactory: ActionAwaitableMixin.Factory,
         walletUiUseCase: WalletUiUseCase,
         interactor: WalletConnectSessionInteractor,
-        dAppSignCommunicator: DAppSignCommunicator
+        dAppSignCommunicator: ExternalSignCommunicator
     ): ViewModel {
         return WalletConnectSessionsViewModel(router, communicator, awaitableMixinFactory, walletUiUseCase, interactor, dAppSignCommunicator)
     }

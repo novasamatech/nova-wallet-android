@@ -1,14 +1,14 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport
 
 import com.google.gson.Gson
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionHash
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Transport
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.EthereumAddress
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChain
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskPersonalSignMessage
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskTransaction
-import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.PersonalSignMessage
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskTypedMessage
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.SignedMessage
-import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.TransactionHash
-import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.TypedMessage
 
 sealed class MetamaskTransportRequest<R>(
     val id: String,
@@ -72,13 +72,13 @@ sealed class MetamaskTransportRequest<R>(
         id: String,
         gson: Gson,
         responder: MetamaskResponder,
-        val message: TypedMessage
+        val message: MetamaskTypedMessage
     ) : MetamaskTransportRequest<SignedMessage>(id, gson, responder)
 
     class PersonalSign(
         id: String,
         gson: Gson,
         responder: MetamaskResponder,
-        val message: PersonalSignMessage
+        val message: MetamaskPersonalSignMessage
     ) : MetamaskTransportRequest<SignedMessage>(id, gson, responder)
 }

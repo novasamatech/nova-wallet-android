@@ -5,7 +5,6 @@ import com.walletconnect.web3.wallet.client.Wallet
 import com.walletconnect.web3.wallet.client.Wallet.Model.SessionRequest.JSONRPCRequest
 import com.walletconnect.web3.wallet.client.Wallet.Params.SessionRequestResponse
 import io.novafoundation.nova.common.utils.fromJson
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.sdk.WalletConnectError
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.sdk.approved
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.sdk.failed
@@ -13,6 +12,7 @@ import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.sdk.rejecte
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.session.KnownSessionRequest.Params.Polkadot
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayload
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
+import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 
 class KnownSessionRequest(val id: String, val params: Params, val sessionRequest: Wallet.Model.SessionRequest) {
 
@@ -29,9 +29,9 @@ class KnownSessionRequest(val id: String, val params: Params, val sessionRequest
 
 interface KnownSessionRequestProcessor {
 
-    fun parseKnownRequest(request: Wallet.Model.SessionRequest): KnownSessionRequest
+    fun parseKnownRequest(sessionRequest: Wallet.Model.SessionRequest): KnownSessionRequest
 
-    fun prepareResponse(request: KnownSessionRequest, response: DAppSignCommunicator.Response): SessionRequestResponse
+    fun prepareResponse(request: KnownSessionRequest, response: ExternalSignCommunicator.Response): SessionRequestResponse
 }
 
 class RealKnownSessionRequestProcessor(
@@ -52,15 +52,15 @@ class RealKnownSessionRequestProcessor(
         return KnownSessionRequest(request.id.toString(), params, sessionRequest)
     }
 
-    override fun prepareResponse(request: KnownSessionRequest, response: DAppSignCommunicator.Response): SessionRequestResponse {
+    override fun prepareResponse(request: KnownSessionRequest, response: ExternalSignCommunicator.Response): SessionRequestResponse {
         return when (response) {
-            is DAppSignCommunicator.Response.Rejected -> request.sessionRequest.rejected()
+            is ExternalSignCommunicator.Response.Rejected -> request.sessionRequest.rejected()
 
-            is DAppSignCommunicator.Response.Sent -> when (request.params) {
+            is ExternalSignCommunicator.Response.Sent -> when (request.params) {
                 is Polkadot -> error("Polkadot WC protocol does not support sending txs")
             }
 
-            is DAppSignCommunicator.Response.Signed -> {
+            is ExternalSignCommunicator.Response.Signed -> {
                 val responseJson = when (request.params) {
                     is Polkadot -> preparePolkadotSignResponse(response)
                 }
@@ -68,11 +68,11 @@ class RealKnownSessionRequestProcessor(
                 request.sessionRequest.approved(responseJson)
             }
 
-            is DAppSignCommunicator.Response.SigningFailed -> request.sessionRequest.failed(WalletConnectError.GENERAL_FAILURE)
+            is ExternalSignCommunicator.Response.SigningFailed -> request.sessionRequest.failed(WalletConnectError.GENERAL_FAILURE)
         }
     }
 
-    private fun preparePolkadotSignResponse(signResponse: DAppSignCommunicator.Response.Signed): String {
+    private fun preparePolkadotSignResponse(signResponse: ExternalSignCommunicator.Response.Signed): String {
         val response = SignerResult(signResponse.requestId, signResponse.signature)
 
         return gson.toJson(response)
