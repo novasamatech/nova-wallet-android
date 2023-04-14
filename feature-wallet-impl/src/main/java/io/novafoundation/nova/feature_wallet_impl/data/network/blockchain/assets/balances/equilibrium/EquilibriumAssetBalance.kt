@@ -131,15 +131,16 @@ class EquilibriumAssetBalance(
             val freeByAssetId = assetBalances.assets.associateBy { it.assetId }
             val reservedByAssetId = reservedBalancesWithBlocks.associateBy { it.assetId }
 
-            val locks = if (chainAsset.isUtilityAsset) assetBalances.lock else BigInteger.ZERO
-
             val diff = assetCache.updateAssetsByChain(metaAccount, chain) { asset: Chain.Asset ->
+                val free = freeByAssetId[asset.id]?.balance
+                val reserved = reservedByAssetId[asset.id]?.reservedBalance
+                val locks = if (asset.isUtilityAsset) assetBalances.lock else BigInteger.ZERO
                 AssetLocal(
                     asset.id,
                     asset.chainId,
                     metaAccount.id,
-                    freeInPlanks = freeByAssetId[asset.id]?.balance.orZero(),
-                    reservedInPlanks = reservedByAssetId[asset.id]?.reservedBalance.orZero(),
+                    freeInPlanks = free.orZero(),
+                    reservedInPlanks = reserved.orZero(),
                     frozenInPlanks = locks.orZero(),
                     redeemableInPlanks = BigInteger.ZERO,
                     bondedInPlanks = BigInteger.ZERO,
