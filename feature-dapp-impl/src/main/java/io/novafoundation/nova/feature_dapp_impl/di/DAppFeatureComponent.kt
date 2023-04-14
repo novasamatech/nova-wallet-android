@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_dapp_impl.di
 
 import dagger.BindsInstance
 import dagger.Component
+import io.novafoundation.nova.caip.di.CaipApi
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
@@ -23,7 +24,6 @@ import io.novafoundation.nova.feature_dapp_impl.walletConnect.presentation.scan.
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.presentation.sessions.di.WalletConnectSessionsComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
-import io.novafoundation.nova.web3names.di.Web3NamesApi
 
 @Component(
     dependencies = [
@@ -76,7 +76,7 @@ interface DAppFeatureComponent : DAppFeatureApi {
             WalletFeatureApi::class,
             RuntimeApi::class,
             CurrencyFeatureApi::class,
-            Web3NamesApi::class
+            CaipApi::class
         ]
     )
     interface DAppFeatureDependenciesComponent : DAppFeatureDependencies

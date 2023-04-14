@@ -8,8 +8,8 @@ import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.runtime.ext.isValidAddress
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.web3names.data.caip19.Caip19MatcherFactory
-import io.novafoundation.nova.web3names.data.caip19.Caip19Parser
+import io.novafoundation.nova.caip.caip19.Caip19MatcherFactory
+import io.novafoundation.nova.caip.caip19.Caip19Parser
 import io.novafoundation.nova.web3names.data.endpoints.TransferRecipientsApi
 import io.novafoundation.nova.web3names.data.endpoints.model.TransferRecipientRemote
 import io.novafoundation.nova.web3names.data.integrity.Web3NamesIntegrityVerifier
@@ -36,8 +36,8 @@ class RealWeb3NamesRepository(
     private val remoteStorageSource: StorageDataSource,
     private val web3NamesServiceChainIdProvider: Web3NamesServiceChainIdProvider,
     private val transferRecipientApi: TransferRecipientsApi,
-    private val caip19MatcherFactory: Caip19MatcherFactory,
-    private val caip19Parser: Caip19Parser,
+    private val caip19MatcherFactory: io.novafoundation.nova.caip.caip19.Caip19MatcherFactory,
+    private val caip19Parser: io.novafoundation.nova.caip.caip19.Caip19Parser,
     private val web3NamesIntegrityVerifier: Web3NamesIntegrityVerifier,
     private val gson: Gson,
 ) : Web3NamesRepository {

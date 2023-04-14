@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    namespace 'io.novafoundation.nova.web3names'
+    namespace 'io.novafoundation.nova.caip'
     compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
@@ -11,6 +11,7 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "SLIP_44_COINS_BASE_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/assets/slip44.json\""
     }
 
     buildTypes {
@@ -32,7 +33,6 @@ dependencies {
     implementation project(":core-db")
     implementation project(":runtime")
     implementation project(":core-api")
-    implementation project(":caip")
 
     implementation kotlinDep
 

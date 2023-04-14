@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.caip.caip2.Caip2Resolver
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -22,7 +23,6 @@ import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.session.Rea
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.domain.session.WalletConnectSessionInteractor
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.presentation.sessions.WalletConnectSessionsViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.web3names.data.caip19.Caip19MatcherFactory
 
 @Module(includes = [ViewModelModule::class])
 class WalletConnectSessionsModule {
@@ -36,12 +36,12 @@ class WalletConnectSessionsModule {
     fun provideInteractor(
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        caip19MatcherFactory: Caip19MatcherFactory,
+        caip2Resolver: Caip2Resolver,
         knownSessionRequestProcessor: KnownSessionRequestProcessor
     ): WalletConnectSessionInteractor = RealWalletConnectSessionInteractor(
         accountRepository = accountRepository,
         chainRegistry = chainRegistry,
-        caip19MatcherFactory = caip19MatcherFactory,
+        caip2Resolver = caip2Resolver,
         sessionRequestParser = knownSessionRequestProcessor
     )
 

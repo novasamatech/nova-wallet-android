@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_dapp_impl.di
 
 import coil.ImageLoader
 import com.google.gson.Gson
+import io.novafoundation.nova.caip.caip2.Caip2Resolver
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -26,7 +27,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
-import io.novafoundation.nova.web3names.data.caip19.Caip19MatcherFactory
 import okhttp3.OkHttpClient
 
 interface DAppFeatureDependencies {
@@ -86,5 +86,5 @@ interface DAppFeatureDependencies {
 
     val permissionsAskerFactory: PermissionsAskerFactory
 
-    val caip19MatcherFactory: Caip19MatcherFactory
+    val caip2Resolver: Caip2Resolver
 }

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.di
 
+import io.novafoundation.nova.caip.di.CaipApi
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -12,7 +13,6 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCo
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.WalletConnectScanCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
-import io.novafoundation.nova.web3names.di.Web3NamesApi
 import javax.inject.Inject
 
 @ApplicationScope
@@ -33,7 +33,7 @@ class DAppFeatureHolder @Inject constructor(
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .currencyFeatureApi(getFeature(CurrencyFeatureApi::class.java))
-            .web3NamesApi(getFeature(Web3NamesApi::class.java))
+            .caipApi(getFeature(CaipApi::class.java))
             .build()
 
         return DaggerDAppFeatureComponent.factory()

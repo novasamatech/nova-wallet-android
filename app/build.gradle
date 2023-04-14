@@ -201,6 +201,8 @@ dependencies {
     implementation project(':feature-versions-api')
     implementation project(':feature-versions-impl')
 
+    implementation project(':caip')
+
     implementation kotlinDep
 
     implementation androidDep
