@@ -81,7 +81,13 @@ class DAppSignViewModel(
         .successOrFinish()
         .shareInBackground()
 
-    val dAppInfo = flowOf { commonInteractor.getDAppInfo(payload.dappUrl) }
+    val dAppInfo = flowOf {
+        if (payload.dappUrl != null) {
+            commonInteractor.getDAppInfo(payload.dappUrl)
+        } else {
+            null
+        }
+    }
         .shareInBackground()
 
     init {

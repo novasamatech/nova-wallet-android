@@ -13,6 +13,6 @@ class DAppSignCommunicatorImpl(navigationHolder: NavigationHolder) :
     DAppSignCommunicator {
 
     override fun openRequest(request: DAppSignPayload) {
-        navController.navigate(R.id.action_DAppBrowserFragment_to_ConfirmSignExtrinsicFragment, DAppSignExtrinsicFragment.getBundle(request))
+        navController.navigate(R.id.action_open_externalSignGraph, DAppSignExtrinsicFragment.getBundle(request))
     }
 }

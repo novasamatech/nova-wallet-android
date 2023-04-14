@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:background="@color/secondary_screen_background"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/wcSessionsToolbar"
+        app:titleText="@string/wallet_connect_title"
+        app:dividerVisible="false"
+        app:iconRight="@drawable/ic_scan" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title3"
+        android:text="Some cool session UI might be here" />
+</LinearLayout>

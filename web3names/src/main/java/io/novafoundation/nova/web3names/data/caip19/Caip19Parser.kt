@@ -3,10 +3,9 @@ package io.novafoundation.nova.web3names.data.caip19
 import io.novafoundation.nova.web3names.data.caip19.identifiers.AssetIdentifier
 import io.novafoundation.nova.web3names.data.caip19.identifiers.Caip19Identifier
 import io.novafoundation.nova.web3names.data.caip19.identifiers.Caip2Identifier
-import io.novafoundation.nova.web3names.data.caip19.identifiers.EIP155
+import io.novafoundation.nova.web3names.data.caip19.identifiers.Caip2Namespace
 import io.novafoundation.nova.web3names.data.caip19.identifiers.ERC20
 import io.novafoundation.nova.web3names.data.caip19.identifiers.NotSupportedIdentifierException
-import io.novafoundation.nova.web3names.data.caip19.identifiers.POLKADOT
 import io.novafoundation.nova.web3names.data.caip19.identifiers.SLIP44
 
 class Caip19Parser {
@@ -15,16 +14,16 @@ class Caip19Parser {
         val (chain, asset) = raw.splitToNamespaces()
 
         return runCatching {
-            Caip19Identifier(parserChain(chain), parseAsset(asset))
+            Caip19Identifier(parserCaip2(chain), parseAsset(asset))
         }
     }
 
-    private fun parserChain(chain: String): Caip2Identifier {
+    fun parserCaip2(chain: String): Caip2Identifier {
         val (chainNamespace, chainIdentifier) = chain.toNamespaceAndReference()
 
         return when (chainNamespace) {
-            EIP155 -> Caip2Identifier.Eip155(chainIdentifier.toBigInteger())
-            POLKADOT -> Caip2Identifier.Polkadot(chainIdentifier)
+            Caip2Namespace.EIP155.namespaceName -> Caip2Identifier.Eip155(chainIdentifier.toBigInteger())
+            Caip2Namespace.POLKADOT.namespaceName -> Caip2Identifier.Polkadot(chainIdentifier)
             else -> throw NotSupportedIdentifierException()
         }
     }

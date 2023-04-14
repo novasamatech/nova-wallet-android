@@ -9,8 +9,10 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
+import io.novafoundation.nova.feature_dapp_impl.walletConnect.WalletConnectScanCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
+import io.novafoundation.nova.web3names.di.Web3NamesApi
 import javax.inject.Inject
 
 @ApplicationScope
@@ -19,6 +21,8 @@ class DAppFeatureHolder @Inject constructor(
     private val router: DAppRouter,
     private val signCommunicator: DAppSignCommunicator,
     private val searchCommunicator: DAppSearchCommunicator,
+    // TODO move to WC module
+    private val walletConnectScanCommunicator: WalletConnectScanCommunicator,
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -29,9 +33,10 @@ class DAppFeatureHolder @Inject constructor(
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .currencyFeatureApi(getFeature(CurrencyFeatureApi::class.java))
+            .web3NamesApi(getFeature(Web3NamesApi::class.java))
             .build()
 
         return DaggerDAppFeatureComponent.factory()
-            .create(router, signCommunicator, searchCommunicator, dApp)
+            .create(router, signCommunicator, searchCommunicator, walletConnectScanCommunicator, dApp)
     }
 }

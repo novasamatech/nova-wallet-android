@@ -29,6 +29,7 @@ import kotlinx.android.synthetic.main.fragment_profile.settingsSafeModeContainer
 import kotlinx.android.synthetic.main.fragment_profile.settingsTelegram
 import kotlinx.android.synthetic.main.fragment_profile.settingsTerms
 import kotlinx.android.synthetic.main.fragment_profile.settingsTwitter
+import kotlinx.android.synthetic.main.fragment_profile.settingsWalletConnect
 import kotlinx.android.synthetic.main.fragment_profile.settingsWallets
 import kotlinx.android.synthetic.main.fragment_profile.settingsWebsite
 import kotlinx.android.synthetic.main.fragment_profile.settingsYoutube
@@ -68,6 +69,8 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
 
         settingsSafeModeContainer.setOnClickListener { viewModel.changeSafeMode() }
         settingsPin.setOnClickListener { viewModel.changePinCodeClicked() }
+
+        settingsWalletConnect.setOnClickListener { viewModel.openWalletConnect() }
 
         settingsAvatar.setOnClickListener { viewModel.selectedWalletClicked() }
     }

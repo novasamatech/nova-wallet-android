@@ -595,6 +595,10 @@ class Navigator(
         navigationHolder.finishApp()
     }
 
+    override fun openWalletConnect() {
+        navController?.navigate(R.id.action_mainFragment_to_walletConnectGraph)
+    }
+
     override fun openCreateWatchWallet() {
         navController?.navigate(R.id.action_welcomeFragment_to_createWatchWalletFragment)
     }

@@ -2,6 +2,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
     <string name="send_address_hint">Address or w3n</string>
 
+    <string name="wallet_connect_title">Wallet Connect</string>
+    <string name="wallet_connect_scan_title">Scan Wallet Connect QR code</string>
+
     <string name="ethereum_function">Function</string>
     <string name="ethereum_contract">Contract</string>
     <string name="ethereum_contract_call">Contract call</string>

@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 apply from: '../tests.gradle'
+apply from: "../scripts/secrets.gradle"
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -14,6 +15,8 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/dapps/dapps_dev.json\""
+
+        buildConfigField "String", "WALLET_CONNECT_PROJECT_ID", readSecret("WALLET_CONNECT_PROJECT_ID")
     }
 
     buildTypes {
@@ -58,6 +61,7 @@ dependencies {
     implementation project(':feature-dapp-api')
     implementation project(':feature-currency-api')
     implementation project(':runtime')
+    implementation project(':web3names')
 
     implementation kotlinDep
 
@@ -86,6 +90,9 @@ dependencies {
 
     implementation web3jDep
     implementation coroutinesFutureDep
+
+    implementation walletConnectCoreDep, withoutTransitiveAndroidX
+    implementation walletConnectWalletDep, withoutTransitiveAndroidX
 
     testImplementation jUnitDep
     testImplementation mockitoDep

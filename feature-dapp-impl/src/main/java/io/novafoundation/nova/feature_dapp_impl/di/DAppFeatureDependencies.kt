@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
@@ -25,6 +26,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
+import io.novafoundation.nova.web3names.data.caip19.Caip19MatcherFactory
 import okhttp3.OkHttpClient
 
 interface DAppFeatureDependencies {
@@ -81,4 +83,8 @@ interface DAppFeatureDependencies {
     val validationExecutor: ValidationExecutor
 
     val signerProvider: SignerProvider
+
+    val permissionsAskerFactory: PermissionsAskerFactory
+
+    val caip19MatcherFactory: Caip19MatcherFactory
 }

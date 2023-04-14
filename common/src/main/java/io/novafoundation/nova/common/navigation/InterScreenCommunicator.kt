@@ -19,3 +19,5 @@ interface InterScreenResponder<I, O> {
 
     fun respond(response: O)
 }
+
+fun InterScreenRequester<Unit, *>.openRequest() = openRequest(Unit)
