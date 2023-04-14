@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/walletConnectSessionsFragment"
-        android:name="io.novafoundation.nova.feature_dapp_impl.walletConnect.presentation.sessions.WalletConnectSessionsFragment"
+        android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.WalletConnectSessionsFragment"
         android:label="WalletConnectSessionsFragment">
 
 
@@ -21,6 +21,6 @@
 
     <fragment
         android:id="@+id/walletConnectScanFragment"
-        android:name="io.novafoundation.nova.feature_dapp_impl.walletConnect.presentation.scan.WalletConnectScanFragment"
+        android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.scan.WalletConnectScanFragment"
         android:label="WalletConnectScanFragment" />
 </navigation>

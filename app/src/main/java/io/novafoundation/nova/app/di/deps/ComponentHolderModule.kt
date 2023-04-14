@@ -41,6 +41,8 @@ import io.novafoundation.nova.feature_versions_impl.di.VersionsFeatureHolder
 import io.novafoundation.nova.feature_vote.di.VoteFeatureApi
 import io.novafoundation.nova.feature_vote.di.VoteFeatureHolder
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
+import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
+import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatureHolder
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureHolder
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.di.RuntimeHolder
@@ -175,4 +177,10 @@ interface ComponentHolderModule {
     @ClassKey(ExternalSignFeatureApi::class)
     @IntoMap
     fun provideExternalSignFeature(holder: ExternalSignFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(WalletConnectFeatureApi::class)
+    @IntoMap
+    fun provideWalletConnectFeature(holder: WalletConnectFeatureHolder): FeatureApiHolder
 }

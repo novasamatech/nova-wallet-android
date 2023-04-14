@@ -1,0 +1,3 @@
+package io.novafoundation.nova.feature_wallet_connect_api.di
+
+interface WalletConnectFeatureApi

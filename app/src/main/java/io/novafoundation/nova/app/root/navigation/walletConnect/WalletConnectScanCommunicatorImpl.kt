@@ -3,7 +3,7 @@ package io.novafoundation.nova.app.root.navigation.walletConnect
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseInterScreenCommunicator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
-import io.novafoundation.nova.feature_dapp_impl.walletConnect.WalletConnectScanCommunicator
+import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectScanCommunicator
 
 class WalletConnectScanCommunicatorImpl(
     navigationHolder: NavigationHolder
