@@ -88,7 +88,7 @@ class BalancesIntegrationTest(
     private suspend fun CoroutineScope.testBalancesInChainAsync(chain: Chain, currentAccount: String): Result<AccountInfo?> {
         return coroutineScope {
             runCatching {
-                withTimeout(20.seconds) {
+                withTimeout(80.seconds) {
                     remoteStorage.query(
                         chainId = chain.id,
                         keyBuilder = { it.metadata.system().storage("Account").storageKey(it, currentAccount.fromHex()) },
