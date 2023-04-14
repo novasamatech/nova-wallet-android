@@ -107,7 +107,7 @@ class ChainConnection internal constructor(
                     socketService.pause()
                 }
             }
-                .launchIn(this)
+                .launchIn(this@ChainConnection)
         }
     }
 
