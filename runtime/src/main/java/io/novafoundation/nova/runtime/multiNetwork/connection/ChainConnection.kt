@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import javax.inject.Provider
 
 class ChainConnectionFactory(
@@ -94,29 +93,27 @@ class ChainConnection internal constructor(
         availableNodesFlow = availableNodes,
     ).shareIn(scope = this, started = SharingStarted.Eagerly, replay = 1)
 
-    fun setup() {
+    suspend fun setup() {
         socketService.setInterceptor(this)
 
-        launch {
-            observeCurrentNode()
+        observeCurrentNode()
 
-            externalRequirementFlow.onEach {
-                if (it == ExternalRequirement.ALLOWED) {
-                    socketService.resume()
-                } else {
-                    socketService.pause()
-                }
+        externalRequirementFlow.onEach {
+            if (it == ExternalRequirement.ALLOWED) {
+                socketService.resume()
+            } else {
+                socketService.pause()
             }
-                .launchIn(this)
         }
+            .launchIn(this)
     }
 
     private suspend fun observeCurrentNode() {
-        val firstNodeUrl = connectionSecrets.saturateUrl(currentNode.first().unformattedUrl) ?: return
+        val firstNodeUrl = currentNode.first()?.unformattedUrl?.let(connectionSecrets::saturateUrl) ?: return
         socketService.start(firstNodeUrl, remainPaused = true)
 
         currentNode
-            .mapNotNull { node -> connectionSecrets.saturateUrl(node.unformattedUrl) }
+            .mapNotNull { node -> node?.unformattedUrl?.let(connectionSecrets::saturateUrl) }
             .filter { nodeUrl -> actualUrl() != nodeUrl }
             .onEach { nodeUrl -> socketService.switchUrl(nodeUrl) }
             .onEach { nodeUrl -> Log.d(this@ChainConnection.LOG_TAG, "Switching node in ${chain.name} to $nodeUrl") }
