@@ -13,14 +13,11 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.di.RuntimeComponent
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
-import java.math.BigInteger
-import java.math.BigInteger.ZERO
-import java.net.URL
+import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
-import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
+import jp.co.soramitsu.fearless_utils.wsrpc.networkStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -31,6 +28,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import java.math.BigInteger
+import java.math.BigInteger.ZERO
+import java.net.URL
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
 
 @RunWith(Parameterized::class)
@@ -86,13 +88,15 @@ class BalancesIntegrationTest(
     private suspend fun CoroutineScope.testBalancesInChainAsync(chain: Chain, currentAccount: String): Result<AccountInfo?> {
         return coroutineScope {
             runCatching {
-                withTimeout(80.seconds) {
+                withTimeout(20.seconds) {
                     remoteStorage.query(
                         chainId = chain.id,
                         keyBuilder = { it.metadata.system().storage("Account").storageKey(it, currentAccount.fromHex()) },
                         binding = { scale, runtime -> scale?.let { bindAccountInfo(scale, runtime) } }
                     )
                 }
+            }.recover {
+                throw Exception("Started: ${chainRegistry.getSocket(chain.id).networkStateFlow().first()}")
             }
         }
     }
