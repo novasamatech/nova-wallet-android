@@ -7,10 +7,10 @@ import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.asHexString
 import io.novafoundation.nova.common.utils.castOrNull
+import io.novafoundation.nova.common.utils.decodeEvmQuantity
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.parseArbitraryObject
-import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.EmptyValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystem
@@ -26,10 +26,11 @@ import io.novafoundation.nova.feature_external_sign_api.model.failedSigningIfNot
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmChain
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmChainSource
-import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmSignPayload
-import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmSignPayload.SendTx
-import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmTransaction
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmPersonalSignMessage
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmSignPayload.ConfirmTx
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmSignPayload.PersonalSign
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmSignPayload.SignTypedMessage
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmTransaction
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmTypedMessage
 import io.novafoundation.nova.feature_external_sign_impl.data.evmApi.EvmApi
 import io.novafoundation.nova.feature_external_sign_impl.data.evmApi.EvmApiFactory
@@ -61,6 +62,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import org.web3j.crypto.RawTransaction
+import org.web3j.crypto.TransactionDecoder
 import java.math.BigInteger
 
 class EvmSignInteractorFactory(
@@ -105,13 +107,13 @@ class EvmSignInteractor(
 
     @OptIn(DelicateCoroutinesApi::class)
     private val ethereumApi by GlobalScope.lazyAsync {
-        payload.castOrNull<SendTx>()?.chainSource?.let { chainSource ->
+        payload.castOrNull<ConfirmTx>()?.chainSource?.let { chainSource ->
             evmApiFactory.create(chainSource)
         }
     }
 
     override val validationSystem = when (payload) {
-        is SendTx -> transactionValidationSystem()
+        is ConfirmTx -> transactionValidationSystem()
         else -> EmptyValidationSystem()
     }
 
@@ -124,7 +126,7 @@ class EvmSignInteractor(
 
     override suspend fun chainUi(): Result<ChainUi?> = withContext(Dispatchers.Default) {
         runCatching {
-            if (payload is SendTx) {
+            if (payload is ConfirmTx) {
                 chainRegistry.findEvmChain(payload.chainSource.evmChainId)?.let(::mapChainToUi)
                     ?: payload.chainSource.fallbackChain?.let(::mapEvmChainToUi)
                     ?: throw ExternalSignInteractor.Error.UnsupportedChain(payload.chainSource.evmChainId.toString())
@@ -135,7 +137,7 @@ class EvmSignInteractor(
     }
 
     override fun commissionTokenFlow(): Flow<Token?>? {
-        if (payload !is SendTx) return null
+        if (payload !is ConfirmTx) return null
 
         return flow {
             val chain = chainRegistry.findEvmChain(payload.chainSource.evmChainId)
@@ -149,7 +151,7 @@ class EvmSignInteractor(
     }
 
     override suspend fun calculateFee(): Balance = withContext(Dispatchers.Default) {
-        if (payload !is SendTx) return@withContext Balance.ZERO
+        if (payload !is ConfirmTx) return@withContext Balance.ZERO
 
         val api = ethereumApi() ?: return@withContext Balance.ZERO
 
@@ -162,9 +164,9 @@ class EvmSignInteractor(
     override suspend fun performOperation(): ExternalSignCommunicator.Response? = withContext(Dispatchers.Default) {
         runCatching {
             when (payload) {
-                is SendTx -> sendTx(payload.transaction, payload.chainSource.evmChainId)
-                is EvmSignPayload.SignTypedMessage -> signTypedMessage(payload.message)
-                is EvmSignPayload.PersonalSign -> personalSign(payload.message)
+                is ConfirmTx -> confirmTx(payload.transaction, payload.chainSource.evmChainId.toLong(), payload.action)
+                is SignTypedMessage -> signTypedMessage(payload.message)
+                is PersonalSign -> personalSign(payload.message)
             }
         }.getOrElse { error ->
             Log.e(LOG_TAG, "Failed to sign evm tx", error)
@@ -175,9 +177,9 @@ class EvmSignInteractor(
 
     override suspend fun readableOperationContent(): String = withContext(Dispatchers.Default) {
         when (payload) {
-            is SendTx -> extrinsicGson.toJson(mostRecentFormedTx.first())
-            is EvmSignPayload.SignTypedMessage -> signTypedMessageReadableContent(payload)
-            is EvmSignPayload.PersonalSign -> personalSignReadableContent(payload)
+            is ConfirmTx -> extrinsicGson.toJson(mostRecentFormedTx.first())
+            is SignTypedMessage -> signTypedMessageReadableContent(payload)
+            is PersonalSign -> personalSignReadableContent(payload)
         }
     }
 
@@ -203,16 +205,24 @@ class EvmSignInteractor(
         }
     }
 
-    private suspend fun sendTx(basedOn: EvmTransaction, evmChainId: Int): ExternalSignCommunicator.Response.Sent {
+    private suspend fun confirmTx(basedOn: EvmTransaction, evmChainId: Long, action: ConfirmTx.Action): ExternalSignCommunicator.Response.Sent {
         val api = requireNotNull(ethereumApi())
 
         val tx = api.formTransaction(basedOn)
 
         val originAccountId = originAccountId()
+        val signer = resolveSigner()
 
-        val txHash = api.sendTransaction(tx, resolveSigner(), originAccountId, evmChainId.toLong())
-
-        return ExternalSignCommunicator.Response.Sent(request.id, txHash)
+        return when (action) {
+            ConfirmTx.Action.SIGN -> {
+                val signedTx = api.signTransaction(tx, signer, originAccountId, evmChainId)
+                ExternalSignCommunicator.Response.Sent(request.id, signedTx)
+            }
+            ConfirmTx.Action.SEND -> {
+                val txHash = api.sendTransaction(tx, signer, originAccountId, evmChainId)
+                ExternalSignCommunicator.Response.Sent(request.id, txHash)
+            }
+        }
     }
 
     private suspend fun signTypedMessage(message: EvmTypedMessage): ExternalSignCommunicator.Response.Signed {
@@ -236,14 +246,14 @@ class EvmSignInteractor(
         return resolveSigner().signRaw(signerPayload).asHexString()
     }
 
-    private fun personalSignReadableContent(payload: EvmSignPayload.PersonalSign): String {
+    private fun personalSignReadableContent(payload: PersonalSign): String {
         val data = payload.message.data
 
         return runCatching { data.fromHex().decodeToString(throwOnInvalidSequence = true) }
             .getOrDefault(data)
     }
 
-    private fun signTypedMessageReadableContent(payload: EvmSignPayload.SignTypedMessage): String {
+    private fun signTypedMessageReadableContent(payload: SignTypedMessage): String {
         return runCatching {
             val parsedRaw = extrinsicGson.parseArbitraryObject(payload.message.raw!!)
 
@@ -267,12 +277,19 @@ class EvmSignInteractor(
     }
 
     private suspend fun EvmApi.formTransaction(basedOn: EvmTransaction): RawTransaction {
-        return formTransaction(
-            fromAddress = basedOn.from,
-            toAddress = basedOn.to,
-            data = basedOn.data,
-            value = basedOn.value?.removeHexPrefix()?.toBigIntegerOrNull(16)
-        )
+        return when (basedOn) {
+            is EvmTransaction.Raw -> TransactionDecoder.decode(basedOn.rawContent)
+
+            is EvmTransaction.Struct -> formTransaction(
+                fromAddress = basedOn.from,
+                toAddress = basedOn.to,
+                data = basedOn.data,
+                value = basedOn.value?.decodeEvmQuantity(),
+                nonce = basedOn.nonce?.decodeEvmQuantity(),
+                gasLimit = basedOn.gas?.decodeEvmQuantity(),
+                gasPrice = basedOn.gasPrice?.decodeEvmQuantity()
+            )
+        }
     }
 
     private suspend fun createTokenFrom(unknownChainOptions: EvmChainSource.UnknownChainOptions): Token? {

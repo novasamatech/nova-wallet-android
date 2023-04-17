@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_dapp_impl.walletConnect.presentation.sessions.di
+package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.caip.caip2.Caip2Parser
 import io.novafoundation.nova.caip.caip2.Caip2Resolver
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
@@ -29,7 +30,10 @@ class WalletConnectSessionsModule {
 
     @Provides
     @ScreenScope
-    fun provideKnownRequestParser(gson: Gson): KnownSessionRequestProcessor = RealKnownSessionRequestProcessor(gson)
+    fun provideKnownRequestParser(
+        gson: Gson,
+        caip2Parser: Caip2Parser,
+    ): KnownSessionRequestProcessor = RealKnownSessionRequestProcessor(gson, caip2Parser)
 
     @Provides
     @ScreenScope

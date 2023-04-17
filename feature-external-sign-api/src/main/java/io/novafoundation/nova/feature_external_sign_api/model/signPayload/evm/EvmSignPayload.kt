@@ -8,11 +8,17 @@ sealed class EvmSignPayload : Parcelable {
     abstract val originAddress: String
 
     @Parcelize
-    class SendTx(
+    class ConfirmTx(
         val transaction: EvmTransaction,
         override val originAddress: String,
         val chainSource: EvmChainSource,
-    ) : EvmSignPayload()
+        val action: Action,
+    ): EvmSignPayload() {
+
+        enum class Action {
+            SIGN, SEND
+        }
+    }
 
     @Parcelize
     class SignTypedMessage(

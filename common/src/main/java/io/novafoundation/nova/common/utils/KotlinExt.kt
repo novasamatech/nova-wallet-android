@@ -6,6 +6,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import org.web3j.utils.Numeric
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.math.BigDecimal
@@ -67,6 +68,10 @@ inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fol
 }
 
 fun Iterable<BigInteger>.sum() = sumOf { it }
+
+fun String.decodeEvmQuantity(): BigInteger {
+    return Numeric.decodeQuantity(this)
+}
 
 suspend operator fun <T> Deferred<T>.invoke() = await()
 

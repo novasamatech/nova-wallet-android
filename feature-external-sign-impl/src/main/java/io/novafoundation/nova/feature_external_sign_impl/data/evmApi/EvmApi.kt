@@ -30,9 +30,25 @@ interface EvmApi {
         toAddress: String,
         data: String?,
         value: BigInteger?,
+        nonce: BigInteger? = null,
+        gasLimit: BigInteger? = null,
+        gasPrice: BigInteger? = null,
     ): RawTransaction
 
+    /**
+     * @return hash of submitted transaction
+     */
     suspend fun sendTransaction(
+        transaction: RawTransaction,
+        signer: Signer,
+        accountId: AccountId,
+        ethereumChainId: Long,
+    ): String
+
+    /**
+     * @return signed transaction, ready to be send by eth_sendRawTransaction
+     */
+    suspend fun signTransaction(
         transaction: RawTransaction,
         signer: Signer,
         accountId: AccountId,
@@ -77,28 +93,38 @@ private class Web3JEvmApi(
     private val shouldShutdown: Boolean,
 ) : EvmApi {
 
-    override suspend fun formTransaction(fromAddress: String, toAddress: String, data: String?, value: BigInteger?): RawTransaction {
-        val nonce = getNonce(fromAddress)
-        val gasPrice = getGasPrice()
+    override suspend fun formTransaction(
+        fromAddress: String,
+        toAddress: String,
+        data: String?,
+        value: BigInteger?,
+        nonce: BigInteger?,
+        gasLimit: BigInteger?,
+        gasPrice: BigInteger?,
+    ): RawTransaction {
+        val finalNonce = nonce ?: getNonce(fromAddress)
+        val finalGasPrice = gasPrice ?: getGasPrice()
 
         val dataOrDefault = data.orEmpty()
 
-        val forFeeEstimatesTx = Transaction.createFunctionCallTransaction(
-            fromAddress,
-            nonce,
-            null,
-            null,
-            toAddress,
-            value,
-            dataOrDefault
-        )
+        val finalGasLimit = gasLimit ?: run {
+            val forFeeEstimatesTx = Transaction.createFunctionCallTransaction(
+                fromAddress,
+                finalNonce,
+                null,
+                null,
+                toAddress,
+                value,
+                dataOrDefault
+            )
 
-        val gasLimit = estimateGasLimit(forFeeEstimatesTx)
+            estimateGasLimit(forFeeEstimatesTx)
+        }
 
         return RawTransaction.createTransaction(
-            nonce,
-            gasPrice,
-            gasLimit,
+            finalNonce,
+            finalGasPrice,
+            finalGasLimit,
             toAddress,
             value,
             dataOrDefault
@@ -114,14 +140,24 @@ private class Web3JEvmApi(
         accountId: AccountId,
         ethereumChainId: Long,
     ): String {
+        val signedRawTransaction = signTransaction(transaction, signer, accountId, ethereumChainId)
+
+        return sendTransaction(signedRawTransaction)
+    }
+
+    override suspend fun signTransaction(
+        transaction: RawTransaction,
+        signer: Signer,
+        accountId: AccountId,
+        ethereumChainId: Long
+    ): String {
         val encodedTx = TransactionEncoder.encode(transaction, ethereumChainId)
         val signerPayload = SignerPayloadRaw(encodedTx, accountId)
         val signatureData = signer.signRaw(signerPayload).toSignatureData()
 
         val eip155SignatureData: SignatureData = TransactionEncoder.createEip155SignatureData(signatureData, ethereumChainId)
-        val transactionData = transaction.encodeWith(eip155SignatureData).toHexString(withPrefix = true)
 
-        return sendTransaction(transactionData)
+        return transaction.encodeWith(eip155SignatureData).toHexString(withPrefix = true)
     }
 
     override suspend fun getAccountBalance(address: String): BigInteger {

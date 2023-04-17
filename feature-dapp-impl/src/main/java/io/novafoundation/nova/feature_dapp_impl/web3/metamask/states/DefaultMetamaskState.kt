@@ -145,13 +145,14 @@ class DefaultMetamaskState(
 
         val hostApiConfirmRequest = ExternalSignRequest.Evm(
             id = request.id,
-            payload = EvmSignPayload.SendTx(
+            payload = EvmSignPayload.ConfirmTx(
                 transaction = mapMetamaskTransactionToEvm(request.transaction),
                 chainSource = EvmChainSource(
                     evmChainId = chain.chainIdInt(),
                     unknownChainOptions = UnknownChainOptions.WithFallBack(mapMetamaskChainToEvmChain(chain))
                 ),
-                originAddress = selectedAddress
+                originAddress = selectedAddress,
+                action = EvmSignPayload.ConfirmTx.Action.SEND,
             )
         )
 
@@ -259,13 +260,14 @@ class DefaultMetamaskState(
 
     private fun mapMetamaskTransactionToEvm(metamaskTransaction: MetamaskTransaction): EvmTransaction {
         return with(metamaskTransaction) {
-            EvmTransaction(
+            EvmTransaction.Struct(
                 gas = gas,
                 gasPrice = gasPrice,
                 from = from,
                 to = to,
                 data = data,
-                value = value
+                value = value,
+                nonce = nonce
             )
         }
     }

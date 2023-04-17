@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_connect_impl.di
 
 import coil.ImageLoader
 import com.google.gson.Gson
+import io.novafoundation.nova.caip.caip2.Caip2Parser
 import io.novafoundation.nova.caip.caip2.Caip2Resolver
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -35,4 +36,6 @@ interface WalletConnectFeatureDependencies {
     val permissionsAskerFactory: PermissionsAskerFactory
 
     val caip2Resolver: Caip2Resolver
+
+    val caip2Parser: Caip2Parser
 }

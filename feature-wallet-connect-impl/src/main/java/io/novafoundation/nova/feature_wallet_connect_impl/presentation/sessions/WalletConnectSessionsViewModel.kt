@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions
 
+import android.util.Log
 import com.walletconnect.android.Core
 import com.walletconnect.android.CoreClient
 import com.walletconnect.web3.wallet.client.Wallet
@@ -97,7 +98,10 @@ class WalletConnectSessionsViewModel(
         val session = Web3Wallet.getActiveSessionByTopic(sessionRequest.topic) ?: return
 
         // TODO reject request if not able to parse
-        val knownSessionRequest = interactor.parseSessionRequest(sessionRequest).getOrNull() ?: return
+        val knownSessionRequest = interactor.parseSessionRequest(sessionRequest)
+            .onFailure { Log.e("WalletConnect", "Failed to parse session request $sessionRequest", it) }
+            .getOrNull() ?: return
+
         val confirmTxRequest = mapKnownSessionRequestToExternalSignRequest(sessionRequest.request.id.toString(), knownSessionRequest)
 
         val result = withContext(Dispatchers.Main) {
@@ -120,6 +124,7 @@ class WalletConnectSessionsViewModel(
             is KnownSessionRequest.Params.Polkadot.SignTransaction -> {
                 ExternalSignRequest.Polkadot(requestId, params.transactionPayload)
             }
+            is KnownSessionRequest.Params.Evm -> ExternalSignRequest.Evm(requestId, params.payload)
         }
     }
 
