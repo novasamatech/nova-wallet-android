@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_external_sign_api.domain.sign.evm.EvmTypedMessageParser
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 interface WalletConnectFeatureDependencies {
@@ -38,4 +39,6 @@ interface WalletConnectFeatureDependencies {
     val caip2Resolver: Caip2Resolver
 
     val caip2Parser: Caip2Parser
+
+    val evmTypedMessageParser: EvmTypedMessageParser
 }

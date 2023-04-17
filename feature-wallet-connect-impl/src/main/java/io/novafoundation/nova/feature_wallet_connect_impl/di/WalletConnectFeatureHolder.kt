@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_external_sign_api.di.ExternalSignFeatureApi
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectScanCommunicator
@@ -27,6 +28,7 @@ class WalletConnectFeatureHolder @Inject constructor(
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .caipApi(getFeature(CaipApi::class.java))
+            .externalSignFeatureApi(getFeature(ExternalSignFeatureApi::class.java))
             .build()
 
         return DaggerWalletConnectFeatureComponent.factory()

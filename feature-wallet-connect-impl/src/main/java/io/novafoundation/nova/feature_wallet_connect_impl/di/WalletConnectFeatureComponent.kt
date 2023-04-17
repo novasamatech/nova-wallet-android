@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.walletConnect.presentation.sessions.di.WalletConnectSessionsComponent
+import io.novafoundation.nova.feature_external_sign_api.di.ExternalSignFeatureApi
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
@@ -47,7 +48,8 @@ interface WalletConnectFeatureComponent : WalletConnectFeatureApi {
             DbApi::class,
             AccountFeatureApi::class,
             RuntimeApi::class,
-            CaipApi::class
+            CaipApi::class,
+            ExternalSignFeatureApi::class
         ]
     )
     interface WalletConnectFeatureDependenciesComponent : WalletConnectFeatureDependencies

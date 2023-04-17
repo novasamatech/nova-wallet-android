@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_external_sign_api.domain.sign.evm.EvmTypedMessageParser
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectScanCommunicator
@@ -33,7 +34,8 @@ class WalletConnectSessionsModule {
     fun provideKnownRequestParser(
         gson: Gson,
         caip2Parser: Caip2Parser,
-    ): KnownSessionRequestProcessor = RealKnownSessionRequestProcessor(gson, caip2Parser)
+        typedMessageParser: EvmTypedMessageParser,
+    ): KnownSessionRequestProcessor = RealKnownSessionRequestProcessor(gson, caip2Parser, typedMessageParser)
 
     @Provides
     @ScreenScope

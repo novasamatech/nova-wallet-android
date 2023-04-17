@@ -8,11 +8,13 @@ import io.novafoundation.nova.caip.caip2.Caip2Parser
 import io.novafoundation.nova.caip.caip2.identifier.Caip2Identifier
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.fromJson
+import io.novafoundation.nova.feature_external_sign_api.domain.sign.evm.EvmTypedMessageParser
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmChainSource
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmSignPayload
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmSignPayload.ConfirmTx
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmTransaction
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmTypedMessage
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.PolkadotSignPayload
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.PolkadotSignerResult
 import io.novafoundation.nova.feature_wallet_connect_impl.data.model.evm.WalletConnectEvmTransaction
@@ -48,6 +50,7 @@ interface KnownSessionRequestProcessor {
 class RealKnownSessionRequestProcessor(
     private val gson: Gson,
     private val caip2Parser: Caip2Parser,
+    private val typedMessageParser: EvmTypedMessageParser,
 ) : KnownSessionRequestProcessor {
 
     override fun parseKnownRequest(sessionRequest: Wallet.Model.SessionRequest): KnownSessionRequest {
@@ -128,10 +131,21 @@ class RealKnownSessionRequestProcessor(
 
             "eth_signTransaction" -> parseEvmConfirmTx(request, chainId, ConfirmTx.Action.SIGN)
 
+            "eth_signTypedData" -> parseEvmSignTypedMessage(request)
+
             else -> unknownRequest(request.method)
         }
 
         return Evm(signPayload)
+    }
+
+    private fun parseEvmSignTypedMessage(request: JSONRPCRequest): EvmSignPayload.SignTypedMessage {
+        val (address, typedMessage) = parseEvmSignTypedDataParams(request.params)
+
+        return EvmSignPayload.SignTypedMessage(
+            message = typedMessage,
+            originAddress = address
+        )
     }
 
     private fun parseEvmConfirmTx(request: JSONRPCRequest, chainId: Int, action: ConfirmTx.Action): EvmSignPayload {
@@ -140,12 +154,22 @@ class RealKnownSessionRequestProcessor(
                 transaction = transaction,
                 originAddress = transaction.from,
                 chainSource = EvmChainSource(chainId, EvmChainSource.UnknownChainOptions.MustBeKnown),
-                action =action
+                action = action
             )
         }
     }
 
     private fun unknownRequest(reason: String): Nothing = error("Unknown session request: $reason")
+
+    private fun parseEvmSignTypedDataParams(params: String): Pair<String, EvmTypedMessage> {
+        // params = ["addressParam", structuredDataObject]
+        val (addressParam, structuredData) = params.removeSurrounding("[", "]").split(',', limit = 2)
+        val address = addressParam.removeSurrounding("\"")
+
+        val evmTypedMessage = typedMessageParser.parseEvmTypedMessage(structuredData)
+
+        return address to evmTypedMessage
+    }
 
     private fun parseStructTransaction(params: String): EvmTransaction.Struct {
         val parsed: WalletConnectEvmTransaction = parseEvmParameters(params)
