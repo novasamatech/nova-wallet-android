@@ -12,7 +12,7 @@ import kotlinx.coroutines.withContext
 
 abstract class BaseWalletConnectRequest(
     private val sessionRequest: Wallet.Model.SessionRequest
-): WalletConnectRequest {
+) : WalletConnectRequest {
 
     override val id: String = sessionRequest.request.id.toString()
 
@@ -22,7 +22,7 @@ abstract class BaseWalletConnectRequest(
 
     override suspend fun respondWith(response: ExternalSignCommunicator.Response): Result<*> = kotlin.runCatching {
         withContext(Dispatchers.Default) {
-            val walletConnectResponse = when(response) {
+            val walletConnectResponse = when (response) {
                 is ExternalSignCommunicator.Response.Rejected -> sessionRequest.rejected()
                 is ExternalSignCommunicator.Response.Sent -> sentResponse(response)
                 is ExternalSignCommunicator.Response.Signed -> signedResponse(response)
@@ -36,7 +36,7 @@ abstract class BaseWalletConnectRequest(
 
 abstract class SignWalletConnectRequest(
     sessionRequest: Wallet.Model.SessionRequest
-): BaseWalletConnectRequest(sessionRequest) {
+) : BaseWalletConnectRequest(sessionRequest) {
 
     override suspend fun sentResponse(response: ExternalSignCommunicator.Response.Sent): Wallet.Params.SessionRequestResponse {
         error("Expected Signed response, got: Sent")
@@ -45,7 +45,7 @@ abstract class SignWalletConnectRequest(
 
 abstract class SendTxWalletConnectRequest(
     sessionRequest: Wallet.Model.SessionRequest
-): BaseWalletConnectRequest(sessionRequest) {
+) : BaseWalletConnectRequest(sessionRequest) {
 
     override suspend fun signedResponse(response: ExternalSignCommunicator.Response.Signed): Wallet.Params.SessionRequestResponse {
         error("Expected Sent response, got: Signed")

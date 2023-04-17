@@ -63,7 +63,6 @@ class EvmWalletConnectRequestFactory(
     private fun Wallet.Model.SessionRequest.eipChainId(): Int {
         return chainId?.let(::extractEvmChainId)
             ?: error("No chain id supplied for ${request.method}")
-
     }
 
     private fun parseStructTransaction(params: String): EvmTransaction.Struct {

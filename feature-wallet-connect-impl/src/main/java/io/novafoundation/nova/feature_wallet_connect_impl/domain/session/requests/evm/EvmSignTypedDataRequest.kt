@@ -13,7 +13,7 @@ class EvmSignTypedDataRequest(
     private val originAddress: String,
     private val typedMessage: EvmTypedMessage,
     private val sessionRequest: Wallet.Model.SessionRequest
-): SignWalletConnectRequest(sessionRequest) {
+) : SignWalletConnectRequest(sessionRequest) {
 
     override suspend fun signedResponse(response: Response.Signed): SessionRequestResponse {
         return sessionRequest.approved(response.signature)

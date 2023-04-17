@@ -50,8 +50,8 @@ class WalletConnectSessionsModule {
     @Provides
     @ScreenScope
     fun provideRequestFactory(
-       polkadotFactory: PolkadotWalletConnectRequestFactory,
-       evmFactory: EvmWalletConnectRequestFactory,
+        polkadotFactory: PolkadotWalletConnectRequestFactory,
+        evmFactory: EvmWalletConnectRequestFactory,
     ): WalletConnectRequest.Factory {
         return CompoundWalletConnectRequestFactory(polkadotFactory, evmFactory)
     }
