@@ -13,7 +13,7 @@ sealed class EvmSignPayload : Parcelable {
         override val originAddress: String,
         val chainSource: EvmChainSource,
         val action: Action,
-    ): EvmSignPayload() {
+    ) : EvmSignPayload() {
 
         enum class Action {
             SIGN, SEND

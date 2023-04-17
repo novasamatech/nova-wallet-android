@@ -205,7 +205,7 @@ class EvmSignInteractor(
         }
     }
 
-    private suspend fun confirmTx(basedOn: EvmTransaction, evmChainId: Long, action: ConfirmTx.Action): ExternalSignCommunicator.Response.Sent {
+    private suspend fun confirmTx(basedOn: EvmTransaction, evmChainId: Long, action: ConfirmTx.Action): ExternalSignCommunicator.Response {
         val api = requireNotNull(ethereumApi())
 
         val tx = api.formTransaction(basedOn)
@@ -216,7 +216,7 @@ class EvmSignInteractor(
         return when (action) {
             ConfirmTx.Action.SIGN -> {
                 val signedTx = api.signTransaction(tx, signer, originAccountId, evmChainId)
-                ExternalSignCommunicator.Response.Sent(request.id, signedTx)
+                ExternalSignCommunicator.Response.Signed(request.id, signedTx)
             }
             ConfirmTx.Action.SEND -> {
                 val txHash = api.sendTransaction(tx, signer, originAccountId, evmChainId)

@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
-sealed class EvmTransaction: Parcelable {
+sealed class EvmTransaction : Parcelable {
     @Parcelize
     class Struct(
         val gas: String?,
@@ -14,6 +14,7 @@ sealed class EvmTransaction: Parcelable {
         val value: String?,
         val nonce: String?,
     ) : EvmTransaction()
+
     @Parcelize
-    class Raw(val rawContent: String): EvmTransaction()
+    class Raw(val rawContent: String) : EvmTransaction()
 }
