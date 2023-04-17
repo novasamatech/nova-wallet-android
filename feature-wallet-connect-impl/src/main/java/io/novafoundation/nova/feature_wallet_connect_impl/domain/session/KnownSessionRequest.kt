@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.feature_external_sign_api.domain.sign.evm.EvmTypedMessageParser
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmChainSource
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmPersonalSignMessage
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmSignPayload
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmSignPayload.ConfirmTx
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmTransaction
@@ -66,6 +67,8 @@ class RealKnownSessionRequestProcessor(
 
                 parseEvmRequest(request, chainId)
             }
+
+            request.method == "personal_sign" -> parsePersonalSign(request)
 
             else -> unknownRequest(request.method)
         }
@@ -139,6 +142,18 @@ class RealKnownSessionRequestProcessor(
         return Evm(signPayload)
     }
 
+    private fun parsePersonalSign(request: JSONRPCRequest): KnownSessionRequest.Params {
+        val (message, address) = gson.fromJson<List<String>>(request.params)
+
+        return Evm(
+            EvmSignPayload.PersonalSign(
+                EvmPersonalSignMessage(message),
+                address
+            )
+        )
+    }
+
+
     private fun parseEvmSignTypedMessage(request: JSONRPCRequest): EvmSignPayload.SignTypedMessage {
         val (address, typedMessage) = parseEvmSignTypedDataParams(request.params)
 
@@ -172,7 +187,7 @@ class RealKnownSessionRequestProcessor(
     }
 
     private fun parseStructTransaction(params: String): EvmTransaction.Struct {
-        val parsed: WalletConnectEvmTransaction = parseEvmParameters(params)
+        val parsed: WalletConnectEvmTransaction = parseSingleEvmParameter(params)
 
         return with(parsed) {
             EvmTransaction.Struct(
@@ -187,7 +202,7 @@ class RealKnownSessionRequestProcessor(
         }
     }
 
-    private inline fun <reified T : List<I>, reified I> parseEvmParameters(params: String): I {
+    private inline fun <reified T : List<I>, reified I> parseSingleEvmParameter(params: String): I {
         // gson.fromJson<List<I>>(params) does not work even with inlining - gson ignores inner list types and creates hash map instead
         val parsed = gson.fromJson<T>(params)
 
