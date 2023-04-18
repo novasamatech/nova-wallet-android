@@ -13,7 +13,7 @@ fun <T> BaseFragmentMixin<*>.setupListChooserMixin(
             context = fragment.requireContext(),
             payload = action.payload,
             onCancel = action.onCancel,
-            onClicked = action.onSuccess,
+            onClicked = { _, item -> action.onSuccess(item) },
         ).show()
     }
 
@@ -30,7 +30,7 @@ fun <T> BaseFragmentMixin<*>.setupListChooserMixinBottomSheet(
             context = fragment.requireContext(),
             payload = action.payload,
             onCancel = action.onCancel,
-            onClicked = action.onSuccess,
+            onClicked = { _, item -> action.onSuccess(item) },
         ).show()
     }
 }

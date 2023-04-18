@@ -1,10 +1,11 @@
 package io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput
 
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.ExternalAccountResolver
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.inputSpec.AddressInputSpec
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
-interface AddressInputMixin {
+interface AddressInputMixin : ExternalAccountResolver {
 
     suspend fun getInputSpec(): AddressInputSpec
 
@@ -19,6 +20,10 @@ interface AddressInputMixin {
     fun scanClicked()
 
     fun myselfClicked()
+
+    suspend fun getAddress(): String
+
+    fun clearExtendedAccount()
 }
 
 suspend fun AddressInputMixin.isAddressValid(input: String) = getInputSpec().isValidAddress(input)
