@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.BaseAssetTransfers
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInUsedAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.positiveAmount
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientBalanceInUsedAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientTransferableBalanceToPayOriginFee
@@ -32,19 +33,20 @@ private const val TRANSFER_CALL = "transfer"
 
 class EquilibriumAssetTransfers(
     chainRegistry: ChainRegistry,
-    assetSourceRegistry: AssetSourceRegistry,
+    private val assetSourceRegistry: AssetSourceRegistry,
     extrinsicService: ExtrinsicService,
     phishingValidationFactory: PhishingValidationFactory,
     private val remoteStorageSource: StorageDataSource,
 ) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory) {
 
-    override val validationSystem: AssetTransfersValidationSystem
-        get() = ValidationSystem {
-            validAddress()
-            positiveAmount()
-            sufficientBalanceInUsedAsset()
-            sufficientTransferableBalanceToPayOriginFee()
-        }
+    override val validationSystem: AssetTransfersValidationSystem = ValidationSystem {
+        validAddress()
+        positiveAmount()
+        sufficientBalanceInUsedAsset()
+        sufficientTransferableBalanceToPayOriginFee()
+
+        notDeadRecipientInUsedAsset(assetSourceRegistry)
+    }
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
         if (transfer.originChainAsset.type !is Chain.Asset.Type.Equilibrium) return
