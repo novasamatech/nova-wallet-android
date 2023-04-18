@@ -11,8 +11,6 @@
 
     <string name="web3names_unsupported_asset_title">Token %s is not supported yet</string>
     <string name="web3names_unsupported_asset_message">Nova can\'t resolve code for token %s</string>
-    <string name="common_unknown_error_title">Unknown error</string>
-    <string name="common_unknown_error_message">Something went wrong. Please try again later.</string>
     <string name="web3names_address_with_description">%s (%s)</string>
     <string name="web3names_invalid_recepient_title">Invalid recipient</string>
     <string name="web3names_service_unavailable_title">Error resolving w3n</string>
