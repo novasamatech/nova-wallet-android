@@ -41,6 +41,5 @@ class WalletConnectSessionsFragment : BaseFragment<WalletConnectSessionsViewMode
     }
 
     override fun subscribe(viewModel: WalletConnectSessionsViewModel) {
-
     }
 }

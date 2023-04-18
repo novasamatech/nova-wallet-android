@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_external_sign_api.presentation.externalSig
 
 fun <T> T.setupWalletConnectService(
     service: WalletConnectService,
-) where T: WithLifecycleExtensions, T: WithContextExtensions {
+) where T : WithLifecycleExtensions, T : WithContextExtensions {
     service.authorizeDapp.awaitableActionLiveData.observeEvent { action ->
         AuthorizeDappBottomSheet(
             context = providedContext,

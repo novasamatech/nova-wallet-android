@@ -16,7 +16,6 @@ suspend fun AutomaticInteractionGate.awaitInteractionAllowed() {
     isInteractionAllowedFlow.first { allowed -> allowed == true }
 }
 
-
 internal class RealAutomaticInteractionGate : AutomaticInteractionGate {
 
     override val isInteractionAllowedFlow = MutableStateFlow(false)

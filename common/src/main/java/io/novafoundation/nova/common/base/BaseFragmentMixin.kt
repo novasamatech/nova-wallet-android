@@ -27,7 +27,6 @@ interface BaseFragmentMixin<T : BaseViewModel> : WithContextExtensions, WithLife
     override val providedContext: Context
         get() = fragment.requireContext()
 
-
     override val lifecycleOwner: LifecycleOwner
         get() = fragment.viewLifecycleOwner
 

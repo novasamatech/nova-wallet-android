@@ -70,7 +70,7 @@ class WalletConnectFeatureModule {
         walletUiUseCase: WalletUiUseCase,
         interactor: WalletConnectSessionInteractor,
         dAppSignRequester: ExternalSignCommunicator,
-    ) : WalletConnectService.Factory {
+    ): WalletConnectService.Factory {
         return RealWalletConnectServiceFactory(
             awaitableMixinFactory = awaitableMixinFactory,
             walletUiUseCase = walletUiUseCase,

@@ -32,16 +32,16 @@ internal class RealWalletConnectServiceFactory(
     private val walletUiUseCase: WalletUiUseCase,
     private val interactor: WalletConnectSessionInteractor,
     private val dAppSignRequester: ExternalSignRequester,
-): WalletConnectService.Factory {
+) : WalletConnectService.Factory {
 
     override fun create(coroutineScope: CoroutineScope): WalletConnectService {
-       return RealWalletConnectService(
-           parentScope = coroutineScope,
-           awaitableMixinFactory = awaitableMixinFactory,
-           walletUiUseCase = walletUiUseCase,
-           interactor = interactor,
-           dAppSignRequester = dAppSignRequester
-       )
+        return RealWalletConnectService(
+            parentScope = coroutineScope,
+            awaitableMixinFactory = awaitableMixinFactory,
+            walletUiUseCase = walletUiUseCase,
+            interactor = interactor,
+            dAppSignRequester = dAppSignRequester
+        )
     }
 }
 

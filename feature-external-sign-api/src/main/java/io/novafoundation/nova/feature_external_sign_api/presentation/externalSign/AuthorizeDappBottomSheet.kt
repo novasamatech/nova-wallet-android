@@ -42,7 +42,7 @@ class AuthorizeDappBottomSheet(
     override val contentLayoutRes: Int = R.layout.bottom_sheet_confirm_authorize
 
     init {
-        FeatureUtils.getCommonApi(context).let {api ->
+        FeatureUtils.getCommonApi(context).let { api ->
             interactionGate = api.automaticInteractionGate
             imageLoader = api.imageLoader()
         }

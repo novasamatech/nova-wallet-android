@@ -10,8 +10,10 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.WithLifecycleExtensions
 import javax.inject.Inject
 
-abstract class BaseActivity<T : BaseViewModel> : AppCompatActivity(),
-    WithContextExtensions, WithLifecycleExtensions {
+abstract class BaseActivity<T : BaseViewModel> :
+    AppCompatActivity(),
+    WithContextExtensions,
+    WithLifecycleExtensions {
 
     override val providedContext: Context
         get() = this
