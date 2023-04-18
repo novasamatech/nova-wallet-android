@@ -5,6 +5,7 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.WalletConnectSessionsFragment
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.di.WalletConnectSessionsModule
 
 @Subcomponent(
     modules = [

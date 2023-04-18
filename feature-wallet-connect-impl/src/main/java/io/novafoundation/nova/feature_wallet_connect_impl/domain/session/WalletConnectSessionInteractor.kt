@@ -8,12 +8,11 @@ import io.novafoundation.nova.caip.caip2.identifier.Caip2Namespace
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
-import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.approveSession
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.approved
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.rejectSession
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.rejected
-import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.respondSessionRequest
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.WalletConnectRequest
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -25,16 +24,14 @@ interface WalletConnectSessionInteractor {
 
     suspend fun rejectSession(proposal: SessionProposal): Result<Unit>
 
-    suspend fun parseSessionRequest(request: Wallet.Model.SessionRequest): Result<KnownSessionRequest>
-
-    suspend fun respondSessionRequest(request: KnownSessionRequest, result: ExternalSignCommunicator.Response): Result<Unit>
+    suspend fun parseSessionRequest(request: Wallet.Model.SessionRequest): Result<WalletConnectRequest>
 }
 
 class RealWalletConnectSessionInteractor(
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
     private val caip2Resolver: Caip2Resolver,
-    private val sessionRequestParser: KnownSessionRequestProcessor,
+    private val walletConnectRequestFactory: WalletConnectRequest.Factory,
 ) : WalletConnectSessionInteractor {
 
     override suspend fun approveSession(sessionProposal: SessionProposal): Result<Unit> {
@@ -77,17 +74,11 @@ class RealWalletConnectSessionInteractor(
         return Web3Wallet.rejectSession(response)
     }
 
-    override suspend fun parseSessionRequest(request: Wallet.Model.SessionRequest): Result<KnownSessionRequest> = runCatching {
+    override suspend fun parseSessionRequest(request: Wallet.Model.SessionRequest): Result<WalletConnectRequest> = runCatching {
         withContext(Dispatchers.Default) {
-            sessionRequestParser.parseKnownRequest(request)
-        }
-    }
-
-    override suspend fun respondSessionRequest(request: KnownSessionRequest, result: ExternalSignCommunicator.Response): Result<Unit> = runCatching {
-        withContext(Dispatchers.Default) {
-            val response = sessionRequestParser.prepareResponse(request, result)
-
-            Web3Wallet.respondSessionRequest(response)
+            requireNotNull(walletConnectRequestFactory.create(request)) {
+                "${request.request.method} is not supported"
+            }
         }
     }
 

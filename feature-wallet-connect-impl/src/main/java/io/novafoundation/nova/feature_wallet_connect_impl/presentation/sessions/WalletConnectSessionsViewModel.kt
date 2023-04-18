@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions
 
+import android.util.Log
 import com.walletconnect.android.Core
 import com.walletconnect.android.CoreClient
 import com.walletconnect.web3.wallet.client.Wallet
@@ -12,13 +13,10 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignRequester
 import io.novafoundation.nova.feature_external_sign_api.model.awaitConfirmation
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignPayload
-import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.SigningDappMetadata
-import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.PolkadotSignPayload
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectScanCommunicator
-import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.KnownSessionRequest
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.WalletConnectSessionInteractor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -97,30 +95,20 @@ class WalletConnectSessionsViewModel(
         val session = Web3Wallet.getActiveSessionByTopic(sessionRequest.topic) ?: return
 
         // TODO reject request if not able to parse
-        val knownSessionRequest = interactor.parseSessionRequest(sessionRequest).getOrNull() ?: return
-        val confirmTxRequest = mapKnownSessionRequestToExternalSignRequest(sessionRequest.request.id.toString(), knownSessionRequest)
+        val walletConnectRequest = interactor.parseSessionRequest(sessionRequest)
+            .onFailure { Log.e("WalletConnect", "Failed to parse session request $sessionRequest", it) }
+            .getOrNull() ?: return
 
-        val result = withContext(Dispatchers.Main) {
+        val externalSignResponse = withContext(Dispatchers.Main) {
             dAppSignRequester.awaitConfirmation(
                 ExternalSignPayload(
-                    signRequest = confirmTxRequest,
+                    signRequest = walletConnectRequest.toExternalSignRequest(),
                     dappMetadata = mapWalletConnectSessionToSignDAppMetadata(session)
                 )
             )
         }
 
-        interactor.respondSessionRequest(knownSessionRequest, result)
-    }
-
-    private fun mapKnownSessionRequestToExternalSignRequest(requestId: String, request: KnownSessionRequest): ExternalSignRequest {
-        return when (val params = request.params) {
-            is KnownSessionRequest.Params.Polkadot.SignMessage -> {
-                ExternalSignRequest.Polkadot(requestId, PolkadotSignPayload.Raw(data = params.message, address = params.address, type = null))
-            }
-            is KnownSessionRequest.Params.Polkadot.SignTransaction -> {
-                ExternalSignRequest.Polkadot(requestId, params.transactionPayload)
-            }
-        }
+        walletConnectRequest.respondWith(externalSignResponse)
     }
 
     private fun mapWalletConnectSessionToSignDAppMetadata(session: Wallet.Model.Session): SigningDappMetadata? {

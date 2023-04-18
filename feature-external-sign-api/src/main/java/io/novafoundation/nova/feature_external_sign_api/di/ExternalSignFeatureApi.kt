@@ -1,3 +1,8 @@
 package io.novafoundation.nova.feature_external_sign_api.di
 
-interface ExternalSignFeatureApi
+import io.novafoundation.nova.feature_external_sign_api.domain.sign.evm.EvmTypedMessageParser
+
+interface ExternalSignFeatureApi {
+
+    val evmTypedMessageParser: EvmTypedMessageParser
+}

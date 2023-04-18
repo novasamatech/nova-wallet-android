@@ -6,7 +6,8 @@ class MetamaskTransaction(
     val from: String,
     val to: String,
     val data: String?,
-    val value: String?
+    val value: String?,
+    val nonce: String?,
 )
 
 class MetamaskTypedMessage(
