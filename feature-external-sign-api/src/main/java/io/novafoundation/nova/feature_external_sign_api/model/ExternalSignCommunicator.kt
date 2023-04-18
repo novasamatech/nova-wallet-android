@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.navigation.InterScreenResponder
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator.Response
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignPayload
 import kotlinx.android.parcel.Parcelize
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 
 interface ExternalSignRequester : InterScreenRequester<ExternalSignPayload, Response>
@@ -35,11 +34,9 @@ interface ExternalSignCommunicator : ExternalSignRequester, ExternalSignResponde
 }
 
 suspend fun ExternalSignRequester.awaitConfirmation(request: ExternalSignPayload): Response {
-    val responsesForRequest = responseFlow.filter { it.requestId == request.signRequest.id }
-
     openRequest(request)
 
-    return responsesForRequest.first()
+    return responseFlow.first { it.requestId == request.signRequest.id }
 }
 
 fun Throwable.failedSigningIfNotCancelled(requestId: String) = if (this is SigningCancelledException) {

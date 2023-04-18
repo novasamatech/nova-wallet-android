@@ -33,9 +33,6 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     @Inject
     lateinit var contextManager: ContextManager
 
-    @Inject
-    protected lateinit var imageLoader: ImageLoader
-
     override fun inject() {
         FeatureUtils.getFeature<RootComponent>(this, RootApi::class.java)
             .mainActivityComponentFactory()
@@ -119,7 +116,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
             }
         )
 
-        setupWalletConnectService(viewModel.walletConnectService, imageLoader)
+        setupWalletConnectService(viewModel.walletConnectService)
     }
 
     override fun removeSplashBackground() {

@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.core.updater.UpdateSystem
@@ -65,4 +66,6 @@ interface RootDependencies {
     val walletConnectServiceFactory: WalletConnectService.Factory
 
     val imageLoader: ImageLoader
+
+    val automaticInteractionGate: AutomaticInteractionGate
 }
