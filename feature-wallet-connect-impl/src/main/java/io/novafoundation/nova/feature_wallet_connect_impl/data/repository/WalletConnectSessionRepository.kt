@@ -15,14 +15,14 @@ interface WalletConnectSessionRepository {
 
 class RealWalletConnectSessionRepository(
     private val dao: WalletConnectSessionsDao,
-): WalletConnectSessionRepository {
+) : WalletConnectSessionRepository {
 
     override suspend fun addSession(session: WalletConnectSession) {
         dao.insertSession(mapSessionToLocal(session))
     }
 
     override suspend fun getSession(sessionTopic: String): WalletConnectSession? {
-       return dao.getSession(sessionTopic)?.let(::mapSessionFromLocal)
+        return dao.getSession(sessionTopic)?.let(::mapSessionFromLocal)
     }
 
     override suspend fun deleteSession(sessionTopic: String) {

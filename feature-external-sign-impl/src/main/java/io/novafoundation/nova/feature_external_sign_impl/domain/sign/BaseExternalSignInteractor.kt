@@ -19,7 +19,7 @@ abstract class BaseExternalSignInteractor(
     }
 
     protected suspend fun resolveMetaAccount(): MetaAccount {
-        return when(wallet) {
+        return when (wallet) {
             ExternalSignWallet.Current -> accountRepository.getSelectedMetaAccount()
             is ExternalSignWallet.WithId -> accountRepository.getMetaAccount(wallet.metaId)
         }

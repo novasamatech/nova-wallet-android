@@ -19,13 +19,13 @@ class SigningDappMetadata(
     val url: String
 ) : Parcelable
 
-sealed class ExternalSignWallet: Parcelable {
+sealed class ExternalSignWallet : Parcelable {
 
     @Parcelize
-    object Current: ExternalSignWallet()
+    object Current : ExternalSignWallet()
 
     @Parcelize
-    class WithId(val metaId: Long): ExternalSignWallet()
+    class WithId(val metaId: Long) : ExternalSignWallet()
 }
 
 sealed interface ExternalSignRequest : Parcelable {

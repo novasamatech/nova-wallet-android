@@ -178,7 +178,7 @@ class ExternaSignViewModel(
     }
 
     private fun WalletUiUseCase.walletUiFor(externalSignWallet: ExternalSignWallet): Flow<WalletModel> {
-        return when(externalSignWallet) {
+        return when (externalSignWallet) {
             ExternalSignWallet.Current -> selectedWalletUiFlow(showAddressIcon = true)
             is ExternalSignWallet.WithId -> walletUiFlow(externalSignWallet.metaId, showAddressIcon = true)
         }

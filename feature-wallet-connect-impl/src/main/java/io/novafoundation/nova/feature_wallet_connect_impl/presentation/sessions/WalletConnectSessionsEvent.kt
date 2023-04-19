@@ -16,9 +16,9 @@ sealed class WalletConnectSessionsEvent {
 
     data class SessionRequest(val request: Wallet.Model.SessionRequest) : WalletConnectSessionsEvent()
 
-    data class SessionSettlement(val settlement: Wallet.Model.SettledSessionResponse): WalletConnectSessionsEvent()
+    data class SessionSettlement(val settlement: Wallet.Model.SettledSessionResponse) : WalletConnectSessionsEvent()
 
-    data class SessionDeleted(val delete: Wallet.Model.SessionDelete): WalletConnectSessionsEvent()
+    data class SessionDeleted(val delete: Wallet.Model.SessionDelete) : WalletConnectSessionsEvent()
 }
 
 fun Web3Wallet.sessionEventsFlow(scope: CoroutineScope): Flow<WalletConnectSessionsEvent> {
