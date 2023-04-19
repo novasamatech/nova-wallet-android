@@ -694,6 +694,7 @@
     <string name="select_delegation_tracks_unavailable_tracks">Недоступные треки</string>
     <string name="select_ledger_location_enable_request_message">Nova нуждается в включении местоположения, чтобы иметь возможность выполнять сканирование Bluetooth для поиска вашего устройства Ledger</string>
     <string name="select_ledger_location_enable_request_title">Пожалуйста, включите геолокацию в настройках устройства</string>
+    <string name="send_address_hint">Адрес или w3n</string>
     <string name="settings_community">Сообщество</string>
     <string name="settings_email">Написать разработчикам</string>
     <string name="settings_general">Основные</string>
@@ -1068,6 +1069,17 @@
     <string name="wallet_transfer_details_send_back">Отправить этому контакту</string>
     <string name="wallet_transfer_details_title">Детали перевода</string>
     <string name="wallet_your_balance">Ваш баланс</string>
+    <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
+    <string name="web3names_identifiers_sheet_title" formatted="false">%s адреса для %s</string>
+    <string name="web3names_integrity_check_failed_message">Nova обнаружила проблемы с целостностью информации об адресах %1$s. Пожалуйста, свяжитесь с владельцем %1$s для решения проблем с целостностью.</string>
+    <string name="web3names_integrity_check_failed_title">Проверка целостности не удалась</string>
+    <string name="web3names_invalid_recepient_title">Неверный получатель</string>
+    <string name="web3names_no_valid_recepient_found_message" formatted="false">Не найден действительный адрес для %s в сети %s</string>
+    <string name="web3names_recepient_not_found_message">%s не найден</string>
+    <string name="web3names_service_unavailable_message">%1$s сервисы w3n недоступны. Повторите попытку позже или введите адрес %1$s вручную</string>
+    <string name="web3names_service_unavailable_title">Ошибка при поиске w3n</string>
+    <string name="web3names_unsupported_asset_message">Nova не может установить код для токена %s</string>
+    <string name="web3names_unsupported_asset_title">Токен %s пока не поддерживается</string>
     <string name="yesterday">Вчера</string>
     <string name="yield_boost_already_enabled_message">Yield Boost будет отключен для текущих коллаторов. Новый коллатор: %s</string>
     <string name="yield_boost_already_enabled_title">Изменить коллатора с Yield Boost?</string>

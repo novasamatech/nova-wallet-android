@@ -8,5 +8,7 @@
     <declare-styleable name="AddressInputField">
 
         <attr name="android:hint" />
+
+        <attr name="hasExternalAccountIdentifiers" format="boolean"/>
     </declare-styleable>
 </resources>

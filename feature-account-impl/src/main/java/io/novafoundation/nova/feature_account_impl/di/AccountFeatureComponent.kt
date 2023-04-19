@@ -42,6 +42,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
+import io.novafoundation.nova.web3names.di.Web3NamesApi
 
 @Component(
     dependencies = [
@@ -123,7 +124,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
             RuntimeApi::class,
             CurrencyFeatureApi::class,
             DbApi::class,
-            VersionsFeatureApi::class
+            VersionsFeatureApi::class,
+            Web3NamesApi::class
         ]
     )
     interface AccountFeatureDependenciesComponent : AccountFeatureDependencies

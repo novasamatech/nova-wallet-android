@@ -1,6 +1,5 @@
 package io.novafoundation.nova.common.utils
 
-import android.app.Activity
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.TypedArray
@@ -14,7 +13,6 @@ import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ScrollView
@@ -201,23 +199,6 @@ inline fun View.doOnGlobalLayout(crossinline action: () -> Unit) {
 
 fun View.setVisible(visible: Boolean, falseState: Int = View.GONE) {
     visibility = if (visible) View.VISIBLE else falseState
-}
-
-fun View.hideSoftKeyboard() {
-    val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
-}
-
-fun Activity.hideSoftKeyboard() {
-    currentFocus?.hideSoftKeyboard()
-}
-
-fun View.showSoftKeyboard() {
-    requestFocus()
-
-    val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-
-    inputMethodManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
 }
 
 fun ViewGroup.addAfter(anchor: View, newViews: List<View>) {

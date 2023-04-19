@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.utils.hideSoftKeyboard
+import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.R
 import kotlinx.android.synthetic.main.fragment_create_wallet_name.createWalletNameContinue

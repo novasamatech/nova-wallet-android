@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.getList
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.combine
+import io.novafoundation.nova.common.utils.constantOrNull
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.common.utils.eqBalances
 import io.novafoundation.nova.common.utils.hasUpdated
@@ -34,8 +35,8 @@ import io.novafoundation.nova.runtime.ext.requireEquilibrium
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.network.binding.number
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
@@ -48,6 +49,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import java.math.BigInteger
 
 class EquilibriumAssetBalance(
     private val chainRegistry: ChainRegistry,
@@ -88,7 +90,14 @@ class EquilibriumAssetBalance(
     }
 
     override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
-        return BigInteger.ZERO
+        return if (chainAsset.isUtilityAsset) {
+            remoteStorageSource.query(chain.id) {
+                runtime.metadata.eqBalances().constantOrNull("ExistentialDepositBasic")?.getAs(number())
+                    .orZero()
+            }
+        } else {
+            BigInteger.ZERO
+        }
     }
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
