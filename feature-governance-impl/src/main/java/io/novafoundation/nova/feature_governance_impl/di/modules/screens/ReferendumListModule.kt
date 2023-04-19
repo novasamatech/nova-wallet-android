@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.di.modules.screens
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
@@ -9,6 +10,9 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.RealReferendaListInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.ReferendaSharedComputation
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.RealReferendaCommonRepository
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.ReferendaCommonRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.RealReferendaSortingProvider
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -24,19 +28,44 @@ class ReferendumListModule {
 
     @Provides
     @FeatureScope
-    fun provideReferendaListInteractor(
+    fun provideReferendaCommonRepository(
         chainStateRepository: ChainStateRepository,
         governanceSourceRegistry: GovernanceSourceRegistry,
         referendaConstructor: ReferendaConstructor,
         referendaSortingProvider: ReferendaSortingProvider,
-        identityRepository: OnChainIdentityRepository,
-        governanceSharedState: GovernanceSharedState
+        identityRepository: OnChainIdentityRepository
+    ): ReferendaCommonRepository {
+        return RealReferendaCommonRepository(
+            chainStateRepository = chainStateRepository,
+            governanceSourceRegistry = governanceSourceRegistry,
+            referendaConstructor = referendaConstructor,
+            referendaSortingProvider = referendaSortingProvider,
+            identityRepository = identityRepository
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideReferendaSharedComputation(
+        computationalCache: ComputationalCache,
+        referendaCommonRepository: ReferendaCommonRepository
+    ): ReferendaSharedComputation {
+        return ReferendaSharedComputation(computationalCache, referendaCommonRepository)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideReferendaListInteractor(
+        referendaCommonRepository: ReferendaCommonRepository,
+        governanceSharedState: GovernanceSharedState,
+        referendaSharedComputation: ReferendaSharedComputation,
+        governanceSourceRegistry: GovernanceSourceRegistry,
+        referendaSortingProvider: ReferendaSortingProvider
     ): ReferendaListInteractor = RealReferendaListInteractor(
-        chainStateRepository = chainStateRepository,
+        referendaCommonRepository = referendaCommonRepository,
+        governanceSharedState = governanceSharedState,
+        referendaSharedComputation = referendaSharedComputation,
         governanceSourceRegistry = governanceSourceRegistry,
-        referendaConstructor = referendaConstructor,
-        referendaSortingProvider = referendaSortingProvider,
-        identityRepository = identityRepository,
-        governanceSharedState = governanceSharedState
+        referendaSortingProvider = referendaSortingProvider
     )
 }

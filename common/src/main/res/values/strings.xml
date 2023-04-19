@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="referenda_title">Referenda</string>
+    <string name="referenda_search_toolbar_hint">Search by referendum title or ID</string>
+    <string name="referenda_search_placeholder">No referenda with entered title or ID were found</string>
+
     <string name="ethereum_function">Function</string>
     <string name="ethereum_contract">Contract</string>
     <string name="ethereum_contract_call">Contract call</string>

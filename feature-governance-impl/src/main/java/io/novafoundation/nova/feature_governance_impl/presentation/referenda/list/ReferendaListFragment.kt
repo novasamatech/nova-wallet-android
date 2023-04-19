@@ -80,4 +80,12 @@ class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel>(
     override fun onClickDelegations() {
         viewModel.delegationsClicked()
     }
+
+    override fun onClickReferendaSearch() {
+        viewModel.searchClicked()
+    }
+
+    override fun onClickReferendaFilters() {
+        viewModel.filtersClicked()
+    }
 }
