@@ -8,7 +8,8 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class ExternalSignPayload(
     val signRequest: ExternalSignRequest,
-    val dappMetadata: SigningDappMetadata?
+    val dappMetadata: SigningDappMetadata?,
+    val wallet: ExternalSignWallet
 ) : Parcelable
 
 @Parcelize
@@ -17,6 +18,15 @@ class SigningDappMetadata(
     val name: String?,
     val url: String
 ) : Parcelable
+
+sealed class ExternalSignWallet: Parcelable {
+
+    @Parcelize
+    object Current: ExternalSignWallet()
+
+    @Parcelize
+    class WithId(val metaId: Long): ExternalSignWallet()
+}
 
 sealed interface ExternalSignRequest : Parcelable {
 

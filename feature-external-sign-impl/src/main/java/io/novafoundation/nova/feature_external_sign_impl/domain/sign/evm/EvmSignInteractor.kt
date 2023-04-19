@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.sign.asE
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_external_sign_api.model.failedSigningIfNotCancelled
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignWallet
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmChain
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmChainSource
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmPersonalSignMessage
@@ -34,6 +35,7 @@ import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.Ev
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmTypedMessage
 import io.novafoundation.nova.feature_external_sign_impl.data.evmApi.EvmApi
 import io.novafoundation.nova.feature_external_sign_impl.data.evmApi.EvmApiFactory
+import io.novafoundation.nova.feature_external_sign_impl.domain.sign.BaseExternalSignInteractor
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationFailure
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationSystem
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
@@ -50,7 +52,6 @@ import io.novafoundation.nova.runtime.multiNetwork.findEvmChain
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
-import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -76,7 +77,7 @@ class EvmSignInteractorFactory(
     private val signerProvider: SignerProvider
 ) {
 
-    fun create(request: ExternalSignRequest.Evm) = EvmSignInteractor(
+    fun create(request: ExternalSignRequest.Evm, wallet: ExternalSignWallet) = EvmSignInteractor(
         chainRegistry = chainRegistry,
         tokenRepository = tokenRepository,
         currencyRepository = currencyRepository,
@@ -85,7 +86,8 @@ class EvmSignInteractorFactory(
         request = request,
         evmApiFactory = evmApiFactory,
         accountRepository = accountRepository,
-        signerProvider = signerProvider
+        signerProvider = signerProvider,
+        wallet = wallet
     )
 }
 
@@ -97,9 +99,11 @@ class EvmSignInteractor(
     private val currencyRepository: CurrencyRepository,
     private val chainRegistry: ChainRegistry,
     private val extrinsicGson: Gson,
-    private val accountRepository: AccountRepository,
     private val signerProvider: SignerProvider,
-) : ExternalSignInteractor, CoroutineScope by CoroutineScope(Dispatchers.Default) {
+    accountRepository: AccountRepository,
+    wallet: ExternalSignWallet,
+) : BaseExternalSignInteractor(accountRepository, wallet, signerProvider),
+    CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
     private val mostRecentFormedTx = singleReplaySharedFlow<RawTransaction>()
 
@@ -211,7 +215,7 @@ class EvmSignInteractor(
         val tx = api.formTransaction(basedOn)
 
         val originAccountId = originAccountId()
-        val signer = resolveSigner()
+        val signer = resolveWalletSigner()
 
         return when (action) {
             ConfirmTx.Action.SIGN -> {
@@ -235,7 +239,7 @@ class EvmSignInteractor(
         val personalSignMessage = message.data.fromHex().asEthereumPersonalSignMessage()
         val payload = SignerPayloadRaw(personalSignMessage, originAccountId(), skipMessageHashing = true)
 
-        val signature = resolveSigner().signRaw(payload).asHexString()
+        val signature = resolveWalletSigner().signRaw(payload).asHexString()
 
         return ExternalSignCommunicator.Response.Signed(request.id, signature)
     }
@@ -243,7 +247,7 @@ class EvmSignInteractor(
     private suspend fun signMessage(message: ByteArray): String {
         val signerPayload = SignerPayloadRaw(message, originAccountId(), skipMessageHashing = true)
 
-        return resolveSigner().signRaw(signerPayload).asHexString()
+        return resolveWalletSigner().signRaw(signerPayload).asHexString()
     }
 
     private fun personalSignReadableContent(payload: PersonalSign): String {
@@ -319,12 +323,6 @@ class EvmSignInteractor(
             ),
             currency = currency
         )
-    }
-
-    private suspend fun resolveSigner(): Signer {
-        val metaAccount = accountRepository.getSelectedMetaAccount()
-
-        return signerProvider.signerFor(metaAccount)
     }
 
     private fun RawTransaction.fee() = gasLimit * gasPrice

@@ -6,8 +6,10 @@ import com.walletconnect.web3.wallet.client.Web3Wallet
 import io.novafoundation.nova.caip.caip2.Caip2Resolver
 import io.novafoundation.nova.caip.caip2.identifier.Caip2Namespace
 import io.novafoundation.nova.common.utils.mapValuesNotNull
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.WalletConnectSessionRepository
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSession
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.approveSession
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.approved
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.rejectSession
@@ -17,26 +19,39 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import java.util.concurrent.ConcurrentHashMap
 
 interface WalletConnectSessionInteractor {
 
-    suspend fun approveSession(sessionProposal: SessionProposal): Result<Unit>
+    suspend fun approveSession(
+        sessionProposal: SessionProposal,
+        metaAccount: MetaAccount
+    ): Result<Unit>
 
     suspend fun rejectSession(proposal: SessionProposal): Result<Unit>
 
     suspend fun parseSessionRequest(request: Wallet.Model.SessionRequest): Result<WalletConnectRequest>
+
+    suspend fun onSessionSettled(settledSessionResponse: Wallet.Model.SettledSessionResponse)
+
+    suspend fun onSessionDelete(sessionDelete: Wallet.Model.SessionDelete)
+
+    suspend fun getSession(sessionTopic: String): WalletConnectSession?
 }
 
 class RealWalletConnectSessionInteractor(
-    private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
     private val caip2Resolver: Caip2Resolver,
     private val walletConnectRequestFactory: WalletConnectRequest.Factory,
+    private val walletConnectSessionRepository: WalletConnectSessionRepository,
 ) : WalletConnectSessionInteractor {
 
-    override suspend fun approveSession(sessionProposal: SessionProposal): Result<Unit> {
-        val metaAccount = accountRepository.getSelectedMetaAccount()
+    private val pendingSessionSettlementsByPairingTopic = ConcurrentHashMap<String, PendingSessionSettlement>()
 
+    override suspend fun approveSession(
+        sessionProposal: SessionProposal,
+        metaAccount: MetaAccount
+    ): Result<Unit> {
         val requestedNameSpaces = sessionProposal.requiredNamespaces + sessionProposal.optionalNamespaces
 
         val localChains = chainRegistry.currentChains.first()
@@ -66,6 +81,7 @@ class RealWalletConnectSessionInteractor(
         val response = sessionProposal.approved(namespaceSessions)
 
         return Web3Wallet.approveSession(response)
+            .onSuccess { registerPendingSettlement(sessionProposal, metaAccount) }
     }
 
     override suspend fun rejectSession(proposal: SessionProposal): Result<Unit> {
@@ -82,7 +98,34 @@ class RealWalletConnectSessionInteractor(
         }
     }
 
+    override suspend fun onSessionSettled(settledSessionResponse: Wallet.Model.SettledSessionResponse) {
+        if (settledSessionResponse !is Wallet.Model.SettledSessionResponse.Result) return
+
+        val pairingTopic = settledSessionResponse.session.pairingTopic
+        val pendingSessionSettlement = pendingSessionSettlementsByPairingTopic[pairingTopic] ?: return
+
+        val sessionTopic = settledSessionResponse.session.topic
+        val walletConnectSession = WalletConnectSession(pendingSessionSettlement.metaId, sessionTopic)
+        walletConnectSessionRepository.addSession(walletConnectSession)
+    }
+
+    override suspend fun onSessionDelete(sessionDelete: Wallet.Model.SessionDelete) {
+        if (sessionDelete !is Wallet.Model.SessionDelete.Success) return
+
+        walletConnectSessionRepository.deleteSession(sessionDelete.topic)
+    }
+
+    override suspend fun getSession(sessionTopic: String): WalletConnectSession? {
+        return walletConnectSessionRepository.getSession(sessionTopic)
+    }
+
     private fun formatWalletConnectAccount(address: String, chainCaip2: String): String {
         return "$chainCaip2:$address"
     }
+
+    private fun registerPendingSettlement(sessionProposal: SessionProposal, metaAccount: MetaAccount) {
+        pendingSessionSettlementsByPairingTopic[sessionProposal.pairingTopic] = PendingSessionSettlement(metaAccount.id)
+    }
+
+    private class PendingSessionSettlement(val metaId: Long)
 }

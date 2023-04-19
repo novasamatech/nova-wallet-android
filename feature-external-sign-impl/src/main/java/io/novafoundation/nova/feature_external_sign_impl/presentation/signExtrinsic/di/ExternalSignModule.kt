@@ -12,11 +12,10 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
-import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignPayload
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
 import io.novafoundation.nova.feature_external_sign_impl.ExternalSignRouter
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.evm.EvmSignInteractorFactory
@@ -34,8 +33,8 @@ class ExternalSignModule {
         metamaskSignInteractorFactory: EvmSignInteractorFactory,
         payload: ExternalSignPayload
     ): ExternalSignInteractor = when (val request = payload.signRequest) {
-        is ExternalSignRequest.Polkadot -> polkadotSignInteractorFactory.create(request)
-        is ExternalSignRequest.Evm -> metamaskSignInteractorFactory.create(request)
+        is ExternalSignRequest.Polkadot -> polkadotSignInteractorFactory.create(request, payload.wallet)
+        is ExternalSignRequest.Evm -> metamaskSignInteractorFactory.create(request, payload.wallet)
     }
 
     @Provides
@@ -52,7 +51,6 @@ class ExternalSignModule {
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         interactor: ExternalSignInteractor,
         payload: ExternalSignPayload,
-        selectedAccountUseCase: SelectedAccountUseCase,
         communicator: ExternalSignCommunicator,
         walletUiUseCase: WalletUiUseCase,
         validationExecutor: ValidationExecutor,
@@ -61,7 +59,6 @@ class ExternalSignModule {
     ): ViewModel {
         return ExternaSignViewModel(
             router = router,
-            selectedAccountUseCase = selectedAccountUseCase,
             interactor = interactor,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             payload = payload,
