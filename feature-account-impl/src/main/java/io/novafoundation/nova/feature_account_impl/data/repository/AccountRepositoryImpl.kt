@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.data.secrets.keypair
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AuthType
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
@@ -120,6 +121,10 @@ class AccountRepositoryImpl(
 
     override suspend fun allMetaAccounts(): List<MetaAccount> {
         return accountDataSource.allMetaAccounts()
+    }
+
+    override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
+        return accountDataSource.allLightMetaAccounts()
     }
 
     override fun allMetaAccountsFlow(): Flow<List<MetaAccount>> {

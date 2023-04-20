@@ -8,6 +8,7 @@ import io.novafoundation.nova.caip.caip2.Caip2Resolver
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_external_sign_api.domain.sign.evm.EvmTypedMessageParser
@@ -62,12 +63,14 @@ class WalletConnectFeatureModule {
         chainRegistry: ChainRegistry,
         caip2Resolver: Caip2Resolver,
         requestFactory: WalletConnectRequest.Factory,
-        walletConnectSessionRepository: WalletConnectSessionRepository
+        walletConnectSessionRepository: WalletConnectSessionRepository,
+        accountRepository: AccountRepository
     ): WalletConnectSessionInteractor = RealWalletConnectSessionInteractor(
         chainRegistry = chainRegistry,
         caip2Resolver = caip2Resolver,
         walletConnectRequestFactory = requestFactory,
-        walletConnectSessionRepository = walletConnectSessionRepository
+        walletConnectSessionRepository = walletConnectSessionRepository,
+        accountRepository = accountRepository
     )
 
     @Provides

@@ -42,6 +42,7 @@ dependencies {
     implementation project(':feature-external-sign-api')
     implementation project(':feature-currency-api')
     implementation project(':feature-wallet-connect-api')
+    implementation project(':feature-dapp-api')
     implementation project(':caip')
     implementation project(':runtime')
 

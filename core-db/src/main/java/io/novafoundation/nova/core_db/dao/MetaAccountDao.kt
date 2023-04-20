@@ -83,6 +83,9 @@ interface MetaAccountDao {
     suspend fun getJoinedMetaAccountsInfo(): List<RelationJoinedMetaAccountInfo>
 
     @Query("SELECT * FROM meta_accounts")
+    suspend fun getMetaAccountsInfo(): List<MetaAccountLocal>
+
+    @Query("SELECT * FROM meta_accounts")
     fun getJoinedMetaAccountsInfoFlow(): Flow<List<RelationJoinedMetaAccountInfo>>
 
     @Query(META_ACCOUNTS_WITH_BALANCE_QUERY)

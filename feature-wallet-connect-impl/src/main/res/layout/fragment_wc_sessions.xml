@@ -12,14 +12,21 @@
         android:layout_height="wrap_content"
         android:id="@+id/wcSessionsToolbar"
         app:titleText="@string/wallet_connect_title"
-        app:dividerVisible="false"
-        app:iconRight="@drawable/ic_scan" />
+        app:dividerVisible="false" />
 
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
+        android:paddingTop="8dp"
+        android:id="@+id/wcSessionsConnectionsList"
+        android:clipToPadding="false"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        style="@style/TextAppearance.NovaFoundation.Bold.Title3"
-        android:text="Some cool session UI might be here" />
+        android:layout_weight="1" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:layout_width="match_parent"
+        android:id="@+id/wcSessionsNewConnection"
+        android:layout_margin="16dp"
+        android:text="@string/wallet_connect_new_connection"
+        android:layout_height="wrap_content"/>
 </LinearLayout>
