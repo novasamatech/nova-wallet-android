@@ -18,8 +18,11 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_external_sign_api.model.failedSigningIfNotCancelled
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignWallet
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.PolkadotSignPayload
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.maybeSignExtrinsic
+import io.novafoundation.nova.feature_external_sign_impl.domain.sign.BaseExternalSignInteractor
+import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationFailure.NotEnoughBalanceToPayFees
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationSystem
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.convertingToAmount
@@ -64,7 +67,7 @@ class PolkadotSignInteractorFactory(
     private val signerProvider: SignerProvider,
 ) {
 
-    fun create(request: ExternalSignRequest.Polkadot) = PolkadotSignInteractor(
+    fun create(request: ExternalSignRequest.Polkadot, wallet: ExternalSignWallet) = PolkadotExternalSignInteractor(
         extrinsicService = extrinsicService,
         chainRegistry = chainRegistry,
         accountRepository = accountRepository,
@@ -72,22 +75,24 @@ class PolkadotSignInteractorFactory(
         extrinsicGson = extrinsicGson,
         addressIconGenerator = addressIconGenerator,
         request = request,
+        wallet = wallet,
         walletRepository = walletRepository,
         signerProvider = signerProvider
     )
 }
 
-class PolkadotSignInteractor(
+class PolkadotExternalSignInteractor(
     private val extrinsicService: ExtrinsicService,
     private val chainRegistry: ChainRegistry,
-    private val accountRepository: AccountRepository,
     private val tokenRepository: TokenRepository,
     private val extrinsicGson: Gson,
     private val addressIconGenerator: AddressIconGenerator,
     private val request: ExternalSignRequest.Polkadot,
     private val walletRepository: WalletRepository,
-    private val signerProvider: SignerProvider
-) : ExternalSignInteractor {
+    private val signerProvider: SignerProvider,
+    wallet: ExternalSignWallet,
+    accountRepository: AccountRepository
+) : BaseExternalSignInteractor(accountRepository, wallet, signerProvider) {
 
     private val signPayload = request.payload
 
@@ -168,13 +173,13 @@ class PolkadotSignInteractor(
             fee = { it.convertingToAmount { calculateFee().orZero() } },
             available = {
                 val asset = walletRepository.getAsset(
-                    metaId = accountRepository.getSelectedMetaAccount().id,
+                    metaId = resolveMetaAccount().id,
                     chainAsset = operationPayload.chain().utilityAsset
                 )!!
 
                 asset.transferable
             },
-            error = { _, _ -> io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationFailure.NotEnoughBalanceToPayFees },
+            error = { _, _ -> NotEnoughBalanceToPayFees },
             skippable = true
         )
     }
@@ -194,9 +199,7 @@ class PolkadotSignInteractor(
         // assumption - only substrate dApps
         val substrateAccountId = signBytesPayload.address.toAccountId()
 
-        // assumption - extension has access only to selected meta account
-        val metaAccount = accountRepository.getSelectedMetaAccount()
-        val signer = signerProvider.signerFor(metaAccount)
+        val signer = resolveWalletSigner()
         val payload = runCatching {
             SignerPayloadRaw.fromHex(signBytesPayload.data, substrateAccountId)
         }.getOrElse {
@@ -223,14 +226,12 @@ class PolkadotSignInteractor(
         val runtime = chainRegistry.getRuntime(genesisHash)
         val parsedExtrinsic = parseDAppExtrinsic(runtime, this)
 
-        // assumption - extension has access only to selected meta account
-        val metaAccount = accountRepository.getSelectedMetaAccount()
         val accountId = chain.accountIdOf(address)
 
         val signer = if (forFee) {
             signerProvider.feeSigner(chain)
         } else {
-            signerProvider.signerFor(metaAccount)
+            resolveWalletSigner()
         }
 
         return with(parsedExtrinsic) {

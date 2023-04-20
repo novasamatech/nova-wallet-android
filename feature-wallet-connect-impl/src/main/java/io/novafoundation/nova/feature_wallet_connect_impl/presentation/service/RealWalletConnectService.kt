@@ -10,10 +10,12 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAc
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignRequester
 import io.novafoundation.nova.feature_external_sign_api.model.awaitConfirmation
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignPayload
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignWallet
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.SigningDappMetadata
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
@@ -32,6 +34,7 @@ internal class RealWalletConnectServiceFactory(
     private val walletUiUseCase: WalletUiUseCase,
     private val interactor: WalletConnectSessionInteractor,
     private val dAppSignRequester: ExternalSignRequester,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
 ) : WalletConnectService.Factory {
 
     override fun create(coroutineScope: CoroutineScope): WalletConnectService {
@@ -40,7 +43,8 @@ internal class RealWalletConnectServiceFactory(
             awaitableMixinFactory = awaitableMixinFactory,
             walletUiUseCase = walletUiUseCase,
             interactor = interactor,
-            dAppSignRequester = dAppSignRequester
+            dAppSignRequester = dAppSignRequester,
+            selectedAccountUseCase = selectedAccountUseCase
         )
     }
 }
@@ -51,6 +55,8 @@ internal class RealWalletConnectService(
     private val walletUiUseCase: WalletUiUseCase,
     private val interactor: WalletConnectSessionInteractor,
     private val dAppSignRequester: ExternalSignRequester,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
+
 ) : WalletConnectService,
     CoroutineScope by parentScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(parentScope) {
@@ -67,6 +73,8 @@ internal class RealWalletConnectService(
             when (it) {
                 is WalletConnectSessionsEvent.SessionProposal -> handleSessionProposal(it.proposal)
                 is WalletConnectSessionsEvent.SessionRequest -> handleSessionRequest(it.request)
+                is WalletConnectSessionsEvent.SessionSettlement -> handleSessionSettlement(it.settlement)
+                is WalletConnectSessionsEvent.SessionDeleted -> handleSessionDelete(it.delete)
             }
         }
             .inBackground()
@@ -86,6 +94,9 @@ internal class RealWalletConnectService(
     }
 
     private suspend fun handleSessionProposal(proposal: Wallet.Model.SessionProposal) {
+        // TODO allow to switch meta account
+        val metaAccount = selectedAccountUseCase.getSelectedMetaAccount()
+
         val payload = AuthorizeDappBottomSheet.Payload(
             title = proposal.name,
             dAppIconUrl = proposal.icons.firstOrNull()?.toString(),
@@ -96,14 +107,15 @@ internal class RealWalletConnectService(
         val allowed = authorizeDapp.awaitAction(payload)
 
         if (allowed) {
-            interactor.approveSession(proposal)
+            interactor.approveSession(proposal, metaAccount)
         } else {
             interactor.rejectSession(proposal)
         }
     }
 
     private suspend fun handleSessionRequest(sessionRequest: Wallet.Model.SessionRequest) {
-        val session = Web3Wallet.getActiveSessionByTopic(sessionRequest.topic) ?: return
+        val sdkSession = Web3Wallet.getActiveSessionByTopic(sessionRequest.topic) ?: return
+        val appSession = interactor.getSession(sessionRequest.topic) ?: return
 
         // TODO reject request if not able to parse
         val walletConnectRequest = interactor.parseSessionRequest(sessionRequest)
@@ -114,12 +126,21 @@ internal class RealWalletConnectService(
             dAppSignRequester.awaitConfirmation(
                 ExternalSignPayload(
                     signRequest = walletConnectRequest.toExternalSignRequest(),
-                    dappMetadata = mapWalletConnectSessionToSignDAppMetadata(session)
+                    dappMetadata = mapWalletConnectSessionToSignDAppMetadata(sdkSession),
+                    wallet = ExternalSignWallet.WithId(appSession.metaId)
                 )
             )
         }
 
         walletConnectRequest.respondWith(externalSignResponse)
+    }
+
+    private suspend fun handleSessionSettlement(settlement: Wallet.Model.SettledSessionResponse) {
+        interactor.onSessionSettled(settlement)
+    }
+
+    private suspend fun handleSessionDelete(settlement: Wallet.Model.SessionDelete) {
+        interactor.onSessionDelete(settlement)
     }
 
     private fun mapWalletConnectSessionToSignDAppMetadata(session: Wallet.Model.Session): SigningDappMetadata? {

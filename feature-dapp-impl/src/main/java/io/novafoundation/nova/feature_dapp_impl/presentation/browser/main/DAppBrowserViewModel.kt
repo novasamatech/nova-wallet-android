@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignReques
 import io.novafoundation.nova.feature_external_sign_api.model.awaitConfirmation
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignPayload
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignWallet
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.SigningDappMetadata
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import kotlinx.coroutines.Dispatchers
@@ -251,7 +252,8 @@ class DAppBrowserViewModel(
     private suspend fun mapSignExtrinsicRequestToPayload(request: ExternalSignRequest): ExternalSignPayload {
         return ExternalSignPayload(
             signRequest = request,
-            dappMetadata = getDAppSignMetadata(currentPageAnalyzed.first().url)
+            dappMetadata = getDAppSignMetadata(currentPageAnalyzed.first().url),
+            wallet = ExternalSignWallet.Current
         )
     }
 

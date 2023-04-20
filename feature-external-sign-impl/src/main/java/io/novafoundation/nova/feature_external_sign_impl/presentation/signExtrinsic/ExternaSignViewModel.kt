@@ -9,11 +9,12 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator.Response
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignResponder
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignPayload
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignWallet
 import io.novafoundation.nova.feature_external_sign_impl.ExternalSignRouter
 import io.novafoundation.nova.feature_external_sign_impl.R
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationFailure
@@ -42,7 +43,6 @@ class ExternaSignViewModel(
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
     walletUiUseCase: WalletUiUseCase,
-    selectedAccountUseCase: SelectedAccountUseCase,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 ) : BaseViewModel(),
@@ -62,16 +62,13 @@ class ExternaSignViewModel(
         )
     }
 
-    private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
-        .share()
-
     private val _performingOperationInProgress = MutableStateFlow(false)
     val performingOperationInProgress: StateFlow<Boolean> = _performingOperationInProgress
 
-    val walletUi = walletUiUseCase.selectedWalletUiFlow(showAddressIcon = true)
+    val walletUi = walletUiUseCase.walletUiFor(payload.wallet)
         .shareInBackground()
 
-    val requestedAccountModel = selectedAccount.map {
+    val requestedAccountModel = flowOf {
         interactor.createAccountAddressModel()
     }
         .shareInBackground()
@@ -178,5 +175,12 @@ class ExternaSignViewModel(
     private fun <T> Flow<Result<T>>.finishOnFailure(): Flow<T?> {
         return onEach { result -> result.onFailure { respondError(it) } }
             .map { it.getOrNull() }
+    }
+
+    private fun WalletUiUseCase.walletUiFor(externalSignWallet: ExternalSignWallet): Flow<WalletModel> {
+        return when (externalSignWallet) {
+            ExternalSignWallet.Current -> selectedWalletUiFlow(showAddressIcon = true)
+            is ExternalSignWallet.WithId -> walletUiFlow(externalSignWallet.metaId, showAddressIcon = true)
+        }
     }
 }
