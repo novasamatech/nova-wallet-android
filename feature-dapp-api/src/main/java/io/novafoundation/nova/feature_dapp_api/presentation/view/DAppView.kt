@@ -70,7 +70,7 @@ class DAppView @JvmOverloads constructor(
         itemDappAction.isActivated = activate
     }
 
-    fun enableSubtitleIcon() : ImageView {
+    fun enableSubtitleIcon(): ImageView {
         return itemDAppSubtitleIcon.also { icon -> icon.makeVisible() }
     }
 
