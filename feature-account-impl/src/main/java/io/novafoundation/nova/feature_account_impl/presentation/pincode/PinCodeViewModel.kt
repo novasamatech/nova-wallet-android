@@ -186,7 +186,7 @@ class PinCodeViewModel(
             }
             is PinCodeAction.TwoFactorVerification -> {
                 twoFactorVerificationExecutor.confirm()
-                router.openAfterPinCode(pinCodeAction.delayedNavigation)
+                router.back()
             }
         }
     }
