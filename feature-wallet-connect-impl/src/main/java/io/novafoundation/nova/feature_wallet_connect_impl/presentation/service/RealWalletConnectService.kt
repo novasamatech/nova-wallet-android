@@ -56,7 +56,6 @@ internal class RealWalletConnectService(
     private val interactor: WalletConnectSessionInteractor,
     private val dAppSignRequester: ExternalSignRequester,
     private val selectedAccountUseCase: SelectedAccountUseCase,
-
 ) : WalletConnectService,
     CoroutineScope by parentScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(parentScope) {
@@ -108,6 +107,9 @@ internal class RealWalletConnectService(
 
         if (allowed) {
             interactor.approveSession(proposal, metaAccount)
+                .onFailure {
+                    Log.d("WalletConnect", "Session approve failed", it)
+                }
         } else {
             interactor.rejectSession(proposal)
         }
