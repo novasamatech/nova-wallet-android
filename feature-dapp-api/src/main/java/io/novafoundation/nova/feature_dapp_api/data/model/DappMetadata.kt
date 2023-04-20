@@ -1,5 +1,10 @@
 package io.novafoundation.nova.feature_dapp_api.data.model
 
+class DappCatalog(
+    val categories: List<DappCategory>,
+    val dApps: List<DappMetadata>
+)
+
 class DappMetadata(
     val name: String,
     val iconLink: String,

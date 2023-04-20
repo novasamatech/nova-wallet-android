@@ -42,6 +42,8 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.di.RuntimeHolder
 import io.novafoundation.nova.splash.di.SplashFeatureApi
 import io.novafoundation.nova.splash.di.SplashFeatureHolder
+import io.novafoundation.nova.web3names.di.Web3NamesApi
+import io.novafoundation.nova.web3names.di.Web3NamesHolder
 
 @Module
 interface ComponentHolderModule {
@@ -133,6 +135,12 @@ interface ComponentHolderModule {
     @ClassKey(RuntimeApi::class)
     @IntoMap
     fun provideRuntimeFeature(runtimeHolder: RuntimeHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(Web3NamesApi::class)
+    @IntoMap
+    fun provideWeb3Names(web3NamesHolder: Web3NamesHolder): FeatureApiHolder
 
     @ApplicationScope
     @Binds

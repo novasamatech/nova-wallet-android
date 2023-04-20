@@ -209,6 +209,9 @@ object ChainGeneses {
     const val CENTRIFUGE = "b3db41421702df9a7fcac62b53ffeac85f7853cc4e689e0b93aeb3db18c09d82"
 
     const val XX_NETWORK = "50dd5d206917bf10502c68fb4d18a59fc8aa31586f4e8856b493e43544aa82aa"
+
+    const val KILT = "411f057b9107718c9624d6aa4a3f23c1653898297f3d4d529d9bb6511a39dd21"
+    const val KILT_TESTNET = "a0c6e3bac382b316a68bca7141af1fba507207594c761076847ce358aeedcc21"
 }
 
 object ChainIds {
@@ -243,6 +246,12 @@ fun Chain.Asset.requireOrml(): Type.Orml {
 
 fun Chain.Asset.requireErc20(): Type.EvmErc20 {
     require(type is Type.EvmErc20)
+
+    return type
+}
+
+fun Chain.Asset.requireEquilibrium(): Type.Equilibrium {
+    require(type is Type.Equilibrium)
 
     return type
 }

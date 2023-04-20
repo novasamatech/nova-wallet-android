@@ -54,11 +54,13 @@ class DappInteractor(
 
     fun observeDAppsByCategory(): Flow<GroupedList<DappCategory, DApp>> {
         return combine(
-            dAppMetadataRepository.observeDAppMetadatas(),
+            dAppMetadataRepository.observeDAppCatalog(),
             favouritesDAppRepository.observeFavourites()
-        ) { dAppMetadatas, favourites ->
+        ) { dAppCatalog, favourites ->
+            val categories = dAppCatalog.categories
+            val dapps = dAppCatalog.dApps
 
-            val urlToDAppMapping = buildUrlToDappMapping(dAppMetadatas, favourites)
+            val urlToDAppMapping = buildUrlToDappMapping(dapps, favourites)
 
             val favouritesCategory = DappCategory(
                 id = "favourites",
@@ -66,12 +68,10 @@ class DappInteractor(
             )
             val favouritesCategoryItems = favourites.map { urlToDAppMapping.getValue(it.url) }
 
-            val allCategories = dAppMetadatas.flatMap { it.categories }
             // Regrouping in O(Categories * Dapps)
             // Complexity should be fine for expected amount of dApps
-            val derivedCategories = allCategories.associateWith { category ->
-                dAppMetadatas
-                    .filter { category in it.categories }
+            val derivedCategories = categories.associateWith { category ->
+                dapps.filter { category in it.categories }
                     .map { urlToDAppMapping.getValue(it.url) }
             }
 

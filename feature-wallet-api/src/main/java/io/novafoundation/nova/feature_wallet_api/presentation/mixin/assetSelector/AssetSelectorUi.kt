@@ -44,7 +44,7 @@ fun <V> BaseFragment<V>.subscribeOnAssetClick(
             imageLoader = imageLoader,
             context = requireContext(),
             payload = it,
-            onClicked = selectorMixin::assetChosen
+            onClicked = { _, item -> selectorMixin.assetChosen(item) }
         ).show()
     }
 }

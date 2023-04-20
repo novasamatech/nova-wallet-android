@@ -37,6 +37,7 @@ interface AssetReadOnlyCache {
     fun observeSyncedAssets(metaId: Long): Flow<List<AssetWithToken>>
 
     suspend fun getSyncedAssets(metaId: Long): List<AssetWithToken>
+
     suspend fun getSupportedAssets(metaId: Long): List<AssetWithToken>
 
     fun observeAsset(metaId: Long, chainId: String, assetId: Int): Flow<AssetWithToken>
@@ -44,6 +45,8 @@ interface AssetReadOnlyCache {
     suspend fun getAssetWithToken(metaId: Long, chainId: String, assetId: Int): AssetWithToken?
 
     suspend fun getAsset(metaId: Long, chainId: String, assetId: Int): AssetLocal?
+
+    suspend fun getAssetsInChain(metaId: Long, chainId: String): List<AssetLocal>
 }
 
 @Dao
@@ -67,8 +70,14 @@ abstract class AssetDao : AssetReadOnlyCache {
     @Query("SELECT * FROM assets WHERE metaId = :metaId AND chainId = :chainId AND assetId = :assetId")
     abstract override suspend fun getAsset(metaId: Long, chainId: String, assetId: Int): AssetLocal?
 
+    @Query("SELECT * FROM assets WHERE metaId = :metaId AND chainId = :chainId")
+    abstract override suspend fun getAssetsInChain(metaId: Long, chainId: String): List<AssetLocal>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertAsset(asset: AssetLocal)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertAssets(assets: List<AssetLocal>)
 
     @Query("DELETE FROM assets WHERE chainId = :chainId AND assetId = :assetId")
     protected abstract suspend fun clearAssets(chainId: String, assetId: Int)
