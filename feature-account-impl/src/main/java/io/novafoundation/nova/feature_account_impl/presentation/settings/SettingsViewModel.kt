@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.AppVersionProvider
@@ -63,7 +62,7 @@ class SettingsViewModel(
         .inBackground()
         .share()
 
-    val pinCodeVerificationStatus = twoFactorVerificationService.stateFlow()
+    val pinCodeVerificationStatus = twoFactorVerificationService.isEnabledFlow()
 
     val safeModeStatus = safeModeService.safeModeStatusFlow()
 

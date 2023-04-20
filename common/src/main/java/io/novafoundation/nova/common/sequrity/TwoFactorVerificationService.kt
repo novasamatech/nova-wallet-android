@@ -15,11 +15,11 @@ interface TwoFactorVerificationService {
 
     fun isEnabled(): Boolean
 
-    fun stateFlow(): Flow<Boolean>
+    fun isEnabledFlow(): Flow<Boolean>
 
     suspend fun toggle()
 
-    suspend fun confirm(): TwoFactorVerificationResult
+    suspend fun requestConfirmation(): TwoFactorVerificationResult
 }
 
 interface TwoFactorVerificationExecutor {
@@ -46,13 +46,13 @@ class RealTwoFactorVerificationService(
         return preferences.getBoolean(PREF_TWO_FACTOR_CONFIRMATION_STATE, false)
     }
 
-    override fun stateFlow(): Flow<Boolean> = state
+    override fun isEnabledFlow(): Flow<Boolean> = state
 
     override suspend fun toggle() {
         val isEnabled = isEnabled()
 
         if (isEnabled) {
-            val confirmationResult = confirm()
+            val confirmationResult = requestConfirmation()
             if (confirmationResult != TwoFactorVerificationResult.CONFIRMED) {
                 return
             }
@@ -61,7 +61,7 @@ class RealTwoFactorVerificationService(
         setEnable(!isEnabled)
     }
 
-    override suspend fun confirm(): TwoFactorVerificationResult {
+    override suspend fun requestConfirmation(): TwoFactorVerificationResult {
         if (isEnabled()) {
             return twoFactorVerificationExecutor.runConfirmation()
         }
