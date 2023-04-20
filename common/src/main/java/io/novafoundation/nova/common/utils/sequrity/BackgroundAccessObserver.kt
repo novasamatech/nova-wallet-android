@@ -5,18 +5,19 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import io.novafoundation.nova.common.data.storage.Preferences
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
 class BackgroundAccessObserver(
     private val preferences: Preferences,
-    private val accessTimeInBackground: Long = DEFAULT_ACCESS_TIME
+    private val automaticInteractionGate: AutomaticInteractionGate,
+    private val accessTimeInBackground: Long = DEFAULT_ACCESS_TIME,
 ) : DefaultLifecycleObserver, CoroutineScope {
 
     companion object {
@@ -46,6 +47,7 @@ class BackgroundAccessObserver(
     fun onAccessed() {
         changeState(State.NOTHING)
         preferences.removeField(PREFS_ON_PAUSE_TIME)
+        automaticInteractionGate.setInteractionAllowed(true)
     }
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -55,6 +57,7 @@ class BackgroundAccessObserver(
     override fun onStop(owner: LifecycleOwner) {
         val elapsedTime = SystemClock.elapsedRealtime()
         preferences.putLong(PREFS_ON_PAUSE_TIME, elapsedTime)
+        automaticInteractionGate.setInteractionAllowed(false)
     }
 
     override fun onStart(owner: LifecycleOwner) {

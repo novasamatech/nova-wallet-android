@@ -1,3 +1,8 @@
 package io.novafoundation.nova.feature_wallet_connect_api.di
 
-interface WalletConnectFeatureApi
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
+
+interface WalletConnectFeatureApi {
+
+    val walletConnectServiceFactory: WalletConnectService.Factory
+}

@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
-import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -56,9 +55,6 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
 
     @Inject
     lateinit var webViewHolder: WebViewHolder
-
-    @Inject
-    lateinit var imageLoader: ImageLoader
 
     @Inject
     lateinit var fileChooser: WebViewFileChooser
@@ -205,7 +201,6 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
             onConfirm = pendingConfirmation.onConfirm,
             onDeny = pendingConfirmation.onDeny,
             payload = pendingConfirmation.action.content,
-            imageLoader = imageLoader
         ).show()
     }
 
