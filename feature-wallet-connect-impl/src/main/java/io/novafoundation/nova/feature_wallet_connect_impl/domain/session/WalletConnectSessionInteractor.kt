@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.domain.session
 
 import com.walletconnect.web3.wallet.client.Wallet
+import com.walletconnect.web3.wallet.client.Wallet.Model.Namespace
 import com.walletconnect.web3.wallet.client.Wallet.Model.SessionProposal
 import com.walletconnect.web3.wallet.client.Web3Wallet
 import io.novafoundation.nova.caip.caip2.Caip2Resolver
@@ -52,7 +53,7 @@ class RealWalletConnectSessionInteractor(
         sessionProposal: SessionProposal,
         metaAccount: MetaAccount
     ): Result<Unit> {
-        val requestedNameSpaces = sessionProposal.requiredNamespaces + sessionProposal.optionalNamespaces
+        val requestedNameSpaces = sessionProposal.requiredNamespaces mergeWith sessionProposal.optionalNamespaces
 
         val localChains = chainRegistry.currentChains.first()
 
@@ -70,7 +71,7 @@ class RealWalletConnectSessionInteractor(
                 formatWalletConnectAccount(address, requestedChain) to requestedChain
             }
 
-            Wallet.Model.Namespace.Session(
+            Namespace.Session(
                 chains = supportedChainsWithAccounts.map { (_, chain) -> chain },
                 accounts = supportedChainsWithAccounts.map { (address, _) -> address },
                 methods = namespaceProposal.methods,
@@ -117,6 +118,33 @@ class RealWalletConnectSessionInteractor(
 
     override suspend fun getSession(sessionTopic: String): WalletConnectSession? {
         return walletConnectSessionRepository.getSession(sessionTopic)
+    }
+
+    private infix fun Map<String, Namespace.Proposal>.mergeWith(other: Map<String, Namespace.Proposal>): Map<String, Namespace.Proposal> {
+        val allNamespaceKeys = keys + other.keys
+
+        return allNamespaceKeys.associateWith { namespace ->
+            val thisProposal = get(namespace)
+            val otherProposal = other[namespace]
+
+            thisProposal.orEmpty() + otherProposal.orEmpty()
+        }
+    }
+
+    private operator fun Namespace.Proposal.plus(other: Namespace.Proposal): Namespace.Proposal {
+        return Namespace.Proposal(
+            chains = chains.orEmpty() + other.chains.orEmpty(),
+            methods = methods + other.methods,
+            events = events + other.events
+        )
+    }
+
+    private fun Namespace.Proposal?.orEmpty(): Namespace.Proposal {
+        return this ?: Namespace.Proposal(
+            chains = null,
+            methods = emptyList(),
+            events = emptyList()
+        )
     }
 
     private fun formatWalletConnectAccount(address: String, chainCaip2: String): String {
