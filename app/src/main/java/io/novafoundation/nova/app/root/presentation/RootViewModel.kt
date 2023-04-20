@@ -118,7 +118,7 @@ class RootViewModel(
             if (interactor.isAccountSelected() && interactor.isPinCodeSet()) {
                 rootRouter.nonCancellableVerify()
             } else {
-                backgroundAccessObserver.onAccessed()
+                backgroundAccessObserver.checkPassed()
             }
         }
     }
