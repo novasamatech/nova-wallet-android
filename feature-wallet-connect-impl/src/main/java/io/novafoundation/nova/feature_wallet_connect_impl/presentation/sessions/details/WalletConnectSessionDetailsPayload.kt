@@ -4,4 +4,4 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class WalletConnectSessionDetailsPayload(val sessionTopic: String): Parcelable
+class WalletConnectSessionDetailsPayload(val sessionTopic: String) : Parcelable

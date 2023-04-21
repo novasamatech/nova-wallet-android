@@ -19,7 +19,7 @@ interface Caip2Resolver {
 
 internal class RealCaip2Resolver(
     private val chainRegistry: ChainRegistry,
-): Caip2Resolver {
+) : Caip2Resolver {
 
     override fun caip2Of(chain: Chain, preferredNamespace: Caip2Namespace): Caip2Identifier? {
         val allCaips = allCaip2Of(chain)

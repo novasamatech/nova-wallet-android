@@ -11,7 +11,7 @@ interface WalletConnectSessionMapper {
 
 class RealWalletConnectSessionMapper(
     private val resourceManager: ResourceManager
-): WalletConnectSessionMapper {
+) : WalletConnectSessionMapper {
 
     override fun formatSessionDAppTitle(metadata: SessionDappMetadata?): String {
         return metadata?.name ?: metadata?.dappUrl ?: resourceManager.getString(R.string.wallet_connect_unknown_dapp)

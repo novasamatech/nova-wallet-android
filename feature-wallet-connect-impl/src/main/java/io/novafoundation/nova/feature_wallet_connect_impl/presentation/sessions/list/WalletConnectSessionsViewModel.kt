@@ -45,7 +45,7 @@ class WalletConnectSessionsViewModel(
     }
 
     fun sessionClicked(item: SessionListModel) {
-       router.openSessionDetails(WalletConnectSessionDetailsPayload(item.sessionTopic))
+        router.openSessionDetails(WalletConnectSessionDetailsPayload(item.sessionTopic))
     }
 
     private suspend fun mapSessionToUi(session: WalletConnectSession): SessionListModel {

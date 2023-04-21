@@ -12,11 +12,11 @@ class ChainListOverview(
 )
 
 fun ResourceManager.formatChainListOverview(chains: List<ChainUi>): ChainListOverview {
-   return ChainListOverview(
-       icon = chains.singleOrNull()?.icon,
-       label = formatListPreview(chains.map(ChainUi::name)),
-       hasMoreElements = chains.size > 1
-   )
+    return ChainListOverview(
+        icon = chains.singleOrNull()?.icon,
+        label = formatListPreview(chains.map(ChainUi::name)),
+        hasMoreElements = chains.size > 1
+    )
 }
 
 fun TableCellView.showChainsOverView(chainListOverview: ChainListOverview) {

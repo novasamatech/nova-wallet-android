@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_account_api.R
 import kotlinx.android.synthetic.main.item_bottom_sheet_chain_list.view.itemChainListBottomSheet
 
-
 class ChainListBottomSheet(
     context: Context,
     data: List<ChainUi>,

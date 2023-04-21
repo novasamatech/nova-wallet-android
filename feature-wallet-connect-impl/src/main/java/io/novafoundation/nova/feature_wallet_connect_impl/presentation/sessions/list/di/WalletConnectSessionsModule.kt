@@ -29,7 +29,7 @@ class WalletConnectSessionsModule {
         resourceManager: ResourceManager,
         walletUiUseCase: WalletUiUseCase,
         walletConnectSessionMapper: WalletConnectSessionMapper,
-        ): ViewModel {
+    ): ViewModel {
         return WalletConnectSessionsViewModel(
             router = router,
             scanCommunicator = communicator,

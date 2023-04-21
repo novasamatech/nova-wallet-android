@@ -37,7 +37,6 @@ class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDet
     @Inject
     protected lateinit var imageLoader: ImageLoader
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
