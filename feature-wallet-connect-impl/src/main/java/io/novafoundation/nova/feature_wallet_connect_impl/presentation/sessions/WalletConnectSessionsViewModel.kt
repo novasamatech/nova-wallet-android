@@ -46,7 +46,7 @@ class WalletConnectSessionsViewModel(
         showMessage("TODO - clicked ${item.dappTitle}")
     }
 
-    private suspend fun mapSessionToUi(session: WalletConnectSession) : SessionListModel {
+    private suspend fun mapSessionToUi(session: WalletConnectSession): SessionListModel {
         val title = session.dappMetadata?.name
             ?: session.dappMetadata?.dappUrl
             ?: resourceManager.getString(R.string.wallet_connect_unknown_dapp)

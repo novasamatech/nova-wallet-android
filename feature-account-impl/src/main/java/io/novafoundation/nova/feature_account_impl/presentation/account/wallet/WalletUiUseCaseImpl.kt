@@ -66,7 +66,7 @@ class WalletUiUseCaseImpl(
         return generateWalletIcon(seed, transparentBackground)
     }
 
-    override suspend fun walletUiFor(metaAccount: MetaAccount) : WalletModel {
+    override suspend fun walletUiFor(metaAccount: MetaAccount): WalletModel {
         return WalletModel(
             metaId = metaAccount.id,
             name = metaAccount.name,

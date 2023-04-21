@@ -21,7 +21,7 @@ class BackgroundAccessObserver(
 ) : DefaultLifecycleObserver, CoroutineScope {
 
     companion object {
-        val DEFAULT_ACCESS_TIME = TimeUnit.MINUTES.toMillis(5L)
+        val DEFAULT_ACCESS_TIME = TimeUnit.SECONDS.toMillis(5L)
 
         private const val PREFS_ON_PAUSE_TIME = "ON_PAUSE_TIME"
     }
@@ -44,10 +44,10 @@ class BackgroundAccessObserver(
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
 
-    fun onAccessed() {
+    fun checkPassed() {
         changeState(State.NOTHING)
         preferences.removeField(PREFS_ON_PAUSE_TIME)
-        automaticInteractionGate.setInteractionAllowed(true)
+        automaticInteractionGate.foregroundCheckPassed()
     }
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -57,7 +57,7 @@ class BackgroundAccessObserver(
     override fun onStop(owner: LifecycleOwner) {
         val elapsedTime = SystemClock.elapsedRealtime()
         preferences.putLong(PREFS_ON_PAUSE_TIME, elapsedTime)
-        automaticInteractionGate.setInteractionAllowed(false)
+        automaticInteractionGate.wentToBackground()
     }
 
     override fun onStart(owner: LifecycleOwner) {
@@ -66,6 +66,8 @@ class BackgroundAccessObserver(
         val difference = elapsedTime - onPauseTime
         if (onPauseTime >= 0 && difference > accessTimeInBackground) {
             changeState(State.REQUEST_ACCESS)
+        } else {
+            automaticInteractionGate.foregroundCheckPassed()
         }
     }
 

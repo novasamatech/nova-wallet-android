@@ -16,6 +16,6 @@ class MainViewModel(
 
     init {
         updateNotificationsInteractor.allowInAppUpdateCheck()
-        automaticInteractionGate.setInteractionAllowed(true)
+        automaticInteractionGate.initialPinPassed()
     }
 }

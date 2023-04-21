@@ -168,7 +168,7 @@ class PinCodeViewModel(
             is PinCodeAction.Create -> router.openAfterPinCode(pinCodeAction.delayedNavigation)
             is PinCodeAction.Check -> {
                 router.openAfterPinCode(pinCodeAction.delayedNavigation)
-                backgroundAccessObserver.onAccessed()
+                backgroundAccessObserver.checkPassed()
             }
             is PinCodeAction.Change -> {
                 when (currentState) {
