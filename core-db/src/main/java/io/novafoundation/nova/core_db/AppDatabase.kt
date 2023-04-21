@@ -94,7 +94,7 @@ import io.novafoundation.nova.core_db.model.PhishingSiteLocal
 import io.novafoundation.nova.core_db.model.StorageEntryLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.core_db.model.TotalRewardLocal
-import io.novafoundation.nova.core_db.model.WalletConnectSessionLocal
+import io.novafoundation.nova.core_db.model.WalletConnectSessionAccountLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
@@ -133,7 +133,7 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         ContributionLocal::class,
         GovernanceDAppLocal::class,
         BrowserHostSettingsLocal::class,
-        WalletConnectSessionLocal::class
+        WalletConnectSessionAccountLocal::class
     ],
 )
 @TypeConverters(

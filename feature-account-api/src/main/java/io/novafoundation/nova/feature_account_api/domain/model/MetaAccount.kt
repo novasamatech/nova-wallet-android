@@ -39,7 +39,7 @@ fun LightMetaAccount(
     id: Long,
     substratePublicKey: ByteArray?,
     substrateCryptoType: CryptoType?,
-    substrateAccountId: ByteArray,
+    substrateAccountId: ByteArray?,
     ethereumAddress: ByteArray?,
     ethereumPublicKey: ByteArray?,
     isSelected: Boolean,
@@ -49,7 +49,7 @@ fun LightMetaAccount(
     override val id: Long = id
     override val substratePublicKey: ByteArray? = substratePublicKey
     override val substrateCryptoType: CryptoType? = substrateCryptoType
-    override val substrateAccountId: ByteArray = substrateAccountId
+    override val substrateAccountId: ByteArray? = substrateAccountId
     override val ethereumAddress: ByteArray? = ethereumAddress
     override val ethereumPublicKey: ByteArray? = ethereumPublicKey
     override val isSelected: Boolean = isSelected

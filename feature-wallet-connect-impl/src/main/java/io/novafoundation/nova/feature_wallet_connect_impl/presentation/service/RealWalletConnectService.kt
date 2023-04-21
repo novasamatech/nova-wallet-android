@@ -117,7 +117,7 @@ internal class RealWalletConnectService(
 
     private suspend fun handleSessionRequest(sessionRequest: Wallet.Model.SessionRequest) {
         val sdkSession = Web3Wallet.getActiveSessionByTopic(sessionRequest.topic) ?: return
-        val appSession = interactor.getSession(sessionRequest.topic) ?: return
+        val appSession = interactor.getSessionAccount(sessionRequest.topic) ?: return
 
         // TODO reject request if not able to parse
         val walletConnectRequest = interactor.parseSessionRequest(sessionRequest)

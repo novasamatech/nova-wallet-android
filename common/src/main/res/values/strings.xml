@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="wallet_connect_unknown_dapp">Unknown dApp</string>
+
+    <string name="wallet_connect_new_connection">New connection</string>
+
     <string name="send_address_hint">Address or w3n</string>
 
     <string name="wallet_connect_title">Wallet Connect</string>

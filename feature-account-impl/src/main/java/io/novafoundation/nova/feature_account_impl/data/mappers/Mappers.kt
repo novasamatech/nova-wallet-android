@@ -139,6 +139,24 @@ fun mapMetaAccountLocalToMetaAccount(
     }
 }
 
+fun mapMetaAccountLocalToLightMetaAccount(
+    metaAccountLocal: MetaAccountLocal
+): LightMetaAccount {
+    return with(metaAccountLocal) {
+        LightMetaAccount(
+            id = id,
+            substratePublicKey = substratePublicKey,
+            substrateCryptoType = substrateCryptoType,
+            substrateAccountId = substrateAccountId,
+            ethereumAddress = ethereumAddress,
+            ethereumPublicKey = ethereumPublicKey,
+            isSelected = isSelected,
+            name = name,
+            type = mapMetaAccountTypeFromLocal(type)
+        )
+    }
+}
+
 fun mapAddAccountPayloadToAddAccountType(
     payload: AddAccountPayload,
     accountNameState: AccountNameChooserMixin.State,

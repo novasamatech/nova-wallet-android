@@ -27,6 +27,7 @@ class WalletUiUseCaseImpl(
             val icon = maybeGenerateIcon(accountId = metaAccount.walletIconSeed(), shouldGenerate = showAddressIcon)
 
             WalletModel(
+                metaId = metaAccount.id,
                 name = metaAccount.name,
                 icon = icon
             )
@@ -39,6 +40,7 @@ class WalletUiUseCaseImpl(
             val icon = maybeGenerateIcon(accountId = metaAccount.walletIconSeed(), shouldGenerate = showAddressIcon)
 
             WalletModel(
+                metaId = metaId,
                 name = metaAccount.name,
                 icon = icon
             )
@@ -49,6 +51,7 @@ class WalletUiUseCaseImpl(
         val metaAccount = accountRepository.getSelectedMetaAccount()
 
         return WalletModel(
+            metaId = metaAccount.id,
             name = metaAccount.name,
             icon = walletIcon(metaAccount)
         )
@@ -61,6 +64,14 @@ class WalletUiUseCaseImpl(
         val seed = metaAccount.walletIconSeed()
 
         return generateWalletIcon(seed, transparentBackground)
+    }
+
+    override suspend fun walletUiFor(metaAccount: MetaAccount) : WalletModel {
+        return WalletModel(
+            metaId = metaAccount.id,
+            name = metaAccount.name,
+            icon = walletIcon(metaAccount, transparentBackground = true)
+        )
     }
 
     private suspend fun maybeGenerateIcon(accountId: AccountId, shouldGenerate: Boolean): Drawable? {

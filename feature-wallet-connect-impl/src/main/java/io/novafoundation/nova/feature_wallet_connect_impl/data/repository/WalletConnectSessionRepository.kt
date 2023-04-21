@@ -1,43 +1,51 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.data.repository
 
+import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
-import io.novafoundation.nova.core_db.model.WalletConnectSessionLocal
-import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSession
+import io.novafoundation.nova.core_db.model.WalletConnectSessionAccountLocal
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionAccount
+import kotlinx.coroutines.flow.Flow
 
 interface WalletConnectSessionRepository {
 
-    suspend fun addSession(session: WalletConnectSession)
+    suspend fun addSessionAccount(sessionAccount: WalletConnectSessionAccount)
 
-    suspend fun getSession(sessionTopic: String): WalletConnectSession?
+    suspend fun getSessionAccount(sessionTopic: String): WalletConnectSessionAccount?
 
-    suspend fun deleteSession(sessionTopic: String)
+    suspend fun deleteSessionAccount(sessionTopic: String)
+
+    fun allSessionAccountsFlow(): Flow<List<WalletConnectSessionAccount>>
 }
 
 class RealWalletConnectSessionRepository(
     private val dao: WalletConnectSessionsDao,
 ) : WalletConnectSessionRepository {
 
-    override suspend fun addSession(session: WalletConnectSession) {
-        dao.insertSession(mapSessionToLocal(session))
+    override suspend fun addSessionAccount(sessionAccount: WalletConnectSessionAccount) {
+        dao.insertSession(mapSessionToLocal(sessionAccount))
     }
 
-    override suspend fun getSession(sessionTopic: String): WalletConnectSession? {
+    override suspend fun getSessionAccount(sessionTopic: String): WalletConnectSessionAccount? {
         return dao.getSession(sessionTopic)?.let(::mapSessionFromLocal)
     }
 
-    override suspend fun deleteSession(sessionTopic: String) {
+    override suspend fun deleteSessionAccount(sessionTopic: String) {
         dao.deleteSession(sessionTopic)
     }
 
-    private fun mapSessionToLocal(session: WalletConnectSession): WalletConnectSessionLocal {
+    override fun allSessionAccountsFlow(): Flow<List<WalletConnectSessionAccount>> {
+        return dao.allSessionsFlow().mapList(::mapSessionFromLocal)
+    }
+
+    private fun mapSessionToLocal(session: WalletConnectSessionAccount): WalletConnectSessionAccountLocal {
         return with(session) {
-            WalletConnectSessionLocal(sessionTopic = sessionTopic, metaId = metaId)
+            WalletConnectSessionAccountLocal(sessionTopic = sessionTopic, metaId = metaId)
         }
     }
 
-    private fun mapSessionFromLocal(sessionLocal: WalletConnectSessionLocal): WalletConnectSession {
+    private fun mapSessionFromLocal(sessionLocal: WalletConnectSessionAccountLocal): WalletConnectSessionAccount {
         return with(sessionLocal) {
-            WalletConnectSession(sessionTopic = sessionTopic, metaId = metaId)
+            WalletConnectSessionAccount(sessionTopic = sessionTopic, metaId = metaId)
         }
     }
 }

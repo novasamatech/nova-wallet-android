@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.domain.session
 
+import com.walletconnect.android.Core
 import com.walletconnect.web3.wallet.client.Wallet
 import com.walletconnect.web3.wallet.client.Wallet.Model.Namespace
 import com.walletconnect.web3.wallet.client.Wallet.Model.SessionProposal
@@ -7,10 +8,13 @@ import com.walletconnect.web3.wallet.client.Web3Wallet
 import io.novafoundation.nova.caip.caip2.Caip2Resolver
 import io.novafoundation.nova.caip.caip2.identifier.Caip2Namespace
 import io.novafoundation.nova.common.utils.mapValuesNotNull
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.WalletConnectSessionRepository
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.SessionDappMetadata
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSession
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionAccount
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.approveSession
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.approved
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.rejectSession
@@ -18,7 +22,9 @@ import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.rejected
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.WalletConnectRequest
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
 
@@ -37,7 +43,9 @@ interface WalletConnectSessionInteractor {
 
     suspend fun onSessionDelete(sessionDelete: Wallet.Model.SessionDelete)
 
-    suspend fun getSession(sessionTopic: String): WalletConnectSession?
+    suspend fun getSessionAccount(sessionTopic: String): WalletConnectSessionAccount?
+
+    fun activeSessionsFlow(): Flow<List<WalletConnectSession>>
 }
 
 class RealWalletConnectSessionInteractor(
@@ -45,6 +53,7 @@ class RealWalletConnectSessionInteractor(
     private val caip2Resolver: Caip2Resolver,
     private val walletConnectRequestFactory: WalletConnectRequest.Factory,
     private val walletConnectSessionRepository: WalletConnectSessionRepository,
+    private val accountRepository: AccountRepository
 ) : WalletConnectSessionInteractor {
 
     private val pendingSessionSettlementsByPairingTopic = ConcurrentHashMap<String, PendingSessionSettlement>()
@@ -106,18 +115,27 @@ class RealWalletConnectSessionInteractor(
         val pendingSessionSettlement = pendingSessionSettlementsByPairingTopic[pairingTopic] ?: return
 
         val sessionTopic = settledSessionResponse.session.topic
-        val walletConnectSession = WalletConnectSession(pendingSessionSettlement.metaId, sessionTopic)
-        walletConnectSessionRepository.addSession(walletConnectSession)
+        val walletConnectSessionAccount = WalletConnectSessionAccount(pendingSessionSettlement.metaId, sessionTopic)
+        walletConnectSessionRepository.addSessionAccount(walletConnectSessionAccount)
     }
 
     override suspend fun onSessionDelete(sessionDelete: Wallet.Model.SessionDelete) {
         if (sessionDelete !is Wallet.Model.SessionDelete.Success) return
 
-        walletConnectSessionRepository.deleteSession(sessionDelete.topic)
+        walletConnectSessionRepository.deleteSessionAccount(sessionDelete.topic)
     }
 
-    override suspend fun getSession(sessionTopic: String): WalletConnectSession? {
-        return walletConnectSessionRepository.getSession(sessionTopic)
+    override suspend fun getSessionAccount(sessionTopic: String): WalletConnectSessionAccount? {
+        return walletConnectSessionRepository.getSessionAccount(sessionTopic)
+    }
+
+    override fun activeSessionsFlow(): Flow<List<WalletConnectSession>> {
+        return walletConnectSessionRepository.allSessionAccountsFlow().map { sessionAccounts ->
+            val activeSessions = Web3Wallet.getListOfActiveSessions()
+            val allMetaAccounts = accountRepository.allMetaAccounts()
+
+            createWalletSessions(activeSessions, allMetaAccounts, sessionAccounts)
+        }
     }
 
     private infix fun Map<String, Namespace.Proposal>.mergeWith(other: Map<String, Namespace.Proposal>): Map<String, Namespace.Proposal> {
@@ -156,4 +174,32 @@ class RealWalletConnectSessionInteractor(
     }
 
     private class PendingSessionSettlement(val metaId: Long)
+
+    private fun createWalletSessions(
+        sessions: List<Wallet.Model.Session>,
+        metaAccounts: List<MetaAccount>,
+        sessionAccounts: List<WalletConnectSessionAccount>
+    ): List<WalletConnectSession> {
+        val metaAccountsById = metaAccounts.associateBy(MetaAccount::id)
+        val sessionAccountsByTopic = sessionAccounts.associateBy(WalletConnectSessionAccount::sessionTopic)
+
+        return sessions.mapNotNull { session ->
+            val sessionAccount = sessionAccountsByTopic[session.topic] ?: return@mapNotNull null
+            val metaAccount = metaAccountsById[sessionAccount.metaId] ?: return@mapNotNull null
+
+            WalletConnectSession(
+                connectedMetaAccount = metaAccount,
+                dappMetadata = session.metaData?.let(::mapAppMetadataToSessionMetadata),
+                sessionTopic = session.topic
+            )
+        }
+    }
+
+    private fun mapAppMetadataToSessionMetadata(metadata: Core.Model.AppMetaData): SessionDappMetadata {
+        return SessionDappMetadata(
+            dappUrl = metadata.url,
+            icon = metadata.icons.firstOrNull(),
+            name = metadata.name
+        )
+    }
 }

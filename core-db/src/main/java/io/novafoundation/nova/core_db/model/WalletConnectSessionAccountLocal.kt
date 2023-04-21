@@ -17,7 +17,7 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         ),
     ]
 )
-class WalletConnectSessionLocal(
+class WalletConnectSessionAccountLocal(
     @PrimaryKey
     val sessionTopic: String,
     @ColumnInfo(index = true)
