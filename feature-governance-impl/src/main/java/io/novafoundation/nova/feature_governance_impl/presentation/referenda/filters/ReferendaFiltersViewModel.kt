@@ -45,4 +45,8 @@ class ReferendaFiltersViewModel(
         interactor.updateReferendumTypeFilter(ReferendumTypeFilter(selectedFilterFlow.value))
         governanceRouter.back()
     }
+
+    fun homeButtonClicked() {
+        governanceRouter.back()
+    }
 }

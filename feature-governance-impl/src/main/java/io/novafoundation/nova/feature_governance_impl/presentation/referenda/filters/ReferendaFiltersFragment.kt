@@ -23,6 +23,7 @@ class ReferendaFiltersFragment : BaseFragment<ReferendaFiltersViewModel>() {
 
     override fun initViews() {
         referendaFiltersToolbar.applyStatusBarInsets()
+        referendaFiltersToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
 
         referendaFiltersApplyButton.setOnClickListener {
             viewModel.onApplyFilters()
