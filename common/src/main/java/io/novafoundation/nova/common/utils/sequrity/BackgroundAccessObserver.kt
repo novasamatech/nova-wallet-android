@@ -21,7 +21,7 @@ class BackgroundAccessObserver(
 ) : DefaultLifecycleObserver, CoroutineScope {
 
     companion object {
-        val DEFAULT_ACCESS_TIME = TimeUnit.SECONDS.toMillis(5L)
+        val DEFAULT_ACCESS_TIME = TimeUnit.MINUTES.toMillis(5L)
 
         private const val PREFS_ON_PAUSE_TIME = "ON_PAUSE_TIME"
     }
