@@ -8,6 +8,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
+import io.novafoundation.nova.feature_account_impl.presentation.settings.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.di.modules.ExportModule
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -113,6 +114,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
             @BindsInstance paritySignerSignInterScreenCommunicator: ParitySignerSignCommunicator,
             @BindsInstance ledgerSignInterScreenCommunicator: LedgerSignCommunicator,
             @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,
+            @BindsInstance pinCodeTwoFactorVerificationCommunicator: PinCodeTwoFactorVerificationCommunicator,
             deps: AccountFeatureDependencies
         ): AccountFeatureComponent
     }

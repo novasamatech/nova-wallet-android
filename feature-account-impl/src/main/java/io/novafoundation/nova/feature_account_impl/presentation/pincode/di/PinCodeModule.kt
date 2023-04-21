@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.io.MainThreadExecutor
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
@@ -39,7 +40,8 @@ class PinCodeModule {
         deviceVibrator: DeviceVibrator,
         resourceManager: ResourceManager,
         backgroundAccessObserver: BackgroundAccessObserver,
-        pinCodeAction: PinCodeAction
+        pinCodeAction: PinCodeAction,
+        twoFactorVerificationExecutor: TwoFactorVerificationExecutor
     ): ViewModel {
         return PinCodeViewModel(
             interactor,
@@ -47,6 +49,7 @@ class PinCodeModule {
             deviceVibrator,
             resourceManager,
             backgroundAccessObserver,
+            twoFactorVerificationExecutor,
             pinCodeAction
         )
     }
