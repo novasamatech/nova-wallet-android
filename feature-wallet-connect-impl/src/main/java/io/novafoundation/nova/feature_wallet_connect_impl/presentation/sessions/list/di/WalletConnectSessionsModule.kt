@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.di
+package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -13,7 +13,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectScanCommunicator
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.WalletConnectSessionInteractor
-import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.WalletConnectSessionsViewModel
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.common.WalletConnectSessionMapper
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsViewModel
 
 @Module(includes = [ViewModelModule::class])
 class WalletConnectSessionsModule {
@@ -27,13 +28,15 @@ class WalletConnectSessionsModule {
         interactor: WalletConnectSessionInteractor,
         resourceManager: ResourceManager,
         walletUiUseCase: WalletUiUseCase,
-    ): ViewModel {
+        walletConnectSessionMapper: WalletConnectSessionMapper,
+        ): ViewModel {
         return WalletConnectSessionsViewModel(
             router = router,
             scanCommunicator = communicator,
             interactor = interactor,
             resourceManager = resourceManager,
-            walletUiUseCase = walletUiUseCase
+            walletUiUseCase = walletUiUseCase,
+            walletConnectSessionMapper = walletConnectSessionMapper
         )
     }
 

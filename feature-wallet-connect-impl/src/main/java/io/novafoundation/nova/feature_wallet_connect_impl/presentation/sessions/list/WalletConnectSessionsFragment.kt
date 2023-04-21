@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions
+package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,11 +7,13 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_impl.R
 import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatureComponent
-import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.model.SessionListModel
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.model.SessionListModel
 import kotlinx.android.synthetic.main.fragment_wc_sessions.wcSessionsConnectionsList
+import kotlinx.android.synthetic.main.fragment_wc_sessions.wcSessionsConnectionsPlaceholder
 import kotlinx.android.synthetic.main.fragment_wc_sessions.wcSessionsNewConnection
 import kotlinx.android.synthetic.main.fragment_wc_sessions.wcSessionsToolbar
 import javax.inject.Inject
@@ -50,8 +52,11 @@ class WalletConnectSessionsFragment : BaseFragment<WalletConnectSessionsViewMode
     }
 
     override fun subscribe(viewModel: WalletConnectSessionsViewModel) {
-        viewModel.sessionsFlow.observe {
-            sessionsAdapter.submitList(it)
+        viewModel.sessionsFlow.observe { sessions ->
+            sessionsAdapter.submitList(sessions)
+
+            wcSessionsConnectionsList.setVisible(sessions.isNotEmpty())
+            wcSessionsConnectionsPlaceholder.setVisible(sessions.isEmpty())
         }
     }
 

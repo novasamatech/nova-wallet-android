@@ -19,6 +19,9 @@ interface WalletConnectSessionsDao {
     @Query("SELECT * FROM wallet_connect_sessions WHERE sessionTopic = :sessionTopic")
     suspend fun getSession(sessionTopic: String): WalletConnectSessionAccountLocal?
 
+    @Query("SELECT * FROM wallet_connect_sessions WHERE sessionTopic = :sessionTopic")
+    fun sessionFlow(sessionTopic: String): Flow<WalletConnectSessionAccountLocal?>
+
     @Query("SELECT * FROM wallet_connect_sessions")
     fun allSessionsFlow(): Flow<List<WalletConnectSessionAccountLocal>>
 }

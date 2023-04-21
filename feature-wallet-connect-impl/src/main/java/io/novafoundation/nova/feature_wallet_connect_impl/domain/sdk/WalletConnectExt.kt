@@ -77,6 +77,16 @@ suspend fun Web3Wallet.rejectSession(reject: Wallet.Params.SessionReject): Resul
     }
 }
 
+suspend fun Web3Wallet.disconnectSession(sessionTopic: String): Result<Unit> {
+    return suspendCoroutine { continuation ->
+        disconnectSession(
+            params = Wallet.Params.SessionDisconnect(sessionTopic),
+            onSuccess = { continuation.resume(Result.success(Unit)) },
+            onError = { continuation.resume(Result.failure(it.throwable)) }
+        )
+    }
+}
+
 suspend fun Web3Wallet.respondSessionRequest(response: Wallet.Params.SessionRequestResponse): Result<Unit> {
     return suspendCoroutine { continuation ->
         respondSessionRequest(

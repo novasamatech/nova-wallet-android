@@ -1,11 +1,10 @@
-package io.novafoundation.nova.feature_dapp_impl.walletConnect.presentation.sessions.di
+package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.di
 
 import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.WalletConnectSessionsFragment
-import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.di.WalletConnectSessionsModule
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsFragment
 
 @Subcomponent(
     modules = [

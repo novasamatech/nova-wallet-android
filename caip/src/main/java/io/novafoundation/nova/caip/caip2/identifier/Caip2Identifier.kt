@@ -18,11 +18,18 @@ sealed interface Caip2Identifier {
 
     val namespaceWitId: String
 
+    val namespace: Caip2Namespace
+
     class Eip155(val chainId: BigInteger) : Caip2Identifier {
+
+        override val namespace = Caip2Namespace.EIP155
+
         override val namespaceWitId: String = formatCaip2(Caip2Namespace.EIP155, chainId)
     }
 
     class Polkadot(val genesisHash: String) : Caip2Identifier {
+        override val namespace = Caip2Namespace.POLKADOT
+
         override val namespaceWitId: String = formatCaip2(Caip2Namespace.POLKADOT, genesisHash.take(32))
     }
 }

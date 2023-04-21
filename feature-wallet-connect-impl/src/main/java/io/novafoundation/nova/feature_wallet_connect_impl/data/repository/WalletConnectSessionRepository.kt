@@ -5,6 +5,7 @@ import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 import io.novafoundation.nova.core_db.model.WalletConnectSessionAccountLocal
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionAccount
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 interface WalletConnectSessionRepository {
 
@@ -15,6 +16,8 @@ interface WalletConnectSessionRepository {
     suspend fun deleteSessionAccount(sessionTopic: String)
 
     fun allSessionAccountsFlow(): Flow<List<WalletConnectSessionAccount>>
+
+    fun sessionAccountFlow(sessionTopic: String): Flow<WalletConnectSessionAccount?>
 }
 
 class RealWalletConnectSessionRepository(
@@ -35,6 +38,10 @@ class RealWalletConnectSessionRepository(
 
     override fun allSessionAccountsFlow(): Flow<List<WalletConnectSessionAccount>> {
         return dao.allSessionsFlow().mapList(::mapSessionFromLocal)
+    }
+
+    override fun sessionAccountFlow(sessionTopic: String): Flow<WalletConnectSessionAccount?> {
+        return dao.sessionFlow(sessionTopic).map { localSession -> localSession?.let(::mapSessionFromLocal) }
     }
 
     private fun mapSessionToLocal(session: WalletConnectSessionAccount): WalletConnectSessionAccountLocal {

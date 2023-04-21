@@ -18,6 +18,7 @@ import io.novafoundation.nova.caip.slip44.Slip44CoinRepository
 import io.novafoundation.nova.caip.slip44.endpoint.Slip44CoinApi
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
 class CaipModule {
@@ -49,7 +50,7 @@ class CaipModule {
 
     @Provides
     @FeatureScope
-    fun provideCaip2Resolver(): Caip2Resolver = RealCaip2Resolver()
+    fun provideCaip2Resolver(chainRegistry: ChainRegistry): Caip2Resolver = RealCaip2Resolver(chainRegistry)
 
     @Provides
     @FeatureScope

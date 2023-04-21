@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions
+package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.feature_dapp_api.presentation.view.DAppView
 import io.novafoundation.nova.feature_wallet_connect_impl.R
-import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.model.SessionListModel
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.model.SessionListModel
 
 class WalletConnectSessionsAdapter(
     private val handler: Handler

@@ -7,6 +7,7 @@ import io.novafoundation.nova.caip.caip2.Caip2Parser
 import io.novafoundation.nova.caip.caip2.Caip2Resolver
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -23,7 +24,8 @@ import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.request
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.evm.EvmWalletConnectRequestFactory
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.polkadot.PolkadotWalletConnectRequestFactory
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.service.RealWalletConnectServiceFactory
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.common.RealWalletConnectSessionMapper
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.common.WalletConnectSessionMapper
 
 @Module
 class WalletConnectFeatureModule {
@@ -60,13 +62,11 @@ class WalletConnectFeatureModule {
     @Provides
     @FeatureScope
     fun provideInteractor(
-        chainRegistry: ChainRegistry,
         caip2Resolver: Caip2Resolver,
         requestFactory: WalletConnectRequest.Factory,
         walletConnectSessionRepository: WalletConnectSessionRepository,
         accountRepository: AccountRepository
     ): WalletConnectSessionInteractor = RealWalletConnectSessionInteractor(
-        chainRegistry = chainRegistry,
         caip2Resolver = caip2Resolver,
         walletConnectRequestFactory = requestFactory,
         walletConnectSessionRepository = walletConnectSessionRepository,
@@ -89,5 +89,11 @@ class WalletConnectFeatureModule {
             dAppSignRequester = dAppSignRequester,
             selectedAccountUseCase = selectedAccountUseCase
         )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSessionMapper(resourceManager: ResourceManager): WalletConnectSessionMapper {
+        return RealWalletConnectSessionMapper(resourceManager)
     }
 }
