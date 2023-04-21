@@ -154,7 +154,7 @@
 
     <action
         android:id="@+id/action_open_referenda_filters"
-        app:destination="@id/referenda_filters_graph"
+        app:destination="@id/referendaFiltersFragment"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -293,6 +293,7 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
         <action
             android:id="@+id/action_mainFragment_to_nfts_nav_graph"
             app:destination="@id/nfts_nav_graph"
@@ -1094,6 +1095,10 @@
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.ParachainStakingRebondFragment"
         android:label="ParachainStakingRebondFragment" />
 
+    <fragment
+        android:id="@+id/referendaFiltersFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.filters.ReferendaFiltersFragment"
+        android:label="ReferendaFiltersFragment" />
 
     <fragment
         android:id="@+id/assetSearchFragment"
@@ -1129,8 +1134,6 @@
     <include app:graph="@navigation/your_delegations_nav_graph" />
 
     <include app:graph="@navigation/referenda_search_graph" />
-
-    <include app:graph="@navigation/referenda_filters_graph" />
 
     <fragment
         android:id="@+id/rebagFragment"

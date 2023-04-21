@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.domain.referendum.list
 
 import io.novafoundation.nova.common.utils.SearchComparator
 import io.novafoundation.nova.common.utils.SearchFilter
+import io.novafoundation.nova.common.utils.applyFilter
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.filterWith
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Vote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.getName
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.user
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.data.repository.filters.ReferendaFiltersRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.ReferendaCommonRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
 import io.novafoundation.nova.runtime.ext.fullId
@@ -39,6 +41,7 @@ class RealReferendaListInteractor(
     private val referendaSharedComputation: ReferendaSharedComputation,
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val referendaSortingProvider: ReferendaSortingProvider,
+    private val referendaFiltersRepository: ReferendaFiltersRepository
 ) : ReferendaListInteractor {
 
     override fun searchReferendaListStateFlow(
@@ -99,15 +102,18 @@ class RealReferendaListInteractor(
             val delegationSupported = governanceSource.delegationsRepository.isDelegationSupported(chain)
 
             val trackLocksFlow = governanceSource.convictionVoting.trackLocksFlowOrEmpty(voter?.accountId, asset.fullId)
+            val referendumFilterFlow = referendaFiltersRepository.getReferendumTypeFiltersFlow()
 
-            combine(referendaStateFlow, trackLocksFlow) { intermediateData, trackLocks ->
+            combine(referendaStateFlow, trackLocksFlow, referendumFilterFlow) { intermediateData, trackLocks, referendumFilter ->
                 val claimScheduleCalculator = with(intermediateData) {
                     RealClaimScheduleCalculator(voting, currentBlockNumber, onChainReferenda, tracksById, undecidingTimeout, voteLockingPeriod, trackLocks)
                 }
                 val locksOverview = claimScheduleCalculator.governanceLocksOverview()
 
+                val filteredReferenda = intermediateData.referenda.applyFilter(referendumFilter)
+
                 ReferendaListState(
-                    groupedReferenda = sortReferendaPreviews(intermediateData.referenda),
+                    groupedReferenda = sortReferendaPreviews(filteredReferenda),
                     locksOverview = locksOverview,
                     delegated = determineDelegatedState(intermediateData.voting, delegationSupported),
                 )
