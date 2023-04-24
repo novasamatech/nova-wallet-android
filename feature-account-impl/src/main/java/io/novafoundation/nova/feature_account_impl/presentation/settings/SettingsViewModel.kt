@@ -62,6 +62,8 @@ class SettingsViewModel(
         .inBackground()
         .share()
 
+    val biometricAuthStatus = accountInteractor.isBiometricEnabledFlow()
+
     val pinCodeVerificationStatus = twoFactorVerificationService.isEnabledFlow()
 
     val safeModeStatus = safeModeService.safeModeStatusFlow()
@@ -85,6 +87,21 @@ class SettingsViewModel(
 
     fun languagesClicked() {
         router.openLanguages()
+    }
+
+    fun changeBiometricAuth() {
+        launch {
+            if (!accountInteractor.isBiometricEnabled()) {
+                confirmationAwaitableAction.awaitAction(
+                    SettingsConfirmationData(
+                        R.string.settings_biometric_confirmation_title,
+                        R.string.settings_biometric_confirmation_message
+                    )
+                )
+            }
+
+            accountInteractor.toggleBiometric()
+        }
     }
 
     fun changePincodeVerification() {

@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.fragment_profile.accountView
 import kotlinx.android.synthetic.main.fragment_profile.settingsSafeMode
 import kotlinx.android.synthetic.main.fragment_profile.settingsAppVersion
 import kotlinx.android.synthetic.main.fragment_profile.settingsAvatar
+import kotlinx.android.synthetic.main.fragment_profile.settingsBiometricAuth
 import kotlinx.android.synthetic.main.fragment_profile.settingsContainer
 import kotlinx.android.synthetic.main.fragment_profile.settingsCurrency
 import kotlinx.android.synthetic.main.fragment_profile.settingsEmail
@@ -66,6 +67,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         settingsEmail.setOnClickListener { viewModel.emailClicked() }
         settingsRateUs.setOnClickListener { viewModel.rateUsClicked() }
 
+        settingsBiometricAuth.setOnClickListener { viewModel.changeBiometricAuth() }
         settingsPinCodeVerification.setOnClickListener { viewModel.changePincodeVerification() }
         settingsSafeMode.setOnClickListener { viewModel.changeSafeMode() }
         settingsPin.setOnClickListener { viewModel.changePinCodeClicked() }
@@ -100,6 +102,10 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
 
         viewModel.selectedLanguageFlow.observe {
             settingsLanguage.setValue(it.displayName)
+        }
+
+        viewModel.biometricAuthStatus.observe {
+            settingsBiometricAuth.setChecked(it)
         }
 
         viewModel.pinCodeVerificationStatus.observe {

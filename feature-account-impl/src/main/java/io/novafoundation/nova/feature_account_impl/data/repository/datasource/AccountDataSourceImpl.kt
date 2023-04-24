@@ -77,6 +77,16 @@ class AccountDataSourceImpl(
         .inBackground()
         .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
 
+    override fun getAuthTypeFlow(): Flow<AuthType> {
+        return preferences.stringFlow(PREFS_AUTH_TYPE).map { savedValue ->
+            if (savedValue == null) {
+                AuthType.PINCODE
+            } else {
+                AuthType.valueOf(savedValue)
+            }
+        }
+    }
+
     override suspend fun saveAuthType(authType: AuthType) = withContext(Dispatchers.IO) {
         preferences.putString(PREFS_AUTH_TYPE, authType.toString())
     }

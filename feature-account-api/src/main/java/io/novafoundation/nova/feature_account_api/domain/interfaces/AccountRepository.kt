@@ -109,4 +109,6 @@ interface AccountRepository {
     ): String
 
     suspend fun isAccountExists(accountId: AccountId): Boolean
+
+    fun isBiometricEnabledFlow(): Flow<Boolean>
 }

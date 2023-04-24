@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface AccountDataSource : SecretStoreV1 {
 
+    fun getAuthTypeFlow(): Flow<AuthType>
+
     suspend fun saveAuthType(authType: AuthType)
 
     suspend fun getAuthType(): AuthType
