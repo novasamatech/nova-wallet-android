@@ -26,7 +26,7 @@ interface OptionsFilter<T, O> : Filter<T> {
     val options: List<O>
 }
 
-class FilterGroup<T>(val filters: List<Filter<T>>) : Filter<T> {
+class MatchAllFilter<T>(val filters: List<Filter<T>>) : Filter<T> {
 
     override fun shouldInclude(model: T): Boolean {
         return filters.all { filter -> filter.shouldInclude(model) }

@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.data.repository.filters
 
 import io.novafoundation.nova.common.data.storage.Preferences
-import io.novafoundation.nova.common.utils.FilterGroup
+import io.novafoundation.nova.common.utils.MatchAllFilter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendumType
 import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendumTypeFilter
@@ -15,7 +15,7 @@ interface ReferendaFiltersRepository {
 
     fun getReferendumTypeFilter(): ReferendumTypeFilter
 
-    fun getReferendumTypeFiltersFlow(): Flow<FilterGroup<ReferendumPreview>>
+    fun getReferendumTypeFiltersFlow(): Flow<MatchAllFilter<ReferendumPreview>>
 
     fun updateReferendumTypeFilter(filter: ReferendumTypeFilter)
 }
@@ -28,8 +28,8 @@ class PreferencesReferendaFiltersRepository(private val preferences: Preferences
         return referendumTypeFilter.value
     }
 
-    override fun getReferendumTypeFiltersFlow(): Flow<FilterGroup<ReferendumPreview>> {
-        return referendumTypeFilter.map { FilterGroup(listOf(it)) }
+    override fun getReferendumTypeFiltersFlow(): Flow<MatchAllFilter<ReferendumPreview>> {
+        return referendumTypeFilter.map { MatchAllFilter(listOf(it)) }
     }
 
     override fun updateReferendumTypeFilter(filter: ReferendumTypeFilter) {

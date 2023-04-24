@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.domain.filters
 
-import io.novafoundation.nova.common.utils.FilterGroup
+import io.novafoundation.nova.common.utils.MatchAllFilter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_impl.data.repository.filters.ReferendaFiltersRepository
 import kotlinx.coroutines.flow.Flow
@@ -9,7 +9,7 @@ interface ReferendaFiltersInteractor {
 
     fun getReferendumTypeFilter(): ReferendumTypeFilter
 
-    fun getReferendumTypeFiltersFlow(): Flow<FilterGroup<ReferendumPreview>>
+    fun getReferendumTypeFiltersFlow(): Flow<MatchAllFilter<ReferendumPreview>>
 
     fun updateReferendumTypeFilter(filter: ReferendumTypeFilter)
 }
@@ -22,7 +22,7 @@ class RealReferendaFiltersInteractor(
         return referendaFiltersRepository.getReferendumTypeFilter()
     }
 
-    override fun getReferendumTypeFiltersFlow(): Flow<FilterGroup<ReferendumPreview>> {
+    override fun getReferendumTypeFiltersFlow(): Flow<MatchAllFilter<ReferendumPreview>> {
         return referendaFiltersRepository.getReferendumTypeFiltersFlow()
     }
 
