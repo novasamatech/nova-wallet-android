@@ -24,4 +24,7 @@ interface WalletConnectSessionsDao {
 
     @Query("SELECT * FROM wallet_connect_sessions")
     fun allSessionsFlow(): Flow<List<WalletConnectSessionAccountLocal>>
+
+    @Query("SELECT COUNT(*) FROM wallet_connect_sessions")
+    fun numberOfSessionsFlow(): Flow<Int>
 }

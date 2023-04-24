@@ -8,10 +8,8 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
-import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectScanCommunicator
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.WalletConnectSessionInteractor
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.common.WalletConnectSessionMapper
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsViewModel
@@ -24,17 +22,13 @@ class WalletConnectSessionsModule {
     @ViewModelKey(WalletConnectSessionsViewModel::class)
     fun provideViewModel(
         router: WalletConnectRouter,
-        communicator: WalletConnectScanCommunicator,
         interactor: WalletConnectSessionInteractor,
-        resourceManager: ResourceManager,
         walletUiUseCase: WalletUiUseCase,
         walletConnectSessionMapper: WalletConnectSessionMapper,
     ): ViewModel {
         return WalletConnectSessionsViewModel(
             router = router,
-            scanCommunicator = communicator,
             interactor = interactor,
-            resourceManager = resourceManager,
             walletUiUseCase = walletUiUseCase,
             walletConnectSessionMapper = walletConnectSessionMapper
         )

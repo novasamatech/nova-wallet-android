@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="wallet_connect_v2">WalletConnect v2</string>
+
     <string name="common_sign_request">Sign Request</string>
 
 <!--    <string name="staking_nominator_status_active">Active</string>-->
@@ -14,8 +16,8 @@
 
     <string name="wallet_connect_unknown_dapp">Unknown dApp</string>
     <string name="wallet_connect_new_connection">New connection</string>
-    <string name="wallet_connect_title">Wallet Connect</string>
-    <string name="wallet_connect_scan_title">Scan Wallet Connect QR code</string>
+    <string name="wallet_connect_title">WalletConnect</string>
+    <string name="common_scan_qr_code">Scan the QR code</string>
 
     <string name="send_address_hint">Address or w3n</string>
 

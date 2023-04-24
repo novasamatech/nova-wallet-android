@@ -61,7 +61,6 @@ internal class RealWalletConnectService(
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(parentScope) {
 
     override val authorizeDapp = awaitableMixinFactory.confirmingOrDenyingAction<AuthorizeDappBottomSheet.Payload>()
-
     private val selectedWalletUiFlow = walletUiUseCase.selectedWalletUiFlow(showAddressIcon = true)
         .shareInBackground()
 

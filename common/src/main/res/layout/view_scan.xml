@@ -28,7 +28,7 @@
 
     <TextView
         android:id="@+id/viewScanSubtitle"
-        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
