@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.language.mapper.
 
 internal class RealLanguageUseCase(
     private val accountInteractor: AccountInteractor,
-): LanguageUseCase {
+) : LanguageUseCase {
 
     override suspend fun selectedLanguageModel(): LanguageModel {
         return mapLanguageToLanguageModel(accountInteractor.getSelectedLanguage())

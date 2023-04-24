@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 internal class RealWalletConnectSessionsUseCase(
     private val sessionRepository: WalletConnectSessionRepository,
-): WalletConnectSessionsUseCase {
+) : WalletConnectSessionsUseCase {
 
     override fun activeSessionsNumberFlow(): Flow<Int> {
         return sessionRepository.numberOfSessionAccountsFlow()

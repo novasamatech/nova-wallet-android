@@ -26,7 +26,7 @@ class WalletConnectSessionsViewModel(
     }
 
     fun newSessionClicked() {
-       router.openScanPairingQrCode()
+        router.openScanPairingQrCode()
     }
 
     fun sessionClicked(item: SessionListModel) {
