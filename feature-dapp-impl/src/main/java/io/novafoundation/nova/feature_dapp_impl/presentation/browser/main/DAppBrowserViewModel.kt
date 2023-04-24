@@ -263,7 +263,7 @@ class DAppBrowserViewModel(
         return SigningDappMetadata(
             icon = dappMetadata.metadata?.iconLink,
             name = dappMetadata.metadata?.name,
-            url = dAppUrl,
+            url = dappMetadata.baseUrl,
         )
     }
 }

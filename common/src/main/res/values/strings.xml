@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="common_sign_request">Sign Request</string>
 
 <!--    <string name="staking_nominator_status_active">Active</string>-->
 <!--    <string name="crowdloan_active_section">Active</string>-->

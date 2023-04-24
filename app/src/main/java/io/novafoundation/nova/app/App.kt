@@ -73,7 +73,7 @@ open class App : Application(), FeatureContainer {
             name = "Nova Wallet",
             description = "Next-gen wallet for Polkadot and Kusama ecosystem",
             url = "https://novawallet.io/",
-            icons = listOf("https://raw.githubusercontent.com/nova-wallet/branding/master/logos/Nova_Wallet_Horizontal_On_White_200px.png"),
+            icons = listOf("https://raw.githubusercontent.com/nova-wallet/branding/master/logos/Nova_Wallet_Star_Color.png"),
             redirect = null
         )
 
