@@ -28,7 +28,7 @@ class RealBiometricService(
     override fun isEnabledFlow(): Flow<Boolean> = accountRepository.isBiometricEnabledFlow()
 
     override suspend fun toggle() {
-        enableBiometry(isEnabled())
+        enableBiometry(!isEnabled())
     }
 
     override fun cancel() {
