@@ -1,6 +1,7 @@
 package io.novafoundation.nova.app.root.navigation
 
 import android.os.Parcelable
+import androidx.annotation.CallSuper
 import androidx.lifecycle.asFlow
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -8,11 +9,12 @@ import io.novafoundation.nova.common.navigation.InterScreenCommunicator
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
-abstract class BaseInterScreenCommunicator<I : Parcelable, O : Parcelable>(
+abstract class NavStackInterScreenCommunicator<I : Parcelable, O : Parcelable>(
     private val navigationHolder: NavigationHolder,
 ) : InterScreenCommunicator<I, O> {
 
-    private val liveDataKey = UUID.randomUUID().toString()
+    private val responseKey = UUID.randomUUID().toString()
+    private val requestKey = UUID.randomUUID().toString()
 
     protected val navController: NavController
         get() = navigationHolder.navController!!
@@ -20,19 +22,27 @@ abstract class BaseInterScreenCommunicator<I : Parcelable, O : Parcelable>(
     // from requester - retrieve from current entry
     override val latestResponse: O?
         get() = navController.currentBackStackEntry!!.savedStateHandle
-            .get(liveDataKey)
+            .get(responseKey)
 
     // from responder - retrieve from previous (requester) entry
     override val lastState: O?
         get() = navController.previousBackStackEntry!!.savedStateHandle
-            .get(liveDataKey)
+            .get(responseKey)
 
     override val responseFlow: Flow<O>
         get() = navController.currentBackStackEntry!!.savedStateHandle
-            .getLiveData<O>(liveDataKey)
+            .getLiveData<O>(responseKey)
             .asFlow()
 
-    abstract override fun openRequest(request: I)
+    // from responder - retrieve from previous (requester) entry
+    override val lastInput: I?
+        get() = navController.previousBackStackEntry!!.savedStateHandle
+            .get(responseKey)
+
+    @CallSuper
+    override fun openRequest(request: I) {
+        saveRequest(request)
+    }
 
     override fun respond(response: O) {
         // previousBackStackEntry since we want to report to previous screen
@@ -40,6 +50,10 @@ abstract class BaseInterScreenCommunicator<I : Parcelable, O : Parcelable>(
     }
 
     protected fun saveResultTo(backStackEntry: NavBackStackEntry, response: O) {
-        backStackEntry.savedStateHandle.set(liveDataKey, response)
+        backStackEntry.savedStateHandle.set(responseKey, response)
+    }
+
+    private fun saveRequest(request: I) {
+        navController.currentBackStackEntry!!.savedStateHandle.set(requestKey, request)
     }
 }

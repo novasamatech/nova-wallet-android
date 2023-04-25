@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting
+package io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi

@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_external_sign_api.di.ExternalSignFeatureApi
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.ApproveSessionCommunicator
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
 
@@ -17,6 +18,7 @@ class WalletConnectFeatureHolder @Inject constructor(
     featureContainer: FeatureContainer,
     private val router: WalletConnectRouter,
     private val signCommunicator: ExternalSignCommunicator,
+    private val approveSessionCommunicator: ApproveSessionCommunicator,
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -30,6 +32,6 @@ class WalletConnectFeatureHolder @Inject constructor(
             .build()
 
         return DaggerWalletConnectFeatureComponent.factory()
-            .create(router, signCommunicator, deps)
+            .create(router, signCommunicator, approveSessionCommunicator, deps)
     }
 }

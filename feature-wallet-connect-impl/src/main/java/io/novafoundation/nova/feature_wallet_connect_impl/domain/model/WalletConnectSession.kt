@@ -18,6 +18,6 @@ class SessionDappMetadata(
 class WalletConnectSessionDetails(
     val connectedMetaAccount: MetaAccount,
     val dappMetadata: SessionDappMetadata?,
-    val chains: List<Chain>,
+    val chains: Set<Chain>,
     val sessionTopic: String,
 )

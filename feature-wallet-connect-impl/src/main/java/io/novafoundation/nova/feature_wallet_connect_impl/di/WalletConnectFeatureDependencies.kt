@@ -12,6 +12,7 @@ import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
 import io.novafoundation.nova.feature_external_sign_api.domain.sign.evm.EvmTypedMessageParser
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -44,4 +45,6 @@ interface WalletConnectFeatureDependencies {
     val evmTypedMessageParser: EvmTypedMessageParser
 
     val sessionsDao: WalletConnectSessionsDao
+
+    val selectWalletMixinFactory: SelectWalletMixin.Factory
 }

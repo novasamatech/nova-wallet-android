@@ -84,7 +84,7 @@
         app:destination="@id/switchWalletFragment" />
 
     <action
-        android:id="@+id/action_open_select_wallet"
+        android:id="@+id/action_open_select_address"
         app:destination="@id/selectAddressFragment" />
 
     <action
@@ -155,6 +155,18 @@
     <action
         android:id="@+id/action_open_scanWalletConnect"
         app:destination="@id/walletConnectScanFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_select_wallet"
+        app:destination="@id/selectWalletFragment" />
+
+    <action
+        android:id="@+id/action_open_approve_wallet_connect_session"
+        app:destination="@id/walletConnectApproveSessionFragment"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -440,7 +452,7 @@
 
     <dialog
         android:id="@+id/selectAddressFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting.SelectAddressFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.SelectAddressFragment"
         android:label="SelectAddressFragment"
         tools:layout="@layout/bottom_sheet_dynamic_list" />
 
@@ -1149,4 +1161,15 @@
         android:id="@+id/walletConnectScanFragment"
         android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.scan.WalletConnectScanFragment"
         android:label="WalletConnectScanFragment" />
+
+    <dialog
+        android:id="@+id/selectWalletFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.SelectWalletFragment"
+        android:label="SelectWalletFragment" />
+
+    <fragment
+        android:id="@+id/walletConnectApproveSessionFragment"
+        android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.WalletConnectApproveSessionFragment"
+        android:label="WalletConnectApproveSessionFragment" />
+
 </navigation>
