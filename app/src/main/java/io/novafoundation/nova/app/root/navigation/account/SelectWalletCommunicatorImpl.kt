@@ -1,7 +1,7 @@
 package io.novafoundation.nova.app.root.navigation.account
 
 import io.novafoundation.nova.app.R
-import io.novafoundation.nova.app.root.navigation.FlowInterScreenCommunicator
+import io.novafoundation.nova.app.root.navigation.NavStackInterScreenCommunicator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator.Payload
@@ -9,9 +9,11 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWall
 
 class SelectWalletCommunicatorImpl(
     private val navigationHolder: NavigationHolder,
-): FlowInterScreenCommunicator<Payload, Response>(), SelectWalletCommunicator {
+): NavStackInterScreenCommunicator<Payload, Response>(navigationHolder), SelectWalletCommunicator {
 
-    override fun dispatchRequest(request: Payload) {
-       navigationHolder.navController!!.navigate(R.id.action_open_select_wallet)
+    override fun openRequest(request: Payload) {
+        super.openRequest(request)
+
+        navigationHolder.navController!!.navigate(R.id.action_open_select_wallet)
     }
 }

@@ -7,16 +7,13 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.ApproveSessionCommunicator
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ApproveSessionCommunicatorImpl(
     private val navigationHolder: NavigationHolder,
     private val automaticInteractionGate: AutomaticInteractionGate,
 ) : FlowInterScreenCommunicator<Wallet.Model.SessionProposal, Unit>(),
-    ApproveSessionCommunicator,
-    CoroutineScope by CoroutineScope(Dispatchers.Main) {
+    ApproveSessionCommunicator {
 
     override fun dispatchRequest(request: Wallet.Model.SessionProposal) {
         launch {

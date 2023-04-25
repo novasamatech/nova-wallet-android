@@ -37,7 +37,7 @@ abstract class NavStackInterScreenCommunicator<I : Parcelable, O : Parcelable>(
     // from responder - retrieve from previous (requester) entry
     override val lastInput: I?
         get() = navController.previousBackStackEntry!!.savedStateHandle
-            .get(responseKey)
+            .get(requestKey)
 
     @CallSuper
     override fun openRequest(request: I) {
