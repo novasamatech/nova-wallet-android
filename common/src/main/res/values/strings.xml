@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <plurals name="common_unknown_chains">
+        <item quantity="one">Unknown network</item>
+        <item quantity="other">%s unknown networks</item>
+    </plurals>
+
     <string name="wallet_connect_v2">WalletConnect v2</string>
 
     <string name="common_sign_request">Sign Request</string>
