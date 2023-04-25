@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve
 
 import android.util.Log
+import androidx.annotation.StringRes
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.navigation.requireLastInput
 import io.novafoundation.nova.common.navigation.respond
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
@@ -11,6 +13,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWall
 import io.novafoundation.nova.feature_wallet_connect_impl.R
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.WalletConnectSessionInteractor
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -23,6 +27,12 @@ class WalletConnectApproveSessionViewModel(
 ) : BaseViewModel() {
 
     val selectWalletMixin = selectWalletMixinFactory.create(this)
+
+    private val processState = MutableStateFlow(ProgressState.IDLE)
+
+    val allowButtonState = buttonStateFor(ProgressState.CONFIRMING, R.string.common_allow)
+
+    val rejectButtonState = buttonStateFor(ProgressState.REJECTING, R.string.common_reject)
 
     private val sessionProposalFlow = flowOf {
         interactor.resolveSessionProposal(responder.requireLastInput())
@@ -41,6 +51,9 @@ class WalletConnectApproveSessionViewModel(
     }
 
     fun rejectClicked() = launch {
+        if (isInProgress()) return@launch
+        processState.value = ProgressState.REJECTING
+
         val proposal = responder.requireLastInput()
 
         interactor.rejectSession(proposal)
@@ -48,7 +61,10 @@ class WalletConnectApproveSessionViewModel(
         router.back()
     }
 
-    fun approveClicked() = launch{
+    fun approveClicked() = launch {
+        if (isInProgress()) return@launch
+        processState.value = ProgressState.CONFIRMING
+
         val proposal = responder.requireLastInput()
         val metaAccount = selectWalletMixin.selectedMetaAccount()
 
@@ -63,4 +79,30 @@ class WalletConnectApproveSessionViewModel(
 
     fun networksClicked() {
     }
+
+    private fun buttonStateFor(
+        buttonAction: ProgressState,
+        @StringRes idleLabelRes: Int
+    ): Flow<DescriptiveButtonState> {
+        return processState.map { progressState ->
+            when (progressState) {
+                ProgressState.IDLE -> DescriptiveButtonState.Enabled(
+                    resourceManager.getString(idleLabelRes)
+                )
+
+                buttonAction -> DescriptiveButtonState.Loading
+
+                else -> DescriptiveButtonState.Disabled(resourceManager.getString(idleLabelRes))
+            }
+        }
+            .shareInBackground()
+    }
+
+    private fun isInProgress(): Boolean {
+        return processState.value != ProgressState.IDLE
+    }
+}
+
+private enum class ProgressState {
+    IDLE, CONFIRMING, REJECTING
 }

@@ -1,35 +1,47 @@
 package io.novafoundation.nova.app.root.navigation
 
 import io.novafoundation.nova.common.navigation.InterScreenCommunicator
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
+import io.novafoundation.nova.common.utils.singleReplaySharedFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 
-abstract class FlowInterScreenCommunicator<I: Any, O: Any>: InterScreenCommunicator<I, O> {
+abstract class FlowInterScreenCommunicator<I: Any, O: Any>
+    : InterScreenCommunicator<I, O>,
+    CoroutineScope by CoroutineScope(Dispatchers.Main) {
 
-    private val _responseFlow = MutableStateFlow<O?>(null)
+    private var response: O? = null
+
+    override val responseFlow = singleReplaySharedFlow<O>()
+
     private var _request: I? = null
 
     override val latestResponse: O?
-        get() = _responseFlow.value
+        get() = response
 
     override val lastState: O?
         get() = latestResponse
 
-    override val responseFlow = _responseFlow.filterNotNull()
 
     override val lastInput: I?
         get() = _request
 
     abstract fun dispatchRequest(request: I)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun openRequest(request: I) {
         _request = request
-        _responseFlow.value = null
+        response = null
+        responseFlow.resetReplayCache()
 
         dispatchRequest(request)
     }
 
     override fun respond(response: O) {
-        _responseFlow.value = response
+        launch {
+            this@FlowInterScreenCommunicator.response = response
+            responseFlow.emit(response)
+        }
     }
 }

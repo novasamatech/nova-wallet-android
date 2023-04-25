@@ -52,7 +52,7 @@ class RealWalletConnectSessionInteractor(
     override suspend fun approveSession(
         sessionProposal: SessionProposal,
         metaAccount: MetaAccount
-    ): Result<Unit> {
+    ): Result<Unit> = withContext(Dispatchers.Default) {
         val requestedNameSpaces = sessionProposal.requiredNamespaces mergeWith sessionProposal.optionalNamespaces
 
         val chainsByCaip2 = caip2Resolver.chainsByCaip2()
@@ -81,7 +81,7 @@ class RealWalletConnectSessionInteractor(
 
         val response = sessionProposal.approved(namespaceSessions)
 
-        return Web3Wallet.approveSession(response)
+        Web3Wallet.approveSession(response)
             .onSuccess { registerPendingSettlement(sessionProposal, metaAccount) }
     }
 
@@ -101,10 +101,10 @@ class RealWalletConnectSessionInteractor(
         )
     }
 
-    override suspend fun rejectSession(proposal: SessionProposal): Result<Unit> {
+    override suspend fun rejectSession(proposal: SessionProposal): Result<Unit> = withContext(Dispatchers.Default) {
         val response = proposal.rejected("Rejected by user")
 
-        return Web3Wallet.rejectSession(response)
+        Web3Wallet.rejectSession(response)
     }
 
     override suspend fun parseSessionRequest(request: Wallet.Model.SessionRequest): Result<WalletConnectRequest> = runCatching {

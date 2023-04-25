@@ -7,6 +7,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.setupSelectWalletMixin
 import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDAppIcon
@@ -35,10 +36,15 @@ class WalletConnectApproveSessionFragment : BaseFragment<WalletConnectApproveSes
     ) = layoutInflater.inflate(R.layout.fragment_wc_session_approve, container, false)
 
     override fun initViews() {
+        onBackPressed { viewModel.exit() }
+
         wcApproveSessionToolbar.setHomeButtonListener { viewModel.exit() }
         wcApproveSessionToolbar.applyStatusBarInsets()
 
         wcApproveSessionReject.setOnClickListener { viewModel.rejectClicked() }
+        wcApproveSessionReject.prepareForProgress(viewLifecycleOwner)
+
+        wcApproveSessionAllow.prepareForProgress(viewLifecycleOwner)
         wcApproveSessionAllow.setOnClickListener { viewModel.approveClicked() }
 
         wcApproveSessionNetworks.setOnClickListener { viewModel.networksClicked() }
@@ -63,5 +69,8 @@ class WalletConnectApproveSessionFragment : BaseFragment<WalletConnectApproveSes
         }
 
         viewModel.title.observe(wcApproveSessionTitle::setText)
+
+        viewModel.allowButtonState.observe(wcApproveSessionAllow::setState)
+        viewModel.rejectButtonState.observe(wcApproveSessionReject::setState)
     }
 }
