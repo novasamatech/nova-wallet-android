@@ -20,9 +20,9 @@ interface AccountDataSource : SecretStoreV1 {
 
     fun getAuthTypeFlow(): Flow<AuthType>
 
-    suspend fun saveAuthType(authType: AuthType)
+    fun saveAuthType(authType: AuthType)
 
-    suspend fun getAuthType(): AuthType
+    fun getAuthType(): AuthType
 
     suspend fun savePinCode(pinCode: String)
 

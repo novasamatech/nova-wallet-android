@@ -191,15 +191,15 @@ class AccountRepositoryImpl(
         return accountDataSource.getAuthTypeFlow().map { it == AuthType.BIOMETRY }
     }
 
-    override suspend fun isBiometricEnabled(): Boolean {
+    override fun isBiometricEnabled(): Boolean {
         return accountDataSource.getAuthType() == AuthType.BIOMETRY
     }
 
-    override suspend fun setBiometricOn() {
+    override fun setBiometricOn() {
         return accountDataSource.saveAuthType(AuthType.BIOMETRY)
     }
 
-    override suspend fun setBiometricOff() {
+    override fun setBiometricOff() {
         return accountDataSource.saveAuthType(AuthType.PINCODE)
     }
 

@@ -68,11 +68,13 @@ interface AccountRepository {
 
     suspend fun generateMnemonic(): Mnemonic
 
-    suspend fun isBiometricEnabled(): Boolean
+    fun isBiometricEnabledFlow(): Flow<Boolean>
 
-    suspend fun setBiometricOn()
+    fun isBiometricEnabled(): Boolean
 
-    suspend fun setBiometricOff()
+    fun setBiometricOn()
+
+    fun setBiometricOff()
 
     fun nodesFlow(): Flow<List<Node>>
 
@@ -109,6 +111,4 @@ interface AccountRepository {
     ): String
 
     suspend fun isAccountExists(accountId: AccountId): Boolean
-
-    fun isBiometricEnabledFlow(): Flow<Boolean>
 }

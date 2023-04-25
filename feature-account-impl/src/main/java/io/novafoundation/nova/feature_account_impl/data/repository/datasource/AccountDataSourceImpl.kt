@@ -87,14 +87,14 @@ class AccountDataSourceImpl(
         }
     }
 
-    override suspend fun saveAuthType(authType: AuthType) = withContext(Dispatchers.IO) {
+    override fun saveAuthType(authType: AuthType) {
         preferences.putString(PREFS_AUTH_TYPE, authType.toString())
     }
 
-    override suspend fun getAuthType(): AuthType = withContext(Dispatchers.IO) {
+    override fun getAuthType(): AuthType {
         val savedValue = preferences.getString(PREFS_AUTH_TYPE)
 
-        if (savedValue == null) {
+        return if (savedValue == null) {
             AuthType.PINCODE
         } else {
             AuthType.valueOf(savedValue)

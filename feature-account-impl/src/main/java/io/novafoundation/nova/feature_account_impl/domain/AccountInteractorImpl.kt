@@ -58,30 +58,6 @@ class AccountInteractorImpl(
         return pinCode == code
     }
 
-    override suspend fun isBiometricEnabled(): Boolean {
-        return accountRepository.isBiometricEnabled()
-    }
-
-    override fun isBiometricEnabledFlow(): Flow<Boolean> {
-        return accountRepository.isBiometricEnabledFlow()
-    }
-
-    override suspend fun toggleBiometric() {
-        if (isBiometricEnabled()) {
-            setBiometricOff()
-        } else {
-            setBiometricOn()
-        }
-    }
-
-    override suspend fun setBiometricOn() {
-        return accountRepository.setBiometricOn()
-    }
-
-    override suspend fun setBiometricOff() {
-        return accountRepository.setBiometricOff()
-    }
-
     override suspend fun getMetaAccount(metaId: Long): MetaAccount {
         return accountRepository.getMetaAccount(metaId)
     }
