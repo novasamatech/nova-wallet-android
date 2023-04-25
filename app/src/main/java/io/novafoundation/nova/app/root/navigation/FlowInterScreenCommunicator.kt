@@ -7,8 +7,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
-abstract class FlowInterScreenCommunicator<I: Any, O: Any>
-    : InterScreenCommunicator<I, O>,
+abstract class FlowInterScreenCommunicator<I : Any, O : Any> :
+    InterScreenCommunicator<I, O>,
     CoroutineScope by CoroutineScope(Dispatchers.Main) {
 
     private var response: O? = null
@@ -22,7 +22,6 @@ abstract class FlowInterScreenCommunicator<I: Any, O: Any>
 
     override val lastState: O?
         get() = latestResponse
-
 
     override val lastInput: I?
         get() = _request

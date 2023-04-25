@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWall
 
 class SelectWalletCommunicatorImpl(
     private val navigationHolder: NavigationHolder,
-): NavStackInterScreenCommunicator<Payload, Response>(navigationHolder), SelectWalletCommunicator {
+) : NavStackInterScreenCommunicator<Payload, Response>(navigationHolder), SelectWalletCommunicator {
 
     override fun openRequest(request: Payload) {
         super.openRequest(request)

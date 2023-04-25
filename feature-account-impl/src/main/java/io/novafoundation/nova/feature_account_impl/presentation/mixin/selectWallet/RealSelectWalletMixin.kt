@@ -24,16 +24,16 @@ internal class RealRealSelectWalletMixinFactory(
     private val accountGroupingInteractor: MetaAccountGroupingInteractor,
     private val walletUiUseCase: WalletUiUseCase,
     private val requester: SelectWalletRequester,
-): SelectWalletMixin.Factory {
+) : SelectWalletMixin.Factory {
 
     override fun create(coroutineScope: CoroutineScope): SelectWalletMixin {
-       return RealSelectWalletMixin(
-           coroutineScope = coroutineScope,
-           accountRepository = accountRepository,
-           accountGroupingInteractor = accountGroupingInteractor,
-           walletUiUseCase = walletUiUseCase,
-           requester = requester
-       )
+        return RealSelectWalletMixin(
+            coroutineScope = coroutineScope,
+            accountRepository = accountRepository,
+            accountGroupingInteractor = accountGroupingInteractor,
+            walletUiUseCase = walletUiUseCase,
+            requester = requester
+        )
     }
 }
 
@@ -43,7 +43,7 @@ internal class RealSelectWalletMixin(
     private val accountGroupingInteractor: MetaAccountGroupingInteractor,
     private val walletUiUseCase: WalletUiUseCase,
     private val requester: SelectWalletRequester,
-): SelectWalletMixin,
+) : SelectWalletMixin,
     CoroutineScope by coroutineScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 

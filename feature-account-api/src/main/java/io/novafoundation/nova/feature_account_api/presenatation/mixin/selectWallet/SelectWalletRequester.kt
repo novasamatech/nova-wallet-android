@@ -14,8 +14,8 @@ interface SelectWalletResponder : InterScreenResponder<Payload, Response>
 interface SelectWalletCommunicator : SelectWalletRequester, SelectWalletResponder {
 
     @Parcelize
-    class Payload(val currentMetaId: Long): Parcelable
+    class Payload(val currentMetaId: Long) : Parcelable
 
     @Parcelize
-    class Response(val newMetaId: Long): Parcelable
+    class Response(val newMetaId: Long) : Parcelable
 }

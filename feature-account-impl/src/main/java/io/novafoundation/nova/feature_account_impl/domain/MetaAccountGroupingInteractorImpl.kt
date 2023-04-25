@@ -51,7 +51,7 @@ class MetaAccountGroupingInteractorImpl(
             currencyRepository.observeSelectCurrency(),
             accountRepository.metaAccountFlow(metaId),
             accountRepository.metaAccountBalancesFlow(metaId)
-        ) {  selectedCurrency, metaAccount, metaAccountBalances ->
+        ) { selectedCurrency, metaAccount, metaAccountBalances ->
             metaAccountWithTotalBalance(metaAccountBalances, metaAccount, selectedCurrency)
         }
     }

@@ -364,7 +364,7 @@ class AccountFeatureModule {
         accountGroupingInteractor: MetaAccountGroupingInteractor,
         walletUiUseCase: WalletUiUseCase,
         communicator: SelectWalletCommunicator,
-    ): SelectWalletMixin.Factory{
+    ): SelectWalletMixin.Factory {
         return RealRealSelectWalletMixinFactory(
             accountRepository = accountRepository,
             accountGroupingInteractor = accountGroupingInteractor,
