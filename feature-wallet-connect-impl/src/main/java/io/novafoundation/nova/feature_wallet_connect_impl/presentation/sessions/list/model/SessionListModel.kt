@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.model
+package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.model
 
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 

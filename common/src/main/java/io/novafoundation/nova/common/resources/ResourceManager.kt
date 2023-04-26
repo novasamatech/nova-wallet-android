@@ -42,7 +42,7 @@ fun ResourceManager.formatTimeLeft(elapsedTimeInMillis: Long): String {
 
 fun ResourceManager.formatListPreview(
     elements: List<String>,
-    @StringRes zeroLabel: Int? = null,
+    @StringRes zeroLabel: Int? = R.string.common_none,
 ): String {
     return when {
         elements.isEmpty() -> zeroLabel?.let(::getString).orEmpty()

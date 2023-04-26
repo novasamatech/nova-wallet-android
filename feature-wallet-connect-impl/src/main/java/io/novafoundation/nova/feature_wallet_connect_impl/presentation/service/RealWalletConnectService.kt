@@ -20,8 +20,8 @@ import io.novafoundation.nova.feature_external_sign_api.model.signPayload.Signin
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.WalletConnectSessionInteractor
-import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.WalletConnectSessionsEvent
-import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.sessionEventsFlow
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsEvent
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.sessionEventsFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first

@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+<!--    <string name="staking_nominator_status_active">Active</string>-->
+<!--    <string name="crowdloan_active_section">Active</string>-->
+
+    <string name="wallet_connect_sessions_placeholder">Wallet Connect sessions will appear here</string>
+
+    <string name="common_active">Active</string>
+    <string name="common_none">None</string>
+    <string name="common_networks">Networks</string>
+    <string name="common_disconnect">Disconnect</string>
+
     <string name="wallet_connect_unknown_dapp">Unknown dApp</string>
-
     <string name="wallet_connect_new_connection">New connection</string>
-
-    <string name="send_address_hint">Address or w3n</string>
-
     <string name="wallet_connect_title">Wallet Connect</string>
     <string name="wallet_connect_scan_title">Scan Wallet Connect QR code</string>
+
+    <string name="send_address_hint">Address or w3n</string>
 
     <string name="ethereum_function">Function</string>
     <string name="ethereum_contract">Contract</string>
@@ -984,7 +993,6 @@
     <string name="crowdloan_acala_direct">Direct</string>
     <string name="crowdloan_acala_learn_types">Learn more about different contributions to Acala</string>
     <string name="crowdloan_acala_liquid">Liquid</string>
-    <string name="crowdloan_active_section">Active</string>
     <string name="crowdloan_active_section_format">Active (%s)</string>
     <string name="crowdloan_agree_with_policy">Agree to Terms and Conditions</string>
     <string name="crowdloan_app_bonus_format">Nova Wallet bonus (%s)</string>
@@ -1176,7 +1184,6 @@
     <string name="staking_max_nominators_reached_message">Maximum number of nominators has been reached</string>
     <string name="staking_max_nominators_reached_title">Cannot start staking</string>
     <string name="staking_month_period_title">Monthly</string>
-    <string name="staking_nominator_status_active">Active</string>
     <string name="staking_nominator_status_alert_active_message">One of your validators have been elected by network.</string>
     <string name="staking_nominator_status_alert_active_title">Active status</string>
     <string name="staking_nominator_status_alert_inactive_title">Inactive status</string>

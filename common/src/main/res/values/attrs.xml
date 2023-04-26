@@ -79,6 +79,7 @@
         <attr name="primaryValueStyle" format="enum">
             <enum name="text" value="0" />
             <enum name="link" value="1" />
+            <enum name="positive" value="2" />
         </attr>
         <attr name="titleValueTextAppearance" format="reference" />
         <attr name="primaryValueTextAppearance" format="reference" />

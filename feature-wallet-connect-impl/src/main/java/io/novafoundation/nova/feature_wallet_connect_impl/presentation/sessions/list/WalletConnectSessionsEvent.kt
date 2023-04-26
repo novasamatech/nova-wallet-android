@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions
+package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list
 
 import android.util.Log
 import com.walletconnect.web3.wallet.client.Wallet

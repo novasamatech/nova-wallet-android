@@ -29,6 +29,20 @@ infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
 
 inline fun <reified E : Enum<E>> enumValueOfOrNull(raw: String): E? = runCatching { enumValueOf<E>(raw) }.getOrNull()
 
+inline fun <K, V> List<V>.associateByMultiple(keysExtractor: (V) -> Iterable<K>): Map<K, V> {
+    val destination = LinkedHashMap<K, V>()
+
+    for (element in this) {
+        val keys = keysExtractor(element)
+
+        for (key in keys) {
+            destination[key] = element
+        }
+    }
+
+    return destination
+}
+
 /**
  * Compares two BigDecimals taking into account only values but not scale unlike `==` operator
  */

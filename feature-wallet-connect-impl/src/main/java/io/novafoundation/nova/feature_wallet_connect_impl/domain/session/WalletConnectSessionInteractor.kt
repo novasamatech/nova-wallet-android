@@ -6,7 +6,7 @@ import com.walletconnect.web3.wallet.client.Wallet.Model.Namespace
 import com.walletconnect.web3.wallet.client.Wallet.Model.SessionProposal
 import com.walletconnect.web3.wallet.client.Web3Wallet
 import io.novafoundation.nova.caip.caip2.Caip2Resolver
-import io.novafoundation.nova.caip.caip2.identifier.Caip2Namespace
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -15,15 +15,17 @@ import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.Wallet
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.SessionDappMetadata
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSession
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionAccount
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionDetails
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.approveSession
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.approved
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.disconnectSession
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.rejectSession
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.rejected
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.WalletConnectRequest
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
@@ -46,14 +48,17 @@ interface WalletConnectSessionInteractor {
     suspend fun getSessionAccount(sessionTopic: String): WalletConnectSessionAccount?
 
     fun activeSessionsFlow(): Flow<List<WalletConnectSession>>
+
+    fun activeSessionFlow(sessionTopic: String): Flow<WalletConnectSessionDetails?>
+
+    suspend fun disconnect(sessionTopic: String): Result<*>
 }
 
 class RealWalletConnectSessionInteractor(
-    private val chainRegistry: ChainRegistry,
     private val caip2Resolver: Caip2Resolver,
     private val walletConnectRequestFactory: WalletConnectRequest.Factory,
     private val walletConnectSessionRepository: WalletConnectSessionRepository,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
 ) : WalletConnectSessionInteractor {
 
     private val pendingSessionSettlementsByPairingTopic = ConcurrentHashMap<String, PendingSessionSettlement>()
@@ -64,17 +69,14 @@ class RealWalletConnectSessionInteractor(
     ): Result<Unit> {
         val requestedNameSpaces = sessionProposal.requiredNamespaces mergeWith sessionProposal.optionalNamespaces
 
-        val localChains = chainRegistry.currentChains.first()
+        val chainsByCaip2 = caip2Resolver.chainsByCaip2()
 
         val namespaceSessions = requestedNameSpaces.mapValuesNotNull { (namespaceRaw, namespaceProposal) ->
             // TODO handle https://docs.walletconnect.com/2.0/specs/clients/sign/namespaces#13-chains-might-be-omitted-if-the-caip-2-is-defined-in-the-index
-            val namespace = Caip2Namespace.find(namespaceRaw) ?: return@mapValuesNotNull null
             val requestedChains = namespaceProposal.chains ?: return@mapValuesNotNull null
 
-            val chainByCaip2 = localChains.associateBy { chain -> caip2Resolver.caip2Of(chain, preferredNamespace = namespace)?.namespaceWitId }
-
             val supportedChainsWithAccounts = requestedChains.mapNotNull { requestedChain ->
-                val chain = chainByCaip2[requestedChain] ?: return@mapNotNull null
+                val chain = chainsByCaip2[requestedChain] ?: return@mapNotNull null
                 val address = metaAccount.addressIn(chain) ?: return@mapNotNull null
 
                 formatWalletConnectAccount(address, requestedChain) to requestedChain
@@ -138,6 +140,28 @@ class RealWalletConnectSessionInteractor(
         }
     }
 
+    override fun activeSessionFlow(sessionTopic: String): Flow<WalletConnectSessionDetails?> {
+        val sessionAccountFlow = walletConnectSessionRepository.sessionAccountFlow(sessionTopic)
+        val chainsWrappedFlow = flowOf { caip2Resolver.chainsByCaip2() }
+
+        return combine(sessionAccountFlow, chainsWrappedFlow) { sessionAccount, chainsByCaip2 ->
+            if (sessionAccount == null) return@combine null
+
+            val activeSession = Web3Wallet.getActiveSessionByTopic(sessionTopic) ?: return@combine null
+            val metaAccount = accountRepository.getMetaAccount(sessionAccount.metaId)
+
+            createWalletSessionDetails(activeSession, metaAccount, chainsByCaip2)
+        }
+    }
+
+    override suspend fun disconnect(sessionTopic: String): Result<*> {
+        return withContext(Dispatchers.Default) {
+            Web3Wallet.disconnectSession(sessionTopic).onSuccess {
+                walletConnectSessionRepository.deleteSessionAccount(sessionTopic)
+            }
+        }
+    }
+
     private infix fun Map<String, Namespace.Proposal>.mergeWith(other: Map<String, Namespace.Proposal>): Map<String, Namespace.Proposal> {
         val allNamespaceKeys = keys + other.keys
 
@@ -192,6 +216,28 @@ class RealWalletConnectSessionInteractor(
                 dappMetadata = session.metaData?.let(::mapAppMetadataToSessionMetadata),
                 sessionTopic = session.topic
             )
+        }
+    }
+
+    private fun createWalletSessionDetails(
+        session: Wallet.Model.Session,
+        metaAccount: MetaAccount,
+        chainsByCaip2: Map<String, Chain>,
+    ): WalletConnectSessionDetails {
+        return WalletConnectSessionDetails(
+            connectedMetaAccount = metaAccount,
+            dappMetadata = session.metaData?.let(::mapAppMetadataToSessionMetadata),
+            sessionTopic = session.topic,
+            chains = chainsByCaip2.findKnownChains(session.namespaces.values)
+        )
+    }
+
+    private fun Map<String, Chain>.findKnownChains(namespaces: Collection<Namespace.Session>): List<Chain> {
+        // TODO handle https://docs.walletconnect.com/2.0/specs/clients/sign/namespaces#13-chains-might-be-omitted-if-the-caip-2-is-defined-in-the-index
+        return namespaces.flatMap { namespace ->
+            namespace.chains.orEmpty().mapNotNull { chainCaip2 ->
+                get(chainCaip2)
+            }
         }
     }
 

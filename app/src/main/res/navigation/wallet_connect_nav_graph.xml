@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/walletConnectSessionsFragment"
-        android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.WalletConnectSessionsFragment"
+        android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsFragment"
         android:label="WalletConnectSessionsFragment">
 
 
@@ -17,10 +17,22 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_walletConnectSessionsFragment_to_walletConnectSessionDetailsFragment"
+            app:destination="@id/walletConnectSessionDetailsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
         android:id="@+id/walletConnectScanFragment"
         android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.scan.WalletConnectScanFragment"
         android:label="WalletConnectScanFragment" />
+    <fragment
+        android:id="@+id/walletConnectSessionDetailsFragment"
+        android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.details.WalletConnectSessionDetailsFragment"
+        android:label="WalletConnectSessionDetailsFragment" />
 </navigation>
