@@ -10,11 +10,11 @@ class SessionChains(
     class ResolvedChains(val knownChains: Set<Chain>, val unknownChains: Set<String>)
 }
 
-fun SessionChains.allKnownChains() : Set<Chain> {
+fun SessionChains.allKnownChains(): Set<Chain> {
     return required.knownChains + optional.knownChains
 }
 
-fun SessionChains.allUnknownChains() : Set<String> {
+fun SessionChains.allUnknownChains(): Set<String> {
     return required.unknownChains + optional.unknownChains
 }
 

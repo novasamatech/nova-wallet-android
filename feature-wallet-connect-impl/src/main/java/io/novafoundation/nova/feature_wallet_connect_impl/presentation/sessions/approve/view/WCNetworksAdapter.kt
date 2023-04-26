@@ -56,7 +56,6 @@ private class WcNetworksLabelHolder(rootView: ViewGroup) : GroupedListHolder(roo
     }
 }
 
-
 private class WCNetworksDiffCallback : BaseGroupedDiffCallback<WCNetworkListModel.Label, WCNetworkListModel.Chain>(WCNetworkListModel.Label::class.java) {
 
     override fun areGroupItemsTheSame(oldItem: WCNetworkListModel.Label, newItem: WCNetworkListModel.Label): Boolean {
