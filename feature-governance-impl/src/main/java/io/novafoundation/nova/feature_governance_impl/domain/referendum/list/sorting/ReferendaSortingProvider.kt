@@ -9,5 +9,5 @@ interface ReferendaSortingProvider {
 
     suspend fun getGroupSorting(): Comparator<ReferendumGroup>
 
-    suspend fun getVotedReferendumSorting(): Comparator<ReferendumPreview>
+    suspend fun getReferendumSorting(): Comparator<ReferendumPreview>
 }

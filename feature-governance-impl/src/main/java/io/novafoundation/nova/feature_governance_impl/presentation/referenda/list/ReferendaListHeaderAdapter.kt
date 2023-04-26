@@ -17,6 +17,8 @@ import kotlinx.android.synthetic.main.item_referenda_header.view.governanceLocks
 import kotlinx.android.synthetic.main.item_referenda_header.view.governanceLocksHeader
 import kotlinx.android.synthetic.main.item_referenda_header.view.governanceLocksLocked
 import kotlinx.android.synthetic.main.item_referenda_header.view.referendaAssetHeader
+import kotlinx.android.synthetic.main.item_referenda_header.view.referendaHeaderFilter
+import kotlinx.android.synthetic.main.item_referenda_header.view.referendaHeaderSearch
 
 class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Handler) : RecyclerView.Adapter<HeaderHolder>() {
 
@@ -26,6 +28,10 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
         fun onClickGovernanceLocks()
 
         fun onClickDelegations()
+
+        fun onClickReferendaSearch()
+
+        fun onClickReferendaFilters()
     }
 
     private var assetModel: AssetSelectorModel? = null
@@ -88,6 +94,9 @@ class HeaderHolder(private val imageLoader: ImageLoader, view: View, handler: Re
 
             governanceLocksLocked.setOnClickListener { handler.onClickGovernanceLocks() }
             governanceLocksDelegations.setOnClickListener { handler.onClickDelegations() }
+
+            referendaHeaderSearch.setOnClickListener { handler.onClickReferendaSearch() }
+            referendaHeaderFilter.setOnClickListener { handler.onClickReferendaFilters() }
         }
     }
 

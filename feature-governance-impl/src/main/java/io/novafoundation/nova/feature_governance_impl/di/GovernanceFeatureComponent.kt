@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.di.ReferendumDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.di.ReferendumFullDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.di.ReferendaListComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.search.di.ReferendaSearchComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.di.ConfirmReferendumVoteComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.di.SetupVoteReferendumComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.di.ReferendumVotersComponent
@@ -45,6 +46,8 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 interface GovernanceFeatureComponent : GovernanceFeatureApi {
 
     fun referendaListFactory(): ReferendaListComponent.Factory
+
+    fun referendaSearchFactory(): ReferendaSearchComponent.Factory
 
     fun referendumDetailsFactory(): ReferendumDetailsComponent.Factory
 
