@@ -6,4 +6,6 @@ import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.
 interface WalletConnectRouter : ReturnableRouter {
 
     fun openSessionDetails(payload: WalletConnectSessionDetailsPayload)
+
+    fun openScanPairingQrCode()
 }

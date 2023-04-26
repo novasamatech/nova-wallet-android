@@ -14,10 +14,12 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_external_sign_api.domain.sign.evm.EvmTypedMessageParser
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
+import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.RealWalletConnectSessionRepository
 import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.WalletConnectSessionRepository
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.RealWalletConnectSessionInteractor
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.RealWalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.WalletConnectSessionInteractor
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.CompoundWalletConnectRequestFactory
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.WalletConnectRequest
@@ -95,5 +97,11 @@ class WalletConnectFeatureModule {
     @FeatureScope
     fun provideSessionMapper(resourceManager: ResourceManager): WalletConnectSessionMapper {
         return RealWalletConnectSessionMapper(resourceManager)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSessionUseCase(repository: WalletConnectSessionRepository): WalletConnectSessionsUseCase {
+        return RealWalletConnectSessionsUseCase(repository)
     }
 }

@@ -8,7 +8,8 @@
         android:id="@+id/walletConnectScan"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:title="@string/wallet_connect_scan_title" />
+        app:subTitle="@string/wallet_connect_v2"
+        app:title="@string/common_scan_qr_code" />
 
     <io.novafoundation.nova.common.view.Toolbar
         android:layout_width="match_parent"

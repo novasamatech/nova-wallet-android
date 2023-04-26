@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
-import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectScanCommunicator
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.scan.WalletConnectScanViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -30,9 +29,8 @@ class WalletConnectScanModule {
     fun provideViewModel(
         router: WalletConnectRouter,
         permissionsAsker: PermissionsAsker.Presentation,
-        interactor: WalletConnectScanCommunicator
     ): ViewModel {
-        return WalletConnectScanViewModel(router, permissionsAsker, interactor)
+        return WalletConnectScanViewModel(router, permissionsAsker)
     }
 
     @Provides

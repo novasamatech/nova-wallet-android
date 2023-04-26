@@ -12,4 +12,6 @@ class WalletConnectNavigator(navigationHolder: NavigationHolder) : BaseNavigator
         actionId = R.id.action_walletConnectSessionsFragment_to_walletConnectSessionDetailsFragment,
         args = WalletConnectSessionDetailsFragment.getBundle(payload)
     )
+
+    override fun openScanPairingQrCode() = performNavigation(R.id.action_open_scanWalletConnect)
 }

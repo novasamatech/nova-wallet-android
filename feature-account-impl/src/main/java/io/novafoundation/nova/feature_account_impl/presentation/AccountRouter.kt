@@ -30,10 +30,6 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun openNodes()
 
-    fun openCurrencies()
-
-    fun openLanguages()
-
     fun openAddAccount(payload: AddAccountPayload)
 
     fun openAccountDetails(metaAccountId: Long)
@@ -61,8 +57,6 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun finishExportFlow()
 
-    fun openChangePinCode()
-
     fun openScanImportParitySigner()
 
     fun openPreviewImportParitySigner(payload: ParitySignerAccountPayload)
@@ -76,6 +70,4 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun openAddLedgerChainAccountFlow(payload: AddAccountPayload.ChainAccount)
 
     fun finishApp()
-
-    fun openWalletConnect()
 }

@@ -17,6 +17,8 @@ interface WalletConnectSessionRepository {
 
     fun allSessionAccountsFlow(): Flow<List<WalletConnectSessionAccount>>
 
+    fun numberOfSessionAccountsFlow(): Flow<Int>
+
     fun sessionAccountFlow(sessionTopic: String): Flow<WalletConnectSessionAccount?>
 }
 
@@ -38,6 +40,10 @@ class RealWalletConnectSessionRepository(
 
     override fun allSessionAccountsFlow(): Flow<List<WalletConnectSessionAccount>> {
         return dao.allSessionsFlow().mapList(::mapSessionFromLocal)
+    }
+
+    override fun numberOfSessionAccountsFlow(): Flow<Int> {
+        return dao.numberOfSessionsFlow()
     }
 
     override fun sessionAccountFlow(sessionTopic: String): Flow<WalletConnectSessionAccount?> {
