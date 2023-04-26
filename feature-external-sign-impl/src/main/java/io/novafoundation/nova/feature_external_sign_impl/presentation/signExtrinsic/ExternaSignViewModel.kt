@@ -85,7 +85,9 @@ class ExternaSignViewModel(
         maybeLoadFee()
     }
 
-    fun cancelled() = rejectClicked()
+    fun backPressed() {
+        // do nothing - screen is non-cancellable
+    }
 
     fun rejectClicked() {
         responder.respond(Response.Rejected(payload.signRequest.id))

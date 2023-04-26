@@ -9,10 +9,14 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.postToSelf
 import io.novafoundation.nova.common.view.dialog.errorDialog
 import io.novafoundation.nova.common.view.setProgress
+import io.novafoundation.nova.common.view.shape.addRipple
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
+import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
@@ -25,10 +29,12 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFee
 import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmDAppActionAllow
 import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmDAppActionReject
 import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicAccount
+import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicDappUrl
 import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicDetails
 import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicFee
 import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicIcon
 import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicNetwork
+import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicToolbar
 import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicWallet
 import javax.inject.Inject
 
@@ -53,7 +59,9 @@ class ExternalSignFragment : BaseFragment<ExternaSignViewModel>() {
     }
 
     override fun initViews() {
-        onBackPressed { viewModel.cancelled() }
+        confirmSignExtinsicToolbar.applyStatusBarInsets()
+
+        onBackPressed { viewModel.backPressed() }
 
         confirmDAppActionAllow.prepareForProgress(viewLifecycleOwner)
 
@@ -62,6 +70,9 @@ class ExternalSignFragment : BaseFragment<ExternaSignViewModel>() {
         confirmDAppActionReject.setOnClickListener { viewModel.rejectClicked() }
 
         confirmSignExtinsicDetails.setOnClickListener { viewModel.detailsClicked() }
+        confirmSignExtinsicDetails.background = with(requireContext()) {
+            addRipple(getBlockDrawable())
+        }
     }
 
     override fun inject() {
@@ -95,6 +106,7 @@ class ExternalSignFragment : BaseFragment<ExternaSignViewModel>() {
         }
 
         confirmSignExtinsicIcon.showDAppIcon(viewModel.dAppInfo?.icon, imageLoader)
+        confirmSignExtinsicDappUrl.showValueOrHide(viewModel.dAppInfo?.url)
 
         viewModel.performingOperationInProgress.observe { operationInProgress ->
             val actionsAllowed = !operationInProgress
