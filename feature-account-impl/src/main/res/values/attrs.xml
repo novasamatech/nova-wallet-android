@@ -20,6 +20,12 @@
         <attr name="icon" />
     </declare-styleable>
 
+    <declare-styleable name="SettingsSwitcherView">
+        <attr name="title" />
+        <attr name="icon" />
+    </declare-styleable>
+
+
     <declare-styleable name="MnemonicContainerView">
 
         <attr name="showBackground" format="boolean" />

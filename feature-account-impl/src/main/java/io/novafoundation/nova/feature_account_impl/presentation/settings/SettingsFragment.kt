@@ -23,9 +23,9 @@ import kotlinx.android.synthetic.main.fragment_profile.settingsGithub
 import kotlinx.android.synthetic.main.fragment_profile.settingsLanguage
 import kotlinx.android.synthetic.main.fragment_profile.settingsNetworks
 import kotlinx.android.synthetic.main.fragment_profile.settingsPin
+import kotlinx.android.synthetic.main.fragment_profile.settingsPinCodeVerification
 import kotlinx.android.synthetic.main.fragment_profile.settingsPrivacy
 import kotlinx.android.synthetic.main.fragment_profile.settingsRateUs
-import kotlinx.android.synthetic.main.fragment_profile.settingsSafeModeContainer
 import kotlinx.android.synthetic.main.fragment_profile.settingsTelegram
 import kotlinx.android.synthetic.main.fragment_profile.settingsTerms
 import kotlinx.android.synthetic.main.fragment_profile.settingsTwitter
@@ -66,7 +66,8 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         settingsEmail.setOnClickListener { viewModel.emailClicked() }
         settingsRateUs.setOnClickListener { viewModel.rateUsClicked() }
 
-        settingsSafeModeContainer.setOnClickListener { viewModel.changeSafeMode() }
+        settingsPinCodeVerification.setOnClickListener { viewModel.changePincodeVerification() }
+        settingsSafeMode.setOnClickListener { viewModel.changeSafeMode() }
         settingsPin.setOnClickListener { viewModel.changePinCodeClicked() }
 
         settingsAvatar.setOnClickListener { viewModel.selectedWalletClicked() }
@@ -83,7 +84,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
     }
 
     override fun subscribe(viewModel: SettingsViewModel) {
-        setupSafeModeConfirmation(viewModel.safeModeAwaitableAction)
+        setupSettingsConfirmationDialog(viewModel.confirmationAwaitableAction)
         observeBrowserEvents(viewModel)
 
         viewModel.selectedWalletModel.observe {
@@ -101,8 +102,12 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
             settingsLanguage.setValue(it.displayName)
         }
 
+        viewModel.pinCodeVerificationStatus.observe {
+            settingsPinCodeVerification.setChecked(it)
+        }
+
         viewModel.safeModeStatus.observe {
-            settingsSafeMode.isChecked = it
+            settingsSafeMode.setChecked(it)
         }
 
         viewModel.appVersionFlow.observe(settingsAppVersion::setText)

@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.vibration.DeviceVibrator
@@ -19,6 +20,7 @@ class PinCodeViewModel(
     private val deviceVibrator: DeviceVibrator,
     private val resourceManager: ResourceManager,
     private val backgroundAccessObserver: BackgroundAccessObserver,
+    private val twoFactorVerificationExecutor: TwoFactorVerificationExecutor,
     val pinCodeAction: PinCodeAction
 ) : BaseViewModel() {
 
@@ -60,11 +62,9 @@ class PinCodeViewModel(
             is PinCodeAction.Create -> {
                 currentState = ScreenState.Creating
             }
-            is PinCodeAction.Check -> {
-                currentState = ScreenState.Checking
-                _showFingerPrintEvent.value = Event(Unit)
-            }
-            is PinCodeAction.Change -> {
+            is PinCodeAction.Check,
+            is PinCodeAction.Change,
+            is PinCodeAction.TwoFactorVerification -> {
                 currentState = ScreenState.Checking
                 _showFingerPrintEvent.value = Event(Unit)
             }
@@ -122,8 +122,8 @@ class PinCodeViewModel(
 
     fun backPressed() {
         when (currentState) {
-            is ScreenState.Creating -> authCancel()
             is ScreenState.Confirmation -> backToCreateFromConfirmation()
+            is ScreenState.Creating,
             is ScreenState.Checking -> authCancel()
             null -> {}
         }
@@ -184,10 +184,17 @@ class PinCodeViewModel(
                     else -> {}
                 }
             }
+            is PinCodeAction.TwoFactorVerification -> {
+                twoFactorVerificationExecutor.confirm()
+                router.back()
+            }
         }
     }
 
     private fun authCancel() {
+        if (pinCodeAction is PinCodeAction.TwoFactorVerification) {
+            twoFactorVerificationExecutor.cancel()
+        }
         router.back()
     }
 

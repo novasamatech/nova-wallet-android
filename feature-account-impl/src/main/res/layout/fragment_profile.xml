@@ -109,29 +109,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <FrameLayout
-                android:id="@+id/settingsSafeModeContainer"
+            <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsSwitcherView
+                android:id="@+id/settingsPinCodeVerification"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:icon="@drawable/approve_with_pin"
+                app:title="@string/profile_settings_pin_code_verification_title" />
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/settingsSafeMode"
-                    style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clickable="false"
-                    android:drawableStart="@drawable/shield_checkmark_outline"
-                    android:drawablePadding="12dp"
-                    android:drawableTint="@color/icon_accent"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:minHeight="48dp"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:text="@string/profile_settings_safe_mode_title"
-                    android:textColor="@color/text_primary" />
-
-            </FrameLayout>
+            <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsSwitcherView
+                android:id="@+id/settingsSafeMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/shield_checkmark_outline"
+                app:title="@string/profile_settings_safe_mode_title" />
 
             <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsItemView
                 android:id="@+id/settingsPin"
