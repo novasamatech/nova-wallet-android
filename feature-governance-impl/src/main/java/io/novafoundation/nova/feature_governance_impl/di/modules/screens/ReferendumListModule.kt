@@ -3,11 +3,16 @@ package io.novafoundation.nova.feature_governance_impl.di.modules.screens
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.data.repository.filters.PreferencesReferendaFiltersRepository
+import io.novafoundation.nova.feature_governance_impl.data.repository.filters.ReferendaFiltersRepository
+import io.novafoundation.nova.feature_governance_impl.domain.filters.RealReferendaFiltersInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFiltersInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.RealReferendaListInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.ReferendaSharedComputation
@@ -19,6 +24,22 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 @Module
 class ReferendumListModule {
+
+    @Provides
+    @FeatureScope
+    fun provideReferendaFiltersRepository(
+        preferences: Preferences
+    ): ReferendaFiltersRepository {
+        return PreferencesReferendaFiltersRepository(preferences)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideReferendaFiltersInteractor(
+        referendaFiltersRepository: ReferendaFiltersRepository
+    ): ReferendaFiltersInteractor {
+        return RealReferendaFiltersInteractor(referendaFiltersRepository)
+    }
 
     @Provides
     @FeatureScope
@@ -60,12 +81,14 @@ class ReferendumListModule {
         governanceSharedState: GovernanceSharedState,
         referendaSharedComputation: ReferendaSharedComputation,
         governanceSourceRegistry: GovernanceSourceRegistry,
-        referendaSortingProvider: ReferendaSortingProvider
+        referendaSortingProvider: ReferendaSortingProvider,
+        referendaFiltersRepository: ReferendaFiltersRepository
     ): ReferendaListInteractor = RealReferendaListInteractor(
         referendaCommonRepository = referendaCommonRepository,
         governanceSharedState = governanceSharedState,
         referendaSharedComputation = referendaSharedComputation,
         governanceSourceRegistry = governanceSourceRegistry,
-        referendaSortingProvider = referendaSortingProvider
+        referendaSortingProvider = referendaSortingProvider,
+        referendaFiltersRepository = referendaFiltersRepository
     )
 }
