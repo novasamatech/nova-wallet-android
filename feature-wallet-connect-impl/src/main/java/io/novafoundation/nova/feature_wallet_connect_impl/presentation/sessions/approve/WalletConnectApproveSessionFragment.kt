@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setState
+import io.novafoundation.nova.common.view.setTextOrHide
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.chain.showChainsOverView
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.setupSelectWalletMixin
@@ -15,7 +16,9 @@ import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDA
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_impl.R
 import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatureComponent
+import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionAccountsAlert
 import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionAllow
+import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionChainsAlert
 import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionDApp
 import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionIcon
 import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionNetworks
@@ -65,13 +68,18 @@ class WalletConnectApproveSessionFragment : BaseFragment<WalletConnectApproveSes
         setupSelectWalletMixin(viewModel.selectWalletMixin, wcApproveSessionWallet)
 
         viewModel.sessionMetadata.observe { sessionMetadata ->
-            wcApproveSessionDApp.showValueOrHide(sessionMetadata.dappUrl)
+            wcApproveSessionDApp.showValueOrHide(sessionMetadata.dAppUrl)
             wcApproveSessionIcon.showDAppIcon(sessionMetadata.icon, imageLoader)
         }
 
         viewModel.chainsOverviewFlow.observe(wcApproveSessionNetworks::showChainsOverView)
 
         viewModel.title.observe(wcApproveSessionTitle::setText)
+
+        viewModel.sessionAlerts.observe { sessionAlerts ->
+            wcApproveSessionChainsAlert.setTextOrHide(sessionAlerts.unsupportedChains?.alertContent)
+            wcApproveSessionAccountsAlert.setTextOrHide(sessionAlerts.missingAccounts?.alertContent)
+        }
 
         viewModel.allowButtonState.observe(wcApproveSessionAllow::setState)
         viewModel.rejectButtonState.observe(wcApproveSessionReject::setState)

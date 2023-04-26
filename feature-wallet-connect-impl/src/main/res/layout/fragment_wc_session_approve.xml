@@ -107,18 +107,43 @@
             app:title="@string/common_networks" />
     </io.novafoundation.nova.common.view.TableView>
 
+    <io.novafoundation.nova.common.view.AlertView
+        android:id="@+id/wcApproveSessionChainsAlert"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/wcApproveSessionRequestSession"
+        tools:text="Some of the required networks requested by 1inch are not supported in Nova Wallet" />
+
     <io.novafoundation.nova.feature_account_api.view.AccountView
+        android:id="@+id/wcApproveSessionWallet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:id="@+id/wcApproveSessionWallet"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         app:actionIcon="@drawable/ic_chevron_right"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/wcApproveSessionRequestSession"
+        app:layout_constraintTop_toBottomOf="@id/wcApproveSessionChainsAlert"
         app:showBackground="true" />
+
+    <io.novafoundation.nova.common.view.AlertView
+        android:id="@+id/wcApproveSessionAccountsAlert"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/wcApproveSessionWallet"
+        tools:text="Ethereum account is missing. Add account to the wallet in Settings" />
+
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/wcApproveSessionReject"

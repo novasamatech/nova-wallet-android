@@ -73,7 +73,7 @@ class WalletConnectSessionDetailsViewModel(
 
         return WalletConnectSessionDetailsUi(
             dappTitle = walletConnectSessionMapper.formatSessionDAppTitle(session.dappMetadata),
-            dappUrl = session.dappMetadata?.dappUrl,
+            dappUrl = session.dappMetadata?.dAppUrl,
             dappIcon = session.dappMetadata?.icon,
             networksOverview = resourceManager.formatChainListOverview(chainUis),
             networks = chainUis,

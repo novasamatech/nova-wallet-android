@@ -10,10 +10,13 @@ class WalletConnectSession(
 )
 
 class SessionDappMetadata(
-    val dappUrl: String,
+    val dAppUrl: String,
     val icon: String?,
     val name: String?
 )
+
+val SessionDappMetadata.dAppTitle: String
+    get() = name ?: dAppUrl
 
 class WalletConnectSessionDetails(
     val connectedMetaAccount: MetaAccount,

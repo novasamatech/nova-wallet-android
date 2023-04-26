@@ -1,27 +1,37 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve
 
 import android.util.Log
-import androidx.annotation.StringRes
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.navigation.requireLastInput
 import io.novafoundation.nova.common.navigation.respond
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.resources.formatListPreview
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainListOverview
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.selectedMetaAccount
 import io.novafoundation.nova.feature_wallet_connect_impl.R
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.SessionChains
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionProposal
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.allKnownChains
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.allUnknownChains
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.dAppTitle
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.hasUnknown
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.WalletConnectSessionInteractor
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.model.SessionAlerts
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.model.hasBlockingAlerts
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+
+private const val MISSING_ACCOUNTS_PREVIEW_SIZE = 3
 
 class WalletConnectApproveSessionViewModel(
     private val router: WalletConnectRouter,
@@ -35,10 +45,6 @@ class WalletConnectApproveSessionViewModel(
 
     private val processState = MutableStateFlow(ProgressState.IDLE)
 
-    val allowButtonState = buttonStateFor(ProgressState.CONFIRMING, R.string.common_allow)
-
-    val rejectButtonState = buttonStateFor(ProgressState.REJECTING, R.string.common_reject)
-
     private val sessionProposalFlow = flowOf {
         interactor.resolveSessionProposal(responder.requireLastInput())
     }.shareInBackground()
@@ -46,7 +52,7 @@ class WalletConnectApproveSessionViewModel(
     val sessionMetadata = sessionProposalFlow.map { it.dappMetadata }
 
     val title = sessionMetadata.map { sessionDAppMetadata ->
-        val dAppTitle = sessionDAppMetadata.name ?: sessionDAppMetadata.dappUrl
+        val dAppTitle = sessionDAppMetadata.dAppTitle
 
         resourceManager.getString(R.string.dapp_confirm_authorize_title_format, dAppTitle)
     }.shareInBackground()
@@ -54,6 +60,14 @@ class WalletConnectApproveSessionViewModel(
     val chainsOverviewFlow = sessionProposalFlow.map { sessionProposal ->
         createChainListOverview(sessionProposal.resolvedChains)
     }.shareInBackground()
+
+    val sessionAlerts = combine(selectWalletMixin.selectedMetaAccountFlow, sessionProposalFlow) { metaAccount, sessionProposal ->
+        constructSessionAlerts(metaAccount, sessionProposal)
+    }.shareInBackground()
+
+    val allowButtonState = allowButtonState().shareInBackground()
+
+    val rejectButtonState = rejectButtonState().shareInBackground()
 
     fun exit() {
         rejectClicked()
@@ -89,22 +103,63 @@ class WalletConnectApproveSessionViewModel(
     fun networksClicked() {
     }
 
-    private fun buttonStateFor(
-        buttonAction: ProgressState,
-        @StringRes idleLabelRes: Int
-    ): Flow<DescriptiveButtonState> {
+    private fun constructSessionAlerts(metaAccount: MetaAccount, sessionProposal: WalletConnectSessionProposal): SessionAlerts {
+        val chains = sessionProposal.resolvedChains
+
+        val unsupportedChainsAlert = if (chains.required.hasUnknown()) {
+            val content = resourceManager.getString(R.string.wallet_connect_session_approve_unsupported_chains_alert, sessionProposal.dappMetadata.dAppTitle)
+
+            SessionAlerts.UnsupportedChains(content)
+        } else {
+            null
+        }
+
+        val chainsWithMissingAccounts = metaAccount.findMissingAccountsFor(chains.required.knownChains)
+
+        val missingAccountsAlert = if (chainsWithMissingAccounts.isNotEmpty()) {
+            val missingChainNames = chainsWithMissingAccounts.map { it.name }
+            val missingChains = resourceManager.formatListPreview(missingChainNames, maxPreviewItems = MISSING_ACCOUNTS_PREVIEW_SIZE)
+            val content = resourceManager.getQuantityString(
+                R.plurals.wallet_connect_session_approve_missing_accounts_alert,
+                chainsWithMissingAccounts.size,
+                missingChains
+            )
+
+            SessionAlerts.MissingAccounts(content)
+        } else {
+            null
+        }
+
+        return SessionAlerts(
+            missingAccounts = missingAccountsAlert,
+            unsupportedChains = unsupportedChainsAlert
+        )
+    }
+
+    private fun rejectButtonState(): Flow<DescriptiveButtonState> {
         return processState.map { progressState ->
             when (progressState) {
-                ProgressState.IDLE -> DescriptiveButtonState.Enabled(
-                    resourceManager.getString(idleLabelRes)
-                )
+                ProgressState.IDLE -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_reject))
 
-                buttonAction -> DescriptiveButtonState.Loading
+                ProgressState.REJECTING -> DescriptiveButtonState.Loading
 
-                else -> DescriptiveButtonState.Disabled(resourceManager.getString(idleLabelRes))
+                else -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_reject))
             }
         }
-            .shareInBackground()
+    }
+
+    private fun allowButtonState(): Flow<DescriptiveButtonState> {
+        return combine(processState, sessionAlerts) { progressState, sessionAlerts ->
+            when  {
+                sessionAlerts.hasBlockingAlerts() -> DescriptiveButtonState.Gone
+
+                progressState == ProgressState.IDLE -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_allow))
+
+                progressState == ProgressState.REJECTING -> DescriptiveButtonState.Loading
+
+                else -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_allow))
+            }
+        }
     }
 
     private fun isInProgress(): Boolean {
@@ -141,11 +196,20 @@ class WalletConnectApproveSessionViewModel(
             }
         }
 
+        val multipleChainsRequested = allChainsCount > 1
+        val hasUnsupportedWarningsToShow = allUnknownChains.isNotEmpty()
+
+        val firstKnownIcon = allKnownChains.firstOrNull()?.icon
+
         return ChainListOverview(
-            icon = allKnownChains.firstOrNull()?.icon?.takeIf { allChainsCount == 1 },
+            icon = firstKnownIcon?.takeUnless { multipleChainsRequested },
             label = label,
-            hasMoreElements = allChainsCount > 1
+            hasMoreElements = multipleChainsRequested || hasUnsupportedWarningsToShow
         )
+    }
+
+    private fun MetaAccount.findMissingAccountsFor(chains: Collection<Chain>): List<Chain> {
+        return chains.filterNot(::hasAccountIn)
     }
 }
 

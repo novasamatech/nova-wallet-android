@@ -17,3 +17,7 @@ fun SessionChains.allKnownChains() : Set<Chain> {
 fun SessionChains.allUnknownChains() : Set<String> {
     return required.unknownChains + optional.unknownChains
 }
+
+fun SessionChains.ResolvedChains.hasUnknown(): Boolean {
+    return unknownChains.isNotEmpty()
+}

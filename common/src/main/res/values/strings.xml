@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="wallet_connect_session_approve_unsupported_chains_alert">Some of the required networks requested by \"%s\" are not supported in Nova Wallet</string>
+
+    <plurals name="wallet_connect_session_approve_missing_accounts_alert">
+        <item quantity="one">%s account is missing. Add account to the wallet in Settings</item>
+        <item quantity="other">%s accounts are missing. Add accounts to the wallet in Settings</item>
+    </plurals>
+
     <plurals name="common_unknown_chains">
-        <item quantity="one">Unknown network</item>
-        <item quantity="other">%s unknown networks</item>
+        <item quantity="one">1 unsupported</item>
+        <item quantity="other">%s Unsupported</item>
     </plurals>
 
     <string name="wallet_connect_v2">WalletConnect v2</string>

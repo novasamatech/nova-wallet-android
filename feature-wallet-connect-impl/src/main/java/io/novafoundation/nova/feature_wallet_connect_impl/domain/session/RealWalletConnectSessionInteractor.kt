@@ -94,7 +94,7 @@ class RealWalletConnectSessionInteractor(
                 optional = chainsByCaip2.resolveChains(sessionProposal.optionalNamespaces.caip2ChainsByNamespace())
             ),
             dappMetadata = SessionDappMetadata(
-                dappUrl = sessionProposal.url,
+                dAppUrl = sessionProposal.url,
                 icon = sessionProposal.icons.firstOrNull()?.toString(),
                 name = sessionProposal.name
             )
@@ -271,7 +271,7 @@ class RealWalletConnectSessionInteractor(
 
     private fun mapAppMetadataToSessionMetadata(metadata: Core.Model.AppMetaData): SessionDappMetadata {
         return SessionDappMetadata(
-            dappUrl = metadata.url,
+            dAppUrl = metadata.url,
             icon = metadata.icons.firstOrNull(),
             name = metadata.name
         )
