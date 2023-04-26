@@ -170,7 +170,7 @@ class WalletConnectApproveSessionViewModel(
 
                 progressState == ProgressState.IDLE -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_allow))
 
-                progressState == ProgressState.REJECTING -> DescriptiveButtonState.Loading
+                progressState == ProgressState.CONFIRMING -> DescriptiveButtonState.Loading
 
                 else -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_allow))
             }
