@@ -1,13 +1,19 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve
 
 import android.util.Log
+import androidx.annotation.StringRes
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.navigation.requireLastInput
 import io.novafoundation.nova.common.navigation.respond
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.formatListPreview
+import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainListOverview
@@ -20,14 +26,17 @@ import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletCon
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.allKnownChains
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.allUnknownChains
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.dAppTitle
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.hasAny
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.hasUnknown
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.WalletConnectSessionInteractor
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.model.SessionAlerts
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.model.hasBlockingAlerts
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.view.WCNetworkListModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -65,9 +74,14 @@ class WalletConnectApproveSessionViewModel(
         constructSessionAlerts(metaAccount, sessionProposal)
     }.shareInBackground()
 
-    val allowButtonState = allowButtonState().shareInBackground()
+    val networksListFlow = sessionProposalFlow.map { constructNetworksList(it.resolvedChains) }
+        .shareInBackground()
 
+    val allowButtonState = allowButtonState().shareInBackground()
     val rejectButtonState = rejectButtonState().shareInBackground()
+
+    private val _showNetworksBottomSheet = MutableLiveData<Event<List<WCNetworkListModel>>>()
+    val showNetworksBottomSheet: LiveData<Event<List<WCNetworkListModel>>> = _showNetworksBottomSheet
 
     fun exit() {
         rejectClicked()
@@ -100,7 +114,8 @@ class WalletConnectApproveSessionViewModel(
         router.back()
     }
 
-    fun networksClicked() {
+    fun networksClicked() = launch {
+        _showNetworksBottomSheet.value = networksListFlow.first().event()
     }
 
     private fun constructSessionAlerts(metaAccount: MetaAccount, sessionProposal: WalletConnectSessionProposal): SessionAlerts {
@@ -150,7 +165,7 @@ class WalletConnectApproveSessionViewModel(
 
     private fun allowButtonState(): Flow<DescriptiveButtonState> {
         return combine(processState, sessionAlerts) { progressState, sessionAlerts ->
-            when  {
+            when {
                 sessionAlerts.hasBlockingAlerts() -> DescriptiveButtonState.Gone
 
                 progressState == ProgressState.IDLE -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_allow))
@@ -210,6 +225,30 @@ class WalletConnectApproveSessionViewModel(
 
     private fun MetaAccount.findMissingAccountsFor(chains: Collection<Chain>): List<Chain> {
         return chains.filterNot(::hasAccountIn)
+    }
+
+    private fun constructNetworksList(sessionChains: SessionChains): List<WCNetworkListModel> {
+        return buildList {
+            addCategory(sessionChains.required, R.string.common_required)
+            addCategory(sessionChains.optional, R.string.common_optional)
+        }
+    }
+
+    private fun MutableList<WCNetworkListModel>.addCategory(resolvedChains: SessionChains.ResolvedChains, @StringRes categoryNameRes: Int) {
+        if (resolvedChains.hasAny()) {
+            val element = WCNetworkListModel.Label(name = resourceManager.getString(categoryNameRes), needsAdditionalSeparator = true)
+            add(element)
+        }
+
+        val knownChainsUi = resolvedChains.knownChains.map { WCNetworkListModel.Chain(mapChainToUi(it)) }
+        addAll(knownChainsUi)
+
+        if (resolvedChains.hasUnknown()) {
+            val unknownCount = resolvedChains.unknownChains.size
+            val unknownLabel = resourceManager.getQuantityString(R.plurals.wallet_connect_unsupported_networks_hidden, unknownCount, unknownCount)
+            val element = WCNetworkListModel.Label(name = unknownLabel, needsAdditionalSeparator = false)
+            add(element)
+        }
     }
 }
 

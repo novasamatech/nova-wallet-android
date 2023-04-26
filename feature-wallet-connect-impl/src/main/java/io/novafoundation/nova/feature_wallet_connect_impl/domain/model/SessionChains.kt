@@ -21,3 +21,11 @@ fun SessionChains.allUnknownChains() : Set<String> {
 fun SessionChains.ResolvedChains.hasUnknown(): Boolean {
     return unknownChains.isNotEmpty()
 }
+
+fun SessionChains.ResolvedChains.hasKnown(): Boolean {
+    return knownChains.isNotEmpty()
+}
+
+fun SessionChains.ResolvedChains.hasAny(): Boolean {
+    return hasUnknown() || hasKnown()
+}

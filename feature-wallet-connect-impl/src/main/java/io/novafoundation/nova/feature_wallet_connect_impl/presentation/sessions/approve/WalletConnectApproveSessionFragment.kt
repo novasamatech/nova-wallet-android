@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDA
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_impl.R
 import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatureComponent
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.view.WCNetworksBottomSheet
 import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionAccountsAlert
 import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionAllow
 import kotlinx.android.synthetic.main.fragment_wc_session_approve.wcApproveSessionChainsAlert
@@ -83,5 +84,10 @@ class WalletConnectApproveSessionFragment : BaseFragment<WalletConnectApproveSes
 
         viewModel.allowButtonState.observe(wcApproveSessionAllow::setState)
         viewModel.rejectButtonState.observe(wcApproveSessionReject::setState)
+
+        viewModel.showNetworksBottomSheet.observeEvent { data ->
+            WCNetworksBottomSheet(context = requireContext(), data = data)
+                .show()
+        }
     }
 }
