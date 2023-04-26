@@ -1,10 +1,11 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.list
 
-import io.novafoundation.nova.common.utils.SearchComparator
-import io.novafoundation.nova.common.utils.SearchFilter
+import io.novafoundation.nova.common.utils.search.SearchComparator
+import io.novafoundation.nova.common.utils.search.SearchFilter
 import io.novafoundation.nova.common.utils.applyFilter
 import io.novafoundation.nova.common.utils.flowOfAll
-import io.novafoundation.nova.common.utils.filterWith
+import io.novafoundation.nova.common.utils.search.filterWith
+import io.novafoundation.nova.common.utils.search.CachedPhraseSearch
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
@@ -65,13 +66,15 @@ class RealReferendaListInteractor(
 
                 val lowercaseQuery = query.lowercase()
 
+                val phraseSearch = CachedPhraseSearch(lowercaseQuery)
+
                 val searchFilter = SearchFilter.Builder<ReferendumPreview>(lowercaseQuery) { it.getName()?.lowercase() }
-                    .separatedWordSearch(true)
-                    .and { it.id.toString() }
+                    .addPhraseSearch(phraseSearch)
+                    .or { it.id.toString() }
                     .build()
 
                 val searchComparator = SearchComparator.Builder<ReferendumPreview>(lowercaseQuery) { it.getName()?.lowercase() }
-                    .separatedWordSearch(true)
+                    .addPhraseSearch(phraseSearch)
                     .and { it.id.toString() }
                     .build()
 
