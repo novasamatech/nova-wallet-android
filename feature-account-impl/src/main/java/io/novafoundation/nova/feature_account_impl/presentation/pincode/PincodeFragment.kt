@@ -5,18 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationOrDenyDialog
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import io.novafoundation.nova.feature_account_impl.presentation.pincode.fingerprint.FingerprintWrapper
 import kotlinx.android.synthetic.main.fragment_pincode.pinCodeNumbers
 import kotlinx.android.synthetic.main.fragment_pincode.pinCodeTitle
 import kotlinx.android.synthetic.main.fragment_pincode.pincodeProgress
 import kotlinx.android.synthetic.main.fragment_pincode.toolbar
-import javax.inject.Inject
 
 class PincodeFragment : BaseFragment<PinCodeViewModel>() {
 
@@ -29,9 +27,6 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
             }
         }
     }
-
-    @Inject
-    lateinit var fingerprintWrapper: FingerprintWrapper
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_pincode, container, false)
@@ -49,11 +44,9 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
     override fun initViews() {
         toolbar.setHomeButtonListener { viewModel.backPressed() }
 
-        viewModel.fingerprintScannerAvailable(fingerprintWrapper.isAuthReady())
-
         with(pinCodeNumbers) {
             pinCodeEnteredListener = { viewModel.pinCodeEntered(it) }
-            fingerprintClickListener = { fingerprintWrapper.toggleScanner() }
+            fingerprintClickListener = { viewModel.startBiometryAuth() }
         }
 
         onBackPressed {
@@ -68,25 +61,17 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
     }
 
     override fun subscribe(viewModel: PinCodeViewModel) {
+        setupConfirmationOrDenyDialog(viewModel.confirmationAwaitableAction)
+
         viewModel.pinCodeAction.toolbarConfiguration.titleRes?.let {
             toolbar.setTitle(getString(it))
         }
 
-        viewModel.startFingerprintScannerEventLiveData.observeEvent {
-            if (fingerprintWrapper.isAuthReady()) {
-                fingerprintWrapper.startAuth()
-            }
-        }
-
-        viewModel.biometricSwitchDialogLiveData.observeEvent {
-            showAuthWithBiometryDialog()
-        }
-
         viewModel.showFingerPrintEvent.observeEvent {
-            pinCodeNumbers.changeFingerPrintButtonVisibility(fingerprintWrapper.isAuthReady())
+            pinCodeNumbers.changeFingerPrintButtonVisibility(true)
         }
 
-        viewModel.fingerPrintErrorEvent.observeEvent {
+        viewModel.biometricEvents.observe {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
         }
 
@@ -104,23 +89,9 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
         viewModel.startAuth()
     }
 
-    private fun showAuthWithBiometryDialog() {
-        MaterialAlertDialogBuilder(requireActivity(), R.style.AlertDialogTheme)
-            .setTitle(R.string.pincode_biometry_dialog_title)
-            .setMessage(R.string.pincode_fingerprint_switch_dialog_title)
-            .setCancelable(false)
-            .setPositiveButton(R.string.common_use) { _, _ ->
-                viewModel.acceptAuthWithBiometry()
-            }
-            .setNegativeButton(R.string.common_skip) { _, _ ->
-                viewModel.declineAuthWithBiometry()
-            }
-            .show()
-    }
-
     override fun onPause() {
         super.onPause()
-        fingerprintWrapper.cancel()
+        viewModel.onPause()
     }
 
     override fun onResume() {
