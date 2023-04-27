@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting.di
+package io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.l
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountValidForTransactionListingMixinFactory
-import io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting.SelectAddressViewModel
+import io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.SelectAddressViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])

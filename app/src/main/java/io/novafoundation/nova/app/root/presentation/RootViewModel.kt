@@ -36,7 +36,7 @@ class RootViewModel(
 
     private var willBeClearedForLanguageChange = false
 
-    val walletConnectService = walletConnectServiceFactory.create(viewModelScope)
+    private val walletConnectService = walletConnectServiceFactory.create(viewModelScope)
 
     init {
         contributionsInteractor.runUpdate()

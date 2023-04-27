@@ -99,7 +99,7 @@ class EvmWalletConnectRequestFactory(
     }
 
     private fun extractEvmChainId(caip2: String): Int? {
-        return caip2Parser.parserCaip2(caip2)
+        return caip2Parser.parseCaip2(caip2)
             .getOrNull()
             ?.castOrNull<Caip2Identifier.Eip155>()
             ?.chainId?.toInt()

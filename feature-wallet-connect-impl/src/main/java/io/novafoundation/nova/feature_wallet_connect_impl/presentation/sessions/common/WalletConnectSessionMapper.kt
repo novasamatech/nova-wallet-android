@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_wallet_connect_impl.R
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.SessionDappMetadata
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.dAppTitle
 
 interface WalletConnectSessionMapper {
 
@@ -14,6 +15,6 @@ class RealWalletConnectSessionMapper(
 ) : WalletConnectSessionMapper {
 
     override fun formatSessionDAppTitle(metadata: SessionDappMetadata?): String {
-        return metadata?.name ?: metadata?.dappUrl ?: resourceManager.getString(R.string.wallet_connect_unknown_dapp)
+        return metadata?.dAppTitle ?: resourceManager.getString(R.string.wallet_connect_unknown_dapp)
     }
 }

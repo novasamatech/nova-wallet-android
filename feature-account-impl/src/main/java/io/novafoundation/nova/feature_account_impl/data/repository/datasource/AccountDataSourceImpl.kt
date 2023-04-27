@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -145,9 +146,11 @@ class AccountDataSourceImpl(
     }
 
     override fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountAssetBalance>> {
-        return metaAccountDao.metaAccountsWithBalanceFlow().mapList {
-            mapMetaAccountWithBalanceFromLocal(it)
-        }
+        return metaAccountDao.metaAccountsWithBalanceFlow().mapList(::mapMetaAccountWithBalanceFromLocal)
+    }
+
+    override fun metaAccountBalancesFlow(metaId: Long): Flow<List<MetaAccountAssetBalance>> {
+        return metaAccountDao.metaAccountWithBalanceFlow(metaId).mapList(::mapMetaAccountWithBalanceFromLocal)
     }
 
     override suspend fun selectMetaAccount(metaId: Long) {
@@ -178,6 +181,12 @@ class AccountDataSourceImpl(
         val joinedMetaAccountInfo = metaAccountDao.getJoinedMetaAccountInfo(metaId)
 
         return mapMetaAccountLocalToMetaAccount(joinedMetaAccountInfo)
+    }
+
+    override fun metaAccountFlow(metaId: Long): Flow<MetaAccount> {
+        return metaAccountDao.metaAccountInfoFlow(metaId).mapNotNull { local ->
+            local?.let(::mapMetaAccountLocalToMetaAccount)
+        }
     }
 
     override suspend fun updateMetaAccountName(metaId: Long, newName: String) {

@@ -36,6 +36,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserProvider
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
 import io.novafoundation.nova.feature_account_impl.data.ethereum.transaction.RealEvmTransactionService
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicService
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
@@ -64,6 +66,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.add
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherProvider
 import io.novafoundation.nova.feature_account_impl.presentation.language.RealLanguageUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.identity.RealIdentityMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.RealRealSelectWalletMixinFactory
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
@@ -352,5 +355,21 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideLanguageUseCase(accountInteractor: AccountInteractor): LanguageUseCase {
         return RealLanguageUseCase(accountInteractor)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSelectWalletMixinFactory(
+        accountRepository: AccountRepository,
+        accountGroupingInteractor: MetaAccountGroupingInteractor,
+        walletUiUseCase: WalletUiUseCase,
+        communicator: SelectWalletCommunicator,
+    ): SelectWalletMixin.Factory {
+        return RealRealSelectWalletMixinFactory(
+            accountRepository = accountRepository,
+            accountGroupingInteractor = accountGroupingInteractor,
+            walletUiUseCase = walletUiUseCase,
+            requester = communicator
+        )
     }
 }

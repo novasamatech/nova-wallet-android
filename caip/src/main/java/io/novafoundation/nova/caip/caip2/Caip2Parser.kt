@@ -1,18 +1,20 @@
 package io.novafoundation.nova.caip.caip2
 
+import io.novafoundation.nova.caip.caip19.identifiers.NotSupportedIdentifierException
 import io.novafoundation.nova.caip.caip2.identifier.Caip2Identifier
 import io.novafoundation.nova.caip.caip2.identifier.Caip2Namespace
-import io.novafoundation.nova.caip.caip19.identifiers.NotSupportedIdentifierException
 import io.novafoundation.nova.caip.common.toNamespaceAndReference
 
 interface Caip2Parser {
 
-    fun parserCaip2(caip2Identifier: String): Result<Caip2Identifier>
+    fun parseCaip2(caip2Identifier: String): Result<Caip2Identifier>
 }
+
+fun Caip2Parser.isValidCaip2(caip2Identifier: String): Boolean = parseCaip2(caip2Identifier).isSuccess
 
 internal class RealCaip2Parser : Caip2Parser {
 
-    override fun parserCaip2(caip2Identifier: String): Result<Caip2Identifier> = runCatching {
+    override fun parseCaip2(caip2Identifier: String): Result<Caip2Identifier> = runCatching {
         val (chainNamespace, chainIdentifier) = caip2Identifier.toNamespaceAndReference()
 
         when (chainNamespace) {

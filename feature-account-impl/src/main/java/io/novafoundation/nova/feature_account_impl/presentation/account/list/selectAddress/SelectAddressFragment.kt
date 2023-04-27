@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting
+package io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress
 
 import android.os.Bundle
 import io.novafoundation.nova.common.di.FeatureUtils

@@ -20,7 +20,7 @@ internal class RealCaip19Parser(
     override fun parseCaip19(caip19Identifier: String): Result<Caip19Identifier> = runCatching {
         val (chain, asset) = caip19Identifier.splitToNamespaces()
 
-        Caip19Identifier(caip2Parser.parserCaip2(chain).getOrThrow(), parseAsset(asset))
+        Caip19Identifier(caip2Parser.parseCaip2(chain).getOrThrow(), parseAsset(asset))
     }
 
     private fun parseAsset(asset: String): AssetIdentifier {

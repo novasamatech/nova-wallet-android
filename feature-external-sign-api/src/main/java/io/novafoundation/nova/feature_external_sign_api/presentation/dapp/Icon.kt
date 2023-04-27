@@ -11,5 +11,6 @@ fun ImageView.showDAppIcon(
 ) {
     load(url, imageLoader) {
         fallback(R.drawable.ic_earth)
+        error(R.drawable.ic_earth)
     }
 }

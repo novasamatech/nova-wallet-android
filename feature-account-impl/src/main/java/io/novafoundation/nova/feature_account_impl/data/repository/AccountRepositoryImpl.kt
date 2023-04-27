@@ -107,6 +107,10 @@ class AccountRepositoryImpl(
         return accountDataSource.getMetaAccount(metaId)
     }
 
+    override fun metaAccountFlow(metaId: Long): Flow<MetaAccount> {
+        return accountDataSource.metaAccountFlow(metaId)
+    }
+
     override fun selectedMetaAccountFlow(): Flow<MetaAccount> {
         return accountDataSource.selectedMetaAccountFlow()
     }
@@ -133,6 +137,10 @@ class AccountRepositoryImpl(
 
     override fun metaAccountBalancesFlow(): Flow<List<MetaAccountAssetBalance>> {
         return accountDataSource.metaAccountsWithBalancesFlow()
+    }
+
+    override fun metaAccountBalancesFlow(metaId: Long): Flow<List<MetaAccountAssetBalance>> {
+        return accountDataSource.metaAccountBalancesFlow(metaId)
     }
 
     override suspend fun selectMetaAccount(metaId: Long) {

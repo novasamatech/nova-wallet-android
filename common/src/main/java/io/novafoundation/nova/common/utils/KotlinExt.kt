@@ -12,6 +12,7 @@ import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
+import java.util.Collections
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
@@ -49,6 +50,8 @@ inline fun <K, V> List<V>.associateByMultiple(keysExtractor: (V) -> Iterable<K>)
 infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another) == 0
 
 fun BigInteger.intSqrt() = sqrt(toDouble()).toLong().toBigInteger()
+
+fun <T> MutableSet<T>.toImmutable(): Set<T> = Collections.unmodifiableSet(this)
 
 operator fun BigInteger.times(double: Double): BigInteger = toBigDecimal().multiply(double.toBigDecimal()).toBigInteger()
 

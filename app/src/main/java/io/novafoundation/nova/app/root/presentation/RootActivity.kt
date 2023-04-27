@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.showToast
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.updatePadding
-import io.novafoundation.nova.feature_wallet_connect_api.presentation.setupWalletConnectService
 import io.novafoundation.nova.splash.presentation.SplashBackgroundHolder
 import kotlinx.android.synthetic.main.activity_root.rootNetworkBar
 import javax.inject.Inject
@@ -114,8 +113,6 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
                 showToast(it)
             }
         )
-
-        setupWalletConnectService(viewModel.walletConnectService)
     }
 
     override fun removeSplashBackground() {

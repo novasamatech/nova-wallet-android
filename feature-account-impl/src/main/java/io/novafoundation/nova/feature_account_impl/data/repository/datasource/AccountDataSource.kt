@@ -48,6 +48,9 @@ interface AccountDataSource : SecretStoreV1 {
     fun allMetaAccountsFlow(): Flow<List<MetaAccount>>
 
     fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountAssetBalance>>
+
+    fun metaAccountBalancesFlow(metaId: Long): Flow<List<MetaAccountAssetBalance>>
+
     suspend fun selectMetaAccount(metaId: Long)
     suspend fun updateAccountPositions(accountOrdering: List<MetaAccountOrdering>)
 
@@ -56,6 +59,8 @@ interface AccountDataSource : SecretStoreV1 {
 
     suspend fun accountExists(accountId: AccountId): Boolean
     suspend fun getMetaAccount(metaId: Long): MetaAccount
+
+    fun metaAccountFlow(metaId: Long): Flow<MetaAccount>
 
     suspend fun updateMetaAccountName(metaId: Long, newName: String)
     suspend fun deleteMetaAccount(metaId: Long)

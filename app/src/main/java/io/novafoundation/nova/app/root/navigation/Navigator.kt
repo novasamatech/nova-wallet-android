@@ -397,7 +397,7 @@ class Navigator(
     }
 
     override fun openSelectAddress(arguments: Bundle) {
-        navController?.navigate(R.id.action_open_select_wallet, arguments)
+        navController?.navigate(R.id.action_open_select_address, arguments)
     }
 
     override fun openNodes() {

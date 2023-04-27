@@ -6,12 +6,9 @@ import dagger.Provides
 import io.novafoundation.nova.caip.caip2.Caip2Parser
 import io.novafoundation.nova.caip.caip2.Caip2Resolver
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_external_sign_api.domain.sign.evm.EvmTypedMessageParser
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
@@ -26,6 +23,7 @@ import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.request
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.evm.EvmWalletConnectRequestFactory
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.polkadot.PolkadotWalletConnectRequestFactory
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.service.RealWalletConnectServiceFactory
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.ApproveSessionCommunicator
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.common.RealWalletConnectSessionMapper
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.common.WalletConnectSessionMapper
 
@@ -67,29 +65,27 @@ class WalletConnectFeatureModule {
         caip2Resolver: Caip2Resolver,
         requestFactory: WalletConnectRequest.Factory,
         walletConnectSessionRepository: WalletConnectSessionRepository,
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
+        caip2Parser: Caip2Parser
     ): WalletConnectSessionInteractor = RealWalletConnectSessionInteractor(
         caip2Resolver = caip2Resolver,
         walletConnectRequestFactory = requestFactory,
         walletConnectSessionRepository = walletConnectSessionRepository,
-        accountRepository = accountRepository
+        accountRepository = accountRepository,
+        caip2Parser = caip2Parser
     )
 
     @Provides
     @FeatureScope
     fun provideWalletConnectServiceFactory(
-        awaitableMixinFactory: ActionAwaitableMixin.Factory,
-        walletUiUseCase: WalletUiUseCase,
         interactor: WalletConnectSessionInteractor,
         dAppSignRequester: ExternalSignCommunicator,
-        selectedAccountUseCase: SelectedAccountUseCase
+        approveSessionCommunicator: ApproveSessionCommunicator,
     ): WalletConnectService.Factory {
         return RealWalletConnectServiceFactory(
-            awaitableMixinFactory = awaitableMixinFactory,
-            walletUiUseCase = walletUiUseCase,
             interactor = interactor,
             dAppSignRequester = dAppSignRequester,
-            selectedAccountUseCase = selectedAccountUseCase
+            approveSessionRequester = approveSessionCommunicator
         )
     }
 

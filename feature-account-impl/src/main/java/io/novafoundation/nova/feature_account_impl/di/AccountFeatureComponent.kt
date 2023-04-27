@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.di.modules.ExportModule
@@ -15,7 +16,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncrypti
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.di.AdvancedEncryptionComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.di.CreateAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.di.AccountDetailsComponent
-import io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting.di.SelectAddressComponent
+import io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.di.SelectAddressComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.di.SwitchWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.management.di.WalletManagmentComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
@@ -24,6 +25,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.p
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.di.ExportSeedComponent
 import io.novafoundation.nova.feature_account_impl.presentation.importing.di.ImportAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.language.di.LanguagesComponent
+import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.di.SelectWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.di.BackupMnemonicComponent
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.di.ConfirmMnemonicComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.add.di.AddNodeComponent
@@ -71,6 +73,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun switchWalletComponentFactory(): SwitchWalletComponent.Factory
 
+    fun selectWalletComponentFactory(): SelectWalletComponent.Factory
+
     fun selectAddressComponentFactory(): SelectAddressComponent.Factory
 
     fun accountDetailsComponentFactory(): AccountDetailsComponent.Factory
@@ -111,6 +115,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
             @BindsInstance paritySignerSignInterScreenCommunicator: ParitySignerSignCommunicator,
             @BindsInstance ledgerSignInterScreenCommunicator: LedgerSignCommunicator,
             @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,
+            @BindsInstance selectWalletCommunicator: SelectWalletCommunicator,
             deps: AccountFeatureDependencies
         ): AccountFeatureComponent
     }
