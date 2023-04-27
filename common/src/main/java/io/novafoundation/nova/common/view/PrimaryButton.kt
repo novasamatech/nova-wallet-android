@@ -117,7 +117,6 @@ class PrimaryButton @JvmOverloads constructor(
         super.onMeasure(widthMeasureSpec, newHeightMeasureSpec)
     }
 
-
     fun prepareForProgress(lifecycleOwner: LifecycleOwner) {
         lifecycleOwner.bindProgressButton(this)
 
