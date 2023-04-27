@@ -15,6 +15,9 @@ import io.novafoundation.nova.feature_external_sign_api.model.signPayload.Extern
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignWallet
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.SigningDappMetadata
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.WalletConnectError
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.failed
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.respondSessionRequest
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.WalletConnectSessionInteractor
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.ApproveSessionRequester
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsEvent
@@ -82,13 +85,13 @@ internal class RealWalletConnectService(
     }
 
     private suspend fun handleSessionRequest(sessionRequest: Wallet.Model.SessionRequest) {
-        val sdkSession = Web3Wallet.getActiveSessionByTopic(sessionRequest.topic) ?: return
-        val appSession = interactor.getSessionAccount(sessionRequest.topic) ?: return
+        val sdkSession = Web3Wallet.getActiveSessionByTopic(sessionRequest.topic) ?: run { respondNoSession(sessionRequest); return }
+        val appSession = interactor.getSessionAccount(sessionRequest.topic) ?: run { respondNoSession(sessionRequest); return }
 
-        // TODO reject request if not able to parse
         val walletConnectRequest = interactor.parseSessionRequest(sessionRequest)
             .onFailure { Log.e("WalletConnect", "Failed to parse session request $sessionRequest", it) }
-            .getOrNull() ?: return
+            .getOrNull()
+            ?: run { respondUnauthorizedMethod(sessionRequest); return }
 
         val externalSignResponse = withContext(Dispatchers.Main) {
             dAppSignRequester.awaitConfirmation(
@@ -119,5 +122,21 @@ internal class RealWalletConnectService(
                 url = url
             )
         }
+    }
+
+    private suspend fun respondNoSession(
+        sessionRequest: Wallet.Model.SessionRequest,
+    ): Result<*> {
+        val response = sessionRequest.failed(WalletConnectError.NO_SESSION_FOR_TOPIC)
+
+        return Web3Wallet.respondSessionRequest(response)
+    }
+
+    private suspend fun respondUnauthorizedMethod(
+        sessionRequest: Wallet.Model.SessionRequest,
+    ): Result<*> {
+        val response = sessionRequest.failed(WalletConnectError.UNAUTHORIZED_METHOD)
+
+        return Web3Wallet.respondSessionRequest(response)
     }
 }

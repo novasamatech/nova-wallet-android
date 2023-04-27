@@ -39,6 +39,10 @@ class WalletConnectError(val code: Int, val message: String) {
         val REJECTED = WalletConnectError(5000, "Rejected by user")
 
         val GENERAL_FAILURE = WalletConnectError(0, "Unknown error")
+
+        val NO_SESSION_FOR_TOPIC = WalletConnectError(7001, "No session for topic")
+
+        val UNAUTHORIZED_METHOD = WalletConnectError(3001, "Unauthorized method")
     }
 }
 
