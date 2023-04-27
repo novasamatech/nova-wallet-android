@@ -5,4 +5,6 @@ import kotlinx.coroutines.flow.Flow
 interface WalletConnectSessionsUseCase {
 
     fun activeSessionsNumberFlow(): Flow<Int>
+
+    suspend fun syncActiveSessions()
 }

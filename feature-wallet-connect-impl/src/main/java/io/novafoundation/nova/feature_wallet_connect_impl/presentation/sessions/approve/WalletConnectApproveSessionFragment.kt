@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.setTextOrHide
 import io.novafoundation.nova.common.view.showValueOrHide
-import io.novafoundation.nova.feature_account_api.presenatation.chain.showChainsOverView
+import io.novafoundation.nova.feature_account_api.presenatation.chain.showChainsOverview
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.setupSelectWalletMixin
 import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDAppIcon
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
@@ -73,7 +73,7 @@ class WalletConnectApproveSessionFragment : BaseFragment<WalletConnectApproveSes
             wcApproveSessionIcon.showDAppIcon(sessionMetadata.icon, imageLoader)
         }
 
-        viewModel.chainsOverviewFlow.observe(wcApproveSessionNetworks::showChainsOverView)
+        viewModel.chainsOverviewFlow.observe(wcApproveSessionNetworks::showChainsOverview)
 
         viewModel.title.observe(wcApproveSessionTitle::setText)
 

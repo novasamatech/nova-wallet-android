@@ -76,6 +76,10 @@ class SettingsViewModel(
     private val _openEmailEvent = MutableLiveData<Event<String>>()
     val openEmailEvent: LiveData<Event<String>> = _openEmailEvent
 
+    init {
+        syncWalletConnectSessions()
+    }
+
     fun walletsClicked() {
         router.openWallets()
     }
@@ -166,5 +170,9 @@ class SettingsViewModel(
         } else {
             WalletConnectSessionsModel(null)
         }
+    }
+
+    private fun syncWalletConnectSessions() = launch {
+        walletConnectSessionsUseCase.syncActiveSessions()
     }
 }

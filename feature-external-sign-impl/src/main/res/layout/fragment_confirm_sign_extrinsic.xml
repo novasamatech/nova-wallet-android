@@ -8,10 +8,10 @@
     tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/confirmSignExtinsicToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
-        android:id="@+id/confirmSignExtinsicToolbar"
         app:homeButtonVisible="false"
         app:titleText="@string/common_sign_request" />
 

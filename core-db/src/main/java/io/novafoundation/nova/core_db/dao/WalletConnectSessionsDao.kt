@@ -22,6 +22,9 @@ interface WalletConnectSessionsDao {
     @Query("SELECT * FROM wallet_connect_sessions WHERE sessionTopic = :sessionTopic")
     fun sessionFlow(sessionTopic: String): Flow<WalletConnectSessionAccountLocal?>
 
+    @Query("DELETE FROM wallet_connect_sessions WHERE sessionTopic NOT IN (:sessionTopics)")
+    suspend fun removeAllSessionsOtherThan(sessionTopics: List<String>)
+
     @Query("SELECT * FROM wallet_connect_sessions")
     fun allSessionsFlow(): Flow<List<WalletConnectSessionAccountLocal>>
 
