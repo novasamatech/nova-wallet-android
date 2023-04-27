@@ -11,7 +11,7 @@ class AlternatingDecoderFactory(
     private val decodeFormats: Collection<BarcodeFormat>? = null,
     private val hints: Map<DecodeHintType, *>? = null,
     private val characterSet: String? = null,
-): DecoderFactory {
+) : DecoderFactory {
 
     override fun createDecoder(baseHints: Map<DecodeHintType, *>): Decoder {
         val allHints: MutableMap<DecodeHintType, Any?> = EnumMap(DecodeHintType::class.java)
@@ -27,7 +27,6 @@ class AlternatingDecoderFactory(
         characterSet?.let {
             allHints[DecodeHintType.CHARACTER_SET] = characterSet
         }
-
 
         val reader = MultiFormatReader().apply { setHints(allHints) }
 
