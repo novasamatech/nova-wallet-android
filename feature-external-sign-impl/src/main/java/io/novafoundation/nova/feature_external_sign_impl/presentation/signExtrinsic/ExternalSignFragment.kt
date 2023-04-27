@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.base.blockBackPressing
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -61,7 +62,7 @@ class ExternalSignFragment : BaseFragment<ExternaSignViewModel>() {
     override fun initViews() {
         confirmSignExtinsicToolbar.applyStatusBarInsets()
 
-        onBackPressed { viewModel.backPressed() }
+        blockBackPressing()
 
         confirmDAppActionAllow.prepareForProgress(viewLifecycleOwner)
 

@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainListBottomSheet
-import io.novafoundation.nova.feature_account_api.presenatation.chain.showChainsOverView
+import io.novafoundation.nova.feature_account_api.presenatation.chain.showChainsOverview
 import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDAppIcon
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_impl.R
@@ -68,7 +68,7 @@ class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDet
         viewModel.sessionUi.observe { sessionUi ->
             wcSessionDetailsWallet.showWallet(sessionUi.wallet)
             wcSessionDetailsDApp.showValueOrHide(sessionUi.dappUrl)
-            wcSessionDetailsNetworks.showChainsOverView(sessionUi.networksOverview)
+            wcSessionDetailsNetworks.showChainsOverview(sessionUi.networksOverview)
 
             wcSessionDetailsTitle.text = sessionUi.dappTitle
             wcSessionDetailsIcon.showDAppIcon(sessionUi.dappIcon, imageLoader)

@@ -74,8 +74,8 @@ class SettingsViewModel(
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     private val _openEmailEvent = MutableLiveData<Event<String>>()
-
     val openEmailEvent: LiveData<Event<String>> = _openEmailEvent
+
     init {
         syncWalletConnectSessions()
     }

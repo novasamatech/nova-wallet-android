@@ -52,7 +52,7 @@ class RealWalletConnectSessionRepository(
     }
 
     override suspend fun removeAllSessionsOtherThan(activeSessionTopics: List<String>) {
-       dao.removeAllSessionsOtherThan(activeSessionTopics)
+        dao.removeAllSessionsOtherThan(activeSessionTopics)
     }
 
     private fun mapSessionToLocal(session: WalletConnectSessionAccount): WalletConnectSessionAccountLocal {

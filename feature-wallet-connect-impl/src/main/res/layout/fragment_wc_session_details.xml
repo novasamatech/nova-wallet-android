@@ -7,13 +7,13 @@
     android:gravity="center_horizontal"
     android:orientation="vertical"
     tools:background="@color/secondary_screen_background">
-    
+
     <io.novafoundation.nova.common.view.Toolbar
-        android:layout_width="match_parent"
         android:id="@+id/wcSessionDetailsToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:dividerVisible="false"
-        app:titleText="@string/wallet_connect_title"
-        android:layout_height="wrap_content" />
+        app:titleText="@string/wallet_connect_title" />
 
     <ImageView
         android:id="@+id/wcSessionDetailsIcon"
@@ -30,14 +30,14 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:gravity="center_horizontal"
-        tools:text="1inch dApp"
-        android:textColor="@color/text_primary" />
+        android:textColor="@color/text_primary"
+        tools:text="1inch dApp" />
 
     <io.novafoundation.nova.common.view.TableView
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="24dp"
-        android:layout_height="wrap_content">
+        android:layout_marginTop="24dp">
 
         <io.novafoundation.nova.common.view.TableCellView
             android:id="@+id/wcSessionDetailsWallet"
@@ -76,8 +76,8 @@
         style="@style/Widget.Nova.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:text="@string/common_disconnect"
         app:appearance="primaryNegative" />

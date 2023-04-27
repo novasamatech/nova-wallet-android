@@ -19,7 +19,7 @@ fun ResourceManager.formatChainListOverview(chains: List<ChainUi>): ChainListOve
     )
 }
 
-fun TableCellView.showChainsOverView(chainListOverview: ChainListOverview) {
+fun TableCellView.showChainsOverview(chainListOverview: ChainListOverview) {
     showValue(chainListOverview.label)
 
     loadImage(chainListOverview.icon, roundedCornersDp = null)
