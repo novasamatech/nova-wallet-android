@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="stacking_period_title">Show staking rewards for</string>
+    <string name="stacking_period_all_time">All time</string>
+    <string name="stacking_period_week">Last 7 days (7D)</string>
+    <string name="stacking_period_month">Last 30 days (30D)</string>
+    <string name="stacking_period_quarter">Last 3 month (3M)</string>
+    <string name="stacking_period_half_year">Last 6 months (6M)</string>
+    <string name="stacking_period_year">Last year (1Y)</string>
+    <string name="stacking_period_custom">Custom period</string>
+
+    <string name="stacking_period_start_title">Starts</string>
+    <string name="stacking_period_current_date_title">End date is always today</string>
+    <string name="stacking_period_end_title">Ends</string>
 
     <string name="settings_pin_code_verification_confirmation_title">Ask authentication for operation signing</string>
     <string name="settings_pin_code_verification_confirmation_message">Each sign operation on wallets with key pair (created in nova wallet or imported) should require PIN verification before constructing signature</string>
