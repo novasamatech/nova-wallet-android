@@ -109,11 +109,11 @@ class ChainConnection internal constructor(
     }
 
     private suspend fun observeCurrentNode() {
-        val firstNodeUrl = connectionSecrets.saturateUrl(currentNode.first().unformattedUrl) ?: return
+        val firstNodeUrl = currentNode.first()?.unformattedUrl?.let(connectionSecrets::saturateUrl) ?: return
         socketService.start(firstNodeUrl, remainPaused = true)
 
         currentNode
-            .mapNotNull { node -> connectionSecrets.saturateUrl(node.unformattedUrl) }
+            .mapNotNull { node -> node?.unformattedUrl?.let(connectionSecrets::saturateUrl) }
             .filter { nodeUrl -> actualUrl() != nodeUrl }
             .onEach { nodeUrl -> socketService.switchUrl(nodeUrl) }
             .onEach { nodeUrl -> Log.d(this@ChainConnection.LOG_TAG, "Switching node in ${chain.name} to $nodeUrl") }
