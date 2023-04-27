@@ -39,5 +39,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        app:iconSrc="@drawable/ic_qr_scan"
         android:text="@string/wallet_connect_new_connection" />
 </LinearLayout>
