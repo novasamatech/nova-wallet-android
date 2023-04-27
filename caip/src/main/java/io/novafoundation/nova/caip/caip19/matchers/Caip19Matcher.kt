@@ -2,8 +2,8 @@ package io.novafoundation.nova.caip.caip19.matchers
 
 import io.novafoundation.nova.caip.caip19.identifiers.Caip19Identifier
 import io.novafoundation.nova.caip.caip19.matchers.asset.AssetMatcher
+import io.novafoundation.nova.caip.caip19.matchers.asset.UnsupportedAssetMatcher
 import io.novafoundation.nova.caip.caip2.matchers.Caip2Matcher
-import io.novafoundation.nova.caip.caip2.matchers.UnsupportedAssetMatcher
 
 class Caip19Matcher(
     private val caip2Matcher: Caip2Matcher,
