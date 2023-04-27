@@ -1,6 +1,12 @@
 package io.novafoundation.nova.common.view
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.ContextThemeWrapper
 import androidx.annotation.ColorInt
@@ -27,6 +33,9 @@ enum class ButtonState {
     PROGRESS,
     GONE
 }
+
+private const val ICON_SIZE_DP_DEFAULT = 24
+private const val ICON_PADDING_DP_DEFAULT = 8
 
 class PrimaryButton @JvmOverloads constructor(
     context: Context,
@@ -86,6 +95,13 @@ class PrimaryButton @JvmOverloads constructor(
 
     private var preparedForProgress = false
 
+    private var icon: Bitmap? = null
+    private var iconPaint: Paint? = null
+    private var iconSrcRect: Rect? = null
+    private var iconDestRect: Rect? = null
+    private var iconPadding = 0
+    private var iconSize = 0
+
     init {
         attrs?.let(this::applyAttrs)
     }
@@ -101,17 +117,34 @@ class PrimaryButton @JvmOverloads constructor(
         super.onMeasure(widthMeasureSpec, newHeightMeasureSpec)
     }
 
-    private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.PrimaryButton) { typedArray ->
-        val appearance = typedArray.getEnum(R.styleable.PrimaryButton_appearance, Appearance.PRIMARY)
-        size = typedArray.getEnum(R.styleable.PrimaryButton_size, Size.LARGE)
-
-        setAppearance(appearance, cornerSizeDp = size.cornerSizeDp)
-    }
-
     fun prepareForProgress(lifecycleOwner: LifecycleOwner) {
         lifecycleOwner.bindProgressButton(this)
 
         preparedForProgress = true
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        val icon = icon
+
+        if (icon != null) {
+            val shift: Int = (iconSize + iconPadding) / 2
+
+            canvas.save()
+            canvas.translate(shift.toFloat(), 0f)
+
+            super.onDraw(canvas)
+
+            val textWidth = paint.measureText(text as String)
+            val left = (width / 2f - textWidth / 2f - iconSize - iconPadding).toInt()
+            val top: Int = height / 2 - iconSize / 2
+
+            iconDestRect!!.set(left, top, left + iconSize, top + iconSize)
+            canvas.drawBitmap(icon, iconSrcRect, iconDestRect!!, iconPaint)
+
+            canvas.restore()
+        } else {
+            super.onDraw(canvas)
+        }
     }
 
     fun setState(state: ButtonState) {
@@ -125,6 +158,22 @@ class PrimaryButton @JvmOverloads constructor(
         } else {
             hideProgress()
         }
+    }
+
+    private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.PrimaryButton) { typedArray ->
+        val appearance = typedArray.getEnum(R.styleable.PrimaryButton_appearance, Appearance.PRIMARY)
+        size = typedArray.getEnum(R.styleable.PrimaryButton_size, Size.LARGE)
+
+        typedArray.getDrawable(R.styleable.PrimaryButton_iconSrc)?.let { icon = drawableToBitmap(it) }
+        icon?.let { icon ->
+            iconPadding = typedArray.getDimensionPixelSize(R.styleable.PrimaryButton_iconPadding, ICON_PADDING_DP_DEFAULT.dp(context))
+            iconSize = typedArray.getDimensionPixelSize(R.styleable.PrimaryButton_iconSize, ICON_SIZE_DP_DEFAULT.dp(context))
+            iconPaint = Paint()
+            iconSrcRect = Rect(0, 0, icon.width, icon.height)
+            iconDestRect = Rect()
+        }
+
+        setAppearance(appearance, cornerSizeDp = size.cornerSizeDp)
     }
 
     private fun setAppearance(appearance: Appearance, cornerSizeDp: Int) = with(context) {
@@ -161,6 +210,17 @@ class PrimaryButton @JvmOverloads constructor(
         showProgress {
             progressColor = currentTextColor
         }
+    }
+
+    private fun drawableToBitmap(drawable: Drawable): Bitmap? {
+        if (drawable is BitmapDrawable) {
+            return drawable.bitmap
+        }
+        val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+        return bitmap
     }
 }
 
