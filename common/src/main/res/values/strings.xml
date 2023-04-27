@@ -14,9 +14,13 @@
 
     <string name="send_address_hint">Address or w3n</string>
 
+    <string name="pincode_biometry_dialog_subtitle">Nova Wallet uses fingerprint to restrict unauthorized users from accessing the app</string>
+    <string name="pincode_biometry_dialog_description">Touch the fingerprint sensor</string>
+
     <string name="settings_pin_code_verification_confirmation_title">Ask authentication for operation signing</string>
     <string name="settings_pin_code_verification_confirmation_message">Each sign operation on wallets with key pair (created in nova wallet or imported) should require PIN verification before constructing signature</string>
 
+    <string name="biometric_auth_title">Biometric auth</string>
     <string name="profile_settings_pin_code_verification_title">Approve with PIN</string>
 
 
