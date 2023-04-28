@@ -177,7 +177,7 @@ private class Web3JEvmApi(
     }
 
     private suspend fun getNonce(address: String): BigInteger {
-        return web3.ethGetTransactionCount(address, DefaultBlockParameterName.LATEST)
+        return web3.ethGetTransactionCount(address, DefaultBlockParameterName.PENDING)
             .sendSuspend()
             .transactionCount
     }
