@@ -4,7 +4,7 @@
     <string name="common_optional">Optional</string>
 
     <plurals name="wallet_connect_unsupported_networks_hidden">
-        <item quantity="one">1 unsupported network is hidden</item>
+        <item quantity="one">%s unsupported network is hidden</item>
         <item quantity="other">%s unsupported networks are hidden</item>
     </plurals>
 
@@ -16,16 +16,13 @@
     </plurals>
 
     <plurals name="common_unknown_chains">
-        <item quantity="one">1 unsupported</item>
-        <item quantity="other">%s Unsupported</item>
+        <item quantity="one">s unsupported</item>
+        <item quantity="other">%s unsupported</item>
     </plurals>
 
     <string name="wallet_connect_v2">WalletConnect v2</string>
 
     <string name="common_sign_request">Sign Request</string>
-
-<!--    <string name="staking_nominator_status_active">Active</string>-->
-<!--    <string name="crowdloan_active_section">Active</string>-->
 
     <string name="wallet_connect_sessions_placeholder">Wallet Connect sessions will appear here</string>
 
