@@ -9,6 +9,8 @@ interface WalletConnectService {
         fun create(coroutineScope: CoroutineScope): WalletConnectService
     }
 
+    fun pair(wcUri: String)
+
     fun connect()
 
     fun disconnect()

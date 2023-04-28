@@ -249,6 +249,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     }
 
     override fun handleBrowserIntent(intent: Intent) {
+//        viewModel.handleDeeplinkInApp(intent.dataString)
+
         try {
             startActivity(intent)
         } catch (e: Exception) {

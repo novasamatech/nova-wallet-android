@@ -68,6 +68,10 @@ internal class RealWalletConnectService(
             .launchIn(this)
     }
 
+    override fun pair(wcUri: String) {
+        Web3Wallet.pair(Wallet.Params.Pair(wcUri))
+    }
+
     override fun connect() {
         CoreClient.Relay.connect { error: Core.Model.Error ->
             Log.d(LOG_TAG, "Failed to connect to Wallet Connect: ", error.throwable)

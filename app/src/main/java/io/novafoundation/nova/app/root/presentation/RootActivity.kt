@@ -126,7 +126,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     }
 
     private fun processIntent(intent: Intent) {
-        val uri = intent.data?.toString()
+        val uri = intent.dataString
 
         uri?.let { viewModel.externalUrlOpened(uri) }
     }

@@ -17,6 +17,8 @@ import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.feature_dapp_impl.BuildConfig
 import javax.inject.Inject
 
+private const val WC_REDIRECT_URL = "kotlin-wallet-wc://request"
+
 open class App : Application(), FeatureContainer {
 
     @Inject
@@ -74,7 +76,8 @@ open class App : Application(), FeatureContainer {
             description = "Next-gen wallet for Polkadot and Kusama ecosystem",
             url = "https://novawallet.io/",
             icons = listOf("https://raw.githubusercontent.com/nova-wallet/branding/master/logos/Nova_Wallet_Star_Color.png"),
-            redirect = null
+            redirect = WC_REDIRECT_URL,
+            verifyUrl = null
         )
 
         CoreClient.initialize(relayServerUrl = serverUrl, connectionType = connectionType, application = this, metaData = appMetaData) { error ->

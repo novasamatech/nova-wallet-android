@@ -266,4 +266,12 @@ class DAppBrowserViewModel(
             url = dappMetadata.baseUrl,
         )
     }
+
+    fun handleDeeplinkInApp(dataString: String?): Boolean {
+        if (dataString != null && dataString.startsWith("wc:")) {
+//            Web3Wallet.pair()
+        }
+
+        return false
+    }
 }

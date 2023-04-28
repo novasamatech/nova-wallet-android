@@ -8,7 +8,9 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
+import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -31,7 +33,8 @@ class RootViewModel(
     private val backgroundAccessObserver: BackgroundAccessObserver,
     private val safeModeService: SafeModeService,
     private val updateNotificationsInteractor: UpdateNotificationsInteractor,
-    private val walletConnectServiceFactory: WalletConnectService.Factory
+    private val walletConnectServiceFactory: WalletConnectService.Factory,
+    private val interactionGate: AutomaticInteractionGate,
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin {
 
     private var willBeClearedForLanguageChange = false
@@ -107,9 +110,15 @@ class RootViewModel(
         }
     }
 
-    fun externalUrlOpened(uri: String) {
+    fun externalUrlOpened(uri: String) = launch {
         if (interactor.isBuyProviderRedirectLink(uri)) {
             showMessage(resourceManager.getString(R.string.buy_completed))
+        }
+
+        if (uri.startsWith("wc:")) {
+            interactionGate.awaitInteractionAllowed()
+
+            walletConnectService.pair(uri)
         }
     }
 

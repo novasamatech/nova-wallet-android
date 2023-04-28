@@ -85,5 +85,4 @@
         android:label="updateNotificationsFragment"
         app:useAdd="true"
         tools:layout="@layout/fragment_update_notifications" />
-
 </navigation>
