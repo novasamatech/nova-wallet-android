@@ -32,7 +32,7 @@ fun <V> BaseFragment<V>.observeRewardDestinationChooser(
         AccountChooserBottomSheetDialog(
             context = requireContext(),
             payload = it,
-            onSuccess = viewModel::payoutDestinationChanged,
+            onSuccess = { _, item -> viewModel.payoutDestinationChanged(item) },
             onCancel = null,
             title = R.string.staking_select_payout_account
         ).show()

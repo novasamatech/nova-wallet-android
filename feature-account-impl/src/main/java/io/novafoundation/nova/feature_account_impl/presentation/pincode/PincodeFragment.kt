@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationOrDenyDialog
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
@@ -26,6 +27,11 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
                 putParcelable(KEY_PINCODE_ACTION, pinCodeAction)
             }
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        hideKeyboard()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

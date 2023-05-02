@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '6.0.2'
-        versionCode = 64
+        versionName = '6.0.3'
+        versionCode = 65
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -31,6 +31,8 @@ buildscript {
         javaxInjectVersion = '1'
 
         architectureComponentVersion = '2.2.0'
+
+        multibaseVersion = '1.1.1'
 
         retrofitVersion = '2.9.0'
         okhttpVersion = '3.8.0'
@@ -178,6 +180,8 @@ buildscript {
         markdownTables = "io.noties.markwon:ext-tables:$markdownVersion"
         markdownLinkify = "io.noties.markwon:linkify:$markdownVersion"
         markdownStrikethrough = "io.noties.markwon:ext-strikethrough:$markdownVersion"
+
+        multibaseDep = "com.github.multiformats:java-multibase:$multibaseVersion"
     }
 
     repositories {

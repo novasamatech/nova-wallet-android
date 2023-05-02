@@ -34,18 +34,18 @@ class CreateWatchWalletViewModel(
     val substrateAddressInput = with(addressInputMixinFactory) {
         create(
             inputSpecProvider = substrateInputSpec(),
-            myselfBehaviorProvider = noMyself(),
             errorDisplayer = this@CreateWatchWalletViewModel::showError,
-            coroutineScope = this@CreateWatchWalletViewModel
+            showAccountEvent = null,
+            coroutineScope = this@CreateWatchWalletViewModel,
         )
     }
 
     val evmAddressInput = with(addressInputMixinFactory) {
         create(
             inputSpecProvider = evmInputSpec(),
-            myselfBehaviorProvider = noMyself(),
             errorDisplayer = this@CreateWatchWalletViewModel::showError,
-            coroutineScope = this@CreateWatchWalletViewModel
+            showAccountEvent = null,
+            coroutineScope = this@CreateWatchWalletViewModel,
         )
     }
 

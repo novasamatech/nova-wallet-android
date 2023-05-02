@@ -78,7 +78,7 @@ class ParachainStakingUnbondFragment : BaseFragment<ParachainStakingUnbondViewMo
             ChooseStakedStakeTargetsBottomSheet(
                 context = requireContext(),
                 payload = action.payload,
-                stakedCollatorSelected = action.onSuccess,
+                stakedCollatorSelected = { _, item -> action.onSuccess(item) },
                 onCancel = action.onCancel,
                 newStakeTargetClicked = null
             ).show()
