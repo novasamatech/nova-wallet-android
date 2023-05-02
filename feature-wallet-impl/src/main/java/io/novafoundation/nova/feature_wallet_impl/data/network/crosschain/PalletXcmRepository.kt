@@ -15,6 +15,8 @@ interface PalletXcmRepository {
     suspend fun lowestPresentMultiLocationVersion(chainId: ChainId): XcmVersion?
 
     suspend fun lowestPresentMultiAssetsVersion(chainId: ChainId): XcmVersion?
+
+    suspend fun lowestPresentMultiAssetVersion(chainId: ChainId): XcmVersion?
 }
 
 class RealPalletXcmRepository(
@@ -27,6 +29,10 @@ class RealPalletXcmRepository(
 
     override suspend fun lowestPresentMultiAssetsVersion(chainId: ChainId): XcmVersion? {
         return lowestPresentXcmTypeVersion(chainId, "xcm.VersionedMultiAssets")
+    }
+
+    override suspend fun lowestPresentMultiAssetVersion(chainId: ChainId): XcmVersion? {
+        return lowestPresentXcmTypeVersion(chainId, "xcm.VersionedMultiAsset")
     }
 
     private suspend fun lowestPresentXcmTypeVersion(chainId: ChainId, typeName: String): XcmVersion? {
