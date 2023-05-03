@@ -7,9 +7,7 @@ import android.view.Gravity
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatTextView
 import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.dpF
-import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.px
 import io.novafoundation.nova.common.utils.setDrawableEnd

@@ -6,7 +6,6 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.period.StackingPeriod
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -22,7 +21,7 @@ class StakingPeriodViewModel : BaseViewModel() {
 
     init {
         launch {
-            //retrieve current state from repository
+            // retrieve current state from repository
         }
     }
 
@@ -31,7 +30,6 @@ class StakingPeriodViewModel : BaseViewModel() {
     }
 
     fun onSaveClick() {
-
     }
 
     private fun mapIdResToStackingPeriod(@IdRes idRes: Int): StackingPeriod {
@@ -60,6 +58,6 @@ class StakingPeriodViewModel : BaseViewModel() {
     }
 
     fun backClicked() {
-        //TODO
+        // TODO
     }
 }
