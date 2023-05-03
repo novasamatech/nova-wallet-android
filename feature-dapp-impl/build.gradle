@@ -15,8 +15,6 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/dapps/dapps_dev.json\""
-
-        buildConfigField "String", "WALLET_CONNECT_PROJECT_ID", readSecret("WALLET_CONNECT_PROJECT_ID")
     }
 
     buildTypes {
