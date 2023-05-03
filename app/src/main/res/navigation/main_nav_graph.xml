@@ -388,6 +388,14 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_mainFragment_to_staking_periods"
+            app:destination="@id/stakingPeriods"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -1093,6 +1101,11 @@
             app:popExitAnim="@anim/fragment_close_exit"
             app:popUpTo="@id/mainFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/stakingPeriods"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.period.StakingPeriodFragment"
+        android:label="StakingPeriodFragment" />
 
     <include app:graph="@navigation/manage_tokens_graph" />
 

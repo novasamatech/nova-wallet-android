@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="staking_period_all_short">All</string>
+    <string name="staking_period_week_short">7D</string>
+    <string name="staking_period_month_short">30D</string>
+    <string name="staking_period_quarter_short">3M</string>
+    <string name="staking_period_half_year_short">6M</string>
+    <string name="staking_period_year_short">1Y</string>
+    <string name="staking_period_custom_short">%sD</string>
+
+    <!--<string name="staking_your_rewards">Your rewards</string>-->
+    <string name="staking_your_rewards">Rewards</string>
+
     <string name="stacking_period_title">Show staking rewards for</string>
     <string name="stacking_period_all_time">All time</string>
     <string name="stacking_period_week">Last 7 days (7D)</string>
@@ -1280,7 +1292,6 @@
     <string name="staking_your_not_allocated_description_v2_2_0">Active validators without your stake assignment</string>
     <string name="staking_your_not_elected_format">Not elected (%s)</string>
     <string name="staking_your_oversubscribed_message">Your tokens are allocated to the oversubscribed validators. You will not receive rewards in this era.</string>
-    <string name="staking_your_rewards">Your rewards</string>
     <string name="staking_your_stake">Your stake</string>
     <string name="staking_your_validators">Your validators</string>
     <string name="staking_your_validators_changing_title">Your validators will change in the next era.</string>

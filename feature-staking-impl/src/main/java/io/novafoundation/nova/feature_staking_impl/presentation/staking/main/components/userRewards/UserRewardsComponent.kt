@@ -12,8 +12,15 @@ typealias UserRewardsComponent = StatefullComponent<UserRewardsState, UserReward
 
 typealias UserRewardsState = LoadingState<AmountModel>
 
-typealias UserRewardsAction = Nothing
-typealias UserRewardsEvent = Nothing
+sealed class UserRewardsEvent {
+
+    object UserRewardPeriodClicked : UserRewardsEvent()
+}
+
+sealed class UserRewardsAction {
+
+    object UserRewardPeriodClicked : UserRewardsAction()
+}
 
 class UserRewardsComponentFactory(
     private val relaychainComponentFactory: RelaychainUserRewardsComponentFactory,

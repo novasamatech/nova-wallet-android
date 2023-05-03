@@ -11,12 +11,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class CustomPeriod(
-    val start: String?,
-    val end: String?,
-    val isEndVisible: Boolean,
-)
-
 class StakingPeriodViewModel : BaseViewModel() {
 
     private val _selectedPeriod: MutableStateFlow<StackingPeriod> = MutableStateFlow(StackingPeriod.AllTime)
@@ -24,21 +18,7 @@ class StakingPeriodViewModel : BaseViewModel() {
         .map { mapStackingPeriodToIdRes(it) }
         .shareInBackground()
 
-    private val _alwaysTodayEndPeriodEnabled: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val alwaysTodayEndPeriodEnabled: Flow<Boolean> = _alwaysTodayEndPeriodEnabled
-
-    private val _customPeriod: MutableStateFlow<StackingPeriod.Custom?> = MutableStateFlow(null)
-
-    val customPeriod: Flow<CustomPeriod?> = combine(
-        _alwaysTodayEndPeriodEnabled,
-        _selectedPeriod
-    ) { alwaysTodayEndPeriodEnabled, selectedPeriod ->
-
-    }
-
     val saveButtonEnabledState: Flow<Boolean> = emptyFlow()
-
-    private val oldCustomPeriod: StackingPeriod.Custom? = null
 
     init {
         launch {
@@ -62,7 +42,7 @@ class StakingPeriodViewModel : BaseViewModel() {
             R.id.quarterStackingPeriod -> StackingPeriod.Quarter
             R.id.halfYearStackingPeriod -> StackingPeriod.HalfYear
             R.id.yearStackingPeriod -> StackingPeriod.Year
-            R.id.customStackingPeriod -> StackingPeriod.Custom("", "")
+            R.id.customStackingPeriod -> TODO()
             else -> throw IllegalArgumentException("Unknown idRes: $idRes")
         }
     }
@@ -77,5 +57,9 @@ class StakingPeriodViewModel : BaseViewModel() {
             StackingPeriod.Year -> R.id.yearStackingPeriod
             is StackingPeriod.Custom -> R.id.customStackingPeriod
         }
+    }
+
+    fun backClicked() {
+        //TODO
     }
 }

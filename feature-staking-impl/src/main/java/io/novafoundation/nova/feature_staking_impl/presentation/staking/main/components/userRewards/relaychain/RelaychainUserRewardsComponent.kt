@@ -39,7 +39,6 @@ class RelaychainUserRewardsComponentFactory(
 private class RelaychainUserRewardsComponent(
     private val stakingInteractor: StakingInteractor,
     private val stakingSharedComputation: StakingSharedComputation,
-
     private val assetWithChain: ChainWithAsset,
     private val hostContext: ComponentHostContext,
 ) : BaseRewardComponent(hostContext) {

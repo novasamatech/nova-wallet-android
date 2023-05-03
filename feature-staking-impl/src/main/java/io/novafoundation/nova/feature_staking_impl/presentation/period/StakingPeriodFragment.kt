@@ -33,6 +33,7 @@ class StakingPeriodFragment : BaseFragment<StakingPeriodViewModel>() {
     override fun initViews() {
         stackingPeriodToolbar.applyStatusBarInsets()
         stackingPeriodToolbar.setRightActionClickListener { viewModel.onSaveClick() }
+        stackingPeriodToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         stackingPeriodGroup.setOnCheckedChangeListener { _, checkedId ->
             viewModel.onPeriodChanged(checkedId)
@@ -50,19 +51,8 @@ class StakingPeriodFragment : BaseFragment<StakingPeriodViewModel>() {
     }
 
     override fun subscribe(viewModel: StakingPeriodViewModel) {
-        customStackingPeriodAlwaysToday.bindTo(viewModel.alwaysTodayEndPeriodEnabled, viewLifecycleOwner.lifecycleScope)
-
         viewModel.saveButtonEnabledState.observe {
             stackingPeriodToolbar.setRightActionEnabled(it)
-        }
-
-        viewModel.customPeriod.observe {
-            customPeriodSettings.isVisible = it != null
-            if (it != null) {
-                customStackingPeriodStart.valuePrimary.text = it.start
-                customStackingPeriodEnd.isVisible = it.end != null
-                customStackingPeriodEnd.valuePrimary.text = it.end
-            }
         }
     }
 }
