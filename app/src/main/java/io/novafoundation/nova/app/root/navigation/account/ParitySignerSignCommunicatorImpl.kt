@@ -1,7 +1,7 @@
 package io.novafoundation.nova.app.root.navigation.account
 
 import io.novafoundation.nova.app.R
-import io.novafoundation.nova.app.root.navigation.BaseInterScreenCommunicator
+import io.novafoundation.nova.app.root.navigation.NavStackInterScreenCommunicator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.getBackStackEntryBefore
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator.Request
@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.Pari
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.show.ShowSignParitySignerFragment
 
 class ParitySignerSignCommunicatorImpl(navigationHolder: NavigationHolder) :
-    BaseInterScreenCommunicator<Request, Response>(navigationHolder), ParitySignerSignCommunicator {
+    NavStackInterScreenCommunicator<Request, Response>(navigationHolder), ParitySignerSignCommunicator {
 
     override fun respond(response: Response) {
         val requester = navController.getBackStackEntryBefore(R.id.showSignParitySignerFragment)
@@ -19,8 +19,9 @@ class ParitySignerSignCommunicatorImpl(navigationHolder: NavigationHolder) :
     }
 
     override fun openRequest(request: Request) {
-        val bundle = ShowSignParitySignerFragment.getBundle(request)
+        super.openRequest(request)
 
+        val bundle = ShowSignParitySignerFragment.getBundle(request)
         navController.navigate(R.id.action_open_sign_parity_signer, bundle)
     }
 }

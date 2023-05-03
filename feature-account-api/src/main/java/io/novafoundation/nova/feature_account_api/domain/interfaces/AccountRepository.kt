@@ -4,6 +4,7 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.domain.model.Account
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
@@ -32,6 +33,8 @@ interface AccountRepository {
 
     suspend fun getMetaAccount(metaId: Long): MetaAccount
 
+    fun metaAccountFlow(metaId: Long): Flow<MetaAccount>
+
     fun selectedMetaAccountFlow(): Flow<MetaAccount>
 
     suspend fun findMetaAccount(accountId: ByteArray): MetaAccount?
@@ -40,9 +43,13 @@ interface AccountRepository {
 
     suspend fun allMetaAccounts(): List<MetaAccount>
 
+    suspend fun allLightMetaAccounts(): List<LightMetaAccount>
+
     fun allMetaAccountsFlow(): Flow<List<MetaAccount>>
 
     fun metaAccountBalancesFlow(): Flow<List<MetaAccountAssetBalance>>
+
+    fun metaAccountBalancesFlow(metaId: Long): Flow<List<MetaAccountAssetBalance>>
 
     suspend fun selectMetaAccount(metaId: Long)
 

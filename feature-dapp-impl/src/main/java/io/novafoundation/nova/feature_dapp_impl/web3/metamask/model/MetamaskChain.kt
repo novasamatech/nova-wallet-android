@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.metamask.model
 
 import android.os.Parcelable
+import io.novafoundation.nova.common.utils.removeHexPrefix
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -32,3 +33,5 @@ data class MetamaskChain(
         val decimals: Int
     ) : Parcelable
 }
+
+fun MetamaskChain.chainIdInt(): Int = chainId.removeHexPrefix().toInt(16)

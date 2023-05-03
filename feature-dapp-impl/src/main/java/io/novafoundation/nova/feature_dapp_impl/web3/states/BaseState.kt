@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Transport
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
-import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.AuthorizeDAppPayload
+import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import kotlinx.coroutines.flow.first
 
 abstract class BaseState<R : Web3Transport.Request<*>, S>(
@@ -53,7 +53,7 @@ abstract class BaseState<R : Web3Transport.Request<*>, S>(
 
         val dAppIdentifier = dAppInfo.metadata?.name ?: dAppInfo.baseUrl
 
-        val action = AuthorizeDAppPayload(
+        val action = AuthorizeDappBottomSheet.Payload(
             title = resourceManager.getString(
                 io.novafoundation.nova.feature_dapp_impl.R.string.dapp_confirm_authorize_title_format,
                 dAppIdentifier

@@ -20,10 +20,10 @@ import io.novafoundation.nova.feature_dapp_impl.data.repository.RealBrowserHostS
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserViewModel
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
+import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 
 @Module(includes = [ViewModelModule::class])
 class DAppBrowserModule {
@@ -64,7 +64,7 @@ class DAppBrowserModule {
         router: DAppRouter,
         interactor: DappBrowserInteractor,
         selectedAccountUseCase: SelectedAccountUseCase,
-        signRequester: DAppSignCommunicator,
+        signRequester: ExternalSignCommunicator,
         searchRequester: DAppSearchCommunicator,
         initialUrl: String,
         extensionStoreFactory: ExtensionStoreFactory,

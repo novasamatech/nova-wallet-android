@@ -7,8 +7,8 @@
 
     <fragment
         android:id="@+id/profileFragment"
-        tools:layout="@layout/fragment_profile"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.settings.SettingsFragment"
+        tools:layout="@layout/fragment_settings"
+        android:name="io.novafoundation.nova.feature_settings_impl.presentation.settings.SettingsFragment"
         android:label="ProfileFragment" />
 
     <fragment

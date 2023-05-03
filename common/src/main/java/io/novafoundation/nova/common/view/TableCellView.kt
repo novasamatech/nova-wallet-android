@@ -52,7 +52,7 @@ open class TableCellView @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyle, defStyleRes), HasDivider {
 
     enum class FieldStyle {
-        TEXT, LINK
+        TEXT, LINK, POSITIVE
     }
 
     companion object {
@@ -110,6 +110,13 @@ open class TableCellView @JvmOverloads constructor(
         image.makeVisible()
     }
 
+    fun setImage(@DrawableRes src: Int, sizeDp: Int) {
+        image.load(src) {
+            size(sizeDp.dp(context))
+        }
+        image.makeVisible()
+    }
+
     fun loadImage(
         url: String?,
         @DrawableRes placeholderRes: Int? = null,
@@ -150,6 +157,9 @@ open class TableCellView @JvmOverloads constructor(
             }
             FieldStyle.LINK -> {
                 valuePrimary.setTextColor(context.getAccentColor())
+            }
+            FieldStyle.POSITIVE -> {
+                valuePrimary.setTextColorRes(R.color.text_positive)
             }
         }
     }

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:background="@color/secondary_screen_background">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/wcSessionDetailsToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:titleText="@string/wallet_connect_title" />
+
+    <ImageView
+        android:id="@+id/wcSessionDetailsIcon"
+        style="@style/Widget.Nova.Icon.Big"
+        android:layout_marginTop="32dp"
+        tools:src="@drawable/ic_earth" />
+
+    <TextView
+        android:id="@+id/wcSessionDetailsTitle"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center_horizontal"
+        android:textColor="@color/text_primary"
+        tools:text="1inch dApp" />
+
+    <io.novafoundation.nova.common.view.TableView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="24dp">
+
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/wcSessionDetailsWallet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/tabbar_wallet_title" />
+
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/wcSessionDetailsDApp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/dapp_dapp" />
+
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/wcSessionDetailsNetworks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/common_networks" />
+
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/wcSessionDetailsStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryValueStyle="positive"
+            app:title="@string/common_status" />
+
+    </io.novafoundation.nova.common.view.TableView>
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/wcSessionDetailsDisconnect"
+        style="@style/Widget.Nova.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/common_disconnect"
+        app:appearance="primaryNegative" />
+</LinearLayout>

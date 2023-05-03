@@ -8,7 +8,10 @@ import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.MetamaskInteractor
 import io.novafoundation.nova.feature_dapp_impl.web3.accept
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChain
-import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskSendTransactionRequest
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskPersonalSignMessage
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskTransaction
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskTypedMessage
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.chainIdInt
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskError
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskTransportRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
@@ -18,6 +21,14 @@ import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMa
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.StateMachineTransition
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3StateMachineHost
 import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxResponse
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmChain
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmChainSource
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmChainSource.UnknownChainOptions
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmPersonalSignMessage
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmSignPayload
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmTransaction
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmTypedMessage
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 
@@ -94,11 +105,10 @@ class DefaultMetamaskState(
         request: MetamaskTransportRequest.PersonalSign,
         selectedAddress: String
     ) {
-        val hostApiConfirmRequest = MetamaskSendTransactionRequest(
+        val hostApiConfirmRequest = ExternalSignRequest.Evm(
             id = request.id,
-            payload = MetamaskSendTransactionRequest.Payload.PersonalSign(
-                message = request.message,
-                chain = chain,
+            payload = EvmSignPayload.PersonalSign(
+                message = mapMetamaskPersonalSignMessageToEvm(request.message),
                 originAddress = selectedAddress
             )
         )
@@ -110,11 +120,10 @@ class DefaultMetamaskState(
         request: MetamaskTransportRequest.SignTypedMessage,
         selectedAddress: String
     ) {
-        val hostApiConfirmRequest = MetamaskSendTransactionRequest(
+        val hostApiConfirmRequest = ExternalSignRequest.Evm(
             id = request.id,
-            payload = MetamaskSendTransactionRequest.Payload.SignTypedMessage(
-                message = request.message,
-                chain = chain,
+            payload = EvmSignPayload.SignTypedMessage(
+                message = mapMetamaskTypedMessageToEvm(request.message),
                 originAddress = selectedAddress
             )
         )
@@ -134,12 +143,16 @@ class DefaultMetamaskState(
             return
         }
 
-        val hostApiConfirmRequest = MetamaskSendTransactionRequest(
+        val hostApiConfirmRequest = ExternalSignRequest.Evm(
             id = request.id,
-            payload = MetamaskSendTransactionRequest.Payload.SendTx(
-                transaction = request.transaction,
-                chain = chain,
-                originAddress = selectedAddress
+            payload = EvmSignPayload.ConfirmTx(
+                transaction = mapMetamaskTransactionToEvm(request.transaction),
+                chainSource = EvmChainSource(
+                    evmChainId = chain.chainIdInt(),
+                    unknownChainOptions = UnknownChainOptions.WithFallBack(mapMetamaskChainToEvmChain(chain))
+                ),
+                originAddress = selectedAddress,
+                action = EvmSignPayload.ConfirmTx.Action.SEND,
             )
         )
 
@@ -163,7 +176,7 @@ class DefaultMetamaskState(
 
     private suspend fun confirmOperation(
         metamaskRequest: MetamaskTransportRequest<String>,
-        hostApiConfirmRequest: MetamaskSendTransactionRequest
+        hostApiConfirmRequest: ExternalSignRequest.Evm
     ) {
         when (val response = hostApi.confirmTx(hostApiConfirmRequest)) {
             is ConfirmTxResponse.Rejected -> metamaskRequest.reject(MetamaskError.Rejected())
@@ -224,6 +237,50 @@ class DefaultMetamaskState(
             }
         } else {
             request.reject(MetamaskError.Rejected())
+        }
+    }
+
+    private fun mapMetamaskChainToEvmChain(metamaskChain: MetamaskChain): EvmChain {
+        return with(metamaskChain) {
+            EvmChain(
+                chainId = chainId,
+                chainName = chainName,
+                nativeCurrency = with(nativeCurrency) {
+                    EvmChain.NativeCurrency(
+                        name = name,
+                        symbol = symbol,
+                        decimals = decimals
+                    )
+                },
+                rpcUrl = rpcUrls.first(),
+                iconUrl = iconUrls?.firstOrNull()
+            )
+        }
+    }
+
+    private fun mapMetamaskTransactionToEvm(metamaskTransaction: MetamaskTransaction): EvmTransaction {
+        return with(metamaskTransaction) {
+            EvmTransaction.Struct(
+                gas = gas,
+                gasPrice = gasPrice,
+                from = from,
+                to = to,
+                data = data,
+                value = value,
+                nonce = nonce
+            )
+        }
+    }
+
+    private fun mapMetamaskPersonalSignMessageToEvm(personalSignMessage: MetamaskPersonalSignMessage): EvmPersonalSignMessage {
+        return with(personalSignMessage) {
+            EvmPersonalSignMessage(data = data)
+        }
+    }
+
+    private fun mapMetamaskTypedMessageToEvm(typedMessage: MetamaskTypedMessage): EvmTypedMessage {
+        return with(typedMessage) {
+            EvmTypedMessage(data = data, raw = raw)
         }
     }
 }
