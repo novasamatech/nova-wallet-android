@@ -66,7 +66,7 @@ class SetControllerFragment : BaseFragment<SetControllerViewModel>() {
             AccountChooserBottomSheetDialog(
                 context = requireContext(),
                 payload = it.payload,
-                onSuccess = it.onSuccess,
+                onSuccess = { _, item -> it.onSuccess(item) },
                 onCancel = it.onCancel,
                 title = R.string.staking_controller_account
             ).show()

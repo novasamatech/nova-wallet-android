@@ -39,6 +39,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import jp.co.soramitsu.fearless_utils.icon.IconGenerator
 import java.util.Random
 import javax.inject.Named
@@ -103,6 +104,8 @@ interface AccountFeatureDependencies {
     fun updateNotificationsInteractor(): UpdateNotificationsInteractor
 
     fun safeModeService(): SafeModeService
+
+    fun web3NamesInteractor(): Web3NamesInteractor
 
     val systemCallExecutor: SystemCallExecutor
 
