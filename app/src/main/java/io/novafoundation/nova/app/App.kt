@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
-import io.novafoundation.nova.feature_dapp_impl.BuildConfig
+import io.novafoundation.nova.feature_wallet_connect_impl.BuildConfig
 import javax.inject.Inject
 
 open class App : Application(), FeatureContainer {
