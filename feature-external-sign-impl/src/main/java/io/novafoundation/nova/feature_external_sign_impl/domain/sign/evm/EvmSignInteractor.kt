@@ -20,7 +20,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
-import io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.sign.asEthereumPersonalSignMessage
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_external_sign_api.model.failedSigningIfNotCancelled
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
