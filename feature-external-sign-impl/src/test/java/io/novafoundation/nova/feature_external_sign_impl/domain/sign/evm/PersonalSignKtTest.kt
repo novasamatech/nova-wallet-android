@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.sign
+package io.novafoundation.nova.feature_external_sign_impl.domain.sign.evm
 
 import org.junit.Assert.assertArrayEquals
 import org.junit.Test
