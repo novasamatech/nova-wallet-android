@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+
+    <string name="referenda_filters_header">Show</string>
+    <string name="referenda_filters_all">All referenda</string>
+    <string name="referenda_filters_not_voted">Not voted</string>
+    <string name="referenda_filters_voted">Voted</string>
+    <string name="common_filters">Filters</string>
+
+    <string name="referenda_title">Referenda</string>
+    <string name="referenda_search_toolbar_hint">Search by referendum title or ID</string>
+    <string name="referenda_search_placeholder">No referenda with entered title or ID were found</string>
+
+    <string name="send_address_hint">Address or w3n</string>
+
+    <string name="pincode_biometry_dialog_subtitle">Nova Wallet uses fingerprint to restrict unauthorized users from accessing the app</string>
+    <string name="pincode_biometry_dialog_description">Touch the fingerprint sensor</string>
+
     <string name="staking_period_select_date">Select date</string>
     <string name="staking_period_start_date_picker_title">Select start date</string>
     <string name="staking_period_end_date_picker_title">Select end date</string>
@@ -32,11 +48,26 @@
     <string name="settings_pin_code_verification_confirmation_title">Ask authentication for operation signing</string>
     <string name="settings_pin_code_verification_confirmation_message">Each sign operation on wallets with key pair (created in nova wallet or imported) should require PIN verification before constructing signature</string>
 
+    <string name="biometric_auth_title">Biometric auth</string>
     <string name="profile_settings_pin_code_verification_title">Approve with PIN</string>
+
 
     <string name="ethereum_function">Function</string>
     <string name="ethereum_contract">Contract</string>
     <string name="ethereum_contract_call">Contract call</string>
+
+    <string name="web3names_integrity_check_failed_title">Integrity check failed</string>
+    <string name="web3names_integrity_check_failed_message">Nova detected issues with integrity of information about %1$s addresses. Please contact owner of %1$s to resolve integrity issues.</string>
+
+    <string name="web3names_unsupported_asset_title">Token %s is not supported yet</string>
+    <string name="web3names_unsupported_asset_message">Nova can\'t resolve code for token %s</string>
+    <string name="web3names_address_with_description">%s (%s)</string>
+    <string name="web3names_invalid_recepient_title">Invalid recipient</string>
+    <string name="web3names_service_unavailable_title">Error resolving w3n</string>
+    <string name="web3names_service_unavailable_message">%1$s w3n services are unavailable. Try again later or enter the %1$s address manually</string>
+    <string name="web3names_recepient_not_found_message">%s not found</string>
+    <string name="web3names_no_valid_recepient_found_message">No valid address was found for %s on the %s network</string>
+    <string name="web3names_identifiers_sheet_title">%s addresses for %s</string>
 
     <string name="common_no_app_to_handle_intent">No suitable app found on device to handle this intent</string>
 

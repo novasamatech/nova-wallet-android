@@ -102,6 +102,7 @@ interface WithContextExtensions {
         get() = dp(providedContext)
 
     fun addRipple(to: Drawable, mask: Drawable? = getRippleMask()) = providedContext.addRipple(to, mask)
+
     fun Drawable.withRippleMask(mask: Drawable = getRippleMask()) = addRipple(this, mask)
 
     fun getRoundedCornerDrawable(

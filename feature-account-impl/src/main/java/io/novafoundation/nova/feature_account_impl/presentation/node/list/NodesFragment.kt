@@ -63,7 +63,9 @@ class NodesFragment : BaseFragment<NodesViewModel>(), NodesAdapter.NodeItemHandl
         }
 
         viewModel.showAccountChooserLiveData.observeEvent {
-            AccountChooserBottomSheetDialog(requireActivity(), it, viewModel::accountSelected).show()
+            AccountChooserBottomSheetDialog(requireActivity(), it) { _, item ->
+                viewModel.accountSelected(item)
+            }.show()
         }
 
         viewModel.editMode.observe(adapter::switchToEdit)

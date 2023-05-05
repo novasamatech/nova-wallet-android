@@ -97,6 +97,13 @@ fun <T> Result<T>.requireException() = exceptionOrNull()!!
 
 fun <T> Result<T>.requireValue() = getOrThrow()!!
 
+fun <T> Result<T>.mapFailure(transform: (Throwable) -> Throwable): Result<T> {
+    return when {
+        isFailure -> Result.failure(transform(requireException()))
+        else -> this
+    }
+}
+
 fun InputStream.readText() = bufferedReader().use { it.readText() }
 
 fun <T> List<T>.second() = get(1)

@@ -41,7 +41,7 @@ fun BaseFragment<*>.setupBuyIntegration(
         BuyProviderChooserBottomSheet(
             context = requireContext(),
             payload = action.payload,
-            onSelect = action.onSuccess,
+            onSelect = { _, item -> action.onSuccess(item) },
             onCancel = action.onCancel
         ).show()
     }

@@ -4,8 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.sendEmailIntent
@@ -16,6 +19,7 @@ import kotlinx.android.synthetic.main.fragment_profile.accountView
 import kotlinx.android.synthetic.main.fragment_profile.settingsSafeMode
 import kotlinx.android.synthetic.main.fragment_profile.settingsAppVersion
 import kotlinx.android.synthetic.main.fragment_profile.settingsAvatar
+import kotlinx.android.synthetic.main.fragment_profile.settingsBiometricAuth
 import kotlinx.android.synthetic.main.fragment_profile.settingsContainer
 import kotlinx.android.synthetic.main.fragment_profile.settingsCurrency
 import kotlinx.android.synthetic.main.fragment_profile.settingsEmail
@@ -66,6 +70,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         settingsEmail.setOnClickListener { viewModel.emailClicked() }
         settingsRateUs.setOnClickListener { viewModel.rateUsClicked() }
 
+        settingsBiometricAuth.setOnClickListener { viewModel.changeBiometricAuth() }
         settingsPinCodeVerification.setOnClickListener { viewModel.changePincodeVerification() }
         settingsSafeMode.setOnClickListener { viewModel.changeSafeMode() }
         settingsPin.setOnClickListener { viewModel.changePinCodeClicked() }
@@ -84,7 +89,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
     }
 
     override fun subscribe(viewModel: SettingsViewModel) {
-        setupSettingsConfirmationDialog(viewModel.confirmationAwaitableAction)
+        setupConfirmationDialog(viewModel.confirmationAwaitableAction)
         observeBrowserEvents(viewModel)
 
         viewModel.selectedWalletModel.observe {
@@ -102,6 +107,18 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
             settingsLanguage.setValue(it.displayName)
         }
 
+        viewModel.showBiometricEvent.observeEvent {
+            settingsBiometricAuth.isVisible = it
+        }
+
+        viewModel.biometricAuthStatus.observe {
+            settingsBiometricAuth.setChecked(it)
+        }
+
+        viewModel.biometricEvents.observe {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+        }
+
         viewModel.pinCodeVerificationStatus.observe {
             settingsPinCodeVerification.setChecked(it)
         }
@@ -113,5 +130,10 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         viewModel.appVersionFlow.observe(settingsAppVersion::setText)
 
         viewModel.openEmailEvent.observeEvent { requireContext().sendEmailIntent(it) }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onPause()
     }
 }

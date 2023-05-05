@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.presentation.SearchState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.common.utils.showSoftKeyboard
+import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter

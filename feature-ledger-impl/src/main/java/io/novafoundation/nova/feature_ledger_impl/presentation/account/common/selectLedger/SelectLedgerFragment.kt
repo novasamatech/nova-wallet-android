@@ -83,7 +83,7 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
         }
 
         viewModel.showRequestLocationDialog.observe {
-            dialog(requireContext(), R.style.AccentPositiveAlertDialogTheme) {
+            dialog(requireContext(), R.style.AccentAlertDialogTheme) {
                 setTitle(R.string.select_ledger_location_enable_request_title)
                 setMessage(getString(R.string.select_ledger_location_enable_request_message))
                 setPositiveButton(R.string.common_enable) { _, _ -> viewModel.enableLocation() }
