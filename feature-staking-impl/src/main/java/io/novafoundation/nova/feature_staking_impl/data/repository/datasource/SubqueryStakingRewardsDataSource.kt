@@ -34,7 +34,7 @@ class SubqueryStakingRewardsDataSource(
         val end = rewardPeriod.getEndDate()?.timestamp()
 
         val response = stakingApi.getTotalReward(
-            url = "https://api.subquery.network/sq/nova-wallet/nova-wallet-kusama__bm92Y",//stakingExternalApi.url,
+            url = stakingExternalApi.url,
             body = StakingSumRewardRequest(accountAddress = accountAddress, startTimestamp = start, endTimestamp = end)
         )
         val totalResult = response.data.totalReward
@@ -67,5 +67,4 @@ class SubqueryStakingRewardsDataSource(
             is RewardPeriod.TimePoint.ThresholdOffset -> throw IllegalStateException()
         }
     }
-
 }

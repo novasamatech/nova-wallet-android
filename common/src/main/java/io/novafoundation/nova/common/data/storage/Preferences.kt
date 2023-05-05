@@ -1,6 +1,5 @@
 package io.novafoundation.nova.common.data.storage
 
-import android.content.SharedPreferences
 import io.novafoundation.nova.core.model.Language
 import kotlinx.coroutines.flow.Flow
 
@@ -59,5 +58,4 @@ interface Editor {
     fun remove(field: String)
 
     fun apply()
-
 }

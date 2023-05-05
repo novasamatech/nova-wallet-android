@@ -4,15 +4,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeInvisible
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
-import io.novafoundation.nova.feature_staking_impl.domain.period.getPeriodMillis
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import java.util.concurrent.TimeUnit
 import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsContentGroup
 import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsFiatAmount
 import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsFiatAmountShimmer

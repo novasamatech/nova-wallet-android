@@ -14,4 +14,3 @@ val SubQueryTotalRewardResponse.totalReward: BigInteger
         val start = start.nodes.firstOrNull()?.accumulatedAmount ?: return BigInteger.ZERO
         return end - start
     }
-

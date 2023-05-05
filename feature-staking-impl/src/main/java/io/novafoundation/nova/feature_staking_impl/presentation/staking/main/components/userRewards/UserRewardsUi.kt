@@ -2,14 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
-import io.novafoundation.nova.feature_staking_impl.domain.period.getPeriodMillis
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.UserRewardsView
-import java.util.concurrent.TimeUnit
 
 fun BaseFragment<*>.setupUserRewardsComponent(component: UserRewardsComponent, view: UserRewardsView, router: StakingRouter) {
     view.setOnRewardPeriodClickedListener {

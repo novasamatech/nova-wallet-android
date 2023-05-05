@@ -7,7 +7,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 
-
 class StakingRewardsRepository(
     private val stakingRewardsDataSource: StakingRewardsDataSource,
 ) {

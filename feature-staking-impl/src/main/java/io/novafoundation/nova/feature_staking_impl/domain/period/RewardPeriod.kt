@@ -36,7 +36,6 @@ sealed class RewardPeriod(
         data class Threshold(val millis: Long) : TimePoint
 
         data class ThresholdOffset(val millis: Long) : TimePoint
-
     }
 }
 
