@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.utils
 
 import android.widget.CompoundButton
+import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.EditText
 import android.widget.RadioGroup
 import androidx.lifecycle.LifecycleCoroutineScope
@@ -282,6 +283,26 @@ inline fun <R> MutableStateFlow<Boolean>.withFlagSet(action: () -> R): R {
     value = false
 
     return result
+}
+
+
+fun CompoundButton.bindTo(flow: Flow<Boolean>, scope: CoroutineScope, callback: (Boolean) -> Unit) {
+    var oldValue = isChecked
+
+    scope.launch {
+        flow.collect { newValue ->
+            if (isChecked != newValue) {
+                isChecked = newValue
+            }
+        }
+    }
+
+    setOnCheckedChangeListener { _, newValue ->
+        if (oldValue != newValue) {
+            callback(newValue)
+            oldValue = newValue
+        }
+    }
 }
 
 fun CompoundButton.bindTo(flow: MutableStateFlow<Boolean>, scope: CoroutineScope) {

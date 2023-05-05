@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
+import android.content.SharedPreferences
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -21,20 +22,25 @@ import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.turing.repository.RealTuringStakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.LocalBagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealParasRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealSessionRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.StakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRepositoryImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.AuraSession
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.BabeSession
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.ElectionsSessionRegistry
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.RealElectionsSessionRegistry
+import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.RealStakingRewardPeriodDataSource
+import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingRewardPeriodDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSourceImpl
@@ -44,6 +50,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteracto
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.payout.PayoutInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.period.RealStakingRewardPeriodInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
@@ -207,6 +215,7 @@ class StakingFeatureModule {
         stakingSharedComputation: StakingSharedComputation,
         bagListRepository: BagListRepository,
         totalIssuanceRepository: TotalIssuanceRepository,
+        stakingPeriodRepository: StakingPeriodRepository
     ) = StakingInteractor(
         walletRepository,
         accountRepository,
@@ -220,7 +229,8 @@ class StakingFeatureModule {
         factory,
         stakingSharedComputation,
         bagListRepository,
-        totalIssuanceRepository
+        totalIssuanceRepository,
+        stakingPeriodRepository
     )
 
     @Provides
@@ -474,4 +484,22 @@ class StakingFeatureModule {
     fun provideCompoundStatefullComponent(
         sharedState: StakingSharedState,
     ) = CompoundStakingComponentFactory(sharedState)
+
+    @Provides
+    @FeatureScope
+    fun provideStakingRewardPeriodDataSource(
+        preferences: Preferences
+    ): StakingRewardPeriodDataSource = RealStakingRewardPeriodDataSource(preferences)
+
+    @Provides
+    @FeatureScope
+    fun provideStakingPeriodRepository(
+        dataSource: StakingRewardPeriodDataSource
+    ): StakingPeriodRepository = RealStakingPeriodRepository(dataSource)
+
+    @Provides
+    @FeatureScope
+    fun provideStakingRewardInteractor(
+        repository: StakingPeriodRepository
+    ): StakingRewardPeriodInteractor = RealStakingRewardPeriodInteractor(repository)
 }

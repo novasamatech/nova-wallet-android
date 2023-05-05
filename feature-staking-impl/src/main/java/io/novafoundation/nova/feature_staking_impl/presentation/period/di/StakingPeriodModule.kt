@@ -8,6 +8,9 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.period.StakingPeriodViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -16,8 +19,16 @@ class StakingPeriodModule {
     @Provides
     @IntoMap
     @ViewModelKey(StakingPeriodViewModel::class)
-    fun provideViewModel(): ViewModel {
-        return StakingPeriodViewModel()
+    fun provideViewModel(
+        stakingRewardPeriodInteractor: StakingRewardPeriodInteractor,
+        resourceManager: ResourceManager,
+        stakingRouter: StakingRouter
+    ): ViewModel {
+        return StakingPeriodViewModel(
+            stakingRewardPeriodInteractor,
+            resourceManager,
+            stakingRouter
+        )
     }
 
     @Provides
