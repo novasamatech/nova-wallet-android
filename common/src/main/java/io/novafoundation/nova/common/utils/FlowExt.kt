@@ -290,6 +290,7 @@ fun CompoundButton.bindTo(flow: Flow<Boolean>, scope: CoroutineScope, callback: 
     scope.launch {
         flow.collect { newValue ->
             if (isChecked != newValue) {
+                oldValue = newValue
                 isChecked = newValue
             }
         }
@@ -297,8 +298,8 @@ fun CompoundButton.bindTo(flow: Flow<Boolean>, scope: CoroutineScope, callback: 
 
     setOnCheckedChangeListener { _, newValue ->
         if (oldValue != newValue) {
-            callback(newValue)
             oldValue = newValue
+            callback(newValue)
         }
     }
 }
