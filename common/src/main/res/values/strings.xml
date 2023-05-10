@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <!--<string name="pincode_fingerprint_switch_dialog_title">Use biometric to authorize</string>-->
+    <string name="pincode_biometric_switch_dialog_title">Use biometric to authorize</string>
+
+    <!--<string name="pincode_fingerprint_error">You are not authorized. Try another finger.</string>-->
+    <string name="pincode_biometric_error">You are not authorized. Try again, please.</string> <!--changed id and value-->
+
     <string name="common_settings">Settings</string>
     <string name="settings_biometric_not_ready_title">Biometrics disabled in Settings</string>
     <string name="settings_biometric_not_ready_message">Please, make sure Nova has access to biometrics in Settings</string>
@@ -18,7 +24,6 @@
     <string name="send_address_hint">Address or w3n</string>
 
     <string name="pincode_biometry_dialog_subtitle">Nova Wallet uses biometric authentication to restrict unauthorized users from accessing the app.</string>
-    <string name="pincode_biometry_dialog_description">Touch the fingerprint sensor</string>
 
     <string name="settings_pin_code_verification_confirmation_title">Ask authentication for operation signing</string>
     <string name="settings_pin_code_verification_confirmation_message">Each sign operation on wallets with key pair (created in nova wallet or imported) should require PIN verification before constructing signature</string>
@@ -1101,8 +1106,6 @@
     <string name="pincode_confirm_your_pin_code">Confirm your pin code</string>
     <string name="pincode_create_top_title">Create pin code</string>
     <string name="pincode_enter_pin_code_v2_2_0">Enter PIN code</string>
-    <string name="pincode_fingerprint_error">You are not authorized. Try another finger.</string>
-    <string name="pincode_fingerprint_switch_dialog_title">Use biometric to authorize</string>
     <string name="pincode_title_create">Set your pin code</string>
     <string name="profile_accounts_title">Accounts</string>
     <string name="profile_accounts_title_2_0">Wallets</string>
