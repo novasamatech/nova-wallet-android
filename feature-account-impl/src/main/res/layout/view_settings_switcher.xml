@@ -21,7 +21,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:textColor="@color/text_primary"
-        tools:icon="@drawable/approve_with_pin"
+        tools:icon="@drawable/ic_approve_with_pin"
         tools:text="@string/profile_settings_pin_code_verification_title" />
 
 </merge>

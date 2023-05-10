@@ -113,14 +113,14 @@
                 android:id="@+id/settingsBiometricAuth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_android_fingerprint"
+                app:icon="@drawable/ic_authentication"
                 app:title="@string/biometric_auth_title" />
 
             <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsSwitcherView
                 android:id="@+id/settingsPinCodeVerification"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/approve_with_pin"
+                app:icon="@drawable/ic_approve_with_pin"
                 app:title="@string/profile_settings_pin_code_verification_title" />
 
             <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsSwitcherView
