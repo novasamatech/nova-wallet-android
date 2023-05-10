@@ -54,8 +54,6 @@ class SubqueryStakingRewardsDataSource(
     }
 
     private fun RewardPeriod.getStartDate(): Date? {
-        return when (start) {
-            is RewardPeriod.TimePoint.NoThreshold -> null
         if (this is RewardPeriod.OffsetFromCurrent) {
             return Date(System.currentTimeMillis() - this.offsetMillis)
         }
