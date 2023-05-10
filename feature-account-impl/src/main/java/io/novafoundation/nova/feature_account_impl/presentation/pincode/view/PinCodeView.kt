@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.pincode_view.view.btn7
 import kotlinx.android.synthetic.main.pincode_view.view.btn8
 import kotlinx.android.synthetic.main.pincode_view.view.btn9
 import kotlinx.android.synthetic.main.pincode_view.view.btnDelete
-import kotlinx.android.synthetic.main.pincode_view.view.fingerprintBtn
+import kotlinx.android.synthetic.main.pincode_view.view.biometricBtn
 
 class PinCodeView @JvmOverloads constructor(
     context: Context,
@@ -64,16 +64,16 @@ class PinCodeView @JvmOverloads constructor(
 
         btnDelete.setOnClickListener(pinCodeDeleteClickListener)
 
-        fingerprintBtn.setOnClickListener(pinCodeFingerprintClickListener)
+        biometricBtn.setOnClickListener(pinCodeFingerprintClickListener)
 
         updateProgress()
     }
 
-    fun changeFingerPrintButtonVisibility(isVisible: Boolean) {
+    fun changeBimometricButtonVisibility(isVisible: Boolean) {
         if (isVisible) {
-            fingerprintBtn.visibility = View.VISIBLE
+            biometricBtn.visibility = View.VISIBLE
         } else {
-            fingerprintBtn.visibility = View.INVISIBLE
+            biometricBtn.visibility = View.INVISIBLE
         }
     }
 
