@@ -15,6 +15,10 @@ internal class RealWalletConnectSessionsUseCase(
         return sessionRepository.numberOfSessionAccountsFlow()
     }
 
+    override suspend fun activeSessionsNumber(): Int {
+       return sessionRepository.numberOfSessionAccounts()
+    }
+
     override suspend fun syncActiveSessions() = withContext(Dispatchers.Default) {
         val activeSessionTopics = Web3Wallet.getListOfActiveSessions().map { it.topic }
 

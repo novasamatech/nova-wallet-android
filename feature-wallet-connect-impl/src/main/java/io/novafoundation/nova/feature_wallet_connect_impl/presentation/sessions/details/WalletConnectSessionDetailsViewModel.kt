@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.formatChainListOverview
+import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_impl.R
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionDetails
@@ -34,6 +35,7 @@ class WalletConnectSessionDetailsViewModel(
     private val walletUiUseCase: WalletUiUseCase,
     private val walletConnectSessionMapper: WalletConnectSessionMapper,
     private val payload: WalletConnectSessionDetailsPayload,
+    private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
 ) : BaseViewModel() {
 
     private val _showChainBottomSheet = MutableLiveData<Event<List<ChainUi>>>()
@@ -81,8 +83,18 @@ class WalletConnectSessionDetailsViewModel(
     private fun watchSessionDisconnect() {
         sessionFlow
             .distinctUntilChanged()
-            .onEach { if (it == null) exit() }
+            .onEach { if (it == null) closeSessionsScreen() }
             .launchIn(this)
+    }
+
+    private suspend fun closeSessionsScreen() {
+        val numberOfActiveSessions = walletConnectSessionsUseCase.activeSessionsNumber()
+
+        if (numberOfActiveSessions > 0) {
+            router.back()
+        } else {
+            router.backToSettings()
+        }
     }
 
     private suspend fun mapSessionDetailsToUi(session: WalletConnectSessionDetails): WalletConnectSessionDetailsUi {

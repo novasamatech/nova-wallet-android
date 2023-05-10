@@ -21,5 +21,15 @@
     <fragment
         android:id="@+id/walletConnectSessionDetailsFragment"
         android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.details.WalletConnectSessionDetailsFragment"
-        android:label="WalletConnectSessionDetailsFragment" />
+        android:label="WalletConnectSessionDetailsFragment">
+
+        <action
+            android:id="@+id/walletConnectSessionDetailsFragment_to_settings"
+            app:popUpTo="@id/wallet_connect_nav_graph"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
 </navigation>

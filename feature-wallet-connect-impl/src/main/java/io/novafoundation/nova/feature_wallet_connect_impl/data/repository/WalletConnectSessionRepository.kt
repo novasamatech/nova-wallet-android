@@ -19,6 +19,8 @@ interface WalletConnectSessionRepository {
 
     fun numberOfSessionAccountsFlow(): Flow<Int>
 
+    suspend fun numberOfSessionAccounts(): Int
+
     fun sessionAccountFlow(sessionTopic: String): Flow<WalletConnectSessionAccount?>
     suspend fun removeAllSessionsOtherThan(activeSessionTopics: List<String>)
 }
@@ -45,6 +47,10 @@ class RealWalletConnectSessionRepository(
 
     override fun numberOfSessionAccountsFlow(): Flow<Int> {
         return dao.numberOfSessionsFlow()
+    }
+
+    override suspend fun numberOfSessionAccounts(): Int {
+        return dao.numberOfSessions()
     }
 
     override fun sessionAccountFlow(sessionTopic: String): Flow<WalletConnectSessionAccount?> {

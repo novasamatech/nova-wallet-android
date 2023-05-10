@@ -8,4 +8,6 @@ interface WalletConnectRouter : ReturnableRouter {
     fun openSessionDetails(payload: WalletConnectSessionDetailsPayload)
 
     fun openScanPairingQrCode()
+
+    fun backToSettings()
 }
