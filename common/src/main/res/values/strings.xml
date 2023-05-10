@@ -8,6 +8,11 @@
         <item quantity="other">%s unsupported networks are hidden</item>
     </plurals>
 
+    <plurals name="common_networks_plural">
+        <item quantity="one">Network</item>
+        <item quantity="other">Networks</item>
+    </plurals>
+
     <string name="wallet_connect_session_approve_unsupported_chains_alert">Some of the required networks requested by \"%s\" are not supported in Nova Wallet</string>
 
     <plurals name="wallet_connect_session_approve_missing_accounts_alert">
