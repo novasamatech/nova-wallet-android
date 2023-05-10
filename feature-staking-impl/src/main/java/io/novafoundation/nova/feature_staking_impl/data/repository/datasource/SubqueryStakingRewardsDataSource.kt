@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import java.util.*
+import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
@@ -47,6 +47,10 @@ class SubqueryStakingRewardsDataSource(
         )
 
         stakingTotalRewardDao.insert(totalRewardLocal)
+    }
+
+    override suspend fun clearRewards() {
+        stakingTotalRewardDao.deleteAll()
     }
 
     private fun RewardPeriod.getStartDate(): Date? {

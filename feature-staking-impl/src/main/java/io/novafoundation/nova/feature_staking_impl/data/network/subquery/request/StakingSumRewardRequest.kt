@@ -33,7 +33,7 @@ class StakingSumRewardRequest(accountAddress: String, val startTimestamp: Long?,
 
     private fun startTimestampFilter(): String {
         if (startTimestamp != null && endTimestamp != null) {
-            return "timestamp: { greaterThanOrEqualTo: \"$startTimestamp\" } and: { timestamp: { lessThanOrEqualTo: \"$endTimestamp\" } }"
+            return getTimestampRangeFilter()
         } else if (startTimestamp != null) {
             return "timestamp: { greaterThanOrEqualTo: \"$startTimestamp\" }"
         }
@@ -43,11 +43,15 @@ class StakingSumRewardRequest(accountAddress: String, val startTimestamp: Long?,
 
     private fun endTimestampFilter(): String {
         if (startTimestamp != null && endTimestamp != null) {
-            return "timestamp: { greaterThanOrEqualTo: \"$startTimestamp\" } and: { timestamp: { lessThanOrEqualTo: \"$endTimestamp\" } }"
+            return getTimestampRangeFilter()
         } else if (endTimestamp != null) {
             return "timestamp: { lessThanOrEqualTo: \"$endTimestamp\" }"
         }
 
         return ""
+    }
+
+    private fun getTimestampRangeFilter(): String {
+        return "timestamp: { greaterThanOrEqualTo: \"$startTimestamp\" } and: { timestamp: { lessThanOrEqualTo: \"$endTimestamp\" } }"
     }
 }

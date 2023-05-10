@@ -498,6 +498,7 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun provideStakingRewardInteractor(
-        repository: StakingPeriodRepository
-    ): StakingRewardPeriodInteractor = RealStakingRewardPeriodInteractor(repository)
+        stakingPeriodRepository: StakingPeriodRepository,
+        stakingRewardsRepository: StakingRewardsRepository
+    ): StakingRewardPeriodInteractor = RealStakingRewardPeriodInteractor(stakingPeriodRepository, stakingRewardsRepository)
 }

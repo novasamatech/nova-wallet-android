@@ -94,8 +94,8 @@ private class RelaychainUserRewardsComponent(
     }.withLoading()
 
     private fun syncStakingRewards() {
-        val noStashAccountStakingStateFlow = selectedAccountStakingStateFlow.filterIsInstance<StakingState.Stash>()
-        combine(noStashAccountStakingStateFlow, rewardPeriodState) { staking, period ->
+        val stashAccountStakingStateFlow = selectedAccountStakingStateFlow.filterIsInstance<StakingState.Stash>()
+        combine(stashAccountStakingStateFlow, rewardPeriodState) { staking, period ->
             stakingInteractor.syncStakingRewards(staking, assetWithChain.chain, assetWithChain.asset, period)
         }
             .inBackground()

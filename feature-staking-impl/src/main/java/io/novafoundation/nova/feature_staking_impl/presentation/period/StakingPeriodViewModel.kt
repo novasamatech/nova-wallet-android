@@ -20,12 +20,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 data class CustomPeriod(
-    val start: Long?,
-    val end: Long?,
-    val isEndToday: Boolean
-) {
-    constructor() : this(null, null, true)
-}
+    val start: Long? = null,
+    val end: Long? = null,
+    val isEndToday: Boolean = true
+)
 
 class DateRangeWithCurrent(
     var current: Long,
@@ -84,9 +82,11 @@ class StakingPeriodViewModel(
     }
 
     fun onSaveClick() {
-        val result = mapSelectedPeriod(selectedPeriod.value, _customPeriod.value)
-        result?.let { stakingRewardPeriodInteractor.setRewardPeriod(it) }
-        router.back()
+        launch {
+            val result = mapSelectedPeriod(selectedPeriod.value, _customPeriod.value)
+            result?.let { stakingRewardPeriodInteractor.setRewardPeriod(it) }
+            router.back()
+        }
     }
 
     fun endIsAlwaysTodayChanged(isAlwaysToday: Boolean) {

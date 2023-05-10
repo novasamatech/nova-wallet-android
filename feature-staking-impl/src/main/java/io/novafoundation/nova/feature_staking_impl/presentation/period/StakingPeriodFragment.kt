@@ -99,7 +99,7 @@ class StakingPeriodFragment : BaseFragment<StakingPeriodViewModel>() {
             .build()
 
         datePicker.addOnPositiveButtonClickListener(onDateSelected)
-        datePicker.show(childFragmentManager, "datePicker")
+        datePicker.show(childFragmentManager, "datePickerTag")
     }
 
     private fun onStartDateSelected(value: Long) {

@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
 import kotlinx.coroutines.flow.Flow
 
 interface StakingPeriodRepository {
+
     fun setRewardPeriod(rewardPeriod: RewardPeriod)
 
     fun getRewardPeriod(): RewardPeriod
@@ -15,6 +16,7 @@ interface StakingPeriodRepository {
 class RealStakingPeriodRepository(
     private val stakingRewardPeriodDataSource: StakingRewardPeriodDataSource
 ) : StakingPeriodRepository {
+
     override fun setRewardPeriod(rewardPeriod: RewardPeriod) {
         stakingRewardPeriodDataSource.setRewardPeriod(rewardPeriod)
     }
