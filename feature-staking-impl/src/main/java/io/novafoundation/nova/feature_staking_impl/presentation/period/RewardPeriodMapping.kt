@@ -3,12 +3,16 @@ package io.novafoundation.nova.feature_staking_impl.presentation.period
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
-import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriodType.*
+import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriodType.ALL_TIME
+import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriodType.WEEK
+import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriodType.MONTH
+import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriodType.QUARTER
+import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriodType.HALF_YEAR
+import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriodType.YEAR
 import io.novafoundation.nova.feature_staking_impl.domain.period.getPeriodDays
-import java.util.concurrent.TimeUnit
 
 fun mapRewardPeriodToString(resourceManager: ResourceManager, rewardPeriod: RewardPeriod): String {
-    return when(rewardPeriod.type) {
+    return when (rewardPeriod.type) {
         ALL_TIME -> resourceManager.getString(R.string.staking_period_all_short)
         WEEK -> resourceManager.getString(R.string.staking_period_week_short)
         MONTH -> resourceManager.getString(R.string.staking_period_month_short)

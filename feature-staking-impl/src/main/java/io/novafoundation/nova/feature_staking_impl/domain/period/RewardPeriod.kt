@@ -17,7 +17,7 @@ sealed interface RewardPeriod {
         override val end: Date? = null
     }
 
-    data class CustomRange(override val start: Date, override val end: Date?): RewardPeriod {
+    data class CustomRange(override val start: Date, override val end: Date?) : RewardPeriod {
         override val type = RewardPeriodType.CUSTOM
     }
 
@@ -29,7 +29,7 @@ sealed interface RewardPeriod {
 
     companion object {
         fun getOffsetByType(type: RewardPeriodType): Long {
-            return when(type) {
+            return when (type) {
                 RewardPeriodType.WEEK -> 7.daysToMillis()
                 RewardPeriodType.MONTH -> 30.daysToMillis()
                 RewardPeriodType.QUARTER -> 90.daysToMillis()
