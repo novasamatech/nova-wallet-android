@@ -1,17 +1,19 @@
 package io.novafoundation.nova.feature_account_impl.presentation.settings
 
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.sendEmailIntent
+import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
@@ -107,15 +109,15 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
             settingsLanguage.setValue(it.displayName)
         }
 
-        viewModel.showBiometricEvent.observeEvent {
-            settingsBiometricAuth.isVisible = it
+        viewModel.showBiometricNotReadyDialogEvent.observeEvent {
+            showBiometricNotReadyDialog()
         }
 
         viewModel.biometricAuthStatus.observe {
             settingsBiometricAuth.setChecked(it)
         }
 
-        viewModel.biometricEvents.observe {
+        viewModel.biometricEventMessages.observe {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
         }
 
@@ -130,6 +132,22 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         viewModel.appVersionFlow.observe(settingsAppVersion::setText)
 
         viewModel.openEmailEvent.observeEvent { requireContext().sendEmailIntent(it) }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onResume()
+    }
+
+    private fun showBiometricNotReadyDialog() {
+        dialog(requireContext(), style = R.style.AccentAlertDialogTheme) {
+            setTitle(R.string.settings_biometric_not_ready_title)
+            setMessage(R.string.settings_biometric_not_ready_message)
+            setNegativeButton(R.string.common_cancel, null)
+            setPositiveButton(getString(R.string.common_settings)) { _, _ ->
+                startActivity(Intent(Settings.ACTION_SETTINGS))
+            }
+        }
     }
 
     override fun onPause() {

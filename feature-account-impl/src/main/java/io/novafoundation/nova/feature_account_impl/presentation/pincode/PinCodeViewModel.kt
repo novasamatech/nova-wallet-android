@@ -79,7 +79,7 @@ class PinCodeViewModel(
             is PinCodeAction.Change,
             is PinCodeAction.TwoFactorVerification -> {
                 currentState = ScreenState.Checking
-                _showFingerPrintEvent.value = Event(biometricService.isBiometricReady())
+                _showFingerPrintEvent.value = Event(biometricService.isBiometricReady() && biometricService.isEnabled())
             }
         }
     }
