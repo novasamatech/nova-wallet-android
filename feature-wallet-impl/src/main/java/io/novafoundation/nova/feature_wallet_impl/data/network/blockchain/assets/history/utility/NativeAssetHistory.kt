@@ -61,7 +61,8 @@ class NativeAssetHistory(
 
         return oneOf(
             balances.call("transfer"),
-            balances.callOrNull("transfer_keep_alive")
+            balances.callOrNull("transfer_keep_alive"),
+            balances.callOrNull("transfer_allow_death")
         )
     }
 }

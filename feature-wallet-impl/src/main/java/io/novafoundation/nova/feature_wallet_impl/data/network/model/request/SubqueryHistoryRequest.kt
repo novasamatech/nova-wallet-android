@@ -22,6 +22,7 @@ private fun ModuleRestriction.Companion.ignoreTransferExtrinsics(
         restrictedCalls = listOf(
             "transfer",
             "transferKeepAlive",
+            "transferAllowDeath",
             "forceTransfer",
             "transferAll"
         )
