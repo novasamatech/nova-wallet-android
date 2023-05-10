@@ -14,7 +14,7 @@
 
     <string name="send_address_hint">Address or w3n</string>
 
-    <string name="pincode_biometry_dialog_subtitle">Nova Wallet uses fingerprint to restrict unauthorized users from accessing the app</string>
+    <string name="pincode_biometry_dialog_subtitle">Nova Wallet uses biometric authentication to restrict unauthorized users from accessing the app.</string>
     <string name="pincode_biometry_dialog_description">Touch the fingerprint sensor</string>
 
     <string name="settings_pin_code_verification_confirmation_title">Ask authentication for operation signing</string>
