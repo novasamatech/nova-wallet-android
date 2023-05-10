@@ -7,17 +7,31 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
+import io.novafoundation.nova.common.utils.reversed
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
+import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriodType
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import java.util.*
+import java.util.Date
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+
+private val PERIOD_TYPES_TO_IDS = mapOf(
+    RewardPeriodType.ALL_TIME to R.id.allTimeStakingPeriod,
+    RewardPeriodType.WEEK to R.id.weekStakingPeriod,
+    RewardPeriodType.MONTH to R.id.monthStakingPeriod,
+    RewardPeriodType.QUARTER to R.id.quarterStakingPeriod,
+    RewardPeriodType.HALF_YEAR to R.id.halfYearStakingPeriod,
+    RewardPeriodType.YEAR to R.id.yearStakingPeriod,
+    RewardPeriodType.CUSTOM to R.id.customStakingPeriod
+)
+
+private val IDS_TO_PERIOD_TYPES = PERIOD_TYPES_TO_IDS.reversed()
 
 data class CustomPeriod(
     val start: Long? = null,
@@ -73,8 +87,8 @@ class StakingPeriodViewModel(
         launch {
             val rewardPeriod = stakingRewardPeriodInteractor.getRewardPeriod()
 
-            if (rewardPeriod is RewardPeriod.Custom) {
-                _customPeriod.value = mapCustomPeriod(rewardPeriod)
+            if (rewardPeriod is RewardPeriod.CustomRange) {
+                _customPeriod.value = mapCustomPeriodFromEntity(rewardPeriod)
             }
 
             selectedPeriod.value = mapStackingPeriodToIdRes(rewardPeriod)
@@ -122,50 +136,42 @@ class StakingPeriodViewModel(
     }
 
     private fun mapStackingPeriodToIdRes(rewardPeriod: RewardPeriod): Int {
-        return when (rewardPeriod) {
-            RewardPeriod.All -> R.id.allTimeStakingPeriod
-            RewardPeriod.Week -> R.id.weekStakingPeriod
-            RewardPeriod.Month -> R.id.monthStakingPeriod
-            RewardPeriod.Quarter -> R.id.quarterStakingPeriod
-            RewardPeriod.HalfYear -> R.id.halfYearStakingPeriod
-            RewardPeriod.Year -> R.id.yearStakingPeriod
-            is RewardPeriod.Custom -> R.id.customStakingPeriod
-        }
+        return PERIOD_TYPES_TO_IDS.getValue(rewardPeriod.type)
     }
 
     private fun mapSelectedPeriod(@IdRes periodId: Int, customPeriod: CustomPeriod?): RewardPeriod? {
-        return when (periodId) {
-            R.id.allTimeStakingPeriod -> RewardPeriod.All
-            R.id.weekStakingPeriod -> RewardPeriod.Week
-            R.id.monthStakingPeriod -> RewardPeriod.Month
-            R.id.quarterStakingPeriod -> RewardPeriod.Quarter
-            R.id.halfYearStakingPeriod -> RewardPeriod.HalfYear
-            R.id.yearStakingPeriod -> RewardPeriod.Year
-            R.id.customStakingPeriod -> customPeriod?.let { mapCustomPeriod(it) }
-            else -> throw IllegalArgumentException("Unknown idRes: $periodId")
+        return when {
+            periodId == R.id.allTimeStakingPeriod -> RewardPeriod.AllTime
+            periodId == R.id.customStakingPeriod -> mapCustomPeriodToEntity(customPeriod)
+            IDS_TO_PERIOD_TYPES.containsKey(periodId) -> {
+                val type = IDS_TO_PERIOD_TYPES.getValue(periodId)
+                RewardPeriod.OffsetFromCurrent(RewardPeriod.getOffsetByType(type), type)
+            }
+            else -> null
         }
     }
 
-    private fun mapCustomPeriod(customPeriod: CustomPeriod): RewardPeriod.Custom? {
-        val start = customPeriod.start ?: return null
+    private fun mapCustomPeriodToEntity(customPeriod: CustomPeriod?): RewardPeriod.CustomRange? {
+        if (customPeriod == null) return null
+
+        val startPeriod = customPeriod.start?.let { Date(it) } ?: return null
 
         val endPeriod = if (customPeriod.isEndToday) {
-            RewardPeriod.TimePoint.NoThreshold
+            null
         } else {
             val end = customPeriod.end ?: return null
-            RewardPeriod.TimePoint.Threshold(end)
+            Date(end)
         }
-        return RewardPeriod.Custom(RewardPeriod.TimePoint.Threshold(start), endPeriod)
+
+        return RewardPeriod.CustomRange(startPeriod, endPeriod)
     }
 
-    private fun mapCustomPeriod(period: RewardPeriod.Custom): CustomPeriod {
-        val start = period.start as RewardPeriod.TimePoint.Threshold
-        val end = period.end as? RewardPeriod.TimePoint.Threshold
-        val isEndToday = period.end is RewardPeriod.TimePoint.NoThreshold
+    private fun mapCustomPeriodFromEntity(period: RewardPeriod.CustomRange): CustomPeriod {
+        val isEndToday = period.end == null
 
         return CustomPeriod(
-            start = start.millis,
-            end = end?.millis,
+            start = period.start.time,
+            end = period.end?.time,
             isEndToday = isEndToday
         )
     }

@@ -1,63 +1,63 @@
 package io.novafoundation.nova.feature_staking_impl.domain.period
 
 import io.novafoundation.nova.common.utils.daysToMillis
-import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod.TimePoint
 import java.util.Date
+import java.util.concurrent.TimeUnit
 
-sealed class RewardPeriod(
-    val start: TimePoint,
-    val end: TimePoint
-) {
+sealed interface RewardPeriod {
+    val type: RewardPeriodType
+    val start: Date?
+    val end: Date?
 
-    init {
-        if (this.start is TimePoint.ThresholdOffset && end is TimePoint.ThresholdOffset) {
-            throw IllegalStateException("invalid data. offset cannot be calculated from another offset")
-        }
+    data class OffsetFromCurrent(
+        val offsetMillis: Long,
+        override val type: RewardPeriodType
+    ) : RewardPeriod {
+        override val start: Date? = null
+        override val end: Date? = null
     }
 
-    object All : RewardPeriod(TimePoint.NoThreshold, TimePoint.NoThreshold)
+    data class CustomRange(override val start: Date, override val end: Date?): RewardPeriod {
+        override val type = RewardPeriodType.CUSTOM
+    }
 
-    object Week : RewardPeriod(7.toThresholdOffset(), TimePoint.NoThreshold)
+    object AllTime : RewardPeriod {
+        override val type = RewardPeriodType.ALL_TIME
+        override val start: Date? = null
+        override val end: Date? = null
+    }
 
-    object Month : RewardPeriod(30.toThresholdOffset(), TimePoint.NoThreshold)
-
-    object Quarter : RewardPeriod(90.toThresholdOffset(), TimePoint.NoThreshold)
-
-    object HalfYear : RewardPeriod(180.toThresholdOffset(), TimePoint.NoThreshold)
-
-    object Year : RewardPeriod(365.toThresholdOffset(), TimePoint.NoThreshold)
-
-    data class Custom(private val _start: TimePoint, private val _end: TimePoint) : RewardPeriod(_start, _end)
-
-    sealed interface TimePoint {
-
-        object NoThreshold : TimePoint
-
-        data class Threshold(val millis: Long) : TimePoint
-
-        data class ThresholdOffset(val millis: Long) : TimePoint
+    companion object {
+        fun getOffsetByType(type: RewardPeriodType): Long {
+            return when(type) {
+                RewardPeriodType.WEEK -> 7.daysToMillis()
+                RewardPeriodType.MONTH -> 30.daysToMillis()
+                RewardPeriodType.QUARTER -> 90.daysToMillis()
+                RewardPeriodType.HALF_YEAR -> 180.daysToMillis()
+                RewardPeriodType.YEAR -> 365.daysToMillis()
+                else -> -1
+            }
+        }
     }
 }
 
-private fun Int.toThresholdOffset(): TimePoint.ThresholdOffset {
-    return TimePoint.ThresholdOffset(daysToMillis())
+enum class RewardPeriodType {
+    ALL_TIME,
+    WEEK,
+    MONTH,
+    QUARTER,
+    HALF_YEAR,
+    YEAR,
+    CUSTOM
 }
 
-fun RewardPeriod.getPeriodMillis(): Long {
-    return when (end) {
-        is TimePoint.NoThreshold -> when (start) {
-            is TimePoint.NoThreshold -> -1
-            is TimePoint.Threshold -> Date().time - start.millis
-            is TimePoint.ThresholdOffset -> start.millis
+fun RewardPeriod.getPeriodDays(): Long {
+    return when (this) {
+        is RewardPeriod.OffsetFromCurrent -> TimeUnit.MILLISECONDS.toDays(offsetMillis)
+        is RewardPeriod.CustomRange -> {
+            val endTime = end ?: Date()
+            TimeUnit.MILLISECONDS.toDays(endTime.time - start.time)
         }
-        is TimePoint.Threshold -> when (start) {
-            is TimePoint.NoThreshold -> -1
-            is TimePoint.Threshold -> end.millis - start.millis
-            is TimePoint.ThresholdOffset -> start.millis
-        }
-        is TimePoint.ThresholdOffset -> when (start) {
-            is TimePoint.ThresholdOffset -> throw IllegalStateException()
-            else -> end.millis
-        }
+        else -> -1
     }
 }

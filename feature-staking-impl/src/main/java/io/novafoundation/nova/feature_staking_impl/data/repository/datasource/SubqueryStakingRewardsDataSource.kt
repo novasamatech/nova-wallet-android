@@ -56,19 +56,14 @@ class SubqueryStakingRewardsDataSource(
     private fun RewardPeriod.getStartDate(): Date? {
         return when (start) {
             is RewardPeriod.TimePoint.NoThreshold -> null
-            is RewardPeriod.TimePoint.Threshold -> Date(start.millis)
-            is RewardPeriod.TimePoint.ThresholdOffset -> {
-                val endDate = getEndDate() ?: Date()
-                Date(endDate.time - this.start.millis)
-            }
+        if (this is RewardPeriod.OffsetFromCurrent) {
+            return Date(System.currentTimeMillis() - this.offsetMillis)
         }
+
+        return start
     }
 
     private fun RewardPeriod.getEndDate(): Date? {
-        return when (end) {
-            is RewardPeriod.TimePoint.NoThreshold -> null
-            is RewardPeriod.TimePoint.Threshold -> Date(end.millis)
-            is RewardPeriod.TimePoint.ThresholdOffset -> throw IllegalStateException()
-        }
+        return end
     }
 }

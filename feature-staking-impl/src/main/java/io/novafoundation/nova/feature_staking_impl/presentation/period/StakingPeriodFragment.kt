@@ -24,6 +24,8 @@ import kotlinx.android.synthetic.main.fragment_period_staking.customStakingPerio
 import kotlinx.android.synthetic.main.fragment_period_staking.stakingPeriodGroup
 import kotlinx.android.synthetic.main.fragment_period_staking.stakingPeriodToolbar
 
+private const val DATE_PICKER_TAG = "datePicker"
+
 class StakingPeriodFragment : BaseFragment<StakingPeriodViewModel>() {
 
     override fun onCreateView(
@@ -99,7 +101,7 @@ class StakingPeriodFragment : BaseFragment<StakingPeriodViewModel>() {
             .build()
 
         datePicker.addOnPositiveButtonClickListener(onDateSelected)
-        datePicker.show(childFragmentManager, "datePickerTag")
+        datePicker.show(childFragmentManager, DATE_PICKER_TAG)
     }
 
     private fun onStartDateSelected(value: Long) {

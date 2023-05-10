@@ -3,10 +3,12 @@ package io.novafoundation.nova.feature_staking_impl.data.repository.datasource
 import io.novafoundation.nova.common.data.storage.Editor
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
-import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod.TimePoint
+import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriodType
+import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+private const val PREFS_PERIOD_OFFSET = "PREFS_PERIOD_OFFSET"
 private const val PREFS_REWARD_PERIOD = "PREFS_REWARD_PERIOD"
 private const val PREFS_CUSTOM_START_TIME = "PREFS_CUSTOM_START_TIME"
 private const val PREFS_CUSTOM_END_TIME = "PREFS_CUSTOM_END_TIME"
@@ -27,69 +29,68 @@ class RealStakingRewardPeriodDataSource(
     override fun setRewardPeriod(rewardPeriod: RewardPeriod) {
         val prefsEditor = preferences.edit()
         prefsEditor.putString(PREFS_REWARD_PERIOD, mapFromRewardPeriod(rewardPeriod))
-        if (rewardPeriod is RewardPeriod.Custom) {
-            prefsEditor.setTimePoint(PREFS_CUSTOM_START_TIME, rewardPeriod.start)
-            prefsEditor.setTimePoint(PREFS_CUSTOM_END_TIME, rewardPeriod.end)
-        } else {
-            prefsEditor.remove(PREFS_CUSTOM_START_TIME)
-            prefsEditor.remove(PREFS_CUSTOM_END_TIME)
+        when (rewardPeriod) {
+            is RewardPeriod.CustomRange -> {
+                prefsEditor.setTimePoint(PREFS_CUSTOM_START_TIME, rewardPeriod.start)
+                prefsEditor.setTimePoint(PREFS_CUSTOM_END_TIME, rewardPeriod.end)
+            }
+            is RewardPeriod.OffsetFromCurrent -> {
+                prefsEditor.putLong(PREFS_PERIOD_OFFSET, rewardPeriod.offsetMillis)
+            }
+            else -> {
+                prefsEditor.remove(PREFS_CUSTOM_START_TIME)
+                prefsEditor.remove(PREFS_CUSTOM_END_TIME)
+                prefsEditor.remove(PREFS_PERIOD_OFFSET)
+            }
         }
         prefsEditor.apply()
     }
 
     override fun getRewardPeriod(): RewardPeriod {
-        return mapToRewardPeriod(preferences.getString(PREFS_REWARD_PERIOD))
+        val periodType = preferences.getString(PREFS_REWARD_PERIOD)
+            ?.let { RewardPeriodType.valueOf(it) }
+        return mapToRewardPeriod(periodType)
     }
 
     override fun getRewardPeriodFlow(): Flow<RewardPeriod> {
         return preferences.keysFlow(PREFS_REWARD_PERIOD, PREFS_CUSTOM_START_TIME, PREFS_CUSTOM_END_TIME)
-            .map {
-                val rewardPeriod = preferences.getString(PREFS_REWARD_PERIOD)
-                mapToRewardPeriod(rewardPeriod)
-            }
+            .map { getRewardPeriod() }
     }
 
-    private fun getTimePeriod(key: String): TimePoint {
+    private fun getTimePeriod(key: String): Date? {
         val value = preferences.getLong(key, -1L)
         return if (value == -1L) {
-            TimePoint.NoThreshold
+            null
         } else {
-            TimePoint.Threshold(value)
+            Date(value)
         }
     }
 
-    private fun Editor.setTimePoint(key: String, timePoint: TimePoint) {
-        if (timePoint is TimePoint.Threshold) {
-            putLong(key, timePoint.millis)
-        } else {
+    private fun Editor.setTimePoint(key: String, date: Date?) {
+        if (date == null) {
             remove(key)
+        } else {
+            putLong(key, date.time)
         }
     }
 
-    private fun mapToRewardPeriod(value: String?): RewardPeriod {
+    private fun mapToRewardPeriod(value: RewardPeriodType?): RewardPeriod {
         return when (value) {
-            "WEEK" -> RewardPeriod.Week
-            "MONTH" -> RewardPeriod.Month
-            "QUARTER" -> RewardPeriod.Quarter
-            "HALF_YEAR" -> RewardPeriod.HalfYear
-            "YEAR" -> RewardPeriod.Year
-            "CUSTOM" -> RewardPeriod.Custom(
-                getTimePeriod(PREFS_CUSTOM_START_TIME),
+            null,
+            RewardPeriodType.ALL_TIME -> RewardPeriod.AllTime
+            RewardPeriodType.WEEK,
+            RewardPeriodType.MONTH,
+            RewardPeriodType.QUARTER,
+            RewardPeriodType.HALF_YEAR,
+            RewardPeriodType.YEAR -> RewardPeriod.OffsetFromCurrent(preferences.getLong(PREFS_PERIOD_OFFSET, 0), value)
+            RewardPeriodType.CUSTOM -> RewardPeriod.CustomRange(
+                getTimePeriod(PREFS_CUSTOM_START_TIME)!!,
                 getTimePeriod(PREFS_CUSTOM_END_TIME)
             )
-            else -> RewardPeriod.All
         }
     }
 
     private fun mapFromRewardPeriod(rewardPeriod: RewardPeriod): String {
-        return when (rewardPeriod) {
-            RewardPeriod.All -> "ALL"
-            RewardPeriod.Week -> "WEEK"
-            RewardPeriod.Month -> "MONTH"
-            RewardPeriod.Quarter -> "QUARTER"
-            RewardPeriod.HalfYear -> "HALF_YEAR"
-            RewardPeriod.Year -> "YEAR"
-            is RewardPeriod.Custom -> "CUSTOM"
-        }
+        return rewardPeriod.type.toString()
     }
 }
