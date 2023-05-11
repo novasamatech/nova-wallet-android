@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.details.model
 
-import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainListOverview
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
@@ -18,7 +18,7 @@ class WalletConnectSessionDetailsUi(
 
     class SessionStatus(
         val label: String,
-        @ColorRes val labelColorRes: Int,
+        val labelStyle: TableCellView.FieldStyle,
         @DrawableRes val icon: Int
     )
 }

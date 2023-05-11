@@ -52,7 +52,7 @@ class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDet
         wcSessionDetailsDisconnect.prepareForProgress(viewLifecycleOwner)
         wcSessionDetailsNetworks.setOnClickListener { viewModel.networksClicked() }
 
-        wcSessionDetailsStatus.setImage(R.drawable.ic_indicator_positive_pulse, sizeDp = 14)
+
         wcSessionDetailsStatus.showValue(getString(R.string.common_active))
     }
 
@@ -74,6 +74,12 @@ class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDet
 
             wcSessionDetailsTitle.text = sessionUi.dappTitle
             wcSessionDetailsIcon.showDAppIcon(sessionUi.dappIcon, imageLoader)
+
+            with(sessionUi.status) {
+                wcSessionDetailsStatus.setImage(icon, sizeDp = 14)
+                wcSessionDetailsStatus.setPrimaryValueStyle(labelStyle)
+                wcSessionDetailsStatus.showValue(label)
+            }
         }
 
         viewModel.showChainBottomSheet.observeEvent { chainList ->

@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.withFlagSet
+import io.novafoundation.nova.common.view.TableCellView.FieldStyle
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
@@ -115,12 +116,12 @@ class WalletConnectSessionDetailsViewModel(
         return when (status) {
             WalletConnectSessionDetails.SessionStatus.ACTIVE -> WalletConnectSessionDetailsUi.SessionStatus(
                 label = resourceManager.getString(R.string.common_active),
-                labelColorRes = R.color.text_positive,
+                labelStyle = FieldStyle.POSITIVE,
                 icon = R.drawable.ic_indicator_positive_pulse
             )
             WalletConnectSessionDetails.SessionStatus.EXPIRED -> WalletConnectSessionDetailsUi.SessionStatus(
                 label = resourceManager.getString(R.string.common_expired),
-                labelColorRes = R.color.text_secondary,
+                labelStyle = FieldStyle.SECONDARY,
                 icon = R.drawable.ic_indicator_inactive_pulse
             )
         }
