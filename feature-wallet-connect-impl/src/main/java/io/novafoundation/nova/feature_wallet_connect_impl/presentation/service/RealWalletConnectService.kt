@@ -89,9 +89,13 @@ internal class RealWalletConnectService(
         val appSession = interactor.getSessionAccount(sessionRequest.topic) ?: run { respondNoSession(sessionRequest); return }
 
         val walletConnectRequest = interactor.parseSessionRequest(sessionRequest)
-            .onFailure { Log.e("WalletConnect", "Failed to parse session request $sessionRequest", it) }
-            .getOrNull()
-            ?: run { respondUnauthorizedMethod(sessionRequest); return }
+            .onFailure { error ->
+                Log.e("WalletConnect", "Failed to parse session request $sessionRequest", error)
+
+                respondWithError(sessionRequest, error)
+
+                return
+            }.getOrThrow()
 
         val externalSignResponse = withContext(Dispatchers.Main) {
             dAppSignRequester.awaitConfirmation(
@@ -132,10 +136,12 @@ internal class RealWalletConnectService(
         return Web3Wallet.respondSessionRequest(response)
     }
 
-    private suspend fun respondUnauthorizedMethod(
+    private suspend fun respondWithError(
         sessionRequest: Wallet.Model.SessionRequest,
+        exception: Throwable
     ): Result<*> {
-        val response = sessionRequest.failed(WalletConnectError.UNAUTHORIZED_METHOD)
+        val error = exception as? WalletConnectError ?: WalletConnectError.GENERAL_FAILURE
+        val response = sessionRequest.failed(error)
 
         return Web3Wallet.respondSessionRequest(response)
     }

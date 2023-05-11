@@ -8,6 +8,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainListBottomSheet
@@ -48,9 +49,9 @@ class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDet
         wcSessionDetailsToolbar.applyStatusBarInsets()
 
         wcSessionDetailsDisconnect.setOnClickListener { viewModel.disconnect() }
+        wcSessionDetailsDisconnect.prepareForProgress(viewLifecycleOwner)
         wcSessionDetailsNetworks.setOnClickListener { viewModel.networksClicked() }
 
-        wcSessionDetailsStatus.setImage(R.drawable.ic_indicator_positive_pulse, sizeDp = 14)
         wcSessionDetailsStatus.showValue(getString(R.string.common_active))
     }
 
@@ -72,6 +73,12 @@ class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDet
 
             wcSessionDetailsTitle.text = sessionUi.dappTitle
             wcSessionDetailsIcon.showDAppIcon(sessionUi.dappIcon, imageLoader)
+
+            with(sessionUi.status) {
+                wcSessionDetailsStatus.setImage(icon, sizeDp = 14)
+                wcSessionDetailsStatus.setPrimaryValueStyle(labelStyle)
+                wcSessionDetailsStatus.showValue(label)
+            }
         }
 
         viewModel.showChainBottomSheet.observeEvent { chainList ->
@@ -80,5 +87,7 @@ class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDet
                 data = chainList
             ).show()
         }
+
+        viewModel.disconnectButtonState.observe(wcSessionDetailsDisconnect::setState)
     }
 }

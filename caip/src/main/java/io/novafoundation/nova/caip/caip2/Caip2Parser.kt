@@ -12,6 +12,8 @@ interface Caip2Parser {
 
 fun Caip2Parser.isValidCaip2(caip2Identifier: String): Boolean = parseCaip2(caip2Identifier).isSuccess
 
+fun Caip2Parser.parseCaip2OrThrow(caip2Identifier: String): Caip2Identifier = parseCaip2(caip2Identifier).getOrThrow()
+
 internal class RealCaip2Parser : Caip2Parser {
 
     override fun parseCaip2(caip2Identifier: String): Result<Caip2Identifier> = runCatching {

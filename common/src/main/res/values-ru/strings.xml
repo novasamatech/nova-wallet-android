@@ -262,6 +262,12 @@
     <string name="common_module">Модуль</string>
     <string name="common_network">Сеть</string>
     <string name="common_networks">Сети</string>
+    <plurals name="common_networks_plural">
+        <item quantity="one">Сеть</item>
+        <item quantity="few">Сети</item>
+        <item quantity="many">Сети</item>
+        <item quantity="other">Сети</item>
+    </plurals>
     <string name="common_next">Далее</string>
     <string name="common_no">Нет</string>
     <string name="common_no_app_to_handle_import_intent">Приложение для импорта файлов не найдено на устройстве. Пожалуйста, установите его и повторите попытку</string>

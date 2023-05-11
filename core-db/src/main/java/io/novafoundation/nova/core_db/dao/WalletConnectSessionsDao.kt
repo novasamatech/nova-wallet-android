@@ -30,4 +30,7 @@ interface WalletConnectSessionsDao {
 
     @Query("SELECT COUNT(*) FROM wallet_connect_sessions")
     fun numberOfSessionsFlow(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM wallet_connect_sessions")
+    suspend fun numberOfSessions(): Int
 }

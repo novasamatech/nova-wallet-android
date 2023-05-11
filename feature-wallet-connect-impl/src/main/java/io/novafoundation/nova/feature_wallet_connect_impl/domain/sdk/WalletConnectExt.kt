@@ -33,7 +33,7 @@ fun Wallet.Model.SessionRequest.approved(result: String): Wallet.Params.SessionR
     )
 }
 
-class WalletConnectError(val code: Int, val message: String) {
+class WalletConnectError(val code: Int, override val message: String) : Throwable() {
 
     companion object {
         val REJECTED = WalletConnectError(5000, "Rejected by user")
@@ -43,6 +43,10 @@ class WalletConnectError(val code: Int, val message: String) {
         val NO_SESSION_FOR_TOPIC = WalletConnectError(7001, "No session for topic")
 
         val UNAUTHORIZED_METHOD = WalletConnectError(3001, "Unauthorized method")
+
+        val CHAIN_MISMATCH = WalletConnectError(1001, "Wrong chain id passed by dApp")
+
+        fun UnknownMethod(method: String) = WalletConnectError(3001, "$method is not supported")
     }
 }
 

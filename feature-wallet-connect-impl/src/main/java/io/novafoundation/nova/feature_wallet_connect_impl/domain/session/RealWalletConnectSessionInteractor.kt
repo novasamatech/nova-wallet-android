@@ -20,7 +20,9 @@ import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.SessionDa
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSession
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionAccount
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionDetails
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionDetails.SessionStatus
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionProposal
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.WalletConnectError
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.approveSession
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.approved
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.disconnectSession
@@ -109,9 +111,7 @@ class RealWalletConnectSessionInteractor(
 
     override suspend fun parseSessionRequest(request: Wallet.Model.SessionRequest): Result<WalletConnectRequest> = runCatching {
         withContext(Dispatchers.Default) {
-            requireNotNull(walletConnectRequestFactory.create(request)) {
-                "${request.request.method} is not supported"
-            }
+            walletConnectRequestFactory.create(request) ?: throw WalletConnectError.UnknownMethod(request.request.method)
         }
     }
 
@@ -233,7 +233,8 @@ class RealWalletConnectSessionInteractor(
             connectedMetaAccount = metaAccount,
             dappMetadata = session.metaData?.let(::mapAppMetadataToSessionMetadata),
             sessionTopic = session.topic,
-            chains = chainsByCaip2.resolveChains(session.namespaces.caip2ChainsByNamespace()).knownChains
+            chains = chainsByCaip2.resolveChains(session.namespaces.caip2ChainsByNamespace()).knownChains,
+            status = determineSessionStatus(session)
         )
     }
 
@@ -275,6 +276,14 @@ class RealWalletConnectSessionInteractor(
             icon = metadata.icons.firstOrNull(),
             name = metadata.name
         )
+    }
+
+    private fun determineSessionStatus(session: Wallet.Model.Session): SessionStatus {
+        return if (session.expiry > System.currentTimeMillis()) {
+            SessionStatus.EXPIRED
+        } else {
+            SessionStatus.ACTIVE
+        }
     }
 
     @JvmName("caip2ChainsByNamespaceForProposal")

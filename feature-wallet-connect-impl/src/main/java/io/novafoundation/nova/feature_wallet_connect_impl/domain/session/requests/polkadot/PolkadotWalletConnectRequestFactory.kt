@@ -2,12 +2,17 @@ package io.novafoundation.nova.feature_wallet_connect_impl.domain.session.reques
 
 import com.google.gson.Gson
 import com.walletconnect.web3.wallet.client.Wallet.Model.SessionRequest
+import io.novafoundation.nova.caip.caip2.Caip2Parser
+import io.novafoundation.nova.caip.caip2.identifier.Caip2Identifier
+import io.novafoundation.nova.caip.caip2.parseCaip2OrThrow
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.PolkadotSignPayload
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.WalletConnectError
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.WalletConnectRequest
 
 class PolkadotWalletConnectRequestFactory(
-    private val gson: Gson
+    private val gson: Gson,
+    private val caip2Parser: Caip2Parser
 ) : WalletConnectRequest.Factory {
 
     override fun create(sessionRequest: SessionRequest): WalletConnectRequest? {
@@ -24,6 +29,11 @@ class PolkadotWalletConnectRequestFactory(
 
     private fun parseSignTransactionRequest(sessionRequest: SessionRequest): WalletConnectRequest {
         val signTxPayload = gson.fromJson<SignTransaction>(sessionRequest.request.params)
+
+        val caip2FromPayload = Caip2Identifier.Polkadot(signTxPayload.transactionPayload.genesisHash)
+        val caip2FromChainId = caip2Parser.parseCaip2OrThrow(requireNotNull(sessionRequest.chainId))
+
+        if (caip2FromChainId != caip2FromPayload) throw WalletConnectError.CHAIN_MISMATCH
 
         return PolkadotSignRequest(
             gson = gson,

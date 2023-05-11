@@ -6,5 +6,7 @@ interface WalletConnectSessionsUseCase {
 
     fun activeSessionsNumberFlow(): Flow<Int>
 
+    suspend fun activeSessionsNumber(): Int
+
     suspend fun syncActiveSessions()
 }

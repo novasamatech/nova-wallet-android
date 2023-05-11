@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="common_expired">Expired</string>
+
+    <plurals name="common_networks_plural">
+        <item quantity="one">Network</item>
+        <item quantity="other">Networks</item>
+    </plurals>
+
     <string name="common_required">Required</string>
     <string name="common_optional">Optional</string>
 

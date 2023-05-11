@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_account_api.R
 
 class ChainListOverview(
     val icon: String?,
+    val value: String,
     val label: String,
     val hasMoreElements: Boolean,
 )
@@ -14,13 +15,15 @@ class ChainListOverview(
 fun ResourceManager.formatChainListOverview(chains: List<ChainUi>): ChainListOverview {
     return ChainListOverview(
         icon = chains.singleOrNull()?.icon,
-        label = formatListPreview(chains.map(ChainUi::name)),
-        hasMoreElements = chains.size > 1
+        value = formatListPreview(chains.map(ChainUi::name)),
+        hasMoreElements = chains.size > 1,
+        label = getQuantityString(R.plurals.common_networks_plural, chains.size)
     )
 }
 
 fun TableCellView.showChainsOverview(chainListOverview: ChainListOverview) {
-    showValue(chainListOverview.label)
+    setTitle(chainListOverview.label)
+    showValue(chainListOverview.value)
 
     loadImage(chainListOverview.icon, roundedCornersDp = null)
 

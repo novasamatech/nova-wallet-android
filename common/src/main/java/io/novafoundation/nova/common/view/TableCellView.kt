@@ -52,7 +52,7 @@ open class TableCellView @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyle, defStyleRes), HasDivider {
 
     enum class FieldStyle {
-        TEXT, LINK, POSITIVE
+        PRIMARY, SECONDARY, LINK, POSITIVE
     }
 
     companion object {
@@ -152,7 +152,7 @@ open class TableCellView @JvmOverloads constructor(
 
     fun setPrimaryValueStyle(style: FieldStyle) {
         when (style) {
-            FieldStyle.TEXT -> {
+            FieldStyle.PRIMARY -> {
                 valuePrimary.setTextColorRes(R.color.text_primary)
             }
             FieldStyle.LINK -> {
@@ -160,6 +160,9 @@ open class TableCellView @JvmOverloads constructor(
             }
             FieldStyle.POSITIVE -> {
                 valuePrimary.setTextColorRes(R.color.text_positive)
+            }
+            FieldStyle.SECONDARY -> {
+                valuePrimary.setTextColorRes(R.color.text_secondary)
             }
         }
     }
@@ -214,7 +217,7 @@ open class TableCellView @JvmOverloads constructor(
             setPrimaryValueIcon(primaryValueIcon, primaryValueIconTint)
         }
 
-        val primaryValueStyle = typedArray.getEnum(R.styleable.TableCellView_primaryValueStyle, default = FieldStyle.TEXT)
+        val primaryValueStyle = typedArray.getEnum(R.styleable.TableCellView_primaryValueStyle, default = FieldStyle.PRIMARY)
         setPrimaryValueStyle(primaryValueStyle)
 
         val titleIconEnd = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIcon)

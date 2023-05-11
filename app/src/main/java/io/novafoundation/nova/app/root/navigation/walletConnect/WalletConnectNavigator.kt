@@ -14,4 +14,5 @@ class WalletConnectNavigator(navigationHolder: NavigationHolder) : BaseNavigator
     )
 
     override fun openScanPairingQrCode() = performNavigation(R.id.action_open_scanWalletConnect)
+    override fun backToSettings() = performNavigation(R.id.walletConnectSessionDetailsFragment_to_settings)
 }

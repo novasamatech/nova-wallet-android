@@ -67,7 +67,7 @@ class WalletConnectApproveSessionViewModel(
     }.shareInBackground()
 
     val chainsOverviewFlow = sessionProposalFlow.map { sessionProposal ->
-        createChainListOverview(sessionProposal.resolvedChains)
+        createSessionNetworksModel(sessionProposal.resolvedChains)
     }.shareInBackground()
 
     val sessionAlerts = combine(selectWalletMixin.selectedMetaAccountFlow, sessionProposalFlow) { metaAccount, sessionProposal ->
@@ -182,13 +182,13 @@ class WalletConnectApproveSessionViewModel(
     }
 
     @Suppress("KotlinConstantConditions")
-    private fun createChainListOverview(sessionChains: SessionChains): ChainListOverview {
+    private fun createSessionNetworksModel(sessionChains: SessionChains): ChainListOverview {
         val allKnownChains = sessionChains.allKnownChains()
         val allUnknownChains = sessionChains.allUnknownChains()
 
         val allChainsCount = allKnownChains.size + allUnknownChains.size
 
-        val label = when {
+        val value = when {
             // no chains
             allKnownChains.isEmpty() && allUnknownChains.isEmpty() -> resourceManager.getString(R.string.common_none)
 
@@ -218,7 +218,8 @@ class WalletConnectApproveSessionViewModel(
 
         return ChainListOverview(
             icon = firstKnownIcon?.takeUnless { multipleChainsRequested },
-            label = label,
+            value = value,
+            label = resourceManager.getQuantityString(R.plurals.common_networks_plural, allChainsCount),
             hasMoreElements = multipleChainsRequested || hasUnsupportedWarningsToShow
         )
     }

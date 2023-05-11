@@ -32,8 +32,8 @@ class WalletConnectFeatureModule {
 
     @Provides
     @FeatureScope
-    fun providePolkadotRequestFactory(gson: Gson): PolkadotWalletConnectRequestFactory {
-        return PolkadotWalletConnectRequestFactory(gson)
+    fun providePolkadotRequestFactory(gson: Gson, caip2Parser: Caip2Parser): PolkadotWalletConnectRequestFactory {
+        return PolkadotWalletConnectRequestFactory(gson, caip2Parser)
     }
 
     @Provides
