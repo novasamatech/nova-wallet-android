@@ -106,7 +106,23 @@ class WalletConnectSessionDetailsViewModel(
             dappIcon = session.dappMetadata?.icon,
             networksOverview = resourceManager.formatChainListOverview(chainUis),
             networks = chainUis,
-            wallet = walletUiUseCase.walletUiFor(session.connectedMetaAccount)
+            wallet = walletUiUseCase.walletUiFor(session.connectedMetaAccount),
+            status = mapSessionStatusToUi(session.status)
         )
+    }
+
+    private fun mapSessionStatusToUi(status: WalletConnectSessionDetails.SessionStatus): WalletConnectSessionDetailsUi.SessionStatus {
+        return when (status) {
+            WalletConnectSessionDetails.SessionStatus.ACTIVE -> WalletConnectSessionDetailsUi.SessionStatus(
+                label = resourceManager.getString(R.string.common_active),
+                labelColorRes = R.color.text_positive,
+                icon = R.drawable.ic_indicator_positive_pulse
+            )
+            WalletConnectSessionDetails.SessionStatus.EXPIRED -> WalletConnectSessionDetailsUi.SessionStatus(
+                label = resourceManager.getString(R.string.common_expired),
+                labelColorRes = R.color.text_secondary,
+                icon = R.drawable.ic_indicator_inactive_pulse
+            )
+        }
     }
 }

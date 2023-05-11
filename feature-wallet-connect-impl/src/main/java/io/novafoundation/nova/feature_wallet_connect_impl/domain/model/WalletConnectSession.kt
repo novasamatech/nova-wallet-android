@@ -23,4 +23,11 @@ class WalletConnectSessionDetails(
     val dappMetadata: SessionDappMetadata?,
     val chains: Set<Chain>,
     val sessionTopic: String,
-)
+    val status: SessionStatus,
+) {
+
+    enum class SessionStatus {
+
+        ACTIVE, EXPIRED
+    }
+}
