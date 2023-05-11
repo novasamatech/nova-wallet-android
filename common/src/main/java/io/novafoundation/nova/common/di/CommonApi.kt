@@ -2,6 +2,7 @@ package io.novafoundation.nova.common.di
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.SharedPreferences
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -116,6 +117,8 @@ interface CommonApi {
     fun appVersionsProvider(): AppVersionProvider
 
     fun ethereumAddressFormat(): EthereumAddressFormat
+
+    fun sharedPreferences(): SharedPreferences
 
     fun safeModeService(): SafeModeService
 

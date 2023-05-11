@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsContentG
 import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsFiatAmount
 import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsFiatAmountShimmer
 import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsShimmerGroup
+import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsStakingPeriod
 import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsTokenAmount
 import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsTokenAmountShimmer
 
@@ -34,6 +35,10 @@ class UserRewardsView @JvmOverloads constructor(
         userRewardsFiatAmountShimmer.startShimmer()
     }
 
+    fun setStakingPeriod(period: String) {
+        userRewardsStakingPeriod.text = period
+    }
+
     fun showValue(amountModel: AmountModel) {
         userRewardsShimmerGroup.makeGone()
         userRewardsContentGroup.makeVisible()
@@ -43,5 +48,9 @@ class UserRewardsView @JvmOverloads constructor(
 
         userRewardsTokenAmount.text = amountModel.token
         userRewardsFiatAmount.text = amountModel.fiat
+    }
+
+    fun setOnRewardPeriodClickedListener(onClick: OnClickListener) {
+        userRewardsStakingPeriod.setOnClickListener(onClick)
     }
 }
