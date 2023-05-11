@@ -71,7 +71,7 @@ class PinCodeView @JvmOverloads constructor(
     }
 
     fun changeBimometricButtonVisibility(isVisible: Boolean) {
-        biometricBtn.setVisible(isVisible, falseState=View.INVISIBLE)
+        biometricBtn.setVisible(isVisible, falseState = View.INVISIBLE)
     }
 
     fun resetInput() {
