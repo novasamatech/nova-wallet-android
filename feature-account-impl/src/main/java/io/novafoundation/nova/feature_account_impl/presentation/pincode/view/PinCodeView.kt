@@ -7,6 +7,7 @@ import android.view.View.OnClickListener
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatButton
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_impl.R
 import kotlinx.android.synthetic.main.pincode_view.view.btn0
 import kotlinx.android.synthetic.main.pincode_view.view.btn1
@@ -70,11 +71,7 @@ class PinCodeView @JvmOverloads constructor(
     }
 
     fun changeBimometricButtonVisibility(isVisible: Boolean) {
-        if (isVisible) {
-            biometricBtn.visibility = View.VISIBLE
-        } else {
-            biometricBtn.visibility = View.INVISIBLE
-        }
+        biometricBtn.setVisible(isVisible, falseState=View.INVISIBLE)
     }
 
     fun resetInput() {
