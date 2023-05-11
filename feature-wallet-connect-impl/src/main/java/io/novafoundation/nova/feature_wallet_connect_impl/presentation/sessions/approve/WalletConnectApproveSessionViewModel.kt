@@ -30,7 +30,6 @@ import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.hasAny
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.hasUnknown
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.WalletConnectSessionInteractor
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.model.SessionAlerts
-import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.model.SessionNetworksModel
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.model.hasBlockingAlerts
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.view.WCNetworkListModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain

@@ -52,7 +52,6 @@ class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDet
         wcSessionDetailsDisconnect.prepareForProgress(viewLifecycleOwner)
         wcSessionDetailsNetworks.setOnClickListener { viewModel.networksClicked() }
 
-
         wcSessionDetailsStatus.showValue(getString(R.string.common_active))
     }
 

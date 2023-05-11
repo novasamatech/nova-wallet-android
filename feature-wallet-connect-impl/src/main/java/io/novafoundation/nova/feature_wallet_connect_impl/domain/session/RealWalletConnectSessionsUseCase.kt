@@ -16,7 +16,7 @@ internal class RealWalletConnectSessionsUseCase(
     }
 
     override suspend fun activeSessionsNumber(): Int {
-       return sessionRepository.numberOfSessionAccounts()
+        return sessionRepository.numberOfSessionAccounts()
     }
 
     override suspend fun syncActiveSessions() = withContext(Dispatchers.Default) {

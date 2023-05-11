@@ -97,7 +97,6 @@ internal class RealWalletConnectService(
                 return
             }.getOrThrow()
 
-
         val externalSignResponse = withContext(Dispatchers.Main) {
             dAppSignRequester.awaitConfirmation(
                 ExternalSignPayload(

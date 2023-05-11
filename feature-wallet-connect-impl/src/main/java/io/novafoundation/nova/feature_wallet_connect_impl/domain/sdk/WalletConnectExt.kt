@@ -33,7 +33,7 @@ fun Wallet.Model.SessionRequest.approved(result: String): Wallet.Params.SessionR
     )
 }
 
-class WalletConnectError(val code: Int, override val message: String): Throwable() {
+class WalletConnectError(val code: Int, override val message: String) : Throwable() {
 
     companion object {
         val REJECTED = WalletConnectError(5000, "Rejected by user")
