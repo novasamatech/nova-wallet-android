@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.EmptyValidationSystem
-import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -35,14 +34,11 @@ import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.Ev
 import io.novafoundation.nova.feature_external_sign_impl.data.evmApi.EvmApi
 import io.novafoundation.nova.feature_external_sign_impl.data.evmApi.EvmApiFactory
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.BaseExternalSignInteractor
-import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationFailure
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationSystem
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
-import io.novafoundation.nova.feature_external_sign_impl.domain.sign.convertingToAmount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -63,7 +59,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import org.web3j.crypto.RawTransaction
 import org.web3j.crypto.TransactionDecoder
-import java.math.BigInteger
 
 class EvmSignInteractorFactory(
     private val chainRegistry: ChainRegistry,
@@ -115,10 +110,7 @@ class EvmSignInteractor(
         }
     }
 
-    override val validationSystem = when (payload) {
-        is ConfirmTx -> transactionValidationSystem()
-        else -> EmptyValidationSystem()
-    }
+    override val validationSystem: ConfirmDAppOperationValidationSystem = EmptyValidationSystem()
 
     override suspend fun createAccountAddressModel(): AddressModel = withContext(Dispatchers.Default) {
         val address = request.payload.originAddress
@@ -188,24 +180,6 @@ class EvmSignInteractor(
 
     override suspend fun shutdown() {
         ethereumApi()?.shutdown()
-    }
-
-    private fun transactionValidationSystem(): ConfirmDAppOperationValidationSystem {
-        return ValidationSystem {
-            sufficientBalance(
-                fee = { payload ->
-                    payload.convertingToAmount { mostRecentFormedTx.first().fee() }
-                },
-                amount = { payload ->
-                    payload.convertingToAmount { mostRecentFormedTx.first().value ?: BigInteger.ZERO }
-                },
-                available = { validationPayload ->
-                    validationPayload.convertingToAmount { ethereumApi()!!.getAccountBalance(payload.originAddress) }
-                },
-                error = { _, _ -> ConfirmDAppOperationValidationFailure.NotEnoughBalanceToPayFees },
-                skippable = true
-            )
-        }
     }
 
     private suspend fun confirmTx(basedOn: EvmTransaction, evmChainId: Long, action: ConfirmTx.Action): ExternalSignCommunicator.Response {

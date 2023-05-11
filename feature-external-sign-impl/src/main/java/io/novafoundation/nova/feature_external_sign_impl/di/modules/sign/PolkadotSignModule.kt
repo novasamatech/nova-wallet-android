@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.polkadot.PolkadotSignInteractorFactory
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -26,7 +25,6 @@ class PolkadotSignModule {
         tokenRepository: TokenRepository,
         @ExtrinsicSerialization extrinsicGson: Gson,
         addressIconGenerator: AddressIconGenerator,
-        walletRepository: WalletRepository,
         signerProvider: SignerProvider
     ) = PolkadotSignInteractorFactory(
         extrinsicService = extrinsicService,
@@ -35,7 +33,6 @@ class PolkadotSignModule {
         tokenRepository = tokenRepository,
         extrinsicGson = extrinsicGson,
         addressIconGenerator = addressIconGenerator,
-        walletRepository = walletRepository,
         signerProvider = signerProvider
     )
 }
