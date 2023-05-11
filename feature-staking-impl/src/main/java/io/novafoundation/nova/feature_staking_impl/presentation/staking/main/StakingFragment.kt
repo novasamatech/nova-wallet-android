@@ -68,7 +68,7 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
 
         setupNetworkInfoComponent(viewModel.networkInfoComponent, stakingNetworkInfo)
         setupStakeSummaryComponent(viewModel.stakeSummaryComponent, stakingStakeSummary)
-        setupUserRewardsComponent(viewModel.userRewardsComponent, stakingUserRewards)
+        setupUserRewardsComponent(viewModel.userRewardsComponent, stakingUserRewards, viewModel.router)
         setupUnbondingComponent(viewModel.unbondingComponent, stakingStakeUnbondings)
         setupStakeActionsComponent(viewModel.stakeActionsComponent, stakingStakeManage)
         setupStartStakingComponent(viewModel.startStakingComponent, stakingEstimate)
