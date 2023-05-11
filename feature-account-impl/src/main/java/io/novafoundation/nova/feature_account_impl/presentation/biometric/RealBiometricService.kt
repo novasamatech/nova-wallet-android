@@ -36,6 +36,11 @@ class RealBiometricService(
     }
 
     override fun enableBiometry(enable: Boolean) {
+        if (!isBiometricReady()) {
+            biometryServiceResponseFlow.tryEmit(BiometricResponse.NotReady)
+            return
+        }
+
         if (enable) {
             accountRepository.setBiometricOn()
         } else {
@@ -43,8 +48,17 @@ class RealBiometricService(
         }
     }
 
+    override fun refreshBiometryState() {
+        if (!isBiometricReady() && isEnabled()) {
+            accountRepository.setBiometricOff()
+        }
+    }
+
     override fun requestBiometric() {
-        if (!isBiometricReady()) return
+        if (!isBiometricReady()) {
+            biometryServiceResponseFlow.tryEmit(BiometricResponse.NotReady)
+            return
+        }
 
         biometricPrompt.authenticate(promptInfo)
     }

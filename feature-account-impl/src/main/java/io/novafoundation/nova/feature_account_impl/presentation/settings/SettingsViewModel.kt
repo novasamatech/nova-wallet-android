@@ -80,14 +80,17 @@ class SettingsViewModel(
     private val _openEmailEvent = MutableLiveData<Event<String>>()
     val openEmailEvent: LiveData<Event<String>> = _openEmailEvent
 
-    private val _showBiometricEvent = MutableLiveData<Event<Boolean>>()
-    val showBiometricEvent: LiveData<Event<Boolean>> = _showBiometricEvent
-
     val biometricAuthStatus = biometricService.isEnabledFlow()
 
-    val biometricEvents = biometricService.biometryServiceResponseFlow
+    val biometricEventMessages = biometricService.biometryServiceResponseFlow
         .mapNotNull { mapBiometricErrors(resourceManager, it) }
         .shareInBackground()
+        .asLiveData()
+
+    val showBiometricNotReadyDialogEvent = biometricService.biometryServiceResponseFlow
+        .filterIsInstance<BiometricResponse.NotReady>()
+        .map { Event(true) }
+        .asLiveData()
 
     init {
         setupBiometric()
@@ -204,16 +207,14 @@ class SettingsViewModel(
     }
 
     private fun setupBiometric() {
-        val isBiometricReady = biometricService.isBiometricReady()
+        biometricService.biometryServiceResponseFlow
+            .filterIsInstance<BiometricResponse.Success>()
+            .onEach { biometricService.toggle() }
+            .launchIn(this)
+    }
 
-        _showBiometricEvent.value = Event(isBiometricReady)
-
-        if (isBiometricReady) {
-            biometricService.biometryServiceResponseFlow
-                .filterIsInstance<BiometricResponse.Success>()
-                .onEach { biometricService.toggle() }
-                .launchIn(this)
-        }
+    fun onResume() {
+        biometricService.refreshBiometryState()
     }
 
     fun onPause() {

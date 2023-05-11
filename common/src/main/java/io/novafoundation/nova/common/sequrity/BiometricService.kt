@@ -30,4 +30,6 @@ interface BiometricService {
     fun cancel()
 
     fun enableBiometry(enable: Boolean)
+
+    fun refreshBiometryState()
 }

@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <!--<string name="pincode_fingerprint_switch_dialog_title">Use biometric to authorize</string>-->
+    <string name="pincode_biometric_switch_dialog_title">Use biometric to authorize</string>
+
+    <!--<string name="pincode_fingerprint_error">You are not authorized. Try another finger.</string>-->
+    <string name="pincode_biometric_error">You are not authorized. Try again, please.</string> <!--changed id and value-->
+
+    <string name="common_settings">Settings</string>
+    <string name="settings_biometric_not_ready_title">Biometrics disabled in Settings</string>
+    <string name="settings_biometric_not_ready_message">Please, make sure Nova has access to biometrics in Settings</string>
+
     <string name="referenda_filters_header">Show</string>
     <string name="referenda_filters_all">All referenda</string>
     <string name="referenda_filters_not_voted">Not voted</string>
@@ -13,8 +23,7 @@
 
     <string name="send_address_hint">Address or w3n</string>
 
-    <string name="pincode_biometry_dialog_subtitle">Nova Wallet uses fingerprint to restrict unauthorized users from accessing the app</string>
-    <string name="pincode_biometry_dialog_description">Touch the fingerprint sensor</string>
+    <string name="pincode_biometry_dialog_subtitle">Nova Wallet uses biometric authentication to restrict unauthorized users from accessing the app.</string>
 
     <string name="staking_period_select_date">Select date</string>
     <string name="staking_period_start_date_picker_title">Select start date</string>
@@ -1125,8 +1134,6 @@
     <string name="pincode_confirm_your_pin_code">Confirm your pin code</string>
     <string name="pincode_create_top_title">Create pin code</string>
     <string name="pincode_enter_pin_code_v2_2_0">Enter PIN code</string>
-    <string name="pincode_fingerprint_error">You are not authorized. Try another finger.</string>
-    <string name="pincode_fingerprint_switch_dialog_title">Use biometric to authorize</string>
     <string name="pincode_title_create">Set your pin code</string>
     <string name="profile_accounts_title">Accounts</string>
     <string name="profile_accounts_title_2_0">Wallets</string>

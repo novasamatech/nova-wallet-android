@@ -74,7 +74,7 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
         }
 
         viewModel.showFingerPrintEvent.observeEvent {
-            pinCodeNumbers.changeFingerPrintButtonVisibility(true)
+            pinCodeNumbers.changeBimometricButtonVisibility(it)
         }
 
         viewModel.biometricEvents.observe {

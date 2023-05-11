@@ -79,7 +79,7 @@ class PinCodeViewModel(
             is PinCodeAction.Change,
             is PinCodeAction.TwoFactorVerification -> {
                 currentState = ScreenState.Checking
-                _showFingerPrintEvent.value = Event(biometricService.isBiometricReady())
+                _showFingerPrintEvent.value = Event(biometricService.isBiometricReady() && biometricService.isEnabled())
             }
         }
     }
@@ -206,7 +206,7 @@ class PinCodeViewModel(
             confirmationAwaitableAction.awaitAction(
                 ConfirmationDialogInfo(
                     title = R.string.pincode_biometry_dialog_title,
-                    message = R.string.pincode_fingerprint_switch_dialog_title,
+                    message = R.string.pincode_biometric_switch_dialog_title,
                     positiveButton = R.string.common_use,
                     negativeButton = R.string.common_skip
                 )

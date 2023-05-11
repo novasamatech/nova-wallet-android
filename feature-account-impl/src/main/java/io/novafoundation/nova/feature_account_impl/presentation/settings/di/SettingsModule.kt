@@ -80,7 +80,6 @@ class SettingsModule {
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(resourceManager.getString(R.string.biometric_auth_title))
             .setSubtitle(resourceManager.getString(R.string.pincode_biometry_dialog_subtitle))
-            .setDescription(resourceManager.getString(R.string.pincode_biometry_dialog_description))
             .setNegativeButtonText(resourceManager.getString(R.string.common_cancel))
             .build()
 
