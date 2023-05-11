@@ -224,6 +224,7 @@
     <string name="common_evm_address">EVM Адрес</string>
     <string name="common_existential_warning_message_v2_2_0">Ваша учетная запись будет удалена из сети после операции, так как ваш баланс опустится ниже минимального</string>
     <string name="common_existential_warning_title">Операция удалит аккаунт</string>
+    <string name="common_expired">Истекла</string>
     <string name="common_explore">Исследуй</string>
     <string name="common_filter_sort_header">Сортировать по:</string>
     <string name="common_find_out_more">Узнать больше</string>

@@ -23,7 +23,7 @@
     </plurals>
 
     <plurals name="common_unknown_chains">
-        <item quantity="one">s unsupported</item>
+        <item quantity="one">%s unsupported</item>
         <item quantity="other">%s unsupported</item>
     </plurals>
 
