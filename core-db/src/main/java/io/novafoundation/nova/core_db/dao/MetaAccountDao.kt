@@ -47,7 +47,7 @@ private const val FIND_NAME_BY_ADDRESS_QUERY = """
 """
 
 @Language("RoomSql")
-private const val META_ACCOUNTS_WITH_BALANCE_QUERY = """
+private const val META_ACCOUNTS_WITH_BALANCE_PART = """
     SELECT 
     m.id, 
     a.freeInPlanks, 
@@ -60,7 +60,18 @@ private const val META_ACCOUNTS_WITH_BALANCE_QUERY = """
     INNER JOIN chain_assets AS ca ON a.assetId = ca.id AND a.chainId = ca.chainId
     INNER JOIN currencies as currency ON currency.selected = 1
     INNER JOIN tokens as t ON t.tokenSymbol = ca.symbol AND t.currencyId = currency.id
+"""
+
+@Language("RoomSql")
+private const val META_ACCOUNTS_WITH_BALANCE_QUERY = """
+    $META_ACCOUNTS_WITH_BALANCE_PART
     ORDER BY m.position
+"""
+
+@Language("RoomSql")
+private const val META_ACCOUNT_WITH_BALANCE_QUERY = """
+    $META_ACCOUNTS_WITH_BALANCE_PART
+    WHERE m.id == :metaId
 """
 
 @Dao
@@ -83,10 +94,16 @@ interface MetaAccountDao {
     suspend fun getJoinedMetaAccountsInfo(): List<RelationJoinedMetaAccountInfo>
 
     @Query("SELECT * FROM meta_accounts")
+    suspend fun getMetaAccountsInfo(): List<MetaAccountLocal>
+
+    @Query("SELECT * FROM meta_accounts")
     fun getJoinedMetaAccountsInfoFlow(): Flow<List<RelationJoinedMetaAccountInfo>>
 
     @Query(META_ACCOUNTS_WITH_BALANCE_QUERY)
     fun metaAccountsWithBalanceFlow(): Flow<List<MetaAccountWithBalanceLocal>>
+
+    @Query(META_ACCOUNT_WITH_BALANCE_QUERY)
+    fun metaAccountWithBalanceFlow(metaId: Long): Flow<List<MetaAccountWithBalanceLocal>>
 
     @Query("UPDATE meta_accounts SET isSelected = (id = :metaId)")
     suspend fun selectMetaAccount(metaId: Long)
@@ -101,6 +118,10 @@ interface MetaAccountDao {
     @Query("SELECT * FROM meta_accounts WHERE isSelected = 1")
     @Transaction
     fun selectedMetaAccountInfoFlow(): Flow<RelationJoinedMetaAccountInfo?>
+
+    @Query("SELECT * FROM meta_accounts WHERE id = :metaId")
+    @Transaction
+    fun metaAccountInfoFlow(metaId: Long): Flow<RelationJoinedMetaAccountInfo?>
 
     @Query("SELECT EXISTS ($FIND_ACCOUNT_BY_ADDRESS_QUERY)")
     fun isMetaAccountExists(accountId: AccountId): Boolean

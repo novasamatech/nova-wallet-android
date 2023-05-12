@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    tools:background="@color/secondary_screen_background"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <ImageView
+        android:id="@+id/walletConnectItemIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        app:srcCompat="@drawable/ic_wallet_connect"
+        app:tint="@color/icon_accent" />
+
+    <TextView
+        android:id="@+id/walletConnectItemTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="24dp"
+        android:layout_weight="1"
+        android:drawablePadding="12dp"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:text="@string/wallet_connect_title"
+        android:textColor="@color/text_primary" />
+
+    <io.novafoundation.nova.feature_settings_impl.presentation.settings.view.WalletConnectConnectionsChip
+        android:id="@+id/walletConnectItemValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="8dp"
+        tools:text="12" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="20dp"
+        android:src="@drawable/ic_chevron_right"
+        app:tint="@color/icon_secondary" />
+</merge>

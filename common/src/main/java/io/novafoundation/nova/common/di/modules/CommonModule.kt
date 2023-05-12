@@ -48,6 +48,8 @@ import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.common.utils.sequrity.RealAutomaticInteractionGate
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
@@ -100,8 +102,15 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun provideBackgroundAccessObserver(preferences: Preferences): BackgroundAccessObserver {
-        return BackgroundAccessObserver(preferences)
+    fun provideInteractionGate(): AutomaticInteractionGate = RealAutomaticInteractionGate()
+
+    @Provides
+    @ApplicationScope
+    fun provideBackgroundAccessObserver(
+        preferences: Preferences,
+        automaticInteractionGate: AutomaticInteractionGate
+    ): BackgroundAccessObserver {
+        return BackgroundAccessObserver(preferences, automaticInteractionGate)
     }
 
     @Provides

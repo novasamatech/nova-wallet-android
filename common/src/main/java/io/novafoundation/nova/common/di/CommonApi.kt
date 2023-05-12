@@ -34,6 +34,7 @@ import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -138,4 +139,6 @@ interface CommonApi {
     val listChooserMixinFactory: ListChooserMixin.Factory
 
     val partialRetriableMixinFactory: PartialRetriableMixin.Factory
+
+    val automaticInteractionGate: AutomaticInteractionGate
 }

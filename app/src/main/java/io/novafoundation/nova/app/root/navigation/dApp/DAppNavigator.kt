@@ -6,7 +6,6 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.extrinsicDetails.DappExtrinsicDetailsFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DappSearchFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
@@ -33,11 +32,6 @@ class DAppNavigator(
     override fun openAddToFavourites(payload: AddToFavouritesPayload) = performNavigation(
         actionId = R.id.action_DAppBrowserFragment_to_addToFavouritesFragment,
         args = AddToFavouritesFragment.getBundle(payload)
-    )
-
-    override fun openExtrinsicDetails(extrinsicContent: String) = performNavigation(
-        actionId = R.id.action_ConfirmSignExtrinsicFragment_to_extrinsicDetailsFragment,
-        args = DappExtrinsicDetailsFragment.getBundle(extrinsicContent)
     )
 
     override fun openAuthorizedDApps() = performNavigation(

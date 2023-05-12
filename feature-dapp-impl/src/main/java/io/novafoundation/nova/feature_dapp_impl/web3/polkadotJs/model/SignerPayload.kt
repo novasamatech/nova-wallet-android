@@ -1,18 +1,12 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model
 
-import android.os.Parcelable
 import com.google.gson.Gson
-import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxRequest
-import kotlinx.android.parcel.Parcelize
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.PolkadotSignPayload
 
-@Parcelize
-class PolkadotJsSignRequest(override val id: String, val payload: SignerPayload) : ConfirmTxRequest
-
-sealed class SignerPayload : Parcelable {
+sealed class SignerPayload {
 
     abstract val address: String
 
-    @Parcelize
     class Json(
         override val address: String,
         val blockHash: String,
@@ -28,15 +22,12 @@ sealed class SignerPayload : Parcelable {
         val version: Int
     ) : SignerPayload()
 
-    @Parcelize
     class Raw(
         val data: String,
         override val address: String,
         val type: String?
     ) : SignerPayload()
 }
-
-fun SignerPayload.maybeSignExtrinsic() = this as? SignerPayload.Json?
 
 fun mapRawPayloadToSignerPayloadJSON(
     raw: Any?,
@@ -58,4 +49,32 @@ fun mapRawPayloadToSignerPayloadRaw(
     return runCatching {
         gson.fromJson(tree, SignerPayload.Raw::class.java)
     }.getOrNull()
+}
+
+fun mapPolkadotJsSignerPayloadToPolkadotPayload(signerPayload: SignerPayload): PolkadotSignPayload {
+    return when (signerPayload) {
+        is SignerPayload.Json -> with(signerPayload) {
+            PolkadotSignPayload.Json(
+                address = address,
+                blockHash = blockHash,
+                blockNumber = blockNumber,
+                era = era,
+                genesisHash = genesisHash,
+                method = method,
+                nonce = nonce,
+                specVersion = specVersion,
+                tip = tip,
+                transactionVersion = transactionVersion,
+                signedExtensions = signedExtensions,
+                version = version
+            )
+        }
+        is SignerPayload.Raw -> with(signerPayload) {
+            PolkadotSignPayload.Raw(
+                data = data,
+                address = address,
+                type = type
+            )
+        }
+    }
 }

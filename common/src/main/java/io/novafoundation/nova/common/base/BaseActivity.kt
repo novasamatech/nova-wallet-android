@@ -4,10 +4,22 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleOwner
 import io.novafoundation.nova.common.di.FeatureContainer
+import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.WithLifecycleExtensions
 import javax.inject.Inject
 
-abstract class BaseActivity<T : BaseViewModel> : AppCompatActivity() {
+abstract class BaseActivity<T : BaseViewModel> :
+    AppCompatActivity(),
+    WithContextExtensions,
+    WithLifecycleExtensions {
+
+    override val providedContext: Context
+        get() = this
+
+    override val lifecycleOwner: LifecycleOwner
+        get() = this
 
     @Inject protected open lateinit var viewModel: T
 

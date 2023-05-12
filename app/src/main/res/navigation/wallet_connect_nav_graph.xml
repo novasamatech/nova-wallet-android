@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/wallet_connect_nav_graph"
+    app:startDestination="@id/walletConnectSessionsFragment">
+
+    <fragment
+        android:id="@+id/walletConnectSessionsFragment"
+        android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsFragment"
+        android:label="WalletConnectSessionsFragment">
+
+        <action
+            android:id="@+id/action_walletConnectSessionsFragment_to_walletConnectSessionDetailsFragment"
+            app:destination="@id/walletConnectSessionDetailsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/walletConnectSessionDetailsFragment"
+        android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.details.WalletConnectSessionDetailsFragment"
+        android:label="WalletConnectSessionDetailsFragment">
+
+        <action
+            android:id="@+id/walletConnectSessionDetailsFragment_to_settings"
+            app:popUpTo="@id/wallet_connect_nav_graph"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+</navigation>
