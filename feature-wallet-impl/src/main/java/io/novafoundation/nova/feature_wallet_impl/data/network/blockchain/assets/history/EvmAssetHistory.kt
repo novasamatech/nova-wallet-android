@@ -2,8 +2,11 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
+import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
+import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.satisfies
 import io.novafoundation.nova.runtime.ext.externalApi
@@ -13,7 +16,9 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 private const val FIRST_PAGE_INDEX = 1
 private const val SECOND_PAGE_INDEX = 2
 
-abstract class EvmAssetHistory : AssetHistory {
+abstract class EvmAssetHistory(
+    protected val coinPriceDataSource: CoinPriceDataSource
+) : AssetHistory {
 
     abstract suspend fun fetchEtherscanOperations(
         chain: Chain,
@@ -22,6 +27,7 @@ abstract class EvmAssetHistory : AssetHistory {
         apiUrl: String,
         page: Int,
         pageSize: Int,
+        coinRate: CoinRate?
     ): List<Operation>
 
     override suspend fun additionalFirstPageSync(
@@ -39,7 +45,8 @@ abstract class EvmAssetHistory : AssetHistory {
         filters: Set<TransactionFilter>,
         accountId: AccountId,
         chain: Chain,
-        chainAsset: Chain.Asset
+        chainAsset: Chain.Asset,
+        currency: Currency
     ): DataPage<Operation> {
         val evmTransfersApi = chain.evmTransfersApi() ?: return DataPage.empty()
 
@@ -50,7 +57,8 @@ abstract class EvmAssetHistory : AssetHistory {
             accountId,
             chain,
             chainAsset,
-            evmTransfersApi.url
+            evmTransfersApi.url,
+            currency
         )
     }
 
@@ -75,7 +83,8 @@ abstract class EvmAssetHistory : AssetHistory {
         accountId: AccountId,
         chain: Chain,
         chainAsset: Chain.Asset,
-        apiUrl: String
+        apiUrl: String,
+        currency: Currency
     ): DataPage<Operation> {
         val page = when (pageOffset) {
             PageOffset.Loadable.FirstPage -> FIRST_PAGE_INDEX
@@ -83,7 +92,8 @@ abstract class EvmAssetHistory : AssetHistory {
             else -> error("Etherscan requires page number pagination")
         }
 
-        val operations = fetchEtherscanOperations(chain, chainAsset, accountId, apiUrl, page, pageSize)
+        val coinRate = chainAsset.priceId?.let { coinPriceDataSource.getCoinRate(it, currency) }
+        val operations = fetchEtherscanOperations(chain, chainAsset, accountId, apiUrl, page, pageSize, coinRate)
 
         val newPageOffset = if (operations.size < pageSize) {
             PageOffset.FullData

@@ -1,13 +1,22 @@
 package io.novafoundation.nova.feature_wallet_impl.data.mappers
 
+import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.OperationLocal.ExtrinsicContentType
+import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
+import io.novafoundation.nova.feature_wallet_api.domain.model.convertAmountByPriceRate
+import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
 import io.novafoundation.nova.feature_wallet_impl.data.network.model.response.SubqueryHistoryElementResponse
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import java.math.BigDecimal
+import java.math.BigInteger
+import java.util.TreeMap
+import kotlin.random.Random
+import kotlin.system.measureNanoTime
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
@@ -129,24 +138,28 @@ fun mapOperationLocalToOperation(
                 hash = hash!!,
                 content = mapExtrinsicContentFromLocal(operationLocal.extrinsicContent!!),
                 fee = fee!!,
-                status = mapOperationStatusLocalToOperationStatus(status)
+                fiatFee = operationLocal.fiatFee!!,
+                status = mapOperationStatusLocalToOperationStatus(status),
             )
 
             OperationLocal.Type.TRANSFER -> Type.Transfer(
+                hash = hash,
                 myAddress = address,
                 amount = amount!!,
+                fiatAmount = operationLocal.fiatAmount!!,
                 receiver = receiver!!,
                 sender = sender!!,
-                fee = fee,
                 status = mapOperationStatusLocalToOperationStatus(status),
-                hash = hash
+                fee = fee,
+                fiatFee = operationLocal.fiatFee
             )
 
             OperationLocal.Type.REWARD -> Type.Reward(
                 amount = amount!!,
+                fiatAmount = operationLocal.fiatAmount!!,
                 isReward = isReward!!,
                 era = era!!,
-                validator = validator,
+                validator = validator
             )
         }
 
@@ -163,12 +176,14 @@ fun mapOperationLocalToOperation(
 @OptIn(ExperimentalTime::class)
 fun mapNodeToOperation(
     node: SubqueryHistoryElementResponse.Query.HistoryElements.Node,
-    tokenType: Chain.Asset,
+    coinRate: CoinRate,
+    chainAsset: Chain.Asset,
 ): Operation {
     val type: Type = when {
         node.reward != null -> with(node.reward) {
             Type.Reward(
                 amount = amount,
+                fiatAmount = coinRate.convertPlanks(chainAsset, amount),
                 era = era,
                 isReward = isReward,
                 validator = validator.nullIfEmpty()
@@ -180,6 +195,7 @@ fun mapNodeToOperation(
                 hash = node.extrinsicHash,
                 content = Content.SubstrateCall(module, call),
                 fee = fee,
+                fiatFee = coinRate.convertPlanks(chainAsset, fee),
                 status = Operation.Status.fromSuccess(success)
             )
         }
@@ -188,9 +204,11 @@ fun mapNodeToOperation(
             Type.Transfer(
                 myAddress = node.address,
                 amount = amount,
+                fiatAmount = coinRate.convertPlanks(chainAsset, amount),
                 receiver = to,
                 sender = from,
                 fee = fee,
+                fiatFee = coinRate.convertPlanks(chainAsset, fee),
                 status = Operation.Status.fromSuccess(success),
                 hash = node.extrinsicHash
             )
@@ -198,13 +216,15 @@ fun mapNodeToOperation(
 
         node.assetTransfer != null -> with(node.assetTransfer) {
             Type.Transfer(
+                hash = node.extrinsicHash,
                 myAddress = node.address,
                 amount = amount,
+                fiatAmount = coinRate.convertPlanks(chainAsset, amount),
                 receiver = to,
                 sender = from,
-                fee = fee,
                 status = Operation.Status.fromSuccess(success),
-                hash = node.extrinsicHash
+                fee = fee,
+                fiatFee = coinRate.convertPlanks(chainAsset, fee),
             )
         }
 
@@ -215,7 +235,7 @@ fun mapNodeToOperation(
         id = node.id,
         address = node.address,
         type = type,
-        time = node.timestamp.toLong().seconds.toLongMilliseconds(),
-        chainAsset = tokenType,
+        time = node.timestamp.seconds.toLongMilliseconds(),
+        chainAsset = chainAsset,
     )
 }

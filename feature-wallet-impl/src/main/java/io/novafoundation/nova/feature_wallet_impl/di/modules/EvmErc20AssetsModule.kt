@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
+import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.StaticAssetSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evmErc20.EvmErc20AssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.evmErc20.EvmErc20AssetHistory
@@ -15,6 +16,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.Ethersc
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanTransactionsApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.RealEtherscanTransactionsApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.RetrofitEtherscanTransactionsApi
+import io.novafoundation.nova.feature_wallet_impl.data.source.CoingeckoCoinPriceDataSource
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import javax.inject.Qualifier
@@ -64,8 +66,9 @@ class EvmErc20AssetsModule {
     @Provides
     @FeatureScope
     fun provideHistory(
-        etherscanTransactionsApi: EtherscanTransactionsApi
-    ) = EvmErc20AssetHistory(etherscanTransactionsApi)
+        etherscanTransactionsApi: EtherscanTransactionsApi,
+        coinPriceDataSource: CoinPriceDataSource
+    ) = EvmErc20AssetHistory(etherscanTransactionsApi, coinPriceDataSource)
 
     @Provides
     @EvmErc20Assets

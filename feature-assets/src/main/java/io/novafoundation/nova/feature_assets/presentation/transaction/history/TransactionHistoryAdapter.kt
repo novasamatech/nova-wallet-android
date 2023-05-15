@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.recyclerview.item.OperationListItem
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
@@ -64,7 +65,7 @@ class TransactionHolder(
             valuePrimary.setTextColorRes(item.amountColorRes)
             valuePrimary.text = item.amount
 
-            valueSecondary.text = item.formattedTime
+            valueSecondary.setTextOrHide(item.fiatAmount)
             subHeader.text = item.subHeader
             icon.setIcon(item.operationIcon, imageLoader)
 

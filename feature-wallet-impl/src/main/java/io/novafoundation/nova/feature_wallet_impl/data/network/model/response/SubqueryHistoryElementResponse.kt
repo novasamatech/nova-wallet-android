@@ -13,7 +13,7 @@ class SubqueryHistoryElementResponse(val query: Query) {
 
             class Node(
                 val id: String,
-                val timestamp: String,
+                val timestamp: Long,
                 val extrinsicHash: String,
                 val address: String,
                 val reward: Rewards?,

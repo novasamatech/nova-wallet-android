@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.transaction.history.m
 
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.common.utils.splitSnakeOrCamelCase
@@ -11,8 +12,11 @@ import io.novafoundation.nova.feature_assets.presentation.model.ExtrinsicContent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationStatusAppearance
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
+import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
@@ -60,6 +64,12 @@ private fun formatAmount(chainAsset: Chain.Asset, reward: Operation.Type.Reward)
 
 private fun formatFee(chainAsset: Chain.Asset, extrinsic: Operation.Type.Extrinsic): String {
     return chainAsset.formatPlanksSigned(extrinsic.fee, negative = true)
+}
+
+private fun formatFiatAmount(token: Token, value: BigInteger): String? {
+    val amount = token.amountFromPlanks(value)
+    val fiatAmount = token.priceOfOrNull(amount)
+    return fiatAmount?.formatAsCurrency(token.currency)
 }
 
 private fun mapStatusToStatusAppearance(status: Operation.Status): OperationStatusAppearance {
@@ -148,20 +158,20 @@ private fun substrateCallUi(
 
 fun mapOperationToOperationModel(
     chain: Chain,
+    token: Token,
     operation: Operation,
     nameIdentifier: AddressDisplayUseCase.Identifier,
     resourceManager: ResourceManager,
 ): OperationModel {
     val statusAppearance = mapStatusToStatusAppearance(operation.type.operationStatus)
-    val formattedTime = resourceManager.formatTime(operation.time)
 
     return with(operation) {
         when (val operationType = type) {
             is Operation.Type.Reward -> {
                 OperationModel(
                     id = id,
-                    formattedTime = formattedTime,
                     amount = formatAmount(chainAsset, operationType),
+                    fiatAmount = formatFiatAmount(token, operationType.amount),
                     amountColorRes = if (operationType.isReward) R.color.text_positive else R.color.text_primary,
                     header = resourceManager.getString(
                         if (operationType.isReward) R.string.staking_reward else R.string.staking_slash
@@ -183,8 +193,8 @@ fun mapOperationToOperationModel(
 
                 OperationModel(
                     id = id,
-                    formattedTime = formattedTime,
                     amount = formatAmount(chainAsset, isIncome, operationType),
+                    fiatAmount = formatFiatAmount(token, operationType.amount),
                     amountColorRes = amountColor,
                     header = nameIdentifier.nameOrAddress(operationType.displayAddress(isIncome)),
                     statusAppearance = statusAppearance,
@@ -199,8 +209,8 @@ fun mapOperationToOperationModel(
 
                 OperationModel(
                     id = id,
-                    formattedTime = formattedTime,
                     amount = formatFee(chainAsset, operationType),
+                    fiatAmount = formatFiatAmount(token, operationType.fee),
                     amountColorRes = amountColor,
                     header = header,
                     subHeader = subHeader,

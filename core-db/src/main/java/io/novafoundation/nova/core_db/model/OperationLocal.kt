@@ -2,6 +2,7 @@ package io.novafoundation.nova.core_db.model
 
 import androidx.room.Embedded
 import androidx.room.Entity
+import java.math.BigDecimal
 import java.math.BigInteger
 
 @Entity(
@@ -20,10 +21,12 @@ data class OperationLocal(
     @Embedded(prefix = "extrinsicContent_")
     val extrinsicContent: ExtrinsicContent? = null,
     val amount: BigInteger? = null,
+    val fiatAmount: BigDecimal? = null,
     val sender: String? = null,
     val receiver: String? = null,
     val hash: String? = null,
     val fee: BigInteger? = null,
+    val fiatFee: BigDecimal? = null,
     val isReward: Boolean? = null,
     val era: Int? = null,
     val validator: String? = null,

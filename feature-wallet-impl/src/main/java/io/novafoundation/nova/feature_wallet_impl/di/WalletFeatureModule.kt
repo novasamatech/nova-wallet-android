@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_api.di.Wallet
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
@@ -56,6 +57,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.RealTransactio
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletConstants
 import io.novafoundation.nova.feature_wallet_impl.data.repository.TokenRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletRepositoryImpl
+import io.novafoundation.nova.feature_wallet_impl.data.source.CoingeckoCoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -76,6 +78,15 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideCoingeckoApi(networkApiCreator: NetworkApiCreator): CoingeckoApi {
         return networkApiCreator.create(CoingeckoApi::class.java)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideCoinPriceDataSource(
+        coingeckoApi: CoingeckoApi,
+        httpExceptionHandler: HttpExceptionHandler
+    ): CoinPriceDataSource {
+        return CoingeckoCoinPriceDataSource(coingeckoApi, httpExceptionHandler)
     }
 
     @Provides
@@ -119,22 +130,20 @@ class WalletFeatureModule {
     fun provideWalletRepository(
         substrateSource: SubstrateRemoteSource,
         operationsDao: OperationDao,
-        httpExceptionHandler: HttpExceptionHandler,
         phishingApi: PhishingApi,
         phishingAddressDao: PhishingAddressDao,
         assetCache: AssetCache,
-        coingeckoApi: CoingeckoApi,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
+        coinPriceDataSource: CoinPriceDataSource
     ): WalletRepository = WalletRepositoryImpl(
         substrateSource,
         operationsDao,
-        httpExceptionHandler,
         phishingApi,
         accountRepository,
         assetCache,
         phishingAddressDao,
-        coingeckoApi,
+        coinPriceDataSource,
         chainRegistry,
     )
 
