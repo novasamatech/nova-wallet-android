@@ -59,7 +59,8 @@ class RewardCalculatorFactory(
     }
 
     private suspend fun Chain.Asset.createRewardCalculator(validators: List<RewardCalculationTarget>, totalIssuance: BigInteger): RewardCalculator {
-        return when (staking) {
+        // TODO staking dashboard - switch by selected staking option
+        return when (staking.firstOrNull()) {
             RELAYCHAIN, RELAYCHAIN_AURA -> {
                 val activePublicParachains = parasRepository.activePublicParachains(chainId)
                 val inflationConfig = InflationConfig.Default(activePublicParachains)
@@ -67,7 +68,7 @@ class RewardCalculatorFactory(
                 RewardCurveInflationRewardCalculator(validators, totalIssuance, inflationConfig)
             }
             ALEPH_ZERO -> AlephZeroRewardCalculator(validators, chainAsset = this)
-            UNSUPPORTED, PARACHAIN, TURING -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
+            null, UNSUPPORTED, PARACHAIN, TURING -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
         }
     }
 }

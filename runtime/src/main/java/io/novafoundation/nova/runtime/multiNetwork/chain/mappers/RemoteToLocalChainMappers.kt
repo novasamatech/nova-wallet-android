@@ -90,7 +90,7 @@ fun mapRemoteAssetToLocal(
         chainId = chainRemote.chainId,
         name = assetRemote.name ?: chainRemote.name,
         priceId = assetRemote.priceId,
-        staking = mapRemoteStakingTypeToLocal(assetRemote.staking),
+        staking = mapRemoteStakingTypesToLocal(assetRemote.staking),
         type = assetRemote.type,
         source = AssetSourceLocal.DEFAULT,
         buyProviders = gson.toJson(assetRemote.buyProviders),
@@ -157,9 +157,11 @@ private fun mapSourceTypeRemoteToLocal(sourceType: String): SourceType = when (s
     else -> SourceType.UNKNOWN
 }
 
-private fun mapRemoteStakingTypeToLocal(stakingString: String?): String {
-    val stakingType = mapStakingStringToStakingType(stakingString)
-    return mapStakingTypeToLocal(stakingType)
+private fun mapRemoteStakingTypesToLocal(stakingTypesRemote: List<String>?): String {
+    return stakingTypesRemote.orEmpty().joinToString(separator = ",") { stakingTypeRemote ->
+        val stakingType = mapStakingStringToStakingType(stakingTypeRemote)
+        mapStakingTypeToLocal(stakingType)
+    }
 }
 
 private fun mapStakingStringToStakingType(stakingString: String?): Chain.Asset.StakingType {

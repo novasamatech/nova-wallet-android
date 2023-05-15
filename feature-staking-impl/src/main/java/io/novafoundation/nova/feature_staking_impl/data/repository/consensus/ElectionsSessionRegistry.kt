@@ -19,10 +19,11 @@ class RealElectionsSessionRegistry(
 ) : ElectionsSessionRegistry {
 
     override fun electionsSessionFor(chainAsset: Chain.Asset): ElectionsSession {
-        return when (chainAsset.staking) {
+        return when (chainAsset.staking.firstOrNull()) {
+            // TODO staking dashboard - switch by selected staking option
             RELAYCHAIN -> babeSession
             RELAYCHAIN_AURA, ALEPH_ZERO -> auraSession
-            UNSUPPORTED, PARACHAIN, TURING -> throw IllegalArgumentException("Unsupported staking type in RealStakingSessionRegistry")
+            null, UNSUPPORTED, PARACHAIN, TURING -> throw IllegalArgumentException("Unsupported staking type in RealStakingSessionRegistry")
         }
     }
 }

@@ -24,8 +24,9 @@ class StakingUpdateSystem(
 ) : SingleChainUpdateSystem(chainRegistry, singleAssetSharedState, storageSharedRequestsBuilderFactory) {
 
     override fun getUpdaters(chain: Chain, chainAsset: Chain.Asset): List<Updater> {
-        return commonUpdaters + when (chainAsset.staking) {
-            UNSUPPORTED -> emptyList()
+        // TODO staking dashboard - switch by selected staking option
+        return commonUpdaters + when (chainAsset.staking.firstOrNull()) {
+            UNSUPPORTED, null -> emptyList()
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainUpdaters
             PARACHAIN -> parachainUpdaters
             TURING -> parachainUpdaters + turingExtraUpdaters

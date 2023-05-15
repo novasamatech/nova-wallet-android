@@ -15,6 +15,10 @@ class StakingSharedState(
 ) : GenericSingleAssetSharedState<NothingAdditional>(
     preferences = preferences,
     chainRegistry = chainRegistry,
-    supportedOptions = uniqueOption { _, chainAsset -> chainAsset.staking != Chain.Asset.StakingType.UNSUPPORTED },
+    supportedOptions = uniqueOption { _, chainAsset ->
+        // TODO with multi-staking dashboard, we will have separate implementation of SingleAssetSharedState
+        val first = chainAsset.staking.firstOrNull() ?: return@uniqueOption false
+        first != Chain.Asset.StakingType.UNSUPPORTED
+    },
     preferencesKey = STAKING_SHARED_STATE
 )

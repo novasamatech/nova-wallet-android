@@ -72,8 +72,9 @@ private class CompoundStakingComponent<S, E, A>(
     }
 
     private fun createDelegate(assetWithChain: ChainWithAsset, childHostContext: ComponentHostContext): StatefullComponent<S, E, A> {
-        return when (assetWithChain.asset.staking) {
-            UNSUPPORTED -> UnsupportedComponent()
+        // TODO staking dashboard - switch by selected staking option
+        return when (assetWithChain.asset.staking.firstOrNull()) {
+            null, UNSUPPORTED -> UnsupportedComponent()
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainComponentCreator(assetWithChain, childHostContext)
             PARACHAIN -> parachainComponentCreator(assetWithChain, childHostContext)
             TURING -> turingComponentCreator(assetWithChain, childHostContext)
