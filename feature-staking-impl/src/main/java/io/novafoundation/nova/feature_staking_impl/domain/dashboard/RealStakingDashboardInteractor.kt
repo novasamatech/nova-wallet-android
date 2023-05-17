@@ -153,4 +153,3 @@ class RealStakingDashboardInteractor(
         return count { (_, chain) -> chain.assets.any { it.supportedStakingOptions().isNotEmpty() } }
     }
 }
-

@@ -179,7 +179,7 @@ fun mapStakingStringToStakingType(stakingString: String?): Chain.Asset.StakingTy
 fun mapStakingTypeToStakingString(stakingType: Chain.Asset.StakingType): String? {
     return when (stakingType) {
         Chain.Asset.StakingType.UNSUPPORTED -> null
-        Chain.Asset.StakingType.RELAYCHAIN ->  "relaychain"
+        Chain.Asset.StakingType.RELAYCHAIN -> "relaychain"
         Chain.Asset.StakingType.PARACHAIN -> "parachain"
         Chain.Asset.StakingType.RELAYCHAIN_AURA -> "aura-relaychain"
         Chain.Asset.StakingType.TURING -> "turing"

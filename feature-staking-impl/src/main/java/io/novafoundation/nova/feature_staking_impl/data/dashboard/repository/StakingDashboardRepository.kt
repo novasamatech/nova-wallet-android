@@ -20,7 +20,7 @@ interface StakingDashboardRepository {
 
 class RealStakingDashboardRepository(
     private val dao: StakingDashboardDao
-): StakingDashboardRepository {
+) : StakingDashboardRepository {
 
     override fun dashboardItemsFlow(metaAccountId: Long): Flow<List<StakingDashboardItem>> {
         return dao.dashboardItemsFlow(metaAccountId).mapList(::mapDashboardItemFromLocal)
@@ -61,7 +61,7 @@ class RealStakingDashboardRepository(
     }
 
     private fun mapStakingStatusFromLocal(localStatus: StakingDashboardItemLocal.Status): HasStake.StakingStatus {
-        return when(localStatus) {
+        return when (localStatus) {
             StakingDashboardItemLocal.Status.ACTIVE -> HasStake.StakingStatus.ACTIVE
             StakingDashboardItemLocal.Status.INACTIVE -> HasStake.StakingStatus.INACTIVE
             StakingDashboardItemLocal.Status.WAITING -> HasStake.StakingStatus.WAITING

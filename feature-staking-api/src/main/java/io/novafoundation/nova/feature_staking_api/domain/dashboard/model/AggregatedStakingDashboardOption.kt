@@ -36,5 +36,3 @@ class AggregatedStakingDashboardOption<S>(
         class Stats(val earnings: Percent)
     }
 }
-
-

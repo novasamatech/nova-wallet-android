@@ -165,7 +165,6 @@ class StakingDashboardRelayStakingUpdater(
     }
 }
 
-
 private class RelaychainStakingBaseInfo(
     val stakingLedger: StakingLedger,
     val nominations: Nominations?,

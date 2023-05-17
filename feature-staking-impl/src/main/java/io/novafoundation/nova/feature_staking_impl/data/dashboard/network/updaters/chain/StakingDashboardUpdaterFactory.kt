@@ -21,8 +21,8 @@ class StakingDashboardUpdaterFactory(
         stakingType: Chain.Asset.StakingType,
         metaAccount: MetaAccount,
         stakingStatsAsync: Deferred<MultiChainStakingStats>,
-    ) : Updater? {
-        return when(stakingType.group()) {
+    ): Updater? {
+        return when (stakingType.group()) {
             StakingTypeGroup.RELAYCHAIN -> relayChain(chain, stakingType, metaAccount, stakingStatsAsync)
             StakingTypeGroup.PARACHAIN -> null // TODO
             StakingTypeGroup.UNSUPPORTED -> null
@@ -34,7 +34,7 @@ class StakingDashboardUpdaterFactory(
         stakingType: Chain.Asset.StakingType,
         metaAccount: MetaAccount,
         stakingStatsAsync: Deferred<MultiChainStakingStats>,
-    ) : Updater {
+    ): Updater {
         return StakingDashboardRelayStakingUpdater(
             chain = chain,
             chainAsset = chain.utilityAsset,

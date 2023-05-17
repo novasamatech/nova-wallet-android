@@ -30,7 +30,7 @@ class RealStakingDashboardUpdateSystem(
     private val chainRegistry: ChainRegistry,
     private val updaterFactory: StakingDashboardUpdaterFactory,
     private val sharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
-): StakingDashboardUpdateSystem {
+) : StakingDashboardUpdateSystem {
 
     override val syncedItemsFlow: MutableStateFlow<Set<StakingOptionId>> = MutableStateFlow(emptySet())
 

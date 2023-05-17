@@ -18,7 +18,7 @@ interface StakingDashboardCache {
 
 class RealStakingDashboardCache(
     private val dao: StakingDashboardDao
-): StakingDashboardCache {
+) : StakingDashboardCache {
 
     override suspend fun update(
         chainId: ChainId,

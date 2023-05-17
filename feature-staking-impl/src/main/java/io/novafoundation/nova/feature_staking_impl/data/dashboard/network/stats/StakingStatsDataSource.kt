@@ -50,10 +50,12 @@ class RealStakingStatsDataSource(
     }
 
     private fun <T : StakingStatsResponse.WithStakingId> SubQueryNodes<T>.associatedById(): Map<StakingOptionId, T> {
-        return nodes.associateBy { StakingOptionId(
-            chainId = it.networkId.requireHexPrefix(),
-            chainAssetId = UTILITY_ASSET_ID,
-            stakingType = mapStakingStringToStakingType(it.stakingType)
-        ) }
+        return nodes.associateBy {
+            StakingOptionId(
+                chainId = it.networkId.requireHexPrefix(),
+                chainAssetId = UTILITY_ASSET_ID,
+                stakingType = mapStakingStringToStakingType(it.stakingType)
+            )
+        }
     }
 }

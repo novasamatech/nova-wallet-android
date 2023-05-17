@@ -2,7 +2,6 @@
 
 package io.novafoundation.nova.common.utils
 
-
 /**
  * Type that represents [Percent] / 100
  * This, 0.1 will represent equivalent to 10%
@@ -14,7 +13,6 @@ value class Perbill(val value: Double) : Comparable<Perbill> {
         return value.compareTo(other.value)
     }
 }
-
 
 /**
  * Type that represents percentages
