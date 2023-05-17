@@ -19,6 +19,12 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 fun bindStakingLedger(scale: String, runtime: RuntimeSnapshot): StakingLedger {
     val type = runtime.metadata.staking().storage("Ledger").returnType()
     val dynamicInstance = type.fromHexOrNull(runtime, scale) ?: incompatible()
+
+    return bindStakingLedger(dynamicInstance)
+}
+
+@UseCaseBinding
+fun bindStakingLedger(dynamicInstance: Any): StakingLedger {
     requireType<Struct.Instance>(dynamicInstance)
 
     return StakingLedger(
@@ -28,6 +34,11 @@ fun bindStakingLedger(scale: String, runtime: RuntimeSnapshot): StakingLedger {
         unlocking = dynamicInstance.getList("unlocking").map(::bindUnlockChunk),
         claimedRewards = dynamicInstance.getList("claimedRewards").map(::bindEraIndex)
     )
+}
+
+@UseCaseBinding
+fun bindStakingLedgerOrNull(dynamicInstance: Any?): StakingLedger? {
+    return dynamicInstance?.let(::bindStakingLedger)
 }
 
 @HelperBinding

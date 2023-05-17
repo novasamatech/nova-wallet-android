@@ -8,6 +8,12 @@ import io.novafoundation.nova.common.utils.findIsInstanceOrNull
 import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ExplorerTemplateExtractor
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -43,12 +49,33 @@ val Chain.isSubstrateBased
 val Chain.commissionAsset
     get() = utilityAsset
 
+fun Chain.Asset.supportedStakingOptions(): List<Chain.Asset.StakingType> {
+    if (staking.isEmpty()) return emptyList()
+
+    return staking.filter { it != UNSUPPORTED }
+}
+
+enum class StakingTypeGroup {
+
+    RELAYCHAIN, PARACHAIN, UNSUPPORTED
+}
+
+fun Chain.Asset.StakingType.group(): StakingTypeGroup {
+    return when (this) {
+        UNSUPPORTED -> StakingTypeGroup.UNSUPPORTED
+        RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> StakingTypeGroup.RELAYCHAIN
+        PARACHAIN, TURING -> StakingTypeGroup.PARACHAIN
+    }
+}
+
 inline fun <reified T : Chain.ExternalApi> Chain.externalApi(): T? {
     return externalApis.findIsInstanceOrNull<T>()
 }
 
+const val UTILITY_ASSET_ID = 0
+
 val Chain.Asset.isUtilityAsset: Boolean
-    get() = id == 0
+    get() = id == UTILITY_ASSET_ID
 
 private const val MOONBEAM_XC_PREFIX = "xc"
 

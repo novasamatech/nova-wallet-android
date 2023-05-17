@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.map
 
 sealed class ExtendedLoadingState<out T> {
 
+    companion object;
+
     object Loading : ExtendedLoadingState<Nothing>()
 
     class Error(val exception: Throwable) : ExtendedLoadingState<Nothing>()
@@ -49,4 +51,12 @@ suspend fun <T> FlowCollector<ExtendedLoadingState<T>>.emitLoading() {
 
 suspend fun <T> FlowCollector<ExtendedLoadingState<T>>.emitError(throwable: Throwable) {
     emit(ExtendedLoadingState.Error(throwable))
+}
+
+fun <T> ExtendedLoadingState.Companion.fromOption(value: T?): ExtendedLoadingState<T> {
+    return if (value != null) {
+        ExtendedLoadingState.Loaded(value)
+    } else {
+        ExtendedLoadingState.Loading
+    }
 }

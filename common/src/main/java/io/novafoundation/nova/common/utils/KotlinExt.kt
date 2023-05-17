@@ -74,6 +74,8 @@ inline fun <T : Comparable<T>, R : Comparable<R>> ClosedRange<T>.map(mapper: (T)
 fun BigInteger?.orZero(): BigInteger = this ?: BigInteger.ZERO
 fun BigDecimal?.orZero(): BigDecimal = this ?: 0.toBigDecimal()
 
+fun Double?.orZero(): Double = this ?: 0.0
+
 fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = MathContext.DECIMAL64): BigDecimal {
     return toBigDecimal().divide(divisor.toBigDecimal(), mathContext)
 }
@@ -260,6 +262,10 @@ fun <T> List<T>.modified(index: Int, modification: T): List<T> {
     newList[index] = modification
 
     return newList
+}
+
+fun <T> Set<T>.added(toAdd: T): Set<T> {
+    return toMutableSet().apply { add(toAdd) }
 }
 
 fun <K, V> Map<K, V>.inserted(key: K, value: V): Map<K, V> {

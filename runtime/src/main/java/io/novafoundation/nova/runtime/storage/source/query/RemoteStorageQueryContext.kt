@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.network.rpc.queryKey
 import io.novafoundation.nova.common.data.network.rpc.retrieveAllValues
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
+import io.novafoundation.nova.core.updater.SubstrateSubscriptionBuilder
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.SubscribeStorageRequest
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.map
 class RemoteStorageQueryContext(
     private val bulkRetriever: BulkRetriever,
     private val socketService: SocketService,
+    private val subscriptionBuilder: SubstrateSubscriptionBuilder?,
     at: BlockHash?,
     runtime: RuntimeSnapshot
 ) : BaseStorageQueryContext(runtime, at) {
@@ -35,9 +37,14 @@ class RemoteStorageQueryContext(
         return bulkRetriever.queryKey(socketService, key, at)
     }
 
+    @Suppress("IfThenToElvis")
     override suspend fun observeKey(key: String): Flow<String?> {
-        return socketService.subscriptionFlow(SubscribeStorageRequest(key))
-            .map { it.storageChange().getSingleChange() }
+        return if (subscriptionBuilder != null) {
+            subscriptionBuilder.subscribe(key).map { it.value }
+        } else {
+            socketService.subscriptionFlow(SubscribeStorageRequest(key))
+                .map { it.storageChange().getSingleChange() }
+        }
     }
 
     override suspend fun observeKeys(keys: List<String>): Flow<Map<String, String?>> {

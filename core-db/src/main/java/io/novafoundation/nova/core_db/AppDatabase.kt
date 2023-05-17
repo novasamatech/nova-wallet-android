@@ -33,6 +33,7 @@ import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.PhishingSitesDao
+import io.novafoundation.nova.core_db.dao.StakingDashboardDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
@@ -58,6 +59,7 @@ import io.novafoundation.nova.core_db.migrations.AddNodeSelectionStrategyField_3
 import io.novafoundation.nova.core_db.migrations.AddRuntimeFlagToChains_36_37
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AddSourceToLocalAsset_28_29
+import io.novafoundation.nova.core_db.migrations.AddStakingDashboardItems_40_41
 import io.novafoundation.nova.core_db.migrations.AddTransferApisTable_29_30
 import io.novafoundation.nova.core_db.migrations.AddVersioningToGovernanceDapps_32_33
 import io.novafoundation.nova.core_db.migrations.AddWalletConnectSessions_39_40
@@ -91,6 +93,7 @@ import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.PhishingAddressLocal
 import io.novafoundation.nova.core_db.model.PhishingSiteLocal
+import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.core_db.model.StorageEntryLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.core_db.model.TotalRewardLocal
@@ -105,7 +108,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 40,
+    version = 41,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -133,7 +136,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         ContributionLocal::class,
         GovernanceDAppLocal::class,
         BrowserHostSettingsLocal::class,
-        WalletConnectSessionAccountLocal::class
+        WalletConnectSessionAccountLocal::class,
+        StakingDashboardItemLocal::class,
     ],
 )
 @TypeConverters(
@@ -178,7 +182,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddGovernanceNetworkToExternalApi_33_34, AddBrowserHostSettings_34_35)
                     .addMigrations(ExtractExternalApiToSeparateTable_35_36, AddRuntimeFlagToChains_36_37)
                     .addMigrations(AddExtrinsicContentField_37_38, AddNodeSelectionStrategyField_38_39)
-                    .addMigrations(AddWalletConnectSessions_39_40)
+                    .addMigrations(AddWalletConnectSessions_39_40, AddStakingDashboardItems_40_41)
                     .build()
             }
             return instance!!
@@ -228,4 +232,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun browserHostSettingsDao(): BrowserHostSettingsDao
 
     abstract fun walletConnectSessionsDao(): WalletConnectSessionsDao
+
+    abstract fun stakingDashboardDao(): StakingDashboardDao
 }
