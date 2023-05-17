@@ -9,13 +9,14 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardOptionUpdated
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterFactory
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
+import io.novafoundation.nova.runtime.ethereum.subscribe
 import io.novafoundation.nova.runtime.ext.supportedStakingOptions
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.findChains
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlin.coroutines.coroutineContext
 
 class RealStakingDashboardUpdateSystem(
     private val stakingStatsDataSource: StakingStatsDataSource,
@@ -38,28 +40,30 @@ class RealStakingDashboardUpdateSystem(
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
             syncedItemsFlow.emit(emptySet())
 
-            coroutineScope {
-                val stakingChains = chainRegistry.stakingChains()
+            val stakingChains = chainRegistry.stakingChains()
 
-                val statsDeferred = async { stakingStatsDataSource.fetchStakingStats(metaAccount, stakingChains) }
+            val statsDeferred = CoroutineScope(coroutineContext).async { stakingStatsDataSource.fetchStakingStats(metaAccount, stakingChains) }
 
-                val updateFlows = stakingChains.flatMap { stakingChain ->
-                    val sharedRequestsBuilder = sharedRequestsBuilderFactory.create(stakingChain.id)
+            val updateFlows = stakingChains.flatMap { stakingChain ->
+                val sharedRequestsBuilder = sharedRequestsBuilderFactory.create(stakingChain.id)
 
-                    stakingChain.utilityAsset.supportedStakingOptions().mapNotNull { stakingType ->
-                        val updater = updaterFactory.createUpdater(stakingChain, stakingType, metaAccount, statsDeferred)
-                            ?: return@mapNotNull null
+                val chainUpdates = stakingChain.utilityAsset.supportedStakingOptions().mapNotNull { stakingType ->
+                    val updater = updaterFactory.createUpdater(stakingChain, stakingType, metaAccount, statsDeferred)
+                        ?: return@mapNotNull null
 
-                        updater.listenForUpdates(sharedRequestsBuilder)
-                    }
+                    updater.listenForUpdates(sharedRequestsBuilder)
                 }
 
-                updateFlows.merge()
-                    .filterIsInstance<StakingDashboardOptionUpdated>()
-                    .onEach {
-                        syncedItemsFlow.value = syncedItemsFlow.value.added(it.option)
-                    }
+                sharedRequestsBuilder.subscribe(coroutineContext)
+
+                chainUpdates
             }
+
+            updateFlows.merge()
+                .filterIsInstance<StakingDashboardOptionUpdated>()
+                .onEach {
+                    syncedItemsFlow.value = syncedItemsFlow.value.added(it.option)
+                }
         }
             .onCompletion { syncedItemsFlow.emit(emptySet()) }
     }

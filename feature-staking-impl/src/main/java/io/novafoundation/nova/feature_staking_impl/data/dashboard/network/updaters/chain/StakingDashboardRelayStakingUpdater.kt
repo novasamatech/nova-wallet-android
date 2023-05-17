@@ -12,6 +12,7 @@ import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal.Status
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
@@ -22,7 +23,6 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindin
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindNominationsOrNull
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedgerOrNull
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
-import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapStakingTypeToStakingString
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -82,7 +82,7 @@ class StakingDashboardRelayStakingUpdater(
         }
     }
 
-    private suspend fun subscribeToStakingState(controllerId: AccountId): Flow<RelaychainStakingBaseInfo?> {
+    private fun subscribeToStakingState(controllerId: AccountId): Flow<RelaychainStakingBaseInfo?> {
         return remoteStorageSource.subscribe(chain.id) {
             metadata.staking().storage("Ledger").observe(controllerId, binding = ::bindStakingLedgerOrNull).flatMapLatest { ledger ->
                 if (ledger != null) {

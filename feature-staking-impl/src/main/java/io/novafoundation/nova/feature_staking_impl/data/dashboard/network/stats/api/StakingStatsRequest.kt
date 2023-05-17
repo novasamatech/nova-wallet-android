@@ -19,33 +19,31 @@ class StakingStatsRequest(metaAccount: MetaAccount, chains: List<Chain>) {
 
     val query = """
     {
-        query {
-            activeStakers(
-                filter: { $chainAddressesFilter }
-            ) {
-                nodes {
-                    networkId
-                    stakingType
-                    address
-                }
+        activeStakers(
+            filter: { $chainAddressesFilter }
+        ) {
+            nodes {
+                networkId
+                stakingType
+                address
             }
-            
-            stakingApies {
-                nodes {
-                    networkId
-                    stakingType
-                    maxAPY
-                }
+        }
+        
+        stakingApies {
+            nodes {
+                networkId
+                stakingType
+                maxAPY
             }
-            
-            accumulatedRewards(
-                filter: { $chainAddressesFilter }
-            ) {
-                nodes {
-                    networkId
-                    stakingType
-                    amount
-                }
+        }
+        
+        accumulatedRewards(
+            filter: { $chainAddressesFilter }
+        ) {
+            nodes {
+                networkId
+                stakingType
+                amount
             }
         }
     }

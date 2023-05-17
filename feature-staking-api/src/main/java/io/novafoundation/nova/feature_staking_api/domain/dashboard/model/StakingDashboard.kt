@@ -6,5 +6,5 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 class StakingDashboard(
     val hasStake: List<AggregatedStakingDashboardOption<HasStake>>,
     val noStake: List<AggregatedStakingDashboardOption<NoStake>>,
-    val resolvingItems: Int
+    val resolvingItems: Int,
 )
