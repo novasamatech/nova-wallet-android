@@ -3,10 +3,12 @@ package io.novafoundation.nova.feature_staking_api.domain.dashboard.model
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class AggregatedStakingDashboardOption<S>(
     val chain: Chain,
+    val token: Token,
     val stakingState: S,
     val syncing: Boolean
 ) {

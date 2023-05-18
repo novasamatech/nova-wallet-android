@@ -17,10 +17,14 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Staking
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.model.StakingDashboardItem
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.supportedStakingOptions
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -34,14 +38,16 @@ class RealStakingDashboardInteractor(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val stakingDashboardSyncTracker: StakingDashboardSyncTracker,
+    private val tokenRepository: TokenRepository
 ) : StakingDashboardInteractor {
 
     override fun stakingDashboardFlow(): Flow<StakingDashboard> {
         return flow {
             val chains = chainRegistry.chainsById()
-            val knownStakingChainsCount = chains.knownStakingChainsCount()
+            val knownStakingAssets = chains.knownStakingAssets()
+            val knownStakingChainsCount = knownStakingAssets.distinctBy { it.chainId }.size
 
-            val innerFlow = accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
+            val noPriceDashboardFlow = accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
                 combine(
                     dashboardRepository.dashboardItemsFlow(metaAccount.id),
                     stakingDashboardSyncTracker.syncedItemsFlow,
@@ -50,7 +56,11 @@ class RealStakingDashboardInteractor(
                 }
             }
 
-            emitAll(innerFlow)
+            val pricesFlow = tokenRepository.observeTokens(knownStakingAssets)
+
+            val dashboardFlow = combine(noPriceDashboardFlow, pricesFlow, ::addPricesToDashboard)
+
+            emitAll(dashboardFlow)
         }
     }
 
@@ -59,11 +69,11 @@ class RealStakingDashboardInteractor(
         knownStakingChainsCount: Int,
         dashboardItems: List<StakingDashboardItem>,
         syncedIds: Set<StakingOptionId>
-    ): StakingDashboard {
+    ): NoPriceStakingDashboard {
         val itemsByChain = dashboardItems.groupBy(StakingDashboardItem::fullChainAssetId)
 
-        val hasStake = mutableListOf<AggregatedStakingDashboardOption<HasStake>>()
-        val noStake = mutableListOf<AggregatedStakingDashboardOption<NoStake>>()
+        val hasStake = mutableListOf<NoPriceStakingDashboardOption<HasStake>>()
+        val noStake = mutableListOf<NoPriceStakingDashboardOption<NoStake>>()
 
         itemsByChain.forEach { (fullChainAssetId, items) ->
             val chain = chainsById[fullChainAssetId.chainId] ?: return@forEach
@@ -80,10 +90,33 @@ class RealStakingDashboardInteractor(
         val resolvedItems = itemsByChain.size
         val resolvingItems = (knownStakingChainsCount - resolvedItems).coerceAtLeast(0)
 
-        return StakingDashboard(
+        return NoPriceStakingDashboard(
             hasStake = hasStake,
             noStake = noStake,
             resolvingItems = resolvingItems
+        )
+    }
+
+    private fun addPricesToDashboard(
+        noPriceStakingDashboard: NoPriceStakingDashboard,
+        prices: Map<FullChainAssetId, Token>
+    ): StakingDashboard {
+        return StakingDashboard(
+            hasStake = noPriceStakingDashboard.hasStake.map { addPriceToStakingDashboardItem(it, prices) },
+            noStake = noPriceStakingDashboard.noStake.map { addPriceToStakingDashboardItem(it, prices) },
+            resolvingItems = noPriceStakingDashboard.resolvingItems
+        )
+    }
+
+    private fun <S> addPriceToStakingDashboardItem(
+        item: NoPriceStakingDashboardOption<S>,
+        prices: Map<FullChainAssetId, Token>,
+    ): AggregatedStakingDashboardOption<S> {
+        return AggregatedStakingDashboardOption(
+            chain = item.chain,
+            token = prices.getValue(item.chainAsset.fullId),
+            stakingState = item.stakingState,
+            syncing = item.syncing
         )
     }
 
@@ -98,12 +131,13 @@ class RealStakingDashboardInteractor(
         chainAsset: Chain.Asset,
         items: List<StakingDashboardItem>,
         syncedIds: Set<StakingOptionId>,
-    ): AggregatedStakingDashboardOption<NoStake> {
+    ): NoPriceStakingDashboardOption<NoStake> {
         val maxEarnings = items.findMaxEarnings()
         val stats = maxEarnings?.let(NoStake::Stats)
 
-        return AggregatedStakingDashboardOption(
+        return NoPriceStakingDashboardOption(
             chain = chain,
+            chainAsset = chainAsset,
             stakingState = NoStake(
                 stats = ExtendedLoadingState.fromOption(stats),
                 flowType = NoStake.FlowType.Aggregated
@@ -119,11 +153,12 @@ class RealStakingDashboardInteractor(
         chainAsset: Chain.Asset,
         item: StakingDashboardItem,
         syncedIds: Set<StakingOptionId>,
-    ): AggregatedStakingDashboardOption<HasStake>? {
+    ): NoPriceStakingDashboardOption<HasStake>? {
         if (item.stakeState !is StakingDashboardItem.StakeState.HasStake) return null
 
-        return AggregatedStakingDashboardOption(
+        return NoPriceStakingDashboardOption(
             chain = chain,
+            chainAsset = chainAsset,
             stakingState = HasStake(
                 stats = item.stakeState.stats.map(::mapItemStatsToOptionStats),
                 stakingType = item.stakingType,
@@ -149,7 +184,20 @@ class RealStakingDashboardInteractor(
         }
     }
 
-    private fun ChainsById.knownStakingChainsCount(): Int {
-        return count { (_, chain) -> chain.assets.any { it.supportedStakingOptions().isNotEmpty() } }
+    private fun ChainsById.knownStakingAssets(): List<Chain.Asset> {
+        return flatMap { (_, chain) -> chain.assets.filter { it.supportedStakingOptions().isNotEmpty() } }
     }
+
+    private class NoPriceStakingDashboardOption<S>(
+        val chain: Chain,
+        val chainAsset: Chain.Asset,
+        val stakingState: S,
+        val syncing: Boolean
+    )
+
+    private class NoPriceStakingDashboard(
+        val hasStake: List<NoPriceStakingDashboardOption<HasStake>>,
+        val noStake: List<NoPriceStakingDashboardOption<NoStake>>,
+        val resolvingItems: Int,
+    )
 }
