@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.update
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.RealStakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.domain.dashboard.RealStakingDashboardInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -76,10 +77,12 @@ class StakingDashboardModule {
         chainRegistry: ChainRegistry,
         accountRepository: AccountRepository,
         stakingDashboardUpdateSystem: StakingDashboardUpdateSystem,
+        tokenRepository: TokenRepository
     ): StakingDashboardInteractor = RealStakingDashboardInteractor(
         dashboardRepository = dashboardRepository,
         chainRegistry = chainRegistry,
         accountRepository = accountRepository,
-        stakingDashboardSyncTracker = stakingDashboardUpdateSystem
+        stakingDashboardSyncTracker = stakingDashboardUpdateSystem,
+        tokenRepository = tokenRepository
     )
 }
