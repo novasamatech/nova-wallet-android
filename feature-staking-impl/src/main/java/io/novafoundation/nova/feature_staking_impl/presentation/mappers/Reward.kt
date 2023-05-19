@@ -36,7 +36,7 @@ fun mapPeriodReturnsToRewardEstimation(
 
     return RewardEstimation(
         amount = amountWithSuffix,
-        fiatAmount = token.priceOf(periodReturns.gainAmount).formatAsCurrency(token.currency),
+        fiatAmount = token.amountToFiat(periodReturns.gainAmount).formatAsCurrency(token.currency),
         gain = gainWithSuffix
     )
 }

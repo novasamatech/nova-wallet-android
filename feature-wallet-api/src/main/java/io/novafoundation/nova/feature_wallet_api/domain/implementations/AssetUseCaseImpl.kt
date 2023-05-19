@@ -52,7 +52,7 @@ class AssetUseCaseImpl(
     private fun assetsComparator(): Comparator<AssetAndOption> {
         return compareBy<AssetAndOption> { it.option.assetWithChain.chain.relaychainsFirstAscendingOrder }
             .thenBy { it.option.assetWithChain.chain.testnetsLastAscendingOrder }
-            .thenByDescending { it.asset.token.priceOf(it.asset.transferable) }
+            .thenByDescending { it.asset.token.amountToFiat(it.asset.transferable) }
             .thenByDescending { it.asset.transferable }
             .thenBy { it.option.assetWithChain.chain.alphabeticalOrder }
     }

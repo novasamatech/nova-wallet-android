@@ -8,9 +8,10 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.filterOwn
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
-import io.novafoundation.nova.feature_wallet_api.data.source.getCoinRateByAsset
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
-import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksToFiatOrNull
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.SubstrateAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
@@ -28,6 +29,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.call
 class EquilibriumAssetHistory(
     private val chainRegistry: ChainRegistry,
     private val eventsRepository: EventsRepository,
+    private val walletRepository: WalletRepository,
     walletOperationsApi: SubQueryOperationsApi,
     cursorStorage: TransferCursorStorage,
     coinPriceDataSource: CoinPriceDataSource
@@ -43,7 +45,7 @@ class EquilibriumAssetHistory(
         val runtime = chainRegistry.getRuntime(chain.id)
         val extrinsicsWithEvents = eventsRepository.getExtrinsicsWithEvents(chain.id, blockHash)
 
-        val coinRate = coinPriceDataSource.getCoinRateByAsset(chainAsset, currency)
+        val token = walletRepository.getAsset(accountId, chainAsset)?.token
 
         extrinsicsWithEvents.filter { it.extrinsic.call.isTransfer(runtime) }
             .map { extrinsicWithEvents ->
@@ -54,7 +56,7 @@ class EquilibriumAssetHistory(
                     senderId = bindAccountIdentifier(extrinsic.signature!!.accountIdentifier),
                     recipientId = bindAccountIdentifier(extrinsic.call.arguments["to"]),
                     amountInPlanks = amount,
-                    fiatAmount = coinRate?.convertPlanks(chainAsset, amount),
+                    fiatAmount = token?.planksToFiatOrNull(amount),
                     hash = extrinsicWithEvents.extrinsicHash,
                     chainAsset = chainAsset,
                     status = extrinsicWithEvents.status()

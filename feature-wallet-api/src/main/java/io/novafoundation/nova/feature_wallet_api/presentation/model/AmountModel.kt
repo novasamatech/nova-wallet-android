@@ -47,7 +47,7 @@ fun mapAmountToAmountModel(
     tokenAmountSign: AmountSign = AmountSign.NONE,
     roundingMode: RoundingMode = RoundingMode.FLOOR
 ): AmountModel {
-    val fiatAmount = token.priceOf(amount)
+    val fiatAmount = token.amountToFiat(amount)
 
     val unsignedTokenAmount = if (includeAssetTicker) {
         amount.formatTokenAmount(token.configuration, roundingMode)

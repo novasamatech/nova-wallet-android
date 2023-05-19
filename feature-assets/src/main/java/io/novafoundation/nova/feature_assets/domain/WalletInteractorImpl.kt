@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetF
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByNetwork
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
@@ -41,6 +42,7 @@ class WalletInteractorImpl(
     private val chainRegistry: ChainRegistry,
     private val nftRepository: NftRepository,
     private val transactionHistoryRepository: TransactionHistoryRepository,
+    private val currencyRepository: CurrencyRepository
 ) : WalletInteractor {
 
     override fun filterAssets(assetsFlow: Flow<List<Asset>>): Flow<List<Asset>> {
@@ -102,8 +104,9 @@ class WalletInteractorImpl(
             val metaAccount = accountRepository.getSelectedMetaAccount()
             val (chain, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
             val accountId = metaAccount.accountIdIn(chain)!!
+            val currency = currencyRepository.getSelectedCurrency()
 
-            transactionHistoryRepository.syncOperationsFirstPage(pageSize, filters, accountId, chain, chainAsset)
+            transactionHistoryRepository.syncOperationsFirstPage(pageSize, filters, accountId, chain, chainAsset, currency)
         }
     }
 
@@ -118,6 +121,7 @@ class WalletInteractorImpl(
             val metaAccount = accountRepository.getSelectedMetaAccount()
             val (chain, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
             val accountId = metaAccount.requireAccountIdIn(chain)
+            val currency = currencyRepository.getSelectedCurrency()
 
             transactionHistoryRepository.getOperations(
                 pageSize = pageSize,
@@ -125,7 +129,8 @@ class WalletInteractorImpl(
                 filters = filters,
                 accountId = accountId,
                 chain = chain,
-                chainAsset = chainAsset
+                chainAsset = chainAsset,
+                currency = currency
             )
         }
     }

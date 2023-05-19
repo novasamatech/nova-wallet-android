@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapAssetLocalToAs
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.runtime.ext.addressOf
-import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -96,7 +95,7 @@ class WalletRepositoryImpl(
             val updatedTokens = coinPriceChanges.flatMap { (priceId, coinPriceChange) ->
                 syncingPriceIdsToSymbols[priceId]?.let { symbols ->
                     symbols.map { symbol ->
-                        TokenLocal(symbol, coinPriceChange?.value, currency.id, coinPriceChange?.recentRateChange)
+                        TokenLocal(symbol, coinPriceChange?.rate, currency.id, coinPriceChange?.recentRateChange)
                     }
                 } ?: emptyList()
             }
@@ -110,7 +109,7 @@ class WalletRepositoryImpl(
 
         val coinPriceChange = getAssetPrice(priceId, currency)
 
-        val token = TokenLocal(asset.symbol, coinPriceChange?.value, currency.id, coinPriceChange?.recentRateChange)
+        val token = TokenLocal(asset.symbol, coinPriceChange?.rate, currency.id, coinPriceChange?.recentRateChange)
 
         assetCache.insertToken(token)
     }
@@ -193,7 +192,7 @@ class WalletRepositoryImpl(
         hash: String,
         transfer: AssetTransfer,
         fee: BigDecimal,
-        source: OperationLocal.Source,
+        source: OperationLocal.Source
     ): OperationLocal {
         val senderAddress = transfer.sender.addressIn(transfer.originChain)!!
 
@@ -203,9 +202,11 @@ class WalletRepositoryImpl(
             chainAssetId = transfer.originChainAsset.id,
             chainId = transfer.originChainAsset.chainId,
             amount = transfer.amountInPlanks,
+            fiatAmount = transfer.amount,
             senderAddress = senderAddress,
             receiverAddress = transfer.recipient,
-            fee = transfer.originChain.commissionAsset.planksFromAmount(fee),
+            fee = transfer.commissionAssetToken.planksFromAmount(fee),
+            fiatFee = transfer.commissionAssetToken.amountToFiat(fee),
             status = OperationLocal.Status.PENDING,
             source = source
         )

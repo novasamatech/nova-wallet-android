@@ -19,6 +19,8 @@ import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
+import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
@@ -163,12 +165,14 @@ class WalletFeatureModule {
         operationDao: OperationDao,
         assetSourceRegistry: AssetSourceRegistry,
         accountUpdateScope: AccountUpdateScope,
-        walletRepository: WalletRepository
+        walletRepository: WalletRepository,
+        currencyRepository: CurrencyRepository
     ) = PaymentUpdaterFactory(
         operationDao,
         assetSourceRegistry,
         accountUpdateScope,
-        walletRepository
+        walletRepository,
+        currencyRepository
     )
 
     @Provides

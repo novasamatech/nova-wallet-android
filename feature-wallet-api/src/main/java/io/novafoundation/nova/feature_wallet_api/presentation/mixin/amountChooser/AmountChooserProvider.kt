@@ -85,7 +85,7 @@ class AmountChooserProvider(
         .debounce(DEBOUNCE_DURATION_MILLIS.milliseconds)
 
     override val fiatAmount: Flow<String> = usedAssetFlow.combine(amount) { asset, amount ->
-        asset.token.priceOf(amount).formatAsCurrency(asset.token.currency)
+        asset.token.amountToFiat(amount).formatAsCurrency(asset.token.currency)
     }
         .inBackground()
         .share()

@@ -64,7 +64,7 @@ private fun Asset.totalWithOffChain(offChainSource: Map<FullChainAssetId, BigInt
         .orZero()
 
     val overallTotal = onChainTotal + offChainTotal
-    val overallFiat = token.priceOf(overallTotal)
+    val overallFiat = token.amountToFiat(overallTotal)
 
     return AssetWithOffChainBalance.TotalBalance(overallTotal, overallFiat)
 }

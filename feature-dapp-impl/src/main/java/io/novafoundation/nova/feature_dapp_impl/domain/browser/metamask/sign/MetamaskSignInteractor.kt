@@ -268,8 +268,7 @@ class MetamaskSignInteractor(
         val chainCurrency = metamaskChain.nativeCurrency
 
         return Token(
-            rate = null,
-            recentRateChange = null,
+            coinRateChange = null,
             configuration = Chain.Asset(
                 iconUrl = metamaskChain.iconUrls?.firstOrNull(),
                 id = 0,

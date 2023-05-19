@@ -7,10 +7,12 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.b
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_api.data.source.getCoinRateByAsset
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
 import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksToFiatOrNull
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.EvmAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanTransactionsApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanNormalTxResponse
@@ -35,6 +37,7 @@ import kotlin.time.Duration.Companion.seconds
 class EvmNativeAssetHistory(
     private val chainRegistry: ChainRegistry,
     private val etherscanTransactionsApi: EtherscanTransactionsApi,
+    private val walletRepository: WalletRepository,
     coinPriceDataSource: CoinPriceDataSource
 ) : EvmAssetHistory(coinPriceDataSource) {
 
@@ -45,7 +48,7 @@ class EvmNativeAssetHistory(
         apiUrl: String,
         page: Int,
         pageSize: Int,
-        coinRate: CoinRate?
+        currency: Currency
     ): List<Operation> {
         val accountAddress = chain.addressOf(accountId)
 
@@ -57,8 +60,15 @@ class EvmNativeAssetHistory(
             chainId = chain.id
         )
 
+        val earliestOperationTimestamp = response.result.minOfOrNull { it.timeStamp } ?: 0L
+        val latestOperationTimestamp = response.result.maxOfOrNull { it.timeStamp } ?: 0L
+        val coinPriceRange = getCoinPriceRange(chainAsset, currency, earliestOperationTimestamp, latestOperationTimestamp)
+
         return response.result
-            .map { mapRemoteNormalTxToOperation(it, chainAsset, accountAddress, coinRate) }
+            .map {
+                val coinRate = coinPriceRange.findFloorRate(it.timeStamp)
+                mapRemoteNormalTxToOperation(it, chainAsset, accountAddress, coinRate)
+            }
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -75,7 +85,7 @@ class EvmNativeAssetHistory(
         val block = ethereumApi.ethGetBlockByHash(blockHash, true).sendSuspend()
         val txs = block.block.transactions as List<TransactionResult<EthBlock.TransactionObject>>
 
-        val coinRate = coinPriceDataSource.getCoinRateByAsset(chainAsset, currency)
+        val token = walletRepository.getAsset(accountId, chainAsset)?.token
 
         txs.mapNotNull {
             val tx = it.get()
@@ -91,7 +101,7 @@ class EvmNativeAssetHistory(
                 senderId = chain.accountIdOf(tx.from),
                 recipientId = chain.accountIdOf(tx.to),
                 amountInPlanks = tx.value,
-                fiatAmount = coinRate?.convertPlanks(chainAsset, tx.value),
+                fiatAmount = token?.planksToFiatOrNull(tx.value),
                 chainAsset = chainAsset,
                 status = txReceipt.extrinsicStatus(),
                 hash = tx.hash

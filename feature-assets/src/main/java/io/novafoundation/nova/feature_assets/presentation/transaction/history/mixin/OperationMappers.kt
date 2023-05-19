@@ -24,6 +24,7 @@ import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import java.math.BigDecimal
 import java.math.BigInteger
 
 private val Operation.Type.operationStatus
@@ -64,12 +65,6 @@ private fun formatAmount(chainAsset: Chain.Asset, reward: Operation.Type.Reward)
 
 private fun formatFee(chainAsset: Chain.Asset, extrinsic: Operation.Type.Extrinsic): String {
     return chainAsset.formatPlanksSigned(extrinsic.fee, negative = true)
-}
-
-private fun formatFiatAmount(token: Token, value: BigInteger): String? {
-    val amount = token.amountFromPlanks(value)
-    val fiatAmount = token.priceOfOrNull(amount)
-    return fiatAmount?.formatAsCurrency(token.currency)
 }
 
 private fun mapStatusToStatusAppearance(status: Operation.Status): OperationStatusAppearance {
@@ -171,7 +166,7 @@ fun mapOperationToOperationModel(
                 OperationModel(
                     id = id,
                     amount = formatAmount(chainAsset, operationType),
-                    fiatAmount = formatFiatAmount(token, operationType.amount),
+                    fiatAmount = operationType.fiatAmount?.formatAsCurrency(token.currency),
                     amountColorRes = if (operationType.isReward) R.color.text_positive else R.color.text_primary,
                     header = resourceManager.getString(
                         if (operationType.isReward) R.string.staking_reward else R.string.staking_slash
@@ -194,7 +189,7 @@ fun mapOperationToOperationModel(
                 OperationModel(
                     id = id,
                     amount = formatAmount(chainAsset, isIncome, operationType),
-                    fiatAmount = formatFiatAmount(token, operationType.amount),
+                    fiatAmount = operationType.fiatAmount?.formatAsCurrency(token.currency),
                     amountColorRes = amountColor,
                     header = nameIdentifier.nameOrAddress(operationType.displayAddress(isIncome)),
                     statusAppearance = statusAppearance,
@@ -210,7 +205,7 @@ fun mapOperationToOperationModel(
                 OperationModel(
                     id = id,
                     amount = formatFee(chainAsset, operationType),
-                    fiatAmount = formatFiatAmount(token, operationType.fee),
+                    fiatAmount = operationType.fiatFee?.formatAsCurrency(token.currency),
                     amountColorRes = amountColor,
                     header = header,
                     subHeader = subHeader,
@@ -226,6 +221,7 @@ suspend fun mapOperationToParcel(
     operation: Operation,
     chainRegistry: ChainRegistry,
     resourceManager: ResourceManager,
+    currency: Currency,
 ): OperationParcelizeModel {
     with(operation) {
         return when (val operationType = operation.type) {
@@ -244,9 +240,11 @@ suspend fun mapOperationToParcel(
                     address = address,
                     hash = operationType.hash,
                     amount = formatAmount(operation.chainAsset, isIncome, operationType),
+                    fiatAmount = operationType.fiatAmount?.formatAsCurrency(currency),
                     receiver = operationType.receiver,
                     sender = operationType.sender,
                     fee = feeFormatted,
+                    fiatFee = operationType.fiatFee?.formatAsCurrency(currency),
                     isIncome = isIncome,
                     statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus),
                     transferDirectionIcon = transferDirectionIcon(isIncome)
@@ -262,6 +260,7 @@ suspend fun mapOperationToParcel(
                     address = address,
                     time = time,
                     amount = formatAmount(chainAsset, operationType),
+                    fiatAmount = operationType.fiatAmount?.formatAsCurrency(currency),
                     type = resourceManager.getString(typeRes),
                     era = resourceManager.getString(R.string.staking_era_index_no_prefix, operationType.era),
                     validator = operationType.validator,
@@ -277,6 +276,7 @@ suspend fun mapOperationToParcel(
                     originAddress = address,
                     content = mapExtrinsicContentToParcel(operationType, resourceManager),
                     fee = formatFee(chainAsset, operationType),
+                    fiatFee = operationType.fiatFee?.formatAsCurrency(currency),
                     statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus)
                 )
             }

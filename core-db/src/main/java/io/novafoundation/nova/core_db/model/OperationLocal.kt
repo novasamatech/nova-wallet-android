@@ -61,9 +61,11 @@ data class OperationLocal(
             chainId: String,
             chainAssetId: Int,
             amount: BigInteger,
+            fiatAmount: BigDecimal?,
             senderAddress: String,
             receiverAddress: String,
             fee: BigInteger?,
+            fiatFee: BigDecimal?,
             status: Status,
             source: Source
         ) = OperationLocal(

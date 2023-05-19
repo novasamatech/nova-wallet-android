@@ -10,7 +10,9 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.b
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_api.data.source.getCoinRateByAsset
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksToFiatOrNull
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.SubstrateAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
@@ -28,6 +30,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.callOrNull
 class NativeAssetHistory(
     private val chainRegistry: ChainRegistry,
     private val eventsRepository: EventsRepository,
+    private val walletRepository: WalletRepository,
     walletOperationsApi: SubQueryOperationsApi,
     cursorStorage: TransferCursorStorage,
     coinPriceDataSource: CoinPriceDataSource
@@ -43,7 +46,7 @@ class NativeAssetHistory(
         val runtime = chainRegistry.getRuntime(chain.id)
         val extrinsicsWithEvents = eventsRepository.getExtrinsicsWithEvents(chain.id, blockHash)
 
-        val coinRate = coinPriceDataSource.getCoinRateByAsset(chainAsset, currency)
+        val token = walletRepository.getAsset(accountId, chainAsset)?.token
 
         extrinsicsWithEvents.filter { it.extrinsic.call.isTransfer(runtime) }
             .map {
@@ -54,7 +57,7 @@ class NativeAssetHistory(
                     senderId = bindAccountIdentifier(extrinsic.signature!!.accountIdentifier),
                     recipientId = bindAccountIdentifier(extrinsic.call.arguments["dest"]),
                     amountInPlanks = amount,
-                    fiatAmount = coinRate?.convertPlanks(chainAsset, amount),
+                    fiatAmount = token?.planksToFiatOrNull(amount),
                     hash = it.extrinsicHash,
                     chainAsset = chainAsset,
                     status = it.status()

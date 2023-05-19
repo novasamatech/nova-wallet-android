@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.history.mi
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.state_machine.TransactionStateMachine.State
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.model.DayHeader
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
@@ -50,7 +51,8 @@ class TransactionHistoryProvider(
     private val assetsSourceRegistry: AssetSourceRegistry,
     private val chainRegistry: ChainRegistry,
     private val chainId: ChainId,
-    private val assetId: Int
+    private val assetId: Int,
+    private val currencyRepository: CurrencyRepository
 ) : TransactionHistoryMixin, CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
     private val domainState = singleReplaySharedFlow<State>()
@@ -116,8 +118,10 @@ class TransactionHistoryProvider(
 
             val clickedOperation = operations.first { it.id == transactionModel.id }
 
+            val currency = currencyRepository.getSelectedCurrency()
+
             withContext(Dispatchers.Main) {
-                when (val payload = mapOperationToParcel(clickedOperation, chainRegistry, resourceManager)) {
+                when (val payload = mapOperationToParcel(clickedOperation, chainRegistry, resourceManager, currency)) {
                     is OperationParcelizeModel.Transfer -> {
                         router.openTransferDetail(payload)
                     }

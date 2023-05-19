@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_impl.data.mappers
 
-import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.OperationLocal.ExtrinsicContentType
@@ -8,15 +7,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
-import io.novafoundation.nova.feature_wallet_api.domain.model.convertAmountByPriceRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
 import io.novafoundation.nova.feature_wallet_impl.data.network.model.response.SubqueryHistoryElementResponse
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigDecimal
-import java.math.BigInteger
-import java.util.TreeMap
-import kotlin.random.Random
-import kotlin.system.measureNanoTime
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
@@ -39,6 +32,13 @@ private val Type.operationAmount
         is Type.Transfer -> amount
     }
 
+private val Type.operationFiatAmount
+    get() = when (this) {
+        is Type.Extrinsic -> null
+        is Type.Reward -> fiatAmount
+        is Type.Transfer -> fiatAmount
+    }
+
 private val Type.operationStatus
     get() = when (this) {
         is Type.Extrinsic -> status
@@ -51,6 +51,13 @@ private val Type.operationFee
         is Type.Extrinsic -> fee
         is Type.Reward -> null
         is Type.Transfer -> fee
+    }
+
+private val Type.operationFiatFee
+    get() = when (this) {
+        is Type.Extrinsic -> fiatFee
+        is Type.Reward -> null
+        is Type.Transfer -> fiatFee
     }
 
 private val Type.hash
@@ -114,7 +121,9 @@ fun mapOperationToOperationLocalDb(
             chainAssetId = chainAsset.id,
             extrinsicContent = operation.extrinsicOrNull()?.content?.let(::mapExtrinsicContentToLocal),
             amount = type.operationAmount,
+            fiatAmount = type.operationFiatAmount,
             fee = type.operationFee,
+            fiatFee = type.operationFiatFee,
             status = mapOperationStatusToOperationLocalStatus(type.operationStatus),
             source = source,
             operationType = typeLocal,
@@ -138,7 +147,7 @@ fun mapOperationLocalToOperation(
                 hash = hash!!,
                 content = mapExtrinsicContentFromLocal(operationLocal.extrinsicContent!!),
                 fee = fee!!,
-                fiatFee = operationLocal.fiatFee!!,
+                fiatFee = operationLocal.fiatFee,
                 status = mapOperationStatusLocalToOperationStatus(status),
             )
 
@@ -146,7 +155,7 @@ fun mapOperationLocalToOperation(
                 hash = hash,
                 myAddress = address,
                 amount = amount!!,
-                fiatAmount = operationLocal.fiatAmount!!,
+                fiatAmount = operationLocal.fiatAmount,
                 receiver = receiver!!,
                 sender = sender!!,
                 status = mapOperationStatusLocalToOperationStatus(status),
@@ -156,7 +165,7 @@ fun mapOperationLocalToOperation(
 
             OperationLocal.Type.REWARD -> Type.Reward(
                 amount = amount!!,
-                fiatAmount = operationLocal.fiatAmount!!,
+                fiatAmount = operationLocal.fiatAmount,
                 isReward = isReward!!,
                 era = era!!,
                 validator = validator
@@ -176,14 +185,14 @@ fun mapOperationLocalToOperation(
 @OptIn(ExperimentalTime::class)
 fun mapNodeToOperation(
     node: SubqueryHistoryElementResponse.Query.HistoryElements.Node,
-    coinRate: CoinRate,
+    coinRate: CoinRate?,
     chainAsset: Chain.Asset,
 ): Operation {
     val type: Type = when {
         node.reward != null -> with(node.reward) {
             Type.Reward(
                 amount = amount,
-                fiatAmount = coinRate.convertPlanks(chainAsset, amount),
+                fiatAmount = coinRate?.convertPlanks(chainAsset, amount),
                 era = era,
                 isReward = isReward,
                 validator = validator.nullIfEmpty()
@@ -195,7 +204,7 @@ fun mapNodeToOperation(
                 hash = node.extrinsicHash,
                 content = Content.SubstrateCall(module, call),
                 fee = fee,
-                fiatFee = coinRate.convertPlanks(chainAsset, fee),
+                fiatFee = coinRate?.convertPlanks(chainAsset, fee), // TODO We must remove it if we will not use it in history
                 status = Operation.Status.fromSuccess(success)
             )
         }
@@ -204,11 +213,11 @@ fun mapNodeToOperation(
             Type.Transfer(
                 myAddress = node.address,
                 amount = amount,
-                fiatAmount = coinRate.convertPlanks(chainAsset, amount),
+                fiatAmount = coinRate?.convertPlanks(chainAsset, amount),
                 receiver = to,
                 sender = from,
                 fee = fee,
-                fiatFee = coinRate.convertPlanks(chainAsset, fee),
+                fiatFee = coinRate?.convertPlanks(chainAsset, fee),
                 status = Operation.Status.fromSuccess(success),
                 hash = node.extrinsicHash
             )
@@ -219,12 +228,12 @@ fun mapNodeToOperation(
                 hash = node.extrinsicHash,
                 myAddress = node.address,
                 amount = amount,
-                fiatAmount = coinRate.convertPlanks(chainAsset, amount),
+                fiatAmount = coinRate?.convertPlanks(chainAsset, amount),
                 receiver = to,
                 sender = from,
                 status = Operation.Status.fromSuccess(success),
                 fee = fee,
-                fiatFee = coinRate.convertPlanks(chainAsset, fee),
+                fiatFee = coinRate?.convertPlanks(chainAsset, fee),
             )
         }
 

@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_account_api.view.showOptionalAddress
@@ -16,7 +17,9 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.showOperationStatus
+import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailAmountFiat
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailAmount
+import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailAmountFiat
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailFee
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailFrom
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailHash
@@ -85,10 +88,12 @@ class TransferDetailFragment : BaseFragment<TransactionDetailViewModel>() {
 
             transactionDetailToolbar.setTitle(time.formatDateTime())
 
-            transactionDetailFee.showValue(fee)
+            transactionDetailFee.showValue(fee, fiatFee)
 
             transactionDetailAmount.text = amount
             transactionDetailAmount.setTextColorRes(statusAppearance.amountTint)
+
+            transactionDetailAmountFiat.setTextOrHide(this.fiatAmount)
 
             if (hash != null) {
                 transactionDetailHash.showValue(hash)

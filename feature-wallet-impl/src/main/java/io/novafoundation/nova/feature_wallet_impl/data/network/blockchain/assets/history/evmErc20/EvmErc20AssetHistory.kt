@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
@@ -14,7 +15,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.f
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.requireErc20
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigDecimal
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlin.time.Duration.Companion.seconds
 
@@ -30,7 +30,7 @@ class EvmErc20AssetHistory(
         apiUrl: String,
         page: Int,
         pageSize: Int,
-        coinRate: CoinRate?
+        currency: Currency
     ): List<Operation> {
         val erc20Config = chainAsset.requireErc20()
         val accountAddress = chain.addressOf(accountId)
@@ -44,7 +44,14 @@ class EvmErc20AssetHistory(
             chainId = chain.id
         )
 
-        return response.result.map { mapRemoteTransferToOperation(it, chainAsset, accountAddress, coinRate) }
+        val earliestOperationTimestamp = response.result.minOf { it.timeStamp }
+        val latestOperationTimestamp = response.result.maxOf { it.timeStamp }
+        val coinPriceRange = getCoinPriceRange(chainAsset, currency, earliestOperationTimestamp, latestOperationTimestamp)
+
+        return response.result.map {
+            val coinRate = coinPriceRange.findFloorRate(it.timeStamp)
+            mapRemoteTransferToOperation(it, chainAsset, accountAddress, coinRate)
+        }
     }
 
     override suspend fun fetchOperationsForBalanceChange(

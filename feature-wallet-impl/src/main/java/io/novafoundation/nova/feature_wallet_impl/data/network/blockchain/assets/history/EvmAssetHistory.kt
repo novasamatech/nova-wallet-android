@@ -3,10 +3,8 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
-import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.satisfies
 import io.novafoundation.nova.runtime.ext.externalApi
@@ -18,7 +16,7 @@ private const val SECOND_PAGE_INDEX = 2
 
 abstract class EvmAssetHistory(
     protected val coinPriceDataSource: CoinPriceDataSource
-) : AssetHistory {
+) : BaseAssetHistory(coinPriceDataSource) {
 
     abstract suspend fun fetchEtherscanOperations(
         chain: Chain,
@@ -27,7 +25,7 @@ abstract class EvmAssetHistory(
         apiUrl: String,
         page: Int,
         pageSize: Int,
-        coinRate: CoinRate?
+        currency: Currency
     ): List<Operation>
 
     override suspend fun additionalFirstPageSync(
@@ -92,8 +90,7 @@ abstract class EvmAssetHistory(
             else -> error("Etherscan requires page number pagination")
         }
 
-        val coinRate = chainAsset.priceId?.let { coinPriceDataSource.getCoinRate(it, currency) }
-        val operations = fetchEtherscanOperations(chain, chainAsset, accountId, apiUrl, page, pageSize, coinRate)
+        val operations = fetchEtherscanOperations(chain, chainAsset, accountId, apiUrl, page, pageSize, currency)
 
         val newPageOffset = if (operations.size < pageSize) {
             PageOffset.FullData

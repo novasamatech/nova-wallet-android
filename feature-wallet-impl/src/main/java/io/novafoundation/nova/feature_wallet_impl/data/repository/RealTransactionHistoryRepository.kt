@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.model.OperationLocal
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
@@ -31,12 +32,13 @@ class RealTransactionHistoryRepository(
         filters: Set<TransactionFilter>,
         accountId: AccountId,
         chain: Chain,
-        chainAsset: Chain.Asset
+        chainAsset: Chain.Asset,
+        currency: Currency
     ) = withContext(Dispatchers.Default) {
         val historySource = historySourceFor(chainAsset)
         val accountAddress = chain.addressOf(accountId)
 
-        val dataPage = historySource.getSafeOperations(pageSize, PageOffset.Loadable.FirstPage, filters, accountId, chain, chainAsset)
+        val dataPage = historySource.getSafeOperations(pageSize, PageOffset.Loadable.FirstPage, filters, accountId, chain, chainAsset, currency)
         historySource.additionalFirstPageSync(chain, chainAsset, accountId, dataPage)
 
         val localOperations = dataPage.map { mapOperationToOperationLocalDb(it, chainAsset, OperationLocal.Source.REMOTE) }
@@ -50,7 +52,8 @@ class RealTransactionHistoryRepository(
         filters: Set<TransactionFilter>,
         accountId: AccountId,
         chain: Chain,
-        chainAsset: Chain.Asset
+        chainAsset: Chain.Asset,
+        currency: Currency
     ): DataPage<Operation> = withContext(Dispatchers.Default) {
         val historySource = historySourceFor(chainAsset)
 
@@ -60,7 +63,8 @@ class RealTransactionHistoryRepository(
             filters = filters,
             accountId = accountId,
             chain = chain,
-            chainAsset = chainAsset
+            chainAsset = chainAsset,
+            currency = currency
         )
     }
 
@@ -91,9 +95,10 @@ class RealTransactionHistoryRepository(
         filters: Set<TransactionFilter>,
         accountId: AccountId,
         chain: Chain,
-        chainAsset: Chain.Asset
+        chainAsset: Chain.Asset,
+        currency: Currency
     ): DataPage<Operation> {
-        val nonFiltered = getOperations(pageSize, pageOffset, filters, accountId, chain, chainAsset)
+        val nonFiltered = getOperations(pageSize, pageOffset, filters, accountId, chain, chainAsset, currency)
         val filtered = nonFiltered.filter { it.isSafe() }
 
         return DataPage(nonFiltered.nextOffset, items = filtered)

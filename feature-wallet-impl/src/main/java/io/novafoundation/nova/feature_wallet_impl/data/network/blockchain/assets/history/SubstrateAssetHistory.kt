@@ -4,15 +4,9 @@ import io.novafoundation.nova.common.data.model.CursorOrFull
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.common.data.model.asCursorOrNull
-import io.novafoundation.nova.common.utils.binarySearchFloor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
-import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
-import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
-import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapNodeToOperation
 import io.novafoundation.nova.feature_wallet_impl.data.network.model.request.SubqueryHistoryRequest
@@ -23,15 +17,12 @@ import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 abstract class SubstrateAssetHistory(
     private val subqueryApi: SubQueryOperationsApi,
     private val cursorStorage: TransferCursorStorage,
     protected val coinPriceDataSource: CoinPriceDataSource
-) : AssetHistory {
+) : BaseAssetHistory(coinPriceDataSource) {
 
     override suspend fun additionalFirstPageSync(
         chain: Chain,
@@ -107,17 +98,12 @@ abstract class SubstrateAssetHistory(
         )
 
         val subqueryResponse = subqueryApi.getOperationsHistory(apiUrl, request).data.query
-        val latestOperationTimestamp = getLatestOperationTimestamp(subqueryResponse.historyElements)
         val earliestOperationTimestamp = getEarliestOperationTimestamp(subqueryResponse.historyElements)
-        val coinPriceRange = getCoinPriceRange(chainAsset, currency, latestOperationTimestamp, earliestOperationTimestamp)
+        val latestOperationTimestamp = getLatestOperationTimestamp(subqueryResponse.historyElements)
+        val coinPriceRange = getCoinPriceRange(chainAsset, currency, earliestOperationTimestamp, latestOperationTimestamp)
 
-        var startThreshold = 0
         val operations = subqueryResponse.historyElements.nodes.map { node ->
-            startThreshold = coinPriceRange.binarySearchFloor(fromIndex = startThreshold) {
-                val timestamp = it.millis.milliseconds.inWholeSeconds
-                timestamp.compareTo(node.timestamp)
-            }
-            val coinRate = coinPriceRange[startThreshold]
+            val coinRate = coinPriceRange.findFloorRate(node.timestamp)
             mapNodeToOperation(node, coinRate, chainAsset)
         }
 
@@ -127,28 +113,12 @@ abstract class SubstrateAssetHistory(
         return DataPage(newPageOffset, operations)
     }
 
-    private suspend fun getCoinPriceRange(
-        chainAsset: Chain.Asset,
-        currency: Currency,
-        from: Long,
-        to: Long
-    ): List<HistoricalCoinRate> {
-        val coinPriceRange = chainAsset.priceId?.let { coinPriceDataSource.getCoinPriceRange(it, currency, from, to) }
-        return coinPriceRange ?: emptyList()
-    }
-
     private fun getEarliestOperationTimestamp(operations: SubqueryHistoryElementResponse.Query.HistoryElements): Long {
-        val timestamp = operations.nodes.minOfOrNull { it.timestamp } ?: 0L
-        return timestamp.seconds
-            .minus(1.hours)
-            .inWholeMilliseconds
+        return operations.nodes.minOfOrNull { it.timestamp } ?: 0L
     }
 
     private fun getLatestOperationTimestamp(operations: SubqueryHistoryElementResponse.Query.HistoryElements): Long {
-        val timestamp = operations.nodes.maxOfOrNull { it.timestamp } ?: 0L
-        return timestamp.seconds
-            .plus(1.hours)
-            .inWholeMilliseconds
+        return operations.nodes.maxOfOrNull { it.timestamp } ?: 0L
     }
 
     private fun Chain.substrateTransfersApi(): Chain.ExternalApi.Transfers.Substrate? {
