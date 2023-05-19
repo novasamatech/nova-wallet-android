@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 
 class RecipientCanAcceptTransferValidation(
     private val assetSourceRegistry: AssetSourceRegistry,
-): AssetTransfersValidation  {
+) : AssetTransfersValidation {
 
     override suspend fun validate(value: AssetTransferPayload): ValidationStatus<AssetTransferValidationFailure> {
         val destinationAsset = value.transfer.destinationChainAsset
