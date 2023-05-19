@@ -44,7 +44,7 @@ class RealStakingDashboardInteractor(
 
     override fun stakingDashboardFlow(): Flow<StakingDashboard> {
         return flow {
-            val chains = chainRegistry.chainsById().keepProductionChains()
+            val chains = chainRegistry.chainsById()
             val knownStakingAssets = chains.knownStakingAssets()
             val knownStakingChainsCount = knownStakingAssets.distinctBy { it.chainId }.size
 
@@ -81,14 +81,16 @@ class RealStakingDashboardInteractor(
             val asset = chain.assetsById[fullChainAssetId.assetId] ?: return@forEach
 
             if (items.isNoStakePresent()) {
-                noStake.add(noStakeAggregatedOption(chain, asset, items, syncedIds))
+                if (!chain.isTestNet) {
+                    noStake.add(noStakeAggregatedOption(chain, asset, items, syncedIds))
+                }
             } else {
                 val hasStakeOptions = items.mapNotNull { item -> hasStakeOption(chain, asset, item, syncedIds) }
                 hasStake.addAll(hasStakeOptions)
             }
         }
 
-        val resolvedItems = hasStake.size + noStake.size
+        val resolvedItems = itemsByChain.size
         val resolvingItems = (knownStakingChainsCount - resolvedItems).coerceAtLeast(0)
 
         return NoPriceStakingDashboard(
@@ -187,10 +189,6 @@ class RealStakingDashboardInteractor(
             StakingDashboardItem.StakeState.HasStake.StakingStatus.INACTIVE -> HasStake.StakingStatus.INACTIVE
             StakingDashboardItem.StakeState.HasStake.StakingStatus.WAITING -> HasStake.StakingStatus.WAITING
         }
-    }
-
-    private fun ChainsById.keepProductionChains(): ChainsById {
-        return ChainsById(filterValues { !it.isTestNet })
     }
 
     private fun ChainsById.knownStakingAssets(): List<Chain.Asset> {
