@@ -16,7 +16,7 @@ class StakingStatsResponse(
 
     class ActiveStaker(override val networkId: String, override val stakingType: String, val address: String) : WithStakingId
 
-    class StakingApy(override val networkId: String, override val stakingType: String, val maxApy: Double) : WithStakingId
+    class StakingApy(override val networkId: String, override val stakingType: String, val maxAPY: Double) : WithStakingId
 
     class AccumulatedReward(override val networkId: String, override val stakingType: String, val amount: Balance) : WithStakingId
 }
