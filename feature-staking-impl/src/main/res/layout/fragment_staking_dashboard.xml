@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/drawable_background_image"
     android:id="@+id/stakingDashboardContent"
+    android:paddingBottom="64dp"
     android:clipToPadding="false"
     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
     xmlns:app="http://schemas.android.com/apk/res-auto">

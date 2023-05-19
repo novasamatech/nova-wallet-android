@@ -15,12 +15,16 @@ class DashboardLoadingAdapter : RecyclerView.Adapter<DashboardLoadingHolder>() {
 
     fun setNumberOfLoadingItems(loadingItems: Int) {
         val previousNumber = numberOfItems
-        this.numberOfItems = loadingItems
+        numberOfItems = loadingItems
 
         if (previousNumber < numberOfItems) {
-            notifyItemRangeInserted(previousNumber - 1, numberOfItems - previousNumber)
-        } else {
-            notifyItemRangeRemoved(numberOfItems - 1, previousNumber - numberOfItems)
+            val itemsAdded = numberOfItems - previousNumber
+
+            notifyItemRangeInserted(previousNumber, itemsAdded)
+        } else if (previousNumber > numberOfItems) {
+            val itemsRemoved = previousNumber - numberOfItems
+
+            notifyItemRangeRemoved(numberOfItems, itemsRemoved)
         }
     }
 
