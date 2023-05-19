@@ -28,7 +28,7 @@ class Web3ApiPool(private val web3ApiFactory: Web3ApiFactory) {
         val httpNodes = chain.nodes.httpNodes()
 
         if (httpNodes.nodes.isEmpty()) {
-            pool.remove(chain.id to ConnectionType.HTTPS)
+            removeApi(chain.id, ConnectionType.HTTPS)
 
             return null
         }
@@ -44,8 +44,13 @@ class Web3ApiPool(private val web3ApiFactory: Web3ApiFactory) {
 
     fun removeApis(chainId: String) {
         ConnectionType.values().forEach { connectionType ->
-            pool.remove(chainId to connectionType)
+            removeApi(chainId, connectionType)
         }
+    }
+
+    private fun removeApi(chainId: String, connectionType: ConnectionType) {
+        pool.remove(chainId to connectionType)
+            .also { it?.first?.shutdown() }
     }
 }
 

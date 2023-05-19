@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
-import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -20,7 +19,6 @@ import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.isSecure
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.AcknowledgePhishingBottomSheet
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.ConfirmAuthorizeBottomSheet
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.OptionsBottomSheetDialog
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
@@ -31,7 +29,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.uninjectWeb3
-import javax.inject.Inject
+import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBar
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBarGroup
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserBack
@@ -41,6 +39,7 @@ import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserMore
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserProgress
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserRefresh
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebView
+import javax.inject.Inject
 
 class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomSheetDialog.Callback, PageCallback {
 
@@ -56,9 +55,6 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
 
     @Inject
     lateinit var webViewHolder: WebViewHolder
-
-    @Inject
-    lateinit var imageLoader: ImageLoader
 
     @Inject
     lateinit var fileChooser: WebViewFileChooser
@@ -200,10 +196,11 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     }
 
     private fun showConfirmAuthorizeSheet(pendingConfirmation: DappPendingConfirmation<Action.Authorize>) {
-        ConfirmAuthorizeBottomSheet(
+        AuthorizeDappBottomSheet(
             context = requireContext(),
-            confirmation = pendingConfirmation,
-            imageLoader = imageLoader
+            onConfirm = pendingConfirmation.onConfirm,
+            onDeny = pendingConfirmation.onDeny,
+            payload = pendingConfirmation.action.content,
         ).show()
     }
 

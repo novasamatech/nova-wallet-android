@@ -397,19 +397,11 @@ class Navigator(
     }
 
     override fun openSelectAddress(arguments: Bundle) {
-        navController?.navigate(R.id.action_open_select_wallet, arguments)
+        navController?.navigate(R.id.action_open_select_address, arguments)
     }
 
     override fun openNodes() {
         navController?.navigate(R.id.action_mainFragment_to_nodesFragment)
-    }
-
-    override fun openCurrencies() {
-        navController?.navigate(R.id.action_mainFragment_to_currenciesFragment)
-    }
-
-    override fun openLanguages() {
-        navController?.navigate(R.id.action_mainFragment_to_languagesFragment)
     }
 
     override fun openReceive(assetPayload: AssetPayload) {
@@ -555,12 +547,6 @@ class Navigator(
 
     override fun finishExportFlow() {
         navController?.navigate(R.id.finish_export_flow)
-    }
-
-    override fun openChangePinCode() {
-        val action = PinCodeAction.Change
-        val bundle = PincodeFragment.getPinCodeBundle(action)
-        navController?.navigate(R.id.action_change_pin_code, bundle)
     }
 
     override fun openScanImportParitySigner() {

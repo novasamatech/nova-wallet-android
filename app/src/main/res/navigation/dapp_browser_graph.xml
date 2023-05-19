@@ -12,14 +12,6 @@
         tools:layout="@layout/fragment_dapp_browser">
 
         <action
-            android:id="@+id/action_DAppBrowserFragment_to_ConfirmSignExtrinsicFragment"
-            app:destination="@id/ConfirmSignExtrinsicFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
             android:id="@+id/action_DAppBrowserFragment_to_dappSearchFragment"
             app:destination="@id/dappSearchFragment"
             app:enterAnim="@anim/fragment_open_enter"
@@ -35,24 +27,6 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
-
-    <fragment
-        android:id="@+id/ConfirmSignExtrinsicFragment"
-        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignExtrinsicFragment"
-        android:label="ConfirmSignExtrinsicFragment"
-        app:useAdd="true"
-        tools:layout="@layout/bottom_sheet_confirm_sign_extrinsic">
-
-        <action
-            android:id="@+id/action_ConfirmSignExtrinsicFragment_to_extrinsicDetailsFragment"
-            app:destination="@id/extrinsicDetailsFragment" />
-    </fragment>
-
-    <dialog
-        android:id="@+id/extrinsicDetailsFragment"
-        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.extrinsicDetails.DappExtrinsicDetailsFragment"
-        android:label="ExtrinsicDetailsFragment"
-        tools:layout="@layout/fragment_dapp_extrinsic_details" />
 
     <fragment
         android:id="@+id/dappSearchFragment"

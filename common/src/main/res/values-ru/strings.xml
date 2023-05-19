@@ -170,6 +170,7 @@
     <string name="common_accept_terms">Примите условия...</string>
     <string name="common_account">Аккаунт</string>
     <string name="common_account_address">Адрес аккаунта</string>
+    <string name="common_active">Активно</string>
     <string name="common_add">Добавить</string>
     <string name="common_address">Адрес</string>
     <string name="common_advanced">Продвинутый</string>
@@ -211,6 +212,7 @@
     <string name="common_date">Дата</string>
     <string name="common_details">Подробности</string>
     <string name="common_disabled">Отключен</string>
+    <string name="common_disconnect">Отключить</string>
     <string name="common_done">Готово</string>
     <string name="common_edit">Редактировать</string>
     <string name="common_element_and_more_format" formatted="false">%s (и еще %s)</string>
@@ -222,6 +224,7 @@
     <string name="common_evm_address">EVM Адрес</string>
     <string name="common_existential_warning_message_v2_2_0">Ваша учетная запись будет удалена из сети после операции, так как ваш баланс опустится ниже минимального</string>
     <string name="common_existential_warning_title">Операция удалит аккаунт</string>
+    <string name="common_expired">Истекла</string>
     <string name="common_explore">Исследуй</string>
     <string name="common_filter_sort_header">Сортировать по:</string>
     <string name="common_find_out_more">Узнать больше</string>
@@ -259,12 +262,20 @@
     <string name="common_missing_account_title">%s аккаунт отсутствует</string>
     <string name="common_module">Модуль</string>
     <string name="common_network">Сеть</string>
+    <string name="common_networks">Сети</string>
+    <plurals name="common_networks_plural">
+        <item quantity="one">Сеть</item>
+        <item quantity="few">Сети</item>
+        <item quantity="many">Сети</item>
+        <item quantity="other">Сети</item>
+    </plurals>
     <string name="common_next">Далее</string>
     <string name="common_no">Нет</string>
     <string name="common_no_app_to_handle_import_intent">Приложение для импорта файлов не найдено на устройстве. Пожалуйста, установите его и повторите попытку</string>
     <string name="common_no_app_to_handle_intent">На устройстве не найдено подходящего приложения для обработки данного действия</string>
     <string name="common_no_changes">Нет изменений</string>
     <string name="common_no_screenshot_message_v2_2_0">Мы собираемся показать вашу мнемонику. Убедитесь, что никто не видит ваш экран и не делайте скриншотов - к ним могут получить доступ вредоносные программы</string>
+    <string name="common_none">Нет</string>
     <string name="common_not_enough_funds_message">К сожалению, у вас недостаточно средств для оплаты сетевого сбора.</string>
     <string name="common_not_enough_funds_title">Недостаточный баланс</string>
     <string name="common_off">Выкл</string>
@@ -272,6 +283,7 @@
     <string name="common_ok_back">Хорошо, назад</string>
     <string name="common_on">Вкл</string>
     <string name="common_ongoing">На голосовании</string>
+    <string name="common_optional">Необязательные</string>
     <string name="common_options_title">Выберите опцию</string>
     <string name="common_paste">Вставить</string>
     <string name="common_per_year_format">%s / год</string>
@@ -284,14 +296,17 @@
     <string name="common_read_more">Подробнее</string>
     <string name="common_reject">Отклонить</string>
     <string name="common_remove">Удалить</string>
+    <string name="common_required">Обязательные</string>
     <string name="common_reset">Сброс</string>
     <string name="common_retry">Повторить</string>
     <string name="common_revoke">Отменить</string>
     <string name="common_save">Сохранить</string>
+    <string name="common_scan_qr_code">Отсканируйте QR-код</string>
     <string name="common_search">Поиск</string>
     <string name="common_search_results_number">Результаты поиска: %d</string>
     <string name="common_secret_derivation_path">Последовательность для вывода</string>
     <string name="common_share">Поделиться</string>
+    <string name="common_sign_request">Запрос на подпись</string>
     <string name="common_signature_invalid">Неверная подпись</string>
     <string name="common_skip">Пропустить</string>
     <string name="common_skip_process">Пропустить</string>
@@ -310,6 +325,12 @@
     <string name="common_type">Тип</string>
     <string name="common_undefined_error_message">Пожалуйста, попробуйте снова с другими входными данными. Если ошибка повторяется, то свяжитесь со службой поддержки.</string>
     <string name="common_unknown">Неизвестно</string>
+    <plurals name="common_unknown_chains">
+        <item quantity="one">%s неизвестная</item>
+        <item quantity="few">%s неизвестных</item>
+        <item quantity="many">%s неизвестных</item>
+        <item quantity="other">%s неизвестных</item>
+    </plurals>
     <string name="common_unlimited">Неограниченно</string>
     <string name="common_update">Обновить</string>
     <string name="common_use">Использовать</string>
@@ -339,7 +360,6 @@
     <string name="crowdloan_acala_direct">Напрямую</string>
     <string name="crowdloan_acala_learn_types">Подробнее о различных вкладах в Acala</string>
     <string name="crowdloan_acala_liquid">Liquid вклад</string>
-    <string name="crowdloan_active_section">Активные</string>
     <string name="crowdloan_active_section_format">Активные (%s)</string>
     <string name="crowdloan_agree_with_policy">Согласитесь с Правилами и Условиями</string>
     <string name="crowdloan_app_bonus_format">Бонус Nova Wallet (%s)</string>
@@ -783,7 +803,6 @@
     <string name="staking_month_period_title">Eжемесячно</string>
     <string name="staking_nominated">Номинировано:</string>
     <string name="staking_nominations_rewarded_format">%s вознаграждены</string>
-    <string name="staking_nominator_status_active">Активен</string>
     <string name="staking_nominator_status_alert_active_message">Один из ваших валидаторов был выбран сетью.</string>
     <string name="staking_nominator_status_alert_active_title">Активный статус</string>
     <string name="staking_nominator_status_alert_inactive_title">Неактивный статус</string>
@@ -1020,6 +1039,24 @@
     <string name="wallet_balance_transferable">Доступно</string>
     <string name="wallet_balance_unbonding_v1_9_0">В процессе вывода</string>
     <string name="wallet_chain_management_title">Кошелёк</string>
+    <string name="wallet_connect_new_connection">Новое подключение</string>
+    <plurals name="wallet_connect_session_approve_missing_accounts_alert">
+        <item quantity="one">%s аккаунт не найден. Добавьте аккаунт к кошельку в Настройках</item>
+        <item quantity="few">%s аккаунты не найдены. Добавьте аккаунты к кошельку в Настройках</item>
+        <item quantity="many">%s аккаунты не найдены. Добавьте аккаунты к кошельку в Настройках</item>
+        <item quantity="other">%s аккаунты не найдены. Добавьте аккаунты к кошельку в Настройках</item>
+    </plurals>
+    <string name="wallet_connect_session_approve_unsupported_chains_alert">Некоторые из обязательных сетей, запрошенных \\"%s\\", не поддерживаются в Nova Wallet</string>
+    <string name="wallet_connect_sessions_placeholder">Сеансы Wallet Connect будут отображаться здесь</string>
+    <string name="wallet_connect_title">WalletConnect</string>
+    <string name="wallet_connect_unknown_dapp">Неизвестный dApp</string>
+    <plurals name="wallet_connect_unsupported_networks_hidden">
+        <item quantity="one">%s неизвестная сеть скрыта</item>
+        <item quantity="few">%s неизвестных сети скрыто</item>
+        <item quantity="many">%s неизвестных сетей скрыто</item>
+        <item quantity="other">%s неизвестных сетей скрыто</item>
+    </plurals>
+    <string name="wallet_connect_v2">WalletConnect v2</string>
     <string name="wallet_currency_category_cryptocurrencies">Криптовалюты</string>
     <string name="wallet_currency_category_fiat">Фиатные валюты</string>
     <string name="wallet_currency_category_popular_fiat">Популярные фиатные валюты</string>

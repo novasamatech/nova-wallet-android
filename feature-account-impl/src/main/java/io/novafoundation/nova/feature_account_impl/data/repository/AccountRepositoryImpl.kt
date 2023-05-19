@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.data.secrets.keypair
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AuthType
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
@@ -107,6 +108,10 @@ class AccountRepositoryImpl(
         return accountDataSource.getMetaAccount(metaId)
     }
 
+    override fun metaAccountFlow(metaId: Long): Flow<MetaAccount> {
+        return accountDataSource.metaAccountFlow(metaId)
+    }
+
     override fun selectedMetaAccountFlow(): Flow<MetaAccount> {
         return accountDataSource.selectedMetaAccountFlow()
     }
@@ -123,12 +128,20 @@ class AccountRepositoryImpl(
         return accountDataSource.allMetaAccounts()
     }
 
+    override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
+        return accountDataSource.allLightMetaAccounts()
+    }
+
     override fun allMetaAccountsFlow(): Flow<List<MetaAccount>> {
         return accountDataSource.allMetaAccountsFlow()
     }
 
     override fun metaAccountBalancesFlow(): Flow<List<MetaAccountAssetBalance>> {
         return accountDataSource.metaAccountsWithBalancesFlow()
+    }
+
+    override fun metaAccountBalancesFlow(metaId: Long): Flow<List<MetaAccountAssetBalance>> {
+        return accountDataSource.metaAccountBalancesFlow(metaId)
     }
 
     override suspend fun selectMetaAccount(metaId: Long) {

@@ -128,6 +128,10 @@ android {
             createBindReleaseFileTask(variant.buildType.name)
         }
     }
+
+    packagingOptions {
+        resources.excludes.add("META-INF/versions/9/previous-compilation-data.bin")
+    }
 }
 
 void createBindReleaseFileTask(String destination) {
@@ -197,6 +201,17 @@ dependencies {
     implementation project(':feature-versions-api')
     implementation project(':feature-versions-impl')
 
+    implementation project(':caip')
+
+    implementation project(':feature-external-sign-api')
+    implementation project(':feature-external-sign-impl')
+
+    implementation project(':feature-wallet-connect-api')
+    implementation project(':feature-wallet-connect-impl')
+
+    implementation project(':feature-settings-api')
+    implementation project(':feature-settings-impl')
+
     implementation kotlinDep
 
     implementation androidDep
@@ -233,6 +248,9 @@ dependencies {
     implementation insetterDep
 
     implementation liveDataKtxDep
+
+    implementation walletConnectCoreDep, withoutTransitiveAndroidX
+    implementation walletConnectWalletDep, withoutTransitiveAndroidX
 
     kaptAndroidTest daggerKapt
 

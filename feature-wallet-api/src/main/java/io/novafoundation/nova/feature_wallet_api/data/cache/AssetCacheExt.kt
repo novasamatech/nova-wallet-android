@@ -33,11 +33,9 @@ suspend fun AssetCache.updateNonLockableAsset(
 private fun nativeBalanceUpdater(accountInfo: AccountInfo) = { asset: AssetLocal ->
     val data = accountInfo.data
 
-    val frozen = data.miscFrozen.max(data.feeFrozen)
-
     asset.copy(
         freeInPlanks = data.free,
-        frozenInPlanks = frozen,
+        frozenInPlanks = data.frozen,
         reservedInPlanks = accountInfo.data.reserved
     )
 }
