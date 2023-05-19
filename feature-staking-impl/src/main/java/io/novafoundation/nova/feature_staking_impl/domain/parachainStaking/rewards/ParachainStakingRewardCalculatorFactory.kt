@@ -28,10 +28,11 @@ class ParachainStakingRewardCalculatorFactory(
     ): ParachainStakingRewardCalculator {
         val chainId = chainAsset.chainId
 
-        return when (chainAsset.staking) {
+        // TODO staking dashboard - switch by selected staking option
+        return when (chainAsset.staking.firstOrNull()) {
             PARACHAIN -> defaultCalculator(chainId, snapshots)
             TURING -> turingCalculator(chainId, snapshots)
-            RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, UNSUPPORTED -> {
+            null, RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, UNSUPPORTED -> {
                 throw IllegalStateException("Unknown staking type in ParachainStakingRewardCalculatorFactory")
             }
         }
