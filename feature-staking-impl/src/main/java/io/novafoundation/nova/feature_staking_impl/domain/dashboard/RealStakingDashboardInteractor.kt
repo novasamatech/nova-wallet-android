@@ -88,7 +88,7 @@ class RealStakingDashboardInteractor(
             }
         }
 
-        val resolvedItems = itemsByChain.size
+        val resolvedItems = hasStake.size + noStake.size
         val resolvingItems = (knownStakingChainsCount - resolvedItems).coerceAtLeast(0)
 
         return NoPriceStakingDashboard(
