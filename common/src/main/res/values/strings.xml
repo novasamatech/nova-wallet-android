@@ -59,6 +59,9 @@
 
     <string name="send_address_hint">Address or w3n</string>
 
+    <string name="wallet_send_recipient_blocked_title">Recipient cannot accept transfer</string>
+    <string name="wallet_send_recipient_blocked_message">Recipient has been blocked by token owner and cannot currently accept incoming transfers</string>
+
     <string name="common_expired">Expired</string>
 
     <plurals name="common_networks_plural">

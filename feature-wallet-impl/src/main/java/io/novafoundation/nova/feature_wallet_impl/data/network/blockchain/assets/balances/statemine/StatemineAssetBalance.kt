@@ -8,7 +8,8 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
-import io.novafoundation.nova.runtime.ext.palletNameOrDefault
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.bindAssetAccountOrEmpty
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.statemineModule
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -16,8 +17,6 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.network.updaters.insert
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
@@ -120,17 +119,13 @@ class StatemineAssetBalance(
         }
     }
 
-    private fun bindAssetAccountOrEmpty(decoded: Any?): AssetAccount {
-        return decoded?.let(::bindAssetAccount) ?: AssetAccount.empty()
-    }
-
     private suspend fun updateAssetBalance(
         metaId: Long,
         chainAsset: Chain.Asset,
         isAssetFrozen: Boolean,
         assetAccount: AssetAccount
     ) = assetCache.updateAsset(metaId, chainAsset) {
-        val frozenBalance = if (isAssetFrozen || assetAccount.isFrozen) {
+        val frozenBalance = if (isAssetFrozen || assetAccount.isBalanceFrozen) {
             assetAccount.balance
         } else {
             BigInteger.ZERO
@@ -141,6 +136,4 @@ class StatemineAssetBalance(
             freeInPlanks = assetAccount.balance
         )
     }
-
-    private fun RuntimeMetadata.statemineModule(statemineType: Chain.Asset.Type.Statemine) = module(statemineType.palletNameOrDefault())
 }
