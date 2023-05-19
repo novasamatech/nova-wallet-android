@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboardUpdateSystem
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.StakingDashboardViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.components.ComponentsModule
 
@@ -25,13 +26,15 @@ class StakingDashboardModule {
         interactor: StakingDashboardInteractor,
         accountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
-        dashboardUpdateSystem: StakingDashboardUpdateSystem
+        dashboardUpdateSystem: StakingDashboardUpdateSystem,
+        router: StakingRouter
     ): ViewModel {
         return StakingDashboardViewModel(
             interactor = interactor,
             accountUseCase = accountUseCase,
             resourceManager = resourceManager,
-            stakingDashboardUpdateSystem = dashboardUpdateSystem
+            stakingDashboardUpdateSystem = dashboardUpdateSystem,
+            router = router
         )
     }
 

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
@@ -47,12 +48,13 @@ class StakingDashboardFragment : BaseFragment<StakingDashboardViewModel>(),
         stakingDashboardContent.applyStatusBarInsets()
         stakingDashboardContent.setHasFixedSize(true)
         stakingDashboardContent.adapter = ConcatAdapter(headerAdapter, hasStakeAdapter, noStakeAdapter, loadingItemsAdapter)
+        stakingDashboardContent.itemAnimator = null
     }
 
     override fun subscribe(viewModel: StakingDashboardViewModel) {
         viewModel.stakingDashboardFlow.observe {
-            hasStakeAdapter.submitList(it.hasStakeItems)
-            noStakeAdapter.submitList(it.noStakeItems)
+            hasStakeAdapter.submitListPreservingViewPoint(it.hasStakeItems, stakingDashboardContent)
+            noStakeAdapter.submitListPreservingViewPoint(it.noStakeItems, stakingDashboardContent)
             loadingItemsAdapter.setNumberOfLoadingItems(it.resolvingItems)
         }
 

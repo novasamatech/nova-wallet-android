@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -25,6 +26,7 @@ class StakingDashboardViewModel(
     private val accountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,
     private val stakingDashboardUpdateSystem: StakingDashboardUpdateSystem,
+    private val router: StakingRouter,
 ) : BaseViewModel() {
 
     val walletUi = accountUseCase.selectedWalletModelFlow()
@@ -49,7 +51,7 @@ class StakingDashboardViewModel(
 
 
     fun avatarClicked() {
-        // TODO
+        router.openSwitchWallet()
     }
 
     private fun mapDashboardToUi(dashboard: StakingDashboard): StakingDashboardModel {
