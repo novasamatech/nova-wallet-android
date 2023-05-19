@@ -50,14 +50,14 @@ dependencies {
     implementation cardViewDep
     implementation constraintDep
 
-    implementation biometricDep
-
     implementation zXingCoreDep
     implementation zXingEmbeddedDep
 
     implementation bouncyCastleDep
 
     implementation fearlessLibDep
+
+    implementation biometricDep
 
     implementation coroutinesDep
     implementation coroutinesAndroidDep

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.biometric
+package io.novafoundation.nova.feature_account_impl
 
 import androidx.biometric.BiometricConstants
 import androidx.biometric.BiometricManager
@@ -7,8 +7,26 @@ import io.novafoundation.nova.common.sequrity.BiometricResponse
 import io.novafoundation.nova.common.sequrity.BiometricService
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_impl.presentation.pincode.fingerprint.BiometricPromptFactory
+import io.novafoundation.nova.common.sequrity.biometry.BiometricPromptFactory
+import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import kotlinx.coroutines.flow.Flow
+
+class RealBiometricServiceFactory(
+    private val accountRepository: AccountRepository
+) : BiometricServiceFactory {
+    override fun create(
+        biometricManager: BiometricManager,
+        biometricPromptFactory: BiometricPromptFactory,
+        promptInfo: BiometricPrompt.PromptInfo
+    ): BiometricService {
+        return RealBiometricService(
+            accountRepository,
+            biometricManager,
+            biometricPromptFactory,
+            promptInfo
+        )
+    }
+}
 
 class RealBiometricService(
     private val accountRepository: AccountRepository,

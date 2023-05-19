@@ -1,6 +1,9 @@
 package io.novafoundation.nova.web3names.data.repository
 
 import com.google.gson.Gson
+import io.novafoundation.nova.caip.caip19.Caip19MatcherFactory
+import io.novafoundation.nova.caip.caip19.Caip19Parser
+import io.novafoundation.nova.caip.caip19.matchers.Caip19Matcher
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindString
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
@@ -8,9 +11,6 @@ import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.runtime.ext.isValidAddress
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.web3names.data.caip19.Caip19MatcherFactory
-import io.novafoundation.nova.web3names.data.caip19.Caip19Parser
-import io.novafoundation.nova.web3names.data.caip19.matchers.Caip19Matcher
 import io.novafoundation.nova.web3names.data.endpoints.TransferRecipientsApi
 import io.novafoundation.nova.web3names.data.endpoints.model.TransferRecipientRemote
 import io.novafoundation.nova.web3names.data.integrity.Web3NamesIntegrityVerifier
@@ -99,7 +99,7 @@ class RealWeb3NamesRepository(
         return gson.fromJson(content)
     }
 
-    private suspend fun findChainRecipients(
+    private fun findChainRecipients(
         recipientsByChain: RecipientsByChain,
         w3nIdentifier: String,
         chain: Chain,

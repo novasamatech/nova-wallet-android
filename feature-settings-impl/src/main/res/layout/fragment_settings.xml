@@ -105,21 +105,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsSwitcherView
+            <io.novafoundation.nova.feature_settings_impl.presentation.settings.view.SettingsSwitcherView
                 android:id="@+id/settingsBiometricAuth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_authentication"
                 app:title="@string/biometric_auth_title" />
 
-            <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsSwitcherView
+            <io.novafoundation.nova.feature_settings_impl.presentation.settings.view.SettingsSwitcherView
                 android:id="@+id/settingsPinCodeVerification"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_approve_with_pin"
                 app:title="@string/profile_settings_pin_code_verification_title" />
 
-            <io.novafoundation.nova.feature_account_impl.presentation.settings.view.SettingsSwitcherView
+            <io.novafoundation.nova.feature_settings_impl.presentation.settings.view.SettingsSwitcherView
                 android:id="@+id/settingsSafeMode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

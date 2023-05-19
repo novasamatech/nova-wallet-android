@@ -3,18 +3,13 @@ package io.novafoundation.nova.feature_account_impl.di.modules
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
-import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.sequrity.RealTwoFactorVerificationService
-import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.utils.DefaultMutableSharedState
 import io.novafoundation.nova.common.utils.MutableSharedState
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
-import io.novafoundation.nova.feature_account_impl.presentation.settings.PinCodeTwoFactorVerificationCommunicator
-import io.novafoundation.nova.feature_account_impl.presentation.settings.PinCodeTwoFactorVerificationExecutor
 import io.novafoundation.nova.feature_account_impl.data.signer.RealSignerProvider
 import io.novafoundation.nova.feature_account_impl.data.signer.ledger.LedgerSigner
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSignCommunicator
@@ -27,19 +22,6 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtr
 
 @Module
 class SignersModule {
-
-    @Provides
-    @FeatureScope
-    fun provideTwoFactorExecutor(
-        pinCodeTwoFactorVerificationCommunicator: PinCodeTwoFactorVerificationCommunicator
-    ): TwoFactorVerificationExecutor = PinCodeTwoFactorVerificationExecutor(pinCodeTwoFactorVerificationCommunicator)
-
-    @Provides
-    @FeatureScope
-    fun provideTwoFactorVerificationService(
-        preferences: Preferences,
-        twoFactorVerificationExecutor: TwoFactorVerificationExecutor
-    ): TwoFactorVerificationService = RealTwoFactorVerificationService(preferences, twoFactorVerificationExecutor)
 
     @Provides
     @FeatureScope

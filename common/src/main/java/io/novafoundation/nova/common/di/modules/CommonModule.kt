@@ -26,6 +26,7 @@ import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferencesImpl
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptionUtil
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.interfaces.InternalFileSystemCache
@@ -42,7 +43,12 @@ import io.novafoundation.nova.common.resources.OSAppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.ResourceManagerImpl
 import io.novafoundation.nova.common.sequrity.RealSafeModeService
+import io.novafoundation.nova.common.sequrity.RealTwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
+import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
+import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
@@ -280,4 +286,18 @@ class CommonModule {
     fun providePartialRetriableMixinFactory(
         resourceManager: ResourceManager
     ): PartialRetriableMixin.Factory = RealPartialRetriableMixinFactory(resourceManager)
+
+
+    @Provides
+    @ApplicationScope
+    fun provideTwoFactorVerificationExecutor(
+        twoFactorVerificationExecutor: PinCodeTwoFactorVerificationCommunicator
+    ): TwoFactorVerificationExecutor = PinCodeTwoFactorVerificationExecutor(twoFactorVerificationExecutor)
+
+    @Provides
+    @ApplicationScope
+    fun provideTwoFactorVerificationService(
+        preferences: Preferences,
+        twoFactorVerificationExecutor: TwoFactorVerificationExecutor
+    ): TwoFactorVerificationService = RealTwoFactorVerificationService(preferences, twoFactorVerificationExecutor)
 }

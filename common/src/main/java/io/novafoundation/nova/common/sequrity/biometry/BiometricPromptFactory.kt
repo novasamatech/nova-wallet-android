@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.pincode.fingerprint
+package io.novafoundation.nova.common.sequrity.biometry
 
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment

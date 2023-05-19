@@ -21,10 +21,7 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
-import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.biometric.mapBiometricErrors
-import io.novafoundation.nova.feature_account_impl.presentation.language.mapper.mapLanguageToLanguageModel
+import io.novafoundation.nova.common.sequrity.biometry.mapBiometricErrors
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyToUI
 import io.novafoundation.nova.feature_settings_impl.R
@@ -50,7 +47,6 @@ class SettingsViewModel(
     private val safeModeService: SafeModeService,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
-    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val twoFactorVerificationService: TwoFactorVerificationService,
     private val biometricService: BiometricService
 ) : BaseViewModel(), Browserable {

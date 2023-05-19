@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_api.di
 
-import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
+import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.common.utils.MutableSharedState
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -45,7 +46,7 @@ interface AccountFeatureApi {
 
     fun importTypeChooserMixin(): ImportTypeChooserMixin.Presentation
 
-    fun twoFactorVerificationExecutor(): TwoFactorVerificationExecutor
+    fun biometricServiceFactory(): BiometricServiceFactory
 
     val addressInputMixinFactory: AddressInputMixinFactory
 

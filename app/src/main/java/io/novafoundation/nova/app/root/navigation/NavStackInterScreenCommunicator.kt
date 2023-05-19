@@ -43,7 +43,7 @@ abstract class NavStackInterScreenCommunicator<I : Parcelable, O : Parcelable>(
     }
 
     fun clearedResponseFlow(): Flow<O> {
-        navController.currentBackStackEntry!!.savedStateHandle.remove<O>(liveDataKey)
+        navController.currentBackStackEntry!!.savedStateHandle.remove<O>(requestKey)
         return createResponseFlow()
     }
 

@@ -2,11 +2,11 @@ package io.novafoundation.nova.feature_settings_impl.presentation.settings.di
 
 import android.content.Context
 import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import dagger.Module
+import androidx.biometric.BiometricPrompt
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.data.network.AppLinksProvider
@@ -19,16 +19,12 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.BiometricService
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.common.sequrity.biometry.BiometricPromptFactory
+import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.presentation.biometric.RealBiometricService
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.pincode.fingerprint.BiometricPromptFactory
-import io.novafoundation.nova.feature_account_impl.presentation.settings.SettingsViewModel
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.presentation.settings.SettingsViewModel
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
@@ -64,7 +60,6 @@ class SettingsModule {
             safeModeService,
             actionAwaitableMixinFactory,
             walletConnectSessionsUseCase,
-            actionAwaitableMixinFactory,
             twoFactorVerificationService,
             biometricService
         )
@@ -80,7 +75,7 @@ class SettingsModule {
         fragment: Fragment,
         context: Context,
         resourceManager: ResourceManager,
-        accountRepository: AccountRepository
+        biometricServiceFactory: BiometricServiceFactory
     ): BiometricService {
         val biometricManager = BiometricManager.from(context)
         val biometricPromptFactory = BiometricPromptFactory(fragment, MainThreadExecutor())
@@ -90,6 +85,6 @@ class SettingsModule {
             .setNegativeButtonText(resourceManager.getString(R.string.common_cancel))
             .build()
 
-        return RealBiometricService(accountRepository, biometricManager, biometricPromptFactory, promptInfo)
+        return biometricServiceFactory.create(biometricManager, biometricPromptFactory, promptInfo)
     }
 }
