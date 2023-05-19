@@ -3,8 +3,9 @@ package io.novafoundation.nova.runtime.storage.source.query
 import io.novafoundation.nova.common.utils.ComponentHolder
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
+import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Constant
+import jp.co.soramitsu.fearless_utils.runtime.metadata.module.Module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import kotlinx.coroutines.flow.Flow
 
@@ -95,3 +96,6 @@ interface StorageQueryContext {
 fun Map<StorageEntry, Map<StorageKeyComponents, Any?>>.singleValueOf(storageEntry: StorageEntry) = getValue(storageEntry).values.first()
 
 fun Collection<*>.wrapSingleArgumentKeys(): List<List<Any?>> = map(::listOf)
+
+val StorageQueryContext.metadata: RuntimeMetadata
+    get() = runtime.metadata

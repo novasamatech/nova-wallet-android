@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
+import io.novafoundation.nova.core_db.dao.StakingDashboardDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
@@ -133,4 +134,6 @@ interface StakingFeatureDependencies {
     val identityMixinFactory: IdentityMixin.Factory
 
     val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+
+    val stakingDashboardDao: StakingDashboardDao
 }

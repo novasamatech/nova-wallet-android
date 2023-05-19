@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.storage.source
 import io.novafoundation.nova.common.data.network.runtime.binding.Binder
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.NonNullBinder
+import io.novafoundation.nova.core.updater.SubstrateSubscriptionBuilder
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +42,13 @@ interface StorageDataSource {
 
     fun <R> subscribe(
         chainId: String,
+        at: BlockHash? = null,
+        subscribe: suspend StorageQueryContext.() -> Flow<R>
+    ): Flow<R>
+
+    suspend fun <R> subscribe(
+        chainId: String,
+        subscriptionBuilder: SubstrateSubscriptionBuilder,
         at: BlockHash? = null,
         subscribe: suspend StorageQueryContext.() -> Flow<R>
     ): Flow<R>

@@ -164,7 +164,7 @@ private fun mapRemoteStakingTypesToLocal(stakingTypesRemote: List<String>?): Str
     }
 }
 
-private fun mapStakingStringToStakingType(stakingString: String?): Chain.Asset.StakingType {
+fun mapStakingStringToStakingType(stakingString: String?): Chain.Asset.StakingType {
     return when (stakingString) {
         null -> Chain.Asset.StakingType.UNSUPPORTED
         "relaychain" -> Chain.Asset.StakingType.RELAYCHAIN
@@ -173,6 +173,17 @@ private fun mapStakingStringToStakingType(stakingString: String?): Chain.Asset.S
         "turing" -> Chain.Asset.StakingType.TURING
         "aleph-zero" -> Chain.Asset.StakingType.ALEPH_ZERO
         else -> Chain.Asset.StakingType.UNSUPPORTED
+    }
+}
+
+fun mapStakingTypeToStakingString(stakingType: Chain.Asset.StakingType): String? {
+    return when (stakingType) {
+        Chain.Asset.StakingType.UNSUPPORTED -> null
+        Chain.Asset.StakingType.RELAYCHAIN -> "relaychain"
+        Chain.Asset.StakingType.PARACHAIN -> "parachain"
+        Chain.Asset.StakingType.RELAYCHAIN_AURA -> "aura-relaychain"
+        Chain.Asset.StakingType.TURING -> "turing"
+        Chain.Asset.StakingType.ALEPH_ZERO -> "aleph-zero"
     }
 }
 
