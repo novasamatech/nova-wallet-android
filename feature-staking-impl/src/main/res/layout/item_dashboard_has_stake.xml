@@ -163,7 +163,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:includeFontPadding="false"
+            android:layout_marginBottom="17dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeEarningsLabel"
             app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeEarningsLabel"
             tools:text="19.47%" />
@@ -173,10 +174,12 @@
             style="@style/TextAppearance.NovaFoundation.Regular.Caption2.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:includeFontPadding="false"
             android:layout_marginStart="2dp"
+            android:layout_marginTop="5dp"
             android:text="@string/common_per_year"
-            app:layout_constraintBottom_toBottomOf="@+id/itemDashboardHasStakeEarnings"
-            app:layout_constraintStart_toEndOf="@+id/itemDashboardHasStakeEarnings" />
+            app:layout_constraintStart_toEndOf="@+id/itemDashboardHasStakeEarnings"
+            app:layout_constraintTop_toTopOf="@+id/itemDashboardHasStakeEarnings" />
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/itemDashboardHasStakeEarningsValueGroup"
@@ -189,6 +192,8 @@
             android:layout_width="44dp"
             android:layout_height="10dp"
             android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="19dp"
             android:background="@drawable/bg_shimmering"
             app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeEarningsLabel"
             app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeEarningsLabel" />
