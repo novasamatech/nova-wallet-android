@@ -60,5 +60,9 @@ fun mapAssetTransferValidationFailureToUI(
             resourceManager.getString(R.string.common_not_enough_funds_title) to
                 resourceManager.getString(R.string.wallet_send_insufficient_balance_commission, failure.commissionAsset.symbol)
         }
+        AssetTransferValidationFailure.RecipientCannotAcceptTransfer -> {
+            resourceManager.getString(R.string.wallet_send_recipient_blocked_title) to
+                resourceManager.getString(R.string.wallet_send_recipient_blocked_message)
+        }
     }
 }
