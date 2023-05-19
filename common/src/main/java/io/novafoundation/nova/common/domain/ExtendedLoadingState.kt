@@ -10,7 +10,7 @@ sealed class ExtendedLoadingState<out T> {
 
     object Loading : ExtendedLoadingState<Nothing>()
 
-    class Error(val exception: Throwable) : ExtendedLoadingState<Nothing>()
+    data class Error(val exception: Throwable) : ExtendedLoadingState<Nothing>()
 
     data class Loaded<T>(val data: T) : ExtendedLoadingState<T>()
 }

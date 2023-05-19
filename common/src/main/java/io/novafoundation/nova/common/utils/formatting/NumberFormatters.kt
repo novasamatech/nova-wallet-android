@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.format.DateUtils
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.daysFromMillis
 import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.isNonNegative
@@ -89,6 +90,10 @@ fun BigDecimal.formatAsChange(): String {
 
 fun BigDecimal.formatAsPercentage(): String {
     return defaultAbbreviationFormatter.format(this) + "%"
+}
+
+fun Percent.format(): String {
+    return value.toBigDecimal().formatAsPercentage()
 }
 
 fun BigDecimal.formatFractionAsPercentage(): String {

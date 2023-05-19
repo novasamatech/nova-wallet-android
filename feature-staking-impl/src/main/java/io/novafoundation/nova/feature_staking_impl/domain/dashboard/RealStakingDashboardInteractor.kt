@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.model.StakingD
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.supportedStakingOptions
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -43,7 +44,7 @@ class RealStakingDashboardInteractor(
 
     override fun stakingDashboardFlow(): Flow<StakingDashboard> {
         return flow {
-            val chains = chainRegistry.chainsById()
+            val chains = chainRegistry.chainsById().keepProductionChains()
             val knownStakingAssets = chains.knownStakingAssets()
             val knownStakingChainsCount = knownStakingAssets.distinctBy { it.chainId }.size
 
@@ -102,8 +103,8 @@ class RealStakingDashboardInteractor(
         prices: Map<FullChainAssetId, Token>
     ): StakingDashboard {
         return StakingDashboard(
-            hasStake = noPriceStakingDashboard.hasStake.map { addPriceToStakingDashboardItem(it, prices) },
-            noStake = noPriceStakingDashboard.noStake.map { addPriceToStakingDashboardItem(it, prices) },
+            hasStake = noPriceStakingDashboard.hasStake.map { addPriceToStakingDashboardItem(it, prices) }.sortedByChain(),
+            noStake = noPriceStakingDashboard.noStake.map { addPriceToStakingDashboardItem(it, prices) }.sortedByChain(),
             resolvingItems = noPriceStakingDashboard.resolvingItems
         )
     }
@@ -148,6 +149,10 @@ class RealStakingDashboardInteractor(
         )
     }
 
+    private fun <S> List<AggregatedStakingDashboardOption<S>>.sortedByChain(): List<AggregatedStakingDashboardOption<S>> {
+        return sortedWith(Chain.defaultComparatorFrom { it.chain })
+    }
+
     private fun hasStakeOption(
         chain: Chain,
         chainAsset: Chain.Asset,
@@ -182,6 +187,10 @@ class RealStakingDashboardInteractor(
             StakingDashboardItem.StakeState.HasStake.StakingStatus.INACTIVE -> HasStake.StakingStatus.INACTIVE
             StakingDashboardItem.StakeState.HasStake.StakingStatus.WAITING -> HasStake.StakingStatus.WAITING
         }
+    }
+
+    private fun ChainsById.keepProductionChains(): ChainsById {
+        return ChainsById(filterValues { !it.isTestNet })
     }
 
     private fun ChainsById.knownStakingAssets(): List<Chain.Asset> {

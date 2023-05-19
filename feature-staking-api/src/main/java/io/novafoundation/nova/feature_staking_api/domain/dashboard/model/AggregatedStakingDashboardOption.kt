@@ -35,6 +35,6 @@ class AggregatedStakingDashboardOption<S>(
             class Single(val stakingType: Chain.Asset.StakingType) : FlowType()
         }
 
-        class Stats(val earnings: Percent)
+        class Stats(val estimatedEarnings: Percent)
     }
 }
