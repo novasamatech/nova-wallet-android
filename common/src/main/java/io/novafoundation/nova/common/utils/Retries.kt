@@ -17,7 +17,7 @@ suspend inline fun <T> retryUntilDone(
         if (blockResult.isSuccess) {
             return blockResult.requireValue()
         } else {
-            Log.e("RetryUntilDone","Failed to execute retriable operation:", blockResult.requireException())
+            Log.e("RetryUntilDone", "Failed to execute retriable operation:", blockResult.requireException())
 
             attempt++
 

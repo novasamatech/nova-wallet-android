@@ -20,14 +20,14 @@ class StakingDashboardModel(
         val status: ExtendedLoadingState<StakeStatusModel>,
         val earnings: ExtendedLoadingState<String>,
         override val syncing: Boolean
-    ): BaseItem
+    ) : BaseItem
 
     data class NoStakeItem(
         override val chainUi: ChainUi,
         override val assetId: ChainAssetId,
         val earnings: ExtendedLoadingState<String>,
         override val syncing: Boolean
-    ): BaseItem
+    ) : BaseItem
 
     interface BaseItem {
         val chainUi: ChainUi

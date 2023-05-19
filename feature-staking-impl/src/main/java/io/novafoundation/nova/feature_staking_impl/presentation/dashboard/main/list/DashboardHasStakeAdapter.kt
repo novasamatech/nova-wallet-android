@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.v
 
 class DashboardHasStakeAdapter(
     private val handler: Handler,
-): ListAdapter<HasStakeItem, DashboardHasStakeViewHolder>(DashboardHasStakeDiffCallback()) {
+) : ListAdapter<HasStakeItem, DashboardHasStakeViewHolder>(DashboardHasStakeDiffCallback()) {
 
     interface Handler {
 

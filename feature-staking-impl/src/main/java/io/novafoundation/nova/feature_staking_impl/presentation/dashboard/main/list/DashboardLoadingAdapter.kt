@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_dashboard_loading.view.itemDashboardLoading
 
-
 class DashboardLoadingAdapter : RecyclerView.Adapter<DashboardLoadingHolder>() {
 
     private var numberOfItems: Int = 0
@@ -47,9 +46,9 @@ class DashboardLoadingAdapter : RecyclerView.Adapter<DashboardLoadingHolder>() {
 
 class DashboardLoadingHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
-   fun bind() {
-       containerView.itemDashboardLoading.startShimmer()
-   }
+    fun bind() {
+        containerView.itemDashboardLoading.startShimmer()
+    }
 
     fun unbind() {
         containerView.itemDashboardLoading.stopShimmer()

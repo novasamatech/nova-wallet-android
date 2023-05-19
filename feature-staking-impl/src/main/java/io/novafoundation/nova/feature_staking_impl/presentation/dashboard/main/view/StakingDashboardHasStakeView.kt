@@ -33,7 +33,7 @@ class StakingDashboardHasStakeView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : ShimmerFrameLayout(context, attrs, defStyleAttr) , WithContextExtensions by WithContextExtensions(context) {
+) : ShimmerFrameLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
     init {
         View.inflate(context, R.layout.item_dashboard_has_stake, this)

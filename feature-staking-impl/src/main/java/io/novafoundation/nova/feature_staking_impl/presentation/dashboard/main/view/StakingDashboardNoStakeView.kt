@@ -26,7 +26,7 @@ class StakingDashboardNoStakeView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : ShimmerFrameLayout(context, attrs, defStyleAttr) , WithContextExtensions by WithContextExtensions(context) {
+) : ShimmerFrameLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
     private val imageLoader: ImageLoader
 

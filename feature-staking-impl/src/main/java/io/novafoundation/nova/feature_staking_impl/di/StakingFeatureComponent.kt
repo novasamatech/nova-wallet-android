@@ -77,7 +77,6 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun dashboardComponentFactory(): StakingDashboardComponent.Factory
 
-
     // relaychain staking
 
     fun searchCustomValidatorsComponentFactory(): SearchCustomValidatorsComponent.Factory

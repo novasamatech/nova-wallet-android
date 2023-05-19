@@ -49,7 +49,6 @@ class StakingDashboardViewModel(
         // TODO
     }
 
-
     fun avatarClicked() {
         router.openSwitchWallet()
     }

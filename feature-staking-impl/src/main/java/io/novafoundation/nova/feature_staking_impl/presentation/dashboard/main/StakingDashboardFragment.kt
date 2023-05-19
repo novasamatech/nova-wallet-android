@@ -18,8 +18,11 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.l
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardNoStakeAdapter
 import kotlinx.android.synthetic.main.fragment_staking_dashboard.stakingDashboardContent
 
-class StakingDashboardFragment : BaseFragment<StakingDashboardViewModel>(),
-    DashboardHasStakeAdapter.Handler, DashboardNoStakeAdapter.Handler, DashboardHeaderAdapter.Handler {
+class StakingDashboardFragment :
+    BaseFragment<StakingDashboardViewModel>(),
+    DashboardHasStakeAdapter.Handler,
+    DashboardNoStakeAdapter.Handler,
+    DashboardHeaderAdapter.Handler {
 
     private val headerAdapter = DashboardHeaderAdapter(this)
     private val hasStakeAdapter = DashboardHasStakeAdapter(this)
