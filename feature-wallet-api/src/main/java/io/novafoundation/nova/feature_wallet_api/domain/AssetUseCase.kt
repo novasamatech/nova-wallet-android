@@ -1,7 +1,8 @@
 package io.novafoundation.nova.feature_wallet_api.domain
 
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.runtime.state.GenericSingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AssetSharedStateAdditionalData
+import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -19,4 +20,4 @@ interface AssetUseCase {
 
 suspend fun AssetUseCase.getCurrentAsset() = currentAssetFlow().first()
 
-data class AssetAndOption(val asset: Asset, val option: GenericSingleAssetSharedState.SupportedAssetOption<*>)
+data class AssetAndOption(val asset: Asset, val option: SelectedAssetOptionSharedState.SupportedAssetOption<AssetSharedStateAdditionalData>)

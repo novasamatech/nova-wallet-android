@@ -1,6 +1,5 @@
 package io.novafoundation.nova.runtime.state
 
-import io.novafoundation.nova.common.data.holders.ChainIdHolder
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.common.utils.findById
@@ -11,11 +10,10 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAssetOrNull
-import io.novafoundation.nova.runtime.state.GenericSingleAssetSharedState.SupportedAssetOption
+import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState.SupportedAssetOption
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -25,23 +23,18 @@ private const val DELIMITER = ":"
 
 typealias SupportedOptionsResolver<A> = (Chain, Chain.Asset) -> List<A>
 
-typealias SingleAssetSharedState = GenericSingleAssetSharedState<*>
+typealias SingleAssetSharedState = SelectableSingleAssetSharedState<*>
 
 interface AssetSharedStateAdditionalData : Formatable, Identifiable
 
-abstract class GenericSingleAssetSharedState<A : AssetSharedStateAdditionalData>(
+abstract class SelectableSingleAssetSharedState<A : AssetSharedStateAdditionalData>(
     private val preferencesKey: String,
     private val chainRegistry: ChainRegistry,
     private val supportedOptions: SupportedOptionsResolver<A>,
     private val preferences: Preferences
-) : ChainIdHolder {
+) : SelectedAssetOptionSharedState<A> {
 
-    data class SupportedAssetOption<A : AssetSharedStateAdditionalData>(
-        val assetWithChain: ChainWithAsset,
-        val additional: A
-    )
-
-    val selectedOption: Flow<SupportedAssetOption<A>> = preferences.stringFlow(
+    override val selectedOption: Flow<SupportedAssetOption<A>> = preferences.stringFlow(
         field = preferencesKey,
         initialValueProducer = {
             val option = availableToSelect().first()
@@ -60,9 +53,6 @@ abstract class GenericSingleAssetSharedState<A : AssetSharedStateAdditionalData>
         .inBackground()
         .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
 
-    val assetWithChain: Flow<ChainWithAsset> = selectedOption.map { it.assetWithChain }
-        .inBackground()
-        .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
 
     suspend fun availableToSelect(): List<SupportedAssetOption<A>> {
         val allChains = chainRegistry.currentChains.first()
@@ -125,20 +115,3 @@ abstract class GenericSingleAssetSharedState<A : AssetSharedStateAdditionalData>
         return Triple(chainId, chainAssetRaw.toInt(), additionalIdentifierRaw)
     }
 }
-
-fun SingleAssetSharedState.selectedChainFlow() = assetWithChain
-    .map { it.chain }
-    .distinctUntilChanged()
-
-suspend fun SingleAssetSharedState.chain() = assetWithChain.first().chain
-
-suspend fun SingleAssetSharedState.chainAsset() = assetWithChain.first().asset
-
-suspend fun SingleAssetSharedState.chainAndAsset() = assetWithChain.first()
-
-suspend fun <A : AssetSharedStateAdditionalData> GenericSingleAssetSharedState<A>.selectedOption(): SupportedAssetOption<A> {
-    return selectedOption.first()
-}
-
-fun SingleAssetSharedState.selectedAssetFlow() = assetWithChain
-    .map { it.asset }
