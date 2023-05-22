@@ -1,19 +1,19 @@
-package io.novafoundation.nova.app.di.app.navigation
+package io.novafoundation.nova.app.di.app.navigation.staking
 
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
-import io.novafoundation.nova.app.root.navigation.staking.ParachainStakingNavigator
-import io.novafoundation.nova.app.root.navigation.staking.SelectCollatorInterScreenCommunicatorImpl
-import io.novafoundation.nova.app.root.navigation.staking.SelectCollatorSettingsInterScreenCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.staking.parachain.ParachainStakingNavigator
+import io.novafoundation.nova.app.root.navigation.staking.parachain.SelectCollatorInterScreenCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.staking.parachain.SelectCollatorSettingsInterScreenCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenCommunicator
 
 @Module
-class StakingNavigationModule {
+class ParachainStakingNavigationModule {
 
     @Provides
     @ApplicationScope

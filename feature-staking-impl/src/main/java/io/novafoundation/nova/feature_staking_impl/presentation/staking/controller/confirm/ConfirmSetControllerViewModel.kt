@@ -115,7 +115,7 @@ class ConfirmSetControllerViewModel(
         if (result.isSuccess) {
             showMessage(resourceManager.getString(R.string.staking_controller_change_success))
 
-            router.returnToMain()
+            router.returnToStakingMain()
         }
     }
 

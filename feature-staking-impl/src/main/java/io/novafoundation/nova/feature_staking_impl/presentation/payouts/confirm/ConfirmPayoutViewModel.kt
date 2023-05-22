@@ -127,7 +127,7 @@ class ConfirmPayoutViewModel(
         if (result.isSuccess) {
             showMessage(resourceManager.getString(R.string.make_payout_transaction_sent))
 
-            router.returnToMain()
+            router.returnToStakingMain()
         } else {
             showError(result.requireException())
         }

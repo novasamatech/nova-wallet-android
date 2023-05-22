@@ -2,6 +2,7 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.app.di.app.navigation.staking.StakingNavigationModule
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
@@ -10,7 +11,6 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.splash.SplashRouter
 
 @Module(
@@ -58,10 +58,6 @@ class NavigationModule {
     @ApplicationScope
     @Provides
     fun provideAssetsRouter(navigator: Navigator): AssetsRouter = navigator
-
-    @ApplicationScope
-    @Provides
-    fun provideStakingRouter(navigator: Navigator): StakingRouter = navigator
 
     @ApplicationScope
     @Provides

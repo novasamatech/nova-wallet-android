@@ -184,7 +184,7 @@ class ConfirmStartParachainStakingViewModel(
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.returnToMain()
+                router.returnToStakingMain()
             }
 
         _showNextProgress.value = false

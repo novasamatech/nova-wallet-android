@@ -132,18 +132,24 @@ class RealStakingDashboardInteractor(
     private fun noStakeAggregatedOption(
         chain: Chain,
         chainAsset: Chain.Asset,
-        items: List<StakingDashboardItem>,
+        noStakeItems: List<StakingDashboardItem>,
         syncedIds: Set<StakingOptionId>,
     ): NoPriceStakingDashboardOption<NoStake> {
-        val maxEarnings = items.findMaxEarnings()
+        val maxEarnings = noStakeItems.findMaxEarnings()
         val stats = maxEarnings?.let(NoStake::Stats)
+
+        val flowType = if (noStakeItems.size > 1) {
+            NoStake.FlowType.Aggregated
+        } else {
+            NoStake.FlowType.Single(noStakeItems.single().stakingType)
+        }
 
         return NoPriceStakingDashboardOption(
             chain = chain,
             chainAsset = chainAsset,
             stakingState = NoStake(
                 stats = ExtendedLoadingState.fromOption(stats),
-                flowType = NoStake.FlowType.Aggregated
+                flowType = flowType
             ),
             syncing = chainAsset.supportedStakingOptions().any { stakingType ->
                 StakingOptionId(chain.id, chainAsset.id, stakingType) !in syncedIds

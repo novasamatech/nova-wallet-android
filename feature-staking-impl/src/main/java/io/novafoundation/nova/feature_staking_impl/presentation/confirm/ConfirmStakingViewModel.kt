@@ -250,7 +250,7 @@ class ConfirmStakingViewModel(
             if (currentProcessState.payload is Payload.Validators) {
                 router.returnToCurrentValidators()
             } else {
-                router.returnToMain()
+                router.returnToStakingMain()
             }
         } else {
             showError(setupResult.requireException())

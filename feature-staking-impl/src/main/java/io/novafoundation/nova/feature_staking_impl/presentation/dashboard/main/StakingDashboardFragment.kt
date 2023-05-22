@@ -55,7 +55,7 @@ class StakingDashboardFragment :
     }
 
     override fun subscribe(viewModel: StakingDashboardViewModel) {
-        viewModel.stakingDashboardFlow.observe {
+        viewModel.stakingDashboardUiFlow.observe {
             hasStakeAdapter.submitListPreservingViewPoint(it.hasStakeItems, stakingDashboardContent)
             noStakeAdapter.submitListPreservingViewPoint(it.noStakeItems, stakingDashboardContent)
             loadingItemsAdapter.setNumberOfLoadingItems(it.resolvingItems)

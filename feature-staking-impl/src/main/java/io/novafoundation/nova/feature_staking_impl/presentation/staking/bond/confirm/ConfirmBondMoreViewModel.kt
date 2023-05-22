@@ -127,6 +127,6 @@ class ConfirmBondMoreViewModel(
     }
 
     private fun finishFlow() {
-        router.returnToMain()
+        router.returnToStakingMain()
     }
 }

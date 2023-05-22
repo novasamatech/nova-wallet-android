@@ -1,4 +1,4 @@
-package io.novafoundation.nova.app.root.navigation.staking
+package io.novafoundation.nova.app.root.navigation.staking.parachain
 
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.NavStackInterScreenCommunicator
