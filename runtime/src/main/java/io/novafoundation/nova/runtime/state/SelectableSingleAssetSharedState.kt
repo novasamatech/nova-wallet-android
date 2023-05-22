@@ -53,7 +53,6 @@ abstract class SelectableSingleAssetSharedState<A : SelectableAssetAdditionalDat
         .inBackground()
         .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
 
-
     suspend fun availableToSelect(): List<SupportedAssetOption<A>> {
         val allChains = chainRegistry.currentChains.first()
 

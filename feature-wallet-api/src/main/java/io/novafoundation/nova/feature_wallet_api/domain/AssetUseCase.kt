@@ -26,4 +26,3 @@ typealias AssetUseCase = GenericAssetUseCase<*>
 typealias SelectableAssetAndOption = AssetAndOption<SelectableAssetAdditionalData>
 
 suspend fun AssetUseCase.getCurrentAsset() = currentAssetFlow().first()
-

@@ -203,8 +203,6 @@ class Navigator(
         navigationHolder.executeBack()
     }
 
-
-
     override fun returnToMain() {
         navController?.navigate(R.id.back_to_main)
     }
@@ -343,7 +341,6 @@ class Navigator(
 
         navController?.navigate(R.id.action_open_account_details, extras)
     }
-
 
     override fun openNodeDetails(nodeId: Int) {
         navController?.navigate(R.id.action_nodesFragment_to_nodeDetailsFragment, NodeDetailsFragment.getBundle(nodeId))

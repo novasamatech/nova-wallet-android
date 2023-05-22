@@ -50,7 +50,7 @@ class StakingDashboardViewModel(
             .launchIn(this)
     }
 
-    fun onHasStakeItemClicked(index: Int) = launch{
+    fun onHasStakeItemClicked(index: Int) = launch {
         val hasStakeItems = stakingDashboardFlow.first().hasStake
         val hasStakeItem = hasStakeItems.getOrNull(index) ?: return@launch
 
@@ -65,7 +65,7 @@ class StakingDashboardViewModel(
         val noStakeItems = stakingDashboardFlow.first().noStake
         val noStakeItem = noStakeItems.getOrNull(index) ?: return@launch
 
-        when(val flowType = noStakeItem.stakingState.flowType) {
+        when (val flowType = noStakeItem.stakingState.flowType) {
             NoStake.FlowType.Aggregated -> {} // TODO feature aggregated flows & nomination pools
 
             is NoStake.FlowType.Single -> openChainStaking(

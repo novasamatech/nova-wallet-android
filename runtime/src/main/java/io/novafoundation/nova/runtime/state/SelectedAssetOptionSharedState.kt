@@ -40,5 +40,3 @@ suspend fun SelectedAssetOptionSharedState<*>.chainAndAsset() = assetWithChain.f
 suspend fun <A> SelectedAssetOptionSharedState<A>.selectedOption(): SelectedAssetOptionSharedState.SupportedAssetOption<A> {
     return selectedOption.first()
 }
-
-
