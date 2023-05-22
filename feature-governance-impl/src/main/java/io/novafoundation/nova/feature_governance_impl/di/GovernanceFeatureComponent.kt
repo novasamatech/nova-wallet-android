@@ -23,8 +23,10 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.chooseTracks.di.RevokeDelegationChooseTracksComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm.di.RevokeDelegationConfirmComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.di.ReferendumDetailsComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.filters.di.ReferendaFiltersComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.di.ReferendumFullDetailsComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.di.ReferendaListComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.search.di.ReferendaSearchComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm.di.ConfirmReferendumVoteComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.di.SetupVoteReferendumComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.di.ReferendumVotersComponent
@@ -45,6 +47,8 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 interface GovernanceFeatureComponent : GovernanceFeatureApi {
 
     fun referendaListFactory(): ReferendaListComponent.Factory
+
+    fun referendaSearchFactory(): ReferendaSearchComponent.Factory
 
     fun referendumDetailsFactory(): ReferendumDetailsComponent.Factory
 
@@ -85,6 +89,8 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
     fun revokeDelegationChooseTracksFactory(): RevokeDelegationChooseTracksComponent.Factory
 
     fun revokeDelegationConfirmFactory(): RevokeDelegationConfirmComponent.Factory
+
+    fun referendaFiltersFactory(): ReferendaFiltersComponent.Factory
 
     @Component.Factory
     interface Factory {

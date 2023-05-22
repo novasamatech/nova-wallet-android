@@ -463,22 +463,26 @@
         <item name="android:textColor">@color/text_primary</item>
     </style>
 
-    <style name="AccentPositiveAlertDialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
-        <item name="buttonBarPositiveButtonStyle">@style/AccentDialogPositiveButtonStyle</item>
-        <item name="buttonBarNegativeButtonStyle">@style/AccentDialogPositiveButtonStyle</item>
+    <style name="AccentAlertDialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="buttonBarPositiveButtonStyle">@style/AccentDialogNeutralButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AccentDialogNeutralButtonStyle</item>
     </style>
 
-    <style name="AccentAlertDialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
-        <item name="buttonBarPositiveButtonStyle">@style/AccentDialogPositiveButtonStyle</item>
+    <style name="AccentNegativeAlertDialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="buttonBarPositiveButtonStyle">@style/AccentDialogNeutralButtonStyle</item>
         <item name="buttonBarNegativeButtonStyle">@style/AccentDialogNegativeButtonStyle</item>
     </style>
 
-    <style name="AccentAlertDialogTheme.Reversed">
+    <style name="AccentNegativeAlertDialogTheme.Reversed">
         <item name="buttonBarPositiveButtonStyle">@style/AccentDialogNegativeButtonStyle</item>
-        <item name="buttonBarNegativeButtonStyle">@style/AccentDialogPositiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AccentDialogNeutralButtonStyle</item>
     </style>
 
     <style name="AccentDialogPositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/text_positive</item>
+    </style>
+
+    <style name="AccentDialogNeutralButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">?attr/colorAccent</item>
     </style>
 
@@ -487,7 +491,6 @@
     </style>
 
     <!-- Dialog -->
-
 
     <!--   Bottom Navigation -->
     <style name="BottomNavigationView" parent="@style/TextAppearance.AppCompat.Caption">

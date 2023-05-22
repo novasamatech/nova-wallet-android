@@ -2,7 +2,6 @@ package io.novafoundation.nova.caip.di
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.caip.BuildConfig
 import io.novafoundation.nova.caip.caip19.Caip19MatcherFactory
 import io.novafoundation.nova.caip.caip19.Caip19Parser
 import io.novafoundation.nova.caip.caip19.RealCaip19MatcherFactory
@@ -16,6 +15,7 @@ import io.novafoundation.nova.caip.caip2.RealCaip2Resolver
 import io.novafoundation.nova.caip.slip44.RealSlip44CoinRepository
 import io.novafoundation.nova.caip.slip44.Slip44CoinRepository
 import io.novafoundation.nova.caip.slip44.endpoint.Slip44CoinApi
+import io.novafoundation.nova.caip.BuildConfig
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry

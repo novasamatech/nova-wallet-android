@@ -74,4 +74,6 @@ interface StakingRouter {
     fun openAccountDetails(metaAccountId: Long)
 
     fun openRebag()
+
+    fun openStakingPeriods()
 }

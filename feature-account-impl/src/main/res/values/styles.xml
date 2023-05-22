@@ -13,8 +13,9 @@
 
     <style name="Widget.Nova.Button.PinCodeControlButton" parent="Widget.AppCompat.ImageButton">
         <item name="android:background">@drawable/bg_pincode_control_button</item>
-        <item name="android:scaleType">centerInside</item>
+        <item name="android:scaleType">fitCenter</item>
         <item name="android:elevation">2dp</item>
+        <item name="android:padding">24dp</item>
         <item name="android:layout_width">@dimen/pin_code_number_button_size</item>
         <item name="android:layout_height">@dimen/pin_code_number_button_size</item>
     </style>

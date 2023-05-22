@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
+import kotlin.math.roundToInt
 
 fun Context.getDrawableCompat(@DrawableRes drawableRes: Int) =
     ContextCompat.getDrawable(this, drawableRes)!!
@@ -51,6 +52,10 @@ fun Float.dp(context: Context): Int {
 
 fun Float.dpF(context: Context): Float {
     return context.resources.displayMetrics.density * this
+}
+
+fun Float.px(context: Context): Int {
+    return (this / context.resources.displayMetrics.density).roundToInt()
 }
 
 fun Context.readAssetFile(name: String) = assets.open(name).readText()

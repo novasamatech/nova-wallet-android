@@ -30,9 +30,7 @@ abstract class NavStackInterScreenCommunicator<I : Parcelable, O : Parcelable>(
             .get(responseKey)
 
     override val responseFlow: Flow<O>
-        get() = navController.currentBackStackEntry!!.savedStateHandle
-            .getLiveData<O>(responseKey)
-            .asFlow()
+        get() = createResponseFlow()
 
     // from responder - retrieve from previous (requester) entry
     override val lastInput: I?
@@ -42,6 +40,11 @@ abstract class NavStackInterScreenCommunicator<I : Parcelable, O : Parcelable>(
     @CallSuper
     override fun openRequest(request: I) {
         saveRequest(request)
+    }
+
+    fun clearedResponseFlow(): Flow<O> {
+        navController.currentBackStackEntry!!.savedStateHandle.remove<O>(requestKey)
+        return createResponseFlow()
     }
 
     override fun respond(response: O) {
@@ -55,5 +58,11 @@ abstract class NavStackInterScreenCommunicator<I : Parcelable, O : Parcelable>(
 
     private fun saveRequest(request: I) {
         navController.currentBackStackEntry!!.savedStateHandle.set(requestKey, request)
+    }
+
+    private fun createResponseFlow(): Flow<O> {
+        return navController.currentBackStackEntry!!.savedStateHandle
+            .getLiveData<O>(responseKey)
+            .asFlow()
     }
 }

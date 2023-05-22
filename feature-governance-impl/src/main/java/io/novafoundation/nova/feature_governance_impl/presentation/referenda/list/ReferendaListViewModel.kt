@@ -60,7 +60,7 @@ class ReferendaListViewModel(
         val chainAndAsset = supportedOption.assetWithChain
         val accountId = account.accountIdIn(chainAndAsset.chain)
 
-        referendaListInteractor.referendaListStateFlow(accountId, supportedOption)
+        referendaListInteractor.referendaListStateFlow(accountId, supportedOption, this)
     }
         .inBackground()
         .shareWhileSubscribed()
@@ -160,5 +160,13 @@ class ReferendaListViewModel(
                 governanceRouter.openAddDelegation()
             }
         }
+    }
+
+    fun searchClicked() {
+        governanceRouter.openReferendaSearch()
+    }
+
+    fun filtersClicked() {
+        governanceRouter.openReferendaFilters()
     }
 }

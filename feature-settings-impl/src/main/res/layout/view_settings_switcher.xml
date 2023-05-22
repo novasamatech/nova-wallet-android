@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    tools:background="@color/secondary_screen_background"
+    tools:parentTag="android.widget.FrameLayout">
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/settingsSwitcher"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:drawablePadding="12dp"
+        android:drawableTint="@color/icon_accent"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:minHeight="48dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:textColor="@color/text_primary"
+        tools:icon="@drawable/ic_approve_with_pin"
+        tools:text="@string/profile_settings_pin_code_verification_title" />
+
+</merge>

@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.WithDifferentVoter
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.getName
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.GenericVoter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.SplitVote
 import io.novafoundation.nova.feature_governance_impl.R
@@ -284,9 +285,7 @@ class RealReferendumFormatter(
     }
 
     private fun mapReferendumNameToUi(referendum: ReferendumPreview): String {
-        return referendum.offChainMetadata?.title
-            ?: mapReferendumOnChainNameToUi(referendum)
-            ?: formatUnknownReferendumTitle(referendum.id)
+        return referendum.getName() ?: formatUnknownReferendumTitle(referendum.id)
     }
 
     private fun mapReferendumOnChainNameToUi(referendum: ReferendumPreview): String? {

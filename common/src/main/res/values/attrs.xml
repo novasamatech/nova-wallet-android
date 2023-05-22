@@ -234,4 +234,14 @@
     <declare-styleable name="AddressView">
         <attr name="android:textColor" />
     </declare-styleable>
+
+    <declare-styleable name="ChipLabelView">
+        <attr name="iconStart" format="reference" />
+        <attr name="iconStartTint" format="color" />
+        <attr name="iconStartPadding" format="dimension" />
+        <attr name="iconEnd" format="reference" />
+        <attr name="iconEndTint" format="color" />
+        <attr name="iconEndPadding" format="dimension" />
+    </declare-styleable>
+
 </resources>

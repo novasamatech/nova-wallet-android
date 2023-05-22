@@ -19,9 +19,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface AccountDataSource : SecretStoreV1 {
 
-    suspend fun saveAuthType(authType: AuthType)
+    fun getAuthTypeFlow(): Flow<AuthType>
 
-    suspend fun getAuthType(): AuthType
+    fun saveAuthType(authType: AuthType)
+
+    fun getAuthType(): AuthType
 
     suspend fun savePinCode(pinCode: String)
 
