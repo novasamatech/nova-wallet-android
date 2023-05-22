@@ -8,7 +8,6 @@ import android.widget.Toast
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideKeyboard
-import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationOrDenyDialog
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
