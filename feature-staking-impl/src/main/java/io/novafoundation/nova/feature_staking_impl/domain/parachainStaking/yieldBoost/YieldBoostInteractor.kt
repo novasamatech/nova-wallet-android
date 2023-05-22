@@ -15,7 +15,7 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.TimestampRepository
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -55,7 +55,7 @@ interface YieldBoostInteractor {
 class RealYieldBoostInteractor(
     private val yieldBoostRepository: TuringAutomationTasksRepository,
     private val extrinsicService: ExtrinsicService,
-    private val singleAssetSharedState: SingleAssetSharedState,
+    private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
     private val timestampRepository: TimestampRepository,
 ) : YieldBoostInteractor {
 

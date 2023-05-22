@@ -23,7 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +39,7 @@ class SearchCollatorViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val selectCollatorInterScreenResponder: SelectCollatorInterScreenResponder,
     private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
-    private val singleAssetSharedState: SingleAssetSharedState,
+    private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
     private val collatorsUseCase: CollatorsUseCase,
     resourceManager: ResourceManager,
     tokenUseCase: TokenUseCase,

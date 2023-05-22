@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.chang
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
@@ -43,7 +43,7 @@ class SearchCustomValidatorsViewModel(
     resourceManager: ResourceManager,
     private val sharedStateSetup: SetupStakingSharedState,
     private val validatorRecommendatorFactory: ValidatorRecommendatorFactory,
-    private val singleAssetSharedState: SingleAssetSharedState,
+    private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
     tokenUseCase: TokenUseCase,
 ) : SearchStakeTargetViewModel<Validator>(resourceManager) {
 

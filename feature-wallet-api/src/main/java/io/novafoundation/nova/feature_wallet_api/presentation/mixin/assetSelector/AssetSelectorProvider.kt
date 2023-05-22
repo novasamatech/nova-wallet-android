@@ -6,8 +6,8 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
-import io.novafoundation.nova.feature_wallet_api.domain.AssetAndOption
-import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.SelectableAssetAndOption
+import io.novafoundation.nova.feature_wallet_api.domain.SelectableAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import kotlinx.coroutines.CoroutineScope
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 class AssetSelectorFactory(
-    private val assetUseCase: AssetUseCase,
+    private val assetUseCase: SelectableAssetUseCase<*>,
     private val singleAssetSharedState: SingleAssetSharedState,
     private val resourceManager: ResourceManager
 ) {
@@ -34,7 +34,7 @@ class AssetSelectorFactory(
 }
 
 private class AssetSelectorProvider(
-    private val assetUseCase: AssetUseCase,
+    private val assetUseCase: SelectableAssetUseCase<*>,
     private val resourceManager: ResourceManager,
     private val singleAssetSharedState: SingleAssetSharedState,
     private val scope: CoroutineScope,
@@ -78,14 +78,14 @@ private class AssetSelectorProvider(
         )
     }
 
-    private fun mapAssetAndOptionToSelectorModel(assetAndOption: AssetAndOption): AssetSelectorModel {
+    private fun mapAssetAndOptionToSelectorModel(assetAndOption: SelectableAssetAndOption): AssetSelectorModel {
         val assetModel = mapAssetToAssetModel(assetAndOption.asset, resourceManager, patternId = null, retrieveAmount = amountProvider)
         val title = assetAndOption.formatTitle()
 
         return AssetSelectorModel(assetModel, title, assetAndOption.option.additional.identifier)
     }
 
-    private fun AssetAndOption.formatTitle(): String {
+    private fun SelectableAssetAndOption.formatTitle(): String {
         val formattedOptionLabel = option.additional.format(resourceManager)
         val tokenName = asset.token.configuration.name
 

@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponent.RewardsConfiguration
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponent.State
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -23,7 +23,7 @@ import java.math.BigDecimal
 
 class RealParachainStakingRewardsComponentFactory(
     private val rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
-    private val singleAssetSharedState: SingleAssetSharedState,
+    private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
     private val resourceManager: ResourceManager,
 ) {
 
@@ -41,7 +41,7 @@ class RealParachainStakingRewardsComponentFactory(
 
 private class RealParachainStakingRewardsComponent(
     private val rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
-    private val singleAssetSharedState: SingleAssetSharedState,
+    private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
     private val resourceManager: ResourceManager,
     private val parentScope: CoroutineScope,
     private val assetFlow: Flow<Asset>,

@@ -24,7 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -40,7 +40,7 @@ class RecommendedValidatorsViewModel(
     private val resourceManager: ResourceManager,
     private val sharedStateSetup: SetupStakingSharedState,
     private val tokenUseCase: TokenUseCase,
-    private val selectedAssetState: SingleAssetSharedState
+    private val selectedAssetState: AnySelectedAssetOptionSharedState
 ) : BaseViewModel() {
 
     private val recommendedSettings by lazyAsync {

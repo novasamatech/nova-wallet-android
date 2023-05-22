@@ -11,7 +11,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.network.updaters.SingleChainUpdateSystem
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 
 class StakingUpdateSystem(
     private val relaychainUpdaters: List<Updater>,
@@ -19,7 +19,7 @@ class StakingUpdateSystem(
     private val commonUpdaters: List<Updater>,
     private val turingExtraUpdaters: List<Updater>,
     chainRegistry: ChainRegistry,
-    singleAssetSharedState: SingleAssetSharedState,
+    singleAssetSharedState: AnySelectedAssetOptionSharedState,
     storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : SingleChainUpdateSystem(chainRegistry, singleAssetSharedState, storageSharedRequestsBuilderFactory) {
 

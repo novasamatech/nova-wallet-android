@@ -25,9 +25,9 @@ typealias SupportedOptionsResolver<A> = (Chain, Chain.Asset) -> List<A>
 
 typealias SingleAssetSharedState = SelectableSingleAssetSharedState<*>
 
-interface AssetSharedStateAdditionalData : Formatable, Identifiable
+interface SelectableAssetAdditionalData : Formatable, Identifiable
 
-abstract class SelectableSingleAssetSharedState<A : AssetSharedStateAdditionalData>(
+abstract class SelectableSingleAssetSharedState<A : SelectableAssetAdditionalData>(
     private val preferencesKey: String,
     private val chainRegistry: ChainRegistry,
     private val supportedOptions: SupportedOptionsResolver<A>,
@@ -71,10 +71,6 @@ abstract class SelectableSingleAssetSharedState<A : AssetSharedStateAdditionalDa
 
     fun update(chainId: ChainId, chainAssetId: Int, optionIdentifier: String) {
         preferences.putString(preferencesKey, encode(chainId, chainAssetId, optionIdentifier))
-    }
-
-    override suspend fun chainId(): String {
-        return assetWithChain.first().chain.id
     }
 
     private suspend fun getChainWithAssetOrFallback(chainId: ChainId, chainAssetId: Int, additionalIdentifier: String?): SupportedAssetOption<A> {

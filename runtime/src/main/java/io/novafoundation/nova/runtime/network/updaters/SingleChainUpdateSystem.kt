@@ -10,6 +10,7 @@ import io.novafoundation.nova.runtime.ethereum.subscribe
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.assetWithChain
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +24,7 @@ import kotlin.coroutines.coroutineContext
 
 abstract class SingleChainUpdateSystem(
     private val chainRegistry: ChainRegistry,
-    private val singleAssetSharedState: SingleAssetSharedState,
+    private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : UpdateSystem {
 

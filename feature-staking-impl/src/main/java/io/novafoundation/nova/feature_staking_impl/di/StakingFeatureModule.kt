@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
-import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.storage.StorageCache
@@ -61,14 +60,11 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.hints.Sta
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationProvider
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
+import io.novafoundation.nova.feature_wallet_api.di.common.AssetUseCaseModule
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.SharedStateTokenUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
@@ -76,44 +72,12 @@ import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
+import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
-@Module
+@Module(includes = [AssetUseCaseModule::class])
 class StakingFeatureModule {
-
-    @Provides
-    @FeatureScope
-    fun provideAssetUseCase(
-        walletRepository: WalletRepository,
-        accountRepository: AccountRepository,
-        sharedState: StakingSharedState,
-    ): AssetUseCase = AssetUseCaseImpl(
-        walletRepository,
-        accountRepository,
-        sharedState
-    )
-
-    @Provides
-    fun provideAssetSelectorMixinFactory(
-        assetUseCase: AssetUseCase,
-        singleAssetSharedState: StakingSharedState,
-        resourceManager: ResourceManager
-    ): AssetSelectorFactory = AssetSelectorFactory(
-        assetUseCase,
-        singleAssetSharedState,
-        resourceManager
-    )
-
-    @Provides
-    @FeatureScope
-    fun provideTokenUseCase(
-        tokenRepository: TokenRepository,
-        sharedState: StakingSharedState,
-    ): TokenUseCase = SharedStateTokenUseCase(
-        tokenRepository,
-        sharedState
-    )
 
     @Provides
     @FeatureScope
@@ -124,10 +88,11 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideStakingSharedState(
-        chainRegistry: ChainRegistry,
-        preferences: Preferences
-    ) = StakingSharedState(chainRegistry, preferences)
+    fun provideStakingSharedState() = StakingSharedState()
+
+    @Provides
+    @FeatureScope
+    fun provideSelectableSharedState(stakingSharedState: StakingSharedState): SelectedAssetOptionSharedState<*> = stakingSharedState
 
     @Provides
     @FeatureScope

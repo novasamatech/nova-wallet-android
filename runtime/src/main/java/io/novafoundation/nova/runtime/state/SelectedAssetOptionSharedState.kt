@@ -7,9 +7,13 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
+typealias AnySelectedAssetOptionSharedState = SelectedAssetOptionSharedState<*>
+
 interface SelectedAssetOptionSharedState<A> : ChainIdHolder {
 
     val selectedOption: Flow<SupportedAssetOption<A>>
+
+    override suspend fun chainId(): String = chain().id
 
     data class SupportedAssetOption<out A>(
         val assetWithChain: ChainWithAsset,
@@ -24,7 +28,7 @@ fun SelectedAssetOptionSharedState<*>.selectedChainFlow() = selectedOption
     .map { it.assetWithChain.chain }
     .distinctUntilChanged()
 
-fun SingleAssetSharedState.selectedAssetFlow() = selectedOption
+fun SelectedAssetOptionSharedState<*>.selectedAssetFlow() = selectedOption
     .map { it.assetWithChain.asset }
 
 suspend fun SelectedAssetOptionSharedState<*>.chain() = assetWithChain.first().chain

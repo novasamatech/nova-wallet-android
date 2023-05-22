@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsic
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.calls.cancelDelegationRequest
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +28,7 @@ interface ParachainStakingRebondInteractor {
 class RealParachainStakingRebondInteractor(
     private val extrinsicService: ExtrinsicService,
     private val delegatorStateRepository: DelegatorStateRepository,
-    private val selectedAssetState: SingleAssetSharedState,
+    private val selectedAssetState: AnySelectedAssetOptionSharedState,
 ) : ParachainStakingRebondInteractor {
 
     override suspend fun estimateFee(collatorId: AccountId): BigInteger = withContext(Dispatchers.IO) {
