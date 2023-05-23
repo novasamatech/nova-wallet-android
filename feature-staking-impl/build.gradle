@@ -15,7 +15,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         // TODO use production url
-        buildConfigField "String", "DASHBOARD_SUBQUERY_URL", "\"http://192.168.0.148:3000\""
+        buildConfigField "String", "DASHBOARD_SUBQUERY_URL", "\"https://subql.novasama.uz\""
     }
 
     buildTypes {

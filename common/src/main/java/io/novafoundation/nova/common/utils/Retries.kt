@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.utils
 
+import android.util.Log
 import jp.co.soramitsu.fearless_utils.wsrpc.recovery.LinearReconnectStrategy
 import jp.co.soramitsu.fearless_utils.wsrpc.recovery.ReconnectStrategy
 import kotlinx.coroutines.delay
@@ -16,6 +17,8 @@ suspend inline fun <T> retryUntilDone(
         if (blockResult.isSuccess) {
             return blockResult.requireValue()
         } else {
+            Log.e("RetryUntilDone", "Failed to execute retriable operation:", blockResult.requireException())
+
             attempt++
 
             delay(retryStrategy.getTimeForReconnect(attempt))

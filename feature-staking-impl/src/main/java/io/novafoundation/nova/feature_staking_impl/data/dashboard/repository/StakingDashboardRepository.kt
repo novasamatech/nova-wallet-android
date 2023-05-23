@@ -38,12 +38,18 @@ class RealStakingDashboardRepository(
     }
 
     private fun hasStakeState(localItem: StakingDashboardItemLocal): HasStake {
-        val stats = localItem.estimatedEarnings?.let { estimatedEarnings ->
+        val estimatedEarnings = localItem.estimatedEarnings
+        val rewards = localItem.rewards
+        val status = localItem.status
+
+        val stats = if (estimatedEarnings != null && rewards != null && status != null) {
             HasStake.Stats(
-                rewards = requireNotNull(localItem.rewards),
-                status = mapStakingStatusFromLocal(requireNotNull(localItem.status)),
+                rewards = rewards,
+                status = mapStakingStatusFromLocal(status),
                 estimatedEarnings = estimatedEarnings.asPercent()
             )
+        } else {
+            null
         }
 
         return HasStake(

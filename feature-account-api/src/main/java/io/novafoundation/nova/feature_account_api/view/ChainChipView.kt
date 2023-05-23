@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import coil.ImageLoader
+import coil.clear
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextColorRes
@@ -57,5 +58,9 @@ class ChainChipView @JvmOverloads constructor(
         itemAssetGroupLabel.text = chainUi.name
 
         itemAssetGroupLabelIcon.loadChainIcon(chainUi.icon, imageLoader)
+    }
+
+    fun unbind() {
+        itemAssetGroupLabelIcon.clear()
     }
 }
