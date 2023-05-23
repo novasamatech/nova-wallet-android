@@ -28,9 +28,14 @@ class StakeStatusView @JvmOverloads constructor(
     }
 
     fun setModel(stakeStatusModel: StakeStatusModel) {
+        setStatusIndicator(stakeStatusModel.indicatorRes)
         setDrawableStart(stakeStatusModel.indicatorRes, widthInDp = 14, paddingInDp = 5)
 
         text = stakeStatusModel.text
         setTextColorRes(stakeStatusModel.textColorRes)
+    }
+
+    fun setStatusIndicator(@DrawableRes indicatorRes: Int) {
+        setDrawableStart(indicatorRes, widthInDp = 14, paddingInDp = 5)
     }
 }

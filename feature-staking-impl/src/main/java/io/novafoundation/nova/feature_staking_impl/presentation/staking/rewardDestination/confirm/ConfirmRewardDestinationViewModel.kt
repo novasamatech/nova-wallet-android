@@ -29,7 +29,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDe
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.select.rewardDestinationValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -47,7 +47,7 @@ class ConfirmRewardDestinationViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val validationExecutor: ValidationExecutor,
     private val payload: ConfirmRewardDestinationPayload,
-    private val selectedAssetState: SingleAssetSharedState,
+    private val selectedAssetState: AnySelectedAssetOptionSharedState,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
@@ -153,7 +153,7 @@ class ConfirmRewardDestinationViewModel(
         if (setupResult.isSuccess) {
             showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-            router.returnToMain()
+            router.returnToStakingMain()
         } else {
             showError(setupResult.requireException())
         }

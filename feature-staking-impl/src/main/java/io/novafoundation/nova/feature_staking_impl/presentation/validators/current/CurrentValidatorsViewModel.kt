@@ -34,7 +34,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +54,7 @@ class CurrentValidatorsViewModel(
     private val iconGenerator: AddressIconGenerator,
     private val currentValidatorsInteractor: CurrentValidatorsInteractor,
     private val setupStakingSharedState: SetupStakingSharedState,
-    private val selectedAssetState: SingleAssetSharedState,
+    private val selectedAssetState: AnySelectedAssetOptionSharedState,
     private val validationExecutor: ValidationExecutor,
     tokenUseCase: TokenUseCase,
 ) : CurrentStakeTargetsViewModel(), Validatable by validationExecutor {

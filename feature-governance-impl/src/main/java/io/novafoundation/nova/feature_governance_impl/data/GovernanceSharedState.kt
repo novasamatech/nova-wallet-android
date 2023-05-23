@@ -7,14 +7,14 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.state.GenericSingleAssetSharedState
+import io.novafoundation.nova.runtime.state.SelectableSingleAssetSharedState
 
 private const val GOVERNANCE_SHARED_STATE = "GOVERNANCE_SHARED_STATE"
 
 class GovernanceSharedState(
     chainRegistry: ChainRegistry,
     preferences: Preferences,
-) : GenericSingleAssetSharedState<GovernanceAdditionalState>(
+) : SelectableSingleAssetSharedState<GovernanceAdditionalState>(
     preferences = preferences,
     chainRegistry = chainRegistry,
     supportedOptions = { chain, asset ->

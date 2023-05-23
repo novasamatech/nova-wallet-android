@@ -12,6 +12,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 
 interface StakingRouter {
 
+    fun openChainStakingMain()
+
     fun openSetupStaking()
 
     fun openStartChangeValidators()
@@ -32,7 +34,7 @@ interface StakingRouter {
 
     fun openConfirmNominations()
 
-    fun returnToMain()
+    fun returnToStakingMain()
 
     fun openSwitchWallet()
 

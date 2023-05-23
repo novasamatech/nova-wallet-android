@@ -17,7 +17,9 @@ interface ParachainStakingRouter {
     fun openWalletDetails(metaId: Long)
 
     fun back()
-    fun returnToMain()
+
+    fun returnToStakingMain()
+
     fun returnToStartStaking()
 
     fun openCurrentCollators()

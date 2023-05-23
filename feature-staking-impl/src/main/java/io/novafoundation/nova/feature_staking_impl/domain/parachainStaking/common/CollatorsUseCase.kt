@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.SelectedCollator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.collators.collatorAddressModel
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
@@ -38,7 +38,7 @@ interface CollatorsUseCase {
 }
 
 class RealCollatorsUseCase(
-    private val singleAssetSharedState: SingleAssetSharedState,
+    private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
     private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
     private val collatorProvider: CollatorProvider,
     private val addressIconGenerator: AddressIconGenerator,

@@ -29,7 +29,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.validatio
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
@@ -47,7 +47,7 @@ class SetupStakingViewModel(
     private val validationExecutor: ValidationExecutor,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val rewardDestinationMixin: RewardDestinationMixin.Presentation,
-    private val selectedAssetSharedState: SingleAssetSharedState,
+    private val selectedAssetSharedState: AnySelectedAssetOptionSharedState,
     private val stakingSharedComputation: StakingSharedComputation,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
