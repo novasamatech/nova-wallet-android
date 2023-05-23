@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.list.PlaceholderAdapter
+import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.utils.applyImeInsetts
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
@@ -24,8 +24,7 @@ import kotlinx.android.synthetic.main.fragment_referenda_search.searchedReferend
 
 class ReferendaSearchFragment : BaseReferendaListFragment<ReferendaSearchViewModel>() {
 
-    override val shimmeringAdapter by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.item_referenda_shimmering_no_groups) }
-    override val placeholderAdapter by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.item_referenda_search_placeholder) }
+    override val shimmeringAdapter by lazy(LazyThreadSafetyMode.NONE) { CustomPlaceholderAdapter(R.layout.item_referenda_shimmering_no_groups) }
 
     override fun onCreateView(
         inflater: LayoutInflater,

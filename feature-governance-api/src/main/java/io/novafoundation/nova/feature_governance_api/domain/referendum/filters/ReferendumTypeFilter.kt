@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_governance_impl.domain.filters
+package io.novafoundation.nova.feature_governance_api.domain.referendum.filters
 
 import io.novafoundation.nova.common.utils.OptionsFilter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview

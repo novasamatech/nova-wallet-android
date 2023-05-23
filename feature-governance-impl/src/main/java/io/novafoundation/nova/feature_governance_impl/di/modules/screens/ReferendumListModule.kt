@@ -81,14 +81,12 @@ class ReferendumListModule {
         governanceSharedState: GovernanceSharedState,
         referendaSharedComputation: ReferendaSharedComputation,
         governanceSourceRegistry: GovernanceSourceRegistry,
-        referendaSortingProvider: ReferendaSortingProvider,
-        referendaFiltersRepository: ReferendaFiltersRepository
+        referendaSortingProvider: ReferendaSortingProvider
     ): ReferendaListInteractor = RealReferendaListInteractor(
         referendaCommonRepository = referendaCommonRepository,
         governanceSharedState = governanceSharedState,
         referendaSharedComputation = referendaSharedComputation,
         governanceSourceRegistry = governanceSourceRegistry,
-        referendaSortingProvider = referendaSortingProvider,
-        referendaFiltersRepository = referendaFiltersRepository
+        referendaSortingProvider = referendaSortingProvider
     )
 }

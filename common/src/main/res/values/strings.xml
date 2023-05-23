@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="referenda_list_filter_placeholder">There are no referenda with filters applied</string>
+
     <!--<string name="pincode_fingerprint_switch_dialog_title">Use biometric to authorize</string>-->
     <string name="pincode_biometric_switch_dialog_title">Use biometric to authorize</string>
 

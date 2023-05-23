@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_governance_impl.data.repository.filters
 
 import io.novafoundation.nova.common.data.storage.Preferences
-import io.novafoundation.nova.common.utils.MatchAllFilter
-import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
-import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendumType
-import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendumTypeFilter
+import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumType
+import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumTypeFilter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -15,9 +13,7 @@ interface ReferendaFiltersRepository {
 
     fun getReferendumTypeFilter(): ReferendumTypeFilter
 
-    fun getReferendumTypeFiltersFlow(): Flow<MatchAllFilter<ReferendumPreview>>
-
-    fun observeReferenumTypeFilter(): Flow<ReferendumTypeFilter>
+    fun observeReferendumTypeFilter(): Flow<ReferendumTypeFilter>
 
     fun updateReferendumTypeFilter(filter: ReferendumTypeFilter)
 }
@@ -30,11 +26,7 @@ class PreferencesReferendaFiltersRepository(private val preferences: Preferences
         return referendumTypeFilter.value
     }
 
-    override fun getReferendumTypeFiltersFlow(): Flow<MatchAllFilter<ReferendumPreview>> {
-        return referendumTypeFilter.map { MatchAllFilter(listOf(it)) }
-    }
-
-    override fun observeReferenumTypeFilter(): Flow<ReferendumTypeFilter> {
+    override fun observeReferendumTypeFilter(): Flow<ReferendumTypeFilter> {
         return preferences.stringFlow(PREF_REFERENDUM_TYPE_FILTER).map {
             mapFilterStringToModel(it)
         }
