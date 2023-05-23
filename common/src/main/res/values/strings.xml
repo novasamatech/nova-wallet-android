@@ -9,7 +9,7 @@
 
     <string name="common_settings">Settings</string>
     <string name="settings_biometric_not_ready_title">Biometrics disabled in Settings</string>
-    <string name="settings_biometric_not_ready_message">Please, make sure Nova has access to biometrics in Settings</string>
+    <string name="settings_biometric_not_ready_message">Please, make sure biometrics is enabled in Settings</string>
 
     <string name="referenda_filters_header">Show</string>
     <string name="referenda_filters_all">All referenda</string>
