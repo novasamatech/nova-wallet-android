@@ -11,6 +11,8 @@ interface ReferendaFiltersInteractor {
 
     fun getReferendumTypeFiltersFlow(): Flow<MatchAllFilter<ReferendumPreview>>
 
+    fun observeReferendumTypeFilter(): Flow<ReferendumTypeFilter>
+
     fun updateReferendumTypeFilter(filter: ReferendumTypeFilter)
 }
 
@@ -24,6 +26,10 @@ class RealReferendaFiltersInteractor(
 
     override fun getReferendumTypeFiltersFlow(): Flow<MatchAllFilter<ReferendumPreview>> {
         return referendaFiltersRepository.getReferendumTypeFiltersFlow()
+    }
+
+    override fun observeReferendumTypeFilter(): Flow<ReferendumTypeFilter> {
+        return referendaFiltersRepository.observeReferenumTypeFilter()
     }
 
     override fun updateReferendumTypeFilter(filter: ReferendumTypeFilter) {

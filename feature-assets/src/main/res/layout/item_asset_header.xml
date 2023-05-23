@@ -68,6 +68,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:src="@drawable/ic_search"
+        app:tint="@color/chip_icon"
         app:layout_constraintBottom_toBottomOf="@+id/balanceListFilters"
         app:layout_constraintEnd_toStartOf="@+id/balanceListFilters"
         app:layout_constraintTop_toTopOf="@+id/balanceListFilters" />
@@ -78,6 +79,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:src="@drawable/ic_filter"
+        app:tint="@color/chip_icon"
         app:layout_constraintBottom_toBottomOf="@+id/balanceListManage"
         app:layout_constraintEnd_toStartOf="@+id/balanceListManage"
         app:layout_constraintTop_toTopOf="@+id/balanceListManage" />
@@ -87,6 +89,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_options"
+        app:tint="@color/chip_icon"
         app:layout_constraintBottom_toBottomOf="@+id/balanceListAssetTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/balanceListAssetTitle" />

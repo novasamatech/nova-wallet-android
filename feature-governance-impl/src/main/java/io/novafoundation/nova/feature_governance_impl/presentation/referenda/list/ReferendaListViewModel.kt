@@ -19,6 +19,9 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDAppsInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFiltersInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendumType
+import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendumTypeFilter
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
@@ -30,13 +33,16 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelecto
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class ReferendaListViewModel(
     assetSelectorFactory: AssetSelectorFactory,
     private val referendaListInteractor: ReferendaListInteractor,
+    private val referendaFiltersInteractor: ReferendaFiltersInteractor,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val selectedAssetSharedState: GovernanceSharedState,
     private val resourceManager: ResourceManager,
@@ -78,6 +84,11 @@ class ReferendaListViewModel(
 
         mapDelegatedToUi(it.delegated, asset)
     }
+        .inBackground()
+        .shareWhileSubscribed()
+
+    val referendaFilterIcon = referendaFiltersInteractor.observeReferendumTypeFilter()
+        .map { mapFilterTypeToIconRes(it) }
         .inBackground()
         .shareWhileSubscribed()
 
@@ -145,6 +156,13 @@ class ReferendaListViewModel(
             badge = groupSize.format()
         )
     }
+
+    private fun mapFilterTypeToIconRes(it: ReferendumTypeFilter) =
+        if (it.selectedType == ReferendumType.ALL) {
+            R.drawable.ic_chip_filter
+        } else {
+            R.drawable.ic_chip_filter_indicator
+        }
 
     fun governanceLocksClicked() {
         governanceRouter.openGovernanceLocksOverview()

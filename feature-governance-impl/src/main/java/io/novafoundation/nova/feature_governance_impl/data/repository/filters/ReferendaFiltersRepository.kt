@@ -17,6 +17,8 @@ interface ReferendaFiltersRepository {
 
     fun getReferendumTypeFiltersFlow(): Flow<MatchAllFilter<ReferendumPreview>>
 
+    fun observeReferenumTypeFilter(): Flow<ReferendumTypeFilter>
+
     fun updateReferendumTypeFilter(filter: ReferendumTypeFilter)
 }
 
@@ -32,15 +34,25 @@ class PreferencesReferendaFiltersRepository(private val preferences: Preferences
         return referendumTypeFilter.map { MatchAllFilter(listOf(it)) }
     }
 
+    override fun observeReferenumTypeFilter(): Flow<ReferendumTypeFilter> {
+        return preferences.stringFlow(PREF_REFERENDUM_TYPE_FILTER).map {
+            mapFilterStringToModel(it)
+        }
+    }
+
     override fun updateReferendumTypeFilter(filter: ReferendumTypeFilter) {
-        preferences.putString(PREF_REFERENDUM_TYPE_FILTER, filter.selected.name)
+        preferences.putString(PREF_REFERENDUM_TYPE_FILTER, filter.selectedType.name)
         referendumTypeFilter.value = filter
     }
 
     private fun getReferendumTypeFilterFromPreferences(): ReferendumTypeFilter {
+        val encoded = preferences.getString(PREF_REFERENDUM_TYPE_FILTER)
+        return mapFilterStringToModel(encoded)
+    }
+
+    private fun mapFilterStringToModel(filter: String?): ReferendumTypeFilter {
         return try {
-            val encoded = preferences.getString(PREF_REFERENDUM_TYPE_FILTER)
-            encoded?.let { ReferendumTypeFilter(ReferendumType.valueOf(it)) }
+            filter?.let { ReferendumTypeFilter(ReferendumType.valueOf(it)) }
                 ?: ReferendumTypeFilter(ReferendumType.ALL)
         } catch (e: Exception) {
             preferences.putString(PREF_REFERENDUM_TYPE_FILTER, ReferendumType.ALL.name)

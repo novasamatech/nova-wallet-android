@@ -24,17 +24,17 @@ class ReferendaFiltersViewModel(
     private val governanceRouter: GovernanceRouter
 ) : BaseViewModel() {
 
-    private var selectedFilterFlow = MutableStateFlow(interactor.getReferendumTypeFilter().selected)
+    private var selectedFilterFlow = MutableStateFlow(interactor.getReferendumTypeFilter().selectedType)
 
     private val initialTypeFilter = interactor.getReferendumTypeFilter()
 
     val isApplyButtonAvailableFlow = selectedFilterFlow.map { selectedFilter ->
-        selectedFilter != interactor.getReferendumTypeFilter().selected
+        selectedFilter != interactor.getReferendumTypeFilter().selectedType
     }.inBackground()
         .share()
 
     fun getReferendumTypeSelectedOption(): Int {
-        return REFERENDUM_TYPE_FILTERS_REVERSE.getValue(initialTypeFilter.selected)
+        return REFERENDUM_TYPE_FILTERS_REVERSE.getValue(initialTypeFilter.selectedType)
     }
 
     fun onFilterTypeChanged(checkedId: Int) {
