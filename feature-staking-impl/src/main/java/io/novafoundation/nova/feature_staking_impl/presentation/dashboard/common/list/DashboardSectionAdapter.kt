@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_staking_impl.R
 
 class DashboardSectionAdapter(
     private val textRes: Int
-): RecyclerView.Adapter<DashboardSectionHolder>() {
+) : RecyclerView.Adapter<DashboardSectionHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DashboardSectionHolder {
         val item = parent.inflateChild(R.layout.item_dashboard_section) as TextView
@@ -25,7 +25,7 @@ class DashboardSectionAdapter(
 class DashboardSectionHolder(
     containerView: TextView,
     @StringRes textRes: Int
-): RecyclerView.ViewHolder(containerView) {
+) : RecyclerView.ViewHolder(containerView) {
 
     init {
         containerView.setText(textRes)

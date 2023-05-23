@@ -59,7 +59,7 @@ class MoreStakingOptionsViewModel(
 
     private fun mapMoreOptionsToUi(moreStakingOptions: MoreStakingOptions): MoreStakingOptionsModel {
         return MoreStakingOptionsModel(
-           inAppStaking = moreStakingOptions.inAppStaking.map(::mapNoStakeItemToUi),
+            inAppStaking = moreStakingOptions.inAppStaking.map(::mapNoStakeItemToUi),
             resolvingInAppItems = moreStakingOptions.resolvingInAppItems,
             browserStaking = moreStakingOptions.browserStaking.map { dApps -> dApps.map(::mapStakingDAppToUi) }
         )

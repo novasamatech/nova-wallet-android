@@ -6,9 +6,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.v
 
 class MoreStakingOptionsAdapter(
     private val handler: Handler
-): RecyclerView.Adapter<DashboardSectionHolder>() {
+) : RecyclerView.Adapter<DashboardSectionHolder>() {
 
-    interface Handler{
+    interface Handler {
 
         fun onMoreOptionsClicked()
     }
@@ -27,7 +27,7 @@ class MoreStakingOptionsAdapter(
 class DashboardSectionHolder(
     containerView: StakingDashboardMoreOptionsView,
     handler: MoreStakingOptionsAdapter.Handler
-): RecyclerView.ViewHolder(containerView) {
+) : RecyclerView.ViewHolder(containerView) {
 
     init {
         containerView.setOnClickListener { handler.onMoreOptionsClicked() }

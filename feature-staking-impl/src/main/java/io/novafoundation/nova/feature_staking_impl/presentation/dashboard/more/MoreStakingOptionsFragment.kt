@@ -23,7 +23,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.m
 import kotlinx.android.synthetic.main.fragment_more_staking_options.moreStakingOptionsContent
 import kotlinx.android.synthetic.main.fragment_more_staking_options.moreStakingOptionsToolbar
 
-class MoreStakingOptionsFragment : BaseFragment<MoreStakingOptionsViewModel>(),
+class MoreStakingOptionsFragment :
+    BaseFragment<MoreStakingOptionsViewModel>(),
     DashboardNoStakeAdapter.Handler,
     StakingDappsAdapter.Handler {
 
@@ -60,9 +61,11 @@ class MoreStakingOptionsFragment : BaseFragment<MoreStakingOptionsViewModel>(),
         with(moreStakingOptionsContent) {
             setHasFixedSize(true)
             adapter = ConcatAdapter(
-                noStakeAdapter, noStakeLoadingAdapter,
+                noStakeAdapter,
+                noStakeLoadingAdapter,
                 sectionAdapter,
-                dAppAdapter, dAppLoadingAdapter
+                dAppAdapter,
+                dAppLoadingAdapter
             )
             itemAnimator = null
 

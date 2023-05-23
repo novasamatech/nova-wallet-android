@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.ShimmeringHolder
 import io.novafoundation.nova.common.list.decoration.BackgroundDecoration
 
-class StakingDAppsDecoration(context: Context): BackgroundDecoration(
+class StakingDAppsDecoration(context: Context) : BackgroundDecoration(
     context = context,
     outerHorizontalMarginDp = 16,
     innerVerticalPaddingDp = 4

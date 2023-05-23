@@ -18,7 +18,6 @@ data class DappCategory(
     val id: String
 )
 
-
 private const val STAKING_CATEGORY_ID = "staking"
 
 fun DappCategory.isStaking(): Boolean {
