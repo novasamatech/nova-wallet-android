@@ -1,12 +1,12 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list
+package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list
 
-import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.shimmer.ShimmerFrameLayout
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_dashboard_loading.view.itemDashboardLoading
 
 class DashboardLoadingAdapter : RecyclerView.Adapter<DashboardLoadingHolder>() {
 
@@ -28,7 +28,7 @@ class DashboardLoadingAdapter : RecyclerView.Adapter<DashboardLoadingHolder>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DashboardLoadingHolder {
-        return DashboardLoadingHolder(parent.inflateChild(R.layout.item_dashboard_loading))
+        return DashboardLoadingHolder(parent.inflateChild(R.layout.item_dashboard_loading) as ViewGroup)
     }
 
     override fun onBindViewHolder(holder: DashboardLoadingHolder, position: Int) {
@@ -44,13 +44,13 @@ class DashboardLoadingAdapter : RecyclerView.Adapter<DashboardLoadingHolder>() {
     }
 }
 
-class DashboardLoadingHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+class DashboardLoadingHolder(override val containerView: ViewGroup) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
     fun bind() {
-        containerView.itemDashboardLoading.startShimmer()
+        containerView.children.forEach { (it as? ShimmerFrameLayout)?.startShimmer() }
     }
 
     fun unbind() {
-        containerView.itemDashboardLoading.stopShimmer()
+        containerView.children.forEach { (it as? ShimmerFrameLayout)?.stopShimmer() }
     }
 }

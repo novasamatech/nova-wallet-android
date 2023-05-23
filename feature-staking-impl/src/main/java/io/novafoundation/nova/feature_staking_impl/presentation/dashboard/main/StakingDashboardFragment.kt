@@ -12,22 +12,27 @@ import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardLoadingAdapter
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardNoStakeAdapter
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardSectionAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardHasStakeAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardHeaderAdapter
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardLoadingAdapter
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardNoStakeAdapter
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.MoreStakingOptionsAdapter
 import kotlinx.android.synthetic.main.fragment_staking_dashboard.stakingDashboardContent
 
 class StakingDashboardFragment :
     BaseFragment<StakingDashboardViewModel>(),
     DashboardHasStakeAdapter.Handler,
     DashboardNoStakeAdapter.Handler,
-    DashboardHeaderAdapter.Handler {
+    DashboardHeaderAdapter.Handler,
+    MoreStakingOptionsAdapter.Handler {
 
     private val headerAdapter = DashboardHeaderAdapter(this)
     private val hasStakeAdapter = DashboardHasStakeAdapter(this)
+    private val sectionAdapter = DashboardSectionAdapter(R.string.staking_dashboard_no_stake_header)
     private val noStakeAdapter = DashboardNoStakeAdapter(this)
     private val loadingItemsAdapter = DashboardLoadingAdapter()
+    private val moreStakingOptionsAdapter = MoreStakingOptionsAdapter(this)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,7 +55,16 @@ class StakingDashboardFragment :
     override fun initViews() {
         stakingDashboardContent.applyStatusBarInsets()
         stakingDashboardContent.setHasFixedSize(true)
-        stakingDashboardContent.adapter = ConcatAdapter(headerAdapter, hasStakeAdapter, noStakeAdapter, loadingItemsAdapter)
+
+        stakingDashboardContent.adapter = ConcatAdapter(
+            headerAdapter,
+            hasStakeAdapter,
+            sectionAdapter,
+            noStakeAdapter,
+            loadingItemsAdapter,
+            moreStakingOptionsAdapter
+        )
+
         stakingDashboardContent.itemAnimator = null
     }
 
@@ -74,5 +88,9 @@ class StakingDashboardFragment :
 
     override fun avatarClicked() {
         viewModel.avatarClicked()
+    }
+
+    override fun onMoreOptionsClicked() {
+        viewModel.onMoreOptionsClicked()
     }
 }

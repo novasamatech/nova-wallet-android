@@ -13,7 +13,11 @@ class RelayStakingNavigationModule {
 
     @Provides
     @ApplicationScope
-    fun provideRelayStakingRouter(navigationHolder: NavigationHolder, navigator: Navigator): StakingRouter {
+    fun provideRelayStakingNavigator(navigationHolder: NavigationHolder, navigator: Navigator): RelayStakingNavigator {
         return RelayStakingNavigator(navigationHolder, navigator)
     }
+
+    @Provides
+    @ApplicationScope
+    fun provideRelayStakingRouter(relayStakingNavigator: RelayStakingNavigator): StakingRouter = relayStakingNavigator
 }

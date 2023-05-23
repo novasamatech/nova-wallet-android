@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/TextAppearance.NovaFoundation.SemiBold.Title3.Primary"
+    android:layout_width="match_parent"
+    android:id="@+id/itemDashboardSection"
+    android:layout_height="wrap_content"
+    android:paddingTop="28dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="20dp"
+    tools:text="@tools:sample/lorem[4]" />

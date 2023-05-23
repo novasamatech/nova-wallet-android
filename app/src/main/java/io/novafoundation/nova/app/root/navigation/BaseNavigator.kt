@@ -2,6 +2,7 @@ package io.novafoundation.nova.app.root.navigation
 
 import android.os.Bundle
 import androidx.annotation.IdRes
+import androidx.navigation.NavController
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 
 abstract class BaseNavigator(
@@ -32,11 +33,15 @@ abstract class BaseNavigator(
         }
     }
 
-    fun performNavigation(@IdRes actionId: Int, args: Bundle? = null) {
+    protected fun performNavigation(@IdRes actionId: Int, args: Bundle? = null) {
         val navController = navigationHolder.navController
 
-        navController?.currentDestination?.getAction(actionId)?.let {
-            navController.navigate(actionId, args)
+        navController?.performNavigation(actionId, args)
+    }
+
+    protected fun NavController.performNavigation(@IdRes actionId: Int, args: Bundle? = null) {
+        currentDestination?.getAction(actionId)?.let {
+            navigate(actionId, args)
         }
     }
 }

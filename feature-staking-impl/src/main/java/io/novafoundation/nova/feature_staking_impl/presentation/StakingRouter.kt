@@ -76,4 +76,8 @@ interface StakingRouter {
     fun openAccountDetails(metaAccountId: Long)
 
     fun openRebag()
+    fun openDAppBrowser(url: String)
+
+    fun openMoreStakingOptions()
+    fun backInStakingTab()
 }
