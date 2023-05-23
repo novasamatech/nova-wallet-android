@@ -19,7 +19,7 @@ interface StakingRewardPeriodDataSource {
 
     fun getRewardPeriod(): RewardPeriod
 
-    fun getRewardPeriodFlow(): Flow<RewardPeriod>
+    fun observeRewardPeriod(): Flow<RewardPeriod>
 }
 
 class RealStakingRewardPeriodDataSource(
@@ -52,7 +52,7 @@ class RealStakingRewardPeriodDataSource(
         return mapToRewardPeriod(periodType)
     }
 
-    override fun getRewardPeriodFlow(): Flow<RewardPeriod> {
+    override fun observeRewardPeriod(): Flow<RewardPeriod> {
         return preferences.keysFlow(PREFS_REWARD_PERIOD, PREFS_CUSTOM_START_TIME, PREFS_CUSTOM_END_TIME)
             .map { getRewardPeriod() }
     }
