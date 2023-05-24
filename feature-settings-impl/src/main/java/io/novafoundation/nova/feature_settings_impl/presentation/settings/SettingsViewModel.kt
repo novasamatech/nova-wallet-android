@@ -121,7 +121,7 @@ class SettingsViewModel(
     fun changeBiometricAuth() {
         launch {
             if (biometricService.isEnabled()) {
-                val confirmationResult = twoFactorVerificationService.requestConfirmation(false)
+                val confirmationResult = twoFactorVerificationService.requestConfirmation(useBiometry = false)
                 if (confirmationResult == TwoFactorVerificationResult.CONFIRMED) {
                     biometricService.toggle()
                 }
