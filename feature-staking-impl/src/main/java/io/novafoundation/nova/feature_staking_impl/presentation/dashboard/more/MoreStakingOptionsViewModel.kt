@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MoreSta
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDApp
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.mapNoStakeItemToUi
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.model.MoreStakingOptionsModel
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.model.StakingDAppModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -19,7 +19,8 @@ import kotlinx.coroutines.launch
 class MoreStakingOptionsViewModel(
     private val interactor: StakingDashboardInteractor,
     private val router: StakingRouter,
-    private val stakingSharedState: StakingSharedState
+    private val stakingSharedState: StakingSharedState,
+    private val presentationMapper: StakingDashboardPresentationMapper,
 ) : BaseViewModel() {
 
     init {
@@ -58,7 +59,7 @@ class MoreStakingOptionsViewModel(
 
     private fun mapMoreOptionsToUi(moreStakingOptions: MoreStakingOptions): MoreStakingOptionsModel {
         return MoreStakingOptionsModel(
-            inAppStaking = moreStakingOptions.inAppStaking.map(::mapNoStakeItemToUi),
+            inAppStaking = moreStakingOptions.inAppStaking.map(presentationMapper::mapNoStakeItemToUi),
             resolvingInAppItems = moreStakingOptions.resolvingInAppItems,
             browserStaking = moreStakingOptions.browserStaking.map { dApps -> dApps.map(::mapStakingDAppToUi) }
         )

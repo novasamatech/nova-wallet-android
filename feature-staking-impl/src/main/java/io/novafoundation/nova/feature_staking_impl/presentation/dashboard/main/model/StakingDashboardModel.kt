@@ -26,7 +26,7 @@ class StakingDashboardModel(
         override val chainUi: ChainUi,
         override val assetId: ChainAssetId,
         val earnings: ExtendedLoadingState<String>,
-        val availableBalance: AmountModel?,
+        val availableBalance: String?,
         override val syncing: Boolean
     ) : BaseItem
 

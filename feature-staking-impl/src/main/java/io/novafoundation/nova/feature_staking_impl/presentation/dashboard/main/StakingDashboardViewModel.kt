@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Staking
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.mapNoStakeItemToUi
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -32,7 +32,8 @@ class StakingDashboardViewModel(
     private val resourceManager: ResourceManager,
     private val stakingDashboardUpdateSystem: StakingDashboardUpdateSystem,
     private val router: StakingRouter,
-    private val stakingSharedState: StakingSharedState
+    private val stakingSharedState: StakingSharedState,
+    private val presentationMapper: StakingDashboardPresentationMapper,
 ) : BaseViewModel() {
 
     val walletUi = accountUseCase.selectedWalletModelFlow()
@@ -87,7 +88,7 @@ class StakingDashboardViewModel(
     private fun mapDashboardToUi(dashboard: StakingDashboard): StakingDashboardModel {
         return StakingDashboardModel(
             hasStakeItems = dashboard.hasStake.map(::mapHasStakeItemToUi),
-            noStakeItems = dashboard.noStake.map(::mapNoStakeItemToUi),
+            noStakeItems = dashboard.noStake.map(presentationMapper::mapNoStakeItemToUi),
             resolvingItems = dashboard.resolvingItems
         )
     }
