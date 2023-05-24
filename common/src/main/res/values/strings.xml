@@ -3,11 +3,9 @@
 
     <string name="referenda_list_filter_placeholder">There are no referenda with filters applied</string>
 
-    <!--<string name="pincode_fingerprint_switch_dialog_title">Use biometric to authorize</string>-->
     <string name="pincode_biometric_switch_dialog_title">Use biometric to authorize</string>
 
-    <!--<string name="pincode_fingerprint_error">You are not authorized. Try another finger.</string>-->
-    <string name="pincode_biometric_error">You are not authorized. Try again, please.</string> <!--changed id and value-->
+    <string name="pincode_biometric_error">You are not authorized. Try again, please.</string>
 
     <string name="common_settings">Settings</string>
     <string name="settings_biometric_not_ready_title">Biometrics disabled in Settings</string>
@@ -37,7 +35,6 @@
     <string name="staking_period_year_short">1Y</string>
     <string name="staking_period_custom_short">%dD</string>
 
-    <!--<string name="staking_your_rewards">Your rewards</string>-->
     <string name="staking_your_rewards">Rewards</string>
 
     <string name="staking_period_title">Show staking rewards for</string>
