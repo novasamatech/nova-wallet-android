@@ -580,7 +580,7 @@
     <string name="parachain_staking_pending_revoke_message">Вы не можете добавить стейк в коллатора, для которого вы разблокируете все токены.</string>
     <string name="parachain_staking_unbond_no_rewards">Ваш стейк будет меньше минимального (%s) для этого коллатора.</string>
     <string name="parachain_staking_unstake_all">Оставшийся стейк опустится ниже минимального значения сети (%s) и также будет добавлен к сумме вывода</string>
-    <string name="pincode_biometric_error">Вы не авторизованы. Попробуйте другой палец.</string>
+    <string name="pincode_biometric_error">Вы не авторизованы. Попробуйте еще раз, пожалуйста.</string>
     <string name="pincode_biometric_switch_dialog_title">Использовать биометрию для авторизации</string>
     <string name="pincode_biometry_dialog_subtitle">Nova Wallet использует биометрическую аутентификацию для ограничения доступа неавторизованных пользователей к приложению.</string>
     <string name="pincode_biometry_dialog_title">Биометрия</string>
