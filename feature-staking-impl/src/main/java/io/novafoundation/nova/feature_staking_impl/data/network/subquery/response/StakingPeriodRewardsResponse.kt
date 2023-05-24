@@ -3,12 +3,12 @@ package io.novafoundation.nova.feature_staking_impl.data.network.subquery.respon
 import io.novafoundation.nova.common.data.network.subquery.SubQueryNodes
 import java.math.BigInteger
 
-class SubQueryTotalRewardResponse(val start: SubQueryNodes<RewardNode>, val end: SubQueryNodes<RewardNode>) {
+class StakingPeriodRewardsResponse(val start: SubQueryNodes<RewardNode>, val end: SubQueryNodes<RewardNode>) {
 
     class RewardNode(val accumulatedAmount: BigInteger, val amount: BigInteger)
 }
 
-val SubQueryTotalRewardResponse.totalReward: BigInteger
+val StakingPeriodRewardsResponse.totalReward: BigInteger
     get() {
         val end = end.nodes.firstOrNull() ?: return BigInteger.ZERO
         val start = start.nodes.firstOrNull() ?: return BigInteger.ZERO
