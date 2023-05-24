@@ -79,7 +79,7 @@ class RealStakingDashboardUpdateSystem(
     }
 
     private fun handleUpdaterEvent(event: StakingDashboardUpdaterEvent) {
-        when(event) {
+        when (event) {
             is PrimaryStakingAccountResolved -> {
                 resolvedPrimaryStakingAccountsFlow.value = resolvedPrimaryStakingAccountsFlow.value.inserted(event.option, event.primaryAccount)
             }

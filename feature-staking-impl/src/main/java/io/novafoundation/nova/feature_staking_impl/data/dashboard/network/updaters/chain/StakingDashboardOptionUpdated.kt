@@ -8,5 +8,5 @@ sealed class StakingDashboardUpdaterEvent : Updater.SideEffect {
 
     class StakingDashboardOptionUpdated(val option: StakingOptionId) : StakingDashboardUpdaterEvent()
 
-    class PrimaryStakingAccountResolved(val option: StakingOptionId, val primaryAccount: AccountId?): StakingDashboardUpdaterEvent()
+    class PrimaryStakingAccountResolved(val option: StakingOptionId, val primaryAccount: AccountId?) : StakingDashboardUpdaterEvent()
 }
