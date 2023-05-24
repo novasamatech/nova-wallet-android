@@ -65,7 +65,7 @@ class ReferendaSearchViewModel(
 
         val placeholder = if (referenda.isEmpty()) {
             PlaceholderModel(
-                resourceManager.getString(R.string.referenda_list_placeholder),
+                resourceManager.getString(R.string.referenda_search_placeholder),
                 R.drawable.ic_placeholder
             )
         } else {

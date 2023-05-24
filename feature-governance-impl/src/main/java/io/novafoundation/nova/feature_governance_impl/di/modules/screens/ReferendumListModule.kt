@@ -27,10 +27,8 @@ class ReferendumListModule {
 
     @Provides
     @FeatureScope
-    fun provideReferendaFiltersRepository(
-        preferences: Preferences
-    ): ReferendaFiltersRepository {
-        return PreferencesReferendaFiltersRepository(preferences)
+    fun provideReferendaFiltersRepository(): ReferendaFiltersRepository {
+        return PreferencesReferendaFiltersRepository()
     }
 
     @Provides
