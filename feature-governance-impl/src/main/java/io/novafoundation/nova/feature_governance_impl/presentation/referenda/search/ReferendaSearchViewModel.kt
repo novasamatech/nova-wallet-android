@@ -44,11 +44,11 @@ class ReferendaSearchViewModel(
 
     private val accountAndChainFlow = combineToPair(selectedAccountUseCase.selectedMetaAccountFlow(), selectedAssetSharedState.selectedOption)
 
-    private val referendaSearchFlow = accountAndChainFlow.flatMapLatest { (account, supportedOption) ->
+    private val referendaSearchFlow = accountAndChainFlow.flatMapLatest { (metaAccount, supportedOption) ->
         val chainAndAsset = supportedOption.assetWithChain
-        val accountId = account.accountIdIn(chainAndAsset.chain)
+        val accountId = metaAccount.accountIdIn(chainAndAsset.chain)
 
-        referendaListInteractor.searchReferendaListStateFlow(queryFlow, accountId, supportedOption, this)
+        referendaListInteractor.searchReferendaListStateFlow(metaAccount, queryFlow, accountId, supportedOption, this)
     }
         .inBackground()
         .shareWhileSubscribed()
