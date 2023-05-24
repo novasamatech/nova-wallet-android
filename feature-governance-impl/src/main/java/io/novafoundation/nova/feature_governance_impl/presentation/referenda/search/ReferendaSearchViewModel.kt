@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.withLoadingShared
 import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn

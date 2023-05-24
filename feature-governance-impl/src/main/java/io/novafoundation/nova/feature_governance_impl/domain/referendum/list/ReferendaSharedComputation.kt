@@ -2,10 +2,6 @@ package io.novafoundation.nova.feature_governance_impl.domain.referendum.list
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.common.utils.withLoading
-import io.novafoundation.nova.common.utils.withLoadingShared
-import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Voter
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.ReferendaCommonRepository

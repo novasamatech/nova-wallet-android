@@ -6,10 +6,6 @@ import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
-import io.novafoundation.nova.common.utils.getColorOrNull
-import io.novafoundation.nova.common.utils.getResourceIdOrNull
-import io.novafoundation.nova.common.utils.setImageTint
-import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
 

@@ -158,9 +158,9 @@ class PinCodeViewModel(
     }
 
     fun onResume() {
-        if (currentState is ScreenState.Checking
-            && (currentState as ScreenState.Checking).useBiometry
-            && biometricService.isEnabled()
+        if (currentState is ScreenState.Checking &&
+            (currentState as ScreenState.Checking).useBiometry &&
+            biometricService.isEnabled()
         ) {
             startBiometryAuth()
         }
