@@ -12,10 +12,13 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
+import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeChainAvailableBalance
 import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeChainIcon
 import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeChainName
 import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarnings
@@ -64,6 +67,12 @@ class StakingDashboardNoStakeView @JvmOverloads constructor(
 
     fun setSyncing(isSyncing: Boolean) {
         if (isSyncing) showShimmer(true) else hideShimmer()
+    }
+
+    fun setAvailableBalance(maybeBalance: AmountModel?) {
+        itemDashboardNoStakeChainAvailableBalance.letOrHide(maybeBalance) { balance ->
+            itemDashboardNoStakeChainAvailableBalance.text = balance.token
+        }
     }
 
     fun unbind() {

@@ -16,7 +16,7 @@ class AssetWithToken(
     val currency: CurrencyLocal
 )
 
-class AssetAndChainId(
+data class AssetAndChainId(
     val chainId: String,
     val assetId: Int
 )

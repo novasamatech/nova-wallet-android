@@ -67,7 +67,7 @@ class StakingDashboardViewModel(
         val noStakeItem = noStakeItems.getOrNull(index) ?: return@launch
 
         when (val flowType = noStakeItem.stakingState.flowType) {
-            NoStake.FlowType.Aggregated -> {} // TODO feature aggregated flows & nomination pools
+            is NoStake.FlowType.Aggregated -> {} // TODO feature aggregated flows & nomination pools
 
             is NoStake.FlowType.Single -> openChainStaking(
                 chain = noStakeItem.chain,

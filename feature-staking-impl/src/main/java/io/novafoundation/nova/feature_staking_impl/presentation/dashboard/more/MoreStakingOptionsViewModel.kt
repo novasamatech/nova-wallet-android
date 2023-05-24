@@ -39,7 +39,7 @@ class MoreStakingOptionsViewModel(
         val inAppStakingItem = inAppStakingItems.getOrNull(index) ?: return@launch
 
         when (val flowType = inAppStakingItem.stakingState.flowType) {
-            NoStake.FlowType.Aggregated -> {} // TODO feature aggregated flows & nomination pools
+            is NoStake.FlowType.Aggregated -> {} // TODO feature aggregated flows & nomination pools
 
             is NoStake.FlowType.Single -> openChainStaking(
                 chain = inAppStakingItem.chain,
