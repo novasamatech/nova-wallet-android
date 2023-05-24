@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboardUpdateSystem
@@ -40,7 +39,7 @@ class StakingDashboardViewModel(
         .shareInBackground()
 
     private val stakingDashboardFlow = interactor.stakingDashboardFlow()
-        .inBackground()
+        .shareInBackground()
 
     val stakingDashboardUiFlow = stakingDashboardFlow
         .map(::mapDashboardToUi)

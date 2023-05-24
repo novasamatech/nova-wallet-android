@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.map
-import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MoreStakingOptions
@@ -28,7 +27,7 @@ class MoreStakingOptionsViewModel(
     }
 
     private val moreStakingOptionsFlow = interactor.moreStakingOptionsFlow()
-        .inBackground()
+        .shareInBackground()
 
     val moreStakingOptionsUiFlow = moreStakingOptionsFlow
         .map(::mapMoreOptionsToUi)
