@@ -19,7 +19,7 @@ class PinCodeTwoFactorVerificationCommunicatorImpl(
 
     override fun openRequest(request: Request) {
         super.openRequest(request)
-        val action = PinCodeAction.TwoFactorVerification()
+        val action = PinCodeAction.TwoFactorVerification(request.useBiometryIfEnabled)
         val bundle = PincodeFragment.getPinCodeBundle(action)
         navController.navigate(R.id.action_pin_code_two_factor_verification, bundle)
     }

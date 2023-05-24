@@ -20,9 +20,9 @@ class PinCodeTwoFactorVerificationExecutor(
         interScreenCommunicator.respond(Response(TwoFactorVerificationResult.CONFIRMED))
     }
 
-    override suspend fun runConfirmation(): TwoFactorVerificationResult = withContext(Dispatchers.Main) {
+    override suspend fun runConfirmation(useBiometry: Boolean): TwoFactorVerificationResult = withContext(Dispatchers.Main) {
         val responseFlow = interScreenCommunicator.responseFlow
-        interScreenCommunicator.openRequest(Request)
+        interScreenCommunicator.openRequest(Request(useBiometry))
         return@withContext responseFlow.first().result
     }
 }
