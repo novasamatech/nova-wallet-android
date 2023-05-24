@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.retryUntilDone
 import io.novafoundation.nova.common.utils.toPercent
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.StakingStatsApi
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.StakingStatsRequest
@@ -16,21 +15,25 @@ import io.novafoundation.nova.runtime.ext.supportedStakingOptions
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapStakingStringToStakingType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 interface StakingStatsDataSource {
 
-    suspend fun fetchStakingStats(metaAccount: MetaAccount, stakingChains: List<Chain>): MultiChainStakingStats
+    suspend fun fetchStakingStats(stakingAccounts: Map<StakingOptionId, AccountId?>, stakingChains: List<Chain>): MultiChainStakingStats
 }
 
 class RealStakingStatsDataSource(
     private val api: StakingStatsApi
 ) : StakingStatsDataSource {
 
-    override suspend fun fetchStakingStats(metaAccount: MetaAccount, stakingChains: List<Chain>): MultiChainStakingStats = withContext(Dispatchers.IO) {
+    override suspend fun fetchStakingStats(
+        stakingAccounts: Map<StakingOptionId, AccountId?>,
+        stakingChains: List<Chain>
+    ): MultiChainStakingStats = withContext(Dispatchers.IO) {
         retryUntilDone {
-            val request = StakingStatsRequest(metaAccount, stakingChains)
+            val request = StakingStatsRequest(stakingAccounts, stakingChains)
             val response = api.fetchStakingStats(request).data
 
             val earnings = response.stakingApies.associatedById()

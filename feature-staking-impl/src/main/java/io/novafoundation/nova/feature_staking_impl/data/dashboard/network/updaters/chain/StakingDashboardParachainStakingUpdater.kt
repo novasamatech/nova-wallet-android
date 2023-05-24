@@ -16,6 +16,8 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.activeB
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.ChainStakingStats
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.MultiChainStakingStats
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterEvent.PrimaryStakingAccountResolved
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterEvent.StakingDashboardOptionUpdated
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindCandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindDelegatorState
@@ -32,6 +34,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
 
 class StakingDashboardParachainStakingUpdater(
@@ -60,7 +63,9 @@ class StakingDashboardParachainStakingUpdater(
 
                 saveItem(parachainStakingBaseInfo, secondaryInfo)
 
-                emit(StakingDashboardOptionUpdated(stakingOptionId()))
+                emit(StakingDashboardOptionUpdated(stakingOptionId()) as StakingDashboardUpdaterEvent)
+            }.onStart {
+                emit(PrimaryStakingAccountResolved(stakingOptionId(), metaAccount.accountIdIn(chain)))
             }
     }
 

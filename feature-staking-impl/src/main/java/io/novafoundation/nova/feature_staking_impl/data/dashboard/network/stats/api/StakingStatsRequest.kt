@@ -1,21 +1,22 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api
 
 import io.novafoundation.nova.common.data.network.subquery.SubQueryFilters
-import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.allOf
+import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.and
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.anyOf
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.supportedStakingOptions
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapStakingTypeToStakingString
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
-class StakingStatsRequest(metaAccount: MetaAccount, chains: List<Chain>) {
+class StakingStatsRequest(stakingAccounts: Map<StakingOptionId, AccountId?>, chains: List<Chain>) {
 
     @Transient
-    private val chainAddressesFilter = constructChainAddressesFilter(metaAccount, chains)
+    private val chainAddressesFilter = constructChainAddressesFilter(stakingAccounts, chains)
 
     val query = """
     {
@@ -50,22 +51,34 @@ class StakingStatsRequest(metaAccount: MetaAccount, chains: List<Chain>) {
 
     """.trimIndent()
 
-    private fun constructChainAddressesFilter(metaAccount: MetaAccount, chains: List<Chain>): String = with(SubQueryFilters) {
+    private fun constructChainAddressesFilter(
+        stakingAccounts: Map<StakingOptionId, AccountId?>,
+        chains: List<Chain>
+    ): String = with(SubQueryFilters) {
         val perChain = chains.mapNotNull { chain ->
-            val address = metaAccount.addressIn(chain) ?: return@mapNotNull null
+            val hasTypeAndAddressOptions = hasTypeAndAddressOptions(chain, stakingAccounts)
 
-            val hasStakingTypeList = chain.utilityAsset.supportedStakingOptions().mapNotNull { stakingType ->
-                mapStakingTypeToStakingString(stakingType)?.let { hasStakingType(it) }
-            }
+            if (hasTypeAndAddressOptions.isEmpty()) return@mapNotNull null
 
-            allOf(
-                hasAddress(address),
-                hasNetwork(chain.id.requireHexPrefix()),
-                anyOf(hasStakingTypeList)
-            )
+            hasNetwork(chain.id.requireHexPrefix()) and anyOf(hasTypeAndAddressOptions)
         }
 
         return anyOf(perChain)
+    }
+
+    private fun SubQueryFilters.Companion.hasTypeAndAddressOptions(
+        chain: Chain,
+        stakingAccounts: Map<StakingOptionId, AccountId?>
+    ): List<String> {
+        val utilityAsset = chain.utilityAsset
+
+        return utilityAsset.supportedStakingOptions().mapNotNull { stakingType ->
+            val stakingOptionId = StakingOptionId(chain.id, utilityAsset.id, stakingType)
+            val accountId = stakingAccounts[stakingOptionId] ?: return@mapNotNull null
+            val stakingTypeString = mapStakingTypeToStakingString(stakingType) ?: return@mapNotNull null
+
+            hasAddress(chain.addressOf(accountId)) and hasStakingType(stakingTypeString)
+        }
     }
 
     private fun SubQueryFilters.hasNetwork(chainId: ChainId): String {

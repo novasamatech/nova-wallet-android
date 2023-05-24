@@ -1,12 +1,15 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters
 
 import io.novafoundation.nova.common.utils.added
+import io.novafoundation.nova.common.utils.inserted
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboardUpdateSystem
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.StakingStatsDataSource
-import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardOptionUpdated
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterEvent
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterEvent.PrimaryStakingAccountResolved
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterEvent.StakingDashboardOptionUpdated
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterFactory
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.subscribe
@@ -15,11 +18,13 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.findChains
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
@@ -36,13 +41,20 @@ class RealStakingDashboardUpdateSystem(
 
     override val syncedItemsFlow: MutableStateFlow<Set<StakingOptionId>> = MutableStateFlow(emptySet())
 
+    private val resolvedPrimaryStakingAccountsFlow = MutableStateFlow(emptyMap<StakingOptionId, AccountId?>())
+
     override fun start(): Flow<Updater.SideEffect> {
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
             syncedItemsFlow.emit(emptySet())
+            resolvedPrimaryStakingAccountsFlow.emit(emptyMap())
 
             val stakingChains = chainRegistry.stakingChains()
+            val supportedOptionsSize = stakingChains.sumOf { it.utilityAsset.supportedStakingOptions().size }
 
-            val statsDeferred = CoroutineScope(coroutineContext).async { stakingStatsDataSource.fetchStakingStats(metaAccount, stakingChains) }
+            val statsDeferred = CoroutineScope(coroutineContext).async {
+                val resolvedPrimaryStakingAccounts = resolvedPrimaryStakingAccountsFlow.awaitSize(supportedOptionsSize)
+                stakingStatsDataSource.fetchStakingStats(resolvedPrimaryStakingAccounts, stakingChains)
+            }
 
             val updateFlows = stakingChains.flatMap { stakingChain ->
                 val sharedRequestsBuilder = sharedRequestsBuilderFactory.create(stakingChain.id)
@@ -60,12 +72,25 @@ class RealStakingDashboardUpdateSystem(
             }
 
             updateFlows.merge()
-                .filterIsInstance<StakingDashboardOptionUpdated>()
-                .onEach {
-                    syncedItemsFlow.value = syncedItemsFlow.value.added(it.option)
-                }
+                .filterIsInstance<StakingDashboardUpdaterEvent>()
+                .onEach(::handleUpdaterEvent)
         }
             .onCompletion { syncedItemsFlow.emit(emptySet()) }
+    }
+
+    private fun handleUpdaterEvent(event: StakingDashboardUpdaterEvent) {
+        when(event) {
+            is PrimaryStakingAccountResolved -> {
+                resolvedPrimaryStakingAccountsFlow.value = resolvedPrimaryStakingAccountsFlow.value.inserted(event.option, event.primaryAccount)
+            }
+            is StakingDashboardOptionUpdated -> {
+                syncedItemsFlow.value = syncedItemsFlow.value.added(event.option)
+            }
+        }
+    }
+
+    private suspend fun <K, V> Flow<Map<K, V>>.awaitSize(size: Int): Map<K, V> {
+        return first { it.size >= size }
     }
 
     private suspend fun ChainRegistry.stakingChains(): List<Chain> {
