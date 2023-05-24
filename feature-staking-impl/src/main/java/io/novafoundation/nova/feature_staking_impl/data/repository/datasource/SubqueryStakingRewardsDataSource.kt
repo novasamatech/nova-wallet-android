@@ -47,7 +47,7 @@ class SubqueryStakingRewardsDataSource(
 
         stakingTotalRewardDao.insert(totalRewardLocal)
     }
-    
+
     override suspend fun sync(accountAddress: String, chain: Chain, chainAsset: Chain.Asset, rewardPeriod: RewardPeriod) {
         val stakingExternalApi = chain.stakingExternalApi() ?: return
         val start = rewardPeriod.getStartDate()?.timestamp()

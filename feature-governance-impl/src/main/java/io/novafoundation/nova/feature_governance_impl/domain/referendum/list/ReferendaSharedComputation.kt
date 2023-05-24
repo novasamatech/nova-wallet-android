@@ -9,8 +9,6 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.rep
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.ReferendaState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.shareIn
 
 class ReferendaSharedComputation(
     private val computationalCache: ComputationalCache,

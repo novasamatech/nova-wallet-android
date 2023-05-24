@@ -1,11 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.data.repository.filters
 
-import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumTypeFilter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
 
 private const val PREF_REFERENDUM_TYPE_FILTER = "PREF_REFERENDUM_TYPE_FILTER"
 
