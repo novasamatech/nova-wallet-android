@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.firstLoaded
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.withLoadingShared
+import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
@@ -19,8 +19,13 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDAppsInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFiltersInteractor
+import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumType
+import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumTypeFilter
+import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.list.ReferendaListStateModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendaGroupModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
@@ -31,12 +36,15 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelecto
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class ReferendaListViewModel(
     assetSelectorFactory: AssetSelectorFactory,
     private val referendaListInteractor: ReferendaListInteractor,
+    private val referendaFiltersInteractor: ReferendaFiltersInteractor,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val selectedAssetSharedState: GovernanceSharedState,
     private val resourceManager: ResourceManager,
@@ -56,11 +64,13 @@ class ReferendaListViewModel(
 
     private val accountAndChainFlow = combineToPair(selectedAccount, selectedChainAndAssetFlow)
 
-    private val referendaListStateFlow = accountAndChainFlow.withLoadingShared { (account, supportedOption) ->
+    private val referendaFilters = referendaFiltersInteractor.observeReferendumTypeFilter()
+
+    private val referendaListStateFlow = accountAndChainFlow.flatMapLatest { (account, supportedOption) ->
         val chainAndAsset = supportedOption.assetWithChain
         val accountId = account.accountIdIn(chainAndAsset.chain)
 
-        referendaListInteractor.referendaListStateFlow(accountId, supportedOption, this)
+        referendaListInteractor.referendaListStateFlow(accountId, supportedOption, this, referendaFilters)
     }
         .inBackground()
         .shareWhileSubscribed()
@@ -81,14 +91,13 @@ class ReferendaListViewModel(
         .inBackground()
         .shareWhileSubscribed()
 
-    val referendaUiFlow = referendaListStateFlow.mapLoading { state ->
-        val asset = assetSelectorMixin.selectedAssetFlow.first()
-        val chain = selectedAssetSharedState.chain()
+    val referendaFilterIcon = referendaFilters
+        .map { mapFilterTypeToIconRes(it) }
+        .inBackground()
+        .shareWhileSubscribed()
 
-        state.groupedReferenda.toListWithHeaders(
-            keyMapper = { group, referenda -> mapReferendumGroupToUi(group, referenda.size) },
-            valueMapper = { referendumFormatter.formatReferendumPreview(it, asset.token, chain) }
-        )
+    val referendaUiFlow = referendaListStateFlow.mapLoading { state ->
+        mapReferendaListToStateList(state)
     }
         .inBackground()
         .shareWhileSubscribed()
@@ -144,6 +153,47 @@ class ReferendaListViewModel(
             name = resourceManager.getString(nameRes),
             badge = groupSize.format()
         )
+    }
+
+    private fun mapFilterTypeToIconRes(it: ReferendumTypeFilter) =
+        if (it.selectedType == ReferendumType.ALL) {
+            R.drawable.ic_chip_filter
+        } else {
+            R.drawable.ic_chip_filter_indicator
+        }
+
+    private suspend fun mapReferendaListToStateList(state: ReferendaListState): ReferendaListStateModel {
+        val asset = assetSelectorMixin.selectedAssetFlow.first()
+        val chain = selectedAssetSharedState.chain()
+
+        val referendaList = state.groupedReferenda.toListWithHeaders(
+            keyMapper = { group, referenda -> mapReferendumGroupToUi(group, referenda.size) },
+            valueMapper = { referendumFormatter.formatReferendumPreview(it, asset.token, chain) }
+        )
+
+        val placeholderModel = mapReferendaListPlaceholder(referendaList)
+
+        return ReferendaListStateModel(placeholderModel, referendaList)
+    }
+
+    private suspend fun mapReferendaListPlaceholder(referendaList: List<Any>): PlaceholderModel? {
+        val selectedReferendaType = referendaFilters.first().selectedType
+
+        return if (referendaList.isEmpty()) {
+            if (selectedReferendaType == ReferendumType.ALL) {
+                PlaceholderModel(
+                    resourceManager.getString(R.string.referenda_list_placeholder),
+                    R.drawable.ic_placeholder
+                )
+            } else {
+                PlaceholderModel(
+                    resourceManager.getString(R.string.referenda_list_filter_placeholder),
+                    R.drawable.ic_planet_outline
+                )
+            }
+        } else {
+            null
+        }
     }
 
     fun governanceLocksClicked() {

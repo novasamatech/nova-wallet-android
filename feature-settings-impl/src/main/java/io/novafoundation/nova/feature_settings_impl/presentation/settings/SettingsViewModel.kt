@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.BiometricResponse
 import io.novafoundation.nova.common.sequrity.BiometricService
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationResult
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
@@ -119,10 +120,13 @@ class SettingsViewModel(
 
     fun changeBiometricAuth() {
         launch {
-            if (!biometricService.isEnabled()) {
-                biometricService.requestBiometric()
+            if (biometricService.isEnabled()) {
+                val confirmationResult = twoFactorVerificationService.requestConfirmation(useBiometry = false)
+                if (confirmationResult == TwoFactorVerificationResult.CONFIRMED) {
+                    biometricService.toggle()
+                }
             } else {
-                biometricService.toggle()
+                biometricService.requestBiometric()
             }
         }
     }

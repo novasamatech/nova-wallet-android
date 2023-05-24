@@ -40,7 +40,7 @@ class PinCodeViewModel(
     sealed class ScreenState {
         object Creating : ScreenState()
         data class Confirmation(val codeToConfirm: String) : ScreenState()
-        object Checking : ScreenState()
+        data class Checking(val useBiometry: Boolean) : ScreenState()
     }
 
     val confirmationAwaitableAction = actionAwaitableMixinFactory.confirmingOrDenyingAction<ConfirmationDialogInfo>()
@@ -54,8 +54,8 @@ class PinCodeViewModel(
     private val _matchingPincodeErrorEvent = MutableLiveData<Event<Unit>>()
     val matchingPincodeErrorEvent: LiveData<Event<Unit>> = _matchingPincodeErrorEvent
 
-    private val _showFingerPrintEvent = MutableLiveData<Event<Boolean>>()
-    val showFingerPrintEvent: LiveData<Event<Boolean>> = _showFingerPrintEvent
+    private val _showBiometryEvent = MutableLiveData<Event<Boolean>>()
+    val showFingerPrintEvent: LiveData<Event<Boolean>> = _showBiometryEvent
 
     val biometricEvents = biometricService.biometryServiceResponseFlow
         .mapNotNull { mapBiometricErrors(resourceManager, it) }
@@ -76,10 +76,15 @@ class PinCodeViewModel(
                 currentState = ScreenState.Creating
             }
             is PinCodeAction.Check,
-            is PinCodeAction.Change,
+            is PinCodeAction.Change -> {
+                currentState = ScreenState.Checking(true)
+                _showBiometryEvent.value = Event(biometricService.isBiometricReady() && biometricService.isEnabled())
+            }
             is PinCodeAction.TwoFactorVerification -> {
-                currentState = ScreenState.Checking
-                _showFingerPrintEvent.value = Event(biometricService.isBiometricReady() && biometricService.isEnabled())
+                currentState = ScreenState.Checking(pinCodeAction.useBiometryIfEnabled)
+                if (pinCodeAction.useBiometryIfEnabled) {
+                    _showBiometryEvent.value = Event(biometricService.isBiometricReady() && biometricService.isEnabled())
+                }
             }
         }
     }
@@ -153,7 +158,10 @@ class PinCodeViewModel(
     }
 
     fun onResume() {
-        if (ScreenState.Checking == currentState && biometricService.isEnabled()) {
+        if (currentState is ScreenState.Checking &&
+            (currentState as ScreenState.Checking).useBiometry &&
+            biometricService.isEnabled()
+        ) {
             startBiometryAuth()
         }
     }

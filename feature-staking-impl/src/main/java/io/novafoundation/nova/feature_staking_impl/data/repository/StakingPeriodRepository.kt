@@ -10,7 +10,7 @@ interface StakingPeriodRepository {
 
     fun getRewardPeriod(): RewardPeriod
 
-    fun getRewardPeriodFlow(): Flow<RewardPeriod>
+    fun observeRewardPeriod(): Flow<RewardPeriod>
 }
 
 class RealStakingPeriodRepository(
@@ -25,7 +25,7 @@ class RealStakingPeriodRepository(
         return stakingRewardPeriodDataSource.getRewardPeriod()
     }
 
-    override fun getRewardPeriodFlow(): Flow<RewardPeriod> {
-        return stakingRewardPeriodDataSource.getRewardPeriodFlow()
+    override fun observeRewardPeriod(): Flow<RewardPeriod> {
+        return stakingRewardPeriodDataSource.observeRewardPeriod()
     }
 }

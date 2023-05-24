@@ -2,7 +2,9 @@ package io.novafoundation.nova.feature_governance_impl.domain.referendum.list.re
 
 import io.novafoundation.nova.common.address.get
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.castOrNull
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Proposal
@@ -53,7 +55,7 @@ class ReferendaState(
 
 interface ReferendaCommonRepository {
 
-    suspend fun referendaStateFlow(voter: Voter?, governanceOption: SupportedGovernanceOption): Flow<ReferendaState>
+    suspend fun referendaStateFlow(voter: Voter?, governanceOption: SupportedGovernanceOption): Flow<ExtendedLoadingState<ReferendaState>>
 
     suspend fun referendaListFlow(
         voter: Voter,
@@ -70,7 +72,7 @@ class RealReferendaCommonRepository(
     private val identityRepository: OnChainIdentityRepository,
 ) : ReferendaCommonRepository {
 
-    override suspend fun referendaStateFlow(voter: Voter?, governanceOption: SupportedGovernanceOption): Flow<ReferendaState> {
+    override suspend fun referendaStateFlow(voter: Voter?, governanceOption: SupportedGovernanceOption): Flow<ExtendedLoadingState<ReferendaState>> {
         val chain = governanceOption.assetWithChain.chain
 
         val governanceSource = governanceSourceRegistry.sourceFor(governanceOption)
@@ -103,7 +105,7 @@ class RealReferendaCommonRepository(
 
                 ReferendaState(onChainVoting.await(), currentBlockNumber, onChainReferendaById, referenda, tracksById)
             }
-        }
+        }.withSafeLoading()
     }
 
     override suspend fun referendaListFlow(

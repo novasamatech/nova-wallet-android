@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
@@ -29,6 +30,7 @@ class ReferendaSearchModule {
         selectedAssetSharedState: GovernanceSharedState,
         governanceRouter: GovernanceRouter,
         referendumFormatter: ReferendumFormatter,
+        resourceManager: ResourceManager
     ): ViewModel {
         return ReferendaSearchViewModel(
             assetSelectorFactory = assetSelectorFactory,
@@ -36,7 +38,8 @@ class ReferendaSearchModule {
             selectedAccountUseCase = selectedAccountUseCase,
             selectedAssetSharedState = selectedAssetSharedState,
             governanceRouter = governanceRouter,
-            referendumFormatter = referendumFormatter
+            referendumFormatter = referendumFormatter,
+            resourceManager = resourceManager
         )
     }
 

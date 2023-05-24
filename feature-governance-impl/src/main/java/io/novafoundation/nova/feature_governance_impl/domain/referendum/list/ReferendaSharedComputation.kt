@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.list
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Voter
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.ReferendaCommonRepository
@@ -17,7 +18,7 @@ class ReferendaSharedComputation(
         voter: Voter?,
         governanceOption: SupportedGovernanceOption,
         scope: CoroutineScope
-    ): Flow<ReferendaState> {
+    ): Flow<ExtendedLoadingState<ReferendaState>> {
         val chainId = governanceOption.assetWithChain.chain.id
         val key = "REFERENDA:$chainId"
 

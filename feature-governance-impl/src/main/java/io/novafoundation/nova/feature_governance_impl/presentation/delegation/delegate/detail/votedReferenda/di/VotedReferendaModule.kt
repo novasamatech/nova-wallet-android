@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
@@ -29,6 +30,7 @@ class VotedReferendaModule {
         governanceRouter: GovernanceRouter,
         referendumFormatter: ReferendumFormatter,
         payload: VotedReferendaPayload,
+        resourceManager: ResourceManager
     ): ViewModel {
         return VotedReferendaViewModel(
             interactor = interactor,
@@ -36,6 +38,7 @@ class VotedReferendaModule {
             selectedTokenUseCase = selectedTokenUseCase,
             governanceRouter = governanceRouter,
             referendumFormatter = referendumFormatter,
+            resourceManager = resourceManager,
             payload = payload
         )
     }

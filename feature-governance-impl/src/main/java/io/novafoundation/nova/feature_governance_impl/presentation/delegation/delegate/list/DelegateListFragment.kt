@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.list.PlaceholderAdapter
+import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
@@ -32,7 +32,7 @@ class DelegateListFragment :
 
     private val bannerAdapter by lazy(LazyThreadSafetyMode.NONE) { DelegateBannerAdapter(this) }
     private val sortAndFilterAdapter by lazy(LazyThreadSafetyMode.NONE) { DelegateSortAndFilterAdapter(this) }
-    private val placeholderAdapter by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.item_delegates_shimmering) }
+    private val placeholderAdapter by lazy(LazyThreadSafetyMode.NONE) { CustomPlaceholderAdapter(R.layout.item_delegates_shimmering) }
     private val delegateListAdapter by lazy(LazyThreadSafetyMode.NONE) { DelegateListAdapter(imageLoader, this) }
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(bannerAdapter, sortAndFilterAdapter, placeholderAdapter, delegateListAdapter) }
 

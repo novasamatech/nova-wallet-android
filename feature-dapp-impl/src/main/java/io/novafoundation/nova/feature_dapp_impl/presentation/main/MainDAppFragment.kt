@@ -11,7 +11,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.NestedAdapter
-import io.novafoundation.nova.common.list.PlaceholderAdapter
+import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -35,7 +35,7 @@ class MainDAppFragment :
 
     private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) { DAppHeaderAdapter(imageLoader, this) }
 
-    private val dappsShimmering by lazy(LazyThreadSafetyMode.NONE) { PlaceholderAdapter(R.layout.layout_dapps_shimmering) }
+    private val dappsShimmering by lazy(LazyThreadSafetyMode.NONE) { CustomPlaceholderAdapter(R.layout.layout_dapps_shimmering) }
 
     private val categoriesAdapter by lazy(LazyThreadSafetyMode.NONE) {
         NestedAdapter(

@@ -31,5 +31,5 @@ sealed class PinCodeAction(open val toolbarConfiguration: ToolbarConfiguration) 
     object Change : PinCodeAction(ToolbarConfiguration(R.string.profile_pincode_change_title, true))
 
     @Parcelize
-    class TwoFactorVerification : PinCodeAction(ToolbarConfiguration(titleRes = null, backVisible = true))
+    class TwoFactorVerification(val useBiometryIfEnabled: Boolean = true) : PinCodeAction(ToolbarConfiguration(titleRes = null, backVisible = true))
 }

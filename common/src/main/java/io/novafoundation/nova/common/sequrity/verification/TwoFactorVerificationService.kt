@@ -19,7 +19,9 @@ interface TwoFactorVerificationService {
 
     suspend fun toggle()
 
-    suspend fun requestConfirmation(): TwoFactorVerificationResult
+    suspend fun requestConfirmationIfEnabled(): TwoFactorVerificationResult
+
+    suspend fun requestConfirmation(useBiometry: Boolean): TwoFactorVerificationResult
 }
 
 interface TwoFactorVerificationExecutor {
@@ -28,7 +30,7 @@ interface TwoFactorVerificationExecutor {
 
     fun confirm()
 
-    suspend fun runConfirmation(): TwoFactorVerificationResult
+    suspend fun runConfirmation(useBiometry: Boolean): TwoFactorVerificationResult
 }
 
 class RealTwoFactorVerificationService(
@@ -52,7 +54,7 @@ class RealTwoFactorVerificationService(
         val isEnabled = isEnabled()
 
         if (isEnabled) {
-            val confirmationResult = requestConfirmation()
+            val confirmationResult = requestConfirmationIfEnabled()
             if (confirmationResult != TwoFactorVerificationResult.CONFIRMED) {
                 return
             }
@@ -61,12 +63,16 @@ class RealTwoFactorVerificationService(
         setEnable(!isEnabled)
     }
 
-    override suspend fun requestConfirmation(): TwoFactorVerificationResult {
+    override suspend fun requestConfirmationIfEnabled(): TwoFactorVerificationResult {
         if (isEnabled()) {
-            return twoFactorVerificationExecutor.runConfirmation()
+            return requestConfirmation(true)
         }
 
         return TwoFactorVerificationResult.CONFIRMED
+    }
+
+    override suspend fun requestConfirmation(useBiometry: Boolean): TwoFactorVerificationResult {
+        return twoFactorVerificationExecutor.runConfirmation(useBiometry)
     }
 
     private fun setEnable(enable: Boolean) {

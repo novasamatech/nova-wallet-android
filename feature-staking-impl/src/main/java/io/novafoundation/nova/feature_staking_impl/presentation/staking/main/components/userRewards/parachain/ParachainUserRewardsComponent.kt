@@ -48,7 +48,7 @@ private class ParachainUserRewardsComponent(
     private val resourceManager: ResourceManager
 ) : BaseRewardComponent(hostContext) {
 
-    private val rewardPeriodState = rewardPeriodsInteractor.getRewardPeriodFlow()
+    private val rewardPeriodState = rewardPeriodsInteractor.observeRewardPeriod()
 
     private val rewardAmountState = delegatorStateUseCase.loadDelegatingState(
         hostContext = hostContext,

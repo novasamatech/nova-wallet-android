@@ -5,8 +5,8 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.reversed
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFiltersInteractor
-import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendumType
-import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendumTypeFilter
+import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumType
+import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumTypeFilter
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -24,17 +24,17 @@ class ReferendaFiltersViewModel(
     private val governanceRouter: GovernanceRouter
 ) : BaseViewModel() {
 
-    private var selectedFilterFlow = MutableStateFlow(interactor.getReferendumTypeFilter().selected)
+    private var selectedFilterFlow = MutableStateFlow(interactor.getReferendumTypeFilter().selectedType)
 
     private val initialTypeFilter = interactor.getReferendumTypeFilter()
 
     val isApplyButtonAvailableFlow = selectedFilterFlow.map { selectedFilter ->
-        selectedFilter != interactor.getReferendumTypeFilter().selected
+        selectedFilter != interactor.getReferendumTypeFilter().selectedType
     }.inBackground()
         .share()
 
     fun getReferendumTypeSelectedOption(): Int {
-        return REFERENDUM_TYPE_FILTERS_REVERSE.getValue(initialTypeFilter.selected)
+        return REFERENDUM_TYPE_FILTERS_REVERSE.getValue(initialTypeFilter.selectedType)
     }
 
     fun onFilterTypeChanged(checkedId: Int) {

@@ -62,6 +62,10 @@ class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel>(
             referendaHeaderAdapter.setDelegations(it.dataOrNull)
         }
 
+        viewModel.referendaFilterIcon.observeWhenVisible {
+            referendaHeaderAdapter.setFilterIcon(it)
+        }
+
         viewModel.referendaUiFlow.observeReferendaList()
     }
 

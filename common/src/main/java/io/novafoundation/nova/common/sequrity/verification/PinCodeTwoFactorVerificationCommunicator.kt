@@ -11,7 +11,7 @@ import kotlinx.android.parcel.Parcelize
 interface PinCodeTwoFactorVerificationRequester : InterScreenRequester<Request, Response> {
 
     @Parcelize
-    object Request : Parcelable
+    class Request(val useBiometryIfEnabled: Boolean) : Parcelable
 }
 
 interface PinCodeTwoFactorVerificationResponder : InterScreenResponder<Request, Response> {
