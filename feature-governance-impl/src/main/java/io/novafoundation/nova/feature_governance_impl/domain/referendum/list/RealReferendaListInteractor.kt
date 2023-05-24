@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.list
 
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.utils.search.SearchComparator
 import io.novafoundation.nova.common.utils.search.SearchFilter
 import io.novafoundation.nova.common.utils.applyFilter
@@ -49,36 +51,37 @@ class RealReferendaListInteractor(
         voterAccountId: AccountId?,
         selectedGovernanceOption: SupportedGovernanceOption,
         coroutineScope: CoroutineScope
-    ): Flow<List<ReferendumPreview>> {
+    ): Flow<ExtendedLoadingState<List<ReferendumPreview>>> {
         return flowOfAll {
             combine(
                 queryFlow,
                 referendaSharedComputation.referenda(voterAccountId?.let(Voter.Companion::user), selectedGovernanceOption, coroutineScope)
-            ) { query, referendaState ->
-                val referenda = referendaState.referenda
+            ) { query, referendaLoadingState ->
+                referendaLoadingState.map { referendaState ->
+                    val referenda = referendaState.referenda
+                    if (query.isEmpty()) {
+                        val sorting = referendaSortingProvider.getReferendumSorting()
 
-                if (query.isEmpty()) {
-                    val sorting = referendaSortingProvider.getReferendumSorting()
+                        return@map referenda.sortedWith(sorting)
+                    }
 
-                    return@combine referenda.sortedWith(sorting)
+                    val lowercaseQuery = query.lowercase()
+
+                    val phraseSearch = CachedPhraseSearch(lowercaseQuery)
+
+                    val searchFilter = SearchFilter.Builder<ReferendumPreview>(lowercaseQuery) { it.getName()?.lowercase() }
+                        .addPhraseSearch(phraseSearch)
+                        .or { it.id.toString() }
+                        .build()
+
+                    val searchComparator = SearchComparator.Builder<ReferendumPreview>(lowercaseQuery) { it.getName()?.lowercase() }
+                        .addPhraseSearch(phraseSearch)
+                        .and { it.id.toString() }
+                        .build()
+
+                    referenda.filterWith(searchFilter)
+                        .sortedWith(searchComparator)
                 }
-
-                val lowercaseQuery = query.lowercase()
-
-                val phraseSearch = CachedPhraseSearch(lowercaseQuery)
-
-                val searchFilter = SearchFilter.Builder<ReferendumPreview>(lowercaseQuery) { it.getName()?.lowercase() }
-                    .addPhraseSearch(phraseSearch)
-                    .or { it.id.toString() }
-                    .build()
-
-                val searchComparator = SearchComparator.Builder<ReferendumPreview>(lowercaseQuery) { it.getName()?.lowercase() }
-                    .addPhraseSearch(phraseSearch)
-                    .and { it.id.toString() }
-                    .build()
-
-                referenda.filterWith(searchFilter)
-                    .sortedWith(searchComparator)
             }
         }
     }
@@ -88,7 +91,7 @@ class RealReferendaListInteractor(
         selectedGovernanceOption: SupportedGovernanceOption,
         coroutineScope: CoroutineScope,
         referendumTypeFilterFlow: Flow<ReferendumTypeFilter>
-    ): Flow<ReferendaListState> {
+    ): Flow<ExtendedLoadingState<ReferendaListState>> {
         return flowOfAll {
             val voter = voterAccountId?.let(Voter.Companion::user)
             val referendaStateFlow = referendaSharedComputation.referenda(
@@ -106,19 +109,21 @@ class RealReferendaListInteractor(
 
             val trackLocksFlow = governanceSource.convictionVoting.trackLocksFlowOrEmpty(voter?.accountId, asset.fullId)
 
-            combine(referendaStateFlow, trackLocksFlow, referendumTypeFilterFlow) { intermediateData, trackLocks, referendumFilter ->
-                val claimScheduleCalculator = with(intermediateData) {
-                    RealClaimScheduleCalculator(voting, currentBlockNumber, onChainReferenda, tracksById, undecidingTimeout, voteLockingPeriod, trackLocks)
+            combine(referendaStateFlow, trackLocksFlow, referendumTypeFilterFlow) { referendaLoadingState, trackLocks, referendumFilter ->
+                referendaLoadingState.map { referendaState ->
+                    val claimScheduleCalculator = with(referendaState) {
+                        RealClaimScheduleCalculator(voting, currentBlockNumber, onChainReferenda, tracksById, undecidingTimeout, voteLockingPeriod, trackLocks)
+                    }
+                    val locksOverview = claimScheduleCalculator.governanceLocksOverview()
+
+                    val filteredReferenda = referendaState.referenda.applyFilter(referendumFilter)
+
+                    ReferendaListState(
+                        groupedReferenda = sortReferendaPreviews(filteredReferenda),
+                        locksOverview = locksOverview,
+                        delegated = determineDelegatedState(referendaState.voting, delegationSupported),
+                    )
                 }
-                val locksOverview = claimScheduleCalculator.governanceLocksOverview()
-
-                val filteredReferenda = intermediateData.referenda.applyFilter(referendumFilter)
-
-                ReferendaListState(
-                    groupedReferenda = sortReferendaPreviews(filteredReferenda),
-                    locksOverview = locksOverview,
-                    delegated = determineDelegatedState(intermediateData.voting, delegationSupported),
-                )
             }
         }
     }

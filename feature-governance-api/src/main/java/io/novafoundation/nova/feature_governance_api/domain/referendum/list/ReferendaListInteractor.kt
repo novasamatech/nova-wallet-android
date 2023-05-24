@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_api.domain.referendum.list
 
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumTypeFilter
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -13,14 +14,14 @@ interface ReferendaListInteractor {
         voterAccountId: AccountId?,
         selectedGovernanceOption: SupportedGovernanceOption,
         coroutineScope: CoroutineScope
-    ): Flow<List<ReferendumPreview>>
+    ): Flow<ExtendedLoadingState<List<ReferendumPreview>>>
 
     fun referendaListStateFlow(
         voterAccountId: AccountId?,
         selectedGovernanceOption: SupportedGovernanceOption,
         coroutineScope: CoroutineScope,
         referendumTypeFilterFlow: Flow<ReferendumTypeFilter>
-    ): Flow<ReferendaListState>
+    ): Flow<ExtendedLoadingState<ReferendaListState>>
 
     fun votedReferendaListFlow(
         voter: Voter,

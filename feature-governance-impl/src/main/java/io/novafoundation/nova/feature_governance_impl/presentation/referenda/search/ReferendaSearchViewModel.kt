@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelecto
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 
 class ReferendaSearchViewModel(
     assetSelectorFactory: AssetSelectorFactory,
@@ -44,7 +45,7 @@ class ReferendaSearchViewModel(
 
     private val accountAndChainFlow = combineToPair(selectedAccountUseCase.selectedMetaAccountFlow(), selectedAssetSharedState.selectedOption)
 
-    private val referendaSearchFlow = accountAndChainFlow.withLoadingShared { (account, supportedOption) ->
+    private val referendaSearchFlow = accountAndChainFlow.flatMapLatest { (account, supportedOption) ->
         val chainAndAsset = supportedOption.assetWithChain
         val accountId = account.accountIdIn(chainAndAsset.chain)
 
