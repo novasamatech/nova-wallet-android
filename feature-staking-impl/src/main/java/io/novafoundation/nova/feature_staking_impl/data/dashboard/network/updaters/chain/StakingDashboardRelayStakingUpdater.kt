@@ -19,6 +19,8 @@ import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.ChainStakingStats
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.MultiChainStakingStats
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterEvent.PrimaryStakingAccountResolved
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterEvent.StakingDashboardOptionUpdated
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindActiveEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindNominationsOrNull
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedgerOrNull
@@ -33,7 +35,6 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -54,20 +55,27 @@ class StakingDashboardRelayStakingUpdater(
     override val requiredModules: List<String> = emptyList()
 
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
-        val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow() // TODO handle no accounts present
+        val accountId = metaAccount.accountIdIn(chain)
 
         return remoteStorageSource.subscribe(chain.id, storageSubscriptionBuilder) {
             val activeEraFlow = metadata.staking().storage("ActiveEra").observe(binding = ::bindActiveEra)
-            val bondedFlow = metadata.staking().storage("Bonded").observe(accountId, binding = ::bindNullableAccountId)
 
-            val baseInfo = bondedFlow.flatMapLatest { maybeController ->
-                val controllerId = maybeController ?: accountId
+            val baseInfo = if (accountId != null) {
+                val bondedFlow = metadata.staking().storage("Bonded").observe(accountId, binding = ::bindNullableAccountId)
 
-                subscribeToStakingState(controllerId)
+                bondedFlow.flatMapLatest { maybeController ->
+                    val controllerId = maybeController ?: accountId
+
+                    subscribeToStakingState(controllerId)
+                }
+            } else {
+                flowOf(null)
             }
 
             combineToPair(baseInfo, activeEraFlow)
         }.transformLatest { (relaychainStakingState, activeEra) ->
+            emit(PrimaryStakingAccountResolved(stakingOptionId(), relaychainStakingState?.stakingLedger?.stashId))
+
             if (stakingStatsAsync.isActive) {
                 // we only save base state if secondary is still loading, to avoid unnecessary writes to db
                 saveItem(relaychainStakingState, secondaryInfo = null)
