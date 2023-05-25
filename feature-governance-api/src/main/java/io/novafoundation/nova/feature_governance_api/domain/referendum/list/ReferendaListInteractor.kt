@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_api.domain.referendum.list
 
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumTypeFilter
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface ReferendaListInteractor {
 
     fun searchReferendaListStateFlow(
+        metaAccount: MetaAccount,
         queryFlow: Flow<String>,
         voterAccountId: AccountId?,
         selectedGovernanceOption: SupportedGovernanceOption,
@@ -17,6 +19,7 @@ interface ReferendaListInteractor {
     ): Flow<ExtendedLoadingState<List<ReferendumPreview>>>
 
     fun referendaListStateFlow(
+        metaAccount: MetaAccount,
         voterAccountId: AccountId?,
         selectedGovernanceOption: SupportedGovernanceOption,
         coroutineScope: CoroutineScope,

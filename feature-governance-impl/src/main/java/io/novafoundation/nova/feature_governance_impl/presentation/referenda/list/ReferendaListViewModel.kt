@@ -59,18 +59,18 @@ class ReferendaListViewModel(
         amountProvider = Asset::free
     )
 
-    private val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
+    private val selectedMetaAccount = selectedAccountUseCase.selectedMetaAccountFlow()
     private val selectedChainAndAssetFlow = selectedAssetSharedState.selectedOption
 
-    private val accountAndChainFlow = combineToPair(selectedAccount, selectedChainAndAssetFlow)
+    private val accountAndChainFlow = combineToPair(selectedMetaAccount, selectedChainAndAssetFlow)
 
     private val referendaFilters = referendaFiltersInteractor.observeReferendumTypeFilter()
 
-    private val referendaListStateFlow = accountAndChainFlow.flatMapLatest { (account, supportedOption) ->
+    private val referendaListStateFlow = accountAndChainFlow.flatMapLatest { (metaAccount, supportedOption) ->
         val chainAndAsset = supportedOption.assetWithChain
-        val accountId = account.accountIdIn(chainAndAsset.chain)
+        val accountId = metaAccount.accountIdIn(chainAndAsset.chain)
 
-        referendaListInteractor.referendaListStateFlow(accountId, supportedOption, this, referendaFilters)
+        referendaListInteractor.referendaListStateFlow(metaAccount, accountId, supportedOption, this, referendaFilters)
     }
         .inBackground()
         .shareWhileSubscribed()

@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.applyFilter
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.search.filterWith
 import io.novafoundation.nova.common.utils.search.CachedPhraseSearch
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
@@ -47,6 +48,7 @@ class RealReferendaListInteractor(
 ) : ReferendaListInteractor {
 
     override fun searchReferendaListStateFlow(
+        metaAccount: MetaAccount,
         queryFlow: Flow<String>,
         voterAccountId: AccountId?,
         selectedGovernanceOption: SupportedGovernanceOption,
@@ -55,7 +57,7 @@ class RealReferendaListInteractor(
         return flowOfAll {
             combine(
                 queryFlow,
-                referendaSharedComputation.referenda(voterAccountId?.let(Voter.Companion::user), selectedGovernanceOption, coroutineScope)
+                referendaSharedComputation.referenda(metaAccount, voterAccountId?.let(Voter.Companion::user), selectedGovernanceOption, coroutineScope)
             ) { query, referendaLoadingState ->
                 referendaLoadingState.map { referendaState ->
                     val referenda = referendaState.referenda
@@ -87,6 +89,7 @@ class RealReferendaListInteractor(
     }
 
     override fun referendaListStateFlow(
+        metaAccount: MetaAccount,
         voterAccountId: AccountId?,
         selectedGovernanceOption: SupportedGovernanceOption,
         coroutineScope: CoroutineScope,
@@ -95,6 +98,7 @@ class RealReferendaListInteractor(
         return flowOfAll {
             val voter = voterAccountId?.let(Voter.Companion::user)
             val referendaStateFlow = referendaSharedComputation.referenda(
+                metaAccount,
                 voter,
                 selectedGovernanceOption,
                 coroutineScope
