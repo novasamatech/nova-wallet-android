@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list
+package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil

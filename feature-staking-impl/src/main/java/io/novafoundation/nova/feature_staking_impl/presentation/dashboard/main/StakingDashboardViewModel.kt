@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Staking
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.mapNoStakeItemToUi
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -41,7 +42,7 @@ class StakingDashboardViewModel(
     private val stakingDashboardFlow = interactor.stakingDashboardFlow()
         .inBackground()
 
-    val stakingDashboardUiFlow = interactor.stakingDashboardFlow()
+    val stakingDashboardUiFlow = stakingDashboardFlow
         .map(::mapDashboardToUi)
         .shareInBackground()
 
@@ -76,6 +77,10 @@ class StakingDashboardViewModel(
         }
     }
 
+    fun onMoreOptionsClicked() {
+        router.openMoreStakingOptions()
+    }
+
     fun avatarClicked() {
         router.openSwitchWallet()
     }
@@ -100,18 +105,6 @@ class StakingDashboardViewModel(
             rewards = stats.map { mapAmountToAmountModel(it.rewards, hasStake.token) },
             stake = mapAmountToAmountModel(hasStake.stakingState.stake, hasStake.token),
             status = stats.map { mapStakingStatusToUi(it.status) },
-            earnings = stats.map { it.estimatedEarnings.format() },
-            syncing = showSync
-        )
-    }
-
-    private fun mapNoStakeItemToUi(noStake: AggregatedStakingDashboardOption<NoStake>): StakingDashboardModel.NoStakeItem {
-        val stats = noStake.stakingState.stats
-        val showSync = noStake.syncing && stats is ExtendedLoadingState.Loaded
-
-        return StakingDashboardModel.NoStakeItem(
-            chainUi = mapChainToUi(noStake.chain),
-            assetId = noStake.token.configuration.id,
             earnings = stats.map { it.estimatedEarnings.format() },
             syncing = showSync
         )

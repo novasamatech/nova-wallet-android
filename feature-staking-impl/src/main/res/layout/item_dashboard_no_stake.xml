@@ -15,36 +15,41 @@
             android:id="@+id/itemDashboardNoStakeChainIcon"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="14dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_polkadot_24" />
 
         <TextView
             android:id="@+id/itemDashboardNoStakeChainName"
-            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline.Secondary"
+            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline.Primary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            app:layout_constraintEnd_toEndOf="@+id/itemDashboardNoStakeChainIcon"
-            app:layout_constraintStart_toStartOf="@+id/itemDashboardNoStakeChainIcon"
-            app:layout_constraintTop_toBottomOf="@+id/itemDashboardNoStakeChainIcon"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="@+id/itemDashboardNoStakeChainIcon"
+            app:layout_constraintEnd_toEndOf="@+id/itemDashboardNoStakeRightBarrier"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@+id/itemDashboardNoStakeChainIcon"
+            app:layout_constraintTop_toTopOf="@+id/itemDashboardNoStakeChainIcon"
             tools:text="Polkadot" />
 
         <TextView
             android:id="@+id/itemDashboardNoStakeEarnings"
-            style="@style/TextAppearance.NovaFoundation.SemiBold.Title3.Primary"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Callout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/itemDashboardNoStakeEarningsSuffix"
-            app:layout_constraintHorizontal_bias="0.5"
+            android:layout_marginEnd="4dp"
+            android:textColor="@color/text_positive"
+            app:layout_constraintBottom_toTopOf="@+id/itemDashboardNoStakeEarningsSuffix"
+            app:layout_constraintEnd_toStartOf="@+id/itemDashboardNoStakeArrow"
             app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/itemDashboardNoStakeChainName"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
             tools:text="19.47%" />
 
         <TextView
@@ -52,30 +57,50 @@
             style="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:text="@string/common_per_year"
-            app:layout_constraintBottom_toBottomOf="@+id/itemDashboardNoStakeEarnings"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/itemDashboardNoStakeEarnings" />
-
-        <androidx.constraintlayout.widget.Group
-            android:id="@+id/itemDashboardNoStakeEarningsValueGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:constraint_referenced_ids="itemDashboardNoStakeEarnings,itemDashboardNoStakeEarningsSuffix" />
+            android:text="@string/common_per_year_long"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/itemDashboardNoStakeEarnings"
+            app:layout_constraintTop_toBottomOf="@+id/itemDashboardNoStakeEarnings" />
 
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/itemDashboardNoStakeEarningsShimmer"
-            android:layout_width="66dp"
+            android:layout_width="57dp"
             android:layout_height="12dp"
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_shimmering"
+            app:layout_constraintBottom_toTopOf="@+id/itemDashboardNoStakeEarningsSuffixShimmer"
+            app:layout_constraintEnd_toStartOf="@+id/itemDashboardNoStakeArrow"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/itemDashboardNoStakeEarningsSuffixShimmer"
+            android:layout_width="40dp"
+            android:layout_height="8dp"
+            android:layout_marginTop="8dp"
             android:background="@drawable/bg_shimmering"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/itemDashboardNoStakeEarningsShimmer"
+            app:layout_constraintTop_toBottomOf="@+id/itemDashboardNoStakeEarningsShimmer" />
+
+        <ImageView
+            android:id="@+id/itemDashboardNoStakeArrow"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_chevron_right"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/itemDashboardNoStakeChainName" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/icon_secondary" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/itemDashboardNoStakeRightBarrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="left"
+            app:constraint_referenced_ids="itemDashboardNoStakeEarnings,itemDashboardNoStakeEarningsShimmer, itemDashboardNoStakeEarningsSuffix, itemDashboardNoStakeEarningsSuffixShimmer" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </merge>

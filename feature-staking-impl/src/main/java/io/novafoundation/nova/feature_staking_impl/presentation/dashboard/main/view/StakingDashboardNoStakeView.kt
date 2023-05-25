@@ -20,7 +20,8 @@ import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboard
 import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeChainName
 import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarnings
 import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarningsShimmer
-import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarningsValueGroup
+import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarningsSuffix
+import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarningsSuffixShimmer
 
 class StakingDashboardNoStakeView @JvmOverloads constructor(
     context: Context,
@@ -54,9 +55,11 @@ class StakingDashboardNoStakeView @JvmOverloads constructor(
     }
 
     fun setEarnings(earningsState: ExtendedLoadingState<String>) {
-        earningsState.applyToView(itemDashboardNoStakeEarningsValueGroup, itemDashboardNoStakeEarningsShimmer) { earnings ->
+        earningsState.applyToView(itemDashboardNoStakeEarnings, itemDashboardNoStakeEarningsShimmer) { earnings ->
             itemDashboardNoStakeEarnings.text = earnings
         }
+
+        earningsState.applyToView(itemDashboardNoStakeEarningsSuffix, itemDashboardNoStakeEarningsSuffixShimmer)
     }
 
     fun setSyncing(isSyncing: Boolean) {

@@ -24,7 +24,7 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/stakingFragment"
+        android:id="@+id/staking_dashboard_graph"
         android:enabled="true"
         android:icon="@drawable/bottom_staking"
         android:title="@string/tabbar_staking_title"

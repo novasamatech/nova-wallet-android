@@ -14,6 +14,7 @@ import androidx.navigation.ui.setupWithNavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
+import io.novafoundation.nova.app.root.navigation.staking.relaychain.RelayStakingNavigator
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.blur.SweetBlur
@@ -21,8 +22,12 @@ import io.novafoundation.nova.common.utils.setBackgroundColorRes
 import io.novafoundation.nova.common.utils.updatePadding
 import kotlinx.android.synthetic.main.fragment_main.bottomNavHost
 import kotlinx.android.synthetic.main.fragment_main.bottomNavigationView
+import javax.inject.Inject
 
 class MainFragment : BaseFragment<MainViewModel>() {
+
+    @Inject
+    lateinit var relayStakingNavigator: RelayStakingNavigator
 
     private var navController: NavController? = null
 
@@ -40,6 +45,7 @@ class MainFragment : BaseFragment<MainViewModel>() {
         super.onDestroyView()
 
         backCallback.isEnabled = false
+        relayStakingNavigator.stakingTabNavController = null
     }
 
     override fun initViews() {
@@ -64,6 +70,7 @@ class MainFragment : BaseFragment<MainViewModel>() {
             childFragmentManager.findFragmentById(R.id.bottomNavHost) as NavHostFragment
 
         navController = nestedNavHostFragment.navController
+        relayStakingNavigator.stakingTabNavController = navController
 
         bottomNavigationView.setupWithNavController(navController!!)
 
@@ -88,11 +95,7 @@ class MainFragment : BaseFragment<MainViewModel>() {
             .inject(this)
     }
 
-    override fun subscribe(viewModel: MainViewModel) {
-        viewModel.stakingAvailableLiveData.observe {
-            bottomNavigationView.menu.findItem(R.id.stakingFragment).isVisible = it
-        }
-    }
+    override fun subscribe(viewModel: MainViewModel) {}
 
     private fun isAtHomeTab(destination: NavDestination) =
         destination.id == navController!!.graph.startDestination

@@ -1,9 +1,11 @@
 package io.novafoundation.nova.app.root.navigation.staking.relaychain
 
+import androidx.navigation.NavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.ConfirmPayoutFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
@@ -32,6 +34,8 @@ class RelayStakingNavigator(
     navigationHolder: NavigationHolder,
     private val commonNavigator: Navigator,
 ) : BaseNavigator(navigationHolder), StakingRouter {
+
+    var stakingTabNavController: NavController? = null
 
     override fun returnToStakingMain() = performNavigation(R.id.back_to_staking_main)
 
@@ -156,4 +160,16 @@ class RelayStakingNavigator(
     }
 
     override fun openRebag() = performNavigation(R.id.action_stakingFragment_to_rebag)
+    override fun openDAppBrowser(url: String) = performNavigation(
+        actionId = R.id.action_mainFragment_to_dappBrowserGraph,
+        args = DAppBrowserFragment.getBundle(url)
+    )
+
+    override fun openMoreStakingOptions() {
+        stakingTabNavController?.performNavigation(R.id.action_stakingDashboardFragment_to_moreStakingOptionsFragment)
+    }
+
+    override fun backInStakingTab() {
+        stakingTabNavController?.popBackStack()
+    }
 }

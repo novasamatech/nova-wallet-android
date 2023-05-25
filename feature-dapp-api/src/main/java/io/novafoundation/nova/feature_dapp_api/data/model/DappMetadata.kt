@@ -17,3 +17,9 @@ data class DappCategory(
     val name: String,
     val id: String
 )
+
+private const val STAKING_CATEGORY_ID = "staking"
+
+fun DappCategory.isStaking(): Boolean {
+    return id == STAKING_CATEGORY_ID
+}

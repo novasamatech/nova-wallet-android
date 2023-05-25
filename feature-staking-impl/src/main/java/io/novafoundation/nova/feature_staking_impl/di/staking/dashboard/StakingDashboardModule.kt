@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.StakingDashboardDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboardUpdateSystem
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
 import io.novafoundation.nova.feature_staking_impl.BuildConfig
@@ -77,12 +78,14 @@ class StakingDashboardModule {
         chainRegistry: ChainRegistry,
         accountRepository: AccountRepository,
         stakingDashboardUpdateSystem: StakingDashboardUpdateSystem,
-        tokenRepository: TokenRepository
+        tokenRepository: TokenRepository,
+        dAppMetadataRepository: DAppMetadataRepository,
     ): StakingDashboardInteractor = RealStakingDashboardInteractor(
         dashboardRepository = dashboardRepository,
         chainRegistry = chainRegistry,
         accountRepository = accountRepository,
         stakingDashboardSyncTracker = stakingDashboardUpdateSystem,
-        tokenRepository = tokenRepository
+        tokenRepository = tokenRepository,
+        dAppMetadataRepository = dAppMetadataRepository
     )
 }
