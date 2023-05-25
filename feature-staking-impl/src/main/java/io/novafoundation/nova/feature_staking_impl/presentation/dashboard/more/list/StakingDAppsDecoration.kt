@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.
 
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.common.list.ShimmeringHolder
+import io.novafoundation.nova.common.list.StubHolder
 import io.novafoundation.nova.common.list.decoration.BackgroundDecoration
 
 class StakingDAppsDecoration(context: Context) : BackgroundDecoration(
@@ -12,6 +12,6 @@ class StakingDAppsDecoration(context: Context) : BackgroundDecoration(
 ) {
 
     override fun shouldApplyDecoration(holder: RecyclerView.ViewHolder): Boolean {
-        return holder is StakingDappViewHolder || holder is ShimmeringHolder
+        return holder is StakingDappViewHolder || holder is StubHolder
     }
 }

@@ -3,7 +3,7 @@ package io.novafoundation.nova.common.list
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 
-abstract class PlaceholderAdapter<T : ViewHolder>() : RecyclerView.Adapter<T>() {
+abstract class PlaceholderAdapter<T : ViewHolder> : RecyclerView.Adapter<T>() {
 
     protected var showPlaceholder = false
         private set

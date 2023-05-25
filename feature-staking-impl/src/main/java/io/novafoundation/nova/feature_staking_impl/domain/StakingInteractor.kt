@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_staking_impl.data.mappers.mapAccountToStak
 import io.novafoundation.nova.feature_staking_impl.data.model.Payout
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
-import io.novafoundation.nova.feature_staking_impl.data.repository.StakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.ActiveEraInfo
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculator
@@ -72,7 +71,6 @@ class StakingInteractor(
     private val assetUseCase: AssetUseCase,
     private val factory: EraTimeCalculatorFactory,
     private val stakingSharedComputation: StakingSharedComputation,
-    private val stakingPeriodRepository: StakingPeriodRepository
 ) {
     suspend fun calculatePendingPayouts(scope: CoroutineScope): Result<PendingPayoutsStatistics> = withContext(Dispatchers.Default) {
         runCatching {

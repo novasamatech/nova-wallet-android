@@ -172,4 +172,8 @@ class RelayStakingNavigator(
     override fun backInStakingTab() {
         stakingTabNavController?.popBackStack()
     }
+
+    override fun openStakingPeriods() {
+        performNavigation(R.id.action_stakingFragment_to_staking_periods)
+    }
 }

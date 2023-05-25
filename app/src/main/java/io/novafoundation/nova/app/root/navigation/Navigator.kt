@@ -342,10 +342,6 @@ class Navigator(
         navController?.navigate(R.id.action_open_account_details, extras)
     }
 
-    override fun openStakingPeriods() {
-        performNavigation(R.id.action_mainFragment_to_staking_periods)
-    }
-
     override fun openNodeDetails(nodeId: Int) {
         navController?.navigate(R.id.action_nodesFragment_to_nodeDetailsFragment, NodeDetailsFragment.getBundle(nodeId))
     }
