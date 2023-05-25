@@ -20,13 +20,12 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.setupUnbondingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.setupUserRewardsComponent
 import kotlinx.android.synthetic.main.fragment_staking.stakingAlertsInfo
-import kotlinx.android.synthetic.main.fragment_staking.stakingAvatar
-import kotlinx.android.synthetic.main.fragment_staking.stakingContainer
 import kotlinx.android.synthetic.main.fragment_staking.stakingEstimate
 import kotlinx.android.synthetic.main.fragment_staking.stakingNetworkInfo
 import kotlinx.android.synthetic.main.fragment_staking.stakingStakeManage
 import kotlinx.android.synthetic.main.fragment_staking.stakingStakeSummary
 import kotlinx.android.synthetic.main.fragment_staking.stakingStakeUnbondings
+import kotlinx.android.synthetic.main.fragment_staking.stakingToolbar
 import kotlinx.android.synthetic.main.fragment_staking.stakingUserRewards
 import javax.inject.Inject
 
@@ -43,11 +42,8 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
     }
 
     override fun initViews() {
-        stakingContainer.applyStatusBarInsets()
-
-        stakingAvatar.setOnClickListener {
-            viewModel.avatarClicked()
-        }
+        stakingToolbar.applyStatusBarInsets()
+        stakingToolbar.setHomeButtonListener { viewModel.backClicked() }
     }
 
     override fun inject() {
@@ -71,6 +67,6 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
         setupStartStakingComponent(viewModel.startStakingComponent, stakingEstimate)
         setupAlertsComponent(viewModel.alertsComponent, stakingAlertsInfo)
 
-        viewModel.selectedWalletFlow.observe(stakingAvatar::setModel)
+        viewModel.titleFlow.observe(stakingToolbar::setTitle)
     }
 }
