@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.search
 
+import android.util.Log
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.view.PlaceholderModel
@@ -22,6 +24,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelecto
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 
@@ -50,6 +53,7 @@ class ReferendaSearchViewModel(
 
         referendaListInteractor.searchReferendaListStateFlow(metaAccount, queryFlow, accountId, supportedOption, this)
     }
+        .catch { Log.e(LOG_TAG, it.message, it) }
         .inBackground()
         .shareWhileSubscribed()
 
