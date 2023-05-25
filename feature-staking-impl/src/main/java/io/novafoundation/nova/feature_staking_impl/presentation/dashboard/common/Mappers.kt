@@ -22,7 +22,7 @@ class RealStakingDashboardPresentationMapper(
 
     override fun mapNoStakeItemToUi(noStake: AggregatedStakingDashboardOption<AggregatedStakingDashboardOption.NoStake>): StakingDashboardModel.NoStakeItem {
         val stats = noStake.stakingState.stats
-        val showSync = noStake.syncing && stats is ExtendedLoadingState.Loaded
+        val showSync = noStake.syncingStage && stats is ExtendedLoadingState.Loaded
 
         val availableBalance = noStake.stakingState.availableBalance
         val formattedAvailableBalance = if (availableBalance.isPositive()) {

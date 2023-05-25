@@ -56,12 +56,12 @@ class StakingDashboardIntegrationTest: BaseIntegrationTest() {
            return JsonObject().apply {
                add("chain", JsonPrimitive(src.chain.name))
                add("stakingState", context.serialize(src.stakingState))
-               add("syncing", context.serialize(src.syncing))
+               add("syncing", context.serialize(src.syncingStage))
            }
         }
     }
 
     private fun StakingDashboard.syncingItemsCount(): Int {
-        return noStake.count { it.syncing } + hasStake.count { it.syncing }
+        return noStake.count { it.syncingStage } + hasStake.count { it.syncingStage }
     }
 }

@@ -99,7 +99,7 @@ class StakingDashboardViewModel(
         val stats = hasStake.stakingState.stats
 
         // we don't to show sync while also showing loading for stats
-        val showSync = hasStake.syncing && stats is ExtendedLoadingState.Loaded
+        val showSync = hasStake.syncingStage && stats is ExtendedLoadingState.Loaded
 
         return StakingDashboardModel.HasStakeItem(
             chainUi = mapChainToUi(hasStake.chain),

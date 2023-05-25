@@ -10,7 +10,7 @@ class AggregatedStakingDashboardOption<S>(
     val chain: Chain,
     val token: Token,
     val stakingState: S,
-    val syncing: Boolean
+    val syncingStage: SyncingStage
 ) {
 
     class HasStake(
@@ -36,5 +36,9 @@ class AggregatedStakingDashboardOption<S>(
         }
 
         class Stats(val estimatedEarnings: Percent)
+    }
+
+    enum class SyncingStage {
+        SYNCING_ALL, SYNCING_SECONDARY, SYNCED
     }
 }
