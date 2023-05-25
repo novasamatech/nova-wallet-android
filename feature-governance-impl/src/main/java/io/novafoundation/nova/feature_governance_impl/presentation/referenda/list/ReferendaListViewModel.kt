@@ -1,13 +1,16 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.list
 
+import android.util.Log
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.firstLoaded
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.withItemScope
 import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -35,6 +38,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelecto
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -66,14 +70,19 @@ class ReferendaListViewModel(
 
     private val referendaFilters = referendaFiltersInteractor.observeReferendumTypeFilter()
 
-    private val referendaListStateFlow = accountAndChainFlow.flatMapLatest { (metaAccount, supportedOption) ->
-        val chainAndAsset = supportedOption.assetWithChain
-        val accountId = metaAccount.accountIdIn(chainAndAsset.chain)
+    private val referendaListStateFlow = accountAndChainFlow
+        .withItemScope(parentScope = this)
+        .flatMapLatest { (metaAccountWithOptions, scope) ->
+            val metaAccount = metaAccountWithOptions.first
+            val supportedOption = metaAccountWithOptions.second
+            val chainAndAsset = metaAccountWithOptions.second.assetWithChain
+            val accountId = metaAccount.accountIdIn(chainAndAsset.chain)
 
-        referendaListInteractor.referendaListStateFlow(metaAccount, accountId, supportedOption, this, referendaFilters)
-    }
+            referendaListInteractor.referendaListStateFlow(metaAccount, accountId, supportedOption, scope, referendaFilters)
+        }
+        .catch { Log.e(LOG_TAG, it.message, it) }
         .inBackground()
-        .shareWhileSubscribed()
+        .share()
 
     val governanceTotalLocks = referendaListStateFlow.mapLoading {
         val asset = assetSelectorMixin.selectedAssetFlow.first()

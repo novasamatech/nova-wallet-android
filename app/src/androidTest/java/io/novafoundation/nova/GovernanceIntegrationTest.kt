@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.firstLoaded
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
@@ -31,6 +32,7 @@ import java.math.BigInteger
 
 class GovernanceIntegrationTest : BaseIntegrationTest() {
 
+    private val accountApi = FeatureUtils.getFeature<AccountFeatureApi>(context, AccountFeatureApi::class.java)
     private val governanceApi = FeatureUtils.getFeature<GovernanceFeatureApi>(context, GovernanceFeatureApi::class.java)
 
     @Test
@@ -87,6 +89,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
 
     @Test
     fun shouldRetrieveDomainReferendaPreviews() = runTest {
+        val accountRepository = accountApi.provideAccountRepository()
         val referendaListInteractor = governanceApi.referendaListInteractor
         val updateSystem = governanceApi.governanceUpdateSystem
 
@@ -94,6 +97,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
             .inBackground()
             .launchIn(this)
 
+        val metaAccount = accountRepository.getSelectedMetaAccount()
         val accountId = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".toAccountId()
 
         val chain = chain()
@@ -104,7 +108,7 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
             emit(referendaFilter)
         }
 
-        val referendaByGroup = referendaListInteractor.referendaListStateFlow(accountId, selectedGovernance, this, filterFlow).firstLoaded()
+        val referendaByGroup = referendaListInteractor.referendaListStateFlow(metaAccount, accountId, selectedGovernance, this, filterFlow).firstLoaded()
         val referenda = referendaByGroup.groupedReferenda.values.flatten()
 
         Log.d(this@GovernanceIntegrationTest.LOG_TAG, referenda.joinToString("\n"))
@@ -191,7 +195,8 @@ class GovernanceIntegrationTest : BaseIntegrationTest() {
 
         val trackData = interactor.observeNewDelegationTrackData().first()
 
-        Log.d(this@GovernanceIntegrationTest.LOG_TAG,
+        Log.d(
+            this@GovernanceIntegrationTest.LOG_TAG,
             """
                 Available: ${trackData.trackPartition.available.size}
                 Already voted: ${trackData.trackPartition.alreadyVoted.size}
