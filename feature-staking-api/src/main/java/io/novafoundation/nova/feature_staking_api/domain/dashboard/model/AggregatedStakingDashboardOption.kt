@@ -26,11 +26,11 @@ class AggregatedStakingDashboardOption<S>(
         }
     }
 
-    class NoStake(val stats: ExtendedLoadingState<Stats>, val flowType: FlowType) {
+    class NoStake(val stats: ExtendedLoadingState<Stats>, val flowType: FlowType, val availableBalance: Balance) {
 
         sealed class FlowType {
 
-            object Aggregated : FlowType()
+            class Aggregated(val stakingTypes: List<Chain.Asset.StakingType>) : FlowType()
 
             class Single(val stakingType: Chain.Asset.StakingType) : FlowType()
         }

@@ -59,6 +59,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.hints.StakingHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationProvider
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.RealStakingDashboardPresentationMapper
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_wallet_api.di.common.AssetUseCaseModule
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -435,4 +437,10 @@ class StakingFeatureModule {
     fun provideCompoundStatefullComponent(
         sharedState: StakingSharedState,
     ) = CompoundStakingComponentFactory(sharedState)
+
+    @Provides
+    @FeatureScope
+    fun provideStakingDashboardPresentationMapper(resourceManager: ResourceManager): StakingDashboardPresentationMapper {
+        return RealStakingDashboardPresentationMapper(resourceManager)
+    }
 }

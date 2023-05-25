@@ -38,6 +38,8 @@ interface AssetReadOnlyCache {
 
     suspend fun getSyncedAssets(metaId: Long): List<AssetWithToken>
 
+    fun observeSupportedAssets(metaId: Long): Flow<List<AssetWithToken>>
+
     suspend fun getSupportedAssets(metaId: Long): List<AssetWithToken>
 
     fun observeAsset(metaId: Long, chainId: String, assetId: Int): Flow<AssetWithToken>
@@ -57,6 +59,9 @@ abstract class AssetDao : AssetReadOnlyCache {
 
     @Query(RETRIEVE_SYNCED_ACCOUNT_ASSETS_QUERY)
     abstract override suspend fun getSyncedAssets(metaId: Long): List<AssetWithToken>
+
+    @Query(RETRIEVE_SUPPORTED_ACCOUNT_ASSETS_QUERY)
+    abstract override fun observeSupportedAssets(metaId: Long): Flow<List<AssetWithToken>>
 
     @Query(RETRIEVE_SUPPORTED_ACCOUNT_ASSETS_QUERY)
     abstract override suspend fun getSupportedAssets(metaId: Long): List<AssetWithToken>

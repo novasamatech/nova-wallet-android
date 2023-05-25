@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboardUpdateSystem
@@ -17,7 +16,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Staking
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.mapNoStakeItemToUi
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -33,14 +32,15 @@ class StakingDashboardViewModel(
     private val resourceManager: ResourceManager,
     private val stakingDashboardUpdateSystem: StakingDashboardUpdateSystem,
     private val router: StakingRouter,
-    private val stakingSharedState: StakingSharedState
+    private val stakingSharedState: StakingSharedState,
+    private val presentationMapper: StakingDashboardPresentationMapper,
 ) : BaseViewModel() {
 
     val walletUi = accountUseCase.selectedWalletModelFlow()
         .shareInBackground()
 
     private val stakingDashboardFlow = interactor.stakingDashboardFlow()
-        .inBackground()
+        .shareInBackground()
 
     val stakingDashboardUiFlow = stakingDashboardFlow
         .map(::mapDashboardToUi)
@@ -67,7 +67,7 @@ class StakingDashboardViewModel(
         val noStakeItem = noStakeItems.getOrNull(index) ?: return@launch
 
         when (val flowType = noStakeItem.stakingState.flowType) {
-            NoStake.FlowType.Aggregated -> {} // TODO feature aggregated flows & nomination pools
+            is NoStake.FlowType.Aggregated -> {} // TODO feature aggregated flows & nomination pools
 
             is NoStake.FlowType.Single -> openChainStaking(
                 chain = noStakeItem.chain,
@@ -88,7 +88,7 @@ class StakingDashboardViewModel(
     private fun mapDashboardToUi(dashboard: StakingDashboard): StakingDashboardModel {
         return StakingDashboardModel(
             hasStakeItems = dashboard.hasStake.map(::mapHasStakeItemToUi),
-            noStakeItems = dashboard.noStake.map(::mapNoStakeItemToUi),
+            noStakeItems = dashboard.noStake.map(presentationMapper::mapNoStakeItemToUi),
             resolvingItems = dashboard.resolvingItems
         )
     }
