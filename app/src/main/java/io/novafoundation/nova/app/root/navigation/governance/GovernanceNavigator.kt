@@ -48,6 +48,7 @@ class GovernanceNavigator(
         performNavigation(
             cases = arrayOf(
                 R.id.mainFragment to R.id.action_open_referendum_details,
+                R.id.votedReferendaFragment to R.id.action_open_referendum_details,
                 R.id.referendaSearchFragment to R.id.action_open_referendum_details_from_referenda_search,
             ),
             args = ReferendumDetailsFragment.getBundle(payload)
