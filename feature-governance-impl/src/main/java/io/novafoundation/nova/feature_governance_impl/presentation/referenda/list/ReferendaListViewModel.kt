@@ -73,8 +73,7 @@ class ReferendaListViewModel(
     private val referendaListStateFlow = accountAndChainFlow
         .withItemScope(parentScope = this)
         .flatMapLatest { (metaAccountWithOptions, scope) ->
-            val metaAccount = metaAccountWithOptions.first
-            val supportedOption = metaAccountWithOptions.second
+            val (metaAccount, supportedOption) = metaAccountWithOptions
             val chainAndAsset = metaAccountWithOptions.second.assetWithChain
             val accountId = metaAccount.accountIdIn(chainAndAsset.chain)
 
