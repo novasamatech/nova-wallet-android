@@ -6,15 +6,20 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine.canAcceptFunds
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.bindAssetAccountOrEmpty
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.statemineModule
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.BaseAssetTransfers
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.ext.palletNameOrDefault
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import java.math.BigInteger
 
 class StatemineAssetTransfers(
@@ -22,6 +27,7 @@ class StatemineAssetTransfers(
     assetSourceRegistry: AssetSourceRegistry,
     extrinsicService: ExtrinsicService,
     phishingValidationFactory: PhishingValidationFactory,
+    private val remoteStorage: StorageDataSource,
 ) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory) {
 
     override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem()
@@ -41,6 +47,20 @@ class StatemineAssetTransfers(
             target = transfer.originChain.accountIdOrDefault(transfer.recipient),
             amount = transfer.amountInPlanks
         )
+    }
+
+    override suspend fun recipientCanAcceptTransfer(chainAsset: Chain.Asset, recipient: AccountId): Boolean {
+        val statemineType = chainAsset.requireStatemine()
+
+        val assetAccount = remoteStorage.query(chainAsset.chainId) {
+            runtime.metadata.statemineModule(statemineType).storage("Account").query(
+                statemineType.id,
+                recipient,
+                binding = ::bindAssetAccountOrEmpty
+            )
+        }
+
+        return assetAccount.canAcceptFunds
     }
 
     private fun ExtrinsicBuilder.statemineTransfer(

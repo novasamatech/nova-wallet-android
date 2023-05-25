@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
-import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -13,12 +12,8 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.domain.assets.filters.NonZeroBalanceFilter
 import kotlinx.android.synthetic.main.fragment_asset_filters.assetsFilterSwitchZeroBalances
-import javax.inject.Inject
 
 class AssetFiltersBottomSheetFragment : BaseBottomSheetFragment<AssetFiltersViewModel>() {
-
-    @Inject
-    lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -26,12 +26,6 @@ interface AccountInteractor {
 
     suspend fun isPinCorrect(code: String): Boolean
 
-    suspend fun isBiometricEnabled(): Boolean
-
-    suspend fun setBiometricOn()
-
-    suspend fun setBiometricOff()
-
     suspend fun getMetaAccount(metaId: Long): MetaAccount
 
     suspend fun selectMetaAccount(metaId: Long)

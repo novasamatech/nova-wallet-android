@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
     android:orientation="vertical">
 
     <io.novafoundation.nova.feature_wallet_api.presentation.view.AssetSelectorView
@@ -20,34 +19,65 @@
 
     <LinearLayout
         android:id="@+id/governanceLocksHeader"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
-        tools:background="@color/block_background"
+        android:orientation="vertical"
         android:paddingTop="6dp"
         android:paddingBottom="6dp"
-        android:layout_height="wrap_content" >
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/referendaAssetHeader"
+        tools:background="@color/block_background">
 
         <io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksView
+            android:id="@+id/governanceLocksLocked"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/governanceLocksLocked"
+            android:visibility="gone"
             app:governanceLocksView_icon="@drawable/ic_lock_closed_outline"
             app:governanceLocksView_label="@string/wallet_balance_locked"
-            tools:visibility="visible"
-            android:visibility="gone" />
+            tools:visibility="visible" />
 
         <io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksView
-            android:layout_width="match_parent"
             android:id="@+id/governanceLocksDelegations"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:governanceLocksView_icon="@drawable/ic_delegate_outline"
-            app:governanceLocksView_label="@string/delegation_add_delegation"
-            />
+            app:governanceLocksView_label="@string/delegation_add_delegation" />
+
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/referendaHeaderListTitle"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="28dp"
+        android:text="@string/referenda_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/governanceLocksHeader" />
 
+    <io.novafoundation.nova.common.view.IconButton
+        android:id="@+id/referendaHeaderSearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        app:tint="@color/chip_icon"
+        android:src="@drawable/ic_search"
+        app:layout_constraintBottom_toBottomOf="@+id/referendaHeaderListTitle"
+        app:layout_constraintEnd_toStartOf="@+id/referendaHeaderFilter"
+        app:layout_constraintTop_toTopOf="@+id/referendaHeaderListTitle" />
 
-</LinearLayout>
+    <io.novafoundation.nova.common.view.IconButton
+        android:id="@+id/referendaHeaderFilter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_chip_filter"
+        app:layout_constraintBottom_toBottomOf="@+id/referendaHeaderListTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/referendaHeaderListTitle" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

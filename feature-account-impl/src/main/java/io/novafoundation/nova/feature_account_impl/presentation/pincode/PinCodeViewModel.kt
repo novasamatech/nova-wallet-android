@@ -4,13 +4,25 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAction
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.sequrity.BiometricResponse
+import io.novafoundation.nova.common.sequrity.BiometricService
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.common.sequrity.biometry.mapBiometricErrors
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class PinCodeViewModel(
@@ -19,14 +31,19 @@ class PinCodeViewModel(
     private val deviceVibrator: DeviceVibrator,
     private val resourceManager: ResourceManager,
     private val backgroundAccessObserver: BackgroundAccessObserver,
+    private val twoFactorVerificationExecutor: TwoFactorVerificationExecutor,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val biometricService: BiometricService,
     val pinCodeAction: PinCodeAction
 ) : BaseViewModel() {
 
     sealed class ScreenState {
         object Creating : ScreenState()
         data class Confirmation(val codeToConfirm: String) : ScreenState()
-        object Checking : ScreenState()
+        data class Checking(val useBiometry: Boolean) : ScreenState()
     }
+
+    val confirmationAwaitableAction = actionAwaitableMixinFactory.confirmingOrDenyingAction<ConfirmationDialogInfo>()
 
     private val _homeButtonVisibilityLiveData = MutableLiveData(pinCodeAction.toolbarConfiguration.backVisible)
     val homeButtonVisibilityLiveData: LiveData<Boolean> = _homeButtonVisibilityLiveData
@@ -37,36 +54,37 @@ class PinCodeViewModel(
     private val _matchingPincodeErrorEvent = MutableLiveData<Event<Unit>>()
     val matchingPincodeErrorEvent: LiveData<Event<Unit>> = _matchingPincodeErrorEvent
 
-    private val _showFingerPrintEvent = MutableLiveData<Event<Unit>>()
-    val showFingerPrintEvent: LiveData<Event<Unit>> = _showFingerPrintEvent
+    private val _showBiometryEvent = MutableLiveData<Event<Boolean>>()
+    val showFingerPrintEvent: LiveData<Event<Boolean>> = _showBiometryEvent
 
-    private val _startFingerprintScannerEventLiveData = MutableLiveData<Event<Unit>>()
-    val startFingerprintScannerEventLiveData: LiveData<Event<Unit>> = _startFingerprintScannerEventLiveData
+    val biometricEvents = biometricService.biometryServiceResponseFlow
+        .mapNotNull { mapBiometricErrors(resourceManager, it) }
+        .shareInBackground()
 
-    private val _fingerPrintErrorEvent = MutableLiveData<Event<String>>()
-    val fingerPrintErrorEvent: LiveData<Event<String>> = _fingerPrintErrorEvent
-
-    private val _biometricSwitchDialogLiveData = MutableLiveData<Event<Unit>>()
-    val biometricSwitchDialogLiveData: LiveData<Event<Unit>> = _biometricSwitchDialogLiveData
-
-    private var fingerPrintAvailable = false
     private var currentState: ScreenState? = null
 
     val isBackRoutingBlocked: Boolean
         get() = pinCodeAction is PinCodeAction.CheckAfterInactivity
+
+    init {
+        handleBiometryServiceEvents()
+    }
 
     fun startAuth() {
         when (pinCodeAction) {
             is PinCodeAction.Create -> {
                 currentState = ScreenState.Creating
             }
-            is PinCodeAction.Check -> {
-                currentState = ScreenState.Checking
-                _showFingerPrintEvent.value = Event(Unit)
-            }
+            is PinCodeAction.Check,
             is PinCodeAction.Change -> {
-                currentState = ScreenState.Checking
-                _showFingerPrintEvent.value = Event(Unit)
+                currentState = ScreenState.Checking(true)
+                _showBiometryEvent.value = Event(biometricService.isBiometricReady() && biometricService.isEnabled())
+            }
+            is PinCodeAction.TwoFactorVerification -> {
+                currentState = ScreenState.Checking(pinCodeAction.useBiometryIfEnabled)
+                if (pinCodeAction.useBiometryIfEnabled) {
+                    _showBiometryEvent.value = Event(biometricService.isBiometricReady() && biometricService.isEnabled())
+                }
             }
         }
     }
@@ -99,11 +117,11 @@ class PinCodeViewModel(
         viewModelScope.launch {
             interactor.savePin(code)
 
-            if (fingerPrintAvailable && pinCodeAction is PinCodeAction.Create) {
-                _biometricSwitchDialogLiveData.value = Event(Unit)
-            } else {
-                authSuccess()
+            if (biometricService.isBiometricReady() && pinCodeAction is PinCodeAction.Create) {
+                askForBiometry()
             }
+
+            authSuccess()
         }
     }
 
@@ -122,8 +140,8 @@ class PinCodeViewModel(
 
     fun backPressed() {
         when (currentState) {
-            is ScreenState.Creating -> authCancel()
             is ScreenState.Confirmation -> backToCreateFromConfirmation()
+            is ScreenState.Creating,
             is ScreenState.Checking -> authCancel()
             null -> {}
         }
@@ -140,27 +158,16 @@ class PinCodeViewModel(
     }
 
     fun onResume() {
-        viewModelScope.launch {
-            if (ScreenState.Checking == currentState && interactor.isBiometricEnabled()) {
-                _startFingerprintScannerEventLiveData.value = Event(Unit)
-            }
+        if (currentState is ScreenState.Checking &&
+            (currentState as ScreenState.Checking).useBiometry &&
+            biometricService.isEnabled()
+        ) {
+            startBiometryAuth()
         }
     }
 
-    fun onAuthenticationError(errString: String) {
-        _fingerPrintErrorEvent.value = Event(errString)
-    }
-
-    fun biometryAuthenticationSucceeded() {
-        authSuccess()
-    }
-
-    fun biometryAuthenticationFailed() {
-        _fingerPrintErrorEvent.value = Event(resourceManager.getString(R.string.pincode_fingerprint_error))
-    }
-
-    fun fingerprintScannerAvailable(authReady: Boolean) {
-        fingerPrintAvailable = authReady
+    fun onPause() {
+        biometricService.cancel()
     }
 
     private fun authSuccess() {
@@ -184,27 +191,46 @@ class PinCodeViewModel(
                     else -> {}
                 }
             }
+            is PinCodeAction.TwoFactorVerification -> {
+                twoFactorVerificationExecutor.confirm()
+                router.back()
+            }
         }
+    }
+
+    fun startBiometryAuth() {
+        biometricService.requestBiometric()
+    }
+
+    private fun handleBiometryServiceEvents() {
+        biometricService.biometryServiceResponseFlow
+            .filterIsInstance<BiometricResponse.Success>()
+            .onEach { authSuccess() }
+            .launchIn(this)
+    }
+
+    private suspend fun askForBiometry() {
+        val isSuccess = try {
+            confirmationAwaitableAction.awaitAction(
+                ConfirmationDialogInfo(
+                    title = R.string.pincode_biometry_dialog_title,
+                    message = R.string.pincode_biometric_switch_dialog_title,
+                    positiveButton = R.string.common_use,
+                    negativeButton = R.string.common_skip
+                )
+            )
+        } catch (e: CancellationException) {
+            false
+        }
+
+        biometricService.enableBiometry(isSuccess)
     }
 
     private fun authCancel() {
+        if (pinCodeAction is PinCodeAction.TwoFactorVerification) {
+            twoFactorVerificationExecutor.cancel()
+        }
         router.back()
-    }
-
-    fun acceptAuthWithBiometry() {
-        viewModelScope.launch {
-            interactor.setBiometricOn()
-
-            authSuccess()
-        }
-    }
-
-    fun declineAuthWithBiometry() {
-        viewModelScope.launch {
-            interactor.setBiometricOff()
-
-            authSuccess()
-        }
     }
 
     fun finishApp() {

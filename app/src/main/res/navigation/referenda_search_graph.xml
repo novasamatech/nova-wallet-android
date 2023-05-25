@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/referenda_search_graph"
+    app:startDestination="@id/referendaSearchFragment">
+
+    <fragment
+        android:id="@+id/referendaSearchFragment"
+        android:name="io.novafoundation.nova.feature_governance_impl.presentation.referenda.search.ReferendaSearchFragment"
+        android:label="ReferendaSearch"
+        tools:layout="@layout/fragment_referenda_list">
+
+        <action
+            android:id="@+id/action_open_referendum_details_from_referenda_search"
+            app:destination="@id/referendum_details_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popUpTo="@id/mainFragment"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <include app:graph="@navigation/referendum_details_graph" />
+
+</navigation>

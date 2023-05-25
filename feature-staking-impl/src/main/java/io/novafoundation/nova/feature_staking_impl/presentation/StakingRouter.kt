@@ -80,4 +80,6 @@ interface StakingRouter {
 
     fun openMoreStakingOptions()
     fun backInStakingTab()
+
+    fun openStakingPeriods()
 }

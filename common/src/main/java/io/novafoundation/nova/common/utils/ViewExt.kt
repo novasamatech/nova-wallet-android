@@ -314,6 +314,12 @@ fun View.applyStatusBarInsets(consume: Boolean = true) = applyInsetter {
     consume(consume)
 }
 
+fun View.applyImeInsetts() = applyInsetter {
+    type(ime = true) {
+        padding()
+    }
+}
+
 fun View.setBackgroundColorRes(@ColorRes colorRes: Int) = setBackgroundColor(context.getColor(colorRes))
 
 fun <I> View.useInputValue(input: Input<I>, onValue: (I) -> Unit) {

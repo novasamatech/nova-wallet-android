@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.network.subquery.request
 
-class StakingSumRewardRequest(accountAddress: String) {
+class StakingTotalRewardsRequest(accountAddress: String) {
     val query = """
         query {
             accumulatedRewards (

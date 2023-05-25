@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
+import android.content.SharedPreferences
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -108,6 +109,8 @@ interface StakingFeatureDependencies {
     fun preferences(): Preferences
 
     fun feeLoaderMixinFactory(): FeeLoaderMixin.Factory
+
+    fun sharedPreferences(): SharedPreferences
 
     val amountChooserMixinFactory: AmountChooserMixin.Factory
 

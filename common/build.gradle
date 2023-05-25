@@ -68,6 +68,8 @@ dependencies {
     implementation materialDep
     implementation constraintDep
 
+    implementation biometricDep
+
     implementation bouncyCastleDep
 
     api fearlessLibDep

@@ -12,7 +12,10 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.io.MainThreadExecutor
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.sequrity.BiometricService
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
@@ -20,8 +23,8 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeViewModel
-import io.novafoundation.nova.feature_account_impl.presentation.pincode.fingerprint.FingerprintCallback
-import io.novafoundation.nova.feature_account_impl.presentation.pincode.fingerprint.FingerprintWrapper
+import io.novafoundation.nova.common.sequrity.biometry.BiometricPromptFactory
+import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 
 @Module(
     includes = [
@@ -39,7 +42,10 @@ class PinCodeModule {
         deviceVibrator: DeviceVibrator,
         resourceManager: ResourceManager,
         backgroundAccessObserver: BackgroundAccessObserver,
-        pinCodeAction: PinCodeAction
+        pinCodeAction: PinCodeAction,
+        biometricService: BiometricService,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        twoFactorVerificationExecutor: TwoFactorVerificationExecutor
     ): ViewModel {
         return PinCodeViewModel(
             interactor,
@@ -47,6 +53,9 @@ class PinCodeModule {
             deviceVibrator,
             resourceManager,
             backgroundAccessObserver,
+            twoFactorVerificationExecutor,
+            actionAwaitableMixinFactory,
+            biometricService,
             pinCodeAction
         )
     }
@@ -57,24 +66,19 @@ class PinCodeModule {
     }
 
     @Provides
-    fun provideFingerprintWrapper(
+    fun provideBiometricService(
         fragment: Fragment,
         context: Context,
         resourceManager: ResourceManager,
-        fingerprintListener: FingerprintCallback
-    ): FingerprintWrapper {
+        realBiometricServiceFactory: BiometricServiceFactory
+    ): BiometricService {
         val biometricManager = BiometricManager.from(context)
-        val biometricPrompt = BiometricPrompt(fragment, MainThreadExecutor(), fingerprintListener)
+        val biometricPromptFactory = BiometricPromptFactory(fragment, MainThreadExecutor())
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle(resourceManager.getString(R.string.pincode_biometry_dialog_title))
+            .setTitle(resourceManager.getString(R.string.biometric_auth_title))
             .setNegativeButtonText(resourceManager.getString(R.string.common_cancel))
             .build()
 
-        return FingerprintWrapper(biometricManager, biometricPrompt, promptInfo)
-    }
-
-    @Provides
-    fun provideFingerprintListener(pinCodeViewModel: PinCodeViewModel): FingerprintCallback {
-        return FingerprintCallback(pinCodeViewModel)
+        return realBiometricServiceFactory.create(biometricManager, biometricPromptFactory, promptInfo)
     }
 }

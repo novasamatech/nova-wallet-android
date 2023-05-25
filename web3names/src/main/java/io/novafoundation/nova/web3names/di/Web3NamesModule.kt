@@ -28,7 +28,7 @@ class Web3NamesModule {
 
     @Provides
     @FeatureScope
-    fun provideWeb4NamesServiceChainIdProvider(): Web3NamesServiceChainIdProvider {
+    fun provideWeb3NamesServiceChainIdProvider(): Web3NamesServiceChainIdProvider {
         val chainId = if (BuildConfig.DEBUG) {
             // TODO we should use kilt mainnet in debug as well after all corner-cases will be tested on testnet
             Chain.Geneses.KILT_TESTNET

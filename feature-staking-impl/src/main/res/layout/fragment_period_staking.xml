@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/stakingRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="72dp">
+
+        <io.novafoundation.nova.common.view.Toolbar
+            android:id="@+id/stakingPeriodToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:dividerVisible="false"
+            app:homeButtonIcon="@drawable/ic_close"
+            app:textRight="@string/common_save" />
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/staking_period_title"
+            android:textColor="@color/text_primary" />
+
+        <RadioGroup
+            android:id="@+id/stakingPeriodGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp">
+
+            <RadioButton
+                android:id="@+id/allTimeStakingPeriod"
+                style="@style/Widget.Nova.RadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="12dp"
+                android:text="@string/staking_period_all_time" />
+
+            <RadioButton
+                android:id="@+id/weekStakingPeriod"
+                style="@style/Widget.Nova.RadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="12dp"
+                android:text="@string/staking_period_week" />
+
+            <RadioButton
+                android:id="@+id/monthStakingPeriod"
+                style="@style/Widget.Nova.RadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="12dp"
+                android:text="@string/staking_period_month" />
+
+            <RadioButton
+                android:id="@+id/quarterStakingPeriod"
+                style="@style/Widget.Nova.RadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="12dp"
+                android:text="@string/staking_period_quarter" />
+
+            <RadioButton
+                android:id="@+id/halfYearStakingPeriod"
+                style="@style/Widget.Nova.RadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="12dp"
+                android:text="@string/staking_period_half_year" />
+
+            <RadioButton
+                android:id="@+id/yearStakingPeriod"
+                style="@style/Widget.Nova.RadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="12dp"
+                android:text="@string/staking_period_year" />
+
+            <RadioButton
+                android:id="@+id/customStakingPeriod"
+                style="@style/Widget.Nova.RadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="12dp"
+                android:text="@string/staking_period_custom" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:id="@+id/customPeriodSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/customStakingPeriodStart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                app:dividerVisible="false"
+                app:primaryValueIcon="@drawable/ic_chevron_right"
+                app:primaryValueIconTint="@color/icon_accent"
+                app:title="@string/staking_period_start_title" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/customStakingPeriodAlwaysToday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:text="@string/staking_period_current_date_title"
+                android:textColor="@color/text_secondary" />
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/customStakingPeriodEnd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                app:dividerVisible="false"
+                app:primaryValueIcon="@drawable/ic_chevron_right"
+                app:primaryValueIconTint="@color/icon_accent"
+                app:title="@string/staking_period_end_title" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

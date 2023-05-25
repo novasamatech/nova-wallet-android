@@ -30,7 +30,7 @@ class SetControllerModule {
     @ViewModelKey(SetControllerViewModel::class)
     fun provideViewModel(
         interactor: ControllerInteractor,
-        stackingInteractor: StakingInteractor,
+        stakingInteractor: StakingInteractor,
         addressIconGenerator: AddressIconGenerator,
         router: StakingRouter,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
@@ -45,7 +45,7 @@ class SetControllerModule {
     ): ViewModel {
         return SetControllerViewModel(
             interactor = interactor,
-            stakingInteractor = stackingInteractor,
+            stakingInteractor = stakingInteractor,
             addressIconGenerator = addressIconGenerator,
             router = router,
             feeLoaderMixin = feeLoaderMixin,

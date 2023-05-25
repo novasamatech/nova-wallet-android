@@ -152,4 +152,9 @@ class Toolbar @JvmOverloads constructor(
 
         return actionView
     }
+
+    fun setRightActionEnabled(enabled: Boolean) {
+        rightImg.isEnabled = enabled
+        rightText.isEnabled = enabled
+    }
 }
