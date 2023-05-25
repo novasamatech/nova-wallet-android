@@ -2,17 +2,15 @@ package io.novafoundation.nova.feature_staking_api.domain.dashboard.model
 
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.HasStake
-import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.WithoutStake
 
 class StakingDashboard(
     val hasStake: List<AggregatedStakingDashboardOption<HasStake>>,
-    val noStake: List<AggregatedStakingDashboardOption<NoStake>>,
-    val resolvingItems: Int,
+    val withoutStake: List<AggregatedStakingDashboardOption<WithoutStake>>,
 )
 
 class MoreStakingOptions(
-    val inAppStaking: List<AggregatedStakingDashboardOption<NoStake>>,
-    val resolvingInAppItems: Int,
+    val inAppStaking: List<AggregatedStakingDashboardOption<WithoutStake>>,
     val browserStaking: ExtendedLoadingState<List<StakingDApp>>,
 )
 

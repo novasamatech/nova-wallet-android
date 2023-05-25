@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.ListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncing
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel.HasStakeItem
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.StakingDashboardHasStakeView
 
@@ -35,7 +36,7 @@ class DashboardHasStakeAdapter(
                 HasStakeItem::rewards -> holder.bindRewards(item)
                 HasStakeItem::status -> holder.bindStatus(item)
                 HasStakeItem::earnings -> holder.bindEarnings(item)
-                HasStakeItem::syncing -> holder.bindSyncing(item)
+                HasStakeItem::syncingStage -> holder.bindSyncing(item)
             }
         }
     }
@@ -77,7 +78,7 @@ class DashboardHasStakeViewHolder(
     }
 
     fun bindSyncing(model: HasStakeItem) {
-        containerView.setSyncing(model.syncing)
+        containerView.setSyncing(model.syncingStage.isSyncing())
     }
 
     override fun unbind() {
@@ -92,7 +93,7 @@ private class DashboardHasStakeDiffCallback : DiffUtil.ItemCallback<HasStakeItem
         HasStakeItem::earnings,
         HasStakeItem::status,
         HasStakeItem::rewards,
-        HasStakeItem::syncing
+        HasStakeItem::syncingStage
     )
 
     override fun areItemsTheSame(oldItem: HasStakeItem, newItem: HasStakeItem): Boolean {

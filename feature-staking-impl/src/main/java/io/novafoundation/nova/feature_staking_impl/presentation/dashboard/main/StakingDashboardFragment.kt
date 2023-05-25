@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardLoadingAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardNoStakeAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardSectionAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardHasStakeAdapter
@@ -31,7 +30,6 @@ class StakingDashboardFragment :
     private val hasStakeAdapter = DashboardHasStakeAdapter(this)
     private val sectionAdapter = DashboardSectionAdapter(R.string.staking_dashboard_no_stake_header)
     private val noStakeAdapter = DashboardNoStakeAdapter(this)
-    private val loadingItemsAdapter = DashboardLoadingAdapter()
     private val moreStakingOptionsAdapter = MoreStakingOptionsAdapter(this)
 
     override fun onCreateView(
@@ -61,7 +59,6 @@ class StakingDashboardFragment :
             hasStakeAdapter,
             sectionAdapter,
             noStakeAdapter,
-            loadingItemsAdapter,
             moreStakingOptionsAdapter
         )
 
@@ -72,7 +69,6 @@ class StakingDashboardFragment :
         viewModel.stakingDashboardUiFlow.observe {
             hasStakeAdapter.submitListPreservingViewPoint(it.hasStakeItems, stakingDashboardContent)
             noStakeAdapter.submitListPreservingViewPoint(it.noStakeItems, stakingDashboardContent)
-            loadingItemsAdapter.setNumberOfLoadingItems(it.resolvingItems)
         }
 
         viewModel.walletUi.observe(headerAdapter::setSelectedWallet)

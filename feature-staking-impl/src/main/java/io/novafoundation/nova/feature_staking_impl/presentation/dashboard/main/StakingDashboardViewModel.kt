@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
@@ -65,15 +64,16 @@ class StakingDashboardViewModel(
     }
 
     fun onNoStakeItemClicked(index: Int) = launch {
-        val noStakeItems = stakingDashboardFlow.first().noStake
-        val noStakeItem = noStakeItems.getOrNull(index) ?: return@launch
+        val withoutStakeItems = stakingDashboardFlow.first().withoutStake
+        val withoutStakeItem = withoutStakeItems.getOrNull(index) ?: return@launch
+        val noStakeItemState = withoutStakeItem.stakingState as? NoStake ?: return@launch
 
-        when (val flowType = noStakeItem.stakingState.flowType) {
+        when (val flowType = noStakeItemState.flowType) {
             is NoStake.FlowType.Aggregated -> {} // TODO feature aggregated flows & nomination pools
 
             is NoStake.FlowType.Single -> openChainStaking(
-                chain = noStakeItem.chain,
-                chainAsset = noStakeItem.token.configuration,
+                chain = withoutStakeItem.chain,
+                chainAsset = withoutStakeItem.token.configuration,
                 stakingType = flowType.stakingType
             )
         }
@@ -90,16 +90,12 @@ class StakingDashboardViewModel(
     private fun mapDashboardToUi(dashboard: StakingDashboard): StakingDashboardModel {
         return StakingDashboardModel(
             hasStakeItems = dashboard.hasStake.map(::mapHasStakeItemToUi),
-            noStakeItems = dashboard.noStake.map(presentationMapper::mapNoStakeItemToUi),
-            resolvingItems = dashboard.resolvingItems
+            noStakeItems = dashboard.withoutStake.map(presentationMapper::mapWithoutStakeItemToUi),
         )
     }
 
     private fun mapHasStakeItemToUi(hasStake: AggregatedStakingDashboardOption<HasStake>): StakingDashboardModel.HasStakeItem {
         val stats = hasStake.stakingState.stats
-
-        // we don't to show sync while also showing loading for stats
-        val showSync = hasStake.syncingStage && stats is ExtendedLoadingState.Loaded
 
         return StakingDashboardModel.HasStakeItem(
             chainUi = mapChainToUi(hasStake.chain),
@@ -108,7 +104,7 @@ class StakingDashboardViewModel(
             stake = mapAmountToAmountModel(hasStake.stakingState.stake, hasStake.token),
             status = stats.map { mapStakingStatusToUi(it.status) },
             earnings = stats.map { it.estimatedEarnings.format() },
-            syncing = showSync
+            syncingStage = hasStake.syncingStage
         )
     }
 

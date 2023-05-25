@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.
 
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.SyncingStage
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
@@ -9,7 +10,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 class StakingDashboardModel(
     val hasStakeItems: List<HasStakeItem>,
     val noStakeItems: List<NoStakeItem>,
-    val resolvingItems: Int,
 ) {
 
     data class HasStakeItem(
@@ -19,7 +19,7 @@ class StakingDashboardModel(
         val stake: AmountModel,
         val status: ExtendedLoadingState<StakeStatusModel>,
         val earnings: ExtendedLoadingState<String>,
-        override val syncing: Boolean
+        override val syncingStage: SyncingStage
     ) : BaseItem
 
     data class NoStakeItem(
@@ -27,12 +27,12 @@ class StakingDashboardModel(
         override val assetId: ChainAssetId,
         val earnings: ExtendedLoadingState<String>,
         val availableBalance: String?,
-        override val syncing: Boolean
+        override val syncingStage: SyncingStage
     ) : BaseItem
 
     interface BaseItem {
         val chainUi: ChainUi
         val assetId: ChainAssetId
-        val syncing: Boolean
+        val syncingStage: SyncingStage
     }
 }

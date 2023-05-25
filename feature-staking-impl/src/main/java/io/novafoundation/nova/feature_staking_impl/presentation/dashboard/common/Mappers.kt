@@ -6,6 +6,9 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NotYetResolved
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.WithoutStake
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
@@ -13,16 +16,33 @@ import jp.co.soramitsu.fearless_utils.hash.isPositive
 
 interface StakingDashboardPresentationMapper {
 
-    fun mapNoStakeItemToUi(noStake: AggregatedStakingDashboardOption<AggregatedStakingDashboardOption.NoStake>): StakingDashboardModel.NoStakeItem
+    fun mapWithoutStakeItemToUi(withoutStake: AggregatedStakingDashboardOption<WithoutStake>): StakingDashboardModel.NoStakeItem
 }
 
 class RealStakingDashboardPresentationMapper(
     private val resourceManager: ResourceManager
 ) : StakingDashboardPresentationMapper {
 
-    override fun mapNoStakeItemToUi(noStake: AggregatedStakingDashboardOption<AggregatedStakingDashboardOption.NoStake>): StakingDashboardModel.NoStakeItem {
+    @Suppress("UNCHECKED_CAST")
+    override fun mapWithoutStakeItemToUi(withoutStake: AggregatedStakingDashboardOption<WithoutStake>): StakingDashboardModel.NoStakeItem {
+        return when (withoutStake.stakingState) {
+            is NoStake -> mapNoStakeItemToUi(withoutStake as AggregatedStakingDashboardOption<NoStake>)
+            NotYetResolved -> mapNotYetResolvedItemToUi(withoutStake as AggregatedStakingDashboardOption<NotYetResolved>)
+        }
+    }
+
+    private fun mapNotYetResolvedItemToUi(noStake: AggregatedStakingDashboardOption<NotYetResolved>): StakingDashboardModel.NoStakeItem {
+        return StakingDashboardModel.NoStakeItem(
+            chainUi = mapChainToUi(noStake.chain),
+            assetId = noStake.token.configuration.id,
+            earnings = ExtendedLoadingState.Loading,
+            availableBalance = null,
+            syncingStage = noStake.syncingStage
+        )
+    }
+
+    private fun mapNoStakeItemToUi(noStake: AggregatedStakingDashboardOption<NoStake>): StakingDashboardModel.NoStakeItem {
         val stats = noStake.stakingState.stats
-        val showSync = noStake.syncingStage && stats is ExtendedLoadingState.Loaded
 
         val availableBalance = noStake.stakingState.availableBalance
         val formattedAvailableBalance = if (availableBalance.isPositive()) {
@@ -37,7 +57,7 @@ class RealStakingDashboardPresentationMapper(
             assetId = noStake.token.configuration.id,
             earnings = stats.map { it.estimatedEarnings.format() },
             availableBalance = formattedAvailableBalance,
-            syncing = showSync
+            syncingStage = noStake.syncingStage
         )
     }
 }

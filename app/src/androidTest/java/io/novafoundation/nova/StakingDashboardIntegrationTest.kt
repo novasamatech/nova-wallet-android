@@ -62,6 +62,6 @@ class StakingDashboardIntegrationTest: BaseIntegrationTest() {
     }
 
     private fun StakingDashboard.syncingItemsCount(): Int {
-        return noStake.count { it.syncingStage } + hasStake.count { it.syncingStage }
+        return withoutStake.count { it.syncingStage } + hasStake.count { it.syncingStage }
     }
 }

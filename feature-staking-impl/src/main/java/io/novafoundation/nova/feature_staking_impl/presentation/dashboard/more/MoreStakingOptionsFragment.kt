@@ -14,7 +14,6 @@ import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardLoadingAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardNoStakeAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardSectionAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.list.StakingDAppsDecoration
@@ -29,7 +28,6 @@ class MoreStakingOptionsFragment :
     StakingDappsAdapter.Handler {
 
     private val noStakeAdapter = DashboardNoStakeAdapter(this)
-    private val noStakeLoadingAdapter = DashboardLoadingAdapter()
 
     private val sectionAdapter = DashboardSectionAdapter(R.string.staking_dashboard_browser_stake_header)
 
@@ -62,7 +60,6 @@ class MoreStakingOptionsFragment :
             setHasFixedSize(true)
             adapter = ConcatAdapter(
                 noStakeAdapter,
-                noStakeLoadingAdapter,
                 sectionAdapter,
                 dAppAdapter,
                 dAppLoadingAdapter
@@ -76,7 +73,6 @@ class MoreStakingOptionsFragment :
     override fun subscribe(viewModel: MoreStakingOptionsViewModel) {
         viewModel.moreStakingOptionsUiFlow.observe { stakingOptionsModel ->
             noStakeAdapter.submitListPreservingViewPoint(stakingOptionsModel.inAppStaking, moreStakingOptionsContent)
-            noStakeLoadingAdapter.setNumberOfLoadingItems(stakingOptionsModel.resolvingInAppItems)
 
             when (val browserStakingState = stakingOptionsModel.browserStaking) {
                 is ExtendedLoadingState.Loaded -> {
