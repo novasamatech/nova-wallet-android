@@ -13,6 +13,7 @@ class StakingPeriodRewardsRequest(accountAddress: String, val startTimestamp: Lo
             ) {
                 nodes {
                     accumulatedAmount
+                    amount
                 }
             }
             
@@ -26,6 +27,7 @@ class StakingPeriodRewardsRequest(accountAddress: String, val startTimestamp: Lo
             ) {
                 nodes {
                     accumulatedAmount
+                    amount
                 }
             }
         }
