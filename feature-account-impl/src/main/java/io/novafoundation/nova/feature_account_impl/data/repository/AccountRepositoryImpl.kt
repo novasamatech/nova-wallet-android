@@ -42,6 +42,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class AccountRepositoryImpl(
@@ -199,15 +200,19 @@ class AccountRepositoryImpl(
         return MnemonicCreator.randomMnemonic(Mnemonic.Length.TWELVE)
     }
 
-    override suspend fun isBiometricEnabled(): Boolean {
+    override fun isBiometricEnabledFlow(): Flow<Boolean> {
+        return accountDataSource.getAuthTypeFlow().map { it == AuthType.BIOMETRY }
+    }
+
+    override fun isBiometricEnabled(): Boolean {
         return accountDataSource.getAuthType() == AuthType.BIOMETRY
     }
 
-    override suspend fun setBiometricOn() {
+    override fun setBiometricOn() {
         return accountDataSource.saveAuthType(AuthType.BIOMETRY)
     }
 
-    override suspend fun setBiometricOff() {
+    override fun setBiometricOff() {
         return accountDataSource.saveAuthType(AuthType.PINCODE)
     }
 

@@ -15,7 +15,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="20dp"
             android:layout_marginEnd="100dp"
             android:layout_marginBottom="24dp">
 
@@ -24,17 +23,37 @@
                 style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:text="@string/staking_your_rewards"
                 android:textColor="@color/text_secondary"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <io.novafoundation.nova.common.view.ChipLabelView
+                android:id="@+id/userRewardsStakingPeriod"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="4dp"
+                android:textAllCaps="false"
+                android:textColor="@color/button_text_accent"
+                app:chipIconSize="16dp"
+                app:iconEnd="@drawable/ic_chevron_down"
+                app:iconEndPadding="0dp"
+                app:iconEndTint="@color/icon_accent"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/userRewardsTitle"
+                app:layout_constraintStart_toEndOf="@+id/userRewardsTitle"
+                app:layout_constraintTop_toTopOf="@+id/userRewardsTitle"
+                tools:text="@string/staking_period_all_short" />
 
             <TextView
                 android:id="@+id/userRewardsTokenAmount"
                 style="@style/TextAppearance.NovaFoundation.Bold.Title2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="9dp"
                 android:ellipsize="end"
                 android:includeFontPadding="false"
                 android:lines="1"

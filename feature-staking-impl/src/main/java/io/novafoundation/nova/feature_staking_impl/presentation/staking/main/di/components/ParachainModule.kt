@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.userRewards.ParachainStakingUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.ParachainStakingUnbondPreliminaryValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.parachain.ParachainAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.parachain.ParachainNetworkInfoComponentFactory
@@ -71,9 +72,13 @@ class ParachainModule {
     fun provideParachainUserRewardsComponentFactory(
         delegatorStateUseCase: DelegatorStateUseCase,
         interactor: ParachainStakingUserRewardsInteractor,
+        stakingRewardPeriodInteractor: StakingRewardPeriodInteractor,
+        resourceManager: ResourceManager
     ) = ParachainUserRewardsComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
-        interactor = interactor
+        interactor = interactor,
+        rewardPeriodsInteractor = stakingRewardPeriodInteractor,
+        resourceManager = resourceManager
     )
 
     @Provides

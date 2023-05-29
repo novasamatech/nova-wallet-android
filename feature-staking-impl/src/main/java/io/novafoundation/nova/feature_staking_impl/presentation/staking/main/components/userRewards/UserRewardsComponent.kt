@@ -10,10 +10,20 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 
 typealias UserRewardsComponent = StatefullComponent<UserRewardsState, UserRewardsEvent, UserRewardsAction>
 
-typealias UserRewardsState = LoadingState<AmountModel>
+class UserRewardsState(
+    val amount: LoadingState<AmountModel>,
+    val selectedRewardPeriod: String
+)
 
-typealias UserRewardsAction = Nothing
-typealias UserRewardsEvent = Nothing
+sealed class UserRewardsEvent {
+
+    object UserRewardPeriodClicked : UserRewardsEvent()
+}
+
+sealed class UserRewardsAction {
+
+    object UserRewardPeriodClicked : UserRewardsAction()
+}
 
 class UserRewardsComponentFactory(
     private val relaychainComponentFactory: RelaychainUserRewardsComponentFactory,

@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_BOND_MORE
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_REBOND
@@ -127,8 +128,12 @@ class RelaychainModule {
     fun provideRelaychainUserRewardsComponentFactory(
         stakingInteractor: StakingInteractor,
         stakingSharedComputation: StakingSharedComputation,
+        stakingRewardPeriodInteractor: StakingRewardPeriodInteractor,
+        resourceManager: ResourceManager
     ) = RelaychainUserRewardsComponentFactory(
         stakingInteractor = stakingInteractor,
         stakingSharedComputation = stakingSharedComputation,
+        rewardPeriodsInteractor = stakingRewardPeriodInteractor,
+        resourceManager = resourceManager
     )
 }

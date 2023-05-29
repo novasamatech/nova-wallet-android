@@ -1,5 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="referenda_list_filter_placeholder">There are no referenda with filters applied</string>
+
+    <string name="pincode_biometric_switch_dialog_title">Use biometric to authorize</string>
+
+    <string name="pincode_biometric_error">You are not authorized. Try again, please.</string>
+
+    <string name="common_settings">Settings</string>
+    <string name="settings_biometric_not_ready_title">Biometrics disabled in Settings</string>
+    <string name="settings_biometric_not_ready_message">Please, make sure biometrics is enabled in Settings</string>
+
+    <string name="referenda_filters_header">Show</string>
+    <string name="referenda_filters_all">All referenda</string>
+    <string name="referenda_filters_not_voted">Not voted</string>
+    <string name="referenda_filters_voted">Voted</string>
+    <string name="common_filters">Filters</string>
+
+    <string name="referenda_title">Referenda</string>
+    <string name="referenda_search_toolbar_hint">Search by referendum title or ID</string>
+    <string name="referenda_search_placeholder">No referenda with entered title or ID were found</string>
+
+    <string name="pincode_biometry_dialog_subtitle">Nova Wallet uses biometric authentication to restrict unauthorized users from accessing the app.</string>
+
+    <string name="staking_period_select_date">Select date</string>
+    <string name="staking_period_start_date_picker_title">Select start date</string>
+    <string name="staking_period_end_date_picker_title">Select end date</string>
+
+    <string name="staking_period_all_short">All</string>
+    <string name="staking_period_week_short">7D</string>
+    <string name="staking_period_month_short">30D</string>
+    <string name="staking_period_quarter_short">3M</string>
+    <string name="staking_period_half_year_short">6M</string>
+    <string name="staking_period_year_short">1Y</string>
+    <string name="staking_period_custom_short">%dD</string>
+
+    <string name="staking_your_rewards">Rewards</string>
+
+    <string name="staking_period_title">Show staking rewards for</string>
+    <string name="staking_period_all_time">All time</string>
+    <string name="staking_period_week">Last 7 days (7D)</string>
+    <string name="staking_period_month">Last 30 days (30D)</string>
+    <string name="staking_period_quarter">Last 3 month (3M)</string>
+    <string name="staking_period_half_year">Last 6 months (6M)</string>
+    <string name="staking_period_year">Last year (1Y)</string>
+    <string name="staking_period_custom">Custom period</string>
+
+    <string name="staking_period_start_title">Starts</string>
+    <string name="staking_period_current_date_title">End date is always today</string>
+    <string name="staking_period_end_title">Ends</string>
+
+    <string name="settings_pin_code_verification_confirmation_title">Ask authentication for operation signing</string>
+    <string name="settings_pin_code_verification_confirmation_message">Each sign operation on wallets with key pair (created in nova wallet or imported) should require PIN verification before constructing signature</string>
+
+    <string name="biometric_auth_title">Biometric auth</string>
+    <string name="profile_settings_pin_code_verification_title">Approve with PIN</string>
+
+    <string name="send_address_hint">Address or w3n</string>
+
     <string name="wallet_send_recipient_blocked_title">Recipient cannot accept transfer</string>
     <string name="wallet_send_recipient_blocked_message">Recipient has been blocked by token owner and cannot currently accept incoming transfers</string>
 
@@ -45,8 +103,6 @@
     <string name="wallet_connect_new_connection">New connection</string>
     <string name="wallet_connect_title">WalletConnect</string>
     <string name="common_scan_qr_code">Scan the QR code</string>
-
-    <string name="send_address_hint">Address or w3n</string>
 
     <string name="ethereum_function">Function</string>
     <string name="ethereum_contract">Contract</string>
@@ -198,8 +254,8 @@
 
     <string name="remove_votes_suggestion_title">Remove history of your votes?</string>
     <plurals name="remove_votes_suggestion_description">
-        <item quantity="one" formatted="true">You have previously voted in referendums in %d track. In order to make this track available for delegation, you need to remove your existing votes.</item>
-        <item quantity="other" formatted="true">You have previously voted in referendums in %d tracks. In order to make these tracks available for delegation, you need to remove your existing votes.</item>
+        <item formatted="true" quantity="one">You have previously voted in referendums in %d track. In order to make this track available for delegation, you need to remove your existing votes.</item>
+        <item formatted="true" quantity="other">You have previously voted in referendums in %d tracks. In order to make these tracks available for delegation, you need to remove your existing votes.</item>
     </plurals>
 
     <string name="remove_votes_suggestion_button_text">Remove votes</string>
@@ -1121,8 +1177,6 @@
     <string name="pincode_confirm_your_pin_code">Confirm your pin code</string>
     <string name="pincode_create_top_title">Create pin code</string>
     <string name="pincode_enter_pin_code_v2_2_0">Enter PIN code</string>
-    <string name="pincode_fingerprint_error">You are not authorized. Try another finger.</string>
-    <string name="pincode_fingerprint_switch_dialog_title">Use biometric to authorize</string>
     <string name="pincode_title_create">Set your pin code</string>
     <string name="profile_accounts_title">Accounts</string>
     <string name="profile_accounts_title_2_0">Wallets</string>
@@ -1321,7 +1375,6 @@
     <string name="staking_your_not_allocated_description_v2_2_0">Active validators without your stake assignment</string>
     <string name="staking_your_not_elected_format">Not elected (%s)</string>
     <string name="staking_your_oversubscribed_message">Your tokens are allocated to the oversubscribed validators. You will not receive rewards in this era.</string>
-    <string name="staking_your_rewards">Your rewards</string>
     <string name="staking_your_stake">Your stake</string>
     <string name="staking_your_validators">Your validators</string>
     <string name="staking_your_validators_changing_title">Your validators will change in the next era.</string>

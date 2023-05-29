@@ -18,6 +18,8 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
@@ -106,6 +108,10 @@ interface AccountFeatureDependencies {
     fun safeModeService(): SafeModeService
 
     fun web3NamesInteractor(): Web3NamesInteractor
+
+    fun twoFactorVerificationService(): TwoFactorVerificationService
+
+    fun twoFactorVerificationExecutor(): TwoFactorVerificationExecutor
 
     val systemCallExecutor: SystemCallExecutor
 

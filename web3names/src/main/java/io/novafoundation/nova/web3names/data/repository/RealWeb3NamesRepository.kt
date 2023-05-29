@@ -99,7 +99,7 @@ class RealWeb3NamesRepository(
         return gson.fromJson(content)
     }
 
-    private suspend fun findChainRecipients(
+    private fun findChainRecipients(
         recipientsByChain: RecipientsByChain,
         w3nIdentifier: String,
         chain: Chain,

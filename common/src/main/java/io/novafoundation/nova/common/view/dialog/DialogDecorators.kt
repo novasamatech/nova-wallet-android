@@ -44,7 +44,7 @@ fun warningDialog(
     onCancel: DialogClickHandler? = null,
     decorator: DialogDecorator? = null
 ) {
-    dialog(context.themed(R.style.AccentAlertDialogTheme_Reversed)) {
+    dialog(context.themed(R.style.AccentNegativeAlertDialogTheme_Reversed)) {
         setPositiveButton(confirmTextRes) { _, _ -> onConfirm() }
         setNegativeButton(cancelTextRes) { _, _ -> onCancel?.invoke() }
 

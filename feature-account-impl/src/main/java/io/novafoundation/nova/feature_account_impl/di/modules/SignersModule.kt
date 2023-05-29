@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.utils.DefaultMutableSharedState
 import io.novafoundation.nova.common.utils.MutableSharedState
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
@@ -28,7 +29,11 @@ class SignersModule {
 
     @Provides
     @FeatureScope
-    fun provideSecretsSignerFactory(secretStoreV2: SecretStoreV2, chainRegistry: ChainRegistry) = SecretsSignerFactory(secretStoreV2, chainRegistry)
+    fun provideSecretsSignerFactory(
+        secretStoreV2: SecretStoreV2,
+        chainRegistry: ChainRegistry,
+        twoFactorVerificationService: TwoFactorVerificationService
+    ) = SecretsSignerFactory(secretStoreV2, chainRegistry, twoFactorVerificationService)
 
     @Provides
     @FeatureScope

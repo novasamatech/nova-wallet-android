@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.di
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
@@ -25,6 +26,7 @@ class AccountFeatureHolder @Inject constructor(
     private val ledgerSignCommunicator: LedgerSignCommunicator,
     private val selectAddressCommunicator: SelectAddressCommunicator,
     private val selectWalletCommunicator: SelectWalletCommunicator,
+    private val pinCodeTwoFactorVerificationCommunicator: PinCodeTwoFactorVerificationCommunicator
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -45,6 +47,7 @@ class AccountFeatureHolder @Inject constructor(
                 ledgerSignInterScreenCommunicator = ledgerSignCommunicator,
                 selectAddressCommunicator = selectAddressCommunicator,
                 selectWalletCommunicator = selectWalletCommunicator,
+                pinCodeTwoFactorVerificationCommunicator = pinCodeTwoFactorVerificationCommunicator,
                 deps = accountFeatureDependencies
             )
     }

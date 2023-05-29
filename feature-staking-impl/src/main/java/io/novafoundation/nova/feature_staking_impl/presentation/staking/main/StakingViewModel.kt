@@ -30,7 +30,7 @@ class StakingViewModel(
     stakeActionsComponentFactory: StakeActionsComponentFactory,
     networkInfoComponentFactory: NetworkInfoComponentFactory,
 
-    private val router: StakingRouter,
+    val router: StakingRouter,
     private val validationExecutor: ValidationExecutor,
     stakingUpdateSystem: UpdateSystem,
 ) : BaseViewModel(),

@@ -7,6 +7,7 @@ import android.view.View.OnClickListener
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatButton
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_impl.R
 import kotlinx.android.synthetic.main.pincode_view.view.btn0
 import kotlinx.android.synthetic.main.pincode_view.view.btn1
@@ -19,7 +20,7 @@ import kotlinx.android.synthetic.main.pincode_view.view.btn7
 import kotlinx.android.synthetic.main.pincode_view.view.btn8
 import kotlinx.android.synthetic.main.pincode_view.view.btn9
 import kotlinx.android.synthetic.main.pincode_view.view.btnDelete
-import kotlinx.android.synthetic.main.pincode_view.view.fingerprintBtn
+import kotlinx.android.synthetic.main.pincode_view.view.biometricBtn
 
 class PinCodeView @JvmOverloads constructor(
     context: Context,
@@ -64,17 +65,13 @@ class PinCodeView @JvmOverloads constructor(
 
         btnDelete.setOnClickListener(pinCodeDeleteClickListener)
 
-        fingerprintBtn.setOnClickListener(pinCodeFingerprintClickListener)
+        biometricBtn.setOnClickListener(pinCodeFingerprintClickListener)
 
         updateProgress()
     }
 
-    fun changeFingerPrintButtonVisibility(isVisible: Boolean) {
-        if (isVisible) {
-            fingerprintBtn.visibility = View.VISIBLE
-        } else {
-            fingerprintBtn.visibility = View.INVISIBLE
-        }
+    fun changeBimometricButtonVisibility(isVisible: Boolean) {
+        biometricBtn.setVisible(isVisible, falseState = View.INVISIBLE)
     }
 
     fun resetInput() {

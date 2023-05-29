@@ -15,4 +15,7 @@ abstract class StakingTotalRewardDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(totalRewardLocal: TotalRewardLocal)
+
+    @Query("DELETE FROM total_reward")
+    abstract suspend fun deleteAll()
 }

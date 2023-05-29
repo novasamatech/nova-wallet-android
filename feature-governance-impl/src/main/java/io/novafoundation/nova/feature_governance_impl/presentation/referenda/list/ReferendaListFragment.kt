@@ -62,6 +62,10 @@ class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel>(
             referendaHeaderAdapter.setDelegations(it.dataOrNull)
         }
 
+        viewModel.referendaFilterIcon.observeWhenVisible {
+            referendaHeaderAdapter.setFilterIcon(it)
+        }
+
         viewModel.referendaUiFlow.observeReferendaList()
     }
 
@@ -79,5 +83,13 @@ class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel>(
 
     override fun onClickDelegations() {
         viewModel.delegationsClicked()
+    }
+
+    override fun onClickReferendaSearch() {
+        viewModel.searchClicked()
+    }
+
+    override fun onClickReferendaFilters() {
+        viewModel.filtersClicked()
     }
 }

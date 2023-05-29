@@ -85,7 +85,7 @@ fun contributeValidationFailure(
                         title = resourceManager.getString(R.string.common_skip),
                         action = { validationFlowActions.resumeFlow() }
                     ),
-                    customStyle = R.style.AccentAlertDialogTheme
+                    customStyle = R.style.AccentNegativeAlertDialogTheme
                 )
             )
         }

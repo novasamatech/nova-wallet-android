@@ -78,7 +78,7 @@ fun handleChainAccountNotFound(
                     action = goToWalletDetails
                 ),
                 cancelAction = noOp(resourceManager.getString(R.string.common_cancel)),
-                customStyle = R.style.AccentAlertDialogTheme
+                customStyle = R.style.AccentNegativeAlertDialogTheme
             )
         )
         AddAccountState.LEDGER_NOT_SUPPORTED -> TransformedFailure.Default(

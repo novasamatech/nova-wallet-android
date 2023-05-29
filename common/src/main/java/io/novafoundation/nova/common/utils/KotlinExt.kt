@@ -80,6 +80,8 @@ fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = M
 
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
+fun Number.daysToMillis() = TimeUnit.DAYS.toMillis(this.toLong())
+
 inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fold(BigInteger.ZERO) { acc, element ->
     acc + extractor(element)
 }

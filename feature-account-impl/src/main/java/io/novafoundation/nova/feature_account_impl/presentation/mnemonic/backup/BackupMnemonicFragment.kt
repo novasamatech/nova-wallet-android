@@ -65,7 +65,7 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
         }
     }
 
-    private fun showMnemonicWarning() = dialog(ContextThemeWrapper(requireContext(), R.style.AccentAlertDialogTheme)) {
+    private fun showMnemonicWarning() = dialog(ContextThemeWrapper(requireContext(), R.style.AccentNegativeAlertDialogTheme)) {
         setTitle(R.string.common_attention)
         setMessage(R.string.common_no_screenshot_message_v2_2_0)
 
