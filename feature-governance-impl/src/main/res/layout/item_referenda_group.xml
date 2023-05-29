@@ -12,7 +12,7 @@
 
     <TextView
         android:id="@+id/itemReferendaGroupStatus"
-        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        style="@style/TextAppearance.NovaFoundation.Regular.Body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:includeFontPadding="false"

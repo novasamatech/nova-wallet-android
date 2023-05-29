@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientCommissionBalanceToStayAboveED
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientTransferableBalanceToPayOriginFee
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.validAddress
+import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.recipientCanAcceptTransfer
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -80,6 +81,8 @@ abstract class BaseAssetTransfers(
         notDeadRecipientInCommissionAsset(assetSourceRegistry)
 
         doNotCrossExistentialDeposit()
+
+        recipientCanAcceptTransfer(assetSourceRegistry)
     }
 
     protected fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit() = doNotCrossExistentialDeposit(

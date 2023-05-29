@@ -4,13 +4,10 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.emitError
 import io.novafoundation.nova.common.domain.emitLoaded
 import io.novafoundation.nova.common.domain.emitLoading
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceAdditionalState
-import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.search.DelegateSearchInteractor
-import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.mapDelegateStatsToPreviews
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.repository.DelegateCommonRepository
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.DelegatesSharedComputation
 import io.novafoundation.nova.runtime.ext.accountIdOf
@@ -20,8 +17,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combineTransform
@@ -80,28 +75,5 @@ class RealDelegateSearchInteractor(
             onChainIdentity = identity,
             userDelegations = emptyMap()
         )
-    }
-
-    private suspend fun getDelegates(
-        governanceOption: SupportedGovernanceOption,
-    ): Flow<List<DelegatePreview>> = coroutineScope {
-        val chain = governanceOption.assetWithChain.chain
-        val delegateMetadataDeferred = async { delegateCommonRepository.getMetadata(governanceOption) }
-        val delegatesStatsDeferred = async { delegateCommonRepository.getDelegatesStats(governanceOption) }
-        val tracksDeferred = async { delegateCommonRepository.getTracks(governanceOption) }
-
-        flowOf {
-            val userDelegations = delegateCommonRepository.getUserDelegationsOrEmpty(governanceOption, tracksDeferred.await())
-            val userDelegationIds = userDelegations.keys.map { it.value }
-
-            val identities = identityRepository.getIdentitiesFromIds(userDelegationIds, chain.id)
-
-            mapDelegateStatsToPreviews(
-                delegatesStatsDeferred.await(),
-                delegateMetadataDeferred.await(),
-                identities,
-                userDelegations
-            )
-        }
     }
 }

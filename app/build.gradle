@@ -214,6 +214,8 @@ dependencies {
 
     implementation kotlinDep
 
+    implementation biometricDep
+
     implementation androidDep
     implementation constraintDep
 

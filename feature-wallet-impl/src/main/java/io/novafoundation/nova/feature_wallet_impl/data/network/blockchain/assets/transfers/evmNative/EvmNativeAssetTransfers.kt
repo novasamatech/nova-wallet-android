@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
@@ -10,6 +11,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientBalanceInUsedAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientTransferableBalanceToPayOriginFee
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.validAddress
+import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.recipientCanAcceptTransfer
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -20,6 +22,7 @@ private val NATIVE_COIN_TRANSFER_GAS_LIMIT = 21_000.toBigInteger()
 
 class EvmNativeAssetTransfers(
     private val evmTransactionService: EvmTransactionService,
+    private val assetSourceRegistry: AssetSourceRegistry,
 ) : AssetTransfers {
 
     override val validationSystem: AssetTransfersValidationSystem = ValidationSystem {
@@ -29,6 +32,8 @@ class EvmNativeAssetTransfers(
 
         sufficientBalanceInUsedAsset()
         sufficientTransferableBalanceToPayOriginFee()
+
+        recipientCanAcceptTransfer(assetSourceRegistry)
     }
 
     override suspend fun calculateFee(transfer: AssetTransfer): BigInteger {

@@ -1,27 +1,15 @@
 package io.novafoundation.nova.common.list
 
-import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.common.utils.inflateChild
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 
-class PlaceholderAdapter(@LayoutRes val layoutId: Int) : RecyclerView.Adapter<ShimmeringHolder>() {
+abstract class PlaceholderAdapter<T : ViewHolder> : RecyclerView.Adapter<T>() {
 
-    private var showPlaceholder = false
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShimmeringHolder {
-        return ShimmeringHolder(parent.inflateChild(layoutId))
-    }
-
-    override fun onBindViewHolder(holder: ShimmeringHolder, position: Int) {}
+    protected var showPlaceholder = false
+        private set
 
     override fun getItemCount(): Int {
         return if (showPlaceholder) 1 else 0
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return layoutId
     }
 
     fun showPlaceholder(show: Boolean) {
@@ -35,5 +23,3 @@ class PlaceholderAdapter(@LayoutRes val layoutId: Int) : RecyclerView.Adapter<Sh
         }
     }
 }
-
-class ShimmeringHolder(view: View) : RecyclerView.ViewHolder(view)

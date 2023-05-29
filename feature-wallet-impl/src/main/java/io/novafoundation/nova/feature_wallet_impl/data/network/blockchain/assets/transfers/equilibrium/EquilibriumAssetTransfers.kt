@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientBalanceInUsedAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientTransferableBalanceToPayOriginFee
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.validAddress
+import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.recipientCanAcceptTransfer
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.ext.requireEquilibrium
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -46,6 +47,7 @@ class EquilibriumAssetTransfers(
         sufficientTransferableBalanceToPayOriginFee()
 
         notDeadRecipientInUsedAsset(assetSourceRegistry)
+        recipientCanAcceptTransfer(assetSourceRegistry)
     }
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {

@@ -284,6 +284,26 @@ inline fun <R> MutableStateFlow<Boolean>.withFlagSet(action: () -> R): R {
     return result
 }
 
+fun CompoundButton.bindTo(flow: Flow<Boolean>, scope: CoroutineScope, callback: (Boolean) -> Unit) {
+    var oldValue = isChecked
+
+    scope.launch {
+        flow.collect { newValue ->
+            if (isChecked != newValue) {
+                oldValue = newValue
+                isChecked = newValue
+            }
+        }
+    }
+
+    setOnCheckedChangeListener { _, newValue ->
+        if (oldValue != newValue) {
+            oldValue = newValue
+            callback(newValue)
+        }
+    }
+}
+
 fun CompoundButton.bindTo(flow: MutableStateFlow<Boolean>, scope: CoroutineScope) {
     scope.launch {
         flow.collect { newValue ->

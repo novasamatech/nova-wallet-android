@@ -2,10 +2,10 @@ package io.novafoundation.nova.common.data.storage
 
 import android.content.SharedPreferences
 import io.novafoundation.nova.core.model.Language
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 
 class PreferencesImpl(
     private val sharedPreferences: SharedPreferences
@@ -79,24 +79,29 @@ class PreferencesImpl(
         sharedPreferences.edit().remove(field).apply()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun stringFlow(
         field: String,
         initialValueProducer: (suspend () -> String)?
-    ): Flow<String?> = callbackFlow {
-        if (contains(field)) {
-            send(getString(field))
-        } else {
-            val initialValue = initialValueProducer?.invoke()
-
-            putString(field, initialValue)
-
-            send(initialValue)
+    ): Flow<String?> = keyFlow(field)
+        .map {
+            if (contains(field)) {
+                getString(field)
+            } else {
+                val initialValue = initialValueProducer?.invoke()
+                putString(field, initialValue)
+                initialValue
+            }
         }
 
+    override fun keyFlow(key: String): Flow<String> = keysFlow(key)
+        .map { it.first() }
+
+    override fun keysFlow(vararg keys: String): Flow<List<String>> = callbackFlow {
+        send(keys.toList())
+
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == field) {
-                trySend(getString(field))
+            if (key in keys) {
+                trySend(listOf(key))
             }
         }
 
@@ -107,5 +112,9 @@ class PreferencesImpl(
             listeners.remove(listener)
             sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener)
         }
+    }
+
+    override fun edit(): Editor {
+        return SharedPreferenceEditor(sharedPreferences)
     }
 }

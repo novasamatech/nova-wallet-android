@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 typealias InitialValueProducer<T> = suspend () -> T
 
 interface Preferences {
+
     fun contains(field: String): Boolean
 
     fun putString(field: String, value: String?)
@@ -36,4 +37,25 @@ interface Preferences {
         field: String,
         initialValueProducer: InitialValueProducer<String>? = null
     ): Flow<String?>
+
+    fun keyFlow(key: String): Flow<String>
+
+    fun keysFlow(vararg keys: String): Flow<List<String>>
+
+    fun edit(): Editor
+}
+
+interface Editor {
+
+    fun putString(field: String, value: String?)
+
+    fun putBoolean(field: String, value: Boolean)
+
+    fun putInt(field: String, value: Int)
+
+    fun putLong(field: String, value: Long)
+
+    fun remove(field: String)
+
+    fun apply()
 }

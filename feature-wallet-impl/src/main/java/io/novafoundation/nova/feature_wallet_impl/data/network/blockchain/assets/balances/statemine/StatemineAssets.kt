@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindCollection
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine.AssetAccount.AccountStatus
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import java.math.BigInteger
 
@@ -46,24 +47,49 @@ private fun bindIsFrozen(isFrozen: Boolean): AssetDetails.Status = if (isFrozen)
 
 class AssetAccount(
     val balance: BigInteger,
-    val isFrozen: Boolean
+    val status: AccountStatus
 ) {
+
+    enum class AccountStatus {
+        Liquid, Frozen, Blocked
+    }
 
     companion object {
 
         fun empty() = AssetAccount(
             balance = BigInteger.ZERO,
-            isFrozen = false
+            status = AccountStatus.Liquid
         )
     }
 }
+
+val AssetAccount.isBalanceFrozen: Boolean
+    get() = status == AccountStatus.Blocked || status == AccountStatus.Frozen
+
+val AssetAccount.canAcceptFunds: Boolean
+    get() = status != AccountStatus.Blocked
 
 @UseCaseBinding
 fun bindAssetAccount(decoded: Any): AssetAccount {
     val dynamicInstance = decoded.cast<Struct.Instance>()
 
+    val status = when {
+        // old version of assets pallet - isFrozen flag
+        "isFrozen" in dynamicInstance.mapping -> {
+            val isFrozen = bindBoolean(dynamicInstance["isFrozen"])
+            if (isFrozen) AccountStatus.Frozen else AccountStatus.Liquid
+        }
+
+        // new version of assets pallet - status enum
+        "status" in dynamicInstance.mapping -> {
+            bindCollectionEnum(dynamicInstance["status"])
+        }
+
+        else -> incompatible()
+    }
+
     return AssetAccount(
         balance = bindNumber(dynamicInstance["balance"]),
-        isFrozen = bindBoolean(dynamicInstance["isFrozen"]),
+        status = status,
     )
 }

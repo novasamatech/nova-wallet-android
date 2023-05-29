@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.list.PlaceholderAdapter
+import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -34,7 +34,7 @@ class MoreStakingOptionsFragment :
     private val sectionAdapter = DashboardSectionAdapter(R.string.staking_dashboard_browser_stake_header)
 
     private val dAppAdapter = StakingDappsAdapter(this)
-    private val dAppLoadingAdapter = PlaceholderAdapter(R.layout.layout_dapps_shimmering)
+    private val dAppLoadingAdapter = CustomPlaceholderAdapter(R.layout.layout_dapps_shimmering)
 
     override fun onCreateView(
         inflater: LayoutInflater,

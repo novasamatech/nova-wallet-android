@@ -181,7 +181,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     }
 
     private fun showCloseConfirmation(pendingConfirmation: DappPendingConfirmation<*>) {
-        dialog(requireContext().themed(R.style.AccentAlertDialogTheme_Reversed)) {
+        dialog(requireContext().themed(R.style.AccentNegativeAlertDialogTheme_Reversed)) {
             setPositiveButton(R.string.common_close) { _, _ -> pendingConfirmation.onConfirm() }
             setNegativeButton(R.string.common_cancel) { _, _ -> pendingConfirmation.onCancel() }
 

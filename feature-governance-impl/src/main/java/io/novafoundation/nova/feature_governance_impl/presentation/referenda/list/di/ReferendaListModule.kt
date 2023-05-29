@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDAppsInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFiltersInteractor
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.ReferendaListViewModel
@@ -28,6 +29,7 @@ class ReferendaListModule {
     fun provideViewModel(
         assetSelectorFactory: AssetSelectorFactory,
         referendaListInteractor: ReferendaListInteractor,
+        referendaFiltersInteractor: ReferendaFiltersInteractor,
         selectedAccountUseCase: SelectedAccountUseCase,
         selectedAssetSharedState: GovernanceSharedState,
         resourceManager: ResourceManager,
@@ -39,6 +41,7 @@ class ReferendaListModule {
         return ReferendaListViewModel(
             assetSelectorFactory = assetSelectorFactory,
             referendaListInteractor = referendaListInteractor,
+            referendaFiltersInteractor = referendaFiltersInteractor,
             selectedAccountUseCase = selectedAccountUseCase,
             selectedAssetSharedState = selectedAssetSharedState,
             resourceManager = resourceManager,

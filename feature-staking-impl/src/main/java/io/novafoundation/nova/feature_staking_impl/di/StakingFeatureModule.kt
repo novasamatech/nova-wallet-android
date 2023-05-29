@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.storage.StorageCache
@@ -26,14 +27,18 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.ParasReposito
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealParasRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealSessionRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.StakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRepositoryImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.AuraSession
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.BabeSession
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.ElectionsSessionRegistry
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.RealElectionsSessionRegistry
+import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.RealStakingRewardPeriodDataSource
+import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingRewardPeriodDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSourceImpl
@@ -43,6 +48,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteracto
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.payout.PayoutInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.period.RealStakingRewardPeriodInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
@@ -437,6 +444,25 @@ class StakingFeatureModule {
     fun provideCompoundStatefullComponent(
         sharedState: StakingSharedState,
     ) = CompoundStakingComponentFactory(sharedState)
+
+    @Provides
+    @FeatureScope
+    fun provideStakingRewardPeriodDataSource(
+        preferences: Preferences
+    ): StakingRewardPeriodDataSource = RealStakingRewardPeriodDataSource(preferences)
+
+    @Provides
+    @FeatureScope
+    fun provideStakingPeriodRepository(
+        dataSource: StakingRewardPeriodDataSource
+    ): StakingPeriodRepository = RealStakingPeriodRepository(dataSource)
+
+    @Provides
+    @FeatureScope
+    fun provideStakingRewardInteractor(
+        stakingPeriodRepository: StakingPeriodRepository,
+        stakingRewardsRepository: StakingRewardsRepository
+    ): StakingRewardPeriodInteractor = RealStakingRewardPeriodInteractor(stakingPeriodRepository, stakingRewardsRepository)
 
     @Provides
     @FeatureScope

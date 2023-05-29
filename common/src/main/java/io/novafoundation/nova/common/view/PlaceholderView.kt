@@ -68,4 +68,11 @@ class PlaceholderView @JvmOverloads constructor(
     fun setText(@StringRes textRes: Int) {
         viewPlaceholderText.setText(textRes)
     }
+
+    fun setModel(model: PlaceholderModel) {
+        setText(model.text)
+        setImage(model.imageRes)
+    }
 }
+
+class PlaceholderModel(val text: String, @DrawableRes val imageRes: Int)

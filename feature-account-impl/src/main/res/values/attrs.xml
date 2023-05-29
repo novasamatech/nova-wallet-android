@@ -14,6 +14,12 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="SettingsItemView">
+        <attr name="title" />
+        <attr name="settingValue" format="string" />
+        <attr name="icon" />
+    </declare-styleable>
+
     <declare-styleable name="MnemonicContainerView">
 
         <attr name="showBackground" format="boolean" />

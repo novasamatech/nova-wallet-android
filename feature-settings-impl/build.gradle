@@ -49,6 +49,8 @@ dependencies {
     implementation cardViewDep
     implementation constraintDep
 
+    implementation biometricDep
+
     implementation fearlessLibDep
 
     implementation coroutinesDep

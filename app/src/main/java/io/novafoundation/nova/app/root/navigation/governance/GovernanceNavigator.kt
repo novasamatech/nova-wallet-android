@@ -1,6 +1,5 @@
 package io.novafoundation.nova.app.root.navigation.governance
 
-import androidx.navigation.NavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
@@ -45,12 +44,15 @@ class GovernanceNavigator(
     private val commonNavigator: Navigator,
 ) : BaseNavigator(navigationHolder), GovernanceRouter {
 
-    private val navController: NavController?
-        get() = navigationHolder.navController
-
     override fun openReferendum(payload: ReferendumDetailsPayload) {
-        val bundle = ReferendumDetailsFragment.getBundle(payload)
-        navController?.navigate(R.id.action_open_referendum_details, bundle)
+        performNavigation(
+            cases = arrayOf(
+                R.id.mainFragment to R.id.action_open_referendum_details,
+                R.id.votedReferendaFragment to R.id.action_open_referendum_details,
+                R.id.referendaSearchFragment to R.id.action_open_referendum_details_from_referenda_search,
+            ),
+            args = ReferendumDetailsFragment.getBundle(payload)
+        )
     }
 
     override fun openReferendumFullDetails(payload: ReferendumFullDetailsPayload) = performNavigation(
@@ -114,6 +116,14 @@ class GovernanceNavigator(
 
     override fun openDelegateSearch() {
         performNavigation(R.id.action_delegateListFragment_to_delegateSearchFragment)
+    }
+
+    override fun openReferendaSearch() {
+        performNavigation(R.id.action_open_referenda_search)
+    }
+
+    override fun openReferendaFilters() {
+        performNavigation(R.id.action_open_referenda_filters)
     }
 
     override fun openRemoveVotes(payload: RemoveVotesPayload) = performNavigation(

@@ -22,7 +22,7 @@ class RealReferendaSortingProvider : ReferendaSortingProvider {
         }
     }
 
-    override suspend fun getVotedReferendumSorting(): Comparator<ReferendumPreview> {
+    override suspend fun getReferendumSorting(): Comparator<ReferendumPreview> {
         return compareByDescending { it.id.value }
     }
 

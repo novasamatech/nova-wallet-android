@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.list.NestedAdapter
-import io.novafoundation.nova.common.list.PlaceholderAdapter
+import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setState
@@ -40,7 +40,7 @@ abstract class SelectDelegationTracksFragment<V : SelectDelegationTracksViewMode
         paddingInDp = Rect(12, 8, 12, 12),
         disableItemAnimations = true
     )
-    private val placeholderAdapter = PlaceholderAdapter(R.layout.item_tracks_placeholder)
+    private val placeholderAdapter = CustomPlaceholderAdapter(R.layout.item_tracks_placeholder)
     private val tracksAdapter = SelectDelegationTracksAdapter(this)
     private val concatAdapter = ConcatAdapter(headerAdapter, presetsAdapter, placeholderAdapter, tracksAdapter)
 

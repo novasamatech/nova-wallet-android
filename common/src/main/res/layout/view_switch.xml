@@ -24,7 +24,6 @@
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="Switch subtitle" />
 
-
     <TextView
         android:id="@+id/viewSwitchSubtitle"
         style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
