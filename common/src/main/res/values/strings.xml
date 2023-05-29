@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="staking_title_format">%s staking</string>
+
     <string name="staking_dashboard_more_options">More staking options</string>
     <string name="staking_dashboard_no_stake_header">Stake and earn rewards</string>
     <string name="staking_dashboard_browser_stake_header">Staking via Nova DApp browser</string>
