@@ -8,7 +8,6 @@ import android.graphics.Path
 import android.graphics.RectF
 import android.view.View
 import androidx.annotation.ColorInt
-import androidx.annotation.Dimension
 import androidx.annotation.IdRes
 import androidx.annotation.StyleableRes
 import androidx.core.content.res.getResourceIdOrThrow
@@ -36,10 +35,10 @@ fun Path.applyRoundRect(view: View, radius: Float) {
 
 fun RectF.setCardBounds(view: View) {
     set(
-        view.paddingStart.toFloat(),
-        view.paddingTop.toFloat(),
-        view.width - view.paddingEnd.toFloat(),
-        view.height - view.paddingBottom.toFloat()
+        0f,
+        0f,
+        view.width.toFloat(),
+        view.height.toFloat()
     )
 }
 
@@ -74,8 +73,8 @@ fun Bitmap.downscale(factor: Float): Bitmap {
     return newBitmap
 }
 
-fun Bitmap.toBitmapShaderWithPaint(): BitmapShaderWithPaint {
-    return BitmapShaderWithPaint(this)
+fun Bitmap.toBitmapShaderWithPaint(): BitmapShaderHelper {
+    return BitmapShaderHelper(this)
 }
 
 fun Bitmap.toBitmapWithRect(): BitmapWithRect {

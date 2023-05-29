@@ -4,34 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="20dp"
-    tools:background="@color/block_background"
-    tools:gravity="center_horizontal"
-    tools:orientation="vertical"
-    tools:parentTag="android.widget.LinearLayout">
+    android:paddingBottom="14dp"
+    tools:parentTag="io.novafoundation.nova.common.view.paralaxCard.ParalaxCardView">
 
     <TextView
         android:id="@+id/viewAssetsTotalBalanceTitle"
         style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="13dp"
         android:gravity="center_vertical"
         android:includeFontPadding="false"
         android:text="@string/wallet_balance_details_total"
         android:textColor="@color/text_secondary"
-        app:drawableTint="@color/icon_secondary" />
+        app:drawableTint="@color/icon_secondary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/viewAssetsTotalBalanceTotal"
-        style="@style/TextAppearance.NovaFoundation.Bold.LargeTitle"
+        style="@style/TextAppearance.NovaFoundation.Bold.HugeTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="16dp"
-        android:gravity="center_horizontal"
+        android:layout_marginTop="16dp"
         android:textColor="@color/text_primary"
         android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/viewAssetsTotalBalanceTitle"
         tools:text="$214.66"
         tools:visibility="visible" />
 
@@ -40,47 +39,73 @@
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:drawablePadding="5dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_total_card_chip"
+        android:drawablePadding="4dp"
         android:gravity="center_vertical"
-        android:paddingStart="6dp"
-        android:paddingTop="1dp"
-        android:paddingEnd="6dp"
-        android:paddingBottom="1dp"
+        android:minHeight="22dp"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="2dp"
         android:textColor="@color/chip_text"
         android:visibility="gone"
+        app:drawableEndCompat="@drawable/ic_info_cicrle_filled_16"
         app:drawableStartCompat="@drawable/ic_lock"
         app:drawableTint="@color/chip_icon"
-        tools:background="@color/chips_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:drawableEnd="@drawable/ic_info_cicrle_filled_16"
         tools:drawableStart="@drawable/ic_lock"
         tools:text="$214.66"
         tools:visibility="visible" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="16dp"
+        app:layout_cardBackgroundColor="@color/block_background"
+        app:layout_cardBorderColor="@color/container_card_actions_border"
+        app:layout_cardRadius="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/viewAssetsTotalBalanceTotal">
+
+        <TextView
+            android:id="@+id/viewAssetsTotalBalanceSend"
+            style="@style/Widget.Nova.ActionButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/wallet_asset_send"
+            app:drawableTopCompat="@drawable/ic_send"
+            tools:drawableTop="@drawable/ic_send" />
+
+        <TextView
+            android:id="@+id/viewAssetsTotalBalanceReceive"
+            style="@style/Widget.Nova.ActionButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/wallet_asset_receive"
+            app:drawableTopCompat="@drawable/ic_receive"
+            tools:drawableTop="@drawable/ic_receive" />
+
+    </LinearLayout>
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/viewAssetsTotalBalanceShimmer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="24dp"
         android:layout_marginBottom="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/viewAssetsTotalBalanceTitle"
         tools:visibility="gone">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
+        <View
+            android:layout_width="145dp"
+            android:layout_height="28dp"
+            android:background="@drawable/bg_shimmering" />
 
-            <View
-                android:layout_width="136dp"
-                android:layout_height="32dp"
-                android:background="@drawable/bg_shimmering" />
-
-            <View
-                android:layout_width="80dp"
-                android:layout_height="18dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_shimmering"
-                android:visibility="gone" />
-        </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
+
 </merge>

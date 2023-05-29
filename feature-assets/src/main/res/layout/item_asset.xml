@@ -5,6 +5,7 @@
     android:id="@+id/itemAssetContainer"
     android:layout_width="match_parent"
     android:layout_height="56dp"
+    android:layout_marginHorizontal="16dp"
     android:layout_weight="1"
     android:background="@drawable/bg_primary_list_item"
     tools:background="@color/block_background">

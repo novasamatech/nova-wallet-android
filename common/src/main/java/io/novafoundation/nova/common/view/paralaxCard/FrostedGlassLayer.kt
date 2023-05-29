@@ -17,11 +17,4 @@ class ViewWithLayoutParams(val view: View, layoutParams: ParalaxCardView.LayoutP
         color = layoutParams.cardBackgroundColor!!
     }
 
-    val borderPaint = layoutParams.cardBorderColor?.let {
-        Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.STROKE
-            strokeWidth = layoutParams.strokeWidth
-            color = it
-        }
-    }
 }

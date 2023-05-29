@@ -59,6 +59,8 @@ class AssetGroupingDecoration(
                 // if group is finished
                 isFinalItemInGroup(currentType, nextType) -> {
                     parent.getDecoratedBoundsWithMargins(view, bounds)
+                    bounds.inset(0, 0)
+
                     val groupBottom = bounds.bottom + view.translationY.roundToInt() - groupOuterSpacing
 
                     background.setBounds(bounds.left, groupTop!!, bounds.right, groupBottom)
