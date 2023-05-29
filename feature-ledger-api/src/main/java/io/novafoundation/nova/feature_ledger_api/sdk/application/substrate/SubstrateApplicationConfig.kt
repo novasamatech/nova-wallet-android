@@ -22,6 +22,7 @@ class SubstrateApplicationConfig(
                 SubstrateApplicationConfig(chainId = Chain.Geneses.NODLE_PARACHAIN, coin = 1003, cla = 0x98u),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.POLYMESH, coin = 595, cla = 0x91u),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.XX_NETWORK, coin = 1955, cla = 0xa3u),
+                SubstrateApplicationConfig(chainId = Chain.Geneses.ASTAR, coin = 810, cla = 0xa9u)
             )
         }
 

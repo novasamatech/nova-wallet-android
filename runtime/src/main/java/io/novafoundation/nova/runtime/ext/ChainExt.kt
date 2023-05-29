@@ -212,6 +212,8 @@ object ChainGeneses {
 
     const val KILT = "411f057b9107718c9624d6aa4a3f23c1653898297f3d4d529d9bb6511a39dd21"
     const val KILT_TESTNET = "a0c6e3bac382b316a68bca7141af1fba507207594c761076847ce358aeedcc21"
+
+    const val ASTAR = "9eb76c5184c4ab8679d2d5d819fdf90b9c001403e9e17da2e14b6d8aec4029c6"
 }
 
 object ChainIds {
