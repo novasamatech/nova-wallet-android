@@ -112,7 +112,7 @@ class RealCrossChainTransactor(
 
                 // depending on the version of the pallet, only one of weights arguments going to be encoded
                 "dest_weight" to destWeightEncodable(requiredDestWeight),
-                "dest_weight_limit" to WeightLimit.Limited(requiredDestWeight).toVersionedEncodableInstance(runtime)
+                "dest_weight_limit" to WeightLimit.Unlimited.toVersionedEncodableInstance(runtime)
             )
         )
     }
@@ -163,7 +163,7 @@ class RealCrossChainTransactor(
                 "beneficiary" to assetTransfer.beneficiaryLocation().versioned(lowestMultiLocationVersion).toEncodableInstance(),
                 "assets" to listOf(multiAsset).versioned(lowestMultiAssetsVersion).toEncodableInstance(),
                 "fee_asset_item" to BigInteger.ZERO,
-                "weight_limit" to WeightLimit.Limited(weigher.estimateRequiredDestWeight(configuration)).toVersionedEncodableInstance(runtime)
+                "weight_limit" to WeightLimit.Unlimited.toVersionedEncodableInstance(runtime)
             )
         )
     }
