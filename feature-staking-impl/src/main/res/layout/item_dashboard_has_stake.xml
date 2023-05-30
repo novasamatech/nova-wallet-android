@@ -5,198 +5,240 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:background="@color/block_background"
-    tools:parentTag="com.facebook.shimmer.ShimmerFrameLayout">
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeChainContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <io.novafoundation.nova.feature_account_api.view.ChainChipView
             android:id="@+id/itemDashboardHasStakeChain"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="wrap_content" />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeRewardsLabelСontainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeChainContainer"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeChainContainer">
 
         <TextView
             android:id="@+id/itemDashboardHasStakeRewardsLabel"
             style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/staking_rewards"
-            app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeChain"
-            app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeChain" />
+            android:text="@string/staking_rewards" />
 
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/itemDashboardHasStakeRewardsAmountShimmer"
-            android:layout_width="129dp"
-            android:layout_height="16dp"
-            android:layout_marginTop="11dp"
-            android:background="@drawable/bg_shimmering"
-            app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeRewardsLabel"
-            app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeRewardsLabel" />
+        <View
+            android:id="@+id/itemDashboardHasStakeRewardsLabelShimmer"
+            android:layout_width="49dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/bg_shimmering" />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeRewardsAmountСontainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeRewardsLabelСontainer"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeRewardsLabelСontainer">
 
         <TextView
             android:id="@+id/itemDashboardHasStakeRewardsAmount"
             style="@style/TextAppearance.NovaFoundation.Bold.Title2.Primary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeRewardsLabel"
-            app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeRewardsLabel"
             tools:text="1,643.03 DOT" />
 
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/itemDashboardHasStakeRewardsFiatShimmer"
-            android:layout_width="56dp"
-            android:layout_height="10dp"
-            android:layout_marginTop="14dp"
-            android:background="@drawable/bg_shimmering"
-            app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeRewardsAmountShimmer"
-            app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeRewardsAmountShimmer" />
+        <View
+            android:id="@+id/itemDashboardHasStakeRewardsAmountShimmer"
+            android:layout_width="129dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_shimmering" />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeRewardsFiatContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeRewardsAmountСontainer"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeRewardsAmountСontainer">
 
         <TextView
             android:id="@+id/itemDashboardHasStakeRewardsFiat"
             style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeRewardsAmount"
-            app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeRewardsAmount"
             tools:text="$891.75" />
 
         <View
-            android:id="@+id/itemDashboardHasStakeRightSection"
-            android:layout_width="130dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginBottom="4dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            tools:background="@color/block_background_dark" />
+            android:id="@+id/itemDashboardHasStakeRewardsFiatShimmer"
+            android:layout_width="56dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/bg_shimmering" />
 
-        <ImageView
-            android:id="@+id/itemDashboardHasStakeDetailsAction"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginTop="17dp"
-            android:layout_marginEnd="14dp"
-            android:src="@drawable/ic_chevron_right"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/icon_secondary" />
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <View
+        android:id="@+id/itemDashboardHasStakeRightSection"
+        android:layout_width="130dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:background="@color/block_background_dark" />
+
+    <ImageView
+        android:id="@+id/itemDashboardHasStakeDetailsAction"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="17dp"
+        android:layout_marginEnd="14dp"
+        android:src="@drawable/ic_chevron_right"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/icon_secondary" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeStatusContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeRightSection"
+        app:layout_constraintTop_toTopOf="@+id/itemDashboardHasStakeRightSection">
 
         <io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusView
             android:id="@+id/itemDashboardHasStakeStatus"
             style="@style/Widget.Nova.StakingStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="12dp"
-            app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeRightSection"
-            app:layout_constraintTop_toTopOf="@+id/itemDashboardHasStakeRightSection"
-            tools:background="@color/chips_background"
             tools:text="Waiting" />
 
-        <com.facebook.shimmer.ShimmerFrameLayout
+        <View
             android:id="@+id/itemDashboardHasStakeStatusShimmer"
             android:layout_width="44dp"
             android:layout_height="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="18dp"
-            android:background="@drawable/bg_shimmering"
-            app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeRightSection"
-            app:layout_constraintTop_toTopOf="@+id/itemDashboardHasStakeRightSection" />
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_shimmering" />
 
-        <TextView
-            android:id="@+id/itemDashboardHasStakeStakeLabel"
-            style="@style/TextAppearance.NovaFoundation.Regular.Caption2.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="12dp"
-            android:text="@string/staking_your_stake"
-            app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeRightSection"
-            app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeChain" />
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <TextView
+        android:id="@+id/itemDashboardHasStakeStakeLabel"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption2.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="12dp"
+        android:text="@string/staking_your_stake"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeRightSection"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeChainContainer" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeStakeAmountContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeStakeLabel"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeStakeLabel">
 
         <TextView
             android:id="@+id/itemDashboardHasStakeStakeAmount"
             style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote.Primary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeStakeLabel"
-            app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeStakeLabel"
             tools:text="1,643.03 DOT" />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeStakesFiatContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeStakeAmountContainer"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeStakeAmountContainer">
 
         <TextView
             android:id="@+id/itemDashboardHasStakeStakesFiat"
             style="@style/TextAppearance.NovaFoundation.Regular.Caption2.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeStakeAmount"
-            app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeStakeAmount"
             tools:text="$891.75" />
 
-        <TextView
-            android:id="@+id/itemDashboardHasStakeEarningsLabel"
-            style="@style/TextAppearance.NovaFoundation.Regular.Caption2.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/staking_earnings_per_year"
-            app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeStakeLabel"
-            app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeStakesFiat" />
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <TextView
+        android:id="@+id/itemDashboardHasStakeEarningsLabel"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption2.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/staking_earnings_per_year"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeStakesFiatContainer"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeStakesFiatContainer" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeEarningsContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeEarningsLabel"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeEarningsLabel">
 
         <TextView
             android:id="@+id/itemDashboardHasStakeEarnings"
-            style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote.Primary"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="17dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeEarningsLabel"
-            app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeEarningsLabel"
+            android:textColor="@color/text_positive"
             tools:text="19.47%" />
 
-        <TextView
-            android:id="@+id/itemDashboardHasStakeEarningsSuffix"
-            style="@style/TextAppearance.NovaFoundation.Regular.Caption2.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:includeFontPadding="false"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="5dp"
-            android:text="@string/common_per_year"
-            app:layout_constraintStart_toEndOf="@+id/itemDashboardHasStakeEarnings"
-            app:layout_constraintTop_toTopOf="@+id/itemDashboardHasStakeEarnings" />
-
-        <androidx.constraintlayout.widget.Group
-            android:id="@+id/itemDashboardHasStakeEarningsValueGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:constraint_referenced_ids="itemDashboardHasStakeEarnings,itemDashboardHasStakeEarningsSuffix" />
-
-        <com.facebook.shimmer.ShimmerFrameLayout
+        <View
             android:id="@+id/itemDashboardHasStakeEarningsShimmer"
             android:layout_width="44dp"
             android:layout_height="10dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="19dp"
+            android:layout_marginTop="6dp"
             android:background="@drawable/bg_shimmering"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeEarningsLabel"
             app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeEarningsLabel" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <TextView
+        android:id="@+id/itemDashboardHasStakeEarningsSuffix"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption2.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="5dp"
+        android:includeFontPadding="false"
+        android:text="@string/common_per_year"
+        app:layout_constraintStart_toEndOf="@+id/itemDashboardHasStakeEarningsContainer"
+        app:layout_constraintTop_toTopOf="@+id/itemDashboardHasStakeEarningsContainer" />
 </merge>

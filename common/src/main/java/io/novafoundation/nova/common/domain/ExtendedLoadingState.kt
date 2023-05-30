@@ -41,6 +41,10 @@ fun ExtendedLoadingState<*>.isLoading(): Boolean {
     return this is ExtendedLoadingState.Loading
 }
 
+fun ExtendedLoadingState<*>.isLoaded(): Boolean {
+    return this is ExtendedLoadingState.Loaded
+}
+
 suspend fun <T> FlowCollector<ExtendedLoadingState<T>>.emitLoaded(value: T) {
     emit(ExtendedLoadingState.Loaded(value))
 }

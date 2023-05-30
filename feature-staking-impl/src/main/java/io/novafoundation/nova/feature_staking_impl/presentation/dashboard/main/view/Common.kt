@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setShimmerShown
 
-class ShimmerableGroup<V: View>(val container: ShimmerFrameLayout, val shimmerShape: View, val content: V)
+class ShimmerableGroup<V: View>(val container: ShimmerFrameLayout, val shimmerShape: View? = null, val content: V)
 
 data class SyncingData<T>(val data: T, val isSyncing: Boolean)
 
@@ -19,35 +19,17 @@ fun <V: View, T> ShimmerableGroup<V>.applyState(
 ) {
     when (loadingState) {
         is ExtendedLoadingState.Error, ExtendedLoadingState.Loading -> {
-            shimmerShape.makeVisible()
-            container.startShimmer()
+            shimmerShape?.makeVisible()
+            container.showShimmer(true)
             content.makeGone()
         }
 
         is ExtendedLoadingState.Loaded -> {
-            shimmerShape.makeGone()
-
+            shimmerShape?.makeGone()
+            content.makeVisible()
             container.setShimmerShown(loadingState.data.isSyncing)
 
             setContent?.invoke(content, loadingState.data.data)
-        }
-    }
-}
-
-fun <T> ExtendedLoadingState<T>.applyToView(contentView: View, shimmeringView: ShimmerFrameLayout, contentApplier: (T) -> Unit = {}) {
-    when (this) {
-        is ExtendedLoadingState.Error, ExtendedLoadingState.Loading -> {
-            shimmeringView.makeVisible()
-            shimmeringView.startShimmer()
-            contentView.makeGone()
-        }
-
-        is ExtendedLoadingState.Loaded -> {
-            shimmeringView.makeGone()
-            shimmeringView.stopShimmer()
-            contentView.makeVisible()
-
-            contentApplier(data)
         }
     }
 }

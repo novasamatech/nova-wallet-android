@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.ListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncing
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel.HasStakeItem
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.StakingDashboardHasStakeView
 
@@ -36,7 +35,7 @@ class DashboardHasStakeAdapter(
                 HasStakeItem::rewards -> holder.bindRewards(item)
                 HasStakeItem::status -> holder.bindStatus(item)
                 HasStakeItem::earnings -> holder.bindEarnings(item)
-                HasStakeItem::syncingStage -> holder.bindSyncing(item)
+                HasStakeItem::chainUi -> holder.bindChain(item)
             }
         }
     }
@@ -56,9 +55,11 @@ class DashboardHasStakeViewHolder(
         bindRewards(model)
         bindStake(model)
         bindStatus(model)
-        bindSyncing(model)
+        bindChain(model)
+    }
 
-        containerView.setChainUi(model.chainUi.data)
+    fun bindChain(model: HasStakeItem) {
+        containerView.setChainUi(model.chainUi)
     }
 
     fun bindEarnings(model: HasStakeItem) {
@@ -77,10 +78,6 @@ class DashboardHasStakeViewHolder(
         containerView.setStatus(model.status)
     }
 
-    fun bindSyncing(model: HasStakeItem) {
-        containerView.setSyncing(model.syncingStage.isSyncing())
-    }
-
     override fun unbind() {
         containerView.unbind()
     }
@@ -89,11 +86,11 @@ class DashboardHasStakeViewHolder(
 private class DashboardHasStakeDiffCallback : DiffUtil.ItemCallback<HasStakeItem>() {
 
     private val payloadGenerator = PayloadGenerator(
+        HasStakeItem::chainUi,
         HasStakeItem::stake,
         HasStakeItem::earnings,
         HasStakeItem::status,
         HasStakeItem::rewards,
-        HasStakeItem::syncingStage
     )
 
     override fun areItemsTheSame(oldItem: HasStakeItem, newItem: HasStakeItem): Boolean {

@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingPrimary
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingSecondary
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -98,15 +99,16 @@ class StakingDashboardViewModel(
 
     private fun mapHasStakeItemToUi(hasStake: AggregatedStakingDashboardOption<HasStake>): StakingDashboardModel.HasStakeItem {
         val stats = hasStake.stakingState.stats
+        val isSyncingPrimary = hasStake.syncingStage.isSyncingPrimary()
+        val isSyncingSecondary = hasStake.syncingStage.isSyncingSecondary()
 
         return StakingDashboardModel.HasStakeItem(
-            chainUi = mapChainToUi(hasStake.chain).syncingIf(hasStake.syncingStage.isSyncingPrimary()),
+            chainUi = mapChainToUi(hasStake.chain).syncingIf(isSyncingPrimary),
             assetId = hasStake.token.configuration.id,
-            rewards = stats.map { mapAmountToAmountModel(it.rewards, hasStake.token) },
-            stake = mapAmountToAmountModel(hasStake.stakingState.stake, hasStake.token),
-            status = stats.map { mapStakingStatusToUi(it.status) },
-            earnings = stats.map { it.estimatedEarnings.format() },
-            syncingStage = hasStake.syncingStage
+            rewards = stats.map { mapAmountToAmountModel(it.rewards, hasStake.token).syncingIf(isSyncingSecondary) },
+            stake = mapAmountToAmountModel(hasStake.stakingState.stake, hasStake.token).syncingIf(isSyncingPrimary),
+            status = stats.map { mapStakingStatusToUi(it.status).syncingIf(isSyncingSecondary) },
+            earnings = stats.map { it.estimatedEarnings.format().syncingIf(isSyncingSecondary) },
         )
     }
 
