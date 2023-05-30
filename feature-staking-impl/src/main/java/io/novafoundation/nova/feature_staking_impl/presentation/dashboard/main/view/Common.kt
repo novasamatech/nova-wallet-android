@@ -7,13 +7,13 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setShimmerShown
 
-class ShimmerableGroup<V: View>(val container: ShimmerFrameLayout, val shimmerShape: View? = null, val content: V)
+class ShimmerableGroup<V : View>(val container: ShimmerFrameLayout, val shimmerShape: View? = null, val content: V)
 
 data class SyncingData<T>(val data: T, val isSyncing: Boolean)
 
 fun <T> T.syncingIf(isSyncing: Boolean) = SyncingData(this, isSyncing)
 
-fun <V: View, T> ShimmerableGroup<V>.applyState(
+fun <V : View, T> ShimmerableGroup<V>.applyState(
     loadingState: ExtendedLoadingState<SyncingData<T>>,
     setContent: (V.(T) -> Unit)? = null
 ) {

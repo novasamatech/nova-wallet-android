@@ -14,7 +14,7 @@ abstract class BaseStakingDashboardUpdater(
     protected val chainAsset: Chain.Asset,
     protected val stakingType: Chain.Asset.StakingType,
     protected val metaAccount: MetaAccount,
-): GlobalScopeUpdater {
+) : GlobalScopeUpdater {
 
     protected val stakingTypeLocal = requireNotNull(mapStakingTypeToStakingString(stakingType))
 

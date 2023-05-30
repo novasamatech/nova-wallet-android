@@ -88,7 +88,6 @@ class StakingDashboardHasStakeView @JvmOverloads constructor(
         )
     }
 
-
     init {
         View.inflate(context, R.layout.item_dashboard_has_stake, this)
 
@@ -108,7 +107,7 @@ class StakingDashboardHasStakeView @JvmOverloads constructor(
     fun setRewards(rewardsState: ExtendedLoadingState<SyncingData<AmountModel>>) {
         rewardsLabelGroup.applyState(rewardsState)
         rewardsAmountGroup.applyState(rewardsState) { text = it.token }
-        rewardsFiatGroup.applyState(rewardsState) { text = it.fiat}
+        rewardsFiatGroup.applyState(rewardsState) { text = it.fiat }
     }
 
     fun setStake(stake: SyncingData<AmountModel>) {

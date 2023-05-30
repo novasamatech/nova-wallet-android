@@ -29,7 +29,6 @@ import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboard
 import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarningsSuffixContainer
 import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarningsSuffixShimmerShape
 
-
 class StakingDashboardNoStakeView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
