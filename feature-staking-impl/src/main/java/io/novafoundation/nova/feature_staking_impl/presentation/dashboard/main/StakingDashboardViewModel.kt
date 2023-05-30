@@ -13,11 +13,13 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.HasStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingPrimary
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.syncingIf
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -98,7 +100,7 @@ class StakingDashboardViewModel(
         val stats = hasStake.stakingState.stats
 
         return StakingDashboardModel.HasStakeItem(
-            chainUi = mapChainToUi(hasStake.chain),
+            chainUi = mapChainToUi(hasStake.chain).syncingIf(hasStake.syncingStage.isSyncingPrimary()),
             assetId = hasStake.token.configuration.id,
             rewards = stats.map { mapAmountToAmountModel(it.rewards, hasStake.token) },
             stake = mapAmountToAmountModel(hasStake.stakingState.stake, hasStake.token),

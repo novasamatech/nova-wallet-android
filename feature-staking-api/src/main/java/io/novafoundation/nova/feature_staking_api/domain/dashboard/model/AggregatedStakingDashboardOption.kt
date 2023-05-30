@@ -51,3 +51,11 @@ class AggregatedStakingDashboardOption<out S>(
 fun SyncingStage.isSyncing(): Boolean {
     return this != SyncingStage.SYNCED
 }
+
+fun SyncingStage.isSyncingPrimary(): Boolean {
+    return this == SyncingStage.SYNCING_ALL
+}
+
+fun SyncingStage.isSyncingSecondary(): Boolean {
+    return this < SyncingStage.SYNCED
+}

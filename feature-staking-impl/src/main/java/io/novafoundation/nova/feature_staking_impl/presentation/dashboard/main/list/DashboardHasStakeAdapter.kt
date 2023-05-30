@@ -58,7 +58,7 @@ class DashboardHasStakeViewHolder(
         bindStatus(model)
         bindSyncing(model)
 
-        containerView.setChainUi(model.chainUi)
+        containerView.setChainUi(model.chainUi.data)
     }
 
     fun bindEarnings(model: HasStakeItem) {
@@ -97,7 +97,7 @@ private class DashboardHasStakeDiffCallback : DiffUtil.ItemCallback<HasStakeItem
     )
 
     override fun areItemsTheSame(oldItem: HasStakeItem, newItem: HasStakeItem): Boolean {
-        return oldItem.chainUi.id == newItem.chainUi.id && oldItem.assetId == newItem.assetId
+        return oldItem.chainUi.data.id == newItem.chainUi.data.id && oldItem.assetId == newItem.assetId
     }
 
     override fun areContentsTheSame(oldItem: HasStakeItem, newItem: HasStakeItem): Boolean {

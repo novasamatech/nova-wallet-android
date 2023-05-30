@@ -9,8 +9,11 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NotYetResolved
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.WithoutStake
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingPrimary
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingSecondary
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.syncingIf
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import jp.co.soramitsu.fearless_utils.hash.isPositive
 
@@ -33,16 +36,16 @@ class RealStakingDashboardPresentationMapper(
 
     private fun mapNotYetResolvedItemToUi(noStake: AggregatedStakingDashboardOption<NotYetResolved>): StakingDashboardModel.NoStakeItem {
         return StakingDashboardModel.NoStakeItem(
-            chainUi = mapChainToUi(noStake.chain),
+            chainUi = mapChainToUi(noStake.chain).syncingIf(isSyncing = true),
             assetId = noStake.token.configuration.id,
             earnings = ExtendedLoadingState.Loading,
             availableBalance = null,
-            syncingStage = noStake.syncingStage
         )
     }
 
     private fun mapNoStakeItemToUi(noStake: AggregatedStakingDashboardOption<NoStake>): StakingDashboardModel.NoStakeItem {
         val stats = noStake.stakingState.stats
+        val syncingStage = noStake.syncingStage
 
         val availableBalance = noStake.stakingState.availableBalance
         val formattedAvailableBalance = if (availableBalance.isPositive()) {
@@ -53,11 +56,10 @@ class RealStakingDashboardPresentationMapper(
         }
 
         return StakingDashboardModel.NoStakeItem(
-            chainUi = mapChainToUi(noStake.chain),
+            chainUi = mapChainToUi(noStake.chain).syncingIf(syncingStage.isSyncingPrimary()),
             assetId = noStake.token.configuration.id,
-            earnings = stats.map { it.estimatedEarnings.format() },
+            earnings = stats.map { it.estimatedEarnings.format().syncingIf(syncingStage.isSyncingSecondary()) },
             availableBalance = formattedAvailableBalance,
-            syncingStage = noStake.syncingStage
         )
     }
 }

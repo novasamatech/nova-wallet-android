@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.ListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncing
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel.NoStakeItem
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.StakingDashboardNoStakeView
 
@@ -33,7 +32,6 @@ class DashboardNoStakeAdapter(
         resolvePayload(holder, position, payloads) {
             when (it) {
                 NoStakeItem::earnings -> holder.bindEarnings(item)
-                NoStakeItem::syncingStage -> holder.bindSyncing(item)
                 NoStakeItem::availableBalance -> holder.bindAvailableBalance(item)
             }
         }
@@ -51,7 +49,6 @@ class DashboardNoStakeViewHolder(
 
     fun bind(model: NoStakeItem) {
         bindEarnings(model)
-        bindSyncing(model)
         bindAvailableBalance(model)
 
         containerView.setChainUi(model.chainUi)
@@ -59,10 +56,6 @@ class DashboardNoStakeViewHolder(
 
     fun bindEarnings(model: NoStakeItem) {
         containerView.setEarnings(model.earnings)
-    }
-
-    fun bindSyncing(model: NoStakeItem) {
-        containerView.setSyncing(model.syncingStage.isSyncing())
     }
 
     fun bindAvailableBalance(model: NoStakeItem) {
@@ -76,10 +69,10 @@ class DashboardNoStakeViewHolder(
 
 private class DashboardNoStakeDiffCallback : DiffUtil.ItemCallback<NoStakeItem>() {
 
-    private val payloadGenerator = PayloadGenerator(NoStakeItem::earnings, NoStakeItem::syncingStage, NoStakeItem::availableBalance)
+    private val payloadGenerator = PayloadGenerator(NoStakeItem::earnings, NoStakeItem::availableBalance)
 
     override fun areItemsTheSame(oldItem: NoStakeItem, newItem: NoStakeItem): Boolean {
-        return oldItem.chainUi.id == newItem.chainUi.id && oldItem.assetId == newItem.assetId
+        return oldItem.chainUi.data.id == newItem.chainUi.data.id && oldItem.assetId == newItem.assetId
     }
 
     override fun areContentsTheSame(oldItem: NoStakeItem, newItem: NoStakeItem): Boolean {

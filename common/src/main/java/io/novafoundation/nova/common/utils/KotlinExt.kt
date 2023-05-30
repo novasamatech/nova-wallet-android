@@ -51,6 +51,8 @@ infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another)
 
 fun BigInteger.intSqrt() = sqrt(toDouble()).toLong().toBigInteger()
 
+fun <T> unsafeLazy(initializer: () -> T) = lazy(LazyThreadSafetyMode.NONE, initializer)
+
 fun <T> MutableSet<T>.toImmutable(): Set<T> = Collections.unmodifiableSet(this)
 
 operator fun BigInteger.times(double: Double): BigInteger = toBigDecimal().multiply(double.toBigDecimal()).toBigInteger()
