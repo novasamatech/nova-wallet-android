@@ -12,14 +12,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.children
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.getColorOrNull
 
-private const val CARD_MAX_ROTATION = 2f
-private const val DEVICE_ROTATION_ANGLE = 6f
+private const val DEVICE_ROTATION_ANGLE_RADIUS = 10f
 
 open class ParallaxCardView @JvmOverloads constructor(
     context: Context,
@@ -27,14 +25,13 @@ open class ParallaxCardView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), ParallaxCardBitmapBaking.OnBakingPreparedCallback {
 
-    private val gyroscopeListener = CardGyroscopeListener(context, DEVICE_ROTATION_ANGLE, ::onGyroscopeRotation)
+    private val gyroscopeListener = CardGyroscopeListener(context, DEVICE_ROTATION_ANGLE_RADIUS, ::onGyroscopeRotation)
 
     private val frostedGlassLayer: FrostedGlassLayer = FrostedGlassLayer()
     private val cardRect = RectF()
     private val cardPath = Path()
     private val cardRadius = 12.dpF(context)
     private var travelOffset = 0f
-    private val frostedGlassTranslationRange = 5.dpF(context)
     private val parallaxTopLayerMaxTravel = 0f
     private val parallaxTMiddleLayerMaxTravel = (-15).dpF(context)
     private val parallaxBottomLayerMaxTravel = (-25).dpF(context)
@@ -112,16 +109,11 @@ open class ParallaxCardView @JvmOverloads constructor(
     }
 
     private fun onGyroscopeRotation(rotation: Float) {
-        rotationY = rotation * CARD_MAX_ROTATION
         travelOffset = rotation
 
         if (helper.isPrepared) {
             updateHighlights()
             updateFrostedGlassLayer()
-        }
-
-        children.forEach { child ->
-            child.translationX = getTravelOffsetInRange(frostedGlassTranslationRange)
         }
         invalidate()
     }
