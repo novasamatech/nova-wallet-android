@@ -75,7 +75,7 @@ inline fun <T> ExtendedLoadingState<T>.onLoaded(action: (T) -> Unit): ExtendedLo
     return this
 }
 
-inline fun <T> ExtendedLoadingState<T>.onNotLoaded(action: () -> Unit):  ExtendedLoadingState<T> {
+inline fun <T> ExtendedLoadingState<T>.onNotLoaded(action: () -> Unit): ExtendedLoadingState<T> {
     if (this !is ExtendedLoadingState.Loaded) {
         action()
     }
