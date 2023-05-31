@@ -64,3 +64,21 @@ fun <T> ExtendedLoadingState.Companion.fromOption(value: T?): ExtendedLoadingSta
         ExtendedLoadingState.Loading
     }
 }
+
+fun <T> T.asLoaded(): ExtendedLoadingState.Loaded<T> = ExtendedLoadingState.Loaded(this)
+
+inline fun <T> ExtendedLoadingState<T>.onLoaded(action: (T) -> Unit): ExtendedLoadingState<T> {
+    if (this is ExtendedLoadingState.Loaded) {
+        action(data)
+    }
+
+    return this
+}
+
+inline fun <T> ExtendedLoadingState<T>.onNotLoaded(action: () -> Unit):  ExtendedLoadingState<T> {
+    if (this !is ExtendedLoadingState.Loaded) {
+        action()
+    }
+
+    return this
+}

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.firstLoaded
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
@@ -24,7 +25,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.v
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -46,7 +46,7 @@ class StakingDashboardViewModel(
         .shareInBackground()
 
     val stakingDashboardUiFlow = stakingDashboardFlow
-        .map(::mapDashboardToUi)
+        .map { dashboardLoading -> dashboardLoading.map(::mapDashboardToUi) }
         .shareInBackground()
 
     init {
@@ -56,7 +56,7 @@ class StakingDashboardViewModel(
     }
 
     fun onHasStakeItemClicked(index: Int) = launch {
-        val hasStakeItems = stakingDashboardFlow.first().hasStake
+        val hasStakeItems = stakingDashboardFlow.firstLoaded().hasStake
         val hasStakeItem = hasStakeItems.getOrNull(index) ?: return@launch
 
         openChainStaking(
@@ -67,7 +67,7 @@ class StakingDashboardViewModel(
     }
 
     fun onNoStakeItemClicked(index: Int) = launch {
-        val withoutStakeItems = stakingDashboardFlow.first().withoutStake
+        val withoutStakeItems = stakingDashboardFlow.firstLoaded().withoutStake
         val withoutStakeItem = withoutStakeItems.getOrNull(index) ?: return@launch
         val noStakeItemState = withoutStakeItem.stakingState as? NoStake ?: return@launch
 

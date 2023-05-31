@@ -3,6 +3,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.dashboard
 
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.asLoaded
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.fromOption
 import io.novafoundation.nova.common.domain.map
@@ -67,10 +68,12 @@ class RealStakingDashboardInteractor(
         }
     }
 
-    override fun stakingDashboardFlow(): Flow<StakingDashboard> {
+    override fun stakingDashboardFlow(): Flow<ExtendedLoadingState<StakingDashboard>> {
         return flow {
             val stakingChains = chainRegistry.stakingChainsById()
             val knownStakingAssets = stakingChains.knownStakingAssets()
+
+            emit(ExtendedLoadingState.Loading)
 
             val dashboardFlow = accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
                 val noPriceDashboardFlow = combine(
@@ -209,7 +212,7 @@ class RealStakingDashboardInteractor(
     private fun addPricesToDashboard(
         noPriceStakingDashboard: NoPriceStakingDashboard,
         assets: Map<FullChainAssetId, Asset>,
-    ): StakingDashboard {
+    ): ExtendedLoadingState<StakingDashboard> {
         val hasStakeOptions = noPriceStakingDashboard.hasStake.map { addPriceToHasStakeItem(it, assets) }
         val noStakeOptions = noPriceStakingDashboard.noStake.map { addAssetInfoToNoStakeItem(it, assets) }
         val notYetResolvedOptions = noPriceStakingDashboard.notYetResolved.map { addAssetInfoToNotYetResolvedItem(it, assets) }
@@ -217,7 +220,7 @@ class RealStakingDashboardInteractor(
         return StakingDashboard(
             hasStake = hasStakeOptions.sortedByChain(),
             withoutStake = (noStakeOptions + notYetResolvedOptions).sortedByChain(),
-        )
+        ).asLoaded()
     }
 
     private fun combineNoMoreOptionsInfo(
