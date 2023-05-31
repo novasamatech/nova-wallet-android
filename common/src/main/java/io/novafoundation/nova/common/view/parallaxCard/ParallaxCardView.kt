@@ -16,6 +16,7 @@ import androidx.core.view.children
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.dpF
+import io.novafoundation.nova.common.utils.getColorOrNull
 
 private const val CARD_MAX_ROTATION = 2f
 private const val DEVICE_ROTATION_ANGLE = 6f

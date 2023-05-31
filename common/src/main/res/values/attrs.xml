@@ -247,7 +247,6 @@
     <declare-styleable name="ParallaxCardView_Layout">
         <attr name="layout_cardBackgroundColor" format="color" />
         <attr name="layout_cardBorderColor" format="color" />
-        <attr name="layout_strokeWidth" format="dimension" />
         <attr name="layout_cardRadius" format="dimension" />
     </declare-styleable>
 </resources>

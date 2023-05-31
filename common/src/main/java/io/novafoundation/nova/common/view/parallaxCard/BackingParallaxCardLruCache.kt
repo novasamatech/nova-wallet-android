@@ -8,6 +8,6 @@ private const val DISK_CACHE_SIZE = 1024 * 1024 // 1MB
 class BackingParallaxCardLruCache(cacheSizeInMb: Int) : LruCache<String, Bitmap>(cacheSizeInMb * DISK_CACHE_SIZE) {
 
     override fun sizeOf(key: String, bitmap: Bitmap): Int {
-        return bitmap.byteCount / 1024
+        return bitmap.byteCount
     }
 }

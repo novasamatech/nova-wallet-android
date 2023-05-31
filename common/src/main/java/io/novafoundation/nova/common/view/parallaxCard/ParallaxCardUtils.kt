@@ -1,16 +1,11 @@
 package io.novafoundation.nova.common.view.parallaxCard
 
-import android.content.res.TypedArray
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.Path
 import android.graphics.RectF
 import android.view.View
-import androidx.annotation.ColorInt
-import androidx.annotation.IdRes
-import androidx.annotation.StyleableRes
-import androidx.core.content.res.getResourceIdOrThrow
 import com.google.android.renderscript.Toolkit
 
 fun Path.applyRoundRect(rectF: RectF, radius: Float) {
@@ -79,18 +74,4 @@ fun Bitmap.toBitmapShaderHelper(): BitmapShaderHelper {
 
 fun Bitmap.toBitmapWithRect(): BitmapWithRect {
     return BitmapWithRect(this)
-}
-
-@IdRes
-fun TypedArray.getResourceOrNull(@StyleableRes resId: Int): Int? {
-    return try {
-        getResourceIdOrThrow(resId)
-    } catch (e: IllegalArgumentException) {
-        null
-    }
-}
-
-@ColorInt
-fun TypedArray.getColorOrNull(@StyleableRes resId: Int): Int? {
-    return getResourceOrNull(resId)?.let { getColor(resId, 0) }
 }

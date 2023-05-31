@@ -35,6 +35,7 @@ class ResourceManagerImpl(
     }
 
     override fun getColor(res: Int): Int {
+        contextManager.getApplicationContext().resources
         return ContextCompat.getColor(contextManager.getApplicationContext(), res)
     }
 
@@ -92,5 +93,9 @@ class ResourceManagerImpl(
 
     override fun getDrawable(id: Int): Drawable {
         return contextManager.getApplicationContext().getDrawableCompat(id)
+    }
+
+    override fun getDimensionPixelSize(id: Int): Int {
+        return contextManager.getApplicationContext().resources.getDimensionPixelSize(id)
     }
 }

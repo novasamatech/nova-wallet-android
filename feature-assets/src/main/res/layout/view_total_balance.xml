@@ -21,18 +21,40 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/viewAssetsTotalBalanceTotal"
-        style="@style/TextAppearance.NovaFoundation.Bold.HugeTitle"
-        android:layout_width="match_parent"
+    <FrameLayout
+        android:id="@+id/viewAssetsTotalBalanceContainer"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:textColor="@color/text_primary"
-        android:visibility="gone"
+        android:minHeight="47dp"
+        android:layout_marginTop="15dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/viewAssetsTotalBalanceTitle"
-        tools:text="$214.66"
-        tools:visibility="visible" />
+        app:layout_constraintTop_toBottomOf="@+id/viewAssetsTotalBalanceTitle">
+
+        <TextView
+            android:id="@+id/viewAssetsTotalBalanceTotal"
+            style="@style/TextAppearance.NovaFoundation.Bold.HugeTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:visibility="gone"
+            tools:text="$214.66"
+            tools:visibility="visible" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/viewAssetsTotalBalanceShimmer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            tools:visibility="gone">
+
+            <View
+                android:layout_width="145dp"
+                android:layout_height="28dp"
+                android:background="@drawable/bg_shimmering" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/viewAssetsTotalBalanceLockedContainer"
@@ -81,7 +103,7 @@
         app:layout_cardRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/viewAssetsTotalBalanceTotal">
+        app:layout_constraintTop_toBottomOf="@id/viewAssetsTotalBalanceContainer">
 
         <TextView
             android:id="@+id/viewAssetsTotalBalanceSend"
@@ -104,22 +126,5 @@
             tools:drawableTop="@drawable/ic_receive" />
 
     </LinearLayout>
-
-    <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/viewAssetsTotalBalanceShimmer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="24dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/viewAssetsTotalBalanceTitle"
-        tools:visibility="gone">
-
-        <View
-            android:layout_width="145dp"
-            android:layout_height="28dp"
-            android:background="@drawable/bg_shimmering" />
-
-    </com.facebook.shimmer.ShimmerFrameLayout>
 
 </merge>
