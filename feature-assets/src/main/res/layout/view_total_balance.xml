@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="14dp"
-    tools:parentTag="io.novafoundation.nova.common.view.paralaxCard.ParalaxCardView">
+    tools:parentTag="io.novafoundation.nova.common.view.parallaxCard.ParallaxCardView">
 
     <TextView
         android:id="@+id/viewAssetsTotalBalanceTitle"
@@ -34,29 +34,43 @@
         tools:text="$214.66"
         tools:visibility="visible" />
 
-    <TextView
-        android:id="@+id/viewAssetsTotalBalanceLocked"
-        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+    <LinearLayout
+        android:id="@+id/viewAssetsTotalBalanceLockedContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:background="@drawable/bg_total_card_chip"
-        android:drawablePadding="4dp"
         android:gravity="center_vertical"
         android:minHeight="22dp"
+        android:orientation="horizontal"
         android:paddingHorizontal="8dp"
         android:paddingVertical="2dp"
-        android:textColor="@color/chip_text"
         android:visibility="gone"
-        app:drawableEndCompat="@drawable/ic_info_cicrle_filled_16"
-        app:drawableStartCompat="@drawable/ic_lock"
-        app:drawableTint="@color/chip_icon"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:drawableEnd="@drawable/ic_info_cicrle_filled_16"
-        tools:drawableStart="@drawable/ic_lock"
-        tools:text="$214.66"
-        tools:visibility="visible" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/viewAssetsTotalBalanceLocked"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="4dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/chip_text"
+            app:drawableStartCompat="@drawable/ic_lock"
+            app:drawableTint="@color/chip_icon"
+            tools:drawableStart="@drawable/ic_lock"
+            tools:text="$214.66"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginStart="4dp"
+            android:src="@drawable/ic_info_cicrle_filled_16"
+            app:tint="@color/chip_icon" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="0dp"

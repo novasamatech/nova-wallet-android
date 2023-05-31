@@ -1,4 +1,4 @@
-package io.novafoundation.nova.common.view.paralaxCard
+package io.novafoundation.nova.common.view.parallaxCard
 
 import android.content.res.TypedArray
 import android.graphics.Bitmap
@@ -73,7 +73,7 @@ fun Bitmap.downscale(factor: Float): Bitmap {
     return newBitmap
 }
 
-fun Bitmap.toBitmapShaderWithPaint(): BitmapShaderHelper {
+fun Bitmap.toBitmapShaderHelper(): BitmapShaderHelper {
     return BitmapShaderHelper(this)
 }
 

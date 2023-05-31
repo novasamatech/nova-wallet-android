@@ -1,4 +1,4 @@
-package io.novafoundation.nova.common.view.paralaxCard
+package io.novafoundation.nova.common.view.parallaxCard
 
 import android.animation.TimeAnimator
 import android.content.Context

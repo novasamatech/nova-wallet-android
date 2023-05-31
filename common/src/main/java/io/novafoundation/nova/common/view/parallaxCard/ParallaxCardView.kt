@@ -1,11 +1,8 @@
-package io.novafoundation.nova.common.view.paralaxCard
+package io.novafoundation.nova.common.view.parallaxCard
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.BitmapShader
 import android.graphics.Canvas
-import android.graphics.Matrix
 import android.graphics.Outline
 import android.graphics.Paint
 import android.graphics.Path
@@ -17,78 +14,47 @@ import android.view.ViewOutlineProvider
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.dpF
 
-private const val CARD_MAX_ROTATION = 4f
+private const val CARD_MAX_ROTATION = 2f
 private const val DEVICE_ROTATION_ANGLE = 6f
 
-open class ParalaxCardView @JvmOverloads constructor(
+open class ParallaxCardView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : ConstraintLayout(context, attrs, defStyleAttr) {
+) : ConstraintLayout(context, attrs, defStyleAttr), ParallaxCardBitmapBaking.OnBakingPreparedCallback {
 
     private val gyroscopeListener = CardGyroscopeListener(context, DEVICE_ROTATION_ANGLE, ::onGyroscopeRotation)
 
-    // Card background bitmap
-    private val cardBackgroundBitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_paralax_card_background)
-
-    // Highlights bitmaps
-    private val cardHighlightBitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_card_background_highlight)
-    private val cardBorderHighlightBitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_card_border_highlight)
-    private val nestedViewBorderHighlightBitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_frosted_glass_highlight)
-    private val paralaxHighlightBitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_pattern_highlight)
-
-    // Shaders
-    private val cardHighlightShader = cardHighlightBitmap.toBitmapShaderWithPaint()
-    private val cardBorderHighlightShader = cardBorderHighlightBitmap.toBitmapShaderWithPaint().apply {
-        paint.strokeWidth = 2.dpF(context)
-        paint.style = Paint.Style.STROKE
-    }
-    private val paralaxHighlightShader = paralaxHighlightBitmap.toBitmapShaderWithPaint()
-    private val nestedViewBorderHighlightShader = nestedViewBorderHighlightBitmap.toBitmapShaderWithPaint().apply {
-        paint.strokeWidth = 2.dpF(context)
-        paint.style = Paint.Style.STROKE
-    }
-
-    // Paralax bitmaps
-    private val paralaxFirstBitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_big_star).convertToAlphaMask().toBitmapWithRect()
-    private val paralaxSecondBitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_middle_star)
-        //.downscale(0.2f)
-        .blurBitmap(2.dp(context)).convertToAlphaMask().toBitmapWithRect()
-    private val paralaxThirdBitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_small_star)
-        //.downscale(0.1f)
-        .blurBitmap(4.dp(context)).convertToAlphaMask().toBitmapWithRect()
-
-    // Paralax bitmaps blurred
-    private val paralaxFirstBlurredBitmap = paralaxFirstBitmap.bitmap.downscale(0.25f).blurBitmap(2.dp(context)).convertToAlphaMask().toBitmapWithRect()
-    private val paralaxSecondBlurredBitmap = paralaxSecondBitmap.bitmap.downscale(0.25f).blurBitmap(2.dp(context)).convertToAlphaMask().toBitmapWithRect()
-    private val paralaxThirdBlurredBitmap = paralaxThirdBitmap.bitmap.downscale(0.25f).blurBitmap(2.dp(context)).convertToAlphaMask().toBitmapWithRect()
-
     private val frostedGlassLayer: FrostedGlassLayer = FrostedGlassLayer()
-
     private val cardRect = RectF()
     private val cardPath = Path()
     private val cardRadius = 12.dpF(context)
-
     private var travelOffset = 0f
-
     private val frostedGlassTranslationRange = 5.dpF(context)
-
-    private val paralaxTopLayerMaxTravel = 0f
-    private val paralaxTMiddleLayerMaxTravel = (-15).dpF(context)
-    private val paralaxBottomLayerMaxTravel = (-25).dpF(context)
-
+    private val parallaxTopLayerMaxTravel = 0f
+    private val parallaxTMiddleLayerMaxTravel = (-15).dpF(context)
+    private val parallaxBottomLayerMaxTravel = (-25).dpF(context)
     private val cardBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = context.getColor(R.color.container_card_actions_border)
         strokeWidth = 2.dpF(context)
         style = Paint.Style.STROKE
     }
 
+    private val lruCache: BackingParallaxCardLruCache = FeatureUtils.getCommonApi(context)
+        .bakingParallaxCardCache()
+
+    private val helper = ParallaxCardBitmapBaking(context, lruCache)
+
+
     init {
         cameraDistance = 10000f
         setWillNotDraw(false)
         clipToPadding = false
         gyroscopeListener.start()
+
+        helper.setBakingPreparedCallback(this)
+
         // Implement native shadow
         outlineProvider = object : ViewOutlineProvider() {
             override fun getOutline(view: View, outline: Outline) {
@@ -99,6 +65,7 @@ open class ParalaxCardView @JvmOverloads constructor(
 
     override fun onViewRemoved(view: View?) {
         super.onViewRemoved(view)
+        helper.onViewRemove()
         gyroscopeListener.cancel()
     }
 
@@ -106,6 +73,14 @@ open class ParalaxCardView @JvmOverloads constructor(
         super.onLayout(changed, left, top, right, bottom)
         cardRect.setCardBounds(this)
         cardPath.applyRoundRect(cardRect, cardRadius)
+        if (helper.isPrepared) {
+            updateHighlights()
+            updateParalaxBitmapBounds()
+            updateFrostedGlassLayer()
+        }
+    }
+
+    override fun onBakingPrepared() {
         updateHighlights()
         updateParalaxBitmapBounds()
         updateFrostedGlassLayer()
@@ -136,16 +111,22 @@ open class ParalaxCardView @JvmOverloads constructor(
     private fun onGyroscopeRotation(rotation: Float) {
         rotationY = rotation * CARD_MAX_ROTATION
         travelOffset = rotation
-        updateHighlights()
+
+        if (helper.isPrepared) {
+            updateHighlights()
+            updateFrostedGlassLayer()
+        }
+
         children.forEach { child ->
             child.translationX = getTravelOffsetInRange(frostedGlassTranslationRange)
         }
-        updateFrostedGlassLayer()
         invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        if (!helper.isPrepared) return
+
         canvas.clipPath(cardPath)
         drawCard(canvas)
         drawParalax(canvas)
@@ -153,33 +134,33 @@ open class ParalaxCardView @JvmOverloads constructor(
     }
 
     private fun drawCard(canvas: Canvas) {
-        canvas.drawBitmap(cardBackgroundBitmap, null, cardRect, null)
-        canvas.drawPath(cardPath, cardBorderHighlightShader.paint)
+        canvas.drawBitmap(helper.cardBackgroundBitmap!!, null, cardRect, null)
+        canvas.drawPath(cardPath, helper.cardBorderHighlightShader!!.paint)
         canvas.drawPath(cardPath, cardBorderPaint)
-        canvas.drawRect(cardRect, cardHighlightShader.paint)
+        canvas.drawRect(cardRect, helper.cardHighlightShader!!.paint)
     }
 
     private fun drawParalax(canvas: Canvas) {
-        paralaxFirstBitmap.drawParalaxLayerByRange(canvas, paralaxTopLayerMaxTravel)
-        paralaxSecondBitmap.drawParalaxLayerByRange(canvas, paralaxTMiddleLayerMaxTravel)
-        paralaxThirdBitmap.drawParalaxLayerByRange(canvas, paralaxBottomLayerMaxTravel)
+        helper.parallaxFirstBitmap!!.drawParalaxLayerByRange(canvas, parallaxTopLayerMaxTravel)
+        helper.parallaxSecondBitmap!!.drawParalaxLayerByRange(canvas, parallaxTMiddleLayerMaxTravel)
+        helper.parallaxThirdBitmap!!.drawParalaxLayerByRange(canvas, parallaxBottomLayerMaxTravel)
     }
 
     private fun drawBlurredParalax(canvas: Canvas) {
-        paralaxFirstBlurredBitmap.drawParalaxLayerByRange(canvas, paralaxTopLayerMaxTravel)
-        paralaxSecondBlurredBitmap.drawParalaxLayerByRange(canvas, paralaxTMiddleLayerMaxTravel)
-        paralaxThirdBlurredBitmap.drawParalaxLayerByRange(canvas, paralaxBottomLayerMaxTravel)
+        helper.parallaxFirstBlurredBitmap!!.drawParalaxLayerByRange(canvas, parallaxTopLayerMaxTravel)
+        helper.parallaxSecondBlurredBitmap!!.drawParalaxLayerByRange(canvas, parallaxTMiddleLayerMaxTravel)
+        helper.parallaxThirdBlurredBitmap!!.drawParalaxLayerByRange(canvas, parallaxBottomLayerMaxTravel)
     }
 
     private fun drawFrostedGlassLayer(canvas: Canvas) {
         frostedGlassLayer.layers.forEach {
             canvas.save()
             canvas.clipPath(it.borderPath)
-            canvas.drawBitmap(cardBackgroundBitmap, null, cardRect, null)
+            canvas.drawBitmap(helper.cardBackgroundBitmap!!, null, cardRect, null)
             drawBlurredParalax(canvas)
             canvas.drawPath(it.borderPath, it.cardPaint)
             canvas.drawPath(it.borderPath, cardBorderPaint)
-            canvas.drawPath(it.borderPath, nestedViewBorderHighlightShader.paint)
+            canvas.drawPath(it.borderPath, helper.nestedViewBorderHighlightShader!!.paint)
             canvas.restore()
         }
     }
@@ -188,10 +169,10 @@ open class ParalaxCardView @JvmOverloads constructor(
         if (range != 0f) {
             canvas.save()
             canvas.travelOffsetInRange(range)
-            canvas.drawBitmap(bitmap, null, rect, paralaxHighlightShader.paint)
+            canvas.drawBitmap(bitmap, null, rect, helper.parallaxHighlightShader!!.paint)
             canvas.restore()
         } else {
-            canvas.drawBitmap(bitmap, null, rect, paralaxHighlightShader.paint)
+            canvas.drawBitmap(bitmap, null, rect, helper.parallaxHighlightShader!!.paint)
         }
     }
 
@@ -206,19 +187,19 @@ open class ParalaxCardView @JvmOverloads constructor(
 
     private fun updateHighlights() {
         val highlightOffset = getTravelOffsetInRange(width / 2f)
-        cardHighlightShader.normalizeMatrix(ScaleType.CENTER_INSIDE, highlightOffset)
-        cardBorderHighlightShader.normalizeMatrix(ScaleType.CENTER_INSIDE, highlightOffset)
-        paralaxHighlightShader.normalizeMatrix(ScaleType.CENTER, highlightOffset)
-        nestedViewBorderHighlightShader.normalizeMatrix(ScaleType.CENTER_INSIDE, highlightOffset)
+        helper.cardHighlightShader!!.normalizeMatrix(ScaleType.CENTER_INSIDE, highlightOffset)
+        helper.cardBorderHighlightShader!!.normalizeMatrix(ScaleType.CENTER_INSIDE, highlightOffset)
+        helper.parallaxHighlightShader!!.normalizeMatrix(ScaleType.CENTER, highlightOffset)
+        helper.nestedViewBorderHighlightShader!!.normalizeMatrix(ScaleType.CENTER_INSIDE, highlightOffset)
     }
 
     private fun updateParalaxBitmapBounds() {
-        paralaxFirstBitmap.normalizeBounds(ScaleType.CENTER)
-        paralaxFirstBlurredBitmap.normalizeBounds(ScaleType.CENTER)
-        paralaxSecondBitmap.normalizeBounds(ScaleType.CENTER)
-        paralaxSecondBlurredBitmap.normalizeBounds(ScaleType.CENTER)
-        paralaxThirdBitmap.normalizeBounds(ScaleType.CENTER)
-        paralaxThirdBlurredBitmap.normalizeBounds(ScaleType.CENTER)
+        helper.parallaxFirstBitmap!!.normalizeBounds(ScaleType.CENTER)
+        helper.parallaxFirstBlurredBitmap!!.normalizeBounds(ScaleType.CENTER)
+        helper.parallaxSecondBitmap!!.normalizeBounds(ScaleType.CENTER)
+        helper.parallaxSecondBlurredBitmap!!.normalizeBounds(ScaleType.CENTER)
+        helper.parallaxThirdBitmap!!.normalizeBounds(ScaleType.CENTER)
+        helper.parallaxThirdBlurredBitmap!!.normalizeBounds(ScaleType.CENTER)
     }
 
     private fun updateFrostedGlassLayer() {
@@ -283,12 +264,12 @@ open class ParalaxCardView @JvmOverloads constructor(
         }
 
         constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-            val a = context.obtainStyledAttributes(attrs, R.styleable.ParalaxCardView_Layout)
+            val a = context.obtainStyledAttributes(attrs, R.styleable.ParallaxCardView_Layout)
             cardBackgroundColor = a.getColorOrNull(
-                R.styleable.ParalaxCardView_Layout_layout_cardBackgroundColor
+                R.styleable.ParallaxCardView_Layout_layout_cardBackgroundColor
             )
-            cardBorderColor = a.getColorOrNull(R.styleable.ParalaxCardView_Layout_layout_cardBorderColor)
-            cardRadius = a.getDimension(R.styleable.ParalaxCardView_Layout_layout_cardRadius, 0f)
+            cardBorderColor = a.getColorOrNull(R.styleable.ParallaxCardView_Layout_layout_cardBorderColor)
+            cardRadius = a.getDimension(R.styleable.ParallaxCardView_Layout_layout_cardRadius, 0f)
             a.recycle()
         }
     }

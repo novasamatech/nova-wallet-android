@@ -244,7 +244,7 @@
         <attr name="iconEndPadding" format="dimension" />
     </declare-styleable>
 
-    <declare-styleable name="ParalaxCardView_Layout">
+    <declare-styleable name="ParallaxCardView_Layout">
         <attr name="layout_cardBackgroundColor" format="color" />
         <attr name="layout_cardBorderColor" format="color" />
         <attr name="layout_strokeWidth" format="dimension" />
