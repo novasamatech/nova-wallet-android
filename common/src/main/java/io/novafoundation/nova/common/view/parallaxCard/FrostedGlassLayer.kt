@@ -16,5 +16,4 @@ class ViewWithLayoutParams(val view: View, layoutParams: ParallaxCardView.Layout
     val cardPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = layoutParams.cardBackgroundColor!!
     }
-
 }

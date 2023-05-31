@@ -11,5 +11,4 @@ class ParallaxCardModule {
     @Provides
     @ApplicationScope
     fun provideBackingParallaxCardLruCache() = BackingParallaxCardLruCache(15)
-
 }

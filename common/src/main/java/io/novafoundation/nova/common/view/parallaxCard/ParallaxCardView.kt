@@ -21,7 +21,9 @@ private const val CARD_MAX_ROTATION = 2f
 private const val DEVICE_ROTATION_ANGLE = 6f
 
 open class ParallaxCardView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), ParallaxCardBitmapBaking.OnBakingPreparedCallback {
 
     private val gyroscopeListener = CardGyroscopeListener(context, DEVICE_ROTATION_ANGLE, ::onGyroscopeRotation)
@@ -45,7 +47,6 @@ open class ParallaxCardView @JvmOverloads constructor(
         .bakingParallaxCardCache()
 
     private val helper = ParallaxCardBitmapBaking(context, lruCache)
-
 
     init {
         cameraDistance = 10000f
@@ -100,7 +101,8 @@ open class ParallaxCardView @JvmOverloads constructor(
 
     override fun generateDefaultLayoutParams(): ConstraintLayout.LayoutParams {
         return LayoutParams(
-            ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT
+            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT
         )
     }
 
@@ -213,7 +215,8 @@ open class ParallaxCardView @JvmOverloads constructor(
 
         matrix.setScale(scale, scale)
         matrix.postTranslate(
-            cardRect.left + (cardRect.width() - bitmap.width * scale) / 2f + shaderOffset, cardRect.top + (cardRect.height() - bitmap.height * scale) / 2f
+            cardRect.left + (cardRect.width() - bitmap.width * scale) / 2f + shaderOffset,
+            cardRect.top + (cardRect.height() - bitmap.height * scale) / 2f
         )
 
         shader.setLocalMatrix(matrix)
@@ -223,13 +226,18 @@ open class ParallaxCardView @JvmOverloads constructor(
         val scale = bitmap.calculateScale(scaleType, cardRect.width(), cardRect.height())
 
         rect.set(
-            0f, 0f, bitmap.width * scale, bitmap.height * scale
+            0f,
+            0f,
+            bitmap.width * scale,
+            bitmap.height * scale
         )
         rect.offset((cardRect.width() - rect.width()) / 2, cardRect.top)
     }
 
     private fun Bitmap.calculateScale(
-        scaleType: ScaleType, targetWidth: Float, targetHeight: Float
+        scaleType: ScaleType,
+        targetWidth: Float,
+        targetHeight: Float
     ): Float {
         val wScale = targetWidth / this@calculateScale.width
         val hScale = targetHeight / this@calculateScale.height

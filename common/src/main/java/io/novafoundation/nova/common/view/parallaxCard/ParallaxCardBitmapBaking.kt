@@ -116,7 +116,6 @@ class ParallaxCardBitmapBaking(private val context: Context, val lruCache: Backi
                         paint.strokeWidth = 2.dpF(context)
                         paint.style = Paint.Style.STROKE
                     }
-
                 }
 
                 isPrepared = true
