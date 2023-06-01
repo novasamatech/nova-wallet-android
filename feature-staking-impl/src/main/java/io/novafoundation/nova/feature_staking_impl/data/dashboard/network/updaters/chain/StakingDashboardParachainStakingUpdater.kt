@@ -3,28 +3,25 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updat
 import io.novafoundation.nova.common.address.get
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.parachainStaking
-import io.novafoundation.nova.core.updater.GlobalScopeUpdater
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdKeyMap
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
-import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.SyncingStage
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.activeBonded
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.ChainStakingStats
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.MultiChainStakingStats
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterEvent.PrimaryStakingAccountResolved
-import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterEvent.StakingDashboardOptionUpdated
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindCandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindDelegatorState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.isActive
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.isStakeEnoughToEarnRewards
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapStakingTypeToStakingString
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
@@ -38,32 +35,28 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
 
 class StakingDashboardParachainStakingUpdater(
-    private val chain: Chain,
-    private val chainAsset: Chain.Asset,
-    private val stakingType: Chain.Asset.StakingType,
-    private val metaAccount: MetaAccount,
+    chain: Chain,
+    chainAsset: Chain.Asset,
+    stakingType: Chain.Asset.StakingType,
+    metaAccount: MetaAccount,
     private val stakingStatsAsync: Deferred<MultiChainStakingStats>,
     private val stakingDashboardCache: StakingDashboardCache,
     private val remoteStorageSource: StorageDataSource
-) : GlobalScopeUpdater {
-
-    private val stakingTypeLocal = requireNotNull(mapStakingTypeToStakingString(stakingType))
-
-    override val requiredModules: List<String> = emptyList()
+) : BaseStakingDashboardUpdater(chain, chainAsset, stakingType, metaAccount) {
 
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
         return remoteStorageSource.subscribe(chain.id, storageSubscriptionBuilder) { subscribeToStakingState() }
             .transformLatest { parachainStakingBaseInfo ->
                 if (stakingStatsAsync.isActive) {
                     saveItem(parachainStakingBaseInfo, secondaryInfo = null)
+                    emit(SyncingStage.SYNCING_SECONDARY.asUpdaterEvent())
                 }
 
                 val stakingStats = stakingStatsAsync.await()
                 val secondaryInfo = constructSecondaryInfo(parachainStakingBaseInfo, stakingStats)
-
                 saveItem(parachainStakingBaseInfo, secondaryInfo)
 
-                emit(StakingDashboardOptionUpdated(stakingOptionId()) as StakingDashboardUpdaterEvent)
+                emit(SyncingStage.SYNCED.asUpdaterEvent())
             }.onStart {
                 emit(PrimaryStakingAccountResolved(stakingOptionId(), metaAccount.accountIdIn(chain)))
             }
@@ -122,16 +115,11 @@ class StakingDashboardParachainStakingUpdater(
         }
     }
 
-    private suspend fun StakingDashboardCache.update(updating: (StakingDashboardItemLocal?) -> StakingDashboardItemLocal) {
-        update(chain.id, chainAsset.id, stakingTypeLocal, metaAccount.id, updating)
-    }
-
     private fun constructSecondaryInfo(
         baseInfo: ParachainStakingBaseInfo?,
         multiChainStakingStats: MultiChainStakingStats,
     ): ParachainStakingSecondaryInfo? {
-        val optionId = StakingOptionId(chain.id, chainAsset.id, stakingType)
-        val chainStakingStats = multiChainStakingStats[optionId] ?: return null
+        val chainStakingStats = multiChainStakingStats[stakingOptionId()] ?: return null
 
         return ParachainStakingSecondaryInfo(
             rewards = chainStakingStats.rewards,
@@ -150,10 +138,6 @@ class StakingDashboardParachainStakingUpdater(
             baseInfo.hasWaitingCollators() -> StakingDashboardItemLocal.Status.WAITING
             else -> StakingDashboardItemLocal.Status.INACTIVE
         }
-    }
-
-    private fun stakingOptionId(): StakingOptionId {
-        return StakingOptionId(chain.id, chainAsset.id, stakingType)
     }
 
     private fun ParachainStakingBaseInfo.hasWaitingCollators(): Boolean {

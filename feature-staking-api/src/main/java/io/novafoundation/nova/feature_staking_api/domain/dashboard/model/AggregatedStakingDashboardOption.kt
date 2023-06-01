@@ -2,15 +2,16 @@ package io.novafoundation.nova.feature_staking_api.domain.dashboard.model
 
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.Percent
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.SyncingStage
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
-class AggregatedStakingDashboardOption<S>(
+class AggregatedStakingDashboardOption<out S>(
     val chain: Chain,
     val token: Token,
     val stakingState: S,
-    val syncing: Boolean
+    val syncingStage: SyncingStage
 ) {
 
     class HasStake(
@@ -26,7 +27,9 @@ class AggregatedStakingDashboardOption<S>(
         }
     }
 
-    class NoStake(val stats: ExtendedLoadingState<Stats>, val flowType: FlowType, val availableBalance: Balance) {
+    sealed interface WithoutStake
+
+    class NoStake(val stats: ExtendedLoadingState<Stats>, val flowType: FlowType, val availableBalance: Balance) : WithoutStake {
 
         sealed class FlowType {
 
@@ -37,4 +40,22 @@ class AggregatedStakingDashboardOption<S>(
 
         class Stats(val estimatedEarnings: Percent)
     }
+
+    object NotYetResolved : WithoutStake
+
+    enum class SyncingStage {
+        SYNCING_ALL, SYNCING_SECONDARY, SYNCED
+    }
+}
+
+fun SyncingStage.isSyncing(): Boolean {
+    return this != SyncingStage.SYNCED
+}
+
+fun SyncingStage.isSyncingPrimary(): Boolean {
+    return this == SyncingStage.SYNCING_ALL
+}
+
+fun SyncingStage.isSyncingSecondary(): Boolean {
+    return this < SyncingStage.SYNCED
 }

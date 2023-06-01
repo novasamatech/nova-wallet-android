@@ -1,18 +1,26 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list
 
 import android.view.ViewGroup
+import androidx.annotation.LayoutRes
 import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
 import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.extensions.LayoutContainer
 
-class DashboardLoadingAdapter : RecyclerView.Adapter<DashboardLoadingHolder>() {
+class DashboardLoadingAdapter(
+    private val initialNumberOfItems: Int,
+    @LayoutRes private val layout: Int,
+) : RecyclerView.Adapter<DashboardLoadingHolder>() {
 
-    private var numberOfItems: Int = 0
+    private var numberOfItems: Int = initialNumberOfItems
 
-    fun setNumberOfLoadingItems(loadingItems: Int) {
+    fun setLoaded(loaded: Boolean) {
+        val newItems = if (loaded) 0 else initialNumberOfItems
+        setNumberOfLoadingItems(newItems)
+    }
+
+    private fun setNumberOfLoadingItems(loadingItems: Int) {
         val previousNumber = numberOfItems
         numberOfItems = loadingItems
 
@@ -28,7 +36,7 @@ class DashboardLoadingAdapter : RecyclerView.Adapter<DashboardLoadingHolder>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DashboardLoadingHolder {
-        return DashboardLoadingHolder(parent.inflateChild(R.layout.item_dashboard_loading) as ViewGroup)
+        return DashboardLoadingHolder(parent.inflateChild(layout) as ViewGroup)
     }
 
     override fun onBindViewHolder(holder: DashboardLoadingHolder, position: Int) {
@@ -37,6 +45,10 @@ class DashboardLoadingAdapter : RecyclerView.Adapter<DashboardLoadingHolder>() {
 
     override fun onViewRecycled(holder: DashboardLoadingHolder) {
         holder.unbind()
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return layout
     }
 
     override fun getItemCount(): Int {

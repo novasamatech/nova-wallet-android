@@ -35,15 +35,16 @@ class MoreStakingOptionsViewModel(
         .shareInBackground()
 
     fun onInAppStakingItemClicked(index: Int) = launch {
-        val inAppStakingItems = moreStakingOptionsFlow.first().inAppStaking
-        val inAppStakingItem = inAppStakingItems.getOrNull(index) ?: return@launch
+        val withoutStakeItems = moreStakingOptionsFlow.first().inAppStaking
+        val withoutStakeItem = withoutStakeItems.getOrNull(index) ?: return@launch
+        val noStakeItemState = withoutStakeItem.stakingState as? NoStake ?: return@launch
 
-        when (val flowType = inAppStakingItem.stakingState.flowType) {
+        when (val flowType = noStakeItemState.flowType) {
             is NoStake.FlowType.Aggregated -> {} // TODO feature aggregated flows & nomination pools
 
             is NoStake.FlowType.Single -> openChainStaking(
-                chain = inAppStakingItem.chain,
-                chainAsset = inAppStakingItem.token.configuration,
+                chain = withoutStakeItem.chain,
+                chainAsset = withoutStakeItem.token.configuration,
                 stakingType = flowType.stakingType
             )
         }
@@ -59,8 +60,7 @@ class MoreStakingOptionsViewModel(
 
     private fun mapMoreOptionsToUi(moreStakingOptions: MoreStakingOptions): MoreStakingOptionsModel {
         return MoreStakingOptionsModel(
-            inAppStaking = moreStakingOptions.inAppStaking.map(presentationMapper::mapNoStakeItemToUi),
-            resolvingInAppItems = moreStakingOptions.resolvingInAppItems,
+            inAppStaking = moreStakingOptions.inAppStaking.map(presentationMapper::mapWithoutStakeItemToUi),
             browserStaking = moreStakingOptions.browserStaking.map { dApps -> dApps.map(::mapStakingDAppToUi) }
         )
     }

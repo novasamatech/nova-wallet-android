@@ -5,6 +5,5 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.m
 
 class MoreStakingOptionsModel(
     val inAppStaking: List<NoStakeItem>,
-    val resolvingInAppItems: Int,
     val browserStaking: ExtendedLoadingState<List<StakingDAppModel>>
 )

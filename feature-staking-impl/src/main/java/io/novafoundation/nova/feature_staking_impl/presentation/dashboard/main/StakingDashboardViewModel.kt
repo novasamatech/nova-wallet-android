@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.firstLoaded
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
@@ -14,15 +14,17 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.HasStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingPrimary
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingSecondary
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.syncingIf
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -44,7 +46,7 @@ class StakingDashboardViewModel(
         .shareInBackground()
 
     val stakingDashboardUiFlow = stakingDashboardFlow
-        .map(::mapDashboardToUi)
+        .map { dashboardLoading -> dashboardLoading.map(::mapDashboardToUi) }
         .shareInBackground()
 
     init {
@@ -54,7 +56,7 @@ class StakingDashboardViewModel(
     }
 
     fun onHasStakeItemClicked(index: Int) = launch {
-        val hasStakeItems = stakingDashboardFlow.first().hasStake
+        val hasStakeItems = stakingDashboardFlow.firstLoaded().hasStake
         val hasStakeItem = hasStakeItems.getOrNull(index) ?: return@launch
 
         openChainStaking(
@@ -65,15 +67,16 @@ class StakingDashboardViewModel(
     }
 
     fun onNoStakeItemClicked(index: Int) = launch {
-        val noStakeItems = stakingDashboardFlow.first().noStake
-        val noStakeItem = noStakeItems.getOrNull(index) ?: return@launch
+        val withoutStakeItems = stakingDashboardFlow.firstLoaded().withoutStake
+        val withoutStakeItem = withoutStakeItems.getOrNull(index) ?: return@launch
+        val noStakeItemState = withoutStakeItem.stakingState as? NoStake ?: return@launch
 
-        when (val flowType = noStakeItem.stakingState.flowType) {
+        when (val flowType = noStakeItemState.flowType) {
             is NoStake.FlowType.Aggregated -> {} // TODO feature aggregated flows & nomination pools
 
             is NoStake.FlowType.Single -> openChainStaking(
-                chain = noStakeItem.chain,
-                chainAsset = noStakeItem.token.configuration,
+                chain = withoutStakeItem.chain,
+                chainAsset = withoutStakeItem.token.configuration,
                 stakingType = flowType.stakingType
             )
         }
@@ -90,25 +93,22 @@ class StakingDashboardViewModel(
     private fun mapDashboardToUi(dashboard: StakingDashboard): StakingDashboardModel {
         return StakingDashboardModel(
             hasStakeItems = dashboard.hasStake.map(::mapHasStakeItemToUi),
-            noStakeItems = dashboard.noStake.map(presentationMapper::mapNoStakeItemToUi),
-            resolvingItems = dashboard.resolvingItems
+            noStakeItems = dashboard.withoutStake.map(presentationMapper::mapWithoutStakeItemToUi),
         )
     }
 
     private fun mapHasStakeItemToUi(hasStake: AggregatedStakingDashboardOption<HasStake>): StakingDashboardModel.HasStakeItem {
         val stats = hasStake.stakingState.stats
-
-        // we don't to show sync while also showing loading for stats
-        val showSync = hasStake.syncing && stats is ExtendedLoadingState.Loaded
+        val isSyncingPrimary = hasStake.syncingStage.isSyncingPrimary()
+        val isSyncingSecondary = hasStake.syncingStage.isSyncingSecondary()
 
         return StakingDashboardModel.HasStakeItem(
-            chainUi = mapChainToUi(hasStake.chain),
+            chainUi = mapChainToUi(hasStake.chain).syncingIf(isSyncingPrimary),
             assetId = hasStake.token.configuration.id,
-            rewards = stats.map { mapAmountToAmountModel(it.rewards, hasStake.token) },
-            stake = mapAmountToAmountModel(hasStake.stakingState.stake, hasStake.token),
-            status = stats.map { mapStakingStatusToUi(it.status) },
-            earnings = stats.map { it.estimatedEarnings.format() },
-            syncing = showSync
+            rewards = stats.map { mapAmountToAmountModel(it.rewards, hasStake.token).syncingIf(isSyncingSecondary) },
+            stake = mapAmountToAmountModel(hasStake.stakingState.stake, hasStake.token).syncingIf(isSyncingPrimary),
+            status = stats.map { mapStakingStatusToUi(it.status).syncingIf(isSyncingSecondary) },
+            earnings = stats.map { it.estimatedEarnings.format().syncingIf(isSyncingSecondary) },
         )
     }
 

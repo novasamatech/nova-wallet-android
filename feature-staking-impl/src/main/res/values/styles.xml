@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Widget.Nova.StakingStatus" parent="TextAppearance.NovaFoundation.Bold.Caps.Primary">
+    <style name="Widget.Nova.StakingStatus" parent="TextAppearance.NovaFoundation.SemiBold.Caps2">
         <item name="android:drawablePadding">8dp</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:includeFontPadding">false</item>
