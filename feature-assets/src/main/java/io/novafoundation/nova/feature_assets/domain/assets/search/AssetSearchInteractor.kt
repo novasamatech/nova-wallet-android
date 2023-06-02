@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_assets.domain.assets.search
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByNetwork
@@ -23,8 +22,7 @@ class AssetSearchInteractor(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
-    private val assetSourceRegistry: AssetSourceRegistry,
-    private val buyTokenRegistry: BuyTokenRegistry
+    private val assetSourceRegistry: AssetSourceRegistry
 ) {
 
     fun buyAssetSearch(
@@ -33,7 +31,6 @@ class AssetSearchInteractor(
     ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
         return searchAssetsInternalFlow(queryFlow, offChainBalanceFlow) {
             it.token.configuration.buyProviders.isNotEmpty()
-            buyTokenRegistry.availableProvidersFor(it.token.configuration).isNotEmpty()
         }
     }
 

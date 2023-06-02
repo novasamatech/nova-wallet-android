@@ -42,9 +42,8 @@ class AssetsFeatureModule {
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        assetSourceRegistry: AssetSourceRegistry,
-        buyTokenRegistry: BuyTokenRegistry
-    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry, assetSourceRegistry, buyTokenRegistry)
+        assetSourceRegistry: AssetSourceRegistry
+    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry, assetSourceRegistry)
 
     @Provides
     @FeatureScope

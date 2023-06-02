@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
@@ -53,12 +52,12 @@ private class BuyMixinProvider(
     override val integrateWithBuyProviderEvent = MutableLiveData<Event<BuyMixin.IntegrationPayload>>()
 
     override fun buyEnabledFlow(chainAsset: Chain.Asset): Flow<Boolean> {
-        return flowOf { buyTokenRegistry.availableProvidersFor(chainAsset).isNotEmpty() }
+        return flowOf { buyTokenRegistry.availableSortedProvidersFor(chainAsset).isNotEmpty() }
     }
 
     override fun buyClicked(chainAsset: Chain.Asset) {
         launch {
-            val availableProviders = buyTokenRegistry.availableProvidersFor(chainAsset)
+            val availableProviders = buyTokenRegistry.availableSortedProvidersFor(chainAsset)
 
             when {
                 availableProviders.isEmpty() -> return@launch
