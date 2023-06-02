@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
-import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
@@ -28,7 +27,8 @@ import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowSearch
 import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowSearchContainer
 import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowToolbar
 
-abstract class AssetFlowFragment<T : AssetFlowViewModel> : BaseFragment<T>(),
+abstract class AssetFlowFragment<T : AssetFlowViewModel> :
+    BaseFragment<T>(),
     BalanceListAdapter.ItemAssetHandler {
 
     @Inject

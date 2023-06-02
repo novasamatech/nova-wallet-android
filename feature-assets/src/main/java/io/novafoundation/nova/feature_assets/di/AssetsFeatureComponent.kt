@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoTo
 import io.novafoundation.nova.feature_assets.presentation.balance.search.di.AssetSearchComponent
 import io.novafoundation.nova.feature_assets.presentation.buy.flow.di.AssetBuyFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.receive.di.ReceiveComponent
-import io.novafoundation.nova.feature_assets.presentation.receive.flow.AssetReceiveFlowFragment
 import io.novafoundation.nova.feature_assets.presentation.receive.flow.di.AssetReceiveFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.send.amount.di.SelectSendComponent
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.di.ConfirmSendComponent
