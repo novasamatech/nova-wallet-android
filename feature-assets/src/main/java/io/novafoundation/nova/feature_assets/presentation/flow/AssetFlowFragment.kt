@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringRes
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
@@ -44,6 +45,10 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
         savedInstanceState: Bundle?
     ): View? {
         return layoutInflater.inflate(R.layout.fragment_asset_flow_search, container, false)
+    }
+
+    fun setTitle(@StringRes titleRes: Int) {
+        assetFlowToolbar.setTitle(titleRes)
     }
 
     override fun initViews() {

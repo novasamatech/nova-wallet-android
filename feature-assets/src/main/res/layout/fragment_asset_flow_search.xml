@@ -20,8 +20,9 @@
             android:background="@color/solid_navigation_background"
             app:contentBackground="@color/solid_navigation_background"
             app:dividerVisible="false"
+            app:homeButtonIcon="@drawable/ic_close"
             app:layout_constraintTop_toTopOf="parent"
-            app:titleText="@string/wallet_asset_send" />
+            tools:titleText="@string/wallet_asset_send" />
 
         <io.novafoundation.nova.common.view.SearchView
             android:id="@+id/assetFlowSearch"
