@@ -275,4 +275,16 @@ class BalanceListViewModel(
             spannableBuilder
         }
     }
+
+    fun sendClicked() {
+        router.openSendFlow()
+    }
+
+    fun receiveClicked() {
+        router.openReceiveFlow()
+    }
+
+    fun buyClicked() {
+        router.openBuyFlow()
+    }
 }

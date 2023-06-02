@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -29,14 +30,12 @@ class BuyMixinFactory(
 
     fun create(
         scope: CoroutineScope,
-        assetPayload: AssetPayload,
     ): BuyMixin.Presentation {
         return BuyMixinProvider(
             buyTokenRegistry = buyTokenRegistry,
             chainRegistry = chainRegistry,
             accountUseCase = accountUseCase,
             coroutineScope = scope,
-            assetPayload = assetPayload,
             actionAwaitableMixinFactory = awaitableMixinFactory
         )
     }
@@ -47,45 +46,38 @@ private class BuyMixinProvider(
     private val chainRegistry: ChainRegistry,
     private val accountUseCase: SelectedAccountUseCase,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-
     coroutineScope: CoroutineScope,
-    private val assetPayload: AssetPayload,
 ) : BuyMixin.Presentation,
     CoroutineScope by coroutineScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
-
-    private val chainWithAssetAsync by lazyAsync { chainRegistry.chainWithAsset(assetPayload.chainId, assetPayload.chainAssetId) }
 
     override val awaitProviderChoosing = actionAwaitableMixinFactory.selectingOneOf<BuyProvider>()
 
     override val integrateWithBuyProviderEvent = MutableLiveData<Event<BuyMixin.IntegrationPayload>>()
 
-    override val buyEnabled: Flow<Boolean> = flowOf {
-        val (_, chainAsset) = chainWithAssetAsync()
-
-        buyTokenRegistry.availableProvidersFor(chainAsset).isNotEmpty()
+    override fun buyEnabledFlow(chainAsset: Chain.Asset): Flow<Boolean> {
+        return flowOf { buyTokenRegistry.availableProvidersFor(chainAsset).isNotEmpty() }
     }
 
-    override fun buyClicked() {
+    override fun buyClicked(chainAsset: Chain.Asset) {
         launch {
-            val (_, chainAsset) = chainWithAssetAsync()
             val availableProviders = buyTokenRegistry.availableProvidersFor(chainAsset)
 
             when {
                 availableProviders.isEmpty() -> return@launch
-                availableProviders.size == 1 -> openProvider(availableProviders.single())
+                availableProviders.size == 1 -> openProvider(chainAsset, availableProviders.single())
                 else -> {
                     val payload = DynamicListBottomSheet.Payload(availableProviders)
                     val provider = awaitProviderChoosing.awaitAction(payload)
 
-                    openProvider(provider)
+                    openProvider(chainAsset, provider)
                 }
             }
         }
     }
 
-    private suspend fun openProvider(provider: BuyTokenRegistry.Provider<*>) {
-        val (chain, chainAsset) = chainWithAssetAsync()
+    private suspend fun openProvider(chainAsset: Chain.Asset, provider: BuyTokenRegistry.Provider<*>) {
+        val chain = chainRegistry.getChain(chainAsset.chainId)
         val address = accountUseCase.getSelectedMetaAccount().addressIn(chain)!!
 
         val integrator = provider.createIntegrator(chainAsset, address)
