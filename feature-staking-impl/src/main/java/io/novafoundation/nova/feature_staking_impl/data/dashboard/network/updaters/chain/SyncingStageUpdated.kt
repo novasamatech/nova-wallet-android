@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Staking
 
 sealed class StakingDashboardUpdaterEvent : Updater.SideEffect {
 
-    class AllSynced(val option: StakingOptionId, val indexOfUsedOffChainSync: Int): StakingDashboardUpdaterEvent()
+    class AllSynced(val option: StakingOptionId, val indexOfUsedOffChainSync: Int) : StakingDashboardUpdaterEvent()
 
     class PrimarySynced(val option: StakingOptionId) : StakingDashboardUpdaterEvent()
 }

@@ -96,7 +96,6 @@ class StakingDashboardItemLocal(
     }
 }
 
-
 class StakingDashboardPrimaryAccountView(
     val chainId: String,
     val chainAssetId: Int,

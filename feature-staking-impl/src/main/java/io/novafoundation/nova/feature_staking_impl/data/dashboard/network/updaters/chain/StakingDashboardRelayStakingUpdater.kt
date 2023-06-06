@@ -68,7 +68,7 @@ class StakingDashboardRelayStakingUpdater(
             saveItem(relaychainStakingState, secondaryInfo = null)
             emit(primarySynced())
 
-            val secondarySyncFlow = stakingStatsFlow.map {  (index, stakingStats) ->
+            val secondarySyncFlow = stakingStatsFlow.map { (index, stakingStats) ->
                 val secondaryInfo = constructSecondaryInfo(relaychainStakingState, activeEra, stakingStats)
                 saveItem(relaychainStakingState, secondaryInfo)
 

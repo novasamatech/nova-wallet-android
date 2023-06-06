@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Staking
 data class StakingDashboardPrimaryAccount(
     val stakingOptionId: StakingOptionId,
     val primaryStakingAccountId: AccountIdKey?
-): Identifiable {
+) : Identifiable {
 
     override val identifier: String = "${stakingOptionId.chainId}:${stakingOptionId.chainAssetId}:${stakingOptionId.stakingType}"
 }

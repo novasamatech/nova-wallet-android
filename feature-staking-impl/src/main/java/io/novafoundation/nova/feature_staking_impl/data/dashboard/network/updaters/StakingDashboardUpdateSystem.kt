@@ -63,7 +63,6 @@ class RealStakingDashboardUpdateSystem(
     override val syncedItemsFlow: MutableStateFlow<SyncingStageMap> = MutableStateFlow(emptyMap())
     private val latestOffChainSyncIndex: MutableStateFlow<Int> = MutableStateFlow(EMPTY_OFF_CHAIN_SYNC_INDEX)
 
-
     override fun start(): Flow<Updater.SideEffect> {
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
             val accountScope = CoroutineScope(coroutineContext)
