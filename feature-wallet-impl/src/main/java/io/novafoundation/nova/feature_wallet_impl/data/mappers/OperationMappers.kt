@@ -57,7 +57,7 @@ private val Type.operationFiatFee
     get() = when (this) {
         is Type.Extrinsic -> fiatFee
         is Type.Reward -> null
-        is Type.Transfer -> fiatFee
+        is Type.Transfer -> null
     }
 
 private val Type.hash
@@ -160,7 +160,6 @@ fun mapOperationLocalToOperation(
                 sender = sender!!,
                 status = mapOperationStatusLocalToOperationStatus(status),
                 fee = fee,
-                fiatFee = operationLocal.fiatFee
             )
 
             OperationLocal.Type.REWARD -> Type.Reward(
@@ -217,7 +216,6 @@ fun mapNodeToOperation(
                 receiver = to,
                 sender = from,
                 fee = fee,
-                fiatFee = coinRate?.convertPlanks(chainAsset, fee),
                 status = Operation.Status.fromSuccess(success),
                 hash = node.extrinsicHash
             )
@@ -233,7 +231,6 @@ fun mapNodeToOperation(
                 sender = from,
                 status = Operation.Status.fromSuccess(success),
                 fee = fee,
-                fiatFee = coinRate?.convertPlanks(chainAsset, fee),
             )
         }
 

@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.setTextColorRes
@@ -17,7 +19,6 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.showOperationStatus
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailAmountFiat
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailAmount
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailAmountFiat
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailFee
@@ -88,12 +89,18 @@ class TransferDetailFragment : BaseFragment<TransactionDetailViewModel>() {
 
             transactionDetailToolbar.setTitle(time.formatDateTime())
 
-            transactionDetailFee.showValue(fee, fiatFee)
+            viewModel.fiatFee.observe { loadingState ->
+                if (loadingState is ExtendedLoadingState.Loading) {
+                    transactionDetailFee.showProgress()
+                } else {
+                    transactionDetailFee.showValue(formattedFee, loadingState.dataOrNull)
+                }
+            }
 
-            transactionDetailAmount.text = amount
+            transactionDetailAmount.text = formattedAmount
             transactionDetailAmount.setTextColorRes(statusAppearance.amountTint)
 
-            transactionDetailAmountFiat.setTextOrHide(this.fiatAmount)
+            transactionDetailAmountFiat.setTextOrHide(this.formattedFiatAmount)
 
             if (hash != null) {
                 transactionDetailHash.showValue(hash)

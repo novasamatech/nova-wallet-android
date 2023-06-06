@@ -31,7 +31,9 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_api.di.Wallet
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.CoinPriceInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
@@ -52,6 +54,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCr
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealPalletXcmRepository
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
+import io.novafoundation.nova.feature_wallet_impl.data.repository.CoinPriceRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealBalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealChainAssetRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealCrossChainTransfersRepository
@@ -269,4 +272,12 @@ class WalletFeatureModule {
         chainAssetDao: ChainAssetDao,
         gson: Gson
     ): ChainAssetRepository = RealChainAssetRepository(chainAssetDao, gson)
+
+    @Provides
+    @FeatureScope
+    fun provideCoinPriceRepository(dataSource: CoinPriceDataSource): CoinPriceRepository = CoinPriceRepositoryImpl(dataSource)
+
+    @Provides
+    @FeatureScope
+    fun provideCoinPriceInteractor(coinPriceRepository: CoinPriceRepository) = CoinPriceInteractor(coinPriceRepository)
 }

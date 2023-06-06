@@ -47,8 +47,7 @@ data class Operation(
             val receiver: String,
             val sender: String,
             val status: Status,
-            val fee: BigInteger?,
-            val fiatFee: BigDecimal?,
+            val fee: BigInteger?
         ) : Type()
     }
 

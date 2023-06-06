@@ -65,7 +65,7 @@ class TransactionHolder(
             valuePrimary.setTextColorRes(item.amountColorRes)
             valuePrimary.text = item.amount
 
-            valueSecondary.setTextOrHide(item.fiatAmount)
+            valueSecondary.setTextOrHide(item.fiatWithTime)
             subHeader.text = item.subHeader
             icon.setIcon(item.operationIcon, imageLoader)
 

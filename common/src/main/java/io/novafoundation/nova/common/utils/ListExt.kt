@@ -33,7 +33,7 @@ inline fun <T> List<T>.binarySearchFloor(fromIndex: Int = 0, toIndex: Int = size
     }
 
     // key not found. Takes floor key
-    return if (low == 0) 0
+    return if (low <= 0) 0
     else if (low >= size) size - 1
     else low - 1
 }

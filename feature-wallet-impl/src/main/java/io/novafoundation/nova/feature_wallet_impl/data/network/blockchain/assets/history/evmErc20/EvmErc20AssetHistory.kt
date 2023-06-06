@@ -86,8 +86,7 @@ class EvmErc20AssetHistory(
                 receiver = remote.to,
                 sender = remote.from,
                 status = Operation.Status.COMPLETED,
-                fee = remote.feeUsed,
-                fiatFee = coinRate?.convertPlanks(chainAsset, remote.feeUsed)
+                fee = remote.feeUsed
             ),
             time = remote.timeStamp.seconds.inWholeMilliseconds,
             chainAsset = chainAsset

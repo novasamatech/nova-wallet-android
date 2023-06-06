@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
-import io.novafoundation.nova.feature_wallet_api.data.source.getCoinRateByAsset
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
@@ -164,8 +163,7 @@ class EvmNativeAssetHistory(
             receiver = remote.to,
             sender = remote.from,
             status = remote.operationStatus(),
-            fee = remote.feeUsed,
-            fiatFee = coinRate?.convertPlanks(chainAsset, remote.feeUsed),
+            fee = remote.feeUsed
         )
     }
 

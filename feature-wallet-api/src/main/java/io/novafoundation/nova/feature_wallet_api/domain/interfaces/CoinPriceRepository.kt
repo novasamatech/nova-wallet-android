@@ -1,12 +1,11 @@
-package io.novafoundation.nova.feature_wallet_api.data.source
+package io.novafoundation.nova.feature_wallet_api.domain.interfaces
 
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
-interface CoinPriceDataSource {
+interface CoinPriceRepository {
 
     suspend fun getCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Long): CoinRate?
 
@@ -15,8 +14,4 @@ interface CoinPriceDataSource {
     suspend fun getCoinRates(priceIds: Set<String>, currency: Currency): Map<String, CoinRateChange?>
 
     suspend fun getCoinRate(priceId: String, currency: Currency): CoinRateChange?
-}
-
-suspend fun CoinPriceDataSource.getCoinRateByAsset(asset: Chain.Asset, currency: Currency): CoinRateChange? {
-    return asset.priceId?.let { priceId -> getCoinRate(priceId, currency) }
 }

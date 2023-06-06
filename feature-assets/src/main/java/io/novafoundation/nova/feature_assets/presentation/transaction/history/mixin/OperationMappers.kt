@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin
 
 import androidx.annotation.DrawableRes
+import io.novafoundation.nova.common.presentation.toShortAddressFormat
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.common.utils.splitSnakeOrCamelCase
@@ -89,8 +89,13 @@ private fun String.itemToCapitalizedWords(): String {
 private fun mapExtrinsicContentToHeaderAndSubHeader(extrinsicContent: Content, resourceManager: ResourceManager): Pair<String, String> {
     return when (extrinsicContent) {
         is Content.ContractCall -> {
-            val header = formatContractFunctionName(extrinsicContent) ?: extrinsicContent.contractAddress
-            val subHeader = resourceManager.getString(R.string.ethereum_contract_call)
+            val header = resourceManager.getString(R.string.ethereum_contract_call)
+            val functionName = formatContractFunctionName(extrinsicContent)
+            val subHeader = if (functionName?.contains("transfer") == true) {
+                functionName
+            } else {
+                resourceManager.getString(R.string.transfer_history_send_to, extrinsicContent.contractAddress.toShortAddressFormat())
+            }
 
             header to subHeader
         }
@@ -159,21 +164,21 @@ fun mapOperationToOperationModel(
     resourceManager: ResourceManager,
 ): OperationModel {
     val statusAppearance = mapStatusToStatusAppearance(operation.type.operationStatus)
+    val formattedTime = resourceManager.formatTime(operation.time)
 
     return with(operation) {
         when (val operationType = type) {
             is Operation.Type.Reward -> {
+                val headerResId = if (operationType.isReward) R.string.staking_reward else R.string.staking_slash
                 OperationModel(
                     id = id,
                     amount = formatAmount(chainAsset, operationType),
-                    fiatAmount = operationType.fiatAmount?.formatAsCurrency(token.currency),
+                    fiatWithTime = mapToFiatWithTime(token, operationType.fiatAmount, formattedTime, resourceManager),
                     amountColorRes = if (operationType.isReward) R.color.text_positive else R.color.text_primary,
-                    header = resourceManager.getString(
-                        if (operationType.isReward) R.string.staking_reward else R.string.staking_slash
-                    ),
+                    header = resourceManager.getString(headerResId),
+                    subHeader = resourceManager.getString(R.string.tabbar_staking_title),
                     statusAppearance = statusAppearance,
                     operationIcon = resourceManager.getDrawable(R.drawable.ic_staking_filled).asIcon(),
-                    subHeader = resourceManager.getString(R.string.tabbar_staking_title),
                 )
             }
 
@@ -186,15 +191,23 @@ fun mapOperationToOperationModel(
                     else -> R.color.text_primary
                 }
 
+                val nameOrAddress = nameIdentifier.nameOrAddress(operationType.displayAddress(isIncome))
+
+                val subHeader = if (isIncome) {
+                    resourceManager.getString(R.string.transfer_history_income_from, nameOrAddress)
+                } else {
+                    resourceManager.getString(R.string.transfer_history_send_to, nameOrAddress)
+                }
+
                 OperationModel(
                     id = id,
                     amount = formatAmount(chainAsset, isIncome, operationType),
-                    fiatAmount = operationType.fiatAmount?.formatAsCurrency(token.currency),
+                    fiatWithTime = mapToFiatWithTime(token, operationType.fiatAmount, formattedTime, resourceManager),
                     amountColorRes = amountColor,
-                    header = nameIdentifier.nameOrAddress(operationType.displayAddress(isIncome)),
+                    header = resourceManager.getString(R.string.transfer_title),
+                    subHeader = subHeader,
                     statusAppearance = statusAppearance,
                     operationIcon = resourceManager.getDrawable(transferDirectionIcon(isIncome)).asIcon(),
-                    subHeader = resourceManager.getString(R.string.transfer_title),
                 )
             }
 
@@ -205,7 +218,7 @@ fun mapOperationToOperationModel(
                 OperationModel(
                     id = id,
                     amount = formatFee(chainAsset, operationType),
-                    fiatAmount = operationType.fiatFee?.formatAsCurrency(token.currency),
+                    fiatWithTime = mapToFiatWithTime(token, operationType.fiatFee, formattedTime, resourceManager),
                     amountColorRes = amountColor,
                     header = header,
                     subHeader = subHeader,
@@ -214,6 +227,20 @@ fun mapOperationToOperationModel(
                 )
             }
         }
+    }
+}
+
+fun mapToFiatWithTime(
+    token: Token,
+    amount: BigDecimal?,
+    time: String,
+    resourceManager: ResourceManager,
+): String {
+    val fiatAmount = amount?.formatAsCurrency(token.currency)
+    return if (fiatAmount == null) {
+        time
+    } else {
+        resourceManager.getString(R.string.transaction_history_fiat_with_time, fiatAmount, time)
     }
 }
 
@@ -239,12 +266,12 @@ suspend fun mapOperationToParcel(
                     time = time,
                     address = address,
                     hash = operationType.hash,
-                    amount = formatAmount(operation.chainAsset, isIncome, operationType),
-                    fiatAmount = operationType.fiatAmount?.formatAsCurrency(currency),
+                    formattedAmount = formatAmount(operation.chainAsset, isIncome, operationType),
+                    formattedFiatAmount = operationType.fiatAmount?.formatAsCurrency(currency),
                     receiver = operationType.receiver,
                     sender = operationType.sender,
-                    fee = feeFormatted,
-                    fiatFee = operationType.fiatFee?.formatAsCurrency(currency),
+                    fee = operationType.fee,
+                    formattedFee = feeFormatted,
                     isIncome = isIncome,
                     statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus),
                     transferDirectionIcon = transferDirectionIcon(isIncome)

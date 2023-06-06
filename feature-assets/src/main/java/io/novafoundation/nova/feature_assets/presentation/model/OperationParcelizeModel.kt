@@ -4,6 +4,8 @@ import android.os.Parcelable
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import java.math.BigDecimal
+import java.math.BigInteger
 import kotlinx.android.parcel.Parcelize
 
 sealed class OperationParcelizeModel : Parcelable {
@@ -42,12 +44,12 @@ sealed class OperationParcelizeModel : Parcelable {
         val address: String,
         val hash: String?,
         val isIncome: Boolean,
-        val amount: String,
-        val fiatAmount: String?,
+        val formattedAmount: String,
+        val formattedFiatAmount: String?,
         val receiver: String,
         val sender: String,
-        val fee: String,
-        val fiatFee: String?,
+        val fee: BigInteger?,
+        val formattedFee: String,
         val statusAppearance: OperationStatusAppearance,
         @DrawableRes val transferDirectionIcon: Int
     ) : Parcelable, OperationParcelizeModel()
