@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters
 
-import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.CollectionDiffer
@@ -129,7 +128,6 @@ class RealStakingDashboardUpdateSystem(
         val result = syncedItemsFlow.value.toMutableMap()
 
         changedPrimaryAccounts.forEach { (stakingOptionId, _) ->
-            Log.d("RX", "Marking syncing for ${stakingOptionId.chainId}")
             result[stakingOptionId] = result.getSyncingStage(stakingOptionId).coerceAtMost(SyncingStage.SYNCING_SECONDARY)
         }
 
@@ -166,10 +164,7 @@ class RealStakingDashboardUpdateSystem(
             is StakingDashboardUpdaterEvent.AllSynced -> {
                 // we only mark option as synced if there are no fresher syncs
                 if (event.indexOfUsedOffChainSync >= latestOffChainSyncIndex.value) {
-                    Log.d("RX", "Processing synced event for ${event.option.chainId}")
                     syncedItemsFlow.value = syncedItemsFlow.value.inserted(event.option, SyncingStage.SYNCED)
-                } else {
-                    Log.d("RX", "Ignoring outdated secondary synced event for ${event.option.chainId}")
                 }
             }
             is StakingDashboardUpdaterEvent.PrimarySynced -> {

@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api
 
-import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.subquery.SubQueryFilters
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.and
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.anyOf
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.StakingAccounts
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.supportedStakingOptions
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -13,7 +13,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 
-class StakingStatsRequest(stakingAccounts: Map<StakingOptionId, AccountIdKey?>, chains: List<Chain>) {
+class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>) {
 
     @Transient
     private val chainAddressesFilter = constructChainAddressesFilter(stakingAccounts, chains)
@@ -52,7 +52,7 @@ class StakingStatsRequest(stakingAccounts: Map<StakingOptionId, AccountIdKey?>, 
     """.trimIndent()
 
     private fun constructChainAddressesFilter(
-        stakingAccounts: Map<StakingOptionId, AccountIdKey?>,
+        stakingAccounts: StakingAccounts,
         chains: List<Chain>
     ): String = with(SubQueryFilters) {
         val perChain = chains.mapNotNull { chain ->
@@ -68,7 +68,7 @@ class StakingStatsRequest(stakingAccounts: Map<StakingOptionId, AccountIdKey?>, 
 
     private fun SubQueryFilters.Companion.hasTypeAndAddressOptions(
         chain: Chain,
-        stakingAccounts: Map<StakingOptionId, AccountIdKey?>
+        stakingAccounts: StakingAccounts
     ): List<String> {
         val utilityAsset = chain.utilityAsset
 

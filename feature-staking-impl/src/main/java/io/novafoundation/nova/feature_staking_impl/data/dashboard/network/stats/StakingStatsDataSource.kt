@@ -31,7 +31,7 @@ class RealStakingStatsDataSource(
 ) : StakingStatsDataSource {
 
     override suspend fun fetchStakingStats(
-        stakingAccounts: Map<StakingOptionId, AccountIdKey?>,
+        stakingAccounts: StakingAccounts,
         stakingChains: List<Chain>
     ): MultiChainStakingStats = withContext(Dispatchers.IO) {
         retryUntilDone {
