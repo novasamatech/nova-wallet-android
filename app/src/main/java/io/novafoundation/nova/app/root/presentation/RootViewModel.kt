@@ -13,6 +13,7 @@ import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection.ExternalRequirement
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -29,10 +30,13 @@ class RootViewModel(
     private val contributionsInteractor: ContributionsInteractor,
     private val backgroundAccessObserver: BackgroundAccessObserver,
     private val safeModeService: SafeModeService,
-    private val updateNotificationsInteractor: UpdateNotificationsInteractor
+    private val updateNotificationsInteractor: UpdateNotificationsInteractor,
+    private val walletConnectServiceFactory: WalletConnectService.Factory
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin {
 
     private var willBeClearedForLanguageChange = false
+
+    private val walletConnectService = walletConnectServiceFactory.create(viewModelScope)
 
     init {
         contributionsInteractor.runUpdate()
@@ -80,10 +84,14 @@ class RootViewModel(
     fun noticeInBackground() {
         if (!willBeClearedForLanguageChange) {
             externalConnectionRequirementFlow.value = ExternalRequirement.STOPPED
+
+            walletConnectService.disconnect()
         }
     }
 
     fun noticeInForeground() {
+        walletConnectService.connect()
+
         externalConnectionRequirementFlow.value = ExternalRequirement.ALLOWED
     }
 
@@ -110,7 +118,7 @@ class RootViewModel(
             if (interactor.isAccountSelected() && interactor.isPinCodeSet()) {
                 rootRouter.nonCancellableVerify()
             } else {
-                backgroundAccessObserver.onAccessed()
+                backgroundAccessObserver.checkPassed()
             }
         }
     }

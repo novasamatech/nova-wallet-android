@@ -6,15 +6,11 @@ import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
-import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_dapp_impl.BuildConfig
-import io.novafoundation.nova.feature_dapp_impl.data.network.ethereum.EthereumApiFactory
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.MetamaskInteractor
-import io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.sign.MetamaskSignInteractorFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.di.Metamask
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.states.MetamaskStateFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskInjector
@@ -24,10 +20,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewScriptInjector
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
-import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import okhttp3.OkHttpClient
 
 @Module
 class MetamaskModule {
@@ -96,36 +89,4 @@ class MetamaskModule {
             walletUiUseCase = walletUiUseCase
         )
     }
-
-    @Provides
-    @FeatureScope
-    fun provideEthereumApiFactory(
-        okHttpClient: OkHttpClient
-    ): EthereumApiFactory {
-        return EthereumApiFactory(okHttpClient)
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideSendInteractorFactory(
-        metamaskInteractor: MetamaskInteractor,
-        chainRegistry: ChainRegistry,
-        accountRepository: AccountRepository,
-        tokenRepository: TokenRepository,
-        @ExtrinsicSerialization extrinsicGson: Gson,
-        addressIconGenerator: AddressIconGenerator,
-        ethereumApiFactory: EthereumApiFactory,
-        signerProvider: SignerProvider,
-        currencyRepository: CurrencyRepository
-    ) = MetamaskSignInteractorFactory(
-        metamaskInteractor = metamaskInteractor,
-        chainRegistry = chainRegistry,
-        accountRepository = accountRepository,
-        signerProvider = signerProvider,
-        tokenRepository = tokenRepository,
-        currencyRepository = currencyRepository,
-        extrinsicGson = extrinsicGson,
-        addressIconGenerator = addressIconGenerator,
-        ethereumApiFactory = ethereumApiFactory
-    )
 }

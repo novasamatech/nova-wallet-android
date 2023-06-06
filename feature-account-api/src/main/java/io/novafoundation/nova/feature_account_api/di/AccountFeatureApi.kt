@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_api.di
 
+import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.MutableSharedState
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
@@ -18,9 +19,11 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.AddressD
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
 interface AccountFeatureApi {
@@ -45,6 +48,8 @@ interface AccountFeatureApi {
 
     fun twoFactorVerificationExecutor(): TwoFactorVerificationExecutor
 
+    fun biometricServiceFactory(): BiometricServiceFactory
+
     val addressInputMixinFactory: AddressInputMixinFactory
 
     val walletUiUseCase: WalletUiUseCase
@@ -66,4 +71,8 @@ interface AccountFeatureApi {
     val evmTransactionService: EvmTransactionService
 
     val identityMixinFactory: IdentityMixin.Factory
+
+    val languageUseCase: LanguageUseCase
+
+    val selectWalletMixinFactory: SelectWalletMixin.Factory
 }

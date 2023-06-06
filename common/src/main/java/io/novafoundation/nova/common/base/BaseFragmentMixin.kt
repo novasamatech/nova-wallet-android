@@ -7,18 +7,18 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.WithLifecycleExtensions
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.dialog.dialog
 import kotlinx.coroutines.flow.Flow
 
-interface BaseFragmentMixin<T : BaseViewModel> : WithContextExtensions {
+interface BaseFragmentMixin<T : BaseViewModel> : WithContextExtensions, WithLifecycleExtensions {
 
     val fragment: Fragment
 
@@ -26,6 +26,9 @@ interface BaseFragmentMixin<T : BaseViewModel> : WithContextExtensions {
 
     override val providedContext: Context
         get() = fragment.requireContext()
+
+    override val lifecycleOwner: LifecycleOwner
+        get() = fragment.viewLifecycleOwner
 
     fun initViews()
 
@@ -62,10 +65,6 @@ interface BaseFragmentMixin<T : BaseViewModel> : WithContextExtensions {
         }
 
         fragment.requireActivity().onBackPressedDispatcher.addCallback(fragment.viewLifecycleOwner, callback)
-    }
-
-    fun <V> LiveData<Event<V>>.observeEvent(observer: (V) -> Unit) {
-        observe(fragment.viewLifecycleOwner, EventObserver(observer::invoke))
     }
 
     fun <V> Flow<V>.observe(collector: suspend (V) -> Unit) {

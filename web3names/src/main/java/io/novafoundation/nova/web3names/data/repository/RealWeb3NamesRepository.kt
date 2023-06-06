@@ -1,6 +1,9 @@
 package io.novafoundation.nova.web3names.data.repository
 
 import com.google.gson.Gson
+import io.novafoundation.nova.caip.caip19.Caip19MatcherFactory
+import io.novafoundation.nova.caip.caip19.Caip19Parser
+import io.novafoundation.nova.caip.caip19.matchers.Caip19Matcher
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindString
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
@@ -8,17 +11,14 @@ import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.runtime.ext.isValidAddress
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.web3names.data.caip19.Caip19MatcherFactory
-import io.novafoundation.nova.web3names.data.caip19.Caip19Parser
-import io.novafoundation.nova.web3names.data.caip19.matchers.Caip19Matcher
 import io.novafoundation.nova.web3names.data.endpoints.TransferRecipientsApi
 import io.novafoundation.nova.web3names.data.endpoints.model.TransferRecipientRemote
 import io.novafoundation.nova.web3names.data.integrity.Web3NamesIntegrityVerifier
 import io.novafoundation.nova.web3names.data.provider.Web3NamesServiceChainIdProvider
-import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.UnsupportedAsset
-import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.ValidAccountNotFoundException
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.ChainProviderNotFoundException
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.IntegrityCheckFailed
+import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.UnsupportedAsset
+import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException.ValidAccountNotFoundException
 import io.novafoundation.nova.web3names.domain.models.Web3NameAccount
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
@@ -99,7 +99,7 @@ class RealWeb3NamesRepository(
         return gson.fromJson(content)
     }
 
-    private suspend fun findChainRecipients(
+    private fun findChainRecipients(
         recipientsByChain: RecipientsByChain,
         w3nIdentifier: String,
         chain: Chain,

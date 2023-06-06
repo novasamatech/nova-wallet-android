@@ -12,12 +12,12 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/chains/v10/chains_dev.json\""
+        buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/chains/v11/chains_dev.json\""
         buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/assets/evm/v2/assets_dev.json\""
 
         buildConfigField "String", "TEST_CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/tests/chains_for_testBalance.json\""
 
-        buildConfigField "String", "INFURA_API_KEY", readSecret("INFURA_API_KEY")
+        buildConfigField "String", "INFURA_API_KEY", readStringSecret("INFURA_API_KEY")
     }
 
     buildTypes {
@@ -29,7 +29,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/chains/v10/chains.json\""
+            buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/chains/v11/chains.json\""
             buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/assets/evm/v2/assets.json\""
         }
     }

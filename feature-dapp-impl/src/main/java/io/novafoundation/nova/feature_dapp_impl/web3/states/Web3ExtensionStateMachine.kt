@@ -4,9 +4,9 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Transport
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
-import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.AuthorizeDAppPayload
-import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxResponse
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
+import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -48,8 +48,8 @@ interface Web3StateMachineHost {
 
     val externalEvents: Flow<Web3ExtensionStateMachine.ExternalEvent>
 
-    suspend fun authorizeDApp(payload: AuthorizeDAppPayload): Web3Session.Authorization.State
-    suspend fun confirmTx(request: ConfirmTxRequest): ConfirmTxResponse
+    suspend fun authorizeDApp(payload: AuthorizeDappBottomSheet.Payload): Web3Session.Authorization.State
+    suspend fun confirmTx(request: ExternalSignRequest): ConfirmTxResponse
 
     fun showError(text: String)
 

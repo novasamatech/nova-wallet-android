@@ -30,7 +30,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.validAddress
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.canPayCrossChainFee
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigInteger
 
@@ -101,23 +100,24 @@ class RealCrossChainTransactor(
         val fullDestinationLocation = configuration.destinationChainLocation + assetTransfer.beneficiaryLocation()
         val requiredDestWeight = weigher.estimateRequiredDestWeight(configuration)
 
+        val lowestMultiLocationVersion = palletXcmRepository.lowestPresentMultiLocationVersion(assetTransfer.originChain.id)
+        val lowestMultiAssetVersion = palletXcmRepository.lowestPresentMultiAssetVersion(assetTransfer.originChain.id)
+
         call(
             moduleName = Modules.X_TOKENS,
             callName = "transfer_multiasset",
             arguments = mapOf(
-                "asset" to VersionedMultiAsset.V1(multiAsset).toEncodableInstance(),
-                "dest" to VersionedMultiLocation.V1(fullDestinationLocation).toEncodableInstance(),
+                "asset" to multiAsset.versioned(lowestMultiAssetVersion).toEncodableInstance(),
+                "dest" to fullDestinationLocation.versioned(lowestMultiLocationVersion).toEncodableInstance(),
 
                 // depending on the version of the pallet, only one of weights arguments going to be encoded
                 "dest_weight" to destWeightEncodable(requiredDestWeight),
-                "dest_weight_limit" to destWeightLimitEncodable(requiredDestWeight)
+                "dest_weight_limit" to WeightLimit.Limited(requiredDestWeight).toVersionedEncodableInstance(runtime)
             )
         )
     }
 
     private fun destWeightEncodable(weight: Weight): Any = weight
-    private fun destWeightLimitEncodable(weight: Weight): Any = DictEnum.Entry("Limited", weight)
-
     private suspend fun ExtrinsicBuilder.xcmPalletReserveTransfer(
         configuration: CrossChainTransferConfiguration,
         assetTransfer: AssetTransfer,

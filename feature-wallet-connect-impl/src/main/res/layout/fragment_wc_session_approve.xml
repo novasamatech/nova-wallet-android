@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:background="@color/secondary_screen_background">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/wcApproveSessionToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:homeButtonIcon="@drawable/ic_close"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleText="@string/wallet_connect_title" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/wcApproveSessionNovaIcon"
+                style="@style/Widget.Nova.Icon.Big"
+                android:layout_marginTop="24dp"
+                android:padding="16dp"
+                android:src="@drawable/ic_nova_logo"
+                app:layout_constraintEnd_toStartOf="@+id/wcApproveSessionNovaArrow"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/wcApproveSessionNovaArrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/ic_bidirectonal"
+                app:layout_constraintBottom_toBottomOf="@+id/wcApproveSessionNovaIcon"
+                app:layout_constraintEnd_toStartOf="@+id/wcApproveSessionIcon"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/wcApproveSessionNovaIcon"
+                app:layout_constraintTop_toTopOf="@+id/wcApproveSessionNovaIcon"
+                app:tint="@color/icon_secondary" />
+
+            <ImageView
+                android:id="@+id/wcApproveSessionIcon"
+                style="@style/Widget.Nova.Icon.Big"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/wcApproveSessionNovaArrow"
+                app:layout_constraintTop_toTopOf="@+id/wcApproveSessionNovaIcon"
+                tools:src="@drawable/ic_earth" />
+
+            <TextView
+                android:id="@+id/wcApproveSessionTitle"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center_horizontal"
+                android:textColor="@color/text_primary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/wcApproveSessionNovaIcon"
+                tools:text="Allow “Polkadot.js” to access your account addresses?" />
+
+            <TextView
+                android:id="@+id/wcApproveSessionSubTitle"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center_horizontal"
+                android:text="@string/dapp_confirm_authorize_subtitle"
+                android:textColor="@color/text_secondary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/wcApproveSessionTitle" />
+
+            <io.novafoundation.nova.common.view.TableView
+                android:id="@+id/wcApproveSessionRequestSession"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/wcApproveSessionSubTitle">
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/wcApproveSessionDApp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/dapp_dapp" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/wcApproveSessionNetworks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/common_networks" />
+            </io.novafoundation.nova.common.view.TableView>
+
+            <io.novafoundation.nova.common.view.AlertView
+                android:id="@+id/wcApproveSessionChainsAlert"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/wcApproveSessionRequestSession"
+                tools:text="Some of the required networks requested by 1inch are not supported in Nova Wallet" />
+
+            <io.novafoundation.nova.feature_account_api.view.AccountView
+                android:id="@+id/wcApproveSessionWallet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                app:actionIcon="@drawable/ic_chevron_right"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/wcApproveSessionChainsAlert"
+                app:showBackground="true" />
+
+            <io.novafoundation.nova.common.view.AlertView
+                android:id="@+id/wcApproveSessionAccountsAlert"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/wcApproveSessionWallet"
+                tools:text="Ethereum account is missing. Add account to the wallet in Settings" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="horizontal">
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/wcApproveSessionReject"
+            style="@style/Widget.Nova.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/common_reject"
+            app:appearance="secondary" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/wcApproveSessionAllow"
+            style="@style/Widget.Nova.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:text="@string/common_allow"
+            app:appearance="primary" />
+    </LinearLayout>
+
+</LinearLayout>

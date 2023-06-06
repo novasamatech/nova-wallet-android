@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.Web3Transport
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAccount
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedMetadataKnown
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayload
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerResult
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.PolkadotSignerResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
@@ -75,9 +75,9 @@ sealed class PolkadotJsTransportRequest<R>(
             val signerPayload: SignerPayload,
             private val gson: Gson,
             identifier: Identifier,
-        ) : Single<SignerResult>(web3Responder, url, identifier) {
+        ) : Single<PolkadotSignerResult>(web3Responder, url, identifier) {
 
-            override fun serializeResponse(response: SignerResult): String {
+            override fun serializeResponse(response: PolkadotSignerResult): String {
                 return gson.toJson(response)
             }
 

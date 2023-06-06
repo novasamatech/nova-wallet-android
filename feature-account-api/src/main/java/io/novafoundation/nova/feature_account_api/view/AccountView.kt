@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_account_api.R
@@ -47,6 +48,17 @@ class AccountView @JvmOverloads constructor(
         addressPrimaryIcon.setImageDrawable(addressModel.image)
     }
 
+    fun setTitle(title: String) {
+        addressTitle.text = title
+    }
+    fun setSubTitle(subTitle: String?) {
+        addressSubtitle.setTextOrHide(subTitle)
+    }
+
+    fun setIcon(icon: Drawable) {
+        addressPrimaryIcon.setImageDrawable(icon)
+    }
+
     fun setShowBackground(shouldShow: Boolean) {
         background = if (shouldShow) {
             getRoundedCornerDrawable(R.color.block_background, cornerSizeDp = 12).withRippleMask(getRippleMask(cornerSizeDp = 12))
@@ -68,11 +80,11 @@ class AccountView @JvmOverloads constructor(
         setActionIcon(icon?.let(context::getDrawable))
     }
 
-    private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.AddressView) { typedArray ->
-        val actionIcon = typedArray.getDrawable(R.styleable.AddressView_actionIcon)
+    private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.AccountView) { typedArray ->
+        val actionIcon = typedArray.getDrawable(R.styleable.AccountView_actionIcon)
         setActionIcon(actionIcon)
 
-        val shouldShowBackground = typedArray.getBoolean(R.styleable.AddressView_showBackground, SHOW_BACKGROUND_DEFAULT)
+        val shouldShowBackground = typedArray.getBoolean(R.styleable.AccountView_showBackground, SHOW_BACKGROUND_DEFAULT)
         setShowBackground(shouldShowBackground)
     }
 }

@@ -34,7 +34,7 @@ class StakeSummaryView @JvmOverloads constructor(
 
     sealed class Status(@StringRes val textRes: Int, @ColorRes val tintRes: Int) {
 
-        object Active : Status(R.string.staking_nominator_status_active, R.color.text_positive)
+        object Active : Status(R.string.common_active, R.color.text_positive)
 
         object Inactive : Status(R.string.staking_nominator_status_inactive, R.color.text_secondary)
 

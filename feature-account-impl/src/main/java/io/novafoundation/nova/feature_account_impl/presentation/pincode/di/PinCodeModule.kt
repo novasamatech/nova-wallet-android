@@ -19,13 +19,12 @@ import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.presentation.biometric.RealBiometricService
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeViewModel
-import io.novafoundation.nova.feature_account_impl.presentation.pincode.fingerprint.BiometricPromptFactory
+import io.novafoundation.nova.common.sequrity.biometry.BiometricPromptFactory
+import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 
 @Module(
     includes = [
@@ -71,16 +70,15 @@ class PinCodeModule {
         fragment: Fragment,
         context: Context,
         resourceManager: ResourceManager,
-        accountRepository: AccountRepository
+        realBiometricServiceFactory: BiometricServiceFactory
     ): BiometricService {
         val biometricManager = BiometricManager.from(context)
         val biometricPromptFactory = BiometricPromptFactory(fragment, MainThreadExecutor())
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(resourceManager.getString(R.string.biometric_auth_title))
-            .setDescription(resourceManager.getString(R.string.pincode_biometry_dialog_description))
             .setNegativeButtonText(resourceManager.getString(R.string.common_cancel))
             .build()
 
-        return RealBiometricService(accountRepository, biometricManager, biometricPromptFactory, promptInfo)
+        return realBiometricServiceFactory.create(biometricManager, biometricPromptFactory, promptInfo)
     }
 }

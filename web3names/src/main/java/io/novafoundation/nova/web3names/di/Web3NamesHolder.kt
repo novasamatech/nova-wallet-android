@@ -1,5 +1,6 @@
 package io.novafoundation.nova.web3names.di
 
+import io.novafoundation.nova.caip.di.CaipApi
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -17,6 +18,7 @@ class Web3NamesHolder @Inject constructor(
             .commonApi(commonApi())
             .dbApi(getFeature(DbApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
+            .caipApi(getFeature(CaipApi::class.java))
             .build()
 
         return DaggerWeb3NamesFeatureComponent.builder()

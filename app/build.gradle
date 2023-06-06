@@ -23,21 +23,21 @@ android {
     signingConfigs {
         dev {
             storeFile file('develop_key.jks')
-            storePassword readSecretOrNull('CI_KEYSTORE_PASS')
-            keyAlias readSecretOrNull('CI_KEYSTORE_KEY_ALIAS')
-            keyPassword readSecretOrNull('CI_KEYSTORE_KEY_PASS')
+            storePassword readRawSecretOrNull('CI_KEYSTORE_PASS')
+            keyAlias readRawSecretOrNull('CI_KEYSTORE_KEY_ALIAS')
+            keyPassword readRawSecretOrNull('CI_KEYSTORE_KEY_PASS')
         }
         market {
             storeFile file('market_key.jks')
-            storePassword readSecretOrNull('CI_MARKET_KEYSTORE_PASS')
-            keyAlias readSecretOrNull('CI_MARKET_KEYSTORE_KEY_ALIAS')
-            keyPassword readSecretOrNull('CI_MARKET_KEYSTORE_KEY_PASS')
+            storePassword readRawSecretOrNull('CI_MARKET_KEYSTORE_PASS')
+            keyAlias readRawSecretOrNull('CI_MARKET_KEYSTORE_KEY_ALIAS')
+            keyPassword readRawSecretOrNull('CI_MARKET_KEYSTORE_KEY_PASS')
         }
         github {
             storeFile file('github_key.jks')
-            storePassword readSecretOrNull('CI_GITHUB_KEYSTORE_PASS')
-            keyAlias readSecretOrNull('CI_GITHUB_KEYSTORE_KEY_ALIAS')
-            keyPassword readSecretOrNull('CI_GITHUB_KEYSTORE_KEY_PASS')
+            storePassword readRawSecretOrNull('CI_GITHUB_KEYSTORE_PASS')
+            keyAlias readRawSecretOrNull('CI_GITHUB_KEYSTORE_KEY_ALIAS')
+            keyPassword readRawSecretOrNull('CI_GITHUB_KEYSTORE_KEY_PASS')
         }
     }
     buildTypes {
@@ -128,6 +128,10 @@ android {
             createBindReleaseFileTask(variant.buildType.name)
         }
     }
+
+    packagingOptions {
+        resources.excludes.add("META-INF/versions/9/previous-compilation-data.bin")
+    }
 }
 
 void createBindReleaseFileTask(String destination) {
@@ -197,7 +201,20 @@ dependencies {
     implementation project(':feature-versions-api')
     implementation project(':feature-versions-impl')
 
+    implementation project(':caip')
+
+    implementation project(':feature-external-sign-api')
+    implementation project(':feature-external-sign-impl')
+
+    implementation project(':feature-wallet-connect-api')
+    implementation project(':feature-wallet-connect-impl')
+
+    implementation project(':feature-settings-api')
+    implementation project(':feature-settings-impl')
+
     implementation kotlinDep
+
+    implementation biometricDep
 
     implementation androidDep
     implementation constraintDep
@@ -233,6 +250,9 @@ dependencies {
     implementation insetterDep
 
     implementation liveDataKtxDep
+
+    implementation walletConnectCoreDep, withoutTransitiveAndroidX
+    implementation walletConnectWalletDep, withoutTransitiveAndroidX
 
     kaptAndroidTest daggerKapt
 

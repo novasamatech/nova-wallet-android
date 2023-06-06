@@ -30,11 +30,14 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -122,6 +125,10 @@ interface CommonApi {
 
     fun safeModeService(): SafeModeService
 
+    fun twoFactorVerificationService(): TwoFactorVerificationService
+
+    fun twoFactorVerificationExecutor(): TwoFactorVerificationExecutor
+
     val systemCallExecutor: SystemCallExecutor
 
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
@@ -141,4 +148,6 @@ interface CommonApi {
     val listChooserMixinFactory: ListChooserMixin.Factory
 
     val partialRetriableMixinFactory: PartialRetriableMixin.Factory
+
+    val automaticInteractionGate: AutomaticInteractionGate
 }

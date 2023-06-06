@@ -26,6 +26,7 @@ import io.novafoundation.nova.core_db.dao.PhishingSitesDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
+import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 
 @Module
 class DbModule {
@@ -162,5 +163,11 @@ class DbModule {
     @ApplicationScope
     fun provideBrowserHostSettingsDao(appDatabase: AppDatabase): BrowserHostSettingsDao {
         return appDatabase.browserHostSettingsDao()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideWalletConnectSessionsDao(appDatabase: AppDatabase): WalletConnectSessionsDao {
+        return appDatabase.walletConnectSessionsDao()
     }
 }

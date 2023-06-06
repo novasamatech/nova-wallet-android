@@ -4,19 +4,22 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import coil.clear
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.feature_dapp_api.R
-import io.novafoundation.nova.feature_dapp_api.presentation.common.showDAppIcon
+import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDAppIcon
 import kotlinx.android.synthetic.main.view_dapp.view.itemDAppIcon
 import kotlinx.android.synthetic.main.view_dapp.view.itemDAppSubtitle
+import kotlinx.android.synthetic.main.view_dapp.view.itemDAppSubtitleIcon
 import kotlinx.android.synthetic.main.view_dapp.view.itemDAppTitle
 import kotlinx.android.synthetic.main.view_dapp.view.itemDappAction
 
@@ -65,6 +68,10 @@ class DAppView @JvmOverloads constructor(
 
     fun activateActionIcon(activate: Boolean) {
         itemDappAction.isActivated = activate
+    }
+
+    fun enableSubtitleIcon(): ImageView {
+        return itemDAppSubtitleIcon.also { icon -> icon.makeVisible() }
     }
 
     fun setOnActionClickListener(listener: OnClickListener?) {

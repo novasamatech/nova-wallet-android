@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
             android:textColor="@color/text_primary"
-            android:text="@string/crowdloan_active_section" />
+            android:text="@string/common_active" />
 
         <TextView
             style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"

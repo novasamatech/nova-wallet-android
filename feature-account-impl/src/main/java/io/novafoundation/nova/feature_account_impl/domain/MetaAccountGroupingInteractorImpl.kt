@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTo
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -38,20 +39,20 @@ class MetaAccountGroupingInteractorImpl(
             accounts.map { metaAccount ->
                 val accountBalances = groupedBalances[metaAccount.id] ?: emptyList()
 
-                val totalBalance = accountBalances.sumByBigDecimal {
-                    val totalInPlanks = it.freeInPlanks + it.reservedInPlanks + it.offChainBalance.orZero()
-
-                    totalInPlanks.amountFromPlanks(it.precision) * it.rate.orZero()
-                }
-
-                MetaAccountWithTotalBalance(
-                    metaAccount = metaAccount,
-                    totalBalance = totalBalance,
-                    currency = selectedCurrency
-                )
+                metaAccountWithTotalBalance(accountBalances, metaAccount, selectedCurrency)
             }
                 .groupBy { it.metaAccount.type }
                 .toSortedMap(metaAccountTypeComparator())
+        }
+    }
+
+    override fun metaAccountWithTotalBalanceFlow(metaId: Long): Flow<MetaAccountWithTotalBalance> {
+        return combine(
+            currencyRepository.observeSelectCurrency(),
+            accountRepository.metaAccountFlow(metaId),
+            accountRepository.metaAccountBalancesFlow(metaId)
+        ) { selectedCurrency, metaAccount, metaAccountBalances ->
+            metaAccountWithTotalBalance(metaAccountBalances, metaAccount, selectedCurrency)
         }
     }
 
@@ -68,6 +69,24 @@ class MetaAccountGroupingInteractorImpl(
         val destinationChain = chainRegistry.getChain(destinationId)
         return getValidMetaAccountsForTransaction(fromChain, destinationChain)
             .any { it.hasAccountIn(destinationChain) }
+    }
+
+    private fun metaAccountWithTotalBalance(
+        metaAccountBalances: List<MetaAccountAssetBalance>,
+        metaAccount: MetaAccount,
+        selectedCurrency: Currency
+    ): MetaAccountWithTotalBalance {
+        val totalBalance = metaAccountBalances.sumByBigDecimal {
+            val totalInPlanks = it.freeInPlanks + it.reservedInPlanks + it.offChainBalance.orZero()
+
+            totalInPlanks.amountFromPlanks(it.precision) * it.rate.orZero()
+        }
+
+        return MetaAccountWithTotalBalance(
+            metaAccount = metaAccount,
+            totalBalance = totalBalance,
+            currency = selectedCurrency
+        )
     }
 
     private suspend fun getValidMetaAccountsForTransaction(from: Chain, destination: Chain): List<MetaAccount> {

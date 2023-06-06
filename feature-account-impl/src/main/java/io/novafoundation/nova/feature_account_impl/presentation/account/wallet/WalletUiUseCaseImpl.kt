@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.BACKGROUND_DEFAULT
 import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.BACKGROUND_TRANSPARENT
 import io.novafoundation.nova.common.utils.ByteArrayComparator
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount.ChainAccount
@@ -26,6 +27,20 @@ class WalletUiUseCaseImpl(
             val icon = maybeGenerateIcon(accountId = metaAccount.walletIconSeed(), shouldGenerate = showAddressIcon)
 
             WalletModel(
+                metaId = metaAccount.id,
+                name = metaAccount.name,
+                icon = icon
+            )
+        }
+    }
+
+    override fun walletUiFlow(metaId: Long, showAddressIcon: Boolean): Flow<WalletModel> {
+        return flowOf {
+            val metaAccount = accountRepository.getMetaAccount(metaId)
+            val icon = maybeGenerateIcon(accountId = metaAccount.walletIconSeed(), shouldGenerate = showAddressIcon)
+
+            WalletModel(
+                metaId = metaId,
                 name = metaAccount.name,
                 icon = icon
             )
@@ -36,6 +51,7 @@ class WalletUiUseCaseImpl(
         val metaAccount = accountRepository.getSelectedMetaAccount()
 
         return WalletModel(
+            metaId = metaAccount.id,
             name = metaAccount.name,
             icon = walletIcon(metaAccount)
         )
@@ -48,6 +64,14 @@ class WalletUiUseCaseImpl(
         val seed = metaAccount.walletIconSeed()
 
         return generateWalletIcon(seed, transparentBackground)
+    }
+
+    override suspend fun walletUiFor(metaAccount: MetaAccount): WalletModel {
+        return WalletModel(
+            metaId = metaAccount.id,
+            name = metaAccount.name,
+            icon = walletIcon(metaAccount, transparentBackground = true)
+        )
     }
 
     private suspend fun maybeGenerateIcon(accountId: AccountId, shouldGenerate: Boolean): Drawable? {

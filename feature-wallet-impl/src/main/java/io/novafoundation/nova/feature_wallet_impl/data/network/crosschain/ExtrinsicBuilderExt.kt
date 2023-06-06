@@ -169,6 +169,10 @@ fun VersionedMultiAsset.toEncodableInstance() = when (this) {
         name = "V1",
         value = asset.toEncodableInstance()
     )
+    is VersionedMultiAsset.V2 -> DictEnum.Entry(
+        name = "V2",
+        value = asset.toEncodableInstance()
+    )
 }
 
 fun VersionedMultiLocation.toEncodableInstance() = when (this) {

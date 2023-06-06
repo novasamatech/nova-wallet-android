@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
+import kotlinx.android.synthetic.main.fragment_referenda_filters.referendaFilterAll
 import kotlinx.android.synthetic.main.fragment_referenda_filters.referendaFiltersApplyButton
 import kotlinx.android.synthetic.main.fragment_referenda_filters.referendaFiltersToolbar
 import kotlinx.android.synthetic.main.fragment_referenda_filters.referendaFiltersTypeGroup
@@ -24,6 +25,7 @@ class ReferendaFiltersFragment : BaseFragment<ReferendaFiltersViewModel>() {
     override fun initViews() {
         referendaFiltersToolbar.applyStatusBarInsets()
         referendaFiltersToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
+        referendaFiltersToolbar.setRightActionClickListener { referendaFilterAll.isChecked = true }
 
         referendaFiltersApplyButton.setOnClickListener {
             viewModel.onApplyFilters()

@@ -52,7 +52,7 @@ class SecretsSigner(
 
     private suspend fun runTwoFactorVerificationIfEnabled() {
         if (twoFactorVerificationService.isEnabled()) {
-            val confirmationResult = twoFactorVerificationService.requestConfirmation()
+            val confirmationResult = twoFactorVerificationService.requestConfirmationIfEnabled()
             if (confirmationResult != TwoFactorVerificationResult.CONFIRMED) {
                 throw SigningCancelledException()
             }

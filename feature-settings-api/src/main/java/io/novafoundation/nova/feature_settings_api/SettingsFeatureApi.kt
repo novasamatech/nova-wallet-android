@@ -1,0 +1,3 @@
+package io.novafoundation.nova.feature_settings_api
+
+interface SettingsFeatureApi

@@ -7,6 +7,8 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.app.App
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootFeatureHolder
+import io.novafoundation.nova.caip.di.CaipApi
+import io.novafoundation.nova.caip.di.CaipFeatureHolder
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -22,6 +24,8 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_currency_impl.di.CurrencyFeatureHolder
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureHolder
+import io.novafoundation.nova.feature_external_sign_api.di.ExternalSignFeatureApi
+import io.novafoundation.nova.feature_external_sign_impl.di.ExternalSignFeatureHolder
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureHolder
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
@@ -30,6 +34,8 @@ import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureHolder
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureHolder
+import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
+import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureHolder
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureHolder
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
@@ -37,6 +43,8 @@ import io.novafoundation.nova.feature_versions_impl.di.VersionsFeatureHolder
 import io.novafoundation.nova.feature_vote.di.VoteFeatureApi
 import io.novafoundation.nova.feature_vote.di.VoteFeatureHolder
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
+import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
+import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatureHolder
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureHolder
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.di.RuntimeHolder
@@ -159,4 +167,28 @@ interface ComponentHolderModule {
     @ClassKey(VersionsFeatureApi::class)
     @IntoMap
     fun provideVersionsFeature(holder: VersionsFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(CaipApi::class)
+    @IntoMap
+    fun provideCaipFeature(holder: CaipFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(ExternalSignFeatureApi::class)
+    @IntoMap
+    fun provideExternalSignFeature(holder: ExternalSignFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(WalletConnectFeatureApi::class)
+    @IntoMap
+    fun provideWalletConnectFeature(holder: WalletConnectFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(SettingsFeatureApi::class)
+    @IntoMap
+    fun provideSettingsFeature(holder: SettingsFeatureHolder): FeatureApiHolder
 }

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <io.novafoundation.nova.common.presentation.scan.ScanView
+        android:id="@+id/walletConnectScan"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:subTitle="@string/wallet_connect_v2"
+        app:title="@string/common_scan_qr_code" />
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        android:id="@+id/walletConnectScanToolbar"
+        app:contentBackground="@android:color/transparent" />
+</FrameLayout>

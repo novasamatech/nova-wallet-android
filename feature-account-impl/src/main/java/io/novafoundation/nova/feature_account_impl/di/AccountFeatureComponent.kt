@@ -4,9 +4,11 @@ import dagger.BindsInstance
 import dagger.Component
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.settings.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSignCommunicator
@@ -16,7 +18,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncrypti
 import io.novafoundation.nova.feature_account_impl.presentation.account.advancedEncryption.di.AdvancedEncryptionComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.create.di.CreateAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.di.AccountDetailsComponent
-import io.novafoundation.nova.feature_account_impl.presentation.account.list.selecting.di.SelectAddressComponent
+import io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.di.SelectAddressComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.di.SwitchWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.management.di.WalletManagmentComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.confirm.ShareCompletedReceiver
@@ -25,6 +27,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.p
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.di.ExportSeedComponent
 import io.novafoundation.nova.feature_account_impl.presentation.importing.di.ImportAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.language.di.LanguagesComponent
+import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.di.SelectWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.di.BackupMnemonicComponent
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.di.ConfirmMnemonicComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.add.di.AddNodeComponent
@@ -37,7 +40,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.con
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.di.ScanSignParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.show.di.ShowSignParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.di.PinCodeComponent
-import io.novafoundation.nova.feature_account_impl.presentation.settings.di.SettingsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.di.ChangeWatchAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create.di.CreateWatchWalletComponent
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
@@ -65,8 +67,6 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun backupMnemonicComponentFactory(): BackupMnemonicComponent.Factory
 
-    fun profileComponentFactory(): SettingsComponent.Factory
-
     fun pincodeComponentFactory(): PinCodeComponent.Factory
 
     fun confirmMnemonicComponentFactory(): ConfirmMnemonicComponent.Factory
@@ -74,6 +74,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun walletManagmentComponentFactory(): WalletManagmentComponent.Factory
 
     fun switchWalletComponentFactory(): SwitchWalletComponent.Factory
+
+    fun selectWalletComponentFactory(): SelectWalletComponent.Factory
 
     fun selectAddressComponentFactory(): SelectAddressComponent.Factory
 
@@ -115,6 +117,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
             @BindsInstance paritySignerSignInterScreenCommunicator: ParitySignerSignCommunicator,
             @BindsInstance ledgerSignInterScreenCommunicator: LedgerSignCommunicator,
             @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,
+            @BindsInstance selectWalletCommunicator: SelectWalletCommunicator,
             @BindsInstance pinCodeTwoFactorVerificationCommunicator: PinCodeTwoFactorVerificationCommunicator,
             deps: AccountFeatureDependencies
         ): AccountFeatureComponent

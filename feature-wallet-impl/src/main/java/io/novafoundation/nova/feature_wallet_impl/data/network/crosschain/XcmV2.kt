@@ -57,6 +57,8 @@ sealed class VersionedMultiAssets {
 sealed class VersionedMultiAsset {
 
     class V1(val asset: XcmMultiAsset) : VersionedMultiAsset()
+
+    class V2(val asset: XcmMultiAsset) : VersionedMultiAsset()
 }
 
 sealed class VersionedMultiLocation {
@@ -68,6 +70,12 @@ fun XcmMultiAssets.versioned(lowestAllowedVersion: XcmVersion?) = when {
     lowestAllowedVersion == null -> VersionedMultiAssets.V2(this) // try out best with latest known version
     lowestAllowedVersion <= XcmVersion.V1 -> VersionedMultiAssets.V1(this)
     else -> VersionedMultiAssets.V2(this)
+}
+
+fun XcmMultiAsset.versioned(lowestAllowedVersion: XcmVersion?) = when {
+    lowestAllowedVersion == null -> VersionedMultiAsset.V2(this) // try out best with latest known version
+    lowestAllowedVersion <= XcmVersion.V1 -> VersionedMultiAsset.V1(this)
+    else -> VersionedMultiAsset.V2(this)
 }
 
 fun MultiLocation.versioned(lowestAllowedVersion: XcmVersion?) = when {

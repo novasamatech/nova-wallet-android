@@ -42,16 +42,19 @@ fun ResourceManager.formatTimeLeft(elapsedTimeInMillis: Long): String {
 
 fun ResourceManager.formatListPreview(
     elements: List<String>,
-    @StringRes zeroLabel: Int? = null,
+    maxPreviewItems: Int = 1,
+    @StringRes zeroLabel: Int? = R.string.common_none,
 ): String {
     return when {
         elements.isEmpty() -> zeroLabel?.let(::getString).orEmpty()
-        elements.size == 1 -> elements.single()
+        elements.size <= maxPreviewItems -> elements.joinPreviewItems(maxPreviewItems)
         else -> {
-            val previewItem = elements.first()
-            val remainingCount = elements.size - 1
+            val previewItems = elements.joinPreviewItems(maxPreviewItems)
+            val remainingCount = elements.size - maxPreviewItems
 
-            getString(R.string.common_element_and_more_format, previewItem, remainingCount.format())
+            getString(R.string.common_element_and_more_format, previewItems, remainingCount.format())
         }
     }
 }
+
+private fun List<String>.joinPreviewItems(previewItemsCount: Int): String = take(previewItemsCount).joinToString(separator = ", ")

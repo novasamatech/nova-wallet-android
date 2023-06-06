@@ -226,3 +226,19 @@ fun ChainRegistry.getService(chainId: String) = ChainService(
     runtimeProvider = getRuntimeProvider(chainId),
     connection = getConnection(chainId)
 )
+
+suspend fun ChainRegistry.findEvmChain(evmChainId: Int): Chain? {
+    return findChain { it.isEthereumBased && it.addressPrefix == evmChainId }
+}
+
+suspend fun ChainRegistry.findEvmCallApi(evmChainId: Int): Web3Api? {
+    return findEvmChain(evmChainId)?.let {
+        awaitCallEthereumApi(it.id)
+    }
+}
+
+suspend fun ChainRegistry.findEvmChainFromHexId(evmChainIdHex: String): Chain? {
+    val addressPrefix = evmChainIdHex.removeHexPrefix().toIntOrNull(radix = 16) ?: return null
+
+    return findEvmChain(addressPrefix)
+}

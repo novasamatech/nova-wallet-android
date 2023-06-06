@@ -10,6 +10,7 @@ import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.app.root.presentation.main.MainViewModel
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 
 @Module(
@@ -24,9 +25,10 @@ class MainFragmentModule {
     @ViewModelKey(MainViewModel::class)
     fun provideViewModel(
         interactor: RootInteractor,
-        updateNotificationsInteractor: UpdateNotificationsInteractor
+        updateNotificationsInteractor: UpdateNotificationsInteractor,
+        automaticInteractionGate: AutomaticInteractionGate,
     ): ViewModel {
-        return MainViewModel(interactor, updateNotificationsInteractor)
+        return MainViewModel(interactor, updateNotificationsInteractor, automaticInteractionGate)
     }
 
     @Provides

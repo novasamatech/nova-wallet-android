@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
+import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
 
@@ -35,6 +36,7 @@ class RootFeatureHolder @Inject constructor(
             .crowdloanFeatureApi(getFeature(CrowdloanFeatureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .versionsFeatureApi(getFeature(VersionsFeatureApi::class.java))
+            .walletConnectFeatureApi(getFeature(WalletConnectFeatureApi::class.java))
             .build()
 
         return DaggerRootComponent.factory()

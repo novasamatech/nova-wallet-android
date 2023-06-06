@@ -3,8 +3,10 @@ package io.novafoundation.nova.feature_account_impl.di
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.settings.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSignCommunicator
@@ -24,6 +26,7 @@ class AccountFeatureHolder @Inject constructor(
     private val paritySignerSignCommunicator: ParitySignerSignCommunicator,
     private val ledgerSignCommunicator: LedgerSignCommunicator,
     private val selectAddressCommunicator: SelectAddressCommunicator,
+    private val selectWalletCommunicator: SelectWalletCommunicator,
     private val pinCodeTwoFactorVerificationCommunicator: PinCodeTwoFactorVerificationCommunicator
 ) : FeatureApiHolder(featureContainer) {
 
@@ -44,6 +47,7 @@ class AccountFeatureHolder @Inject constructor(
                 paritySignerSignInterScreenCommunicator = paritySignerSignCommunicator,
                 ledgerSignInterScreenCommunicator = ledgerSignCommunicator,
                 selectAddressCommunicator = selectAddressCommunicator,
+                selectWalletCommunicator = selectWalletCommunicator,
                 pinCodeTwoFactorVerificationCommunicator = pinCodeTwoFactorVerificationCommunicator,
                 deps = accountFeatureDependencies
             )

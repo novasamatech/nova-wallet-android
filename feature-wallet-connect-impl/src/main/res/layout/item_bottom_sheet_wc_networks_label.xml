@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:background="@color/secondary_screen_background"
+    android:textColor="@color/text_secondary"
+    tools:text="@string/common_required"
+    android:layout_marginStart="16dp"
+    style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+    android:id="@+id/itemWcNetworksLabel"
+    android:layout_height="wrap_content" />

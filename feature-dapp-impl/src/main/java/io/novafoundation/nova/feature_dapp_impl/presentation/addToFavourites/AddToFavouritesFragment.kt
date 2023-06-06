@@ -12,13 +12,13 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.hideKeyboard
+import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.utils.moveCursorToTheEnd
 import io.novafoundation.nova.common.utils.postToSelf
-import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
-import io.novafoundation.nova.feature_dapp_api.presentation.common.showDAppIcon
+import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDAppIcon
 import kotlinx.android.synthetic.main.fragment_add_to_favourites.addToFavouritesAddressInput
 import kotlinx.android.synthetic.main.fragment_add_to_favourites.addToFavouritesIcon
 import kotlinx.android.synthetic.main.fragment_add_to_favourites.addToFavouritesTitleInput

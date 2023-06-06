@@ -54,7 +54,8 @@ class StatemineAssetsModule {
         assetSourceRegistry: AssetSourceRegistry,
         extrinsicService: ExtrinsicService,
         phishingValidationFactory: PhishingValidationFactory,
-    ) = StatemineAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory)
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorage: StorageDataSource,
+    ) = StatemineAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory, remoteStorage)
 
     @Provides
     @FeatureScope

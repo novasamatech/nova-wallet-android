@@ -6,7 +6,7 @@ import io.novafoundation.nova.core_db.model.TotalRewardLocal
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapTotalRewardLocalToTotalReward
 import io.novafoundation.nova.feature_staking_impl.data.model.stakingExternalApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
-import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request.StakingSumRewardRequest
+import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request.StakingPeriodRewardsRequest
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.response.totalReward
 import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
@@ -33,9 +33,9 @@ class SubqueryStakingRewardsDataSource(
         val start = rewardPeriod.getStartDate()?.timestamp()
         val end = rewardPeriod.getEndDate()?.timestamp()
 
-        val response = stakingApi.getTotalReward(
+        val response = stakingApi.getRewardsByPeriod(
             url = stakingExternalApi.url,
-            body = StakingSumRewardRequest(accountAddress = accountAddress, startTimestamp = start, endTimestamp = end)
+            body = StakingPeriodRewardsRequest(accountAddress = accountAddress, startTimestamp = start, endTimestamp = end)
         )
         val totalResult = response.data.totalReward
 

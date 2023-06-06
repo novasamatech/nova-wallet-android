@@ -23,11 +23,11 @@ android {
         buildConfigField "String", "YOUTUBE_URL", "\"https://www.youtube.com/channel/UChoQr3YPETJKKVvhQ0AfV6A\""
 
         buildConfigField "String", "TWITTER_ACCOUNT_TEMPLATE", "\"https://twitter.com/%s\""
-        buildConfigField "String", "RECOMMENDED_VALIDATORS_LEARN_MORE", "\"https://github.com/nova-wallet/nova-utils/wiki/Recommended-validators-in-Nova-Wallet\""
+        buildConfigField "String", "RECOMMENDED_VALIDATORS_LEARN_MORE", "\"https://docs.novawallet.io/nova-wallet-wiki/staking/staking-faq#q-how-does-nova-wallet-select-validators-collators\""
 
-        buildConfigField "String", "PAYOUTS_LEARN_MORE", "\"https://wiki.polkadot.network/docs/en/learn-simple-payouts\""
+        buildConfigField "String", "PAYOUTS_LEARN_MORE", "\"https://docs.novawallet.io/nova-wallet-wiki/staking/staking-faq#q-what-is-the-difference-between-restake-rewards-and-transferable-rewards\""
 
-        buildConfigField "String", "SET_CONTROLLER_LEARN_MORE", "\"https://wiki.polkadot.network/docs/en/maintain-guides-how-to-nominate-polkadot#setting-up-stash-and-controller-keys\""
+        buildConfigField "String", "SET_CONTROLLER_LEARN_MORE", "\"https://docs.novawallet.io/nova-wallet-wiki/staking/staking-faq#q-what-are-stash-and-controller-accounts\""
 
         buildConfigField "String", "PARITY_SIGNER_TROUBLESHOOTING", "\"https://github.com/nova-wallet/nova-utils/wiki/Parity-Signer-troubleshooting\""
         buildConfigField "String", "LEDGER_BLEUTOOTH_GUIDE", "\"https://support.ledger.com/hc/en-us/articles/360019138694-Set-up-Bluetooth-connection\""
@@ -67,6 +67,8 @@ dependencies {
     implementation recyclerViewDep
     implementation materialDep
     implementation constraintDep
+
+    implementation biometricDep
 
     implementation bouncyCastleDep
 

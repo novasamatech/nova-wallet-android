@@ -6,11 +6,13 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import org.web3j.utils.Numeric
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
+import java.util.Collections
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
@@ -28,12 +30,28 @@ infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
 
 inline fun <reified E : Enum<E>> enumValueOfOrNull(raw: String): E? = runCatching { enumValueOf<E>(raw) }.getOrNull()
 
+inline fun <K, V> List<V>.associateByMultiple(keysExtractor: (V) -> Iterable<K>): Map<K, V> {
+    val destination = LinkedHashMap<K, V>()
+
+    for (element in this) {
+        val keys = keysExtractor(element)
+
+        for (key in keys) {
+            destination[key] = element
+        }
+    }
+
+    return destination
+}
+
 /**
  * Compares two BigDecimals taking into account only values but not scale unlike `==` operator
  */
 infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another) == 0
 
 fun BigInteger.intSqrt() = sqrt(toDouble()).toLong().toBigInteger()
+
+fun <T> MutableSet<T>.toImmutable(): Set<T> = Collections.unmodifiableSet(this)
 
 operator fun BigInteger.times(double: Double): BigInteger = toBigDecimal().multiply(double.toBigDecimal()).toBigInteger()
 
@@ -69,6 +87,10 @@ inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fol
 }
 
 fun Iterable<BigInteger>.sum() = sumOf { it }
+
+fun String.decodeEvmQuantity(): BigInteger {
+    return Numeric.decodeQuantity(this)
+}
 
 suspend operator fun <T> Deferred<T>.invoke() = await()
 

@@ -42,12 +42,19 @@ import io.novafoundation.nova.common.resources.OSAppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.ResourceManagerImpl
 import io.novafoundation.nova.common.sequrity.RealSafeModeService
+import io.novafoundation.nova.common.sequrity.RealTwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
+import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
+import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.common.utils.sequrity.RealAutomaticInteractionGate
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
@@ -100,8 +107,15 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun provideBackgroundAccessObserver(preferences: Preferences): BackgroundAccessObserver {
-        return BackgroundAccessObserver(preferences)
+    fun provideInteractionGate(): AutomaticInteractionGate = RealAutomaticInteractionGate()
+
+    @Provides
+    @ApplicationScope
+    fun provideBackgroundAccessObserver(
+        preferences: Preferences,
+        automaticInteractionGate: AutomaticInteractionGate
+    ): BackgroundAccessObserver {
+        return BackgroundAccessObserver(preferences, automaticInteractionGate)
     }
 
     @Provides
@@ -271,4 +285,17 @@ class CommonModule {
     fun providePartialRetriableMixinFactory(
         resourceManager: ResourceManager
     ): PartialRetriableMixin.Factory = RealPartialRetriableMixinFactory(resourceManager)
+
+    @Provides
+    @ApplicationScope
+    fun provideTwoFactorVerificationExecutor(
+        twoFactorVerificationExecutor: PinCodeTwoFactorVerificationCommunicator
+    ): TwoFactorVerificationExecutor = PinCodeTwoFactorVerificationExecutor(twoFactorVerificationExecutor)
+
+    @Provides
+    @ApplicationScope
+    fun provideTwoFactorVerificationService(
+        preferences: Preferences,
+        twoFactorVerificationExecutor: TwoFactorVerificationExecutor
+    ): TwoFactorVerificationService = RealTwoFactorVerificationService(preferences, twoFactorVerificationExecutor)
 }

@@ -77,8 +77,10 @@
         <attr name="dividerVisible" />
         <attr name="primaryValueIcon" format="reference|color" />
         <attr name="primaryValueStyle" format="enum">
-            <enum name="text" value="0" />
-            <enum name="link" value="1" />
+            <enum name="primary" value="0" />
+            <enum name="secondary" value="1" />
+            <enum name="link" value="2" />
+            <enum name="positive" value="3" />
         </attr>
         <attr name="titleValueTextAppearance" format="reference" />
         <attr name="primaryValueTextAppearance" format="reference" />
@@ -120,6 +122,10 @@
             <enum name="large" value="0" />
             <enum name="small" value="1" />
         </attr>
+
+        <attr name="iconSrc" format="reference" />
+        <attr name="iconSize" format="dimension" />
+        <attr name="iconPadding" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="PlaceholderView">

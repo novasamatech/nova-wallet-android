@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 apply from: '../tests.gradle'
+apply from: "../scripts/secrets.gradle"
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -57,6 +58,7 @@ dependencies {
     implementation project(':feature-wallet-api')
     implementation project(':feature-dapp-api')
     implementation project(':feature-currency-api')
+    implementation project(':feature-external-sign-api')
     implementation project(':runtime')
 
     implementation kotlinDep
@@ -86,6 +88,9 @@ dependencies {
 
     implementation web3jDep
     implementation coroutinesFutureDep
+
+    implementation walletConnectCoreDep, withoutTransitiveAndroidX
+    implementation walletConnectWalletDep, withoutTransitiveAndroidX
 
     testImplementation jUnitDep
     testImplementation mockitoDep

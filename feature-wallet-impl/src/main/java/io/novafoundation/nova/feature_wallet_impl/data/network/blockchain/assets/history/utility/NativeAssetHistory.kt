@@ -24,7 +24,6 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.status
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
-import jp.co.soramitsu.fearless_utils.runtime.metadata.call
 import jp.co.soramitsu.fearless_utils.runtime.metadata.callOrNull
 
 class NativeAssetHistory(
@@ -73,8 +72,9 @@ class NativeAssetHistory(
         val balances = runtime.metadata.balances()
 
         return oneOf(
-            balances.call("transfer"),
-            balances.callOrNull("transfer_keep_alive")
+            balances.callOrNull("transfer"),
+            balances.callOrNull("transfer_keep_alive"),
+            balances.callOrNull("transfer_allow_death")
         )
     }
 }

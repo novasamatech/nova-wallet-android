@@ -8,9 +8,9 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageModel
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.language.mapper.mapLanguageToLanguageModel
-import io.novafoundation.nova.feature_account_impl.presentation.language.model.LanguageModel
 import kotlinx.coroutines.launch
 
 class LanguagesViewModel(

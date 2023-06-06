@@ -107,7 +107,7 @@ class CrowdloanViewModel(
                 count = statusCount.toString()
             )
             Crowdloan.State.Active::class -> CrowdloanStatusModel(
-                status = resourceManager.getString(R.string.crowdloan_active_section),
+                status = resourceManager.getString(R.string.common_active),
                 count = statusCount.toString()
             )
             else -> throw IllegalArgumentException("Unsupported crowdloan status type: ${statusClass.simpleName}")

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.presentation.language.model.LanguageModel
+import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageModel
 import kotlinx.android.synthetic.main.item_language.view.languageCheck
 
 class LanguagesAdapter(

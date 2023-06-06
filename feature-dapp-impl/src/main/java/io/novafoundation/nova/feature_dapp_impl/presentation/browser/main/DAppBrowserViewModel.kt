@@ -18,10 +18,6 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyz
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignPayload
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignRequester
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.awaitConfirmation
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.RemoveFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
@@ -29,9 +25,15 @@ import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session.Authori
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.ExternalEvent
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3StateMachineHost
-import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.AuthorizeDAppPayload
-import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxRequest
 import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxResponse
+import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
+import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignRequester
+import io.novafoundation.nova.feature_external_sign_api.model.awaitConfirmation
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignPayload
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignWallet
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.SigningDappMetadata
+import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -54,7 +56,7 @@ data class DesktopModeChangedEvent(val desktopModeEnabled: Boolean, val url: Str
 
 class DAppBrowserViewModel(
     private val router: DAppRouter,
-    private val signRequester: DAppSignRequester,
+    private val signRequester: ExternalSignRequester,
     private val extensionStoreFactory: ExtensionStoreFactory,
     private val dAppInteractor: DappInteractor,
     private val interactor: DappBrowserInteractor,
@@ -109,22 +111,22 @@ class DAppBrowserViewModel(
         forceLoad(initialUrl)
     }
 
-    override suspend fun authorizeDApp(payload: AuthorizeDAppPayload): State {
+    override suspend fun authorizeDApp(payload: AuthorizeDappBottomSheet.Payload): State {
         val confirmationState = awaitConfirmation(DappPendingConfirmation.Action.Authorize(payload))
 
         return mapConfirmationStateToAuthorizationState(confirmationState)
     }
 
-    override suspend fun confirmTx(request: ConfirmTxRequest): ConfirmTxResponse {
+    override suspend fun confirmTx(request: ExternalSignRequest): ConfirmTxResponse {
         val response = withContext(Dispatchers.Main) {
             signRequester.awaitConfirmation(mapSignExtrinsicRequestToPayload(request))
         }
 
         return when (response) {
-            is DAppSignCommunicator.Response.Rejected -> ConfirmTxResponse.Rejected(response.requestId)
-            is DAppSignCommunicator.Response.Signed -> ConfirmTxResponse.Signed(response.requestId, response.signature)
-            is DAppSignCommunicator.Response.SigningFailed -> ConfirmTxResponse.SigningFailed(response.requestId, response.shouldPresent)
-            is DAppSignCommunicator.Response.Sent -> ConfirmTxResponse.Sent(response.requestId, response.txHash)
+            is ExternalSignCommunicator.Response.Rejected -> ConfirmTxResponse.Rejected(response.requestId)
+            is ExternalSignCommunicator.Response.Signed -> ConfirmTxResponse.Signed(response.requestId, response.signature)
+            is ExternalSignCommunicator.Response.SigningFailed -> ConfirmTxResponse.SigningFailed(response.requestId, response.shouldPresent)
+            is ExternalSignCommunicator.Response.Sent -> ConfirmTxResponse.Sent(response.requestId, response.txHash)
         }
     }
 
@@ -247,8 +249,21 @@ class DAppBrowserViewModel(
         currentPage.emit(BrowserPage(url, title, synchronizedWithBrowser))
     }
 
-    private suspend fun mapSignExtrinsicRequestToPayload(request: ConfirmTxRequest) = DAppSignPayload(
-        body = request,
-        dappUrl = currentPageAnalyzed.first().url
-    )
+    private suspend fun mapSignExtrinsicRequestToPayload(request: ExternalSignRequest): ExternalSignPayload {
+        return ExternalSignPayload(
+            signRequest = request,
+            dappMetadata = getDAppSignMetadata(currentPageAnalyzed.first().url),
+            wallet = ExternalSignWallet.Current
+        )
+    }
+
+    private suspend fun getDAppSignMetadata(dAppUrl: String): SigningDappMetadata {
+        val dappMetadata = dAppInteractor.getDAppInfo(dAppUrl)
+
+        return SigningDappMetadata(
+            icon = dappMetadata.metadata?.iconLink,
+            name = dappMetadata.metadata?.name,
+            url = dappMetadata.baseUrl,
+        )
+    }
 }

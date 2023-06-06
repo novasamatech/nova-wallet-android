@@ -8,6 +8,7 @@ import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.AuthType
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
@@ -43,9 +44,15 @@ interface AccountDataSource : SecretStoreV1 {
     suspend fun accountNameFor(accountId: AccountId): String?
 
     suspend fun allMetaAccounts(): List<MetaAccount>
+
+    suspend fun allLightMetaAccounts(): List<LightMetaAccount>
+
     fun allMetaAccountsFlow(): Flow<List<MetaAccount>>
 
     fun metaAccountsWithBalancesFlow(): Flow<List<MetaAccountAssetBalance>>
+
+    fun metaAccountBalancesFlow(metaId: Long): Flow<List<MetaAccountAssetBalance>>
+
     suspend fun selectMetaAccount(metaId: Long)
     suspend fun updateAccountPositions(accountOrdering: List<MetaAccountOrdering>)
 
@@ -54,6 +61,8 @@ interface AccountDataSource : SecretStoreV1 {
 
     suspend fun accountExists(accountId: AccountId): Boolean
     suspend fun getMetaAccount(metaId: Long): MetaAccount
+
+    fun metaAccountFlow(metaId: Long): Flow<MetaAccount>
 
     suspend fun updateMetaAccountName(metaId: Long, newName: String)
     suspend fun deleteMetaAccount(metaId: Long)

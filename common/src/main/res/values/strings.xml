@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
-    <string name="transfer_history_income_from">From: %s</string>
-    <string name="transfer_history_send_to">To: %s</string>
+    <string name="referenda_list_filter_placeholder">There are no referenda with filters applied</string>
 
-    <string name="transaction_history_fiat_with_time">%s at %s</string>
+    <string name="pincode_biometric_switch_dialog_title">Use biometric to authorize</string>
+
+    <string name="pincode_biometric_error">You are not authorized. Try again, please.</string>
+
+    <string name="common_settings">Settings</string>
+    <string name="settings_biometric_not_ready_title">Biometrics disabled in Settings</string>
+    <string name="settings_biometric_not_ready_message">Please, make sure biometrics is enabled in Settings</string>
 
     <string name="referenda_filters_header">Show</string>
     <string name="referenda_filters_all">All referenda</string>
@@ -16,10 +21,7 @@
     <string name="referenda_search_toolbar_hint">Search by referendum title or ID</string>
     <string name="referenda_search_placeholder">No referenda with entered title or ID were found</string>
 
-    <string name="send_address_hint">Address or w3n</string>
-
-    <string name="pincode_biometry_dialog_subtitle">Nova Wallet uses fingerprint to restrict unauthorized users from accessing the app</string>
-    <string name="pincode_biometry_dialog_description">Touch the fingerprint sensor</string>
+    <string name="pincode_biometry_dialog_subtitle">Nova Wallet uses biometric authentication to restrict unauthorized users from accessing the app.</string>
 
     <string name="staking_period_select_date">Select date</string>
     <string name="staking_period_start_date_picker_title">Select start date</string>
@@ -33,7 +35,6 @@
     <string name="staking_period_year_short">1Y</string>
     <string name="staking_period_custom_short">%dD</string>
 
-    <!--<string name="staking_your_rewards">Your rewards</string>-->
     <string name="staking_your_rewards">Rewards</string>
 
     <string name="staking_period_title">Show staking rewards for</string>
@@ -55,6 +56,53 @@
     <string name="biometric_auth_title">Biometric auth</string>
     <string name="profile_settings_pin_code_verification_title">Approve with PIN</string>
 
+    <string name="send_address_hint">Address or w3n</string>
+
+    <string name="wallet_send_recipient_blocked_title">Recipient cannot accept transfer</string>
+    <string name="wallet_send_recipient_blocked_message">Recipient has been blocked by token owner and cannot currently accept incoming transfers</string>
+
+    <string name="common_expired">Expired</string>
+
+    <plurals name="common_networks_plural">
+        <item quantity="one">Network</item>
+        <item quantity="other">Networks</item>
+    </plurals>
+
+    <string name="common_required">Required</string>
+    <string name="common_optional">Optional</string>
+
+    <plurals name="wallet_connect_unsupported_networks_hidden">
+        <item quantity="one">%s unsupported network is hidden</item>
+        <item quantity="other">%s unsupported networks are hidden</item>
+    </plurals>
+
+    <string name="wallet_connect_session_approve_unsupported_chains_alert">Some of the required networks requested by \"%s\" are not supported in Nova Wallet</string>
+
+    <plurals name="wallet_connect_session_approve_missing_accounts_alert">
+        <item quantity="one">%s account is missing. Add account to the wallet in Settings</item>
+        <item quantity="other">%s accounts are missing. Add accounts to the wallet in Settings</item>
+    </plurals>
+
+    <plurals name="common_unknown_chains">
+        <item quantity="one">%s unsupported</item>
+        <item quantity="other">%s unsupported</item>
+    </plurals>
+
+    <string name="wallet_connect_v2">WalletConnect v2</string>
+
+    <string name="common_sign_request">Sign Request</string>
+
+    <string name="wallet_connect_sessions_placeholder">Wallet Connect sessions will appear here</string>
+
+    <string name="common_active">Active</string>
+    <string name="common_none">None</string>
+    <string name="common_networks">Networks</string>
+    <string name="common_disconnect">Disconnect</string>
+
+    <string name="wallet_connect_unknown_dapp">Unknown dApp</string>
+    <string name="wallet_connect_new_connection">New connection</string>
+    <string name="wallet_connect_title">WalletConnect</string>
+    <string name="common_scan_qr_code">Scan the QR code</string>
 
     <string name="ethereum_function">Function</string>
     <string name="ethereum_contract">Contract</string>
@@ -1031,7 +1079,6 @@
     <string name="crowdloan_acala_direct">Direct</string>
     <string name="crowdloan_acala_learn_types">Learn more about different contributions to Acala</string>
     <string name="crowdloan_acala_liquid">Liquid</string>
-    <string name="crowdloan_active_section">Active</string>
     <string name="crowdloan_active_section_format">Active (%s)</string>
     <string name="crowdloan_agree_with_policy">Agree to Terms and Conditions</string>
     <string name="crowdloan_app_bonus_format">Nova Wallet bonus (%s)</string>
@@ -1130,8 +1177,6 @@
     <string name="pincode_confirm_your_pin_code">Confirm your pin code</string>
     <string name="pincode_create_top_title">Create pin code</string>
     <string name="pincode_enter_pin_code_v2_2_0">Enter PIN code</string>
-    <string name="pincode_fingerprint_error">You are not authorized. Try another finger.</string>
-    <string name="pincode_fingerprint_switch_dialog_title">Use biometric to authorize</string>
     <string name="pincode_title_create">Set your pin code</string>
     <string name="profile_accounts_title">Accounts</string>
     <string name="profile_accounts_title_2_0">Wallets</string>
@@ -1223,7 +1268,6 @@
     <string name="staking_max_nominators_reached_message">Maximum number of nominators has been reached</string>
     <string name="staking_max_nominators_reached_title">Cannot start staking</string>
     <string name="staking_month_period_title">Monthly</string>
-    <string name="staking_nominator_status_active">Active</string>
     <string name="staking_nominator_status_alert_active_message">One of your validators have been elected by network.</string>
     <string name="staking_nominator_status_alert_active_title">Active status</string>
     <string name="staking_nominator_status_alert_inactive_title">Inactive status</string>

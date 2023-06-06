@@ -43,12 +43,23 @@
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="Astar" />
 
+    <ImageView
+        android:id="@+id/itemDAppSubtitleIcon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginTop="2dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@+id/itemDAppTitle"
+        app:layout_constraintTop_toBottomOf="@+id/itemDAppTitle"
+        tools:visibility="visible" />
+
     <TextView
         android:id="@+id/itemDAppSubtitle"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="8dp"
+        android:includeFontPadding="false"
         android:layout_marginTop="2dp"
         android:layout_marginEnd="24dp"
         android:ellipsize="end"
@@ -57,8 +68,9 @@
         app:layout_constraintBottom_toBottomOf="@+id/itemDAppIcon"
         app:layout_constraintEnd_toStartOf="@+id/itemDappAction"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@id/itemDAppIcon"
+        app:layout_constraintStart_toEndOf="@+id/itemDAppSubtitleIcon"
         app:layout_constraintTop_toBottomOf="@+id/itemDAppTitle"
+        app:layout_goneMarginStart="0dp"
         tools:text="Staking" />
 
     <ImageView

@@ -101,7 +101,7 @@ internal class RealEvmTransactionService(
     }
 
     private suspend fun Web3Api.getNonce(address: String): BigInteger {
-        return ethGetTransactionCount(address, DefaultBlockParameterName.LATEST)
+        return ethGetTransactionCount(address, DefaultBlockParameterName.PENDING)
             .sendSuspend()
             .transactionCount
     }

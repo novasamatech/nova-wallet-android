@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_governance_impl.di.modules.screens
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
-import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
@@ -27,10 +26,8 @@ class ReferendumListModule {
 
     @Provides
     @FeatureScope
-    fun provideReferendaFiltersRepository(
-        preferences: Preferences
-    ): ReferendaFiltersRepository {
-        return PreferencesReferendaFiltersRepository(preferences)
+    fun provideReferendaFiltersRepository(): ReferendaFiltersRepository {
+        return PreferencesReferendaFiltersRepository()
     }
 
     @Provides
@@ -81,14 +78,12 @@ class ReferendumListModule {
         governanceSharedState: GovernanceSharedState,
         referendaSharedComputation: ReferendaSharedComputation,
         governanceSourceRegistry: GovernanceSourceRegistry,
-        referendaSortingProvider: ReferendaSortingProvider,
-        referendaFiltersRepository: ReferendaFiltersRepository
+        referendaSortingProvider: ReferendaSortingProvider
     ): ReferendaListInteractor = RealReferendaListInteractor(
         referendaCommonRepository = referendaCommonRepository,
         governanceSharedState = governanceSharedState,
         referendaSharedComputation = referendaSharedComputation,
         governanceSourceRegistry = governanceSourceRegistry,
-        referendaSortingProvider = referendaSortingProvider,
-        referendaFiltersRepository = referendaFiltersRepository
+        referendaSortingProvider = referendaSortingProvider
     )
 }

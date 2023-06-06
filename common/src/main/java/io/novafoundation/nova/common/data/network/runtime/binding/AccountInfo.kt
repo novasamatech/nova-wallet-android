@@ -10,8 +10,7 @@ import java.math.BigInteger
 class AccountData(
     val free: BigInteger,
     val reserved: BigInteger,
-    val miscFrozen: BigInteger,
-    val feeFrozen: BigInteger,
+    val frozen: BigInteger,
 )
 
 class AccountInfo(
@@ -23,20 +22,33 @@ class AccountInfo(
             data = AccountData(
                 free = BigInteger.ZERO,
                 reserved = BigInteger.ZERO,
-                miscFrozen = BigInteger.ZERO,
-                feeFrozen = BigInteger.ZERO,
+                frozen = BigInteger.ZERO
             )
         )
     }
 }
 
 @HelperBinding
-fun bindAccountData(dynamicInstance: Struct.Instance) = AccountData(
-    free = bindNumber(dynamicInstance["free"]),
-    reserved = bindNumber(dynamicInstance["reserved"]),
-    miscFrozen = bindNumber(dynamicInstance["miscFrozen"]),
-    feeFrozen = bindNumber(dynamicInstance["feeFrozen"]),
-)
+fun bindAccountData(dynamicInstance: Struct.Instance): AccountData {
+    val frozen = if (hasSplitFrozen(dynamicInstance)) {
+        val miscFrozen = bindNumber(dynamicInstance["miscFrozen"])
+        val feeFrozen = bindNumber(dynamicInstance["feeFrozen"])
+
+        miscFrozen.max(feeFrozen)
+    } else {
+        bindNumber(dynamicInstance["frozen"])
+    }
+
+    return AccountData(
+        free = bindNumber(dynamicInstance["free"]),
+        reserved = bindNumber(dynamicInstance["reserved"]),
+        frozen = frozen
+    )
+}
+
+private fun hasSplitFrozen(accountInfo: Struct.Instance): Boolean {
+    return "miscFrozen" in accountInfo.mapping
+}
 
 @HelperBinding
 fun bindNonce(dynamicInstance: Any?): BigInteger {

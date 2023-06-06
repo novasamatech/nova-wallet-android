@@ -6,7 +6,6 @@ import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
-import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
 
@@ -18,8 +17,6 @@ class IconButton @JvmOverloads constructor(
 
     init {
         updatePadding(top = 6.dp, bottom = 6.dp, start = 12.dp, end = 12.dp)
-
-        setImageTintRes(R.color.chip_icon)
 
         background = addRipple(getRoundedCornerDrawable(R.color.button_background_secondary))
 

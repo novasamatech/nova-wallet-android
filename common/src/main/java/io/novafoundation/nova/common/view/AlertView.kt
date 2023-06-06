@@ -10,6 +10,7 @@ import androidx.annotation.StringRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getEnum
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
 import kotlinx.android.synthetic.main.view_alert.view.alertIcon
@@ -80,3 +81,5 @@ class AlertView @JvmOverloads constructor(
         StylePreset.ERROR -> Style(R.drawable.ic_slash, R.color.error_block_background)
     }
 }
+
+fun AlertView.setTextOrHide(text: String?) = letOrHide(text, ::setText)

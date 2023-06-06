@@ -7,7 +7,7 @@ interface AppVersionProvider {
     val versionName: String
 }
 
-class OSAppVersionProvider(
+internal class OSAppVersionProvider(
     private val appContext: Context,
 ) : AppVersionProvider {
 

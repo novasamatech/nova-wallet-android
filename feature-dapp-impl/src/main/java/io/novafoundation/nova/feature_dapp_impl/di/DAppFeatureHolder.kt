@@ -7,8 +7,8 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.DAppRouter
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.signExtrinsic.DAppSignCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
+import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
@@ -17,7 +17,7 @@ import javax.inject.Inject
 class DAppFeatureHolder @Inject constructor(
     featureContainer: FeatureContainer,
     private val router: DAppRouter,
-    private val signCommunicator: DAppSignCommunicator,
+    private val signCommunicator: ExternalSignCommunicator,
     private val searchCommunicator: DAppSearchCommunicator,
 ) : FeatureApiHolder(featureContainer) {
 

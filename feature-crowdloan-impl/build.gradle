@@ -21,11 +21,11 @@ android {
 
         buildConfigField "String", "ACALA_TERMS_LINK", "\"https://acala.network/acala/terms\""
 
-        buildConfigField "String", "ACALA_TEST_AUTH_TOKEN", readSecret("ACALA_TEST_AUTH_TOKEN")
-        buildConfigField "String", "ACALA_PROD_AUTH_TOKEN", readSecret("ACALA_PROD_AUTH_TOKEN")
+        buildConfigField "String", "ACALA_TEST_AUTH_TOKEN", readStringSecret("ACALA_TEST_AUTH_TOKEN")
+        buildConfigField "String", "ACALA_PROD_AUTH_TOKEN", readStringSecret("ACALA_PROD_AUTH_TOKEN")
 
-        buildConfigField "String", "MOONBEAM_TEST_AUTH_TOKEN", readSecret("MOONBEAM_TEST_AUTH_TOKEN")
-        buildConfigField "String", "MOONBEAM_PROD_AUTH_TOKEN", readSecret("MOONBEAM_PROD_AUTH_TOKEN")
+        buildConfigField "String", "MOONBEAM_TEST_AUTH_TOKEN", readStringSecret("MOONBEAM_TEST_AUTH_TOKEN")
+        buildConfigField "String", "MOONBEAM_PROD_AUTH_TOKEN", readStringSecret("MOONBEAM_PROD_AUTH_TOKEN")
     }
 
     buildTypes {

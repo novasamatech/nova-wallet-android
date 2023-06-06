@@ -12,7 +12,6 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
-import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeVisible
@@ -82,16 +81,10 @@ class ScanView @JvmOverloads constructor(
     }
 
     private fun setupDecoder() {
-        val charSet = null
-        val formats = listOf(BarcodeFormat.QR_CODE)
-        val hints = null
-        val inverted = false
-
-        viewScanScanner.decoderFactory = DefaultDecoderFactory(
-            formats,
-            hints,
-            charSet,
-            inverted
+        viewScanScanner.decoderFactory = AlternatingDecoderFactory(
+            decodeFormats = listOf(BarcodeFormat.QR_CODE),
+            hints = null,
+            characterSet = null,
         )
     }
 

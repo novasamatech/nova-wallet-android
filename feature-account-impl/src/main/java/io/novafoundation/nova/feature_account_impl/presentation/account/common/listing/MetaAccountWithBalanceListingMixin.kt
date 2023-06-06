@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -18,13 +19,15 @@ class MetaAccountWithBalanceListingMixinFactory(
 ) {
 
     fun create(
-        coroutineScope: CoroutineScope
+        coroutineScope: CoroutineScope,
+        isMetaAccountSelected: suspend (MetaAccount) -> Boolean = { it.isSelected },
     ): MetaAccountListingMixin {
         return MetaAccountWithBalanceListingMixin(
             walletUiUseCase = walletUiUseCase,
             resourceManager = resourceManager,
             metaAccountGroupingInteractor = metaAccountGroupingInteractor,
-            coroutineScope = coroutineScope
+            coroutineScope = coroutineScope,
+            isMetaAccountSelected = isMetaAccountSelected
         )
     }
 }
@@ -33,6 +36,7 @@ private class MetaAccountWithBalanceListingMixin(
     private val resourceManager: ResourceManager,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val walletUiUseCase: WalletUiUseCase,
+    private val isMetaAccountSelected: suspend (MetaAccount) -> Boolean,
     coroutineScope: CoroutineScope,
 ) : MetaAccountListingMixin, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
@@ -49,7 +53,7 @@ private class MetaAccountWithBalanceListingMixin(
             id = metaAccountWithBalance.metaAccount.id,
             title = metaAccountWithBalance.metaAccount.name,
             subtitle = totalBalance.formatAsCurrency(metaAccountWithBalance.currency),
-            isSelected = metaAccountWithBalance.metaAccount.isSelected,
+            isSelected = isMetaAccountSelected(metaAccountWithBalance.metaAccount),
             isClickable = true,
             picture = walletUiUseCase.walletIcon(metaAccountWithBalance.metaAccount),
             subtitleIconRes = null,

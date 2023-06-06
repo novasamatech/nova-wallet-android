@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -41,7 +42,8 @@ class RootActivityModule {
         contributionsInteractor: ContributionsInteractor,
         backgroundAccessObserver: BackgroundAccessObserver,
         safeModeService: SafeModeService,
-        updateNotificationsInteractor: UpdateNotificationsInteractor
+        updateNotificationsInteractor: UpdateNotificationsInteractor,
+        walletConnectServiceFactory: WalletConnectService.Factory
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -53,7 +55,8 @@ class RootActivityModule {
             contributionsInteractor,
             backgroundAccessObserver,
             safeModeService,
-            updateNotificationsInteractor
+            updateNotificationsInteractor,
+            walletConnectServiceFactory
         )
     }
 

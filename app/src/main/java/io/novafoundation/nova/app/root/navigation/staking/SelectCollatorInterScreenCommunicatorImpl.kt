@@ -1,7 +1,7 @@
 package io.novafoundation.nova.app.root.navigation.staking
 
 import io.novafoundation.nova.app.R
-import io.novafoundation.nova.app.root.navigation.BaseInterScreenCommunicator
+import io.novafoundation.nova.app.root.navigation.NavStackInterScreenCommunicator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator.Request
@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 
 class SelectCollatorInterScreenCommunicatorImpl(navigationHolder: NavigationHolder) :
     SelectCollatorInterScreenCommunicator,
-    BaseInterScreenCommunicator<Request, Response>(navigationHolder) {
+    NavStackInterScreenCommunicator<Request, Response>(navigationHolder) {
 
     override fun respond(response: Response) {
         val responseEntry = navController.getBackStackEntry(R.id.startParachainStakingFragment)
@@ -18,6 +18,8 @@ class SelectCollatorInterScreenCommunicatorImpl(navigationHolder: NavigationHold
     }
 
     override fun openRequest(request: Request) {
+        super.openRequest(request)
+
         navController.navigate(R.id.action_startParachainStakingFragment_to_selectCollatorFragment)
     }
 }

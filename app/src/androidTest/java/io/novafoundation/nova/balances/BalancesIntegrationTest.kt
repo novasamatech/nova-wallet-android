@@ -96,7 +96,7 @@ class BalancesIntegrationTest(
                     )
                 }
             }.recover {
-                throw Exception("Socket state: ${chainRegistry.getSocket(chain.id).networkStateFlow().first()}")
+                throw Exception("Socket state: ${chainRegistry.getSocket(chain.id).networkStateFlow().first()}, error: ${it.message}", it)
             }
         }
     }

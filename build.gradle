@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '6.0.3'
-        versionCode = 65
+        versionName = '6.3.0'
+        versionCode = 73
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -82,6 +82,14 @@ buildscript {
         roomVersion = '2.4.3'
 
         markdownVersion = '4.6.2'
+
+        walletConnectCoreVersion = "1.13.0"
+        walletConnectWalletVersion = "1.6.0"
+
+        withoutTransitiveAndroidX = {
+            exclude group: "androidx.appcompat", module: "appcompat"
+            exclude group: "androidx.fragment", module: "fragment-ktx"
+        }
 
         coilDep = "io.coil-kt:coil:$coilVersion"
         coilSvg = "io.coil-kt:coil-svg:$coilVersion"
@@ -182,6 +190,9 @@ buildscript {
         markdownStrikethrough = "io.noties.markwon:ext-strikethrough:$markdownVersion"
 
         multibaseDep = "com.github.multiformats:java-multibase:$multibaseVersion"
+
+        walletConnectCoreDep = "com.walletconnect:android-core:$walletConnectCoreVersion"
+        walletConnectWalletDep = "com.walletconnect:web3wallet:$walletConnectWalletVersion"
     }
 
     repositories {
