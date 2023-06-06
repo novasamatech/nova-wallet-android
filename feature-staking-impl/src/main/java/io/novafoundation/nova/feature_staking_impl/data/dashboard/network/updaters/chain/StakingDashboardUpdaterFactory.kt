@@ -9,7 +9,7 @@ import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.flow.Flow
 
 class StakingDashboardUpdaterFactory(
     private val stakingDashboardCache: StakingDashboardCache,
@@ -20,11 +20,11 @@ class StakingDashboardUpdaterFactory(
         chain: Chain,
         stakingType: Chain.Asset.StakingType,
         metaAccount: MetaAccount,
-        stakingStatsAsync: Deferred<MultiChainStakingStats>,
+        stakingStatsFlow: Flow<IndexedValue<MultiChainStakingStats>>,
     ): Updater? {
         return when (stakingType.group()) {
-            StakingTypeGroup.RELAYCHAIN -> relayChain(chain, stakingType, metaAccount, stakingStatsAsync)
-            StakingTypeGroup.PARACHAIN -> parachain(chain, stakingType, metaAccount, stakingStatsAsync)
+            StakingTypeGroup.RELAYCHAIN -> relayChain(chain, stakingType, metaAccount, stakingStatsFlow)
+            StakingTypeGroup.PARACHAIN -> parachain(chain, stakingType, metaAccount, stakingStatsFlow)
             StakingTypeGroup.UNSUPPORTED -> null
         }
     }
@@ -33,14 +33,14 @@ class StakingDashboardUpdaterFactory(
         chain: Chain,
         stakingType: Chain.Asset.StakingType,
         metaAccount: MetaAccount,
-        stakingStatsAsync: Deferred<MultiChainStakingStats>,
+        stakingStatsFlow: Flow<IndexedValue<MultiChainStakingStats>>,
     ): Updater {
         return StakingDashboardRelayStakingUpdater(
             chain = chain,
             chainAsset = chain.utilityAsset,
             stakingType = stakingType,
             metaAccount = metaAccount,
-            stakingStatsAsync = stakingStatsAsync,
+            stakingStatsFlow = stakingStatsFlow,
             stakingDashboardCache = stakingDashboardCache,
             remoteStorageSource = remoteStorageSource
         )
@@ -50,14 +50,14 @@ class StakingDashboardUpdaterFactory(
         chain: Chain,
         stakingType: Chain.Asset.StakingType,
         metaAccount: MetaAccount,
-        stakingStatsAsync: Deferred<MultiChainStakingStats>,
+        stakingStatsFlow: Flow<IndexedValue<MultiChainStakingStats>>,
     ): Updater {
         return StakingDashboardParachainStakingUpdater(
             chain = chain,
             chainAsset = chain.utilityAsset,
             stakingType = stakingType,
             metaAccount = metaAccount,
-            stakingStatsAsync = stakingStatsAsync,
+            stakingStatsFlow = stakingStatsFlow,
             stakingDashboardCache = stakingDashboardCache,
             remoteStorageSource = remoteStorageSource
         )

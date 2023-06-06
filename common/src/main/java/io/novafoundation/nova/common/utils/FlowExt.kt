@@ -494,3 +494,7 @@ fun <T> Flow<T>.observeInLifecycle(
 fun <T> Map<out T, MutableStateFlow<Boolean>>.checkEnabled(key: T) = get(key)?.value ?: false
 
 suspend inline fun <reified T> Flow<T?>.firstNotNull(): T = first { it != null } as T
+
+inline fun <T, R> Flow<IndexedValue<T>>.mapIndexed(crossinline transform: suspend (T) -> R): Flow<IndexedValue<R>> {
+    return map { IndexedValue(it.index, transform(it.value)) }
+}

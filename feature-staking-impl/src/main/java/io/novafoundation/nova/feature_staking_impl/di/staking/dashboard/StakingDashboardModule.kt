@@ -63,12 +63,14 @@ class StakingDashboardModule {
         chainRegistry: ChainRegistry,
         updaterFactory: StakingDashboardUpdaterFactory,
         sharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
+        stakingDashboardRepository: StakingDashboardRepository,
     ): StakingDashboardUpdateSystem = RealStakingDashboardUpdateSystem(
         stakingStatsDataSource = stakingStatsDataSource,
         accountRepository = accountRepository,
         chainRegistry = chainRegistry,
         updaterFactory = updaterFactory,
-        sharedRequestsBuilderFactory = sharedRequestsBuilderFactory
+        sharedRequestsBuilderFactory = sharedRequestsBuilderFactory,
+        stakingDashboardRepository = stakingDashboardRepository
     )
 
     @Provides

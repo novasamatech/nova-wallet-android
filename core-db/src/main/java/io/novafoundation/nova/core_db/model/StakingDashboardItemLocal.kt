@@ -6,6 +6,7 @@ import androidx.room.ForeignKey
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
 
 @Entity(
@@ -42,6 +43,7 @@ class StakingDashboardItemLocal(
     val status: Status?,
     val rewards: BigInteger?,
     val estimatedEarnings: Double?,
+    val primaryStakingAccountId: AccountId?,
 ) {
 
     companion object {
@@ -61,7 +63,8 @@ class StakingDashboardItemLocal(
             stake = null,
             status = null,
             rewards = null,
-            estimatedEarnings = estimatedEarnings
+            estimatedEarnings = estimatedEarnings,
+            primaryStakingAccountId = null
         )
 
         fun staking(
@@ -69,6 +72,7 @@ class StakingDashboardItemLocal(
             chainAssetId: Int,
             stakingType: String,
             stake: BigInteger,
+            primaryStakingAccountId: AccountId,
             metaId: Long,
             status: Status?,
             rewards: BigInteger?,
@@ -82,7 +86,8 @@ class StakingDashboardItemLocal(
             stake = stake,
             status = status,
             rewards = rewards,
-            estimatedEarnings = estimatedEarnings
+            estimatedEarnings = estimatedEarnings,
+            primaryStakingAccountId = primaryStakingAccountId
         )
     }
 
@@ -90,3 +95,11 @@ class StakingDashboardItemLocal(
         ACTIVE, INACTIVE, WAITING
     }
 }
+
+
+class StakingDashboardPrimaryAccountView(
+    val chainId: String,
+    val chainAssetId: Int,
+    val stakingType: String,
+    val primaryStakingAccountId: AccountId?
+)
