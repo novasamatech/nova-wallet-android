@@ -28,7 +28,9 @@ object SubqueryExpressions {
     }
 
     private fun compoundExpression(name: String, vararg innerExpressions: String): String {
-        require(innerExpressions.isNotEmpty())
+        if (innerExpressions.isEmpty()) {
+            return ""
+        }
 
         if (innerExpressions.size == 1) {
             return innerExpressions.first()

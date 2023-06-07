@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.common.utils.inserted
-import io.novafoundation.nova.common.utils.mapIndexed
+import io.novafoundation.nova.common.utils.mapLatestIndexed
 import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -121,7 +121,7 @@ class RealStakingDashboardUpdateSystem(
             .withIndex()
             .onEach { latestOffChainSyncIndex.value = it.index }
             .debounce { (index) -> if (index == 0) 0.milliseconds else offChainSyncDebounceRate }
-            .mapIndexed { stakingAccounts -> stakingStatsDataSource.fetchStakingStats(stakingAccounts, stakingChains) }
+            .mapLatestIndexed { stakingAccounts -> stakingStatsDataSource.fetchStakingStats(stakingAccounts, stakingChains) }
     }
 
     private fun markSyncingSecondaryFor(changedPrimaryAccounts: List<Map.Entry<StakingOptionId, AccountIdKey?>>) {
