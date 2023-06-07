@@ -20,7 +20,7 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
 
     val query = """
     {
-        activeStakers${chainAddressesParams} {
+        activeStakers$chainAddressesParams {
             nodes {
                 networkId
                 stakingType
@@ -36,7 +36,7 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
             }
         }
         
-        accumulatedRewards${chainAddressesParams} {
+        accumulatedRewards$chainAddressesParams {
             nodes {
                 networkId
                 stakingType
