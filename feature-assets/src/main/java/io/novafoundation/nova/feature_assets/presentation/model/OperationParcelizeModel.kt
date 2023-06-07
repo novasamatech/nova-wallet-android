@@ -4,7 +4,6 @@ import android.os.Parcelable
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.android.parcel.Parcelize
 

@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 import io.novafoundation.nova.common.utils.binarySearchFloor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
-import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -11,7 +11,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-abstract class BaseAssetHistory(private val coinPriceDataSource: CoinPriceDataSource) : AssetHistory {
+abstract class BaseAssetHistory(internal val coinPriceRepository: CoinPriceRepository) : AssetHistory {
 
     protected suspend fun getCoinPriceRange(
         chainAsset: Chain.Asset,
@@ -27,7 +27,7 @@ abstract class BaseAssetHistory(private val coinPriceDataSource: CoinPriceDataSo
             .plus(1.hours)
             .inWholeSeconds
 
-        return runCatching { coinPriceDataSource.getCoinPriceRange(chainAsset.priceId!!, currency, offsetFrom, offsetTo) }
+        return runCatching { coinPriceRepository.getCoinPriceRange(chainAsset.priceId!!, currency, offsetFrom, offsetTo) }
             .getOrNull()
             ?: emptyList()
     }
@@ -36,10 +36,10 @@ abstract class BaseAssetHistory(private val coinPriceDataSource: CoinPriceDataSo
         if (this.isEmpty()) return null
 
         val id = binarySearchFloor {
-            val itemTimestamp = it.millis.milliseconds.inWholeSeconds
+            val itemTimestamp = it.timestamp.milliseconds.inWholeSeconds
             itemTimestamp.compareTo(timestamp)
         }
 
-        return this[id]
+        return this.getOrNull(id)
     }
 }

@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.history.mi
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.state_machine.TransactionStateMachine.Action
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.state_machine.TransactionStateMachine.State
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.model.DayHeader
-import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
@@ -224,7 +223,6 @@ class TransactionHistoryProvider(
     }
 
     private suspend fun transformDataToUi(data: List<Operation>, token: Token): List<Any> {
-
         val accountIdentifier = addressDisplayUseCase.createIdentifier()
         val chain = chainAsync()
 

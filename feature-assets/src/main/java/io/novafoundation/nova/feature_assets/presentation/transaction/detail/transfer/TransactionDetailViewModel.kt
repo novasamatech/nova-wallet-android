@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_assets.presentation.model.OperationParceli
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.CoinPriceInteractor
-import io.novafoundation.nova.feature_wallet_api.domain.model.convertAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry

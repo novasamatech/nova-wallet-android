@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
+import io.novafoundation.nova.core_db.dao.CoinPriceDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.core_db.dao.CurrencyDao
 import io.novafoundation.nova.core_db.dao.LockDao
@@ -117,6 +118,8 @@ interface WalletFeatureDependencies {
     fun validationExecutor(): ValidationExecutor
 
     fun eventsRepository(): EventsRepository
+
+    fun coinPriceDao(): CoinPriceDao
 
     val fileCache: FileCache
 

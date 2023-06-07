@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.StaticAssetSource
@@ -65,8 +65,8 @@ class StatemineAssetsModule {
         walletRepository: WalletRepository,
         subQueryOperationsApi: SubQueryOperationsApi,
         cursorStorage: TransferCursorStorage,
-        coinPriceDataSource: CoinPriceDataSource
-    ) = StatemineAssetHistory(chainRegistry, eventsRepository, walletRepository, subQueryOperationsApi, cursorStorage, coinPriceDataSource)
+        coinPriceRepository: CoinPriceRepository
+    ) = StatemineAssetHistory(chainRegistry, eventsRepository, walletRepository, subQueryOperationsApi, cursorStorage, coinPriceRepository)
 
     @Provides
     @StatemineAssets

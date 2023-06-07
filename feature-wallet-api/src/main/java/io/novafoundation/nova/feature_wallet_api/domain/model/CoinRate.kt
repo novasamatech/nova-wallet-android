@@ -8,7 +8,7 @@ open class CoinRate(val rate: BigDecimal)
 
 class CoinRateChange(val recentRateChange: BigDecimal, value: BigDecimal) : CoinRate(value)
 
-class HistoricalCoinRate(val millis: Long, value: BigDecimal) : CoinRate(value)
+class HistoricalCoinRate(val timestamp: Long, value: BigDecimal) : CoinRate(value)
 
 fun CoinRate.convertAmount(amount: BigDecimal) = amount * rate
 

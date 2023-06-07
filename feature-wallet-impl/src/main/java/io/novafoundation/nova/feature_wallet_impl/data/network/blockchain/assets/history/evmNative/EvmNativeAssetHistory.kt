@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.ethereumAddressToAccountId
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
-import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
@@ -37,8 +37,8 @@ class EvmNativeAssetHistory(
     private val chainRegistry: ChainRegistry,
     private val etherscanTransactionsApi: EtherscanTransactionsApi,
     private val walletRepository: WalletRepository,
-    coinPriceDataSource: CoinPriceDataSource
-) : EvmAssetHistory(coinPriceDataSource) {
+    coinPriceRepository: CoinPriceRepository
+) : EvmAssetHistory(coinPriceRepository) {
 
     override suspend fun fetchEtherscanOperations(
         chain: Chain,

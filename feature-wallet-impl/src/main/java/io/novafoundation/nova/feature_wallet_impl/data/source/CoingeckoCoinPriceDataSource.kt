@@ -5,17 +5,18 @@ import io.novafoundation.nova.common.utils.asQueryParam
 import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
-import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
+import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class CoingeckoCoinPriceDataSource(
     private val coingeckoApi: CoingeckoApi,
     private val httpExceptionHandler: HttpExceptionHandler
-) : CoinPriceDataSource {
+) : CoinPriceRemoteDataSource {
 
     override suspend fun getCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Long): CoinRate? {
         val from = timestamp.seconds
@@ -29,7 +30,12 @@ class CoingeckoCoinPriceDataSource(
 
     override suspend fun getCoinPriceRange(priceId: String, currency: Currency, fromTimestamp: Long, toTimestamp: Long): List<HistoricalCoinRate> {
         val response = coingeckoApi.getCoinRange(priceId, currency.coingeckoId, fromTimestamp, toTimestamp)
-        return response.prices.map { HistoricalCoinRate(it.first().toLong(), it.second()) }
+        return response.prices.map {
+            HistoricalCoinRate(
+                it.first().toLong().milliseconds.inWholeSeconds,
+                it.second()
+            )
+        }
     }
 
     override suspend fun getCoinRates(priceIds: Set<String>, currency: Currency): Map<String, CoinRateChange?> {

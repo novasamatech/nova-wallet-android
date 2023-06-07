@@ -33,7 +33,6 @@ import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetail
 import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailToolbar
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailAmountFiat
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailAmountFiat
 
 private const val KEY_EXTRINSIC = "KEY_EXTRINSIC"
 

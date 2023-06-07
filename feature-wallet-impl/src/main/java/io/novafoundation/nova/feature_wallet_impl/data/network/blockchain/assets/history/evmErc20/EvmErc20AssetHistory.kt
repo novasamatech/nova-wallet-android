@@ -2,9 +2,8 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
-import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
@@ -20,8 +19,8 @@ import kotlin.time.Duration.Companion.seconds
 
 class EvmErc20AssetHistory(
     private val etherscanTransactionsApi: EtherscanTransactionsApi,
-    coinPriceDataSource: CoinPriceDataSource
-) : EvmAssetHistory(coinPriceDataSource) {
+    coinPriceRepository: CoinPriceRepository
+) : EvmAssetHistory(coinPriceRepository) {
 
     override suspend fun fetchEtherscanOperations(
         chain: Chain,

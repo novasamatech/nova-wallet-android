@@ -13,10 +13,9 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
-import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
+import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapAssetLocalToAsset
@@ -47,7 +46,7 @@ class WalletRepositoryImpl(
     private val accountRepository: AccountRepository,
     private val assetCache: AssetCache,
     private val phishingAddressDao: PhishingAddressDao,
-    private val coinPriceDataSource: CoinPriceDataSource,
+    private val coinPriceRemoteDataSource: CoinPriceRemoteDataSource,
     private val chainRegistry: ChainRegistry,
 ) : WalletRepository {
 
@@ -214,11 +213,11 @@ class WalletRepositoryImpl(
     }
 
     private suspend fun getAssetPrices(priceIds: Set<String>, currency: Currency): Map<String, CoinRateChange?> {
-        return coinPriceDataSource.getCoinRates(priceIds, currency)
+        return coinPriceRemoteDataSource.getCoinRates(priceIds, currency)
     }
 
     private suspend fun getAssetPrice(priceId: String, currency: Currency): CoinRateChange? {
-        return coinPriceDataSource.getCoinRate(priceId, currency)
+        return coinPriceRemoteDataSource.getCoinRate(priceId, currency)
     }
 
     private suspend fun getAsset(accountId: AccountId, chainId: String, assetId: Int) = withContext(Dispatchers.Default) {

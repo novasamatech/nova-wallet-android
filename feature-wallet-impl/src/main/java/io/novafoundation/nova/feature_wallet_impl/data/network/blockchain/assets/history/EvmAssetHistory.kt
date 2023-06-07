@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.satisfies
@@ -15,8 +15,8 @@ private const val FIRST_PAGE_INDEX = 1
 private const val SECOND_PAGE_INDEX = 2
 
 abstract class EvmAssetHistory(
-    protected val coinPriceDataSource: CoinPriceDataSource
-) : BaseAssetHistory(coinPriceDataSource) {
+    coinPriceRepository: CoinPriceRepository
+) : BaseAssetHistory(coinPriceRepository) {
 
     abstract suspend fun fetchEtherscanOperations(
         chain: Chain,

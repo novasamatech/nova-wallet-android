@@ -111,6 +111,7 @@ object TransactionHistoryDiffCallback : BaseGroupedDiffCallback<DayHeader, Opera
         return oldItem.statusAppearance == newItem.statusAppearance &&
             oldItem.header == newItem.header &&
             oldItem.subHeader == newItem.subHeader &&
-            oldItem.amount == newItem.amount
+            oldItem.amount == newItem.amount &&
+            oldItem.fiatWithTime == newItem.fiatWithTime
     }
 }

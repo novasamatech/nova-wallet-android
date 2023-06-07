@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.common.data.model.asCursorOrNull
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapNodeToOperation
@@ -21,8 +21,8 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 abstract class SubstrateAssetHistory(
     private val subqueryApi: SubQueryOperationsApi,
     private val cursorStorage: TransferCursorStorage,
-    protected val coinPriceDataSource: CoinPriceDataSource
-) : BaseAssetHistory(coinPriceDataSource) {
+    coinPriceRepository: CoinPriceRepository
+) : BaseAssetHistory(coinPriceRepository) {
 
     override suspend fun additionalFirstPageSync(
         chain: Chain,

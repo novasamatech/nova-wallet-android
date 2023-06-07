@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
-interface CoinPriceDataSource {
+interface CoinPriceRemoteDataSource {
 
     suspend fun getCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Long): CoinRate?
 
@@ -17,6 +17,6 @@ interface CoinPriceDataSource {
     suspend fun getCoinRate(priceId: String, currency: Currency): CoinRateChange?
 }
 
-suspend fun CoinPriceDataSource.getCoinRateByAsset(asset: Chain.Asset, currency: Currency): CoinRateChange? {
+suspend fun CoinPriceRemoteDataSource.getCoinRateByAsset(asset: Chain.Asset, currency: Currency): CoinRateChange? {
     return asset.priceId?.let { priceId -> getCoinRate(priceId, currency) }
 }

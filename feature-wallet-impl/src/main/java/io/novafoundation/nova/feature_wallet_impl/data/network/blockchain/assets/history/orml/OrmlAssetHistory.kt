@@ -8,11 +8,9 @@ import io.novafoundation.nova.common.utils.tokens
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.filterOwn
-import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
-import io.novafoundation.nova.feature_wallet_api.data.source.getCoinRateByAsset
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksToFiatOrNull
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.SubstrateAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
@@ -36,8 +34,8 @@ class OrmlAssetHistory(
     private val walletRepository: WalletRepository,
     walletOperationsApi: SubQueryOperationsApi,
     cursorStorage: TransferCursorStorage,
-    coinPriceDataSource: CoinPriceDataSource
-) : SubstrateAssetHistory(walletOperationsApi, cursorStorage, coinPriceDataSource) {
+    coinPriceRepository: CoinPriceRepository
+) : SubstrateAssetHistory(walletOperationsApi, cursorStorage, coinPriceRepository) {
 
     override suspend fun fetchOperationsForBalanceChange(
         chain: Chain,

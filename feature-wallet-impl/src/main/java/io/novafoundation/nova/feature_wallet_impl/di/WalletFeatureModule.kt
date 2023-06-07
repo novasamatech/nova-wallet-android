@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
+import io.novafoundation.nova.core_db.dao.CoinPriceDao
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
@@ -19,9 +20,9 @@ import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
-import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
+import io.novafoundation.nova.feature_wallet_api.data.cache.CoinPriceLocalDataSourceImpl
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
@@ -29,7 +30,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
-import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceDataSource
+import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceLocalDataSource
+import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteDataSource
 import io.novafoundation.nova.feature_wallet_api.di.Wallet
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.CoinPriceInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
@@ -87,11 +89,19 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideCoinPriceDataSource(
+    fun provideCoinPriceRemoteDataSource(
         coingeckoApi: CoingeckoApi,
         httpExceptionHandler: HttpExceptionHandler
-    ): CoinPriceDataSource {
+    ): CoinPriceRemoteDataSource {
         return CoingeckoCoinPriceDataSource(coingeckoApi, httpExceptionHandler)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideCoinPriceLocalDataSource(
+        coinPriceDao: CoinPriceDao
+    ): CoinPriceLocalDataSource {
+        return CoinPriceLocalDataSourceImpl(coinPriceDao)
     }
 
     @Provides
@@ -140,7 +150,7 @@ class WalletFeatureModule {
         assetCache: AssetCache,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        coinPriceDataSource: CoinPriceDataSource
+        coinPriceRemoteDataSource: CoinPriceRemoteDataSource
     ): WalletRepository = WalletRepositoryImpl(
         substrateSource,
         operationsDao,
@@ -148,7 +158,7 @@ class WalletFeatureModule {
         accountRepository,
         assetCache,
         phishingAddressDao,
-        coinPriceDataSource,
+        coinPriceRemoteDataSource,
         chainRegistry,
     )
 
@@ -275,7 +285,10 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideCoinPriceRepository(dataSource: CoinPriceDataSource): CoinPriceRepository = CoinPriceRepositoryImpl(dataSource)
+    fun provideCoinPriceRepository(
+        cacheDataSource: CoinPriceLocalDataSource,
+        remoteDataSource: CoinPriceRemoteDataSource
+    ): CoinPriceRepository = CoinPriceRepositoryImpl(cacheDataSource, remoteDataSource)
 
     @Provides
     @FeatureScope

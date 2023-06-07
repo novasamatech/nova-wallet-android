@@ -24,18 +24,23 @@ inline fun <T> List<T>.binarySearchFloor(fromIndex: Int = 0, toIndex: Int = size
         val midVal = get(mid)
         val cmp = comparison(midVal)
 
-        if (cmp < 0)
+        if (cmp < 0) {
             low = mid + 1
-        else if (cmp > 0)
+        } else if (cmp > 0) {
             high = mid - 1
-        else
+        } else {
             return mid // key found
+        }
     }
 
     // key not found. Takes floor key
-    return if (low <= 0) 0
-    else if (low >= size) size - 1
-    else low - 1
+    return if (low <= 0) {
+        0
+    } else if (low >= size) {
+        size - 1
+    } else {
+        low - 1
+    }
 }
 
 fun <T> List<T>.rangeCheck(fromIndex: Int, toIndex: Int) {
