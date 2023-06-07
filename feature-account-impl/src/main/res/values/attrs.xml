@@ -8,7 +8,7 @@
 
     <declare-styleable name="MnemonicWordView">
         <attr name="wordText" format="string" />
-        <attr format="enum" name="colorMode">
+        <attr name="colorMode" format="enum">
             <enum name="light" value="0" />
             <enum name="dark" value="1" />
         </attr>
@@ -19,12 +19,6 @@
         <attr name="settingValue" format="string" />
         <attr name="icon" />
     </declare-styleable>
-
-    <declare-styleable name="SettingsSwitcherView">
-        <attr name="title" />
-        <attr name="icon" />
-    </declare-styleable>
-
 
     <declare-styleable name="MnemonicContainerView">
 
