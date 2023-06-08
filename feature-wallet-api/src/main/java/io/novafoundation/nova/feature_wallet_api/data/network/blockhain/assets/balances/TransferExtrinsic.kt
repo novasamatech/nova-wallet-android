@@ -10,7 +10,6 @@ data class TransferExtrinsic(
     val senderId: ByteArray,
     val recipientId: ByteArray,
     val amountInPlanks: BigInteger,
-    val fiatAmount: BigDecimal?,
     val chainAsset: Chain.Asset,
     val status: ExtrinsicStatus,
     val hash: String,

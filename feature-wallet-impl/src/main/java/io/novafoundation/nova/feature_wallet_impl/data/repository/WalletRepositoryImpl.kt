@@ -202,11 +202,9 @@ class WalletRepositoryImpl(
             chainAssetId = transfer.originChainAsset.id,
             chainId = transfer.originChainAsset.chainId,
             amount = transfer.amountInPlanks,
-            fiatAmount = transfer.amount,
             senderAddress = senderAddress,
             receiverAddress = transfer.recipient,
             fee = transfer.commissionAssetToken.planksFromAmount(fee),
-            fiatFee = transfer.commissionAssetToken.amountToFiat(fee),
             status = OperationLocal.Status.PENDING,
             source = source
         )

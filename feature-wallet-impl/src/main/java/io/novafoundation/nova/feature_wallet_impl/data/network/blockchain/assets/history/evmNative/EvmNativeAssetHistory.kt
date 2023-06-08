@@ -65,7 +65,7 @@ class EvmNativeAssetHistory(
 
         return response.result
             .map {
-                val coinRate = coinPriceRange.findFloorRate(it.timeStamp)
+                val coinRate = coinPriceRepository.findNearestCoinRate(coinPriceRange, it.timeStamp)
                 mapRemoteNormalTxToOperation(it, chainAsset, accountAddress, coinRate)
             }
     }
@@ -84,8 +84,6 @@ class EvmNativeAssetHistory(
         val block = ethereumApi.ethGetBlockByHash(blockHash, true).sendSuspend()
         val txs = block.block.transactions as List<TransactionResult<EthBlock.TransactionObject>>
 
-        val token = walletRepository.getAsset(accountId, chainAsset)?.token
-
         txs.mapNotNull {
             val tx = it.get()
 
@@ -100,7 +98,6 @@ class EvmNativeAssetHistory(
                 senderId = chain.accountIdOf(tx.from),
                 recipientId = chain.accountIdOf(tx.to),
                 amountInPlanks = tx.value,
-                fiatAmount = token?.planksToFiatOrNull(tx.value),
                 chainAsset = chainAsset,
                 status = txReceipt.extrinsicStatus(),
                 hash = tx.hash

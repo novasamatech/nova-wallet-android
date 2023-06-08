@@ -29,9 +29,10 @@ interface TransactionHistoryRepository {
         currency: Currency
     ): DataPage<Operation>
 
-    fun operationsFirstPageFlow(
+    suspend fun operationsFirstPageFlow(
         accountId: AccountId,
         chain: Chain,
-        chainAsset: Chain.Asset
+        chainAsset: Chain.Asset,
+        currency: Currency
     ): Flow<DataPage<Operation>>
 }

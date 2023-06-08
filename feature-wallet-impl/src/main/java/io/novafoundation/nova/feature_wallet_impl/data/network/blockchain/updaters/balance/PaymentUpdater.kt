@@ -160,11 +160,9 @@ class PaymentUpdater(
             address = chain.addressOf(accountId),
             chainAssetId = chainAsset.id,
             amount = extrinsic.amountInPlanks,
-            fiatAmount = extrinsic.fiatAmount,
             senderAddress = chain.addressOf(extrinsic.senderId),
             receiverAddress = chain.addressOf(extrinsic.recipientId),
             fee = localCopy?.fee,
-            fiatFee = localCopy?.fiatFee,
             status = localStatus,
             source = OperationLocal.Source.BLOCKCHAIN,
         )

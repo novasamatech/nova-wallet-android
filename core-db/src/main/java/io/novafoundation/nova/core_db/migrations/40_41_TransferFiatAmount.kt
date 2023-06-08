@@ -5,13 +5,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 val TransferFiatAmount_40_41 = object : Migration(40, 41) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        changeOperationsTable(database)
         createCoinPriceTable(database)
-    }
-
-    private fun changeOperationsTable(database: SupportSQLiteDatabase) {
-        database.execSQL("ALTER TABLE `operations` ADD COLUMN `fiatAmount` TEXT")
-        database.execSQL("ALTER TABLE `operations` ADD COLUMN `fiatFee` TEXT")
     }
 
     private fun createCoinPriceTable(database: SupportSQLiteDatabase) {

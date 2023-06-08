@@ -103,7 +103,7 @@ abstract class SubstrateAssetHistory(
         val coinPriceRange = getCoinPriceRange(chainAsset, currency, earliestOperationTimestamp, latestOperationTimestamp)
 
         val operations = subqueryResponse.historyElements.nodes.map { node ->
-            val coinRate = coinPriceRange.findFloorRate(node.timestamp)
+            val coinRate = coinPriceRepository.findNearestCoinRate(coinPriceRange, node.timestamp)
             mapNodeToOperation(node, coinRate, chainAsset)
         }
 
@@ -113,12 +113,12 @@ abstract class SubstrateAssetHistory(
         return DataPage(newPageOffset, operations)
     }
 
-    private fun getEarliestOperationTimestamp(operations: SubqueryHistoryElementResponse.Query.HistoryElements): Long {
-        return operations.nodes.minOfOrNull { it.timestamp } ?: 0L
+    private fun getEarliestOperationTimestamp(operations: SubqueryHistoryElementResponse.Query.HistoryElements): Long? {
+        return operations.nodes.minOfOrNull { it.timestamp }
     }
 
-    private fun getLatestOperationTimestamp(operations: SubqueryHistoryElementResponse.Query.HistoryElements): Long {
-        return operations.nodes.maxOfOrNull { it.timestamp } ?: 0L
+    private fun getLatestOperationTimestamp(operations: SubqueryHistoryElementResponse.Query.HistoryElements): Long? {
+        return operations.nodes.maxOfOrNull { it.timestamp }
     }
 
     private fun Chain.substrateTransfersApi(): Chain.ExternalApi.Transfers.Substrate? {

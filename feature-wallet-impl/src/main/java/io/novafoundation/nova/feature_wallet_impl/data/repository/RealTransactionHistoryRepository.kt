@@ -1,15 +1,17 @@
 package io.novafoundation.nova.feature_wallet_impl.data.repository
 
+import android.util.Log
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
-import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapOperationLocalToOperation
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapOperationToOperationLocalDb
@@ -20,11 +22,14 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.milliseconds
 
 class RealTransactionHistoryRepository(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val operationDao: OperationDao,
+    private val coinPriceRepository: CoinPriceRepository
 ) : TransactionHistoryRepository {
 
     override suspend fun syncOperationsFirstPage(
@@ -68,23 +73,40 @@ class RealTransactionHistoryRepository(
         )
     }
 
-    override fun operationsFirstPageFlow(
+    override suspend fun operationsFirstPageFlow(
         accountId: AccountId,
         chain: Chain,
-        chainAsset: Chain.Asset
+        chainAsset: Chain.Asset,
+        currency: Currency
     ): Flow<DataPage<Operation>> {
         val accountAddress = chain.addressOf(accountId)
         val historySource = historySourceFor(chainAsset)
 
         return operationDao.observe(accountAddress, chain.id, chainAsset.id)
-            .mapList {
-                mapOperationLocalToOperation(it, chainAsset)
+            .transform { operations ->
+                emit(mapOperations(operations, chainAsset, emptyList()))
+                val coinPrices = try {
+                    val fromTimestamp = operations.minOf { it.time }.milliseconds.inWholeSeconds
+                    val toTimestamp = operations.maxOf { it.time }.milliseconds.inWholeSeconds
+                    coinPriceRepository.getCoinPriceRange(chainAsset.priceId!!, currency, fromTimestamp, toTimestamp)
+                } catch (e: Exception) {
+                    emptyList()
+                }
+                emit(mapOperations(operations, chainAsset, coinPrices))
             }
             .mapLatest { operations ->
                 val pageOffset = historySource.getSyncedPageOffset(accountId, chain, chainAsset)
 
                 DataPage(pageOffset, operations)
             }
+    }
+
+    private fun mapOperations(operations: List<OperationLocal>, chainAsset: Chain.Asset, coinPrices: List<HistoricalCoinRate>): List<Operation> {
+        return operations.map { operation ->
+            val operationTimestamp = operation.time.milliseconds.inWholeSeconds
+            val coinPrice = coinPriceRepository.findNearestCoinRate(coinPrices, operationTimestamp)
+            mapOperationLocalToOperation(operation, chainAsset, coinPrice)
+        }
     }
 
     private fun historySourceFor(chainAsset: Chain.Asset): AssetHistory = assetSourceRegistry.sourceFor(chainAsset).history

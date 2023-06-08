@@ -46,8 +46,6 @@ class StatemineAssetHistory(
         val runtime = chainRegistry.getRuntime(chain.id)
         val extrinsicsWithEvents = eventsRepository.getExtrinsicsWithEvents(chain.id, blockHash)
 
-        val token = walletRepository.getAsset(accountId, chainAsset)?.token
-
         extrinsicsWithEvents.filter { it.extrinsic.call.isTransfer(runtime, chainAsset) }
             .map { extrinsicWithEvents ->
                 val extrinsic = extrinsicWithEvents.extrinsic
@@ -57,7 +55,6 @@ class StatemineAssetHistory(
                     senderId = bindAccountIdentifier(extrinsic.signature!!.accountIdentifier),
                     recipientId = bindAccountIdentifier(extrinsic.call.arguments["target"]),
                     amountInPlanks = amount,
-                    fiatAmount = token?.planksToFiatOrNull(amount),
                     hash = extrinsicWithEvents.extrinsicHash,
                     chainAsset = chainAsset,
                     status = extrinsicWithEvents.status()

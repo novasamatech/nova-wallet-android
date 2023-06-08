@@ -158,7 +158,6 @@ class EvmErc20AssetBalance(
                 senderId = event.from.accountId(),
                 recipientId = event.to.accountId(),
                 amountInPlanks = event.amount.value,
-                fiatAmount = null,
                 chainAsset = chainAsset,
                 status = ExtrinsicStatus.SUCCESS,
                 hash = log.transactionHash,

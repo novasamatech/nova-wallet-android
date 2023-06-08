@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.OperationLocal.ExtrinsicContentType
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
+import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
@@ -121,9 +122,7 @@ fun mapOperationToOperationLocalDb(
             chainAssetId = chainAsset.id,
             extrinsicContent = operation.extrinsicOrNull()?.content?.let(::mapExtrinsicContentToLocal),
             amount = type.operationAmount,
-            fiatAmount = type.operationFiatAmount,
             fee = type.operationFee,
-            fiatFee = type.operationFiatFee,
             status = mapOperationStatusToOperationLocalStatus(type.operationStatus),
             source = source,
             operationType = typeLocal,
@@ -140,6 +139,7 @@ fun mapOperationToOperationLocalDb(
 fun mapOperationLocalToOperation(
     operationLocal: OperationLocal,
     chainAsset: Chain.Asset,
+    coinRate: CoinRate?,
 ): Operation {
     with(operationLocal) {
         val operationType = when (operationType) {
@@ -147,7 +147,7 @@ fun mapOperationLocalToOperation(
                 hash = hash!!,
                 content = mapExtrinsicContentFromLocal(operationLocal.extrinsicContent!!),
                 fee = fee!!,
-                fiatFee = operationLocal.fiatFee,
+                fiatFee = coinRate?.convertPlanks(chainAsset, fee!!),
                 status = mapOperationStatusLocalToOperationStatus(status),
             )
 
@@ -155,7 +155,7 @@ fun mapOperationLocalToOperation(
                 hash = hash,
                 myAddress = address,
                 amount = amount!!,
-                fiatAmount = operationLocal.fiatAmount,
+                fiatAmount = coinRate?.convertPlanks(chainAsset, amount!!),
                 receiver = receiver!!,
                 sender = sender!!,
                 status = mapOperationStatusLocalToOperationStatus(status),
@@ -164,7 +164,7 @@ fun mapOperationLocalToOperation(
 
             OperationLocal.Type.REWARD -> Type.Reward(
                 amount = amount!!,
-                fiatAmount = operationLocal.fiatAmount,
+                fiatAmount = coinRate?.convertPlanks(chainAsset, amount!!),
                 isReward = isReward!!,
                 era = era!!,
                 validator = validator

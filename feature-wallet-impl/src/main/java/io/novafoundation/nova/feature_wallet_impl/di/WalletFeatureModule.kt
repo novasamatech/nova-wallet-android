@@ -166,10 +166,12 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideTransactionHistoryRepository(
         assetSourceRegistry: AssetSourceRegistry,
-        operationsDao: OperationDao
+        operationsDao: OperationDao,
+        coinPriceRepository: CoinPriceRepository
     ): TransactionHistoryRepository = RealTransactionHistoryRepository(
         assetSourceRegistry = assetSourceRegistry,
-        operationDao = operationsDao
+        operationDao = operationsDao,
+        coinPriceRepository = coinPriceRepository
     )
 
     @Provides

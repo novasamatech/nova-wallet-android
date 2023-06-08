@@ -21,12 +21,10 @@ data class OperationLocal(
     @Embedded(prefix = "extrinsicContent_")
     val extrinsicContent: ExtrinsicContent? = null,
     val amount: BigInteger? = null,
-    val fiatAmount: BigDecimal? = null,
     val sender: String? = null,
     val receiver: String? = null,
     val hash: String? = null,
     val fee: BigInteger? = null,
-    val fiatFee: BigDecimal? = null,
     val isReward: Boolean? = null,
     val era: Int? = null,
     val validator: String? = null,
@@ -61,11 +59,9 @@ data class OperationLocal(
             chainId: String,
             chainAssetId: Int,
             amount: BigInteger,
-            fiatAmount: BigDecimal?,
             senderAddress: String,
             receiverAddress: String,
             fee: BigInteger?,
-            fiatFee: BigDecimal?,
             status: Status,
             source: Source
         ) = OperationLocal(

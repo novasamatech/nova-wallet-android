@@ -7,6 +7,8 @@ import coil.clear
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
+import io.novafoundation.nova.common.list.PayloadGenerator
+import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.formatting.formatDaysSinceEpoch
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflateChild
@@ -47,6 +49,14 @@ class TransactionHistoryAdapter(
     override fun bindChild(holder: GroupedListHolder, child: OperationModel) {
         (holder as TransactionHolder).bind(child, handler)
     }
+
+    override fun bindChild(holder: GroupedListHolder, position: Int, child: OperationModel, payloads: List<Any>) {
+        resolvePayload(holder, position, payloads) {
+            when (it) {
+                OperationModel::fiatWithTime -> (holder as TransactionHolder).bindFiatWithTime(child)
+            }
+        }
+    }
 }
 
 class TransactionHolder(
@@ -65,7 +75,7 @@ class TransactionHolder(
             valuePrimary.setTextColorRes(item.amountColorRes)
             valuePrimary.text = item.amount
 
-            valueSecondary.setTextOrHide(item.fiatWithTime)
+            bindFiatWithTime(item)
             subHeader.text = item.subHeader
             icon.setIcon(item.operationIcon, imageLoader)
 
@@ -81,6 +91,10 @@ class TransactionHolder(
         }
     }
 
+    fun bindFiatWithTime(item: OperationModel) {
+        containerView.valueSecondary.setTextOrHide(item.fiatWithTime)
+    }
+
     override fun unbind() {
         containerView.icon.clear()
     }
@@ -93,6 +107,8 @@ class DayHolder(view: View) : GroupedListHolder(view) {
         }
     }
 }
+
+private object TransactionPayloadGenerator : PayloadGenerator<OperationModel>(OperationModel::fiatWithTime)
 
 object TransactionHistoryDiffCallback : BaseGroupedDiffCallback<DayHeader, OperationModel>(DayHeader::class.java) {
     override fun areGroupItemsTheSame(oldItem: DayHeader, newItem: DayHeader): Boolean {
@@ -113,5 +129,9 @@ object TransactionHistoryDiffCallback : BaseGroupedDiffCallback<DayHeader, Opera
             oldItem.subHeader == newItem.subHeader &&
             oldItem.amount == newItem.amount &&
             oldItem.fiatWithTime == newItem.fiatWithTime
+    }
+
+    override fun getChildChangePayload(oldItem: OperationModel, newItem: OperationModel): Any? {
+        return TransactionPayloadGenerator.diff(oldItem, newItem)
     }
 }

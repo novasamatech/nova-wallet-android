@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.domain
 
+import android.util.Log
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.common.utils.applyFilters
@@ -87,8 +88,8 @@ class WalletInteractorImpl(
             .flatMapLatest { metaAccount ->
                 val (chain, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
                 val accountId = metaAccount.accountIdIn(chain)!!
-
-                transactionHistoryRepository.operationsFirstPageFlow(accountId, chain, chainAsset).withIndex().map { (index, cursorPage) ->
+                val currency = currencyRepository.getSelectedCurrency()
+                transactionHistoryRepository.operationsFirstPageFlow(accountId, chain, chainAsset, currency).withIndex().map { (index, cursorPage) ->
                     OperationsPageChange(cursorPage, accountChanged = index == 0)
                 }
             }

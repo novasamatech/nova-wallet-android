@@ -13,7 +13,7 @@ interface CoinPriceDao {
         """
         SELECT * FROM coin_prices 
         WHERE priceId = :priceId AND currencyId = :currencyId
-        AND timestamp >= :timestamp
+        AND timestamp <= :timestamp
         ORDER BY timestamp DESC LIMIT 1
         """
     )
@@ -24,6 +24,7 @@ interface CoinPriceDao {
         SELECT * FROM coin_prices 
         WHERE priceId = :priceId AND currencyId = :currencyId
         AND timestamp BETWEEN :fromTimestamp AND :toTimestamp
+        ORDER BY timestamp ASC
         """
     )
     suspend fun getCoinPriceRange(priceId: String, currencyId: String, fromTimestamp: Long, toTimestamp: Long): List<CoinPriceLocal>

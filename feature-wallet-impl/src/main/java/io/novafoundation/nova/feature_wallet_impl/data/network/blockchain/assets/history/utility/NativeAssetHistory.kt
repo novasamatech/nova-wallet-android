@@ -43,8 +43,6 @@ class NativeAssetHistory(
         val runtime = chainRegistry.getRuntime(chain.id)
         val extrinsicsWithEvents = eventsRepository.getExtrinsicsWithEvents(chain.id, blockHash)
 
-        val token = walletRepository.getAsset(accountId, chainAsset)?.token
-
         extrinsicsWithEvents.filter { it.extrinsic.call.isTransfer(runtime) }
             .map {
                 val extrinsic = it.extrinsic
@@ -54,7 +52,6 @@ class NativeAssetHistory(
                     senderId = bindAccountIdentifier(extrinsic.signature!!.accountIdentifier),
                     recipientId = bindAccountIdentifier(extrinsic.call.arguments["dest"]),
                     amountInPlanks = amount,
-                    fiatAmount = token?.planksToFiatOrNull(amount),
                     hash = it.extrinsicHash,
                     chainAsset = chainAsset,
                     status = it.status()

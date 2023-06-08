@@ -53,15 +53,12 @@ class OrmlAssetHistory(
 
                 val inferredAsset = chain.findAssetByOrmlCurrencyId(runtime, extrinsic.call.arguments["currency_id"])
 
-                val token = walletRepository.getAsset(accountId, chainAsset)?.token
-
                 val amount = bindNumber(extrinsic.call.arguments["amount"])
                 inferredAsset?.let {
                     TransferExtrinsic(
                         senderId = bindAccountIdentifier(extrinsic.signature!!.accountIdentifier),
                         recipientId = bindAccountIdentifier(extrinsic.call.arguments["dest"]),
                         amountInPlanks = amount,
-                        fiatAmount = token?.planksToFiatOrNull(amount),
                         hash = extrinsicWithEvents.extrinsicHash,
                         chainAsset = inferredAsset,
                         status = extrinsicWithEvents.status()
