@@ -36,7 +36,7 @@ class ShowSignParitySignerViewModel(
     private val signSharedState: SharedState<SignerPayloadExtrinsic>,
     private val qrCodeGenerator: QrCodeGenerator,
     private val responder: SignInterScreenCommunicator,
-    private val request: SignInterScreenCommunicator.Request,
+    private val payload: ShowSignParitySignerPayload,
     private val chainRegistry: ChainRegistry,
     private val addressIconGenerator: AddressIconGenerator,
     private val addressDisplayUseCase: AddressDisplayUseCase,
@@ -45,6 +45,8 @@ class ShowSignParitySignerViewModel(
     private val qrCodeExpiredPresentableFactory: QrCodeExpiredPresentableFactory,
     private val extrinsicValidityUseCase: ExtrinsicValidityUseCase,
 ) : BaseViewModel(), ExternalActions by externalActions, Browserable {
+
+    private val request = payload.request
 
     override val openBrowserEvent = mediatorLiveData { updateFrom(externalActions.openBrowserEvent) }
 

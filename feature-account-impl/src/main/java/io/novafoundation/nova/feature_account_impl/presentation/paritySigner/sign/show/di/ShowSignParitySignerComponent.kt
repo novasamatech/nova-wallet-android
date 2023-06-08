@@ -4,8 +4,8 @@ import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.show.ShowSignParitySignerFragment
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.show.ShowSignParitySignerPayload
 
 @Subcomponent(
     modules = [
@@ -20,7 +20,7 @@ interface ShowSignParitySignerComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
-            @BindsInstance payload: SignInterScreenCommunicator.Request
+            @BindsInstance payload: ShowSignParitySignerPayload
         ): ShowSignParitySignerComponent
     }
 

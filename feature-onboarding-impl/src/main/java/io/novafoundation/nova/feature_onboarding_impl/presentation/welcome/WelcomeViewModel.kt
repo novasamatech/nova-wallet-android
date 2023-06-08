@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.fixedSelectionOf
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
@@ -71,9 +72,13 @@ class WelcomeViewModel(
     }
 
     fun connectHardwareWalletClicked() = launch {
-        when (selectHardwareWallet.awaitAction()) {
-            HardwareWalletModel.PARITY_SIGNER -> router.openStartImportParitySigner()
-            HardwareWalletModel.LEDGER_NANO_X -> router.openStartImportLedger()
+        when (val selection = selectHardwareWallet.awaitAction()) {
+            HardwareWalletModel.LedgerNanoX -> router.openStartImportLedger()
+
+            is HardwareWalletModel.PolkadotVault -> when(selection.variant) {
+                PolkadotVaultVariant.POLKADOT_VAULT -> router.openStartImportPolkadotVault()
+                PolkadotVaultVariant.PARITY_SIGNER -> router.openStartImportParitySigner()
+            }
         }
     }
 }

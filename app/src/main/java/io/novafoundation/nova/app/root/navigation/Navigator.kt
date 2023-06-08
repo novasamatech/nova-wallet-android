@@ -9,6 +9,7 @@ import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.navigation.DelayedNavigation
 import io.novafoundation.nova.common.utils.getParcelableCompat
 import io.novafoundation.nova.common.utils.postToUiThread
+import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -590,7 +591,11 @@ class Navigator(
     }
 
     override fun openStartImportParitySigner() {
-        navController?.navigate(R.id.action_welcomeFragment_to_import_parity_signer_graph)
+        openStartImportPolkadotVault(PolkadotVaultVariant.PARITY_SIGNER)
+    }
+
+    override fun openStartImportPolkadotVault() {
+        openStartImportPolkadotVault(PolkadotVaultVariant.POLKADOT_VAULT)
     }
 
     override fun openStartImportLedger() {
@@ -611,6 +616,10 @@ class Navigator(
         val extras = PincodeFragment.getPinCodeBundle(action)
 
         navController?.navigate(R.id.open_pincode_check, extras)
+    }
+
+    private fun openStartImportPolkadotVault(variant: PolkadotVaultVariant) {
+        navController?.navigate(R.id.action_welcomeFragment_to_import_parity_signer_graph)
     }
 
     private fun buildCreatePinBundle(): Bundle {

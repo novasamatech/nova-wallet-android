@@ -11,10 +11,12 @@ import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.PARITY_SIGNER
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
+import io.novafoundation.nova.feature_account_api.domain.model.asPolkadotVaultVariantOrNull
 import io.novafoundation.nova.feature_account_api.domain.model.hasAccountIn
 import io.novafoundation.nova.feature_account_api.domain.validation.NoChainAccountFoundError.AddAccountState
+import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.polkadotVaultLabelFor
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateApplicationConfig
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.supports
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -24,8 +26,12 @@ interface NoChainAccountFoundError {
     val account: MetaAccount
     val addAccountState: AddAccountState
 
-    enum class AddAccountState {
-        CAN_ADD, LEDGER_NOT_SUPPORTED, PARITY_SIGNER_NOT_SUPPORTED
+    sealed class AddAccountState {
+        object CanAdd: AddAccountState()
+
+        object LedgerNotSupported: AddAccountState()
+
+        class PolkadotVaultNotSupported(val variant: PolkadotVaultVariant): AddAccountState()
     }
 }
 
@@ -38,16 +44,20 @@ class HasChainAccountValidation<P, E>(
     override suspend fun validate(value: P): ValidationStatus<E> {
         val account = metaAccountExtractor(value)
         val chain = chainExtractor(value)
+        val polkadotVaultVariant = account.type.asPolkadotVaultVariantOrNull()
 
         return when {
             account.hasAccountIn(chain) -> ValidationStatus.Valid()
+
             account.type == LEDGER && !SubstrateApplicationConfig.supports(chain.id) -> {
-                errorProducer(chain, account, AddAccountState.LEDGER_NOT_SUPPORTED).validationError()
+                errorProducer(chain, account, AddAccountState.LedgerNotSupported).validationError()
             }
-            account.type == PARITY_SIGNER && chain.isEthereumBased -> {
-                errorProducer(chain, account, AddAccountState.PARITY_SIGNER_NOT_SUPPORTED).validationError()
+
+            polkadotVaultVariant != null && chain.isEthereumBased -> {
+                errorProducer(chain, account, AddAccountState.PolkadotVaultNotSupported(polkadotVaultVariant)).validationError()
             }
-            else -> errorProducer(chain, account, AddAccountState.CAN_ADD).validationError()
+
+            else -> errorProducer(chain, account, AddAccountState.CanAdd).validationError()
         }
     }
 }
@@ -68,8 +78,8 @@ fun handleChainAccountNotFound(
 ): TransformedFailure {
     val chainName = failure.chain.name
 
-    return when (failure.addAccountState) {
-        AddAccountState.CAN_ADD -> TransformedFailure.Custom(
+    return when (val state = failure.addAccountState) {
+        AddAccountState.CanAdd -> TransformedFailure.Custom(
             dialogPayload = CustomDialogDisplayer.Payload(
                 title = resourceManager.getString(R.string.common_missing_account_title, chainName),
                 message = resourceManager.getString(addAccountDescriptionRes, chainName),
@@ -81,11 +91,15 @@ fun handleChainAccountNotFound(
                 customStyle = R.style.AccentNegativeAlertDialogTheme
             )
         )
-        AddAccountState.LEDGER_NOT_SUPPORTED -> TransformedFailure.Default(
+        AddAccountState.LedgerNotSupported -> TransformedFailure.Default(
             resourceManager.getString(R.string.ledger_chain_not_supported, chainName) to null
         )
-        AddAccountState.PARITY_SIGNER_NOT_SUPPORTED -> TransformedFailure.Default(
-            resourceManager.getString(R.string.account_parity_signer_chain_not_supported, chainName) to null
-        )
+        is AddAccountState.PolkadotVaultNotSupported -> {
+            val vaultLabel = resourceManager.polkadotVaultLabelFor(state.variant)
+
+            TransformedFailure.Default(
+                resourceManager.getString(R.string.account_parity_signer_chain_not_supported, vaultLabel, chainName) to null
+            )
+        }
     }
 }

@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.setupQrCodeExpiration
@@ -27,7 +26,7 @@ class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>
 
         private const val PAYLOAD_KEY = "ShowSignParitySignerFragment.Payload"
 
-        fun getBundle(payload: SignInterScreenCommunicator.Request): Bundle {
+        fun getBundle(payload: ShowSignParitySignerPayload): Bundle {
             return Bundle().apply {
                 putParcelable(PAYLOAD_KEY, payload)
             }

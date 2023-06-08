@@ -17,6 +17,7 @@ class AppLinksProvider(
     val setControllerLearnMore: String,
 
     val paritySignerTroubleShooting: String,
+    val polkadotVaultTroubleShooting: String,
     val ledgerBluetoothGuide: String,
 ) {
 

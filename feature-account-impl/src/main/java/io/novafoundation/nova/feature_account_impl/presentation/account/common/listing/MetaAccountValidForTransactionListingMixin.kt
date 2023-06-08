@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.map
 class MetaAccountValidForTransactionListingMixinFactory(
     private val walletUiUseCase: WalletUiUseCase,
     private val resourceManager: ResourceManager,
+    private val accountTypePresentationMapper: MetaAccountTypePresentationMapper,
     private val chainRegistry: ChainRegistry,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor
 ) {
@@ -36,6 +37,7 @@ class MetaAccountValidForTransactionListingMixinFactory(
             fromChainId = fromChainId,
             destinationChainId = destinationChainId,
             selectedAddress = selectedAddress,
+            accountTypePresentationMapper = accountTypePresentationMapper,
             coroutineScope = coroutineScope
         )
     }
@@ -49,6 +51,7 @@ private class MetaAccountValidForTransactionListingMixin(
     private val fromChainId: ChainId,
     private val destinationChainId: ChainId,
     private val selectedAddress: String?,
+    private val accountTypePresentationMapper: MetaAccountTypePresentationMapper,
     coroutineScope: CoroutineScope,
 ) : MetaAccountListingMixin, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
@@ -57,7 +60,7 @@ private class MetaAccountValidForTransactionListingMixin(
     override val metaAccountsFlow = metaAccountGroupingInteractor.getMetaAccountsForTransaction(fromChainId, destinationChainId)
         .map { list ->
             list.toListWithHeaders(
-                keyMapper = { type, _ -> mapMetaAccountTypeToUi(type, resourceManager) },
+                keyMapper = { type, _ -> accountTypePresentationMapper.mapMetaAccountTypeToUi(type) },
                 valueMapper = { mapMetaAccountToUi(it) }
             )
         }
