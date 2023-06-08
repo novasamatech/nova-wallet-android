@@ -8,13 +8,15 @@ import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.s
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan.ScanImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
 import kotlinx.coroutines.delay
 
 class ScanImportParitySignerViewModel(
     private val router: AccountRouter,
     permissionsAsker: PermissionsAsker.Presentation,
     private val interactor: ScanImportParitySignerInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val payload: ParitySignerStartPayload,
 ) : ScanQrViewModel(permissionsAsker) {
 
     fun backClicked() {
@@ -37,7 +39,7 @@ class ScanImportParitySignerViewModel(
     }
 
     private fun openPreview(signerAccount: ParitySignerAccount) {
-        val payload = ParitySignerAccountPayload(signerAccount.accountId)
+        val payload = ParitySignerAccountPayload(signerAccount.accountId, payload.variant)
 
         router.openPreviewImportParitySigner(payload)
     }

@@ -24,6 +24,14 @@ class InstructionStepView @JvmOverloads constructor(
         attrs?.let(::applyAttributes)
     }
 
+    fun setStepNumber(stepNumber: Int) {
+        instructionStepIndicator.text = stepNumber.toString()
+    }
+
+    fun setStepText(stepText: CharSequence) {
+        instructionStepText.text = stepText
+    }
+
     private fun applyAttributes(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.InstructionStepView) {
         val stepNumber = it.getString(R.styleable.InstructionStepView_stepNumber)
         instructionStepIndicator.text = stepNumber

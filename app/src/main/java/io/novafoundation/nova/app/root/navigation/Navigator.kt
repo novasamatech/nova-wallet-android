@@ -26,8 +26,12 @@ import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.ConfirmMnemonicPayload
 import io.novafoundation.nova.feature_account_impl.presentation.node.details.NodeDetailsFragment
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.finish.FinishImportParitySignerFragment
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.preview.PreviewImportParitySignerFragment
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.scan.ScanImportParitySignerFragment
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.scan.ScanImportParitySignerViewModel
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.start.StartImportParitySignerFragment
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.ScanSignParitySignerFragment
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
@@ -550,8 +554,9 @@ class Navigator(
         navController?.navigate(R.id.finish_export_flow)
     }
 
-    override fun openScanImportParitySigner() {
-        navController?.navigate(R.id.action_startImportParitySignerFragment_to_scanImportParitySignerFragment)
+    override fun openScanImportParitySigner(payload: ParitySignerStartPayload) {
+        val args = ScanImportParitySignerFragment.getBundle(payload)
+        navController?.navigate(R.id.action_startImportParitySignerFragment_to_scanImportParitySignerFragment, args)
     }
 
     override fun openPreviewImportParitySigner(payload: ParitySignerAccountPayload) {
@@ -619,7 +624,8 @@ class Navigator(
     }
 
     private fun openStartImportPolkadotVault(variant: PolkadotVaultVariant) {
-        navController?.navigate(R.id.action_welcomeFragment_to_import_parity_signer_graph)
+        val args = StartImportParitySignerFragment.getBundle(ParitySignerStartPayload(variant))
+        navController?.navigate(R.id.action_welcomeFragment_to_import_parity_signer_graph, args)
     }
 
     private fun buildCreatePinBundle(): Bundle {

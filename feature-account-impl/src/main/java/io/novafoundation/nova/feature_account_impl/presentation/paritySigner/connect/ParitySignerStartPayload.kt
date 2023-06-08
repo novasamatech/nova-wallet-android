@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVari
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class ParitySignerAccountPayload(
-    val accountId: ByteArray,
+class ParitySignerStartPayload(
     val variant: PolkadotVaultVariant
-) : Parcelable
+): Parcelable
