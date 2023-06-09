@@ -34,7 +34,7 @@ abstract class PolkadotVaultVariantSigner(
         messageSigningNotSupported.presentSigningNotSupported(
             SigningNotSupportedPresentable.Payload(
                 iconRes = config.common.iconRes,
-                message = resourceManager.formatWithPolkadotVaultLabel(R.string.account_polkadot_vault_not_supported_subtitle, variant)
+                message = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_not_supported_subtitle, variant)
             )
         )
 

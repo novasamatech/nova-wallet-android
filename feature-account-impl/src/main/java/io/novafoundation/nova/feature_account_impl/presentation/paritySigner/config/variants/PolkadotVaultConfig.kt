@@ -25,7 +25,7 @@ internal fun PolkadotVaultConfig(resourceManager: ResourceManager, appLinksProvi
 
         common {
             iconRes = R.drawable.ic_polkadot_vault
-            nameRes = R.string.common_polkadot_vault
+            nameRes = R.string.account_polkadot_vault
         }
     }
 }

@@ -25,7 +25,7 @@ internal fun ParitySignerConfig(resourceManager: ResourceManager, appLinksProvid
 
         common {
             iconRes = R.drawable.ic_parity_signer
-            nameRes = R.string.common_parity_signer
+            nameRes = R.string.account_parity_signer
         }
     }
 }
