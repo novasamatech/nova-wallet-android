@@ -16,13 +16,11 @@ import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>) {
 
     @Transient
-    private val chainAddressesFilter = constructChainAddressesFilter(stakingAccounts, chains)
+    private val chainAddressesParams = constructChainAddressesParams(stakingAccounts, chains)
 
     val query = """
     {
-        activeStakers(
-            filter: { $chainAddressesFilter }
-        ) {
+        activeStakers$chainAddressesParams {
             nodes {
                 networkId
                 stakingType
@@ -38,9 +36,7 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
             }
         }
         
-        accumulatedRewards(
-            filter: { $chainAddressesFilter }
-        ) {
+        accumulatedRewards$chainAddressesParams {
             nodes {
                 networkId
                 stakingType
@@ -51,7 +47,7 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
 
     """.trimIndent()
 
-    private fun constructChainAddressesFilter(
+    private fun constructChainAddressesParams(
         stakingAccounts: StakingAccounts,
         chains: List<Chain>
     ): String = with(SubQueryFilters) {
@@ -63,7 +59,9 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
             hasNetwork(chain.id.requireHexPrefix()) and anyOf(hasTypeAndAddressOptions)
         }
 
-        return anyOf(perChain)
+        val filters = anyOf(perChain)
+
+        queryParams(filter = filters)
     }
 
     private fun SubQueryFilters.Companion.hasTypeAndAddressOptions(
