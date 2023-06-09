@@ -33,6 +33,7 @@ class DashboardNoStakeAdapter(
             when (it) {
                 NoStakeItem::earnings -> holder.bindEarnings(item)
                 NoStakeItem::availableBalance -> holder.bindAvailableBalance(item)
+                NoStakeItem::chainUi -> holder.bindChainUi(item)
             }
         }
     }
@@ -50,7 +51,10 @@ class DashboardNoStakeViewHolder(
     fun bind(model: NoStakeItem) {
         bindEarnings(model)
         bindAvailableBalance(model)
+        bindChainUi(model)
+    }
 
+    fun bindChainUi(model: NoStakeItem) {
         containerView.setChainUi(model.chainUi)
     }
 
@@ -69,7 +73,7 @@ class DashboardNoStakeViewHolder(
 
 private class DashboardNoStakeDiffCallback : DiffUtil.ItemCallback<NoStakeItem>() {
 
-    private val payloadGenerator = PayloadGenerator(NoStakeItem::earnings, NoStakeItem::availableBalance)
+    private val payloadGenerator = PayloadGenerator(NoStakeItem::earnings, NoStakeItem::availableBalance, NoStakeItem::chainUi)
 
     override fun areItemsTheSame(oldItem: NoStakeItem, newItem: NoStakeItem): Boolean {
         return oldItem.chainUi.data.id == newItem.chainUi.data.id && oldItem.assetId == newItem.assetId

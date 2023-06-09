@@ -11,14 +11,12 @@ import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal.Status
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
-import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.SyncingStage
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.ChainStakingStats
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.MultiChainStakingStats
-import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterEvent.PrimaryStakingAccountResolved
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindActiveEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindNominationsOrNull
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedgerOrNull
@@ -29,9 +27,9 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -42,7 +40,7 @@ class StakingDashboardRelayStakingUpdater(
     chainAsset: Chain.Asset,
     stakingType: Chain.Asset.StakingType,
     metaAccount: MetaAccount,
-    private val stakingStatsAsync: Deferred<MultiChainStakingStats>,
+    private val stakingStatsFlow: Flow<IndexedValue<MultiChainStakingStats>>,
     private val stakingDashboardCache: StakingDashboardCache,
     private val remoteStorageSource: StorageDataSource
 ) : BaseStakingDashboardUpdater(chain, chainAsset, stakingType, metaAccount) {
@@ -67,19 +65,17 @@ class StakingDashboardRelayStakingUpdater(
 
             combineToPair(baseInfo, activeEraFlow)
         }.transformLatest { (relaychainStakingState, activeEra) ->
-            emit(PrimaryStakingAccountResolved(stakingOptionId(), relaychainStakingState?.stakingLedger?.stashId))
+            saveItem(relaychainStakingState, secondaryInfo = null)
+            emit(primarySynced())
 
-            if (stakingStatsAsync.isActive) {
-                // we only save base state if secondary is still loading, to avoid unnecessary writes to db
-                saveItem(relaychainStakingState, secondaryInfo = null)
-                emit(SyncingStage.SYNCING_SECONDARY.asUpdaterEvent())
+            val secondarySyncFlow = stakingStatsFlow.map { (index, stakingStats) ->
+                val secondaryInfo = constructSecondaryInfo(relaychainStakingState, activeEra, stakingStats)
+                saveItem(relaychainStakingState, secondaryInfo)
+
+                secondarySynced(index)
             }
 
-            val stakingStats = stakingStatsAsync.await()
-            val secondaryInfo = constructSecondaryInfo(relaychainStakingState, activeEra, stakingStats)
-            saveItem(relaychainStakingState, secondaryInfo)
-
-            emit(SyncingStage.SYNCED.asUpdaterEvent())
+            emitAll(secondarySyncFlow)
         }
     }
 
@@ -116,7 +112,8 @@ class StakingDashboardRelayStakingUpdater(
                 stake = relaychainStakingBaseInfo.stakingLedger.active,
                 status = secondaryInfo?.status ?: fromCache?.status,
                 rewards = secondaryInfo?.rewards ?: fromCache?.rewards,
-                estimatedEarnings = secondaryInfo?.estimatedEarnings ?: fromCache?.estimatedEarnings
+                estimatedEarnings = secondaryInfo?.estimatedEarnings ?: fromCache?.estimatedEarnings,
+                primaryStakingAccountId = relaychainStakingBaseInfo.stakingLedger.stashId,
             )
         } else {
             StakingDashboardItemLocal.notStaking(

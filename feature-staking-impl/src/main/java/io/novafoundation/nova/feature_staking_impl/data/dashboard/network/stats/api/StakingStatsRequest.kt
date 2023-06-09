@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.subquery.SubQueryFilters
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.and
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.anyOf
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.StakingAccounts
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.supportedStakingOptions
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -11,9 +12,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapStakingTypeT
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
-class StakingStatsRequest(stakingAccounts: Map<StakingOptionId, AccountId?>, chains: List<Chain>) {
+class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>) {
 
     @Transient
     private val chainAddressesFilter = constructChainAddressesFilter(stakingAccounts, chains)
@@ -52,7 +52,7 @@ class StakingStatsRequest(stakingAccounts: Map<StakingOptionId, AccountId?>, cha
     """.trimIndent()
 
     private fun constructChainAddressesFilter(
-        stakingAccounts: Map<StakingOptionId, AccountId?>,
+        stakingAccounts: StakingAccounts,
         chains: List<Chain>
     ): String = with(SubQueryFilters) {
         val perChain = chains.mapNotNull { chain ->
@@ -68,7 +68,7 @@ class StakingStatsRequest(stakingAccounts: Map<StakingOptionId, AccountId?>, cha
 
     private fun SubQueryFilters.Companion.hasTypeAndAddressOptions(
         chain: Chain,
-        stakingAccounts: Map<StakingOptionId, AccountId?>
+        stakingAccounts: StakingAccounts
     ): List<String> {
         val utilityAsset = chain.utilityAsset
 
@@ -77,7 +77,7 @@ class StakingStatsRequest(stakingAccounts: Map<StakingOptionId, AccountId?>, cha
             val accountId = stakingAccounts[stakingOptionId] ?: return@mapNotNull null
             val stakingTypeString = mapStakingTypeToStakingString(stakingType) ?: return@mapNotNull null
 
-            hasAddress(chain.addressOf(accountId)) and hasStakingType(stakingTypeString)
+            hasAddress(chain.addressOf(accountId.value)) and hasStakingType(stakingTypeString)
         }
     }
 

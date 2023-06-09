@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.subquery.SubQueryNodes
 import io.novafoundation.nova.common.utils.asPerbill
 import io.novafoundation.nova.common.utils.orZero
@@ -15,13 +16,14 @@ import io.novafoundation.nova.runtime.ext.supportedStakingOptions
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapStakingStringToStakingType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+typealias StakingAccounts = Map<StakingOptionId, AccountIdKey?>
+
 interface StakingStatsDataSource {
 
-    suspend fun fetchStakingStats(stakingAccounts: Map<StakingOptionId, AccountId?>, stakingChains: List<Chain>): MultiChainStakingStats
+    suspend fun fetchStakingStats(stakingAccounts: StakingAccounts, stakingChains: List<Chain>): MultiChainStakingStats
 }
 
 class RealStakingStatsDataSource(
@@ -29,7 +31,7 @@ class RealStakingStatsDataSource(
 ) : StakingStatsDataSource {
 
     override suspend fun fetchStakingStats(
-        stakingAccounts: Map<StakingOptionId, AccountId?>,
+        stakingAccounts: StakingAccounts,
         stakingChains: List<Chain>
     ): MultiChainStakingStats = withContext(Dispatchers.IO) {
         retryUntilDone {

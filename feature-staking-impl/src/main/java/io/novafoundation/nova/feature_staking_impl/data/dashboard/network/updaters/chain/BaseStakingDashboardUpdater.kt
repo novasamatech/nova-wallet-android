@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updat
 import io.novafoundation.nova.core.updater.GlobalScopeUpdater
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapStakingTypeToStakingString
@@ -20,8 +19,12 @@ abstract class BaseStakingDashboardUpdater(
 
     override val requiredModules: List<String> = emptyList()
 
-    protected fun AggregatedStakingDashboardOption.SyncingStage.asUpdaterEvent(): StakingDashboardUpdaterEvent {
-        return StakingDashboardUpdaterEvent.SyncingStageUpdated(stakingOptionId(), this)
+    protected fun primarySynced(): StakingDashboardUpdaterEvent {
+        return StakingDashboardUpdaterEvent.PrimarySynced(stakingOptionId())
+    }
+
+    protected fun secondarySynced(indexOfUsedOffChainSync: Int): StakingDashboardUpdaterEvent {
+        return StakingDashboardUpdaterEvent.AllSynced(stakingOptionId(), indexOfUsedOffChainSync)
     }
 
     protected fun stakingOptionId(): StakingOptionId {
