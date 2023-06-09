@@ -16,7 +16,6 @@ class RealPolkadotVaultVariantConfigProvider(
     private val paritySignerConfig by lazy { ParitySignerConfig(resourceManager, appLinksProvider) }
     private val polkadotVaultConfig by lazy { PolkadotVaultConfig(resourceManager, appLinksProvider) }
 
-
     override fun variantConfigFor(variant: PolkadotVaultVariant): PolkadotVaultVariantConfig {
         return when (variant) {
             PolkadotVaultVariant.POLKADOT_VAULT -> polkadotVaultConfig

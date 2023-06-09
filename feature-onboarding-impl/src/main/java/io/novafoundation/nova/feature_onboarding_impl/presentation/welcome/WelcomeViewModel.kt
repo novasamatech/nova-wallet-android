@@ -75,7 +75,7 @@ class WelcomeViewModel(
         when (val selection = selectHardwareWallet.awaitAction()) {
             HardwareWalletModel.LedgerNanoX -> router.openStartImportLedger()
 
-            is HardwareWalletModel.PolkadotVault -> when(selection.variant) {
+            is HardwareWalletModel.PolkadotVault -> when (selection.variant) {
                 PolkadotVaultVariant.POLKADOT_VAULT -> router.openStartImportPolkadotVault()
                 PolkadotVaultVariant.PARITY_SIGNER -> router.openStartImportParitySigner()
             }

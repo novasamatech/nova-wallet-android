@@ -7,4 +7,4 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class ParitySignerStartPayload(
     val variant: PolkadotVaultVariant
-): Parcelable
+) : Parcelable

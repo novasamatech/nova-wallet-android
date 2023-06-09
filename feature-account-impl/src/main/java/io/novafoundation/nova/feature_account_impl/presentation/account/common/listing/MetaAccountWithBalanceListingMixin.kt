@@ -15,7 +15,7 @@ class MetaAccountWithBalanceListingMixinFactory(
     private val walletUiUseCase: WalletUiUseCase,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val accountTypePresentationMapper: MetaAccountTypePresentationMapper,
-    ) {
+) {
 
     fun create(
         coroutineScope: CoroutineScope,

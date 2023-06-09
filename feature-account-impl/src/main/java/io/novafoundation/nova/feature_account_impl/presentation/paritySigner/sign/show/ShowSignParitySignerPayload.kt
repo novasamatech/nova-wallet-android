@@ -9,4 +9,4 @@ import kotlinx.android.parcel.Parcelize
 class ShowSignParitySignerPayload(
     val request: SignInterScreenCommunicator.Request,
     val polkadotVaultVariant: PolkadotVaultVariant,
-): Parcelable
+) : Parcelable

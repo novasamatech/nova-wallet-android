@@ -41,7 +41,7 @@ class RealParitySignerRepository(
     }
 
     private fun PolkadotVaultVariant.asMetaAccountTypeLocal(): MetaAccountLocal.Type {
-        return when(this) {
+        return when (this) {
             PolkadotVaultVariant.POLKADOT_VAULT -> MetaAccountLocal.Type.POLKADOT_VAULT
             PolkadotVaultVariant.PARITY_SIGNER -> MetaAccountLocal.Type.PARITY_SIGNER
         }

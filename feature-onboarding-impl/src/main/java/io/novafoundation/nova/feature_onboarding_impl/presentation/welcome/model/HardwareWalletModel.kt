@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVari
 
 sealed class HardwareWalletModel {
 
-    class PolkadotVault(val variant: PolkadotVaultVariant): HardwareWalletModel()
+    class PolkadotVault(val variant: PolkadotVaultVariant) : HardwareWalletModel()
 
-    object LedgerNanoX: HardwareWalletModel()
+    object LedgerNanoX : HardwareWalletModel()
 }

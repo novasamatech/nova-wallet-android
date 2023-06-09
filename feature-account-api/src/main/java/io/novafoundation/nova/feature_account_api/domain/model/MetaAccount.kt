@@ -180,13 +180,12 @@ fun LightMetaAccount.Type.isPolkadotVaultLike(): Boolean {
 }
 
 fun LightMetaAccount.Type.asPolkadotVaultVariantOrNull(): PolkadotVaultVariant? {
-    return when(this) {
+    return when (this) {
         LightMetaAccount.Type.PARITY_SIGNER -> PolkadotVaultVariant.PARITY_SIGNER
         LightMetaAccount.Type.POLKADOT_VAULT -> PolkadotVaultVariant.POLKADOT_VAULT
         else -> null
     }
 }
-
 
 fun LightMetaAccount.Type.asPolkadotVaultVariantOrThrow(): PolkadotVaultVariant {
     return requireNotNull(asPolkadotVaultVariantOrNull()) {

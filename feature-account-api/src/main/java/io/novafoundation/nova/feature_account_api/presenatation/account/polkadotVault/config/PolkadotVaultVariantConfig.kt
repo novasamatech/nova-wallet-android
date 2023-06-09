@@ -13,9 +13,9 @@ class PolkadotVaultVariantConfig(
 
         sealed class Instruction {
 
-            class Step(val index: Int, val content: CharSequence): Instruction()
+            class Step(val index: Int, val content: CharSequence) : Instruction()
 
-            class Image(val label: String, @DrawableRes val imageRes: Int): Instruction()
+            class Image(val label: String, @DrawableRes val imageRes: Int) : Instruction()
         }
     }
 

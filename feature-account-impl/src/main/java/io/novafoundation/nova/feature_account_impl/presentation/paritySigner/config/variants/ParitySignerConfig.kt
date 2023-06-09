@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.polkadot
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.config.BuildPolkadotVaultVariantConfig
 
-internal fun ParitySignerConfig(resourceManager: ResourceManager, appLinksProvider: AppLinksProvider) : PolkadotVaultVariantConfig {
+internal fun ParitySignerConfig(resourceManager: ResourceManager, appLinksProvider: AppLinksProvider): PolkadotVaultVariantConfig {
     return BuildPolkadotVaultVariantConfig(resourceManager) {
         sign {
             troubleShootingLink = appLinksProvider.paritySignerTroubleShooting

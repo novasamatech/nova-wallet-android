@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 
 fun ResourceManager.polkadotVaultLabelFor(polkadotVaultVariant: PolkadotVaultVariant): String {
-    return when(polkadotVaultVariant){
+    return when (polkadotVaultVariant) {
         PolkadotVaultVariant.POLKADOT_VAULT -> getString(R.string.common_polkadot_vault)
         PolkadotVaultVariant.PARITY_SIGNER -> getString(R.string.common_parity_signer)
     }

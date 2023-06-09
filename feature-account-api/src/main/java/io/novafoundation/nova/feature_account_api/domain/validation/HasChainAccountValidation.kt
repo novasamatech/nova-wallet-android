@@ -27,11 +27,11 @@ interface NoChainAccountFoundError {
     val addAccountState: AddAccountState
 
     sealed class AddAccountState {
-        object CanAdd: AddAccountState()
+        object CanAdd : AddAccountState()
 
-        object LedgerNotSupported: AddAccountState()
+        object LedgerNotSupported : AddAccountState()
 
-        class PolkadotVaultNotSupported(val variant: PolkadotVaultVariant): AddAccountState()
+        class PolkadotVaultNotSupported(val variant: PolkadotVaultVariant) : AddAccountState()
     }
 }
 

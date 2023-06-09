@@ -83,7 +83,6 @@ private class RealPolkadotVaultVariantConfigBuilder(
         common = RealCommonBuilder().apply(builder).build()
     }
 
-
     fun build(): PolkadotVaultVariantConfig {
         val connect = requireNotNull(connect)
         val sign = requireNotNull(sign)
@@ -156,7 +155,7 @@ private class RealSignBuilder : SignBuilder {
     }
 }
 
-private class RealCommonBuilder: CommonBuilder {
+private class RealCommonBuilder : CommonBuilder {
 
     private var _iconRes: Int? = null
     private var _nameRes: Int? = null
@@ -176,4 +175,4 @@ private class RealCommonBuilder: CommonBuilder {
     fun build(): Common {
         return Common(iconRes = iconRes, nameRes = nameRes)
     }
-} 
+}

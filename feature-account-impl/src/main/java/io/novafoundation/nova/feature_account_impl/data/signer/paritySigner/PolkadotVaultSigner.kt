@@ -24,7 +24,7 @@ abstract class PolkadotVaultVariantSigner(
 
     override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignatureWrapper {
         signFlowRequester.setUsedVariant(variant)
-        
+
         return super.signExtrinsic(payloadExtrinsic)
     }
 
