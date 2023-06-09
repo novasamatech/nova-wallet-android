@@ -14,7 +14,8 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class CoinPriceRepositoryImpl(
-    private val cacheCoinPriceDataSource: CoinPriceLocalDataSource, private val remoteCoinPriceDataSource: CoinPriceRemoteDataSource
+    private val cacheCoinPriceDataSource: CoinPriceLocalDataSource,
+    private val remoteCoinPriceDataSource: CoinPriceRemoteDataSource
 ) : CoinPriceRepository {
 
     override suspend fun getCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Long): CoinRate? {

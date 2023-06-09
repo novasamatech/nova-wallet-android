@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.OperationLocal.ExtrinsicContentType
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
-import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content

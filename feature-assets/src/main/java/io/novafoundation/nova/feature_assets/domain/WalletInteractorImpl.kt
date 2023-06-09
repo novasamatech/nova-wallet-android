@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_assets.domain
 
-import android.util.Log
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.common.utils.applyFilters

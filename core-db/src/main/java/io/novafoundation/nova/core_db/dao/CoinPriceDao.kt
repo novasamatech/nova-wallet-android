@@ -19,7 +19,6 @@ interface CoinPriceDao {
     )
     suspend fun getFloorCoinPriceAtTime(priceId: String, currencyId: String, timestamp: Long): CoinPriceLocal?
 
-
     @Query(
         """
         SELECT EXISTS(

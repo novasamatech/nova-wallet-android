@@ -2,7 +2,6 @@ package io.novafoundation.nova.core_db.model
 
 import androidx.room.Embedded
 import androidx.room.Entity
-import java.math.BigDecimal
 import java.math.BigInteger
 
 @Entity(

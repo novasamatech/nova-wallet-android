@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicStatus
-import java.math.BigDecimal
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
 
