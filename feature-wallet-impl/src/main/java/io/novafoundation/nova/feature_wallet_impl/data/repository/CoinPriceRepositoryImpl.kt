@@ -13,6 +13,9 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+private const val START_SYNCING_YEAR = 2010
+private const val BASE_OFFSET = 1
+
 class CoinPriceRepositoryImpl(
     private val cacheCoinPriceDataSource: CoinPriceLocalDataSource,
     private val remoteCoinPriceDataSource: CoinPriceRemoteDataSource
@@ -71,7 +74,7 @@ class CoinPriceRepositoryImpl(
 
     private suspend fun loadAndCacheForAllTime(priceId: String, currency: Currency): List<HistoricalCoinRate> {
         val startCalendar = Calendar.getInstance()
-        startCalendar.set(2010, 0, 0)
+        startCalendar.set(START_SYNCING_YEAR, 0, 0)
         val from = startCalendar.time.time
         val to = System.currentTimeMillis().milliseconds.inWholeSeconds
         val coinRate = remoteCoinPriceDataSource.getCoinPriceRange(priceId, currency, from, to)
@@ -83,15 +86,15 @@ class CoinPriceRepositoryImpl(
     }
 
     private fun getOffsetFor(from: Long, to: Long): Pair<Long, Long> {
-        val offsetFrom = from.seconds.minus(1.days).inWholeSeconds
-        val offsetTo = to.seconds.plus(1.days).inWholeSeconds
+        val offsetFrom = from.seconds.minus(BASE_OFFSET.days).inWholeSeconds
+        val offsetTo = to.seconds.plus(BASE_OFFSET.days).inWholeSeconds
 
         return offsetFrom to offsetTo
     }
 
     private fun timestampIsHigherThanCoinRate(coinRate: HistoricalCoinRate?, timestamp: Long): Boolean {
         if (coinRate == null) return false
-        val coinRateTimestampWithOffset = coinRate.timestamp.plus(1.days.inWholeSeconds)
+        val coinRateTimestampWithOffset = coinRate.timestamp.plus(BASE_OFFSET.days.inWholeSeconds)
         return timestamp >= coinRateTimestampWithOffset
     }
 }
