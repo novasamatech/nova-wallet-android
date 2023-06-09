@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_impl.data.repository
 
-import android.util.Log
 import io.novafoundation.nova.common.utils.binarySearchFloor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceLocalDataSource
@@ -9,8 +8,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepo
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
+import java.util.Calendar
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -19,12 +18,16 @@ class CoinPriceRepositoryImpl(
 ) : CoinPriceRepository {
 
     override suspend fun getCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Long): CoinRate? {
-        var coinRate = cacheCoinPriceDataSource.getCoinPriceAtTime(priceId, currency, timestamp)
-        if (coinRate == null) {
+        var coinRate = cacheCoinPriceDataSource.getFloorCoinPriceAtTime(priceId, currency, timestamp)
+        val hasCeilingItem = cacheCoinPriceDataSource.hasCeilingCoinPriceAtTime(priceId, currency, timestamp)
+        if (coinRate == null && !hasCeilingItem) {
             val timeInMillis = timestamp.seconds.inWholeMilliseconds
             val coinRateForAllTime = loadAndCacheForAllTime(priceId, currency)
             val index = coinRateForAllTime.binarySearchFloor { it.timestamp.compareTo(timeInMillis) }
             coinRate = coinRateForAllTime.getOrNull(index)
+
+            // If nearest coin rate timestamp is bigger than target timestamp it means that coingecko doesn't have data before coin rate timestamp
+            // so in this case we should return null
             if (coinRate != null && coinRate.timestamp > timestamp) {
                 return null
             }
@@ -39,7 +42,9 @@ class CoinPriceRepositoryImpl(
         val (offsetFrom, offsetTo) = getOffsetFor(fromTimestamp, toTimestamp)
 
         var coinRates = cacheCoinPriceDataSource.getCoinPriceRange(priceId, currency, offsetFrom, offsetTo)
-        if (coinRates.isEmpty() || coinRates.last().timestamp < toTimestamp) {
+        val hasCeilingItem = cacheCoinPriceDataSource.hasCeilingCoinPriceAtTime(priceId, currency, offsetTo)
+        val shouldUpdateCache = coinRates.isEmpty() && !hasCeilingItem
+        if (shouldUpdateCache || timestampIsHigherThanCoinRate(coinRates.lastOrNull(), toTimestamp)) {
             val timeRange = offsetFrom..offsetTo
             coinRates = loadAndCacheForAllTime(priceId, currency).filter { it.timestamp in timeRange }
         }
@@ -64,7 +69,9 @@ class CoinPriceRepositoryImpl(
     }
 
     private suspend fun loadAndCacheForAllTime(priceId: String, currency: Currency): List<HistoricalCoinRate> {
-        val from = 0L
+        val startCalendar = Calendar.getInstance()
+        startCalendar.set(2010, 0, 0)
+        val from = startCalendar.time.time
         val to = System.currentTimeMillis().milliseconds.inWholeSeconds
         val coinRate = remoteCoinPriceDataSource.getCoinPriceRange(priceId, currency, from, to)
         if (coinRate.isNotEmpty()) {
@@ -79,5 +86,11 @@ class CoinPriceRepositoryImpl(
         val offsetTo = to.seconds.plus(1.days).inWholeSeconds
 
         return offsetFrom to offsetTo
+    }
+
+    private fun timestampIsHigherThanCoinRate(coinRate: HistoricalCoinRate?, timestamp: Long): Boolean {
+        if (coinRate == null) return false
+        val coinRateTimestampWithOffset = coinRate.timestamp.plus(1.days.inWholeSeconds)
+        return timestamp >= coinRateTimestampWithOffset
     }
 }

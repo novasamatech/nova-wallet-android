@@ -17,7 +17,20 @@ interface CoinPriceDao {
         ORDER BY timestamp DESC LIMIT 1
         """
     )
-    suspend fun getCoinPriceAtTime(priceId: String, currencyId: String, timestamp: Long): CoinPriceLocal?
+    suspend fun getFloorCoinPriceAtTime(priceId: String, currencyId: String, timestamp: Long): CoinPriceLocal?
+
+
+    @Query(
+        """
+        SELECT EXISTS(
+            SELECT * FROM coin_prices 
+            WHERE priceId = :priceId AND currencyId = :currencyId
+            AND timestamp >= :timestamp
+            ORDER BY timestamp ASC LIMIT 1
+        )
+        """
+    )
+    suspend fun hasCeilingCoinPriceAtTime(priceId: String, currencyId: String, timestamp: Long): Boolean
 
     @Query(
         """

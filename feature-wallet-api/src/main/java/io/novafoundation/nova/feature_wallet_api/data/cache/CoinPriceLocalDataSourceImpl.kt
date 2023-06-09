@@ -11,9 +11,13 @@ class CoinPriceLocalDataSourceImpl(
     private val coinPriceDao: CoinPriceDao
 ) : CoinPriceLocalDataSource {
 
-    override suspend fun getCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Long): CoinRate? {
-        val coinPriceLocal = coinPriceDao.getCoinPriceAtTime(priceId, currency.code, timestamp)
+    override suspend fun getFloorCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Long): CoinRate? {
+        val coinPriceLocal = coinPriceDao.getFloorCoinPriceAtTime(priceId, currency.code, timestamp)
         return coinPriceLocal?.let { mapCoinPriceFromLocal(it) }
+    }
+
+    override suspend fun hasCeilingCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Long): Boolean {
+        return coinPriceDao.hasCeilingCoinPriceAtTime(priceId, currency.code, timestamp)
     }
 
     override suspend fun getCoinPriceRange(priceId: String, currency: Currency, fromTimestamp: Long, toTimestamp: Long): List<HistoricalCoinRate> {
