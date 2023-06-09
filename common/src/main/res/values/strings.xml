@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="account_parity_signer_import_scan_invalid_qr">Invalid QR code, please make sure you are scanning QR code from %s</string>
+<!--    <string name="account_parity_signer_import_scan_invalid_qr">Invalid QR code, please make sure you are scanning QR code from Parity Signer</string>-->
+
+    <string name="account_parity_signer_sign_have_error">I have an error in %s</string>
+<!--    <string name="account_parity_signer_sign_have_error">I have an error in Parity Signer</string>-->
+
+
+    <string name="account_parity_signer_sign_title">Sign with %s</string>
+<!--    <string name="account_parity_signer_sign_title">Sign with Parity Signer</string>-->
+
+
     <string name="account_parity_signer_import_preview_description">Following accounts have been successfully read from %s</string>
 <!--    <string name="account_parity_signer_import_preview_description">Following accounts have been successfully read from Parity Signer</string>-->
-
 
     <string name="account_parity_signer_scan_from">Scan the QR code from the %s</string>
 <!--    <string name="account_parity_signer_scan_from">Scan the QR code from the Parity Signer</string>-->
@@ -649,17 +659,12 @@
 
     <string name="common_try_again">Try again</string>
 
-    <string name="account_parity_signer_sign_qr_code_expired_descrition">For security reasons generated operations valid for only %s.\nPlease generate new QR code and sign it with Parity Signer</string>
+    <string name="account_parity_signer_sign_qr_code_expired_descrition">For security reasons generated operations valid for only %s.\nPlease generate new QR code and sign it with %s</string>
     <string name="account_parity_signer_sign_qr_code_expired">QR code has expired</string>
     <string name="account_parity_signer_sign_qr_code_valid_format">QR code is valid for %s</string>
 
-    <string name="account_parity_signer_sign_have_error">I have an error in Parity Signer</string>
-
-    <string name="account_parity_signer_sign_title">Sign with Parity Signer</string>
-
     <string name="account_parity_signer_import_preview_title">Here are your accounts</string>
 
-    <string name="account_parity_signer_import_scan_invalid_qr">Invalid QR code, please make sure you are scanning QR code from Parity Signer</string>
 
     <string name="common_permission_permissions_needed_title">Permissions needed</string>
     <string name="common_permission_permissions_needed_message">Requested permissions are required to use this screen.</string>

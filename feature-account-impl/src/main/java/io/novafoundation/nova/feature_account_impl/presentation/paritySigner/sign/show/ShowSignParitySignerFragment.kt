@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParit
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowQr
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowTimer
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowToolbar
+import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerSignLabel
 
 class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>() {
 
@@ -45,7 +46,7 @@ class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>
         signParitySignerShowToolbar.applyStatusBarInsets()
         signParitySignerShowToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        signParitySignerShowQr.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.text_primary)
+        signParitySignerShowQr.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.qr_code_background)
         signParitySignerShowQr.clipToOutline = true // for round corners
 
         signParitySignerShowAddress.setWholeClickListener { viewModel.addressClicked() }
@@ -76,5 +77,9 @@ class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>
             signParitySignerShowAddress.setMessage(it.address)
             signParitySignerShowAddress.setPrimaryIcon(it.image)
         }
+
+        signParitySignerShowToolbar.setTitle(viewModel.title)
+        signParitySignerSignLabel.text = viewModel.signLabel
+        signParitySignerShowHaveError.text = viewModel.errorButtonLabel
     }
 }

@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.api.Browserable
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.SharedState
 import io.novafoundation.nova.common.utils.event
@@ -13,8 +14,10 @@ import io.novafoundation.nova.common.utils.mediatorLiveData
 import io.novafoundation.nova.common.utils.updateFrom
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.formatWithPolkadotVaultLabel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.sign.cancelled
+import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.show.ShowSignParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -44,13 +47,14 @@ class ShowSignParitySignerViewModel(
     private val appLinksProvider: AppLinksProvider,
     private val qrCodeExpiredPresentableFactory: QrCodeExpiredPresentableFactory,
     private val extrinsicValidityUseCase: ExtrinsicValidityUseCase,
+    private val resourceManager: ResourceManager,
 ) : BaseViewModel(), ExternalActions by externalActions, Browserable {
 
     private val request = payload.request
 
     override val openBrowserEvent = mediatorLiveData { updateFrom(externalActions.openBrowserEvent) }
 
-    val qrCodeExpiredPresentable = qrCodeExpiredPresentableFactory.create(request)
+    val qrCodeExpiredPresentable = qrCodeExpiredPresentableFactory.create(request, payload.polkadotVaultVariant)
 
     val chain = flowOf {
         val signPayload = signSharedState.getOrThrow()
@@ -77,6 +81,11 @@ class ShowSignParitySignerViewModel(
         extrinsicValidityUseCase.extrinsicValidityPeriod(signSharedState.getOrThrow())
     }.shareInBackground()
 
+    val title = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_sign_title, payload.polkadotVaultVariant)
+    val signLabel = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_scan_with, payload.polkadotVaultVariant)
+
+    val errorButtonLabel = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_sign_have_error, payload.polkadotVaultVariant)
+
     fun backClicked() {
         responder.respond(request.cancelled())
 
@@ -85,7 +94,7 @@ class ShowSignParitySignerViewModel(
 
     fun continueClicked() = launch {
         val validityPeriodParcel = mapValidityPeriodToParcel(validityPeriod.first())
-        val payload = ScanSignParitySignerPayload(request, validityPeriodParcel)
+        val payload = ScanSignParitySignerPayload(request, validityPeriodParcel, payload.polkadotVaultVariant)
 
         router.openScanParitySignerSignature(payload)
     }
