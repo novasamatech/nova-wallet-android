@@ -44,6 +44,8 @@ class ScanImportParitySignerFragment : ScanQrFragment<ScanImportParitySignerView
 
         scanImportParitySignerScanToolbar.applyStatusBarInsets()
         scanImportParitySignerScanToolbar.setHomeButtonListener { viewModel.backClicked() }
+
+        scanImportParitySignerScan.setTitle(viewModel.title)
     }
 
     override val scanView: ScanView

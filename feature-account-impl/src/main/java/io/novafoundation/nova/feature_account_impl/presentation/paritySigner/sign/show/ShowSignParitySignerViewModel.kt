@@ -14,8 +14,8 @@ import io.novafoundation.nova.common.utils.updateFrom
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.cancelled
+import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.show.ShowSignParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
@@ -35,7 +35,7 @@ class ShowSignParitySignerViewModel(
     private val interactor: ShowSignParitySignerInteractor,
     private val signSharedState: SharedState<SignerPayloadExtrinsic>,
     private val qrCodeGenerator: QrCodeGenerator,
-    private val responder: SignInterScreenCommunicator,
+    private val responder: PolkadotVaultVariantSignCommunicator,
     private val payload: ShowSignParitySignerPayload,
     private val chainRegistry: ChainRegistry,
     private val addressIconGenerator: AddressIconGenerator,

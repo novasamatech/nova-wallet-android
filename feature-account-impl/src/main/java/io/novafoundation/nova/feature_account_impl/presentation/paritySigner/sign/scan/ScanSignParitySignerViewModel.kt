@@ -7,8 +7,8 @@ import io.novafoundation.nova.common.presentation.scan.ScanQrViewModel
 import io.novafoundation.nova.common.utils.SharedState
 import io.novafoundation.nova.common.utils.getOrThrow
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
-import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenResponder
 import io.novafoundation.nova.feature_account_api.presenatation.sign.signed
+import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.scan.ScanSignParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
@@ -25,7 +25,7 @@ class ScanSignParitySignerViewModel(
     private val interactor: ScanSignParitySignerInteractor,
     private val signSharedState: SharedState<SignerPayloadExtrinsic>,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val responder: SignInterScreenResponder,
+    private val responder: PolkadotVaultVariantSignCommunicator,
     private val payload: ScanSignParitySignerPayload,
     private val qrCodeExpiredPresentableFactory: QrCodeExpiredPresentableFactory,
 ) : ScanQrViewModel(permissionsAsker) {

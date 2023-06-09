@@ -2,11 +2,14 @@ package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.co
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.formatWithPolkadotVaultLabel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.preview.ParitySignerAccountInChain
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.preview.PreviewImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -23,7 +26,10 @@ class PreviewImportParitySignerViewModel(
     private val payload: ParitySignerAccountPayload,
     private val externalActions: ExternalActions.Presentation,
     private val chainRegistry: ChainRegistry,
+    private val resourceManager: ResourceManager,
 ) : BaseViewModel(), ExternalActions by externalActions {
+
+    val title = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_import_preview_description, payload.variant)
 
     val chainAccountProjections = flowOf { interactor.deriveSubstrateChainAccounts(payload.accountId) }
         .mapList(::mapParitySignerAccountInChainToUi)

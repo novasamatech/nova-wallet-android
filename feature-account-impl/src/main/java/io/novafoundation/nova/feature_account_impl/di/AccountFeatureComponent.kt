@@ -10,8 +10,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
-import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSignCommunicator
-import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultSignCommunicator
+import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.di.modules.ExportModule
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
@@ -114,8 +113,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
         fun create(
             @BindsInstance accountRouter: AccountRouter,
             @BindsInstance advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
-            @BindsInstance paritySignerSignInterScreenCommunicator: ParitySignerSignCommunicator,
-            @BindsInstance polkadotVaultSignInterScreenCommunicator: PolkadotVaultSignCommunicator,
+            @BindsInstance polkadotVaultSignInterScreenCommunicator: PolkadotVaultVariantSignCommunicator,
             @BindsInstance ledgerSignInterScreenCommunicator: LedgerSignCommunicator,
             @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,
             @BindsInstance selectWalletCommunicator: SelectWalletCommunicator,

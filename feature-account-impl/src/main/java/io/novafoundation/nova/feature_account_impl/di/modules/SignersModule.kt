@@ -14,10 +14,9 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnl
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.RealSignerProvider
 import io.novafoundation.nova.feature_account_impl.data.signer.ledger.LedgerSigner
-import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSigner
-import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultSigner
+import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.secrets.SecretsSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.watchOnly.WatchOnlySigner
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
@@ -49,7 +48,7 @@ class SignersModule {
     @FeatureScope
     fun provideParitySignerSigner(
         signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
-        communicator: ParitySignerSignCommunicator,
+        communicator: PolkadotVaultVariantSignCommunicator,
         resourceManager: ResourceManager,
         polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
         signingNotSupportedPresentable: SigningNotSupportedPresentable
@@ -65,7 +64,7 @@ class SignersModule {
     @FeatureScope
     fun providePolkadotVaultSigner(
         signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
-        communicator: PolkadotVaultSignCommunicator,
+        communicator: PolkadotVaultVariantSignCommunicator,
         resourceManager: ResourceManager,
         polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
         signingNotSupportedPresentable: SigningNotSupportedPresentable

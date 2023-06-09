@@ -15,7 +15,7 @@ import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.SharedState
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSignCommunicator
+import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.show.RealShowSignParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.show.ShowSignParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -40,7 +40,7 @@ class ShowSignParitySignerModule {
         interactor: ShowSignParitySignerInteractor,
         signSharedState: SharedState<SignerPayloadExtrinsic>,
         qrCodeGenerator: QrCodeGenerator,
-        communicator: ParitySignerSignCommunicator,
+        communicator: PolkadotVaultVariantSignCommunicator,
         payload: ShowSignParitySignerPayload,
         chainRegistry: ChainRegistry,
         addressIconGenerator: AddressIconGenerator,

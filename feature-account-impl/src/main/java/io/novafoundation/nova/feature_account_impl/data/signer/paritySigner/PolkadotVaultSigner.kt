@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.utils.MutableSharedState
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.formatWithPolkadotVaultLabel
-import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenRequester
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.signer.SeparateFlowSigner
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
@@ -16,12 +15,18 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadRaw
 
 abstract class PolkadotVaultVariantSigner(
     signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
-    signFlowRequester: SignInterScreenRequester,
+    private val signFlowRequester: PolkadotVaultVariantSignCommunicator,
     private val resourceManager: ResourceManager,
     private val variant: PolkadotVaultVariant,
     private val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
     private val messageSigningNotSupported: SigningNotSupportedPresentable
 ) : SeparateFlowSigner(signingSharedState, signFlowRequester) {
+
+    override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignatureWrapper {
+        signFlowRequester.setUsedVariant(variant)
+        
+        return super.signExtrinsic(payloadExtrinsic)
+    }
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignatureWrapper {
         val config = polkadotVaultVariantConfigProvider.variantConfigFor(variant)
@@ -39,7 +44,7 @@ abstract class PolkadotVaultVariantSigner(
 
 class ParitySignerSigner(
     signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
-    signFlowRequester: ParitySignerSignCommunicator,
+    signFlowRequester: PolkadotVaultVariantSignCommunicator,
     resourceManager: ResourceManager,
     polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
     messageSigningNotSupported: SigningNotSupportedPresentable
@@ -54,7 +59,7 @@ class ParitySignerSigner(
 
 class PolkadotVaultSigner(
     signingSharedState: MutableSharedState<SignerPayloadExtrinsic>,
-    signFlowRequester: PolkadotVaultSignCommunicator,
+    signFlowRequester: PolkadotVaultVariantSignCommunicator,
     resourceManager: ResourceManager,
     polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
     messageSigningNotSupported: SigningNotSupportedPresentable

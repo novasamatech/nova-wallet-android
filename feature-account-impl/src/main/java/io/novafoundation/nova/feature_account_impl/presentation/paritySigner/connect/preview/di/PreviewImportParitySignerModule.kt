@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.preview.PreviewImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.preview.RealPreviewImportParitySignerInteractor
@@ -38,6 +39,7 @@ class PreviewImportParitySignerModule {
         payload: ParitySignerAccountPayload,
         externalActions: ExternalActions.Presentation,
         chainRegistry: ChainRegistry,
+        resourceManager: ResourceManager
     ): ViewModel {
         return PreviewImportParitySignerViewModel(
             interactor = interactor,
@@ -45,7 +47,8 @@ class PreviewImportParitySignerModule {
             iconGenerator = iconGenerator,
             payload = payload,
             externalActions = externalActions,
-            chainRegistry = chainRegistry
+            chainRegistry = chainRegistry,
+            resourceManager = resourceManager
         )
     }
 
