@@ -15,6 +15,8 @@ fun ExtrinsicBuilder.setController(controllerAddress: MultiAddress): ExtrinsicBu
         "Staking",
         "set_controller",
         mapOf(
+            // `controller` argument is missing on newer versions of staking pallets
+            // but we don`t sanitize it since library will ignore unknown arguments on encoding stage
             "controller" to bindMultiAddress(controllerAddress)
         )
     )
@@ -29,6 +31,8 @@ fun ExtrinsicBuilder.bond(
         "Staking",
         "bond",
         mapOf(
+            // `controller` argument is missing on newer versions of staking pallets
+            // but we don`t sanitize it since library will ignore unknown arguments on encoding stage
             "controller" to bindMultiAddress(controllerAddress),
             "value" to amount,
             "payee" to bindRewardDestination(payee)

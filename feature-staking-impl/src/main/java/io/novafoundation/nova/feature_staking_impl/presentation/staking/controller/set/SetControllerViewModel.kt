@@ -8,20 +8,26 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.selectingOneOf
 import io.novafoundation.nova.common.mixin.api.Validatable
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mediatorLiveData
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.updateFrom
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.common.view.ButtonState
+import io.novafoundation.nova.common.view.AdvertisementCardModel
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.repository.ControllersDeprecationStage
+import io.novafoundation.nova.feature_staking_impl.data.repository.ControllersDeprecationStage.DEPRECATED
+import io.novafoundation.nova.feature_staking_impl.data.repository.ControllersDeprecationStage.NORMAL
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.controller.ControllerInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.SetControllerValidationPayload
@@ -63,10 +69,8 @@ class SetControllerViewModel(
         .filterIsInstance<StakingState.Stash>()
         .shareInBackground()
 
-    val ableToChangeController = accountStakingFlow.map { stakingState ->
-        stakingState.accountAddress == stakingState.stashAddress
-    }
-        .share()
+    private val controllerDeprecationStageFlow = flowOf { interactor.controllerDeprecationStage() }
+        .shareInBackground()
 
     val stashAccountModel = accountStakingFlow.map {
         createAccountAddressModel(it.stashAddress)
@@ -78,7 +82,7 @@ class SetControllerViewModel(
     private val _controllerAccountModel = singleReplaySharedFlow<AddressModel>()
     val controllerAccountModel: Flow<AddressModel> = _controllerAccountModel
 
-    override val openBrowserEvent = mediatorLiveData<Event<String>> {
+    override val openBrowserEvent = mediatorLiveData {
         updateFrom(externalActions.openBrowserEvent)
     }
 
@@ -86,19 +90,57 @@ class SetControllerViewModel(
 
     private val validationInProgress = MutableStateFlow(false)
 
+    val isControllerSelectorEnabled = combine(accountStakingFlow, controllerDeprecationStageFlow) { stakingState, controllerDeprecationStage ->
+        stakingState.isUsingCorrectAccountToChangeController() && controllerDeprecationStage == NORMAL
+    }
+        .share()
+
+    val showSwitchToStashWarning = combine(controllerDeprecationStageFlow, accountStakingFlow) { controllerDeprecationStage, stakingState ->
+        val usingWrongAccountToChangeController = stakingState.isUsingWrongAccountToChangeController()
+
+        when(controllerDeprecationStage) {
+            NORMAL -> usingWrongAccountToChangeController
+
+            // when controllers are deprecated, there is no point to show the switch to stash warning if user has not separate controller
+            // switching to stash wont allow to change controller anyway
+            DEPRECATED -> usingWrongAccountToChangeController && stakingState.hasSeparateController()
+        }
+    }
+        .shareInBackground()
+
     val continueButtonState = combine(
         controllerAccountModel,
         accountStakingFlow,
-        ableToChangeController,
+        controllerDeprecationStageFlow,
         validationInProgress
-    ) { selectedController, stakingState, ableToChangeController, validationInProgress ->
+    ) { selectedController, stakingState, controllerDeprecationStage, validationInProgress ->
         when {
-            validationInProgress -> ButtonState.PROGRESS
-            // The user selected account that was not the controller already and we able to change it
-            selectedController.address != stakingState.controllerAddress && ableToChangeController -> ButtonState.NORMAL
-            else -> ButtonState.GONE
+            validationInProgress -> DescriptiveButtonState.Loading
+
+            stakingState.isUsingWrongAccountToChangeController() -> DescriptiveButtonState.Gone
+
+            // Let user to remove controller when controllers are deprecated
+            controllerDeprecationStage == DEPRECATED && stakingState.hasSeparateController() -> {
+                DescriptiveButtonState.Enabled(resourceManager.getString(R.string.staking_set_controller_deprecated_action))
+            }
+
+            // User cant do anything beneficial when controllers are deprecated and user doesn't have controller set up
+            controllerDeprecationStage == DEPRECATED && stakingState.hasSeparateController().not() -> {
+                DescriptiveButtonState.Gone
+            }
+
+            // The user selected account that was not the controller already
+            selectedController.address != stakingState.controllerAddress -> {
+                DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
+            }
+
+            else -> DescriptiveButtonState.Gone
         }
     }
+        .shareInBackground()
+
+    val advertisementCardModel = controllerDeprecationStageFlow.map(::createBannerContent)
+        .shareInBackground()
 
     init {
         loadFee()
@@ -106,8 +148,8 @@ class SetControllerViewModel(
         setInitialController()
     }
 
-    fun onMoreClicked() {
-        openBrowserEvent.value = Event(appLinksProvider.setControllerLearnMore)
+    fun onMoreClicked() = launch {
+        openBrowserEvent.value = Event(getLearnMoreUrl())
     }
 
     fun stashClicked() {
@@ -159,7 +201,7 @@ class SetControllerViewModel(
 
     private fun maybeGoToConfirm() = feeLoaderMixin.requireFee(this) { fee ->
         launch {
-            val controllerAddress = controllerAccountModel.first().address
+            val controllerAddress = getNewControllerAddress()
 
             val payload = SetControllerValidationPayload(
                 stashAddress = stashAddress(),
@@ -206,5 +248,48 @@ class SetControllerViewModel(
 
     private fun openConfirm(payload: ConfirmSetControllerPayload) {
         router.openConfirmSetController(payload)
+    }
+
+    private fun StakingState.Stash.isUsingCorrectAccountToChangeController(): Boolean {
+        return accountId.contentEquals(stashId)
+    }
+
+    private fun StakingState.Stash.isUsingWrongAccountToChangeController(): Boolean {
+        return !isUsingCorrectAccountToChangeController()
+    }
+
+    private fun StakingState.Stash.hasSeparateController(): Boolean {
+        return !controllerId.contentEquals(stashId)
+    }
+
+    private fun createBannerContent(deprecationStage: ControllersDeprecationStage): AdvertisementCardModel {
+        return when(deprecationStage) {
+            NORMAL -> AdvertisementCardModel(
+                title = resourceManager.getString(R.string.staking_set_controller_title),
+                subtitle = resourceManager.getString(R.string.staking_set_controller_subtitle),
+                imageRes = R.drawable.shield,
+                bannerBackgroundRes = R.drawable.ic_banner_grey_gradient
+            )
+            DEPRECATED -> AdvertisementCardModel(
+                title = resourceManager.getString(R.string.staking_set_controller_deprecated_title),
+                subtitle = resourceManager.getString(R.string.staking_set_controller_deprecated_subtitle),
+                imageRes = R.drawable.ic_banner_warning,
+                bannerBackgroundRes = R.drawable.ic_banner_yellow_gradient
+            )
+        }
+    }
+
+    private suspend fun getNewControllerAddress(): String {
+        return when(controllerDeprecationStageFlow.first()) {
+            NORMAL -> controllerAccountModel.first().address
+            DEPRECATED -> accountStakingFlow.first().stashAddress
+        }
+    }
+
+    private suspend fun getLearnMoreUrl(): String {
+        return when(controllerDeprecationStageFlow.first()) {
+            NORMAL -> appLinksProvider.setControllerLearnMore
+            DEPRECATED -> appLinksProvider.setControllerDeprecatedLeanMore
+        }
     }
 }
