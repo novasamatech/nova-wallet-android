@@ -13,12 +13,11 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.BuildConfig
 import io.novafoundation.nova.web3names.data.endpoints.TransferRecipientsApi
-import io.novafoundation.nova.web3names.data.integrity.RealWe3NamesIntegrityVerifier
-import io.novafoundation.nova.web3names.data.integrity.Web3NamesIntegrityVerifier
 import io.novafoundation.nova.web3names.data.provider.RealWeb3NamesServiceChainIdProvider
 import io.novafoundation.nova.web3names.data.provider.Web3NamesServiceChainIdProvider
 import io.novafoundation.nova.web3names.data.repository.RealWeb3NamesRepository
 import io.novafoundation.nova.web3names.data.repository.Web3NamesRepository
+import io.novafoundation.nova.web3names.data.serviceEndpoint.W3NServiceEndpointHandlerFactory
 import io.novafoundation.nova.web3names.domain.networking.RealWeb3NamesInteractor
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import javax.inject.Named
@@ -49,29 +48,29 @@ class Web3NamesModule {
 
     @Provides
     @FeatureScope
-    fun provideWe3NamesIntegrityVerifier(): Web3NamesIntegrityVerifier {
-        return RealWe3NamesIntegrityVerifier()
-    }
+    fun provideW3NServiceEndpointHandlerFactory(
+        transferRecipientApi: TransferRecipientsApi,
+        gson: Gson
+    ) = W3NServiceEndpointHandlerFactory(
+        transferRecipientApi,
+        gson
+    )
 
     @Provides
     @FeatureScope
     fun provideWeb3NamesRepository(
         @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
         web3NamesServiceChainIdProvider: Web3NamesServiceChainIdProvider,
-        transferRecipientApi: TransferRecipientsApi,
         caip19MatcherFactory: Caip19MatcherFactory,
         caip19Parser: Caip19Parser,
-        we3NamesIntegrityVerifier: Web3NamesIntegrityVerifier,
-        gson: Gson,
+        w3NServiceEndpointHandlerFactory: W3NServiceEndpointHandlerFactory
     ): Web3NamesRepository {
         return RealWeb3NamesRepository(
             storageDataSource,
             web3NamesServiceChainIdProvider,
-            transferRecipientApi,
             caip19MatcherFactory,
             caip19Parser,
-            we3NamesIntegrityVerifier,
-            gson
+            w3NServiceEndpointHandlerFactory
         )
     }
 
