@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFi
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
+import io.novafoundation.nova.feature_wallet_api.domain.model.findNearestCoinRate
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapOperationLocalToOperation
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapOperationToOperationLocalDb
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -83,14 +84,12 @@ class RealTransactionHistoryRepository(
 
         return operationDao.observe(accountAddress, chain.id, chainAsset.id)
             .transform { operations ->
-                emit(mapOperations(operations, chainAsset, emptyList()))
-                val coinPrices = try {
+                emit(mapOperations(operations, chainAsset, coinPrices = emptyList()))
+                val coinPrices = runCatching {
                     val fromTimestamp = operations.minOf { it.time }.milliseconds.inWholeSeconds
                     val toTimestamp = operations.maxOf { it.time }.milliseconds.inWholeSeconds
                     coinPriceRepository.getCoinPriceRange(chainAsset.priceId!!, currency, fromTimestamp, toTimestamp)
-                } catch (e: Exception) {
-                    emptyList()
-                }
+                }.getOrElse { emptyList() }
                 emit(mapOperations(operations, chainAsset, coinPrices))
             }
             .mapLatest { operations ->
@@ -103,7 +102,7 @@ class RealTransactionHistoryRepository(
     private fun mapOperations(operations: List<OperationLocal>, chainAsset: Chain.Asset, coinPrices: List<HistoricalCoinRate>): List<Operation> {
         return operations.map { operation ->
             val operationTimestamp = operation.time.milliseconds.inWholeSeconds
-            val coinPrice = coinPriceRepository.findNearestCoinRate(coinPrices, operationTimestamp)
+            val coinPrice = coinPrices.findNearestCoinRate(operationTimestamp)
             mapOperationLocalToOperation(operation, chainAsset, coinPrice)
         }
     }

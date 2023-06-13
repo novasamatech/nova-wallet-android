@@ -14,6 +14,4 @@ interface CoinPriceRepository {
     suspend fun getCoinRates(priceIds: Set<String>, currency: Currency): Map<String, CoinRateChange?>
 
     suspend fun getCoinRate(priceId: String, currency: Currency): CoinRateChange?
-
-    fun findNearestCoinRate(coinRates: List<HistoricalCoinRate>, timestamp: Long): HistoricalCoinRate?
 }

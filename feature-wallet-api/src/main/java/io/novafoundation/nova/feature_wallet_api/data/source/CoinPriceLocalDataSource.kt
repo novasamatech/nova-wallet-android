@@ -12,7 +12,5 @@ interface CoinPriceLocalDataSource {
 
     suspend fun getCoinPriceRange(priceId: String, currency: Currency, fromTimestamp: Long, toTimestamp: Long): List<HistoricalCoinRate>
 
-    suspend fun saveCoinPrice(priceId: String, currency: Currency, coinRates: List<HistoricalCoinRate>)
-
-    suspend fun removeAllFor(priceId: String, currency: Currency)
+    suspend fun updateCoinPrice(priceId: String, currency: Currency, coinRate: List<HistoricalCoinRate>)
 }

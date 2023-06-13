@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import io.novafoundation.nova.core_db.model.CoinPriceLocal
 
 @Dao
@@ -41,8 +42,14 @@ interface CoinPriceDao {
     )
     suspend fun getCoinPriceRange(priceId: String, currencyId: String, fromTimestamp: Long, toTimestamp: Long): List<CoinPriceLocal>
 
+    @Transaction
+    suspend fun updateCoinPrices(priceId: String, currencyId: String, coinRates: List<CoinPriceLocal>) {
+        deleteCoinPrices(priceId, currencyId)
+        setCoinPrices(coinRates)
+    }
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun updateCoinPrices(coinPrices: List<CoinPriceLocal>)
+    suspend fun setCoinPrices(coinPrices: List<CoinPriceLocal>)
 
     @Query(
         """

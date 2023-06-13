@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_api.presenatation.account
 
-import io.novafoundation.nova.common.presentation.toShortAddressFormat
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -15,7 +14,7 @@ class AddressDisplayUseCase(
     class Identifier(private val addressToName: Map<String, String?>) {
 
         fun nameOrAddress(address: String): String {
-            return addressToName[address] ?: address.toShortAddressFormat()
+            return addressToName[address] ?: address
         }
     }
 

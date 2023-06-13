@@ -202,7 +202,7 @@ fun mapNodeToOperation(
                 hash = node.extrinsicHash,
                 content = Content.SubstrateCall(module, call),
                 fee = fee,
-                fiatFee = coinRate?.convertPlanks(chainAsset, fee), // TODO We must remove it if we will not use it in history
+                fiatFee = coinRate?.convertPlanks(chainAsset, fee),
                 status = Operation.Status.fromSuccess(success)
             )
         }

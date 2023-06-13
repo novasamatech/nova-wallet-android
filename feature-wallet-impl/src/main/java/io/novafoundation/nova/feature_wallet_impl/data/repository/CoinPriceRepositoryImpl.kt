@@ -64,23 +64,14 @@ class CoinPriceRepositoryImpl(
         return remoteCoinPriceDataSource.getCoinRate(priceId, currency)
     }
 
-    override fun findNearestCoinRate(coinRates: List<HistoricalCoinRate>, timestamp: Long): HistoricalCoinRate? {
-        if (coinRates.isEmpty()) return null
-        if (coinRates.first().timestamp > timestamp) return null // To support the case when the token started trading later than the desired coin rate
-
-        val index = coinRates.binarySearchFloor { it.timestamp.compareTo(timestamp) }
-        return coinRates.getOrNull(index)
-    }
-
     private suspend fun loadAndCacheForAllTime(priceId: String, currency: Currency): List<HistoricalCoinRate> {
         val startCalendar = Calendar.getInstance()
         startCalendar.set(START_SYNCING_YEAR, 0, 0)
-        val from = startCalendar.time.time
+        val from = startCalendar.time.time.milliseconds.inWholeSeconds
         val to = System.currentTimeMillis().milliseconds.inWholeSeconds
         val coinRate = remoteCoinPriceDataSource.getCoinPriceRange(priceId, currency, from, to)
         if (coinRate.isNotEmpty()) {
-            cacheCoinPriceDataSource.removeAllFor(priceId, currency)
-            cacheCoinPriceDataSource.saveCoinPrice(priceId, currency, coinRate)
+            cacheCoinPriceDataSource.updateCoinPrice(priceId, currency, coinRate)
         }
         return coinRate
     }

@@ -53,7 +53,7 @@ class TransactionHistoryAdapter(
     override fun bindChild(holder: GroupedListHolder, position: Int, child: OperationModel, payloads: List<Any>) {
         resolvePayload(holder, position, payloads) {
             when (it) {
-                OperationModel::fiatWithTime -> (holder as TransactionHolder).bindFiatWithTime(child)
+                OperationModel::amountDetails -> (holder as TransactionHolder).bindFiatWithTime(child)
             }
         }
     }
@@ -77,6 +77,7 @@ class TransactionHolder(
 
             bindFiatWithTime(item)
             subHeader.text = item.subHeader
+            subHeader.ellipsize = item.subHeaderEllipsize
             icon.setIcon(item.operationIcon, imageLoader)
 
             if (item.statusAppearance != OperationStatusAppearance.COMPLETED) {
@@ -92,7 +93,7 @@ class TransactionHolder(
     }
 
     fun bindFiatWithTime(item: OperationModel) {
-        containerView.valueSecondary.setTextOrHide(item.fiatWithTime)
+        containerView.valueSecondary.setTextOrHide(item.amountDetails)
     }
 
     override fun unbind() {
@@ -108,7 +109,7 @@ class DayHolder(view: View) : GroupedListHolder(view) {
     }
 }
 
-private object TransactionPayloadGenerator : PayloadGenerator<OperationModel>(OperationModel::fiatWithTime)
+private object TransactionPayloadGenerator : PayloadGenerator<OperationModel>(OperationModel::amountDetails)
 
 object TransactionHistoryDiffCallback : BaseGroupedDiffCallback<DayHeader, OperationModel>(DayHeader::class.java) {
     override fun areGroupItemsTheSame(oldItem: DayHeader, newItem: DayHeader): Boolean {
@@ -128,7 +129,7 @@ object TransactionHistoryDiffCallback : BaseGroupedDiffCallback<DayHeader, Opera
             oldItem.header == newItem.header &&
             oldItem.subHeader == newItem.subHeader &&
             oldItem.amount == newItem.amount &&
-            oldItem.fiatWithTime == newItem.fiatWithTime
+            oldItem.amountDetails == newItem.amountDetails
     }
 
     override fun getChildChangePayload(oldItem: OperationModel, newItem: OperationModel): Any? {

@@ -25,18 +25,14 @@ class CoinPriceLocalDataSourceImpl(
             .map { mapCoinPriceFromLocal(it) }
     }
 
-    override suspend fun saveCoinPrice(priceId: String, currency: Currency, coinRates: List<HistoricalCoinRate>) {
-        coinPriceDao.updateCoinPrices(coinRates.map { mapCoinPriceToLocal(priceId, currency, it) })
-    }
-
-    override suspend fun removeAllFor(priceId: String, currency: Currency) {
-        coinPriceDao.deleteCoinPrices(priceId, currency.code)
+    override suspend fun updateCoinPrice(priceId: String, currency: Currency, coinRate: List<HistoricalCoinRate>) {
+        coinPriceDao.updateCoinPrices(priceId, currency.code, coinRate.map { mapCoinPriceToLocal(priceId, currency, it) })
     }
 
     private fun mapCoinPriceFromLocal(coinPriceLocal: CoinPriceLocal): HistoricalCoinRate {
         return HistoricalCoinRate(
             timestamp = coinPriceLocal.timestamp,
-            value = coinPriceLocal.rate
+            rate = coinPriceLocal.rate
         )
     }
 

@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
+import io.novafoundation.nova.feature_wallet_api.domain.model.findNearestCoinRate
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapNodeToOperation
 import io.novafoundation.nova.feature_wallet_impl.data.network.model.request.SubqueryHistoryRequest
 import io.novafoundation.nova.feature_wallet_impl.data.network.model.response.SubqueryHistoryElementResponse
@@ -103,7 +104,7 @@ abstract class SubstrateAssetHistory(
         val coinPriceRange = getCoinPriceRange(chainAsset, currency, earliestOperationTimestamp, latestOperationTimestamp)
 
         val operations = subqueryResponse.historyElements.nodes.map { node ->
-            val coinRate = coinPriceRepository.findNearestCoinRate(coinPriceRange, node.timestamp)
+            val coinRate = coinPriceRange.findNearestCoinRate(node.timestamp)
             mapNodeToOperation(node, coinRate, chainAsset)
         }
 

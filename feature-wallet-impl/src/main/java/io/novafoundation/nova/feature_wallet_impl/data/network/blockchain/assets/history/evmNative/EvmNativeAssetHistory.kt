@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
 import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.findNearestCoinRate
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.EvmAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanTransactionsApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanNormalTxResponse
@@ -64,7 +65,7 @@ class EvmNativeAssetHistory(
 
         return response.result
             .map {
-                val coinRate = coinPriceRepository.findNearestCoinRate(coinPriceRange, it.timeStamp)
+                val coinRate = coinPriceRange.findNearestCoinRate(it.timeStamp)
                 mapRemoteNormalTxToOperation(it, chainAsset, accountAddress, coinRate)
             }
     }

@@ -66,6 +66,7 @@ class TransactionDetailViewModel(
         coinRate?.convertPlanks(commissionAsset, fee)
             ?.formatAsCurrency(currency)
     }.withSafeLoading()
+        .shareInBackground()
 
     fun backClicked() {
         router.back()

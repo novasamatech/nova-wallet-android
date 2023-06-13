@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFi
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.findNearestCoinRate
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.EvmAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanTransactionsApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanAccountTransfer
@@ -43,12 +44,12 @@ class EvmErc20AssetHistory(
             chainId = chain.id
         )
 
-        val earliestOperationTimestamp = response.result.minOf { it.timeStamp }
-        val latestOperationTimestamp = response.result.maxOf { it.timeStamp }
+        val earliestOperationTimestamp = response.result.minOfOrNull { it.timeStamp }
+        val latestOperationTimestamp = response.result.maxOfOrNull { it.timeStamp }
         val coinPriceRange = getCoinPriceRange(chainAsset, currency, earliestOperationTimestamp, latestOperationTimestamp)
 
         return response.result.map {
-            val coinRate = coinPriceRepository.findNearestCoinRate(coinPriceRange, it.timeStamp)
+            val coinRate = coinPriceRange.findNearestCoinRate(it.timeStamp)
             mapRemoteTransferToOperation(it, chainAsset, accountAddress, coinRate)
         }
     }

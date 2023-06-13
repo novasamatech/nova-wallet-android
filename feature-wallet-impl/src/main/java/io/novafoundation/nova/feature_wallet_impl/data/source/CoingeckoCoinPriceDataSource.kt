@@ -6,27 +6,14 @@ import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteDataSource
-import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 class CoingeckoCoinPriceDataSource(
     private val coingeckoApi: CoingeckoApi,
     private val httpExceptionHandler: HttpExceptionHandler
 ) : CoinPriceRemoteDataSource {
-
-    override suspend fun getCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Long): CoinRate? {
-        val from = timestamp.seconds
-            .minus(5.minutes)
-            .inWholeSeconds
-        val to = timestamp.seconds
-            .plus(5.minutes)
-            .inWholeSeconds
-        return getCoinPriceRange(priceId, currency, from, to).firstOrNull()
-    }
 
     override suspend fun getCoinPriceRange(priceId: String, currency: Currency, fromTimestamp: Long, toTimestamp: Long): List<HistoricalCoinRate> {
         val response = coingeckoApi.getCoinRange(priceId, currency.coingeckoId, fromTimestamp, toTimestamp)
