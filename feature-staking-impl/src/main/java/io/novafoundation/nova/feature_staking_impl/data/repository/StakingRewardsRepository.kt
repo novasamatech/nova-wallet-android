@@ -16,7 +16,7 @@ class StakingRewardsRepository(
     }
 
     suspend fun sync(accountAddress: String, chain: Chain, chainAsset: Chain.Asset, rewardPeriod: RewardPeriod) {
-        stakingRewardsDataSource.sync(accountAddress, chain, chainAsset, rewardPeriod)
+        stakingRewardsDataSource.sync(accountAddress, chain, chainAsset) // TODO: provide reward period
     }
 
     suspend fun clearRewards() {
