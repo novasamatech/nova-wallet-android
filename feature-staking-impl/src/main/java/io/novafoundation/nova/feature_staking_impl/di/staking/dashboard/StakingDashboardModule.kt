@@ -18,7 +18,9 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.RealStakingDashboardUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterFactory
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.RealStakingDashboardRepository
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.RealTotalStakeChainComparatorProvider
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.TotalStakeChainComparatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.dashboard.RealStakingDashboardInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -75,6 +77,10 @@ class StakingDashboardModule {
 
     @Provides
     @FeatureScope
+    fun provideTotalStakeComparatorProvider(): TotalStakeChainComparatorProvider = RealTotalStakeChainComparatorProvider()
+
+    @Provides
+    @FeatureScope
     fun provideInteractor(
         dashboardRepository: StakingDashboardRepository,
         chainRegistry: ChainRegistry,
@@ -82,12 +88,14 @@ class StakingDashboardModule {
         stakingDashboardUpdateSystem: StakingDashboardUpdateSystem,
         dAppMetadataRepository: DAppMetadataRepository,
         walletRepository: WalletRepository,
+        totalStakeChainComparatorProvider: TotalStakeChainComparatorProvider
     ): StakingDashboardInteractor = RealStakingDashboardInteractor(
         dashboardRepository = dashboardRepository,
         chainRegistry = chainRegistry,
         accountRepository = accountRepository,
         stakingDashboardSyncTracker = stakingDashboardUpdateSystem,
         walletRepository = walletRepository,
-        dAppMetadataRepository = dAppMetadataRepository
+        dAppMetadataRepository = dAppMetadataRepository,
+        totalStakeChainComparatorProvider = totalStakeChainComparatorProvider
     )
 }
