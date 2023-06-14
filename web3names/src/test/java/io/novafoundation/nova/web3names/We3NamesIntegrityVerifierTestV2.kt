@@ -52,6 +52,9 @@ class We3NamesIntegrityVerifierTestV2 {
         assertEquals(expectedOutcome, endpointHandler.verifyIntegrity(endpointId, resource))
     }
 
+    /**
+     * Not canonized json
+     */
     private fun testResource(): String {
         return """
 {
