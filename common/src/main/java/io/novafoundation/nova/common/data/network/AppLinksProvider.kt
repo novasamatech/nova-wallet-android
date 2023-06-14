@@ -15,6 +15,7 @@ class AppLinksProvider(
     val recommendedValidatorsLearnMore: String,
     val twitterAccountTemplate: String,
     val setControllerLearnMore: String,
+    val setControllerDeprecatedLeanMore: String,
 
     val paritySignerTroubleShooting: String,
     val polkadotVaultTroubleShooting: String,
