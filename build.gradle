@@ -193,6 +193,8 @@ buildscript {
 
         walletConnectCoreDep = "com.walletconnect:android-core:$walletConnectCoreVersion"
         walletConnectWalletDep = "com.walletconnect:web3wallet:$walletConnectWalletVersion"
+
+        canonizationJsonDep = "io.github.erdtman:java-json-canonicalization:1.1"
     }
 
     repositories {
