@@ -11,7 +11,6 @@ import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.web3names.BuildConfig
 import io.novafoundation.nova.web3names.data.endpoints.TransferRecipientsApi
 import io.novafoundation.nova.web3names.data.provider.RealWeb3NamesServiceChainIdProvider
 import io.novafoundation.nova.web3names.data.provider.Web3NamesServiceChainIdProvider
@@ -28,14 +27,7 @@ class Web3NamesModule {
     @Provides
     @FeatureScope
     fun provideWeb3NamesServiceChainIdProvider(): Web3NamesServiceChainIdProvider {
-        val chainId = if (BuildConfig.DEBUG) {
-            // TODO we should use kilt mainnet in debug as well after all corner-cases will be tested on testnet
-            Chain.Geneses.KILT_TESTNET
-        } else {
-            Chain.Geneses.KILT
-        }
-
-        return RealWeb3NamesServiceChainIdProvider(chainId)
+        return RealWeb3NamesServiceChainIdProvider(Chain.Geneses.KILT)
     }
 
     @Provides
