@@ -29,8 +29,7 @@ android {
 
         buildConfigField "String", "SET_CONTROLLER_LEARN_MORE", "\"https://docs.novawallet.io/nova-wallet-wiki/staking/staking-faq#q-what-are-stash-and-controller-accounts\""
 
-        // TODO use url to nova wiki
-        buildConfigField "String", "SET_CONTROLLER_DEPRECATED_LEARN_MORE", "\"https://forum.polkadot.network/t/staking-controller-deprecation-plan-staking-ui-leads-comms/2748\""
+        buildConfigField "String", "SET_CONTROLLER_DEPRECATED_LEARN_MORE", "\"https://docs.novawallet.io/nova-wallet-wiki/staking/controller-account-deprecation\""
 
         buildConfigField "String", "PARITY_SIGNER_TROUBLESHOOTING", "\"https://docs.novawallet.io/nova-wallet-wiki/welcome-to-nova-wallet/hardware-wallets/parity-signer/troubleshooting\""
         buildConfigField "String", "POLKADOT_VAULT_TROUBLESHOOTING", "\"https://docs.novawallet.io/nova-wallet-wiki/welcome-to-nova-wallet/hardware-wallets/polkadot-vault/troubleshooting\""
