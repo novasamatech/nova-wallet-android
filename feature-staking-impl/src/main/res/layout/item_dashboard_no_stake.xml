@@ -39,6 +39,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:singleLine="true"
             tools:text="Polkadot" />
 
     </com.facebook.shimmer.ShimmerFrameLayout>
@@ -133,5 +135,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="left"
-        app:constraint_referenced_ids="itemDashboardNoStakeEarnings,itemDashboardNoStakeEarningsShimmer, itemDashboardNoStakeEarningsSuffix, itemDashboardNoStakeEarningsSuffixShimmer" />
+        app:constraint_referenced_ids="itemDashboardNoStakeEarningsContainer, itemDashboardNoStakeEarningsSuffixContainer" />
 </merge>
