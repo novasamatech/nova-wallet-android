@@ -333,3 +333,5 @@ inline fun CoroutineScope.withChildScope(action: CoroutineScope.() -> Unit) {
 
     childScope.cancel()
 }
+
+fun <T> List<T>.associateWithIndex() = withIndex().associateBy(keySelector = { it.value }, valueTransform = { it.index })

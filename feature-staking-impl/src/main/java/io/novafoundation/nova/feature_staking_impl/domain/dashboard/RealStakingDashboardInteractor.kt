@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.domain.asLoaded
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.fromOption
 import io.novafoundation.nova.common.domain.map
+import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -22,6 +23,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NotYetResolved
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.SyncingStage
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.WithoutStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MoreStakingOptions
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDApp
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
@@ -29,13 +31,16 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Staking
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.common.stakingChainsById
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.model.StakingDashboardItem
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.TotalStakeChainComparatorProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.priceOf
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
-import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
+import io.novafoundation.nova.runtime.ext.alphabeticalOrder
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.group
+import io.novafoundation.nova.runtime.ext.relaychainsFirstAscendingOrder
 import io.novafoundation.nova.runtime.ext.supportedStakingOptions
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -59,6 +64,7 @@ class RealStakingDashboardInteractor(
     private val stakingDashboardSyncTracker: StakingDashboardSyncTracker,
     private val dAppMetadataRepository: DAppMetadataRepository,
     private val walletRepository: WalletRepository,
+    private val totalStakeChainComparatorProvider: TotalStakeChainComparatorProvider,
 ) : StakingDashboardInteractor {
     override suspend fun syncDapps() {
         runCatching {
@@ -107,6 +113,7 @@ class RealStakingDashboardInteractor(
 
             val assetsFlow = walletRepository.supportedAssetsByIdFlow(metaAccount.id, knownStakingAssets)
             val dApps = dAppMetadataRepository.stakingDAppsFlow()
+                .mapLoading { dapps -> dapps.sortedBy { it.name } }
 
             val dashboardFlow = combine(
                 noPriceDashboardFlow,
@@ -209,7 +216,7 @@ class RealStakingDashboardInteractor(
         return NoPriceMoreStakingOptions(noStake, notYetResolved)
     }
 
-    private fun addPricesToDashboard(
+    private suspend fun addPricesToDashboard(
         noPriceStakingDashboard: NoPriceStakingDashboard,
         assets: Map<FullChainAssetId, Asset>,
     ): ExtendedLoadingState<StakingDashboard> {
@@ -223,7 +230,7 @@ class RealStakingDashboardInteractor(
         ).asLoaded()
     }
 
-    private fun combineNoMoreOptionsInfo(
+    private suspend fun combineNoMoreOptionsInfo(
         noPriceMoreStakingOptions: NoPriceMoreStakingOptions,
         assets: Map<FullChainAssetId, Asset>,
         stakingDApps: ExtendedLoadingState<List<StakingDApp>>,
@@ -369,8 +376,34 @@ class RealStakingDashboardInteractor(
         )
     }
 
-    private fun <S> List<AggregatedStakingDashboardOption<S>>.sortedByChain(): List<AggregatedStakingDashboardOption<S>> {
-        return sortedWith(Chain.defaultComparatorFrom { it.chain })
+    private suspend fun List<AggregatedStakingDashboardOption<WithoutStake>>.sortedByChain(): List<AggregatedStakingDashboardOption<WithoutStake>> {
+        val chainTotalStakeComparator = totalStakeChainComparatorProvider.getTotalStakeComparator()
+
+        return sortedWith(
+            compareBy<AggregatedStakingDashboardOption<WithoutStake>> { it.chain.relaychainsFirstAscendingOrder }
+                .thenByDescending { it.token.priceOf(it.stakingState.availableBalance()) }
+                .thenComparing(Comparator.comparing(AggregatedStakingDashboardOption<*>::chain, chainTotalStakeComparator))
+                .thenBy { it.chain.alphabeticalOrder }
+        )
+    }
+
+    @JvmName("sortedHasStakeByChain")
+    private suspend fun List<AggregatedStakingDashboardOption<HasStake>>.sortedByChain(): List<AggregatedStakingDashboardOption<HasStake>> {
+        val chainTotalStakeComparator = totalStakeChainComparatorProvider.getTotalStakeComparator()
+
+        return sortedWith(
+            compareBy<AggregatedStakingDashboardOption<HasStake>> { it.chain.relaychainsFirstAscendingOrder }
+                .thenByDescending { it.token.priceOf(it.stakingState.stake) }
+                .thenComparing(Comparator.comparing(AggregatedStakingDashboardOption<*>::chain, chainTotalStakeComparator))
+                .thenBy { it.chain.alphabeticalOrder }
+        )
+    }
+
+    private fun WithoutStake.availableBalance(): Balance {
+        return when (this) {
+            is NoStake -> availableBalance
+            NotYetResolved -> Balance.ZERO
+        }
     }
 
     private fun mapItemStatsToOptionStats(itemStats: StakingDashboardItem.StakeState.HasStake.Stats): HasStake.Stats {
