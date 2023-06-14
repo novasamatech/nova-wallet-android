@@ -26,7 +26,7 @@ abstract class W3NServiceEndpointHandler(
         return parseRecipients(recipientsContent)
     }
 
-    protected abstract fun verifyIntegrity(serviceEndpointId: String, serviceEndpointContent: String): Boolean
+    abstract fun verifyIntegrity(serviceEndpointId: String, serviceEndpointContent: String): Boolean
 
     protected abstract fun parseRecipients(content: String): List<W3NRecepient>
 }

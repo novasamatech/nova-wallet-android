@@ -16,14 +16,14 @@ class W3NServiceEndpointHandlerV2(
     private val gson: Gson
 ) : W3NServiceEndpointHandler(endpoint, transferRecipientApi) {
 
-    override fun verifyIntegrity(serviceEndpointId: String, serviceEndpointContent: String): Boolean {
+    override fun verifyIntegrity(serviceEndpointId: String, serviceEndpointContent: String): Boolean = runCatching {
         val expectedHash = Multibase.decode(serviceEndpointId)
         val canonizedJson = JsonCanonicalizer(serviceEndpointContent).encodedString
 
         val actualHash = canonizedJson.encodeToByteArray().blake2b256()
 
-        return expectedHash.contentEquals(actualHash)
-    }
+        expectedHash.contentEquals(actualHash)
+    }.getOrDefault(false)
 
     override fun parseRecipients(content: String): List<W3NRecepient> {
         val fromJson = gson.fromJson<RecipientsByChainV2>(content)
