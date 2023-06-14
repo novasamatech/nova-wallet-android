@@ -17,7 +17,7 @@ enum class ControllersDeprecationStage {
 
 class RealStakingVersioningRepository(
     private val chainRegistry: ChainRegistry,
-): StakingVersioningRepository {
+) : StakingVersioningRepository {
 
     override suspend fun controllersDeprecationStage(chainId: ChainId): ControllersDeprecationStage {
         val runtime = chainRegistry.getRuntime(chainId)

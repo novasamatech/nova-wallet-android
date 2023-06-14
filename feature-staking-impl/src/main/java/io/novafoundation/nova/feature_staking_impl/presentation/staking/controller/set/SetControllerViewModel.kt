@@ -98,7 +98,7 @@ class SetControllerViewModel(
     val showSwitchToStashWarning = combine(controllerDeprecationStageFlow, accountStakingFlow) { controllerDeprecationStage, stakingState ->
         val usingWrongAccountToChangeController = stakingState.isUsingWrongAccountToChangeController()
 
-        when(controllerDeprecationStage) {
+        when (controllerDeprecationStage) {
             NORMAL -> usingWrongAccountToChangeController
 
             // when controllers are deprecated, there is no point to show the switch to stash warning if user has not separate controller
@@ -263,7 +263,7 @@ class SetControllerViewModel(
     }
 
     private fun createBannerContent(deprecationStage: ControllersDeprecationStage): AdvertisementCardModel {
-        return when(deprecationStage) {
+        return when (deprecationStage) {
             NORMAL -> AdvertisementCardModel(
                 title = resourceManager.getString(R.string.staking_set_controller_title),
                 subtitle = resourceManager.getString(R.string.staking_set_controller_subtitle),
@@ -280,14 +280,14 @@ class SetControllerViewModel(
     }
 
     private suspend fun getNewControllerAddress(): String {
-        return when(controllerDeprecationStageFlow.first()) {
+        return when (controllerDeprecationStageFlow.first()) {
             NORMAL -> controllerAccountModel.first().address
             DEPRECATED -> accountStakingFlow.first().stashAddress
         }
     }
 
     private suspend fun getLearnMoreUrl(): String {
-        return when(controllerDeprecationStageFlow.first()) {
+        return when (controllerDeprecationStageFlow.first()) {
             NORMAL -> appLinksProvider.setControllerLearnMore
             DEPRECATED -> appLinksProvider.setControllerDeprecatedLeanMore
         }
