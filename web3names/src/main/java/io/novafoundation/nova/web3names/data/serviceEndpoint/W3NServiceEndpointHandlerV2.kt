@@ -8,7 +8,6 @@ import io.novafoundation.nova.web3names.data.endpoints.model.TransferRecipientDe
 import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import org.erdtman.jcs.JsonCanonicalizer
 
-
 private typealias RecipientsByChainV2 = Map<String, Map<String, TransferRecipientDetailsRemoteV2>>
 
 class W3NServiceEndpointHandlerV2(
