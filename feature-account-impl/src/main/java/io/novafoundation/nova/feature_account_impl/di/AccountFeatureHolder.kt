@@ -8,7 +8,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
-import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSignCommunicator
+import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.AdvancedEncryptionCommunicator
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
@@ -22,7 +22,7 @@ class AccountFeatureHolder @Inject constructor(
     featureContainer: FeatureContainer,
     private val accountRouter: AccountRouter,
     private val advancedEncryptionCommunicator: AdvancedEncryptionCommunicator,
-    private val paritySignerSignCommunicator: ParitySignerSignCommunicator,
+    private val polkadotVaultSignCommunicator: PolkadotVaultVariantSignCommunicator,
     private val ledgerSignCommunicator: LedgerSignCommunicator,
     private val selectAddressCommunicator: SelectAddressCommunicator,
     private val selectWalletCommunicator: SelectWalletCommunicator,
@@ -43,7 +43,7 @@ class AccountFeatureHolder @Inject constructor(
             .create(
                 accountRouter = accountRouter,
                 advancedEncryptionCommunicator = advancedEncryptionCommunicator,
-                paritySignerSignInterScreenCommunicator = paritySignerSignCommunicator,
+                polkadotVaultSignInterScreenCommunicator = polkadotVaultSignCommunicator,
                 ledgerSignInterScreenCommunicator = ledgerSignCommunicator,
                 selectAddressCommunicator = selectAddressCommunicator,
                 selectWalletCommunicator = selectWalletCommunicator,

@@ -20,7 +20,7 @@ class AcknowledgeSigningNotSupportedBottomSheet(
         super.onCreate(savedInstanceState)
 
         title.setText(R.string.account_parity_signer_not_supported_title)
-        subtitle.setText(payload.messageRes)
+        subtitle.text = payload.message
 
         applySolidIconStyle(payload.iconRes)
     }

@@ -37,8 +37,8 @@
     <string name="account_delete_confirmation_title">Забыть кошелек?</string>
     <string name="account_derivation_path_ethereum_invalid_title">Некорректный путь деривации для Ethereum</string>
     <string name="account_derivation_path_substrate_invalid_title">Некорректный путь деривации для Substrate</string>
-    <string name="account_details_parity_signer_alert">Этот кошелек работает в паре с Parity Signer. Nova поможет вам сформировать любые операции, которые вы хотите, и вам будет предложено подписать их с помощью Parity Signer</string>
-    <string name="account_details_parity_signer_not_supported">Не поддерживается Parity Signer</string>
+    <string name="account_details_parity_signer_alert">Этот кошелек работает в паре с %1$s. Nova поможет вам сформировать любые операции, которые вы хотите, и вам будет предложено подписать их с помощью %1$s</string>
+    <string name="account_details_parity_signer_not_supported">Не поддерживается %s</string>
     <string name="account_details_watch_only_alert">Это watch-only кошелек, Nova может показать вам баланс и другую информацию, но вы не можете выполнять какие-либо транзакции с этим кошельком.</string>
     <string name="account_enter_wallet_nickname">Введите имя кошелька...</string>
     <string name="account_error_try_another_one">Пожалуйста, попробуйте другой.</string>
@@ -84,25 +84,30 @@
     <string name="account_needed_title">Необходим аккаунт</string>
     <string name="account_no_chain_projection">Аккаунт не найден</string>
     <string name="account_parity_signer">Parity Signer</string>
-    <string name="account_parity_signer_chain_not_supported">Parity Signer не поддерживает %s</string>
-    <string name="account_parity_signer_import_preview_description">Следующие аккаунты были успешно считаны с Parity Signer</string>
+    <string name="account_parity_signer_chain_not_supported" formatted="false">%s не поддерживает %s</string>
+    <string name="account_parity_signer_import_preview_description">Следующие аккаунты были успешно считаны с %s</string>
     <string name="account_parity_signer_import_preview_title">Вот ваши аккаунты</string>
-    <string name="account_parity_signer_import_scan_invalid_qr">Неверный QR-код, пожалуйста, убедитесь, что вы сканируете QR-код из Parity Signer</string>
+    <string name="account_parity_signer_import_scan_invalid_qr">Неверный QR-код, пожалуйста, убедитесь, что вы сканируете QR-код из %s</string>
     <string name="account_parity_signer_import_start_select_top">Убедитесь, что выбрали самый верхний</string>
     <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Откройте приложение Parity Signer</font> на смартфоне.</string>
     <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Перейдите на вкладку «Ключи». Выберите сид, затем аккаунт</font>, который вы хотите добавить в Nova Wallet.</string>
     <string name="account_parity_signer_import_start_step_3">Parity Signer предоставит вам <font color="#FFFFFF">QR-код для сканирования</font></string>
-    <string name="account_parity_signer_import_start_title">Добавить кошелёк из Parity Signer</string>
-    <string name="account_parity_signer_not_supported_subtitle">Parity Signer не поддерживает подписание произвольных сообщений — только транзакции</string>
+    <string name="account_parity_signer_import_start_title">Добавить кошелёк из %s</string>
+    <string name="account_parity_signer_not_supported_subtitle">%s не поддерживает подписание произвольных сообщений — только транзакции</string>
     <string name="account_parity_signer_not_supported_title">Подписание не поддерживается</string>
-    <string name="account_parity_signer_scan_from">Отсканируйте QR-код из Parity Signer</string>
-    <string name="account_parity_signer_scan_with">Отсканируйте QR-код с помощью Parity Signer</string>
-    <string name="account_parity_signer_sign_have_error">У меня ошибка в Parity Signer</string>
+    <string name="account_parity_signer_scan_from">Отсканируйте QR-код из %s</string>
+    <string name="account_parity_signer_scan_with">Отсканируйте QR-код с помощью %s</string>
+    <string name="account_parity_signer_sign_have_error">У меня ошибка в %s</string>
     <string name="account_parity_signer_sign_qr_code_expired">Срок действия QR-кода истек</string>
-    <string name="account_parity_signer_sign_qr_code_expired_descrition">В целях безопасности сгенерированные операции действительны только в течение %s.\nПожалуйста, сгенерируйте новый QR-код и подпишите его с помощью Parity Signer</string>
+    <string name="account_parity_signer_sign_qr_code_expired_descrition" formatted="false">В целях безопасности сгенерированные операции действительны только в течение %s.\nПожалуйста, сгенерируйте новый QR-код и подпишите его с помощью %s</string>
     <string name="account_parity_signer_sign_qr_code_valid_format">QR-код действителен в течение %s</string>
     <string name="account_parity_signer_sign_qr_invalid_message">Убедитесь, что вы сканируете QR-код для текущей подписываемой операции.</string>
-    <string name="account_parity_signer_sign_title">Подписать с Parity Signer</string>
+    <string name="account_parity_signer_sign_title">Подписать с %s</string>
+    <string name="account_polkadot_vault">Polkadot Vault</string>
+    <string name="account_polkadot_vault_import_start_empty_derivation_hint">Обратите внимание, имя пути деривации должно быть пустым</string>
+    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Откройте приложение Polkadot Vault</font> на своем смартфоне</string>
+    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Перейдите на вкладку «Наборы ключей».</font> Выберите свой набор ключей, сеть, а затем учетную запись, которую вы хотите добавить в Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault предоставит вам <font color="#FFFFFF">QR-код для сканирования</font></string>
     <string name="account_private_key">Приватный ключ</string>
     <string name="account_restore_account">У меня уже есть аккаунт</string>
     <string name="account_seed_hex_symbols">64 шест. символа</string>
@@ -121,7 +126,7 @@
     <string name="account_watch_key_missing_description">Ваш кошелек доступен только для просмотра, то есть вы не можете выполнять с ним никаких операций</string>
     <string name="account_watch_key_missing_title">Упс! Ключ отсутствует</string>
     <string name="account_watch_only">watch-only</string>
-    <string name="account_welcome_hardware_wallet_subtitle">Использовать Parity Signer или Ledger</string>
+    <string name="account_welcome_hardware_wallet_subtitle">Использовать Polkadot Vault, Ledger или Parity Signer</string>
     <string name="account_welcome_hardware_wallet_title">Подключить аппаратный кошелёк</string>
     <string name="accounts_add_chain_account">Добавить %s аккаунт</string>
     <string name="accounts_add_wallet">Добавить кошелёк</string>

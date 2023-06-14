@@ -43,7 +43,8 @@ class AddAccountLauncherProvider(
         when (metaAccount.type) {
             LightMetaAccount.Type.SECRETS -> launchAddFromSecrets(chain, metaAccount)
             LightMetaAccount.Type.WATCH_ONLY -> launchAddWatchOnly(chain, metaAccount)
-            LightMetaAccount.Type.PARITY_SIGNER -> { } // adding chain accounts is not supported for Parity Signer wallets yet
+            // adding chain accounts is not supported for Polkadot Vault like wallets
+            LightMetaAccount.Type.PARITY_SIGNER, LightMetaAccount.Type.POLKADOT_VAULT -> { }
             LightMetaAccount.Type.LEDGER -> launchAddLedger(chain, metaAccount)
         }
     }
