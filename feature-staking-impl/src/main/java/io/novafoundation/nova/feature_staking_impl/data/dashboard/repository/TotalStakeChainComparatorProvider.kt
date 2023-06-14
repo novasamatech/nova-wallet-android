@@ -9,7 +9,7 @@ interface TotalStakeChainComparatorProvider {
     suspend fun getTotalStakeComparator(): Comparator<Chain>
 }
 
-class RealTotalStakeChainComparatorProvider: TotalStakeChainComparatorProvider {
+class RealTotalStakeChainComparatorProvider : TotalStakeChainComparatorProvider {
 
     private val positionByGenesisHash by lazy {
         listOf(

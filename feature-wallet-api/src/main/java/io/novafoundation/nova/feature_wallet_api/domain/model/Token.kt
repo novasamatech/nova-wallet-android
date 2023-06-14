@@ -29,6 +29,6 @@ fun Chain.Asset.amountFromPlanks(amountInPlanks: BigInteger) = amountInPlanks.am
 
 fun Chain.Asset.planksFromAmount(amount: BigDecimal): BigInteger = amount.planksFromAmount(precision)
 
-fun Token.priceOf(planks: Balance) : BigDecimal {
+fun Token.priceOf(planks: Balance): BigDecimal {
     return priceOf(amountFromPlanks(planks))
 }

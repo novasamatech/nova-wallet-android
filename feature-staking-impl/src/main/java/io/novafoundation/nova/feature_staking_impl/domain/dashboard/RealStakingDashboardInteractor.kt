@@ -379,12 +379,12 @@ class RealStakingDashboardInteractor(
     private suspend fun List<AggregatedStakingDashboardOption<WithoutStake>>.sortedByChain(): List<AggregatedStakingDashboardOption<WithoutStake>> {
         val chainTotalStakeComparator = totalStakeChainComparatorProvider.getTotalStakeComparator()
 
-       return sortedWith(
-           compareBy<AggregatedStakingDashboardOption<WithoutStake>> { it.chain.relaychainsFirstAscendingOrder }
-               .thenByDescending { it.token.priceOf(it.stakingState.availableBalance()) }
-               .thenComparing(Comparator.comparing(AggregatedStakingDashboardOption<*>::chain, chainTotalStakeComparator))
-               .thenBy { it.chain.alphabeticalOrder }
-       )
+        return sortedWith(
+            compareBy<AggregatedStakingDashboardOption<WithoutStake>> { it.chain.relaychainsFirstAscendingOrder }
+                .thenByDescending { it.token.priceOf(it.stakingState.availableBalance()) }
+                .thenComparing(Comparator.comparing(AggregatedStakingDashboardOption<*>::chain, chainTotalStakeComparator))
+                .thenBy { it.chain.alphabeticalOrder }
+        )
     }
 
     @JvmName("sortedHasStakeByChain")
@@ -400,7 +400,7 @@ class RealStakingDashboardInteractor(
     }
 
     private fun WithoutStake.availableBalance(): Balance {
-        return when(this) {
+        return when (this) {
             is NoStake -> availableBalance
             NotYetResolved -> Balance.ZERO
         }
