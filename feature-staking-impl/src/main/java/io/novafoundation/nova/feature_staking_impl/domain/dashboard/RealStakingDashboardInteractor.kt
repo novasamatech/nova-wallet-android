@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.domain.asLoaded
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.fromOption
 import io.novafoundation.nova.common.domain.map
+import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -112,6 +113,7 @@ class RealStakingDashboardInteractor(
 
             val assetsFlow = walletRepository.supportedAssetsByIdFlow(metaAccount.id, knownStakingAssets)
             val dApps = dAppMetadataRepository.stakingDAppsFlow()
+                .mapLoading { dapps -> dapps.sortedBy { it.name } }
 
             val dashboardFlow = combine(
                 noPriceDashboardFlow,
