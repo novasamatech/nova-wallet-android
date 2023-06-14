@@ -21,6 +21,7 @@
             tools:titleText="Receive KSM" />
 
         <io.novafoundation.nova.common.view.LabeledTextView
+            style="@style/Widget.Nova.WalletWithAddress"
             android:id="@+id/receiveFrom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan.RealScanImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan.ScanImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.scan.ScanImportParitySignerViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -36,9 +37,16 @@ class ScanImportParitySignerModule {
         router: AccountRouter,
         permissionsAsker: PermissionsAsker.Presentation,
         resourceManager: ResourceManager,
-        interactor: ScanImportParitySignerInteractor
+        interactor: ScanImportParitySignerInteractor,
+        payload: ParitySignerStartPayload,
     ): ViewModel {
-        return ScanImportParitySignerViewModel(router, permissionsAsker, interactor, resourceManager)
+        return ScanImportParitySignerViewModel(
+            router = router,
+            permissionsAsker = permissionsAsker,
+            interactor = interactor,
+            resourceManager = resourceManager,
+            payload = payload
+        )
     }
 
     @Provides

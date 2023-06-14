@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    tools:parentTag="android.widget.LinearLayout"
+    tools:orientation="vertical"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/viewInstructionImageLabel"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="6dp"
+        tools:text="@string/account_parity_signer_import_start_select_top"
+        android:textColor="@color/text_positive"
+        app:drawableStartCompat="@drawable/ic_checkmark_circle_16"
+        app:drawableTint="@color/icon_positive" />
+
+    <ImageView
+        android:id="@+id/viewInstructionImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:adjustViewBounds="true"
+        tools:src="@drawable/my_parity_signer" />
+</merge>

@@ -29,7 +29,9 @@ android {
 
         buildConfigField "String", "SET_CONTROLLER_LEARN_MORE", "\"https://docs.novawallet.io/nova-wallet-wiki/staking/staking-faq#q-what-are-stash-and-controller-accounts\""
 
-        buildConfigField "String", "PARITY_SIGNER_TROUBLESHOOTING", "\"https://github.com/nova-wallet/nova-utils/wiki/Parity-Signer-troubleshooting\""
+        buildConfigField "String", "PARITY_SIGNER_TROUBLESHOOTING", "\"https://docs.novawallet.io/nova-wallet-wiki/welcome-to-nova-wallet/hardware-wallets/parity-signer/troubleshooting\""
+        buildConfigField "String", "POLKADOT_VAULT_TROUBLESHOOTING", "\"https://docs.novawallet.io/nova-wallet-wiki/welcome-to-nova-wallet/hardware-wallets/polkadot-vault/troubleshooting\""
+
         buildConfigField "String", "LEDGER_BLEUTOOTH_GUIDE", "\"https://support.ledger.com/hc/en-us/articles/360019138694-Set-up-Bluetooth-connection\""
     }
 

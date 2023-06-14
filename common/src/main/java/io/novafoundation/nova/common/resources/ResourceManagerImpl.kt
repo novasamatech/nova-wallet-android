@@ -34,6 +34,10 @@ class ResourceManagerImpl(
         return contextManager.getApplicationContext().getString(res, *arguments)
     }
 
+    override fun getText(res: Int): CharSequence {
+        return contextManager.getApplicationContext().getText(res)
+    }
+
     override fun getColor(res: Int): Int {
         return ContextCompat.getColor(contextManager.getApplicationContext(), res)
     }

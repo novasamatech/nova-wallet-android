@@ -11,11 +11,11 @@ import io.novafoundation.nova.common.utils.SharedState
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.feature_account_impl.data.repository.ParitySignerRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.RealParitySignerRepository
-import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.ParitySignerSignCommunicator
+import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
-import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.RealSigningNotSupportedPresentable
+import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 
 @Module
@@ -39,7 +39,7 @@ class ParitySignerModule {
         resourceManager: ResourceManager,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         router: AccountRouter,
-        communicator: ParitySignerSignCommunicator
+        communicator: PolkadotVaultVariantSignCommunicator
     ) = QrCodeExpiredPresentableFactory(resourceManager, actionAwaitableMixinFactory, router, communicator)
 
     @Provides
