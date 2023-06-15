@@ -6,6 +6,6 @@ import retrofit2.http.POST
 
 interface StakingStatsApi {
 
-    @POST("/")
+    @POST("nova-wallet/subquery-staking")
     suspend fun fetchStakingStats(@Body request: StakingStatsRequest): SubQueryResponse<StakingStatsResponse>
 }
