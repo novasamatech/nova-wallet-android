@@ -26,7 +26,7 @@ class StakingUpdateSystem(
 
     override fun getUpdaters(selectedAssetOption: StakingOption): List<Updater> {
         return commonUpdaters + when (selectedAssetOption.additional.stakingType) {
-            UNSUPPORTED-> emptyList()
+            UNSUPPORTED -> emptyList()
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainUpdaters
             PARACHAIN -> parachainUpdaters
             TURING -> parachainUpdaters + turingExtraUpdaters
