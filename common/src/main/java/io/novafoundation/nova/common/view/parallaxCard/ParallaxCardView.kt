@@ -18,7 +18,6 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.getColorOrNull
-import java.util.logging.Handler
 
 private const val DEVICE_ROTATION_ANGLE_RADIUS = 16f
 
