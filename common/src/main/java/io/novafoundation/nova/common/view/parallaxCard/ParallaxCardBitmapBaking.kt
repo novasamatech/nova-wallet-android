@@ -7,9 +7,11 @@ import android.graphics.Paint
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.dpF
+import java.util.concurrent.Executors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -18,7 +20,10 @@ class ParallaxCardBitmapBaking(private val context: Context, val lruCache: Backi
 
     private var callback: OnBakingPreparedCallback? = null
 
-    val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val dispatcher = Executors.newSingleThreadExecutor()
+        .asCoroutineDispatcher() + SupervisorJob()
+
+    val coroutineScope = CoroutineScope(dispatcher)
 
     // Card background bitmap
     var cardBackgroundBitmap: Bitmap? = null
@@ -57,7 +62,7 @@ class ParallaxCardBitmapBaking(private val context: Context, val lruCache: Backi
             try {
                 withContext(Dispatchers.Default) {
                     cardBackgroundBitmap = getBitmapFromCache("cardBackgroundBitmap") {
-                        BitmapFactory.decodeResource(context.resources, R.drawable.ic_parallax_card_background).downscale(0.5f)
+                        BitmapFactory.decodeResource(context.resources, R.drawable.ic_parallax_card_background)
                     }
                     cardHighlightBitmap = getBitmapFromCache("cardHighlightBitmap") {
                         BitmapFactory.decodeResource(context.resources, R.drawable.ic_card_background_highlight).downscale(0.5f)
@@ -83,7 +88,7 @@ class ParallaxCardBitmapBaking(private val context: Context, val lruCache: Backi
                     }.toBitmapWithRect()
                     parallaxThirdBitmap = getBitmapFromCache("parallaxThirdBitmap") {
                         BitmapFactory.decodeResource(context.resources, R.drawable.ic_small_star)
-                            .blurBitmap(4.dp(context))
+                            .blurBitmap(3.dp(context))
                             .convertToAlphaMask()
                     }.toBitmapWithRect()
 
@@ -128,6 +133,7 @@ class ParallaxCardBitmapBaking(private val context: Context, val lruCache: Backi
 
     fun onViewRemove() {
         coroutineScope.cancel()
+        callback = null
     }
 
     fun setBakingPreparedCallback(callback: OnBakingPreparedCallback) {
