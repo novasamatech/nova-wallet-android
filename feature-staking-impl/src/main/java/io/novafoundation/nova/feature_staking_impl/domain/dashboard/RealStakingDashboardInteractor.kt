@@ -42,6 +42,7 @@ import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.ext.relaychainsFirstAscendingOrder
 import io.novafoundation.nova.runtime.ext.supportedStakingOptions
+import io.novafoundation.nova.runtime.ext.testnetsLastAscendingOrder
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
@@ -388,13 +389,10 @@ class RealStakingDashboardInteractor(
     }
 
     @JvmName("sortedHasStakeByChain")
-    private suspend fun List<AggregatedStakingDashboardOption<HasStake>>.sortedByChain(): List<AggregatedStakingDashboardOption<HasStake>> {
-        val chainTotalStakeComparator = totalStakeChainComparatorProvider.getTotalStakeComparator()
-
+    private fun List<AggregatedStakingDashboardOption<HasStake>>.sortedByChain(): List<AggregatedStakingDashboardOption<HasStake>> {
         return sortedWith(
-            compareBy<AggregatedStakingDashboardOption<HasStake>> { it.chain.relaychainsFirstAscendingOrder }
-                .thenByDescending { it.token.priceOf(it.stakingState.stake) }
-                .thenComparing(Comparator.comparing(AggregatedStakingDashboardOption<*>::chain, chainTotalStakeComparator))
+            compareByDescending<AggregatedStakingDashboardOption<HasStake>> { it.token.priceOf(it.stakingState.stake) }
+                .thenBy { it.chain.testnetsLastAscendingOrder }
                 .thenBy { it.chain.alphabeticalOrder }
         )
     }
