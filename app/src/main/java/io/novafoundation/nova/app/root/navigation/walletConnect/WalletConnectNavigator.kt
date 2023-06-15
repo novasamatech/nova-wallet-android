@@ -6,6 +6,8 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.details.WalletConnectSessionDetailsFragment
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.details.WalletConnectSessionDetailsPayload
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsFragment
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 
 class WalletConnectNavigator(navigationHolder: NavigationHolder) : BaseNavigator(navigationHolder), WalletConnectRouter {
     override fun openSessionDetails(payload: WalletConnectSessionDetailsPayload) = performNavigation(
@@ -17,5 +19,8 @@ class WalletConnectNavigator(navigationHolder: NavigationHolder) : BaseNavigator
 
     override fun backToSettings() = performNavigation(R.id.walletConnectSessionDetailsFragment_to_settings)
 
-    override fun openWalletConnectSessions() = performNavigation(R.id.action_mainFragment_to_walletConnectGraph)
+    override fun openWalletConnectSessions(payload: WalletConnectSessionsPayload) = performNavigation(
+        actionId = R.id.action_mainFragment_to_walletConnectGraph,
+        args = WalletConnectSessionsFragment.getBundle(payload)
+    )
 }

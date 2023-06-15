@@ -210,7 +210,8 @@ class BalanceListViewModel(
     fun walletConnectClicked() {
         launch {
             if (walletConnectAccountSessions.first() > 0) {
-                router.openWalletConnectSessions()
+                val metaAccount = selectedMetaAccount.first()
+                router.openWalletConnectSessions(metaAccount.id)
             } else {
                 router.openWalletConnectScan()
             }

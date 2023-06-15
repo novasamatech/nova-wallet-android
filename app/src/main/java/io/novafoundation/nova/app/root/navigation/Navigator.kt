@@ -90,6 +90,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.story.StoryFragm
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 import io.novafoundation.nova.splash.SplashRouter
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.Flow
@@ -444,8 +445,8 @@ class Navigator(
         navController?.navigate(R.id.finish_add_token_flow)
     }
 
-    override fun openWalletConnectSessions() {
-        walletConnectDelegate.openWalletConnectSessions()
+    override fun openWalletConnectSessions(metaId: Long) {
+        walletConnectDelegate.openWalletConnectSessions(WalletConnectSessionsPayload(metaId = metaId))
     }
 
     override fun openWalletConnectScan() {

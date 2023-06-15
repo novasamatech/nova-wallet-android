@@ -136,6 +136,15 @@ class RealWalletConnectSessionInteractor(
         return walletConnectSessionRepository.getSessionAccount(sessionTopic)
     }
 
+    override fun activeSessionsFlow(metaId: Long): Flow<List<WalletConnectSession>> {
+        return walletConnectSessionRepository.sessionAccountsByMetaIdFlow(metaId).map { sessionAccounts ->
+            val activeSessions = Web3Wallet.getListOfActiveSessions()
+            val metaAccount = accountRepository.getMetaAccount(metaId)
+
+            createWalletSessions(activeSessions, listOf(metaAccount), sessionAccounts)
+        }
+    }
+
     override fun activeSessionsFlow(): Flow<List<WalletConnectSession>> {
         return walletConnectSessionRepository.allSessionAccountsFlow().map { sessionAccounts ->
             val activeSessions = Web3Wallet.getListOfActiveSessions()

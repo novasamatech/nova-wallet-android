@@ -29,6 +29,8 @@ interface WalletConnectSessionInteractor {
 
     suspend fun getSessionAccount(sessionTopic: String): WalletConnectSessionAccount?
 
+    fun activeSessionsFlow(metaId: Long): Flow<List<WalletConnectSession>>
+
     fun activeSessionsFlow(): Flow<List<WalletConnectSession>>
 
     fun activeSessionFlow(sessionTopic: String): Flow<WalletConnectSessionDetails?>

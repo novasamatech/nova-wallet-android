@@ -49,7 +49,7 @@ interface AssetsRouter {
 
     fun finishAddTokenFlow()
 
-    fun openWalletConnectSessions()
+    fun openWalletConnectSessions(metaId: Long)
 
     fun openWalletConnectScan()
 }
