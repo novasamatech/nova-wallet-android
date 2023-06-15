@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.si
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
@@ -14,6 +13,7 @@ import io.novafoundation.nova.common.utils.mediatorLiveData
 import io.novafoundation.nova.common.utils.updateFrom
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.formatWithPolkadotVaultLabel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.sign.cancelled
@@ -44,10 +44,10 @@ class ShowSignParitySignerViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val addressDisplayUseCase: AddressDisplayUseCase,
     private val externalActions: ExternalActions.Presentation,
-    private val appLinksProvider: AppLinksProvider,
     private val qrCodeExpiredPresentableFactory: QrCodeExpiredPresentableFactory,
     private val extrinsicValidityUseCase: ExtrinsicValidityUseCase,
     private val resourceManager: ResourceManager,
+    private val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
 ) : BaseViewModel(), ExternalActions by externalActions, Browserable {
 
     private val request = payload.request
@@ -99,8 +99,9 @@ class ShowSignParitySignerViewModel(
         router.openScanParitySignerSignature(payload)
     }
 
-    fun troublesClicked() {
-        openBrowserEvent.value = appLinksProvider.paritySignerTroubleShooting.event()
+    fun troublesClicked() = launch {
+        val variantConfig = polkadotVaultVariantConfigProvider.variantConfigFor(payload.polkadotVaultVariant)
+        openBrowserEvent.value = variantConfig.sign.troubleShootingLink.event()
     }
 
     fun timerFinished() {
