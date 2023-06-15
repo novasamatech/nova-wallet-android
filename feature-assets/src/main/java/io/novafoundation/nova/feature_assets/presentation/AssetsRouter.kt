@@ -50,6 +50,6 @@ interface AssetsRouter {
     fun finishAddTokenFlow()
 
     fun openWalletConnectSessions()
-    
+
     fun openWalletConnectScan()
 }

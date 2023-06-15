@@ -6,14 +6,10 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
-import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawableFromColors
 import io.novafoundation.nova.feature_account_api.R
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
-import kotlinx.android.synthetic.main.view_selected_wallet.view.viewSelectedWalletTypeIcon
 import kotlinx.android.synthetic.main.view_wallet_connect.view.viewWalletConnectConnectedCount
 import kotlinx.android.synthetic.main.view_wallet_connect.view.viewWalletConnectConnectionsIcon
 import kotlinx.android.synthetic.main.view_wallet_connect.view.viewWalletConnectIconContainer

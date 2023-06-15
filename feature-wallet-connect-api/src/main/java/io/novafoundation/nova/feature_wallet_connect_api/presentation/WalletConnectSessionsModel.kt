@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.utils.formatting.format
 
 class WalletConnectSessionsModel(val connections: String?)
 
-
 fun mapNumberOfActiveSessionsToUi(activeSessions: Int): WalletConnectSessionsModel {
     return if (activeSessions > 0) {
         WalletConnectSessionsModel(activeSessions.format())
