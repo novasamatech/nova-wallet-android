@@ -5,20 +5,29 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <io.novafoundation.nova.feature_account_api.view.WalletConnectView
+        android:id="@+id/balanceListWalletConnect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/balanceListTotalTitle"
-        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="33dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginHorizontal="16dp"
         android:ellipsize="end"
         android:includeFontPadding="false"
         android:singleLine="true"
+        android:gravity="center"
         android:textColor="@color/text_primary"
         app:layout_constraintEnd_toStartOf="@+id/balanceListAvatar"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/balanceListWalletConnect"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/full_names" />
 
@@ -68,10 +77,10 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:src="@drawable/ic_search"
-        app:tint="@color/chip_icon"
         app:layout_constraintBottom_toBottomOf="@+id/balanceListFilters"
         app:layout_constraintEnd_toStartOf="@+id/balanceListFilters"
-        app:layout_constraintTop_toTopOf="@+id/balanceListFilters" />
+        app:layout_constraintTop_toTopOf="@+id/balanceListFilters"
+        app:tint="@color/chip_icon" />
 
     <io.novafoundation.nova.common.view.IconButton
         android:id="@+id/balanceListFilters"
@@ -79,20 +88,20 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:src="@drawable/ic_filter"
-        app:tint="@color/chip_icon"
         app:layout_constraintBottom_toBottomOf="@+id/balanceListManage"
         app:layout_constraintEnd_toStartOf="@+id/balanceListManage"
-        app:layout_constraintTop_toTopOf="@+id/balanceListManage" />
+        app:layout_constraintTop_toTopOf="@+id/balanceListManage"
+        app:tint="@color/chip_icon" />
 
     <io.novafoundation.nova.common.view.IconButton
         android:id="@+id/balanceListManage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_options"
-        app:tint="@color/chip_icon"
         app:layout_constraintBottom_toBottomOf="@+id/balanceListAssetTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/balanceListAssetTitle" />
+        app:layout_constraintTop_toTopOf="@+id/balanceListAssetTitle"
+        app:tint="@color/chip_icon" />
 
     <io.novafoundation.nova.common.view.PlaceholderView
         android:id="@+id/balanceListAssetPlaceholder"

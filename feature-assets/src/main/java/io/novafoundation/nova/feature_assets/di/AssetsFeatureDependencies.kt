@@ -46,6 +46,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstan
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
@@ -143,6 +144,8 @@ interface AssetsFeatureDependencies {
     fun ethereumAddressFormat(): EthereumAddressFormat
 
     fun coingeckoApi(): CoingeckoApi
+
+    fun walletConnectSessionsUseCase(): WalletConnectSessionsUseCase
 
     val assetsSourceRegistry: AssetSourceRegistry
 

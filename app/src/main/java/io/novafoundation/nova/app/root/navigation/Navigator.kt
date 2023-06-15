@@ -89,6 +89,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.c
 import io.novafoundation.nova.feature_staking_impl.presentation.story.StoryFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
+import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.splash.SplashRouter
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.Flow
@@ -101,6 +102,7 @@ object BackDelayedNavigation : DelayedNavigation
 
 class Navigator(
     private val navigationHolder: NavigationHolder,
+    private val walletConnectDelegate: WalletConnectRouter,
 ) : BaseNavigator(navigationHolder),
     SplashRouter,
     OnboardingRouter,
@@ -440,6 +442,14 @@ class Navigator(
 
     override fun finishAddTokenFlow() {
         navController?.navigate(R.id.finish_add_token_flow)
+    }
+
+    override fun openWalletConnectSessions() {
+        walletConnectDelegate.openWalletConnectSessions()
+    }
+
+    override fun openWalletConnectScan() {
+        walletConnectDelegate.openScanPairingQrCode()
     }
 
     override fun openNfts() {

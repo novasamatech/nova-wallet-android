@@ -34,11 +34,14 @@ import io.novafoundation.nova.feature_currency_api.presentation.formatters.forma
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.mapNumberOfActiveSessionsToUi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -59,7 +62,8 @@ class BalanceListViewModel(
     private val currencyInteractor: CurrencyInteractor,
     private val balanceBreakdownInteractor: BalanceBreakdownInteractor,
     private val contributionsInteractor: ContributionsInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
 ) : BaseViewModel() {
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
@@ -137,6 +141,15 @@ class BalanceListViewModel(
     }
         .shareInBackground()
 
+    private val walletConnectAccountSessions = selectedMetaAccount.flatMapLatest {
+        walletConnectSessionsUseCase.activeSessionsNumberFlow(it)
+    }
+        .shareInBackground()
+
+    val walletConnectAccountSessionsUI = walletConnectAccountSessions
+        .map(::mapNumberOfActiveSessionsToUi)
+        .shareInBackground()
+
     init {
         selectedCurrency
             .onEach { fullSync() }
@@ -192,6 +205,16 @@ class BalanceListViewModel(
 
     fun searchClicked() {
         router.openAssetSearch()
+    }
+
+    fun walletConnectClicked() {
+        launch {
+            if (walletConnectAccountSessions.first() > 0) {
+                router.openWalletConnectSessions()
+            } else {
+                router.openWalletConnectScan()
+            }
+        }
     }
 
     fun balanceBreakdownClicked() {

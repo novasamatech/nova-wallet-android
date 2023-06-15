@@ -27,8 +27,9 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyToUI
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
-import io.novafoundation.nova.feature_settings_impl.presentation.settings.model.WalletConnectSessionsModel
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectSessionsModel
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.mapNumberOfActiveSessionsToUi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
@@ -221,14 +222,6 @@ class SettingsViewModel(
 
     private fun openLink(link: String) {
         openBrowserEvent.value = link.event()
-    }
-
-    private fun mapNumberOfActiveSessionsToUi(activeSessions: Int): WalletConnectSessionsModel {
-        return if (activeSessions > 0) {
-            WalletConnectSessionsModel(activeSessions.format())
-        } else {
-            WalletConnectSessionsModel(null)
-        }
     }
 
     private fun syncWalletConnectSessions() = launch {

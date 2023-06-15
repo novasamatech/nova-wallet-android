@@ -23,8 +23,7 @@ import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAssets
 import kotlinx.android.synthetic.main.fragment_balance_list.walletContainer
 import javax.inject.Inject
 
-class BalanceListFragment :
-    BaseFragment<BalanceListViewModel>(),
+class BalanceListFragment : BaseFragment<BalanceListViewModel>(),
     BalanceListAdapter.ItemAssetHandler,
     AssetsHeaderAdapter.Handler {
 
@@ -121,6 +120,10 @@ class BalanceListFragment :
             }
             balanceBreakdownBottomSheet?.show()
         }
+
+        viewModel.walletConnectAccountSessionsUI.observe {
+            headerAdapter.setWalletConnectModel(it)
+        }
     }
 
     override fun assetClicked(asset: AssetModel) {
@@ -149,5 +152,9 @@ class BalanceListFragment :
 
     override fun goToNftsClicked() {
         viewModel.goToNftsClicked()
+    }
+
+    override fun walletConnectClicked() {
+        viewModel.walletConnectClicked()
     }
 }

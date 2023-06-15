@@ -41,5 +41,7 @@ class SettingsNavigator(
         walletConnectDelegate.openScanPairingQrCode()
     }
 
-    override fun openWalletConnectSessions() = performNavigation(R.id.action_mainFragment_to_walletConnectGraph)
+    override fun openWalletConnectSessions() {
+        walletConnectDelegate.openWalletConnectSessions()
+    }
 }

@@ -9,6 +9,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWall
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
+import io.novafoundation.nova.feature_assets.presentation.balance.list.model.WalletConnectModel
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectSessionsModel
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAssetPlaceholder
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAvatar
@@ -18,6 +20,7 @@ import kotlinx.android.synthetic.main.item_asset_header.view.balanceListNfts
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListSearch
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalBalance
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalTitle
+import kotlinx.android.synthetic.main.item_asset_header.view.balanceListWalletConnect
 
 class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<HeaderHolder>() {
 
@@ -31,9 +34,12 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         fun avatarClicked()
 
         fun goToNftsClicked()
+
+        fun walletConnectClicked()
     }
 
     private var shouldShowPlaceholder: Boolean = false
+    private var walletConnectModel: WalletConnectSessionsModel? = null
     private var totalBalance: TotalBalanceModel? = null
     private var selectedWalletModel: SelectedWalletModel? = null
     private var nftCountLabel: String? = null
@@ -69,6 +75,12 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         notifyItemChanged(0, Payload.PLACEHOLDER)
     }
 
+    fun setWalletConnectModel(walletConnectModel: WalletConnectSessionsModel) {
+        this.walletConnectModel = walletConnectModel
+
+        notifyItemChanged(0, Payload.WALLET_CONNECT)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
         return HeaderHolder(parent.inflateChild(R.layout.item_asset_header), handler)
     }
@@ -84,13 +96,14 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
                     Payload.NFT_COUNT -> holder.bindNftCount(nftCountLabel)
                     Payload.NFT_PREVIEWS -> holder.bindNftPreviews(nftPreviews)
                     Payload.PLACEHOLDER -> holder.bindPlaceholder(shouldShowPlaceholder)
+                    Payload.WALLET_CONNECT -> holder.bindWalletConnect(walletConnectModel)
                 }
             }
         }
     }
 
     override fun onBindViewHolder(holder: HeaderHolder, position: Int) {
-        holder.bind(totalBalance, selectedWalletModel, nftCountLabel, nftPreviews, shouldShowPlaceholder)
+        holder.bind(totalBalance, selectedWalletModel, nftCountLabel, nftPreviews, shouldShowPlaceholder, walletConnectModel)
     }
 
     override fun getItemCount(): Int {
@@ -99,7 +112,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
 }
 
 private enum class Payload {
-    TOTAL_BALANCE, ADDRESS, NFT_COUNT, NFT_PREVIEWS, PLACEHOLDER
+    TOTAL_BALANCE, ADDRESS, NFT_COUNT, NFT_PREVIEWS, PLACEHOLDER, WALLET_CONNECT
 }
 
 class HeaderHolder(
@@ -109,6 +122,7 @@ class HeaderHolder(
 
     init {
         with(containerView) {
+            balanceListWalletConnect.setOnClickListener { handler.walletConnectClicked() }
             balanceListTotalBalance.setOnClickListener { handler.totalBalanceClicked() }
             balanceListManage.setOnClickListener { handler.manageClicked() }
             balanceListAvatar.setOnClickListener { handler.avatarClicked() }
@@ -123,13 +137,15 @@ class HeaderHolder(
         addressModel: SelectedWalletModel?,
         nftCount: String?,
         nftPreviews: List<NftPreviewUi>?,
-        shouldShowPlaceholder: Boolean
+        shouldShowPlaceholder: Boolean,
+        walletConnect: WalletConnectSessionsModel?,
     ) {
         bindTotalBalance(totalBalance)
         bindAddress(addressModel)
         bindNftPreviews(nftPreviews)
         bindNftCount(nftCount)
         bindPlaceholder(shouldShowPlaceholder)
+        bindWalletConnect(walletConnect)
     }
 
     fun bindNftPreviews(nftPreviews: List<NftPreviewUi>?) = with(containerView) {
@@ -154,5 +170,9 @@ class HeaderHolder(
 
     fun bindPlaceholder(shouldShowPlaceholder: Boolean) = with(containerView) {
         balanceListAssetPlaceholder.setVisible(shouldShowPlaceholder)
+    }
+
+    fun bindWalletConnect(walletConnectModel: WalletConnectSessionsModel?) = walletConnectModel?.let {
+        containerView.balanceListWalletConnect.setConnectionCount(it.connections)
     }
 }
