@@ -169,6 +169,7 @@ fun mapStakingStringToStakingType(stakingString: String?): Chain.Asset.StakingTy
         null -> Chain.Asset.StakingType.UNSUPPORTED
         "relaychain" -> Chain.Asset.StakingType.RELAYCHAIN
         "parachain" -> Chain.Asset.StakingType.PARACHAIN
+        "nomination-pools" -> Chain.Asset.StakingType.NOMINATION_POOLS
         "aura-relaychain" -> Chain.Asset.StakingType.RELAYCHAIN_AURA
         "turing" -> Chain.Asset.StakingType.TURING
         "aleph-zero" -> Chain.Asset.StakingType.ALEPH_ZERO
@@ -184,6 +185,7 @@ fun mapStakingTypeToStakingString(stakingType: Chain.Asset.StakingType): String?
         Chain.Asset.StakingType.RELAYCHAIN_AURA -> "aura-relaychain"
         Chain.Asset.StakingType.TURING -> "turing"
         Chain.Asset.StakingType.ALEPH_ZERO -> "aleph-zero"
+        Chain.Asset.StakingType.NOMINATION_POOLS -> "nomination-pools"
     }
 }
 

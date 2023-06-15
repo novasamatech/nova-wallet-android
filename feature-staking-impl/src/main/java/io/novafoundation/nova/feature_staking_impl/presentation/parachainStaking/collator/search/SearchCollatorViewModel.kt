@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.collator.search.SearchCollatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
@@ -23,9 +24,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
-import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
-import io.novafoundation.nova.runtime.state.chainAsset
+import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
@@ -39,7 +39,7 @@ class SearchCollatorViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val selectCollatorInterScreenResponder: SelectCollatorInterScreenResponder,
     private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
-    private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
+    private val singleAssetSharedState: StakingSharedState,
     private val collatorsUseCase: CollatorsUseCase,
     resourceManager: ResourceManager,
     tokenUseCase: TokenUseCase,
@@ -49,9 +49,9 @@ class SearchCollatorViewModel(
         .share()
 
     private val electedCollators by lazyAsync {
-        val chainAsset = singleAssetSharedState.chainAsset()
+        val stakingOption = singleAssetSharedState.selectedOption()
 
-        collatorRecommendatorFactory.create(chainAsset, scope = viewModelScope)
+        collatorRecommendatorFactory.create(stakingOption, scope = viewModelScope)
             .recommendations(CollatorRecommendationConfig.DEFAULT)
     }
 

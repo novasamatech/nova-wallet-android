@@ -25,6 +25,7 @@ class StakingDashboardUpdaterFactory(
         return when (stakingType.group()) {
             StakingTypeGroup.RELAYCHAIN -> relayChain(chain, stakingType, metaAccount, stakingStatsFlow)
             StakingTypeGroup.PARACHAIN -> parachain(chain, stakingType, metaAccount, stakingStatsFlow)
+            StakingTypeGroup.NOMINATION_POOL -> null // TODO nomination pools
             StakingTypeGroup.UNSUPPORTED -> null
         }
     }

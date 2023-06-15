@@ -1,20 +1,21 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.unbond
 
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.isRedeemableIn
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.chill
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.unbond
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
+import io.novafoundation.nova.runtime.state.selectedOption
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
 
@@ -22,6 +23,7 @@ class UnbondInteractor(
     private val extrinsicService: ExtrinsicService,
     private val stakingRepository: StakingRepository,
     private val eraTimeCalculator: EraTimeCalculatorFactory,
+    private val stakingSharedState: StakingSharedState,
 ) {
 
     suspend fun estimateFee(
@@ -49,12 +51,12 @@ class UnbondInteractor(
     }
 
     fun unbondingsFlow(stakingState: StakingState.Stash): Flow<Unbondings> {
-        return flowOf(stakingState).flatMapLatest { stash ->
-            val calculator = eraTimeCalculator.create(stakingState.chainAsset)
+        return flowOfAll {
+            val calculator = eraTimeCalculator.create(stakingSharedState.selectedOption())
 
             combine(
-                stakingRepository.ledgerFlow(stash),
-                stakingRepository.observeActiveEraIndex(stash.chain.id)
+                stakingRepository.ledgerFlow(stakingState),
+                stakingRepository.observeActiveEraIndex(stakingState.chain.id)
             ) { ledger, activeEraIndex ->
                 val unbondings = ledger.unlocking.mapIndexed { index, unbonding ->
                     val progressState = if (unbonding.isRedeemableIn(activeEraIndex)) {

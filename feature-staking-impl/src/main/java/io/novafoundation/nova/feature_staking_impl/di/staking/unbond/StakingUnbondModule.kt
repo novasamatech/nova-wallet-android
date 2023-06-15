@@ -5,6 +5,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.common.hints.StakingHintsUseCase
@@ -19,7 +20,8 @@ class StakingUnbondModule {
         extrinsicService: ExtrinsicService,
         stakingRepository: StakingRepository,
         eraTimeCalculatorFactory: EraTimeCalculatorFactory,
-    ) = UnbondInteractor(extrinsicService, stakingRepository, eraTimeCalculatorFactory)
+        stakingSharedState: StakingSharedState
+    ) = UnbondInteractor(extrinsicService, stakingRepository, eraTimeCalculatorFactory, stakingSharedState)
 
     @Provides
     @FeatureScope

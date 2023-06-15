@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.TuringAutomationTasksRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.ParachainStakingUnbondPreliminaryValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
@@ -15,7 +16,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.ParachainStakeActionsComponent
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -33,12 +33,12 @@ class TuringStakeActionsComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: ChainWithAsset,
+        stakingOption: StakingOption,
         hostContext: ComponentHostContext
     ): StakeActionsComponent = TuringStakeActionsComponent(
         delegatorStateUseCase = delegatorStateUseCase,
         resourceManager = resourceManager,
-        assetWithChain = assetWithChain,
+        stakingOption = stakingOption,
         hostContext = hostContext,
         router = router,
         validationExecutor = validationExecutor,
@@ -51,7 +51,7 @@ private class TuringStakeActionsComponent(
     delegatorStateUseCase: DelegatorStateUseCase,
     private val resourceManager: ResourceManager,
     private val router: ParachainStakingRouter,
-    assetWithChain: ChainWithAsset,
+    stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
     unbondValidationSystem: ParachainStakingUnbondPreliminaryValidationSystem,
     validationExecutor: ValidationExecutor,
@@ -60,7 +60,7 @@ private class TuringStakeActionsComponent(
     delegatorStateUseCase = delegatorStateUseCase,
     resourceManager = resourceManager,
     router = router,
-    assetWithChain = assetWithChain,
+    stakingOption = stakingOption,
     hostContext = hostContext,
     unbondValidationSystem = unbondValidationSystem,
     validationExecutor = validationExecutor

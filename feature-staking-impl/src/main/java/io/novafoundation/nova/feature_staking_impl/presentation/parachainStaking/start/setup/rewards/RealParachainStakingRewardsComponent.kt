@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.RewardSuffix
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapPeriodReturnsToRewardEstimation
@@ -12,8 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponent.RewardsConfiguration
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponent.State
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
-import io.novafoundation.nova.runtime.state.chainAsset
+import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +23,7 @@ import java.math.BigDecimal
 
 class RealParachainStakingRewardsComponentFactory(
     private val rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
-    private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
+    private val singleAssetSharedState: StakingSharedState,
     private val resourceManager: ResourceManager,
 ) {
 
@@ -41,14 +41,14 @@ class RealParachainStakingRewardsComponentFactory(
 
 private class RealParachainStakingRewardsComponent(
     private val rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
-    private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
+    private val singleAssetSharedState: StakingSharedState,
     private val resourceManager: ResourceManager,
     private val parentScope: CoroutineScope,
     private val assetFlow: Flow<Asset>,
 ) : ParachainStakingRewardsComponent, CoroutineScope by parentScope {
 
     private val rewardCalculator by lazyAsync {
-        rewardCalculatorFactory.create(singleAssetSharedState.chainAsset())
+        rewardCalculatorFactory.create(singleAssetSharedState.selectedOption())
     }
 
     override val events = MutableLiveData<Event<Nothing>>()

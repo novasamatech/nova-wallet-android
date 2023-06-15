@@ -2,9 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.domain.common
 
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.ElectionsSessionRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import java.math.BigInteger
 import kotlin.time.Duration
@@ -64,9 +64,9 @@ class EraTimeCalculatorFactory(
     private val electionsSessionRegistry: ElectionsSessionRegistry,
 ) {
 
-    suspend fun create(chainAsset: Chain.Asset): EraTimeCalculator {
-        val chainId = chainAsset.chainId
-        val electionsSession = electionsSessionRegistry.electionsSessionFor(chainAsset)
+    suspend fun create(stakingOption: StakingOption): EraTimeCalculator {
+        val chainId = stakingOption.assetWithChain.asset.chainId
+        val electionsSession = electionsSessionRegistry.electionsSessionFor(stakingOption)
 
         val activeEra = stakingRepository.getActiveEraIndex(chainId)
 

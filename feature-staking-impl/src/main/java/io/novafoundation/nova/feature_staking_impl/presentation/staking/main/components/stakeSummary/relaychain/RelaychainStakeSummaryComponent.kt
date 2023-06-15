@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.model.NominatorStatus
@@ -19,7 +20,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryState
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
@@ -33,12 +33,12 @@ class RelaychainStakeSummaryComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: ChainWithAsset,
+        stakingOption: StakingOption,
         hostContext: ComponentHostContext
     ): StakeSummaryComponent = RelaychainStakeSummaryComponent(
         stakingInteractor = stakingInteractor,
         resourceManager = resourceManager,
-        assetWithChain = assetWithChain,
+        stakingOption = stakingOption,
         hostContext = hostContext,
         stakingSharedComputation = stakingSharedComputation,
     )
@@ -47,13 +47,13 @@ class RelaychainStakeSummaryComponentFactory(
 private class RelaychainStakeSummaryComponent(
     private val stakingInteractor: StakingInteractor,
     private val stakingSharedComputation: StakingSharedComputation,
-    private val assetWithChain: ChainWithAsset,
+    private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
     private val resourceManager: ResourceManager,
 ) : BaseStakeSummaryComponent(hostContext.scope) {
 
     private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
-        assetWithChain = assetWithChain,
+        assetWithChain = stakingOption.assetWithChain,
         scope = hostContext.scope
     )
 

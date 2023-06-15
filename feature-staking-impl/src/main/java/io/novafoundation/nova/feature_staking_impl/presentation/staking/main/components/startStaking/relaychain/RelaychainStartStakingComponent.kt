@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.calculateMaxPeriodReturns
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationPayload
@@ -20,7 +21,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.StartStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.StartStakingEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.welcomeStakingValidationFailure
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
@@ -38,7 +38,7 @@ class RelaychainStartStakingComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: ChainWithAsset,
+        stakingOption: StakingOption,
         hostContext: ComponentHostContext
     ): StartStakingComponent = RelaychainStartStakingComponent(
         stakingSharedComputation = stakingSharedComputation,
@@ -47,7 +47,7 @@ class RelaychainStartStakingComponentFactory(
         router = router,
         validationSystem = validationSystem,
         validationExecutor = validationExecutor,
-        assetWithChain = assetWithChain,
+        stakingOption = stakingOption,
         hostContext = hostContext
     )
 }
@@ -60,16 +60,16 @@ private class RelaychainStartStakingComponent(
     private val validationSystem: WelcomeStakingValidationSystem,
     private val validationExecutor: ValidationExecutor,
 
-    private val assetWithChain: ChainWithAsset,
+    private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
-) : BaseStartStakingComponent(assetWithChain, hostContext, resourceManager) {
+) : BaseStartStakingComponent(stakingOption, hostContext, resourceManager) {
 
     private val currentSetupProgress = setupStakingSharedState.get<SetupStakingProcess.Initial>()
 
-    private val rewardCalculator = async { stakingSharedComputation.rewardCalculator(assetWithChain.asset, hostContext.scope) }
+    private val rewardCalculator = async { stakingSharedComputation.rewardCalculator(stakingOption, hostContext.scope) }
 
     private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
-        assetWithChain = assetWithChain,
+        assetWithChain = stakingOption.assetWithChain,
         scope = hostContext.scope
     )
 
@@ -95,7 +95,7 @@ private class RelaychainStartStakingComponent(
 
     override suspend fun nextClicked() {
         val payload = WelcomeStakingValidationPayload(
-            chain = assetWithChain.chain,
+            chain = stakingOption.assetWithChain.chain,
             metaAccount = hostContext.selectedAccount.first(),
         )
 

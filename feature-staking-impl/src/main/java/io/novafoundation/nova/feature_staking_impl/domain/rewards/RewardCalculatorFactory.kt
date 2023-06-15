@@ -4,12 +4,13 @@ import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEra
 import io.novafoundation.nova.feature_staking_impl.domain.error.accountIdNotFound
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.NOMINATION_POOLS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
@@ -29,11 +30,11 @@ class RewardCalculatorFactory(
 ) {
 
     suspend fun create(
-        chainAsset: Chain.Asset,
+        stakingOption: StakingOption,
         exposures: AccountIdMap<Exposure>,
         validatorsPrefs: AccountIdMap<ValidatorPrefs?>
     ): RewardCalculator = withContext(Dispatchers.Default) {
-        val totalIssuance = totalIssuanceRepository.getTotalIssuance(chainAsset.chainId)
+        val totalIssuance = totalIssuanceRepository.getTotalIssuance(stakingOption.assetWithChain.chain.id)
 
         val validators = exposures.keys.mapNotNull { accountIdHex ->
             val exposure = exposures[accountIdHex] ?: accountIdNotFound(accountIdHex)
@@ -46,29 +47,28 @@ class RewardCalculatorFactory(
             )
         }
 
-        chainAsset.createRewardCalculator(validators, totalIssuance)
+        stakingOption.createRewardCalculator(validators, totalIssuance)
     }
 
-    suspend fun create(chainAsset: Chain.Asset, scope: CoroutineScope): RewardCalculator = withContext(Dispatchers.Default) {
-        val chainId = chainAsset.chainId
+    suspend fun create(stakingOption: StakingOption, scope: CoroutineScope): RewardCalculator = withContext(Dispatchers.Default) {
+        val chainId = stakingOption.assetWithChain.chain.id
 
         val exposures = shareStakingSharedComputation.get().electedExposuresInActiveEra(chainId, scope)
         val validatorsPrefs = stakingRepository.getValidatorPrefs(chainId, exposures.keys.toList())
 
-        create(chainAsset, exposures, validatorsPrefs)
+        create(stakingOption, exposures, validatorsPrefs)
     }
 
-    private suspend fun Chain.Asset.createRewardCalculator(validators: List<RewardCalculationTarget>, totalIssuance: BigInteger): RewardCalculator {
-        // TODO staking dashboard - switch by selected staking option
-        return when (staking.firstOrNull()) {
+    private suspend fun StakingOption.createRewardCalculator(validators: List<RewardCalculationTarget>, totalIssuance: BigInteger): RewardCalculator {
+        return when (additional.stakingType) {
             RELAYCHAIN, RELAYCHAIN_AURA -> {
-                val activePublicParachains = parasRepository.activePublicParachains(chainId)
+                val activePublicParachains = parasRepository.activePublicParachains(assetWithChain.chain.id)
                 val inflationConfig = InflationConfig.Default(activePublicParachains)
 
                 RewardCurveInflationRewardCalculator(validators, totalIssuance, inflationConfig)
             }
-            ALEPH_ZERO -> AlephZeroRewardCalculator(validators, chainAsset = this)
-            null, UNSUPPORTED, PARACHAIN, TURING -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
+            ALEPH_ZERO -> AlephZeroRewardCalculator(validators, chainAsset = assetWithChain.asset)
+            NOMINATION_POOLS, UNSUPPORTED, PARACHAIN, TURING -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
         }
     }
 }

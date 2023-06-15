@@ -8,11 +8,9 @@ import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.subscribe
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
-import io.novafoundation.nova.runtime.state.assetWithChain
+import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
+import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState.SupportedAssetOption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -22,21 +20,22 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.merge
 import kotlin.coroutines.coroutineContext
 
-abstract class SingleChainUpdateSystem(
+abstract class SingleChainUpdateSystem<A>(
     private val chainRegistry: ChainRegistry,
-    private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
+    private val singleAssetSharedState: SelectedAssetOptionSharedState<A>,
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : UpdateSystem {
 
-    abstract fun getUpdaters(chain: Chain, chainAsset: Chain.Asset): List<Updater>
+    abstract fun getUpdaters(selectedAssetOption: SupportedAssetOption<A>): List<Updater>
 
-    override fun start(): Flow<Updater.SideEffect> = singleAssetSharedState.assetWithChain.flatMapLatest { (chain, chainAsset) ->
+    override fun start(): Flow<Updater.SideEffect> = singleAssetSharedState.selectedOption.flatMapLatest { selectedOption ->
+        val chain = selectedOption.assetWithChain.chain
         val runtimeMetadata = chainRegistry.getRuntime(chain.id).metadata
 
         val logTag = this@SingleChainUpdateSystem.LOG_TAG
         val selfName = this@SingleChainUpdateSystem::class.java.simpleName
 
-        val updaters = getUpdaters(chain, chainAsset)
+        val updaters = getUpdaters(selectedOption)
 
         val scopeFlows = updaters.groupBy(Updater::scope).map { (scope, scopeUpdaters) ->
             scope.invalidationFlow().flatMapLatest {
@@ -67,11 +66,11 @@ abstract class SingleChainUpdateSystem(
 class ConstantSingleChainUpdateSystem(
     private val updaters: List<Updater>,
     chainRegistry: ChainRegistry,
-    singleAssetSharedState: SingleAssetSharedState,
+    singleAssetSharedState: SelectedAssetOptionSharedState<*>,
     storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
-) : SingleChainUpdateSystem(chainRegistry, singleAssetSharedState, storageSharedRequestsBuilderFactory) {
+) : SingleChainUpdateSystem<Any?>(chainRegistry, singleAssetSharedState, storageSharedRequestsBuilderFactory) {
 
-    override fun getUpdaters(chain: Chain, chainAsset: Chain.Asset): List<Updater> {
+    override fun getUpdaters(selectedAssetOption: SupportedAssetOption<Any?>): List<Updater> {
         return updaters
     }
 }
