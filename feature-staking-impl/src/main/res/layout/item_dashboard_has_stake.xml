@@ -13,10 +13,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="4dp"
         app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toStartOf="@+id/itemDashboardHasStakeRightSection"
+        app:layout_constraintEnd_toStartOf="@+id/itemDashboardHasStakeStakingType"
         app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -26,6 +27,19 @@
             android:layout_height="wrap_content" />
 
     </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.StakingTypeBadgeView
+        android:id="@+id/itemDashboardHasStakeStakingType"
+        android:layout_width="wrap_content"
+        tools:text="@string/nomination_pools_direct"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        style="@style/Widget.Nova.StakingTypeBadge.Medium"
+        app:layout_constraintBottom_toBottomOf="@+id/itemDashboardHasStakeChainContainer"
+        app:layout_constraintEnd_toStartOf="@+id/itemDashboardHasStakeRightSection"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/itemDashboardHasStakeChainContainer"
+        app:layout_constraintTop_toTopOf="@+id/itemDashboardHasStakeChainContainer" />
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/itemDashboardHasStakeRewardsLabelСontainer"

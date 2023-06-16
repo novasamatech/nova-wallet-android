@@ -15,6 +15,7 @@ class AggregatedStakingDashboardOption<out S>(
 ) {
 
     class HasStake(
+        val showStakingType: Boolean,
         val stakingType: Chain.Asset.StakingType,
         val stake: Balance,
         val stats: ExtendedLoadingState<Stats>,
@@ -35,7 +36,7 @@ class AggregatedStakingDashboardOption<out S>(
 
             class Aggregated(val stakingTypes: List<Chain.Asset.StakingType>) : FlowType()
 
-            class Single(val stakingType: Chain.Asset.StakingType) : FlowType()
+            class Single(val stakingType: Chain.Asset.StakingType, val showStakingType: Boolean) : FlowType()
         }
 
         class Stats(val estimatedEarnings: Percent)
