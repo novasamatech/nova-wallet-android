@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondInteractor
@@ -28,7 +29,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.mainStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
@@ -55,7 +55,7 @@ class RelaychainUnbondingComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: ChainWithAsset,
+        stakingOption: StakingOption,
         hostContext: ComponentHostContext,
     ): UnbondingComponent = RelaychainUnbondingComponent(
         unbondInteractor = unbondInteractor,
@@ -66,7 +66,7 @@ class RelaychainUnbondingComponentFactory(
         router = router,
         hostContext = hostContext,
         stakingSharedComputation = stakingSharedComputation,
-        assetWithChain = assetWithChain
+        stakingOption = stakingOption
     )
 }
 
@@ -79,7 +79,7 @@ private class RelaychainUnbondingComponent(
     private val router: StakingRouter,
     private val resourceManager: ResourceManager,
 
-    private val assetWithChain: ChainWithAsset,
+    private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
 ) : UnbondingComponent,
     CoroutineScope by hostContext.scope,
@@ -88,7 +88,7 @@ private class RelaychainUnbondingComponent(
     override val events = MutableLiveData<Event<UnbondingEvent>>()
 
     private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
-        assetWithChain = assetWithChain,
+        assetWithChain = stakingOption.assetWithChain,
         scope = hostContext.scope
     )
 

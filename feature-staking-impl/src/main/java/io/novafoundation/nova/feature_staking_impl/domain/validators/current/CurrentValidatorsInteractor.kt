@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.controller
 import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.controllerAccountAccess
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorSource
-import io.novafoundation.nova.runtime.state.chainAndAsset
+import io.novafoundation.nova.runtime.state.selectedOption
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -43,7 +43,8 @@ class CurrentValidatorsInteractor(
             return flowOf(emptyGroupedList())
         }
 
-        val (chain, chainAsset) = stakingSharedState.chainAndAsset()
+        val stakingOption = stakingSharedState.selectedOption()
+        val chain = stakingOption.assetWithChain.chain
         val chainId = chain.id
 
         return stakingRepository.observeActiveEraIndex(chainId).map { activeEra ->
@@ -62,8 +63,7 @@ class CurrentValidatorsInteractor(
             val maxRewardedNominators = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
             val groupedByStatusClass = validatorProvider.getValidators(
-                chain = chain,
-                chainAsset = chainAsset,
+                stakingOption = stakingOption,
                 source = ValidatorSource.Custom(nominatedValidatorIds.toList()),
                 scope = scope
             )

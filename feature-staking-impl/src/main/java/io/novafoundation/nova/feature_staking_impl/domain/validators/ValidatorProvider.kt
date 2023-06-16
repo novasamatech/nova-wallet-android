@@ -4,12 +4,12 @@ import io.novafoundation.nova.common.utils.toHexAccountId
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEra
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.runtime.ext.addressOf
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import kotlinx.coroutines.CoroutineScope
@@ -30,11 +30,11 @@ class ValidatorProvider(
 ) {
 
     suspend fun getValidators(
-        chain: Chain,
-        chainAsset: Chain.Asset,
+        stakingOption: StakingOption,
         source: ValidatorSource,
         scope: CoroutineScope,
     ): List<Validator> {
+        val chain = stakingOption.assetWithChain.chain
         val chainId = chain.id
 
         val electedValidatorExposures = stakingSharedComputation.electedExposuresInActiveEra(chainId, scope)
@@ -51,7 +51,7 @@ class ValidatorProvider(
         val identities = identityRepository.getIdentitiesFromIdsHex(chainId, requestedValidatorIds)
         val slashes = stakingRepository.getSlashes(chainId, requestedValidatorIds)
 
-        val rewardCalculator = rewardCalculatorFactory.create(chainAsset, electedValidatorExposures, validatorPrefs)
+        val rewardCalculator = rewardCalculatorFactory.create(stakingOption, electedValidatorExposures, validatorPrefs)
         val maxNominators = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
         return requestedValidatorIds.map { accountIdHex ->

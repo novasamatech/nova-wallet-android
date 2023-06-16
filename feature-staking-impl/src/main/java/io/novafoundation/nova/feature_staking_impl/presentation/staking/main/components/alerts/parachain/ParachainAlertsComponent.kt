@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.alerts.ParachainStakingAlert
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.alerts.ParachainStakingAlertsInteractor
@@ -18,7 +19,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.parachainStaking.loadDelegatingState
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -32,13 +32,13 @@ class ParachainAlertsComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: ChainWithAsset,
+        stakingOption: StakingOption,
         hostContext: ComponentHostContext,
     ): AlertsComponent = ParachainAlertsComponent(
         delegatorStateUseCase = delegatorStateUseCase,
         interactor = interactor,
         resourceManager = resourceManager,
-        assetWithChain = assetWithChain,
+        stakingOption = stakingOption,
         hostContext = hostContext,
         router = router
     )
@@ -49,7 +49,7 @@ private class ParachainAlertsComponent(
     private val interactor: ParachainStakingAlertsInteractor,
     private val resourceManager: ResourceManager,
 
-    private val assetWithChain: ChainWithAsset,
+    private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
     private val router: ParachainStakingRouter
 ) : AlertsComponent,
@@ -60,7 +60,7 @@ private class ParachainAlertsComponent(
 
     override val state = delegatorStateUseCase.loadDelegatingState(
         hostContext = hostContext,
-        assetWithChain = assetWithChain,
+        assetWithChain = stakingOption.assetWithChain,
         stateProducer = ::stateFor
     )
         .shareInBackground()

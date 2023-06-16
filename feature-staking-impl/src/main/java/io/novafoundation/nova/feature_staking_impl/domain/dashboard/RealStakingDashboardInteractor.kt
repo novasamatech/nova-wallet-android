@@ -445,6 +445,7 @@ class RealStakingDashboardInteractor(
         return when (stakingType.group()) {
             StakingTypeGroup.RELAYCHAIN -> freeInPlanks
             StakingTypeGroup.PARACHAIN -> freeInPlanks
+            StakingTypeGroup.NOMINATION_POOL -> transferableInPlanks
             StakingTypeGroup.UNSUPPORTED -> Balance.ZERO
         }
     }

@@ -7,6 +7,8 @@ import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState.SupportedAssetOption
 import kotlinx.coroutines.flow.Flow
 
+typealias StakingOption = SupportedAssetOption<StakingSharedState.OptionAdditionalData>
+
 class StakingSharedState : SelectedAssetOptionSharedState<StakingSharedState.OptionAdditionalData> {
 
     class OptionAdditionalData(val stakingType: Chain.Asset.StakingType)

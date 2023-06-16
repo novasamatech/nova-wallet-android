@@ -15,13 +15,13 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsState
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onStart
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import kotlinx.coroutines.flow.transformLatest
 
 class RelaychainUserRewardsComponentFactory(
@@ -32,11 +32,11 @@ class RelaychainUserRewardsComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: ChainWithAsset,
+        stakingOption: StakingOption,
         hostContext: ComponentHostContext
     ): UserRewardsComponent = RelaychainUserRewardsComponent(
         stakingInteractor = stakingInteractor,
-        assetWithChain = assetWithChain,
+        stakingOption = stakingOption,
         hostContext = hostContext,
         stakingSharedComputation = stakingSharedComputation,
         rewardPeriodsInteractor = rewardPeriodsInteractor,
@@ -47,14 +47,14 @@ class RelaychainUserRewardsComponentFactory(
 private class RelaychainUserRewardsComponent(
     private val stakingInteractor: StakingInteractor,
     private val stakingSharedComputation: StakingSharedComputation,
-    private val assetWithChain: ChainWithAsset,
+    private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
     private val rewardPeriodsInteractor: StakingRewardPeriodInteractor,
     private val resourceManager: ResourceManager
 ) : BaseRewardComponent(hostContext) {
 
     private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
-        assetWithChain = assetWithChain,
+        assetWithChain = stakingOption.assetWithChain,
         scope = hostContext.scope
     )
 
@@ -87,7 +87,7 @@ private class RelaychainUserRewardsComponent(
     }
 
     private fun rewardsFlow(stakingState: StakingState.Stash): Flow<LoadingState<AmountModel>> = combine(
-        stakingInteractor.observeUserRewards(stakingState, assetWithChain.chain, assetWithChain.asset),
+        stakingInteractor.observeUserRewards(stakingState, stakingOption.assetWithChain.chain, stakingOption.assetWithChain.asset),
         hostContext.assetFlow
     ) { totalReward, asset ->
         mapAmountToAmountModel(totalReward, asset)
@@ -96,7 +96,7 @@ private class RelaychainUserRewardsComponent(
     private fun syncStakingRewards() {
         val stashAccountStakingStateFlow = selectedAccountStakingStateFlow.filterIsInstance<StakingState.Stash>()
         combine(stashAccountStakingStateFlow, rewardPeriodState) { staking, period ->
-            stakingInteractor.syncStakingRewards(staking, assetWithChain.chain, assetWithChain.asset, period)
+            stakingInteractor.syncStakingRewards(staking, stakingOption.assetWithChain.chain, stakingOption.assetWithChain.asset, period)
         }
             .inBackground()
             .launchIn(this)
