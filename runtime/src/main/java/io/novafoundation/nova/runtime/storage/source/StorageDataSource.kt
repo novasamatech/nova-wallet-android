@@ -52,6 +52,16 @@ interface StorageDataSource {
         at: BlockHash? = null,
         subscribe: suspend StorageQueryContext.() -> Flow<R>
     ): Flow<R>
+
+    /**
+     * Aggregates all requests called via [subscribe] block and executes them as a single batch request, if possible
+     * Lifecycle of subscription is bound to parent coroutine
+     */
+    suspend fun <R> subscribeBatched(
+        chainId: String,
+        at: BlockHash? = null,
+        subscribe: suspend StorageQueryContext.() -> Flow<R>
+    ): Flow<R>
 }
 
 suspend inline fun <T> StorageDataSource.queryNonNull(

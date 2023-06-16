@@ -49,7 +49,7 @@ interface StakingRepository {
 
     suspend fun ledgerFlow(stakingState: StakingState.Stash): Flow<StakingLedger>
 
-    suspend fun ledger(chainId: ChainId, address: String): StakingLedger?
+    suspend fun ledger(chainId: ChainId, accountId: AccountId): StakingLedger?
 
     suspend fun getRewardDestination(stakingState: StakingState.Stash): RewardDestination
 

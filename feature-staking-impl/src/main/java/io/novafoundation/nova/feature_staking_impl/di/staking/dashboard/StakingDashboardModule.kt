@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.Rea
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.RealTotalStakeChainComparatorProvider
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.TotalStakeChainComparatorProvider
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolBalanceRepository
 import io.novafoundation.nova.feature_staking_impl.domain.dashboard.RealStakingDashboardInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -54,8 +55,9 @@ class StakingDashboardModule {
     @FeatureScope
     fun provideStakingDashboardUpdaterFactory(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
-        stakingDashboardCache: StakingDashboardCache
-    ) = StakingDashboardUpdaterFactory(stakingDashboardCache, remoteStorageSource)
+        stakingDashboardCache: StakingDashboardCache,
+        nominationPoolBalanceRepository: NominationPoolBalanceRepository,
+    ) = StakingDashboardUpdaterFactory(stakingDashboardCache, remoteStorageSource, nominationPoolBalanceRepository)
 
     @Provides
     @FeatureScope
