@@ -39,12 +39,12 @@ class ParallaxCardBitmapBaking(private val context: Context, val lruCache: Backi
     var parallaxHighlightBitmap: Bitmap? = null
         private set
 
-    // Paralax bitmaps
+    // Parallax bitmaps
     var parallaxFirstBitmap: BitmapWithRect? = null
     var parallaxSecondBitmap: BitmapWithRect? = null
     var parallaxThirdBitmap: BitmapWithRect? = null
 
-    // Paralax bitmaps blurred
+    // Parallax bitmaps blurred
     var parallaxFirstBlurredBitmap: BitmapWithRect? = null
     var parallaxSecondBlurredBitmap: BitmapWithRect? = null
     var parallaxThirdBlurredBitmap: BitmapWithRect? = null
