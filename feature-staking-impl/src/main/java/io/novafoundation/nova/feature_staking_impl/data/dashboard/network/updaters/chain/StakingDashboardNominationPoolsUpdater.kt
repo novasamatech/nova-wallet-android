@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain
 
-import android.util.Log
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
@@ -30,7 +29,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.transformLatest
 
 class StakingDashboardNominationPoolsUpdater(
@@ -65,8 +63,6 @@ class StakingDashboardNominationPoolsUpdater(
             .flatMapLatest(::subscribeToPoolWithBalance)
 
         return combine(poolMemberFlow, pollWithBalanceFlow) { poolMember, poolWithBalance ->
-            Log.d("RX", "Constructing on chain info")
-
             if (poolMember != null && poolWithBalance != null) {
                 PoolsOnChainInfo(poolMember, poolWithBalance)
             } else {
@@ -80,10 +76,10 @@ class StakingDashboardNominationPoolsUpdater(
 
         return remoteStorageSource.subscribeBatched(chain.id) {
             combine(
-                metadata.nominationPools.bondedPools.observeNonNull(poolId.value).onEach { Log.d("RX", "Got bonded pool update") },
-                nominationPoolBalanceRepository.observeBondedBalance(poolId).onEach { Log.d("RX", "Got pool balance update") },
+                metadata.nominationPools.bondedPools.observeNonNull(poolId.value),
+                nominationPoolBalanceRepository.observeBondedBalance(poolId),
                 ::PoolWithBalance
-            ).onEach { Log.d("RX", "Constructed pool with balance") }
+            )
         }
     }
 
