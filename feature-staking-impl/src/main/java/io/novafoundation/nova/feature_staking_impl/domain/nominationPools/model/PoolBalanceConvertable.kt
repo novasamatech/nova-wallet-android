@@ -15,7 +15,6 @@ interface PoolBalanceConvertable {
 val PoolBalanceConvertable.balanceToPointsRatio: BigDecimal
     get() = poolBalance.divideToDecimal(poolPoints.value)
 
-
 fun PoolBalanceConvertable.amountOf(memberPoints: PoolPoints): Balance {
     return (balanceToPointsRatio * memberPoints.value.toBigDecimal()).toBigInteger()
 }

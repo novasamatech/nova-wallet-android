@@ -20,7 +20,7 @@ interface NominationPoolBalanceRepository {
 
 class RealNominationPoolBalanceRepository(
     private val poolAccountDerivation: PoolAccountDerivation
-): NominationPoolBalanceRepository {
+) : NominationPoolBalanceRepository {
 
     context(StorageQueryContext)
     override suspend fun observeBondedBalance(poolId: PoolId): Flow<Balance> {

@@ -83,7 +83,6 @@ class StakingDashboardNominationPoolsUpdater(
         }
     }
 
-
     private suspend fun saveItem(
         relaychainStakingBaseInfo: PoolsOnChainInfo?,
     ) = stakingDashboardCache.update { fromCache ->

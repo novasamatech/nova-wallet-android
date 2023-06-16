@@ -7,7 +7,7 @@ class BondedPool(
     val points: PoolPoints,
 )
 
-fun bindBondedPool(decoded: Any, poolId: PoolId) : BondedPool {
+fun bindBondedPool(decoded: Any, poolId: PoolId): BondedPool {
     val asStruct = decoded.castToStruct()
 
     return BondedPool(

@@ -9,7 +9,7 @@ class PoolMember(
     val points: PoolPoints,
 )
 
-fun bindPoolMember(decoded: Any, accountId: AccountId) : PoolMember {
+fun bindPoolMember(decoded: Any, accountId: AccountId): PoolMember {
     val asStruct = decoded.castToStruct()
 
     return PoolMember(

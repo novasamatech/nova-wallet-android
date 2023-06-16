@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.map
 
 typealias QueryableStorageBinder1<K, V> = (dynamicInstance: Any, key: K) -> V
 
-interface QueryableStorageEntry1<I, T: Any> {
+interface QueryableStorageEntry1<I, T : Any> {
 
     context(StorageQueryContext)
     suspend fun query(argument: I): T?
@@ -20,21 +20,21 @@ interface QueryableStorageEntry1<I, T: Any> {
 }
 
 context(StorageQueryContext)
-suspend fun <I, T: Any> QueryableStorageEntry1<I, T>.observeNonNull(argument: I): Flow<T> = observe(argument).map { it!! }
+suspend fun <I, T : Any> QueryableStorageEntry1<I, T>.observeNonNull(argument: I): Flow<T> = observe(argument).map { it!! }
 
-internal class RealQueryableStorageEntry1<I, T: Any>(
+internal class RealQueryableStorageEntry1<I, T : Any>(
     private val storageEntry: StorageEntry,
     private val binding: QueryableStorageBinder1<I, T>
-): QueryableStorageEntry1<I, T>{
+) : QueryableStorageEntry1<I, T> {
 
     context(StorageQueryContext)
     override suspend fun query(argument: I): T? {
-        return storageEntry.query(argument, binding = { decoded -> decoded?.let { binding(it, argument) }})
+        return storageEntry.query(argument, binding = { decoded -> decoded?.let { binding(it, argument) } })
     }
 
     context(StorageQueryContext)
     override suspend fun observe(argument: I): Flow<T?> {
-        return storageEntry.observe(argument, binding = { decoded -> decoded?.let { binding(it, argument) }})
+        return storageEntry.observe(argument, binding = { decoded -> decoded?.let { binding(it, argument) } })
     }
 
     context(StorageQueryContext)

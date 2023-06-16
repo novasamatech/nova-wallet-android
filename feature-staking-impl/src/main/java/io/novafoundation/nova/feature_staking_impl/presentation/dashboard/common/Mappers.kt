@@ -87,7 +87,7 @@ class RealStakingDashboardPresentationMapper(
     }
 
     private fun FlowType.displayableStakingType(): StakingType? {
-        return when(this) {
+        return when (this) {
             is FlowType.Aggregated -> null
             is FlowType.Single -> stakingType.takeIf { showStakingType }
         }

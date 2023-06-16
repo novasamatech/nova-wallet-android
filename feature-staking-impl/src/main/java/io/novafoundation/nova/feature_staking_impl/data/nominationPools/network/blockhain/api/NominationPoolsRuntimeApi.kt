@@ -22,7 +22,6 @@ context(StorageQueryContext)
 val RuntimeMetadata.nominationPools: NominationPoolsApi
     get() = NominationPoolsApi(nominationPools())
 
-
 context(StorageQueryContext)
 val NominationPoolsApi.bondedPools: QueryableStorageEntry1<PoolIdRaw, BondedPool>
     get() = storage1("BondedPools", binding = { decoded, poolIdRaw -> bindBondedPool(decoded, PoolId(poolIdRaw)) })

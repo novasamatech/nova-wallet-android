@@ -18,7 +18,6 @@ context(StorageQueryContext)
 val RuntimeMetadata.staking: StakingRuntimeApi
     get() = StakingRuntimeApi(staking())
 
-
 context(StorageQueryContext)
 val StakingRuntimeApi.ledger: QueryableStorageEntry1<AccountId, StakingLedger>
     get() = storage1("Ledger", binding = { decoded, _ -> bindStakingLedger(decoded) })
