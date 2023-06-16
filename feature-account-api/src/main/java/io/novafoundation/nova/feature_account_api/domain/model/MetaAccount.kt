@@ -31,7 +31,7 @@ interface LightMetaAccount {
     val type: Type
 
     enum class Type {
-        SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER
+        SECRETS, WATCH_ONLY, PARITY_SIGNER, LEDGER, POLKADOT_VAULT
     }
 }
 
@@ -174,3 +174,21 @@ private fun MultiChainEncryption.Companion.substrateFrom(cryptoType: CryptoType)
 }
 
 fun MetaAccount.chainAccountFor(chainId: ChainId) = chainAccounts.getValue(chainId)
+
+fun LightMetaAccount.Type.isPolkadotVaultLike(): Boolean {
+    return asPolkadotVaultVariantOrNull() != null
+}
+
+fun LightMetaAccount.Type.asPolkadotVaultVariantOrNull(): PolkadotVaultVariant? {
+    return when (this) {
+        LightMetaAccount.Type.PARITY_SIGNER -> PolkadotVaultVariant.PARITY_SIGNER
+        LightMetaAccount.Type.POLKADOT_VAULT -> PolkadotVaultVariant.POLKADOT_VAULT
+        else -> null
+    }
+}
+
+fun LightMetaAccount.Type.asPolkadotVaultVariantOrThrow(): PolkadotVaultVariant {
+    return requireNotNull(asPolkadotVaultVariantOrNull()) {
+        "Not a Polkadot Vault compatible account type"
+    }
+}

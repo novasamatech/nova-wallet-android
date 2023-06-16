@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.common.chainAcco
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
 import kotlinx.android.synthetic.main.fragment_import_parity_signer_preview.previewImportParitySignerAccounts
 import kotlinx.android.synthetic.main.fragment_import_parity_signer_preview.previewImportParitySignerContinue
+import kotlinx.android.synthetic.main.fragment_import_parity_signer_preview.previewImportParitySignerDescription
 import kotlinx.android.synthetic.main.fragment_import_parity_signer_preview.previewImportParitySignerToolbar
 import javax.inject.Inject
 
@@ -71,6 +72,8 @@ class PreviewImportParitySignerFragment : BaseFragment<PreviewImportParitySigner
         setupExternalActions(viewModel)
 
         viewModel.chainAccountProjections.observe(adapter::submitList)
+
+        previewImportParitySignerDescription.text = viewModel.title
     }
 
     override fun chainAccountClicked(item: AccountInChainUi) {

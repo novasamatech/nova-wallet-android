@@ -54,6 +54,9 @@ class ScanSignParitySignerFragment : ScanQrFragment<ScanSignParitySignerViewMode
     override fun subscribe(viewModel: ScanSignParitySignerViewModel) {
         super.subscribe(viewModel)
 
+        signParitySignerScanToolbar.setTitle(viewModel.title)
+        scanView.setTitle(viewModel.scanLabel)
+
         setupQrCodeExpiration(
             validityPeriodFlow = viewModel.validityPeriodFlow,
             qrCodeExpiredPresentable = viewModel.qrCodeExpiredPresentable,

@@ -17,7 +17,7 @@ android {
 
         buildConfigField "String", "TEST_CHAINS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/tests/chains_for_testBalance.json\""
 
-        buildConfigField "String", "INFURA_API_KEY", readSecret("INFURA_API_KEY")
+        buildConfigField "String", "INFURA_API_KEY", readStringSecret("INFURA_API_KEY")
     }
 
     buildTypes {

@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="account_parity_signer_sign_qr_code_expired_descrition">For security reasons generated operations valid for only %s.\nPlease generate new QR code and sign it with %s</string>
+    <string name="account_parity_signer_import_scan_invalid_qr">Invalid QR code, please make sure you are scanning QR code from %s</string>
+    <string name="account_parity_signer_sign_have_error">I have an error in %s</string>
+    <string name="account_parity_signer_sign_title">Sign with %s</string>
+    <string name="account_parity_signer_import_preview_description">Following accounts have been successfully read from %s</string>
+    <string name="account_parity_signer_scan_from">Scan the QR code from the %s</string>
+    <string name="account_parity_signer_scan_with">Scan the QR code with the %s</string>
+    <string name="account_parity_signer_import_start_title">Add wallet from %s</string>
+    <string name="account_welcome_hardware_wallet_subtitle">Use Polkadot Vault, Ledger or Parity Signer</string>
+    <string name="account_details_parity_signer_alert">This wallet is paired with %1$s. Nova will help you to form any operations you want, and you will be requested to sign them using %1$s</string>
+    <string name="account_details_parity_signer_not_supported">Not supported by %s</string>
+    <string name="account_parity_signer_not_supported_subtitle">%s does not support signing arbitrary messages — only transactions</string>
+    <string name="account_parity_signer_chain_not_supported">%s doesn’t support %s</string>
+
+    <string name="account_polkadot_vault_import_start_empty_derivation_hint">Pay attention, the derivation path name should be empty</string>
+    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault will provide you <font color='#FFFFFF'>QR code to scan</font></string>
+    <string name="account_polkadot_vault_import_start_step_2"><font color='#FFFFFF'>Go to “Key Sets” tab.</font> Select your Key set, Network, and then the account you would like to add to Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_1"><font color='#FFFFFF'>Open Polkadot Vault</font> application on your smartphone</string>
+
+
+    <string name="account_parity_signer">Parity Signer</string>
+    <string name="account_polkadot_vault">Polkadot Vault</string>
+
+    <string name="staking_set_controller_deprecated_title">Controller Accounts Are Being Deprecated</string>
+    <string name="staking_set_controller_deprecated_subtitle">Network is migrating towards replacing Controllers to Proxies feature. Nova Wallet will support Proxies in future updates</string>
+    <string name="staking_set_controller_deprecated_action">Update Controller to Stash</string>
 
     <string name="referenda_list_filter_placeholder">There are no referenda with filters applied</string>
 
@@ -528,7 +554,6 @@
     <string name="staking_turing_yield_boost">Yield Boost</string>
 
     <string name="ledger_chain_not_supported">Ledger doesn’t support %s</string>
-    <string name="account_parity_signer_chain_not_supported">Parity Signer doesn’t support %s</string>
 
     <string name="ledger_sign_raw_not_supported">Ledger does not support signing arbitrary messages — only transactions</string>
 
@@ -581,7 +606,6 @@
     <string name="account_ledger_import_fill_title">Add accounts to your wallet</string>
     <string name="account_ledger_import_fill_description">Make sure Network app is installed to your Ledger device using Ledger Live app. Open the network app on your Ledger device.</string>
 
-    <string name="account_welcome_hardware_wallet_subtitle">Use Parity Signer or Ledger</string>
 
     <string name="account_ledger_nano_x">Ledger Nano X</string>
     <string name="account_select_hardware_wallet">Select hardware wallet</string>
@@ -607,25 +631,17 @@
     <string name="assets_balance_details_locks_phrelect">Elections</string>
 
     <string name="account_parity_signer_not_supported_title">Signing is not supported</string>
-    <string name="account_parity_signer_not_supported_subtitle">Parity Signer does not support signing arbitrary messages — only transactions</string>
 
     <string name="common_invalid_qr">QR code is invalid</string>
     <string name="account_parity_signer_sign_qr_invalid_message">Please make sure you are scanning QR code for currently signing operation</string>
 
     <string name="common_try_again">Try again</string>
 
-    <string name="account_parity_signer_sign_qr_code_expired_descrition">For security reasons generated operations valid for only %s.\nPlease generate new QR code and sign it with Parity Signer</string>
     <string name="account_parity_signer_sign_qr_code_expired">QR code has expired</string>
     <string name="account_parity_signer_sign_qr_code_valid_format">QR code is valid for %s</string>
 
-    <string name="account_parity_signer_sign_have_error">I have an error in Parity Signer</string>
-
-    <string name="account_parity_signer_sign_title">Sign with Parity Signer</string>
-
     <string name="account_parity_signer_import_preview_title">Here are your accounts</string>
-    <string name="account_parity_signer_import_preview_description">Following accounts have been successfully read from Parity Signer</string>
 
-    <string name="account_parity_signer_import_scan_invalid_qr">Invalid QR code, please make sure you are scanning QR code from Parity Signer</string>
 
     <string name="common_permission_permissions_needed_title">Permissions needed</string>
     <string name="common_permission_permissions_needed_message">Requested permissions are required to use this screen.</string>
@@ -635,20 +651,12 @@
     <string name="common_permission_permissions_denied_message">Requested permissions are required to use this screen. You should enable them in Settings.</string>
     <string name="common_to_settings">Open Settings</string>
 
-    <string name="account_parity_signer_scan_from">Scan the QR code from the Parity Signer</string>
-    <string name="account_parity_signer_scan_with">Scan the QR code with the Parity Signer</string>
-
     <string name="account_welcome_hardware_wallet_title">Connect hardware wallet</string>
 
     <string name="account_parity_signer_import_start_select_top">Make sure to select top one</string>
     <string name="account_parity_signer_import_start_step_3">Parity Signer will provide you <font color='#FFFFFF'>QR code to scan</font></string>
     <string name="account_parity_signer_import_start_step_2"><font color='#FFFFFF'>Go to “Keys” tab. Select seed, then account</font> you would like to add to Nova Wallet</string>
     <string name="account_parity_signer_import_start_step_1"><font color='#FFFFFF'>Open Parity Signer</font> application on your smartphone</string>
-    <string name="account_parity_signer_import_start_title">Add wallet from Parity Signer</string>
-
-    <string name="account_details_parity_signer_not_supported">Not supported by Parity Signer</string>
-    <string name="account_details_parity_signer_alert">This wallet is paired with Parity Signer. Nova will help you to form any operations you want, and you will be requested to sign them using Parity Signer</string>
-    <string name="account_parity_signer">Parity Signer</string>
 
     <string name="account_delete_confirmation_description">Make sure you have exported your wallet before proceeding.</string>
     <string name="account_delete_confirmation_title">Forget wallet?</string>

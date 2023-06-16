@@ -28,11 +28,13 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutReposit
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealParasRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealSessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingPeriodRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingVersioningRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRepositoryImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.StakingVersioningRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.AuraSession
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.BabeSession
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.ElectionsSessionRegistry
@@ -434,10 +436,17 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideStakingVersioningRepository(chainRegistry: ChainRegistry): StakingVersioningRepository {
+        return RealStakingVersioningRepository(chainRegistry)
+    }
+
+    @Provides
+    @FeatureScope
     fun provideControllerInteractor(
         sharedState: StakingSharedState,
         extrinsicService: ExtrinsicService,
-    ) = ControllerInteractor(extrinsicService, sharedState)
+        stakingVersioningRepository: StakingVersioningRepository
+    ) = ControllerInteractor(extrinsicService, sharedState, stakingVersioningRepository)
 
     @Provides
     @FeatureScope

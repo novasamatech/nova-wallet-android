@@ -91,6 +91,7 @@ private fun mapMetaAccountTypeFromLocal(local: MetaAccountLocal.Type): LightMeta
         MetaAccountLocal.Type.WATCH_ONLY -> LightMetaAccount.Type.WATCH_ONLY
         MetaAccountLocal.Type.PARITY_SIGNER -> LightMetaAccount.Type.PARITY_SIGNER
         MetaAccountLocal.Type.LEDGER -> LightMetaAccount.Type.LEDGER
+        MetaAccountLocal.Type.POLKADOT_VAULT -> LightMetaAccount.Type.POLKADOT_VAULT
     }
 }
 
