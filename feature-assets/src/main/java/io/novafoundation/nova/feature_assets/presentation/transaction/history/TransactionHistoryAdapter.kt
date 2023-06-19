@@ -7,6 +7,8 @@ import coil.clear
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
+import io.novafoundation.nova.common.list.PayloadGenerator
+import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.formatting.formatDaysSinceEpoch
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflateChild
@@ -14,6 +16,7 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.recyclerview.item.OperationListItem
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
@@ -46,6 +49,14 @@ class TransactionHistoryAdapter(
     override fun bindChild(holder: GroupedListHolder, child: OperationModel) {
         (holder as TransactionHolder).bind(child, handler)
     }
+
+    override fun bindChild(holder: GroupedListHolder, position: Int, child: OperationModel, payloads: List<Any>) {
+        resolvePayload(holder, position, payloads) {
+            when (it) {
+                OperationModel::amountDetails -> (holder as TransactionHolder).bindFiatWithTime(child)
+            }
+        }
+    }
 }
 
 class TransactionHolder(
@@ -64,8 +75,9 @@ class TransactionHolder(
             valuePrimary.setTextColorRes(item.amountColorRes)
             valuePrimary.text = item.amount
 
-            valueSecondary.text = item.formattedTime
+            bindFiatWithTime(item)
             subHeader.text = item.subHeader
+            subHeader.ellipsize = item.subHeaderEllipsize
             icon.setIcon(item.operationIcon, imageLoader)
 
             if (item.statusAppearance != OperationStatusAppearance.COMPLETED) {
@@ -80,6 +92,10 @@ class TransactionHolder(
         }
     }
 
+    fun bindFiatWithTime(item: OperationModel) {
+        containerView.valueSecondary.setTextOrHide(item.amountDetails)
+    }
+
     override fun unbind() {
         containerView.icon.clear()
     }
@@ -92,6 +108,8 @@ class DayHolder(view: View) : GroupedListHolder(view) {
         }
     }
 }
+
+private object TransactionPayloadGenerator : PayloadGenerator<OperationModel>(OperationModel::amountDetails)
 
 object TransactionHistoryDiffCallback : BaseGroupedDiffCallback<DayHeader, OperationModel>(DayHeader::class.java) {
     override fun areGroupItemsTheSame(oldItem: DayHeader, newItem: DayHeader): Boolean {
@@ -110,6 +128,11 @@ object TransactionHistoryDiffCallback : BaseGroupedDiffCallback<DayHeader, Opera
         return oldItem.statusAppearance == newItem.statusAppearance &&
             oldItem.header == newItem.header &&
             oldItem.subHeader == newItem.subHeader &&
-            oldItem.amount == newItem.amount
+            oldItem.amount == newItem.amount &&
+            oldItem.amountDetails == newItem.amountDetails
+    }
+
+    override fun getChildChangePayload(oldItem: OperationModel, newItem: OperationModel): Any? {
+        return TransactionPayloadGenerator.diff(oldItem, newItem)
     }
 }

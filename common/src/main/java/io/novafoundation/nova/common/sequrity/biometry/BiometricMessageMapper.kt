@@ -2,7 +2,6 @@ package io.novafoundation.nova.common.sequrity.biometry
 
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.sequrity.BiometricResponse
 
 fun mapBiometricErrors(resourceManager: ResourceManager, biometricResponse: BiometricResponse): String? {
     return when (biometricResponse) {

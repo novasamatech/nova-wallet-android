@@ -27,6 +27,11 @@
     <string name="staking_set_controller_deprecated_subtitle">Network is migrating towards replacing Controllers to Proxies feature. Nova Wallet will support Proxies in future updates</string>
     <string name="staking_set_controller_deprecated_action">Update Controller to Stash</string>
 
+    <string name="transfer_history_income_from">From: %s</string>
+    <string name="transfer_history_send_to">To: %s</string>
+
+    <string name="transaction_history_fiat_with_time">%s at %s</string>
+
     <string name="referenda_list_filter_placeholder">There are no referenda with filters applied</string>
 
     <string name="pincode_biometric_switch_dialog_title">Use biometric to authorize</string>

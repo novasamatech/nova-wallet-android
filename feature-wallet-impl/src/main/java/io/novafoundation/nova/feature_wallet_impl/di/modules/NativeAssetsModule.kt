@@ -8,6 +8,8 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.StaticAssetSource
@@ -49,9 +51,11 @@ class NativeAssetsModule {
     fun provideHistory(
         chainRegistry: ChainRegistry,
         eventsRepository: EventsRepository,
+        walletRepository: WalletRepository,
         subQueryOperationsApi: SubQueryOperationsApi,
-        cursorStorage: TransferCursorStorage
-    ) = NativeAssetHistory(chainRegistry, eventsRepository, subQueryOperationsApi, cursorStorage)
+        cursorStorage: TransferCursorStorage,
+        coinPriceRepository: CoinPriceRepository
+    ) = NativeAssetHistory(chainRegistry, eventsRepository, walletRepository, subQueryOperationsApi, cursorStorage, coinPriceRepository)
 
     @Provides
     @NativeAsset

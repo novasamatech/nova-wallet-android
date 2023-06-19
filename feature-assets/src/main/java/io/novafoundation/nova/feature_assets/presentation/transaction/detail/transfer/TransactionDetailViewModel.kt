@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createOptionalAddressModel
@@ -14,8 +15,14 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
+import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.CoinPriceInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class TransactionDetailViewModel(
     private val router: AssetsRouter,
@@ -24,6 +31,8 @@ class TransactionDetailViewModel(
     private val chainRegistry: ChainRegistry,
     val operation: OperationParcelizeModel.Transfer,
     private val externalActions: ExternalActions.Presentation,
+    private val currencyInteractor: CurrencyInteractor,
+    private val coinPriceInteractor: CoinPriceInteractor
 ) : BaseViewModel(),
     ExternalActions by externalActions {
 
@@ -48,6 +57,16 @@ class TransactionDetailViewModel(
     }
         .inBackground()
         .share()
+
+    val fiatFee = flowOf {
+        val fee = operation.fee ?: return@flowOf null
+        val currency = currencyInteractor.getSelectedCurrency()
+        val commissionAsset = chain.await().commissionAsset
+        val coinRate = coinPriceInteractor.getCoinPriceAtTime(commissionAsset.priceId!!, currency, operation.time.milliseconds.inWholeSeconds)
+        coinRate?.convertPlanks(commissionAsset, fee)
+            ?.formatAsCurrency(currency)
+    }.withSafeLoading()
+        .shareInBackground()
 
     fun backClicked() {
         router.back()

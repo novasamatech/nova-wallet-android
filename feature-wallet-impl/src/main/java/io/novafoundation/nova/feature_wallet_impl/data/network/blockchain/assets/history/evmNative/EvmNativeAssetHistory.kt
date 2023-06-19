@@ -2,10 +2,16 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import io.novafoundation.nova.common.utils.ethereumAddressToAccountId
 import io.novafoundation.nova.common.utils.removeHexPrefix
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
+import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.findNearestCoinRate
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.EvmAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanTransactionsApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanNormalTxResponse
@@ -30,7 +36,9 @@ import kotlin.time.Duration.Companion.seconds
 class EvmNativeAssetHistory(
     private val chainRegistry: ChainRegistry,
     private val etherscanTransactionsApi: EtherscanTransactionsApi,
-) : EvmAssetHistory() {
+    private val walletRepository: WalletRepository,
+    coinPriceRepository: CoinPriceRepository
+) : EvmAssetHistory(coinPriceRepository) {
 
     override suspend fun fetchEtherscanOperations(
         chain: Chain,
@@ -39,6 +47,7 @@ class EvmNativeAssetHistory(
         apiUrl: String,
         page: Int,
         pageSize: Int,
+        currency: Currency
     ): List<Operation> {
         val accountAddress = chain.addressOf(accountId)
 
@@ -50,8 +59,15 @@ class EvmNativeAssetHistory(
             chainId = chain.id
         )
 
+        val earliestOperationTimestamp = response.result.minOfOrNull { it.timeStamp } ?: 0L
+        val latestOperationTimestamp = response.result.maxOfOrNull { it.timeStamp } ?: 0L
+        val coinPriceRange = getCoinPriceRange(chainAsset, currency, earliestOperationTimestamp, latestOperationTimestamp)
+
         return response.result
-            .map { mapRemoteNormalTxToOperation(it, chainAsset, accountAddress) }
+            .map {
+                val coinRate = coinPriceRange.findNearestCoinRate(it.timeStamp)
+                mapRemoteNormalTxToOperation(it, chainAsset, accountAddress, coinRate)
+            }
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -60,7 +76,8 @@ class EvmNativeAssetHistory(
         chain: Chain,
         chainAsset: Chain.Asset,
         blockHash: String,
-        accountId: AccountId
+        accountId: AccountId,
+        currency: Currency
     ): Result<List<TransferExtrinsic>> = runCatching {
         val ethereumApi = chainRegistry.awaitCallEthereumApiOrThrow(chain.id)
 
@@ -112,11 +129,12 @@ class EvmNativeAssetHistory(
         remote: EtherscanNormalTxResponse,
         chainAsset: Chain.Asset,
         accountAddress: String,
+        coinRate: CoinRate?
     ): Operation {
         val type = if (remote.isTransfer) {
-            mapNativeTransferToTransfer(remote, accountAddress)
+            mapNativeTransferToTransfer(remote, accountAddress, chainAsset, coinRate)
         } else {
-            mapContractCallToExtrinsic(remote)
+            mapContractCallToExtrinsic(remote, chainAsset, coinRate)
         }
 
         return Operation(
@@ -131,20 +149,25 @@ class EvmNativeAssetHistory(
     private fun mapNativeTransferToTransfer(
         remote: EtherscanNormalTxResponse,
         accountAddress: String,
+        chainAsset: Chain.Asset,
+        coinRate: CoinRate?
     ): Operation.Type.Transfer {
         return Operation.Type.Transfer(
             hash = remote.hash,
             myAddress = accountAddress,
             amount = remote.value,
+            fiatAmount = coinRate?.convertPlanks(chainAsset, remote.value),
             receiver = remote.to,
             sender = remote.from,
             status = remote.operationStatus(),
-            fee = remote.feeUsed,
+            fee = remote.feeUsed
         )
     }
 
     private fun mapContractCallToExtrinsic(
         remote: EtherscanNormalTxResponse,
+        chainAsset: Chain.Asset,
+        coinRate: CoinRate?
     ): Operation.Type.Extrinsic {
         return Operation.Type.Extrinsic(
             hash = remote.hash,
@@ -152,10 +175,12 @@ class EvmNativeAssetHistory(
                 contractAddress = remote.to,
                 function = remote.functionName,
             ),
-            status = remote.operationStatus(),
             fee = remote.feeUsed,
+            fiatFee = coinRate?.convertPlanks(chainAsset, remote.feeUsed),
+            status = remote.operationStatus()
         )
     }
+
     private fun EtherscanNormalTxResponse.operationStatus(): Operation.Status {
         return if (txReceiptStatus == BigInteger.ONE) {
             Operation.Status.COMPLETED
