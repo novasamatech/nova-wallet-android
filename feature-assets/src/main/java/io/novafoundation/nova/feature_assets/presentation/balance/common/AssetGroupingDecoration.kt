@@ -59,6 +59,8 @@ class AssetGroupingDecoration(
                 // if group is finished
                 isFinalItemInGroup(currentType, nextType) -> {
                     parent.getDecoratedBoundsWithMargins(view, bounds)
+                    bounds.set(view.left, bounds.top, view.right, bounds.bottom)
+
                     val groupBottom = bounds.bottom + view.translationY.roundToInt() - groupOuterSpacing
 
                     background.setBounds(bounds.left, groupTop!!, bounds.right, groupBottom)
@@ -74,6 +76,7 @@ class AssetGroupingDecoration(
                 // draw last group
                 index == parent.childCount - 1 -> {
                     parent.getDecoratedBoundsWithMargins(view, bounds)
+                    bounds.set(view.left, bounds.top, view.right, bounds.bottom)
 
                     val groupBottom = bounds.bottom + view.translationY.roundToInt() + finalGroupExtraPadding
                     background.setBounds(bounds.left, groupTop!!, bounds.right, groupBottom)
