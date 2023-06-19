@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 
 private const val SECOND_IN_MILLIS = 1000f
 private const val VELOCITY = 0.1f
+private const val SENSOR_Z_INDEX = 1
 
 class CardGyroscopeListener(
     context: Context,
@@ -20,8 +21,8 @@ class CardGyroscopeListener(
     private val timeAnimator = TimeAnimator()
     private val sensorManager = ContextCompat.getSystemService(context, SensorManager::class.java)
 
-    private var currentRotationY = 0f
-    private var targetRotationZ = 0f
+    private var screenRotation = 0f
+    private var deviceRotation = 0f
     private var previousEventMillis: Long = 0
 
     init {
@@ -48,21 +49,19 @@ class CardGyroscopeListener(
     }
 
     private fun onTimeChanged(animator: TimeAnimator, totalTime: Long, deltaTime: Long) {
-        currentRotationY += (targetRotationZ - currentRotationY) * VELOCITY
-        val resultRotation = currentRotationY / deviceRotationAngle
+        screenRotation += (deviceRotation - screenRotation) * VELOCITY
+        val resultRotation = screenRotation / deviceRotationAngle
         callback(resultRotation)
     }
 
     override fun onSensorChanged(event: SensorEvent) {
         val currentMillis = System.currentTimeMillis()
         val dT = (currentMillis - previousEventMillis) / SECOND_IN_MILLIS
-        val rotationZVelocityInRadians = event.values[1] * dT
-        val rotationZVelocityAngle = Math.toDegrees(rotationZVelocityInRadians.toDouble())
-        targetRotationZ += rotationZVelocityAngle.toFloat()
+        val rotationDistanceInRadians = event.values[SENSOR_Z_INDEX] * dT
+        val rotationDistanceInDegrees = Math.toDegrees(rotationDistanceInRadians.toDouble())
+        deviceRotation += rotationDistanceInDegrees.toFloat()
 
-        targetRotationZ = targetRotationZ
-            .coerceAtMost(deviceRotationAngle)
-            .coerceAtLeast(-deviceRotationAngle)
+        deviceRotation = deviceRotation.coerceIn(-deviceRotationAngle, deviceRotationAngle)
 
         previousEventMillis = currentMillis
     }

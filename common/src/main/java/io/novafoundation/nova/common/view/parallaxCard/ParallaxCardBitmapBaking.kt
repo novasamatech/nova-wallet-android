@@ -4,7 +4,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Paint
+import android.util.Log
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.data.network.TAG
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.dpF
 import kotlinx.coroutines.CoroutineScope
@@ -121,7 +123,7 @@ class ParallaxCardBitmapBaking(private val context: Context, val lruCache: Backi
                 isPrepared = true
                 callback?.onBakingPrepared()
             } catch (e: Exception) {
-                throw e
+                Log.d(TAG, e.message, e)
             }
         }
     }
