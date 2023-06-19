@@ -3,7 +3,7 @@ package io.novafoundation.nova.runtime.storage.source.query.api
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.filterNotNull
 
 typealias QueryableStorageBinder1<K, V> = (dynamicInstance: Any, key: K) -> V
 
@@ -20,7 +20,7 @@ interface QueryableStorageEntry1<I, T : Any> {
 }
 
 context(StorageQueryContext)
-suspend fun <I, T : Any> QueryableStorageEntry1<I, T>.observeNonNull(argument: I): Flow<T> = observe(argument).map { it!! }
+suspend fun <I, T : Any> QueryableStorageEntry1<I, T>.observeNonNull(argument: I): Flow<T> = observe(argument).filterNotNull()
 
 internal class RealQueryableStorageEntry1<I, T : Any>(
     private val storageEntry: StorageEntry,

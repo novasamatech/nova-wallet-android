@@ -3,8 +3,9 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updat
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
-import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.MultiChainStakingStats
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolBalanceRepository
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.MultiChainOffChainSyncResult
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -15,14 +16,15 @@ import kotlinx.coroutines.flow.Flow
 class StakingDashboardUpdaterFactory(
     private val stakingDashboardCache: StakingDashboardCache,
     private val remoteStorageSource: StorageDataSource,
-    private val nominationPoolBalanceRepository: NominationPoolBalanceRepository,
+    private val nominationPoolBalanceRepository: NominationPoolStateRepository,
+    private val poolAccountDerivation: PoolAccountDerivation,
 ) {
 
     fun createUpdater(
         chain: Chain,
         stakingType: Chain.Asset.StakingType,
         metaAccount: MetaAccount,
-        stakingStatsFlow: Flow<IndexedValue<MultiChainStakingStats>>,
+        stakingStatsFlow: Flow<MultiChainOffChainSyncResult>,
     ): Updater? {
         return when (stakingType.group()) {
             StakingTypeGroup.RELAYCHAIN -> relayChain(chain, stakingType, metaAccount, stakingStatsFlow)
@@ -36,7 +38,7 @@ class StakingDashboardUpdaterFactory(
         chain: Chain,
         stakingType: Chain.Asset.StakingType,
         metaAccount: MetaAccount,
-        stakingStatsFlow: Flow<IndexedValue<MultiChainStakingStats>>,
+        stakingStatsFlow: Flow<MultiChainOffChainSyncResult>,
     ): Updater {
         return StakingDashboardRelayStakingUpdater(
             chain = chain,
@@ -53,7 +55,7 @@ class StakingDashboardUpdaterFactory(
         chain: Chain,
         stakingType: Chain.Asset.StakingType,
         metaAccount: MetaAccount,
-        stakingStatsFlow: Flow<IndexedValue<MultiChainStakingStats>>,
+        stakingStatsFlow: Flow<MultiChainOffChainSyncResult>,
     ): Updater {
         return StakingDashboardParachainStakingUpdater(
             chain = chain,
@@ -70,7 +72,7 @@ class StakingDashboardUpdaterFactory(
         chain: Chain,
         stakingType: Chain.Asset.StakingType,
         metaAccount: MetaAccount,
-        stakingStatsFlow: Flow<IndexedValue<MultiChainStakingStats>>,
+        stakingStatsFlow: Flow<MultiChainOffChainSyncResult>,
     ): Updater {
         return StakingDashboardNominationPoolsUpdater(
             chain = chain,
@@ -81,6 +83,7 @@ class StakingDashboardUpdaterFactory(
             stakingDashboardCache = stakingDashboardCache,
             remoteStorageSource = remoteStorageSource,
             nominationPoolBalanceRepository = nominationPoolBalanceRepository,
+            poolAccountDerivation =poolAccountDerivation
         )
     }
 }

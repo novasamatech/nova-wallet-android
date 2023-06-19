@@ -10,6 +10,11 @@ interface QueryableModule {
 }
 
 context(StorageQueryContext)
+fun <T : Any> QueryableModule.storage0(name: String, binding: QueryableStorageBinder0<T>): QueryableStorageEntry0<T> {
+    return RealQueryableStorageEntry0(module.storage(name), binding)
+}
+
+context(StorageQueryContext)
 fun <I, T : Any> QueryableModule.storage1(name: String, binding: QueryableStorageBinder1<I, T>): QueryableStorageEntry1<I, T> {
     return RealQueryableStorageEntry1(module.storage(name), binding)
 }
