@@ -1,11 +1,13 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.presentation.service
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.walletconnect.android.Core
 import com.walletconnect.android.CoreClient
 import com.walletconnect.web3.wallet.client.Wallet
 import com.walletconnect.web3.wallet.client.Web3Wallet
 import io.novafoundation.nova.common.navigation.awaitResponse
+import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.inBackground
@@ -37,8 +39,9 @@ internal class RealWalletConnectService(
     CoroutineScope by parentScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(parentScope) {
 
-    private var onPairErrorCallback: ((throwable: Throwable) -> Unit)? = null
     private val events = Web3Wallet.sessionEventsFlow(scope = this)
+
+    override val onPairErrorLiveData: MutableLiveData<Event<Throwable>> = MutableLiveData()
 
     init {
         events.onEach {
@@ -66,11 +69,7 @@ internal class RealWalletConnectService(
     }
 
     override fun pair(uri: String) {
-        Web3Wallet.pair(Wallet.Params.Pair(uri), onError = { onPairErrorCallback?.invoke(it.throwable) })
-    }
-
-    override fun setOnPairErrorCallback(callback: (throwable: Throwable) -> Unit) {
-        onPairErrorCallback = callback
+        Web3Wallet.pair(Wallet.Params.Pair(uri), onError = { onPairErrorLiveData.postValue(Event(it.throwable)) })
     }
 
     private suspend fun handleSessionProposal(proposal: Wallet.Model.SessionProposal) = withContext(Dispatchers.Main) {

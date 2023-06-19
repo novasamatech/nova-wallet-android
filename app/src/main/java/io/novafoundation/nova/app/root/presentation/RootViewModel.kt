@@ -57,8 +57,8 @@ class RootViewModel(
 
         updatePhishingAddresses()
 
-        walletConnectService.setOnPairErrorCallback {
-            showError(it)
+        walletConnectService.onPairErrorLiveData.observeForever {
+            showError(it.peekContent())
         }
     }
 

@@ -141,12 +141,12 @@ class BalanceListViewModel(
     }
         .shareInBackground()
 
-    private val walletConnectAccountSessions = selectedMetaAccount.flatMapLatest {
+    private val walletConnectAccountSessionCount = selectedMetaAccount.flatMapLatest {
         walletConnectSessionsUseCase.activeSessionsNumberFlow(it)
     }
         .shareInBackground()
 
-    val walletConnectAccountSessionsUI = walletConnectAccountSessions
+    val walletConnectAccountSessionsUI = walletConnectAccountSessionCount
         .map(::mapNumberOfActiveSessionsToUi)
         .shareInBackground()
 
@@ -209,7 +209,7 @@ class BalanceListViewModel(
 
     fun walletConnectClicked() {
         launch {
-            if (walletConnectAccountSessions.first() > 0) {
+            if (walletConnectAccountSessionCount.first() > 0) {
                 val metaAccount = selectedMetaAccount.first()
                 router.openWalletConnectSessions(metaAccount.id)
             } else {

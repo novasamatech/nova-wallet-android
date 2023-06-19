@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.WalletC
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.common.WalletConnectSessionMapper
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.details.WalletConnectSessionDetailsPayload
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.model.SessionListModel
-import kotlinx.coroutines.flow.Flow
 
 class WalletConnectSessionsViewModel(
     private val router: WalletConnectRouter,
@@ -19,7 +18,7 @@ class WalletConnectSessionsViewModel(
     private val walletConnectSessionsPayload: WalletConnectSessionsPayload
 ) : BaseViewModel() {
 
-    val sessionsFlow = sessionsFlow()
+    val sessionsFlow = interactor.activeSessionsFlow(walletConnectSessionsPayload.metaId)
         .mapList(::mapSessionToUi)
         .shareInBackground()
 
@@ -33,14 +32,6 @@ class WalletConnectSessionsViewModel(
 
     fun sessionClicked(item: SessionListModel) {
         router.openSessionDetails(WalletConnectSessionDetailsPayload(item.sessionTopic))
-    }
-
-    private fun sessionsFlow(): Flow<List<WalletConnectSession>> {
-        return if (walletConnectSessionsPayload.metaId == null) {
-            interactor.activeSessionsFlow()
-        } else {
-            interactor.activeSessionsFlow(walletConnectSessionsPayload.metaId)
-        }
     }
 
     private suspend fun mapSessionToUi(session: WalletConnectSession): SessionListModel {

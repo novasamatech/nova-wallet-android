@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.view_wallet_connect.view.viewWalletConnect
 import kotlinx.android.synthetic.main.view_wallet_connect.view.viewWalletConnectConnectionsIcon
 import kotlinx.android.synthetic.main.view_wallet_connect.view.viewWalletConnectIconContainer
 
-class WalletConnectView @JvmOverloads constructor(
+class WalletConnectCounterView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0

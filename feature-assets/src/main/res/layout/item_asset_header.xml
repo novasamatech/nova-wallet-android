@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <io.novafoundation.nova.feature_account_api.view.WalletConnectView
+    <io.novafoundation.nova.feature_account_api.view.WalletConnectCounterView
         android:id="@+id/balanceListWalletConnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
