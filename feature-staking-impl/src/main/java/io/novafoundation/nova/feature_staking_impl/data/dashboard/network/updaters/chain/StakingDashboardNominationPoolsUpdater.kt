@@ -50,7 +50,7 @@ class StakingDashboardNominationPoolsUpdater(
     private val stakingStatsFlow: Flow<MultiChainOffChainSyncResult>,
     private val stakingDashboardCache: StakingDashboardCache,
     private val remoteStorageSource: StorageDataSource,
-    private val nominationPoolBalanceRepository: NominationPoolStateRepository,
+    private val nominationPoolStateRepository: NominationPoolStateRepository,
     private val poolAccountDerivation: PoolAccountDerivation,
 ) : BaseStakingDashboardUpdater(chain, chainAsset, stakingType, metaAccount) {
 
@@ -103,8 +103,8 @@ class StakingDashboardNominationPoolsUpdater(
         return remoteStorageSource.subscribeBatched(chain.id) {
             combine(
                 metadata.nominationPools.bondedPools.observeNonNull(poolId.value),
-                nominationPoolBalanceRepository.observePoolNominations(bondedPoolAccountId),
-                nominationPoolBalanceRepository.observeBondedBalance(bondedPoolAccountId),
+                nominationPoolStateRepository.observePoolNominations(bondedPoolAccountId),
+                nominationPoolStateRepository.observeBondedBalance(bondedPoolAccountId),
             ) { bondedPool, nominations, balance ->
                 PoolAggregatedState(bondedPool, nominations, balance, bondedPoolAccountId)
             }

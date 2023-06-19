@@ -512,7 +512,7 @@ inline fun <T, R> Flow<IndexedValue<T>>.mapLatestIndexed(crossinline transform: 
  *      emit(num)
  *      delay(25)
  *  }
- * }.throttle(100)
+ * }.throttleLast(100)
  *  .onEach { println(it) }
  *  .collect()  // Prints 1, 5, 9, 13, 15
  *
