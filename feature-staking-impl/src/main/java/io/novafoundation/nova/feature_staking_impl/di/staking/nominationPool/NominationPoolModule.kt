@@ -22,6 +22,5 @@ class NominationPoolModule {
 
     @Provides
     @FeatureScope
-    fun provideNominationPoolBalanceRepository(
-    ): NominationPoolStateRepository = RealNominationPoolStateRepository()
+    fun provideNominationPoolBalanceRepository(): NominationPoolStateRepository = RealNominationPoolStateRepository()
 }

@@ -30,6 +30,6 @@ class RealNominationPoolStateRepository() : NominationPoolStateRepository {
 
     context(StorageQueryContext)
     override suspend fun observePoolNominations(poolAccount: AccountId): Flow<Nominations?> {
-       return metadata.staking.nominators.observe(poolAccount)
+        return metadata.staking.nominators.observe(poolAccount)
     }
 }

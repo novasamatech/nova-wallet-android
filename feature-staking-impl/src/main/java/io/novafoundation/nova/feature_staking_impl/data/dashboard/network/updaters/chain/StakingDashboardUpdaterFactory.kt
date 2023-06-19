@@ -83,7 +83,7 @@ class StakingDashboardUpdaterFactory(
             stakingDashboardCache = stakingDashboardCache,
             remoteStorageSource = remoteStorageSource,
             nominationPoolBalanceRepository = nominationPoolBalanceRepository,
-            poolAccountDerivation =poolAccountDerivation
+            poolAccountDerivation = poolAccountDerivation
         )
     }
 }
