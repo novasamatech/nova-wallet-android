@@ -109,6 +109,10 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
+    init {
+        sync()
+    }
+
     override fun onCleared() {
         super.onCleared()
 
