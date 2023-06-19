@@ -31,6 +31,12 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         fun avatarClicked()
 
         fun goToNftsClicked()
+
+        fun sendClicked()
+
+        fun receiveClicked()
+
+        fun buyClicked()
     }
 
     private var shouldShowPlaceholder: Boolean = false
@@ -115,6 +121,9 @@ class HeaderHolder(
             balanceListNfts.setOnClickListener { handler.goToNftsClicked() }
             balanceListSearch.setOnClickListener { handler.searchClicked() }
             balanceListFilters.setOnClickListener { handler.filtersClicked() }
+            balanceListTotalBalance.onSendClick { handler.sendClicked() }
+            balanceListTotalBalance.onReceiveClick { handler.receiveClicked() }
+            balanceListTotalBalance.onBuyClick { handler.buyClicked() }
         }
     }
 

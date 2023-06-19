@@ -27,6 +27,8 @@
     <string name="staking_set_controller_deprecated_subtitle">Network is migrating towards replacing Controllers to Proxies feature. Nova Wallet will support Proxies in future updates</string>
     <string name="staking_set_controller_deprecated_action">Update Controller to Stash</string>
 
+    <string name="assets_search_placeholder">No networks or tokens with entered\nname were found</string>
+
     <string name="referenda_list_filter_placeholder">There are no referenda with filters applied</string>
 
     <string name="pincode_biometric_switch_dialog_title">Use biometric to authorize</string>
@@ -327,7 +329,6 @@
     <string name="dapp_options_remove_from_favorite">Remove from Favorites</string>
     <string name="dapp_options_desktop_mode">Desktop mode</string>
 
-    <string name="assets_search_placeholder">No tokens with\nentered name were found</string>
 
     <string name="asset_add_evm_token_invalid_contract_address_message">The entered contract address is not a %s ERC-20 contract.</string>
 

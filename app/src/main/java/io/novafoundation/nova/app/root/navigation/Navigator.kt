@@ -433,6 +433,18 @@ class Navigator(
         navController?.navigate(R.id.action_manageTokensFragment_to_addTokenSelectChainFragment)
     }
 
+    override fun openSendFlow() {
+        navController?.navigate(R.id.action_mainFragment_to_sendFlow)
+    }
+
+    override fun openReceiveFlow() {
+        navController?.navigate(R.id.action_mainFragment_to_receiveFlow)
+    }
+
+    override fun openBuyFlow() {
+        navController?.navigate(R.id.action_mainFragment_to_buyFlow)
+    }
+
     override fun openAddTokenEnterInfo(payload: AddTokenEnterInfoPayload) {
         val args = AddTokenEnterInfoFragment.getBundle(payload)
         navController?.navigate(R.id.action_addTokenSelectChainFragment_to_addTokenEnterInfoFragment, args)

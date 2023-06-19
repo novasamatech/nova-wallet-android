@@ -6,8 +6,10 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_assets.BuildConfig
 import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
 import io.novafoundation.nova.feature_assets.data.buyToken.providers.MercuryoProvider
@@ -20,8 +22,10 @@ import io.novafoundation.nova.feature_assets.di.modules.ManageTokensCommonModule
 import io.novafoundation.nova.feature_assets.di.modules.SendModule
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
+import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.domain.tokens.add.CoinGeckoLinkParser
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -31,6 +35,15 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [SendModule::class, ManageTokensCommonModule::class, AddTokenModule::class])
 class AssetsFeatureModule {
+
+    @Provides
+    @FeatureScope
+    fun provideSearchInteractor(
+        walletRepository: WalletRepository,
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+        assetSourceRegistry: AssetSourceRegistry
+    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry, assetSourceRegistry)
 
     @Provides
     @FeatureScope
@@ -128,5 +141,19 @@ class AssetsFeatureModule {
     @FeatureScope
     fun provideCoinGeckoLinkParser(): CoinGeckoLinkParser {
         return CoinGeckoLinkParser()
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideControllableAssetCheckMixin(
+        missingKeysPresenter: WatchOnlyMissingKeysPresenter,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        resourceManager: ResourceManager
+    ): ControllableAssetCheckMixin {
+        return ControllableAssetCheckMixin(
+            missingKeysPresenter,
+            actionAwaitableMixinFactory,
+            resourceManager
+        )
     }
 }

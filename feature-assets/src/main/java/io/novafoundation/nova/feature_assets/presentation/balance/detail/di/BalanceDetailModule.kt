@@ -9,11 +9,9 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractorImpl
@@ -22,6 +20,7 @@ import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailViewModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
@@ -83,11 +82,10 @@ class BalanceDetailModule {
         buyMixinFactory: BuyMixinFactory,
         assetPayload: AssetPayload,
         accountUseCase: SelectedAccountUseCase,
-        missingKeysPresenter: WatchOnlyMissingKeysPresenter,
         resourceManager: ResourceManager,
         currencyInteractor: CurrencyInteractor,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        contributionsInteractor: ContributionsInteractor
+        contributionsInteractor: ContributionsInteractor,
+        controllableAssetCheckMixin: ControllableAssetCheckMixin
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -98,11 +96,10 @@ class BalanceDetailModule {
             buyMixinFactory = buyMixinFactory,
             transactionHistoryMixin = transactionHistoryMixin,
             accountUseCase = accountUseCase,
-            missingKeysPresenter = missingKeysPresenter,
             resourceManager = resourceManager,
             currencyInteractor = currencyInteractor,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            contributionsInteractor = contributionsInteractor
+            contributionsInteractor = contributionsInteractor,
+            controllableAssetCheck = controllableAssetCheckMixin
         )
     }
 
