@@ -29,6 +29,8 @@
         android:layout_gravity="center_vertical"
         android:src="@drawable/ic_connections"
         android:layout_marginStart="8dp"
+        android:visibility="gone"
+        tools:visibility="visible"
         app:tint="@color/chip_icon"/>
 
     <TextView

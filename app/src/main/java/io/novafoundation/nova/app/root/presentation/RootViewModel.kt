@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
@@ -15,6 +16,7 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection.ExternalRequirement
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -31,12 +33,11 @@ class RootViewModel(
     private val backgroundAccessObserver: BackgroundAccessObserver,
     private val safeModeService: SafeModeService,
     private val updateNotificationsInteractor: UpdateNotificationsInteractor,
-    private val walletConnectServiceFactory: WalletConnectService.Factory
+    private val walletConnectService: WalletConnectService,
+    private val rootScope: RootScope
 ) : BaseViewModel(), NetworkStateUi by networkStateMixin {
 
     private var willBeClearedForLanguageChange = false
-
-    private val walletConnectService = walletConnectServiceFactory.create(viewModelScope)
 
     init {
         contributionsInteractor.runUpdate()
@@ -55,6 +56,10 @@ class RootViewModel(
         syncCurrencies()
 
         updatePhishingAddresses()
+
+        walletConnectService.setOnPairErrorCallback {
+            showError(it)
+        }
     }
 
     private fun checkForUpdates() {
@@ -125,5 +130,9 @@ class RootViewModel(
 
     fun applySafeModeIfEnabled() {
         safeModeService.applySafeModeIfEnabled()
+    }
+
+    override fun onCleared() {
+        rootScope.cancel()
     }
 }

@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.app.root.presentation.RootRouter
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.app.root.presentation.RootViewModel
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -43,7 +44,8 @@ class RootActivityModule {
         backgroundAccessObserver: BackgroundAccessObserver,
         safeModeService: SafeModeService,
         updateNotificationsInteractor: UpdateNotificationsInteractor,
-        walletConnectServiceFactory: WalletConnectService.Factory
+        walletConnectService: WalletConnectService,
+        rootScope: RootScope
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -56,7 +58,8 @@ class RootActivityModule {
             backgroundAccessObserver,
             safeModeService,
             updateNotificationsInteractor,
-            walletConnectServiceFactory
+            walletConnectService,
+            rootScope
         )
     }
 

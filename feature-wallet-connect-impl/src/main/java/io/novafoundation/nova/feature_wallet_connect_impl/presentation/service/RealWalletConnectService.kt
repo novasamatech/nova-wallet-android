@@ -28,22 +28,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 
-internal class RealWalletConnectServiceFactory(
-    private val interactor: WalletConnectSessionInteractor,
-    private val dAppSignRequester: ExternalSignRequester,
-    private val approveSessionRequester: ApproveSessionRequester,
-) : WalletConnectService.Factory {
-
-    override fun create(coroutineScope: CoroutineScope): WalletConnectService {
-        return RealWalletConnectService(
-            parentScope = coroutineScope,
-            interactor = interactor,
-            dAppSignRequester = dAppSignRequester,
-            approveSessionRequester = approveSessionRequester
-        )
-    }
-}
-
 internal class RealWalletConnectService(
     parentScope: CoroutineScope,
     private val interactor: WalletConnectSessionInteractor,
@@ -53,6 +37,7 @@ internal class RealWalletConnectService(
     CoroutineScope by parentScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(parentScope) {
 
+    private var onPairErrorCallback: ((throwable: Throwable) -> Unit)? = null
     private val events = Web3Wallet.sessionEventsFlow(scope = this)
 
     init {
@@ -78,6 +63,14 @@ internal class RealWalletConnectService(
         CoreClient.Relay.disconnect { error: Core.Model.Error ->
             Log.d(LOG_TAG, "Failed to disconnect to Wallet Connect: ", error.throwable)
         }
+    }
+
+    override fun pair(uri: String) {
+        Web3Wallet.pair(Wallet.Params.Pair(uri), onError = { onPairErrorCallback?.invoke(it.throwable) })
+    }
+
+    override fun setOnPairErrorCallback(callback: (throwable: Throwable) -> Unit) {
+        onPairErrorCallback = callback
     }
 
     private suspend fun handleSessionProposal(proposal: Wallet.Model.SessionProposal) = withContext(Dispatchers.Main) {

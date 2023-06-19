@@ -6,14 +6,10 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
 import io.novafoundation.nova.common.di.FeatureContainer
-import io.novafoundation.nova.common.utils.WithContextExtensions
-import io.novafoundation.nova.common.utils.WithLifecycleExtensions
 import javax.inject.Inject
 
 abstract class BaseActivity<T : BaseViewModel> :
-    AppCompatActivity(),
-    WithContextExtensions,
-    WithLifecycleExtensions {
+    AppCompatActivity(), BaseScreenMixin<T> {
 
     override val providedContext: Context
         get() = this
@@ -21,7 +17,8 @@ abstract class BaseActivity<T : BaseViewModel> :
     override val lifecycleOwner: LifecycleOwner
         get() = this
 
-    @Inject protected open lateinit var viewModel: T
+    @Inject
+    override lateinit var viewModel: T
 
     override fun attachBaseContext(base: Context) {
         val commonApi = (base.applicationContext as FeatureContainer).commonApi()
@@ -44,15 +41,13 @@ abstract class BaseActivity<T : BaseViewModel> :
         inject()
         initViews()
         subscribe(viewModel)
+
+        viewModel.errorLiveData.observeEvent(::showError)
+
+        viewModel.messageLiveData.observeEvent(::showMessage)
     }
 
-    abstract fun inject()
-
     abstract fun layoutResource(): Int
-
-    abstract fun initViews()
-
-    abstract fun subscribe(viewModel: T)
 
     abstract fun changeLanguage()
 }

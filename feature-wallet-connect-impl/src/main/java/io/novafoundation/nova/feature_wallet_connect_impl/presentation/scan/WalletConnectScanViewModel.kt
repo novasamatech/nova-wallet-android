@@ -1,15 +1,14 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.presentation.scan
 
-import com.walletconnect.web3.wallet.client.Wallet
-import com.walletconnect.web3.wallet.client.Web3Wallet
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.common.presentation.scan.ScanQrViewModel
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
-import kotlinx.coroutines.launch
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 
 class WalletConnectScanViewModel(
     private val router: ReturnableRouter,
     private val permissionsAsker: PermissionsAsker.Presentation,
+    private val walletConnectService: WalletConnectService
 ) : ScanQrViewModel(permissionsAsker) {
 
     fun backClicked() {
@@ -18,22 +17,11 @@ class WalletConnectScanViewModel(
 
     override suspend fun scanned(result: String) {
         initiatePairing(result)
+
+        router.back()
     }
 
     private fun initiatePairing(uri: String) {
-        Web3Wallet.pair(Wallet.Params.Pair(uri), onSuccess = ::onPairingSuccess, onError = ::onPairingError)
-    }
-
-    private fun onPairingSuccess(params: Wallet.Params.Pair) {
-        launch {
-            router.back()
-        }
-    }
-
-    private fun onPairingError(error: Wallet.Model.Error) {
-        launch {
-            showError(error.throwable)
-            router.back()
-        }
+        walletConnectService.pair(uri)
     }
 }
