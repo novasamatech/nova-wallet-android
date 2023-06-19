@@ -17,6 +17,8 @@ import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingStory
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.ledger
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.staking
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindActiveEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindCurrentEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindErasStartSessionIndex
@@ -29,7 +31,6 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindin
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindRewardDestination
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSlashDeferDuration
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSlashingSpans
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedger
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindValidatorPrefs
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.activeEraStorageKey
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
@@ -40,6 +41,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.observeNonNull
+import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
@@ -48,7 +50,6 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageOrNull
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -232,18 +233,14 @@ class StakingRepositoryImpl(
     }
 
     override suspend fun ledgerFlow(stakingState: StakingState.Stash): Flow<StakingLedger> {
-        return localStorage.observe(
-            keyBuilder = { it.metadata.staking().storage("Ledger").storageKey(it, stakingState.controllerId) },
-            binder = { scale, runtime -> scale?.let { bindStakingLedger(it, runtime) } },
-            chainId = stakingState.chain.id
-        ).filterNotNull()
+        return localStorage.query(stakingState.chain.id) {
+            metadata.staking.ledger.observe(stakingState.controllerId)
+        }.filterNotNull()
     }
 
-    override suspend fun ledger(chainId: ChainId, address: String) = remoteStorage.query(
-        keyBuilder = { it.metadata.staking().storage("Ledger").storageKey(it, address.toAccountId()) },
-        binding = { scale, runtime -> scale?.let { bindStakingLedger(it, runtime) } },
-        chainId = chainId
-    )
+    override suspend fun ledger(chainId: ChainId, accountId: AccountId): StakingLedger? = remoteStorage.query(chainId) {
+        metadata.staking.ledger.query(accountId)
+    }
 
     private fun observeStashState(
         chain: Chain,

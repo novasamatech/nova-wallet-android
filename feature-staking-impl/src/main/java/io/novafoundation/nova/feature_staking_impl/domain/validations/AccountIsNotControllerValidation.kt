@@ -5,6 +5,8 @@ import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.state.chain
 
 class AccountIsNotControllerValidation<P, E>(
     private val stakingRepository: StakingRepository,
@@ -14,7 +16,8 @@ class AccountIsNotControllerValidation<P, E>(
 ) : Validation<P, E> {
     override suspend fun validate(value: P): ValidationStatus<E> {
         val controllerAddress = controllerAddressProducer(value)
-        val ledger = stakingRepository.ledger(sharedState.chainId(), controllerAddress)
+        val chain = sharedState.chain()
+        val ledger = stakingRepository.ledger(sharedState.chainId(), chain.accountIdOf(controllerAddress))
 
         return if (ledger == null) {
             ValidationStatus.Valid()

@@ -4,6 +4,7 @@ import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.MultiChainStakingStats
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolBalanceRepository
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -13,7 +14,8 @@ import kotlinx.coroutines.flow.Flow
 
 class StakingDashboardUpdaterFactory(
     private val stakingDashboardCache: StakingDashboardCache,
-    private val remoteStorageSource: StorageDataSource
+    private val remoteStorageSource: StorageDataSource,
+    private val nominationPoolBalanceRepository: NominationPoolBalanceRepository,
 ) {
 
     fun createUpdater(
@@ -25,7 +27,7 @@ class StakingDashboardUpdaterFactory(
         return when (stakingType.group()) {
             StakingTypeGroup.RELAYCHAIN -> relayChain(chain, stakingType, metaAccount, stakingStatsFlow)
             StakingTypeGroup.PARACHAIN -> parachain(chain, stakingType, metaAccount, stakingStatsFlow)
-            StakingTypeGroup.NOMINATION_POOL -> null // TODO nomination pools
+            StakingTypeGroup.NOMINATION_POOL -> nominationPools(chain, stakingType, metaAccount, stakingStatsFlow)
             StakingTypeGroup.UNSUPPORTED -> null
         }
     }
@@ -61,6 +63,24 @@ class StakingDashboardUpdaterFactory(
             stakingStatsFlow = stakingStatsFlow,
             stakingDashboardCache = stakingDashboardCache,
             remoteStorageSource = remoteStorageSource
+        )
+    }
+
+    private fun nominationPools(
+        chain: Chain,
+        stakingType: Chain.Asset.StakingType,
+        metaAccount: MetaAccount,
+        stakingStatsFlow: Flow<IndexedValue<MultiChainStakingStats>>,
+    ): Updater {
+        return StakingDashboardNominationPoolsUpdater(
+            chain = chain,
+            chainAsset = chain.utilityAsset,
+            stakingType = stakingType,
+            metaAccount = metaAccount,
+            stakingStatsFlow = stakingStatsFlow,
+            stakingDashboardCache = stakingDashboardCache,
+            remoteStorageSource = remoteStorageSource,
+            nominationPoolBalanceRepository = nominationPoolBalanceRepository,
         )
     }
 }

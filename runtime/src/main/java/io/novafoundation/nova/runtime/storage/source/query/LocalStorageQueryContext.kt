@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.map
 
 class LocalStorageQueryContext(
     private val storageCache: StorageCache,
-    private val chainId: ChainId,
+    chainId: ChainId,
     at: BlockHash?,
     runtime: RuntimeSnapshot
-) : BaseStorageQueryContext(runtime, at) {
+) : BaseStorageQueryContext(chainId, runtime, at) {
 
     override suspend fun queryKeysByPrefix(prefix: String, at: BlockHash?): List<String> {
         return storageCache.getKeys(prefix, chainId)

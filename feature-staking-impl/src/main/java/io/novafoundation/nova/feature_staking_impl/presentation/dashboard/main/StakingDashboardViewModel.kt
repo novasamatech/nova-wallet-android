@@ -102,6 +102,12 @@ class StakingDashboardViewModel(
         val isSyncingPrimary = hasStake.syncingStage.isSyncingPrimary()
         val isSyncingSecondary = hasStake.syncingStage.isSyncingSecondary()
 
+        val stakingTypBadge = if (hasStake.stakingState.showStakingType) {
+            presentationMapper.mapStakingTypeToUi(hasStake.stakingState.stakingType)
+        } else {
+            null
+        }
+
         return StakingDashboardModel.HasStakeItem(
             chainUi = mapChainToUi(hasStake.chain).syncingIf(isSyncingPrimary),
             assetId = hasStake.token.configuration.id,
@@ -109,6 +115,7 @@ class StakingDashboardViewModel(
             stake = mapAmountToAmountModel(hasStake.stakingState.stake, hasStake.token).syncingIf(isSyncingPrimary),
             status = stats.map { mapStakingStatusToUi(it.status).syncingIf(isSyncingSecondary) },
             earnings = stats.map { it.estimatedEarnings.format().syncingIf(isSyncingSecondary) },
+            stakingTypeBadge = stakingTypBadge
         )
     }
 
