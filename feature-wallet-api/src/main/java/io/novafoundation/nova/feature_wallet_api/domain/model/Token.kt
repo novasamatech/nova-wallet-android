@@ -9,17 +9,22 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 data class Token(
-    val rate: BigDecimal?,
     val currency: Currency,
-    val recentRateChange: BigDecimal?,
+    val coinRateChange: CoinRateChange?,
     val configuration: Chain.Asset
 ) {
     // TODO move out of the class when Context Receivers will be stable
     fun BigDecimal.toPlanks() = planksFromAmount(this)
     fun BigInteger.toAmount() = amountFromPlanks(this)
 
-    fun priceOf(tokenAmount: BigDecimal): BigDecimal = rate?.multiply(tokenAmount) ?: BigDecimal.ZERO
+    fun amountToFiat(tokenAmount: BigDecimal): BigDecimal = toFiatOrNull(tokenAmount) ?: BigDecimal.ZERO
+
+    fun planksToFiat(tokenAmountPlanks: BigInteger): BigDecimal = planksToFiatOrNull(tokenAmountPlanks) ?: BigDecimal.ZERO
 }
+
+fun Token.toFiatOrNull(tokenAmount: BigDecimal): BigDecimal? = coinRateChange?.convertAmount(tokenAmount)
+
+fun Token.planksToFiatOrNull(tokenAmountPlanks: BigInteger): BigDecimal? = coinRateChange?.convertPlanks(configuration, tokenAmountPlanks)
 
 fun Token.amountFromPlanks(amountInPlanks: BigInteger) = configuration.amountFromPlanks(amountInPlanks)
 

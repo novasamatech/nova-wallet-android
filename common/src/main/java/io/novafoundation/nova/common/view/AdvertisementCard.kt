@@ -3,7 +3,7 @@ package io.novafoundation.nova.common.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import androidx.core.content.res.getStringOrThrow
+import androidx.annotation.DrawableRes
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.card.MaterialCardView
@@ -61,6 +61,13 @@ class AdvertisementCard @JvmOverloads constructor(
         advertisementCardClose.setOnClickListener(listener)
     }
 
+    fun setModel(model: AdvertisementCardModel) {
+        advertisementCardTitle.text = model.title
+        advertisementCardSubTitle.text = model.subtitle
+        advertisementCardImage.setImageResource(model.imageRes)
+        advertisementCardBackground.setBackgroundResource(model.bannerBackgroundRes)
+    }
+
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.AdvertisementCard) {
         val actionLabel = it.getString(R.styleable.AdvertisementCard_action)
         action.setTextOrHide(actionLabel)
@@ -69,10 +76,10 @@ class AdvertisementCard @JvmOverloads constructor(
         advertisementCardLearnMoreGroup.setVisible(learnMore != null)
         advertisementCardLearnMoreContent.text = learnMore
 
-        val title = it.getStringOrThrow(R.styleable.AdvertisementCard_title)
+        val title = it.getString(R.styleable.AdvertisementCard_title)
         advertisementCardTitle.text = title
 
-        val subtitle = it.getStringOrThrow(R.styleable.AdvertisementCard_subtitle)
+        val subtitle = it.getString(R.styleable.AdvertisementCard_subtitle)
         advertisementCardSubTitle.text = subtitle
 
         val image = it.getDrawable(R.styleable.AdvertisementCard_image)
@@ -85,3 +92,10 @@ class AdvertisementCard @JvmOverloads constructor(
         advertisementCardClose.isVisible = showClose
     }
 }
+
+class AdvertisementCardModel(
+    val title: String,
+    val subtitle: String,
+    @DrawableRes val imageRes: Int,
+    @DrawableRes val bannerBackgroundRes: Int,
+)

@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.io.MainThreadExecutor
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.sequrity.BiometricService
+import io.novafoundation.nova.common.sequrity.biometry.BiometricService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.vibration.DeviceVibrator

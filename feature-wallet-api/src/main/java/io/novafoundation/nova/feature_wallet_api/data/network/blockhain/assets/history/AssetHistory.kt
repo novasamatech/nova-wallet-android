@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.
 
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
@@ -14,7 +15,8 @@ interface AssetHistory {
         chain: Chain,
         chainAsset: Chain.Asset,
         blockHash: String,
-        accountId: AccountId
+        accountId: AccountId,
+        currency: Currency
     ): Result<List<TransferExtrinsic>>
 
     fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter>
@@ -32,7 +34,8 @@ interface AssetHistory {
         filters: Set<TransactionFilter>,
         accountId: AccountId,
         chain: Chain,
-        chainAsset: Chain.Asset
+        chainAsset: Chain.Asset,
+        currency: Currency,
     ): DataPage<Operation>
 
     suspend fun getSyncedPageOffset(

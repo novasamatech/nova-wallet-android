@@ -100,9 +100,10 @@ class MetaAccountGroupingInteractorImpl(
     private fun metaAccountTypeComparator() = compareBy<LightMetaAccount.Type> {
         when (it) {
             LightMetaAccount.Type.SECRETS -> 0
-            LightMetaAccount.Type.PARITY_SIGNER -> 1
-            LightMetaAccount.Type.LEDGER -> 2
-            LightMetaAccount.Type.WATCH_ONLY -> 3
+            LightMetaAccount.Type.POLKADOT_VAULT -> 1
+            LightMetaAccount.Type.PARITY_SIGNER -> 2
+            LightMetaAccount.Type.LEDGER -> 3
+            LightMetaAccount.Type.WATCH_ONLY -> 4
         }
     }
 }

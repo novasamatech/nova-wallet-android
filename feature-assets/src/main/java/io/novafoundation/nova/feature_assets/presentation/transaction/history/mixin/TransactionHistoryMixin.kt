@@ -13,11 +13,11 @@ interface TransactionHistoryUi {
 
         sealed class ListState {
 
-            object Empty : State.ListState()
+            object Empty : ListState()
 
-            object EmptyProgress : State.ListState()
+            object EmptyProgress : ListState()
 
-            class Data(val items: List<Any>) : State.ListState()
+            class Data(val items: List<Any>) : ListState()
         }
     }
 

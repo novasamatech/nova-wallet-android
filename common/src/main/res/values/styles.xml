@@ -399,6 +399,11 @@
         </item>
     </style>
 
+    <style name="Widget.Nova.WalletWithAddress" parent="">
+        <item name="labelStyle">@style/TextAppearance.NovaFoundation.Regular.SubHeadline.Primary</item>
+        <item name="messageStyle">@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary</item>
+    </style>
+
     <!-- Buttons -->
 
     <!-- Input -->

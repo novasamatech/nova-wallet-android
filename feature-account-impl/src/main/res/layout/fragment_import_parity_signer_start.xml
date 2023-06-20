@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/account_parity_signer_import_start_title"
+                tools:text="@string/account_parity_signer_import_start_title"
                 android:textColor="@color/text_primary" />
 
             <io.novafoundation.nova.common.view.NovaConnectView
@@ -40,55 +40,16 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="32dp"
-                app:targetImage="@drawable/ic_parity_signer" />
+                android:id="@+id/startImportParitySignerConnectOverview"
+                tools:targetImage="@drawable/ic_parity_signer" />
 
-            <io.novafoundation.nova.common.view.InstructionStepView
-                android:id="@+id/startImportParitySignerStep1"
+            <LinearLayout
+                android:id="@+id/startImportParitySignerInstructionContainer"
                 android:layout_width="match_parent"
+                android:layout_marginTop="8dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                app:stepNumber="1"
-                app:stepText="@string/account_parity_signer_import_start_step_1" />
+                android:orientation="vertical" />
 
-            <io.novafoundation.nova.common.view.InstructionStepView
-                android:id="@+id/startImportParitySignerStep2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:stepNumber="2"
-                app:stepText="@string/account_parity_signer_import_start_step_2" />
-
-            <TextView
-                android:id="@+id/startImportParitySignerSelectTop"
-                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="48dp"
-                android:layout_marginTop="12dp"
-                android:drawablePadding="6dp"
-                android:text="@string/account_parity_signer_import_start_select_top"
-                android:textColor="@color/text_positive"
-                app:drawableStartCompat="@drawable/ic_checkmark_circle_16"
-                app:drawableTint="@color/icon_positive" />
-
-            <ImageView
-                android:id="@+id/startImportParitySignerSelectTopImage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="48dp"
-                android:layout_marginTop="6dp"
-                android:layout_marginEnd="16dp"
-                android:adjustViewBounds="true"
-                android:src="@drawable/my_parity_signer" />
-
-            <io.novafoundation.nova.common.view.InstructionStepView
-                android:id="@+id/startImportParitySignerStep3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:stepNumber="3"
-                app:stepText="@string/account_parity_signer_import_start_step_3" />
         </LinearLayout>
 
     </ScrollView>

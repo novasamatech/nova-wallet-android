@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
 import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
@@ -16,6 +17,7 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.showOperationStatus
 import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailAmount
+import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailAmountFiat
 import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailEra
 import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailEvent
 import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailNetwork
@@ -70,6 +72,7 @@ class RewardDetailFragment : BaseFragment<RewardDetailViewModel>() {
             rewardDetailEvent.showValue(eventId)
             rewardDetailToolbar.setTitle(time.formatDateTime())
             rewardDetailAmount.text = amount
+            rewardDetailAmountFiat.setTextOrHide(this.fiatAmount)
 
             rewardDetailEra.showValue(era)
 

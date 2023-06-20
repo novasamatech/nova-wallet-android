@@ -14,7 +14,7 @@ on:
 
 jobs:
   build:
-    uses: nova-wallet/nova-wallet-android/.github/workflows/android_build.yml@develop
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
     with:
       branch: ${{ github.event.inputs.branch }}
       gradlew-command: assembleDevelop

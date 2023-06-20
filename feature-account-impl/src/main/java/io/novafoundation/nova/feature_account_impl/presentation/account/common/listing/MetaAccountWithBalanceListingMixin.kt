@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.common.listing
 
 import io.novafoundation.nova.common.list.toListWithHeaders
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -14,8 +13,8 @@ import kotlinx.coroutines.flow.map
 
 class MetaAccountWithBalanceListingMixinFactory(
     private val walletUiUseCase: WalletUiUseCase,
-    private val resourceManager: ResourceManager,
-    private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor
+    private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
+    private val accountTypePresentationMapper: MetaAccountTypePresentationMapper,
 ) {
 
     fun create(
@@ -24,25 +23,25 @@ class MetaAccountWithBalanceListingMixinFactory(
     ): MetaAccountListingMixin {
         return MetaAccountWithBalanceListingMixin(
             walletUiUseCase = walletUiUseCase,
-            resourceManager = resourceManager,
             metaAccountGroupingInteractor = metaAccountGroupingInteractor,
             coroutineScope = coroutineScope,
-            isMetaAccountSelected = isMetaAccountSelected
+            isMetaAccountSelected = isMetaAccountSelected,
+            accountTypePresentationMapper = accountTypePresentationMapper
         )
     }
 }
 
 private class MetaAccountWithBalanceListingMixin(
-    private val resourceManager: ResourceManager,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val walletUiUseCase: WalletUiUseCase,
     private val isMetaAccountSelected: suspend (MetaAccount) -> Boolean,
+    private val accountTypePresentationMapper: MetaAccountTypePresentationMapper,
     coroutineScope: CoroutineScope,
 ) : MetaAccountListingMixin, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
     override val metaAccountsFlow = metaAccountGroupingInteractor.metaAccountsWithTotalBalanceFlow().map { list ->
         list.toListWithHeaders(
-            keyMapper = { type, _ -> mapMetaAccountTypeToUi(type, resourceManager) },
+            keyMapper = { type, _ -> accountTypePresentationMapper.mapMetaAccountTypeToUi(type) },
             valueMapper = { mapMetaAccountToUi(it) }
         )
     }

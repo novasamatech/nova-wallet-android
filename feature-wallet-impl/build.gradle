@@ -14,11 +14,11 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "EHTERSCAN_API_KEY_MOONBEAM", readSecret("EHTERSCAN_API_KEY_MOONBEAM")
-        buildConfigField "String", "EHTERSCAN_API_KEY_MOONRIVER", readSecret("EHTERSCAN_API_KEY_MOONRIVER")
-        buildConfigField "String", "EHTERSCAN_API_KEY_ETHEREUM", readSecret("EHTERSCAN_API_KEY_ETHEREUM")
+        buildConfigField "String", "EHTERSCAN_API_KEY_MOONBEAM", readStringSecret("EHTERSCAN_API_KEY_MOONBEAM")
+        buildConfigField "String", "EHTERSCAN_API_KEY_MOONRIVER", readStringSecret("EHTERSCAN_API_KEY_MOONRIVER")
+        buildConfigField "String", "EHTERSCAN_API_KEY_ETHEREUM", readStringSecret("EHTERSCAN_API_KEY_ETHEREUM")
 
-        buildConfigField "String", "CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/xcm/v3/transfers_dev.json\""
+        buildConfigField "String", "CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/xcm/v4/transfers_dev.json\""
     }
 
     buildTypes {
@@ -26,7 +26,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            buildConfigField "String", "CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/xcm/v3/transfers.json\""
+            buildConfigField "String", "CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/xcm/v4/transfers.json\""
         }
     }
 

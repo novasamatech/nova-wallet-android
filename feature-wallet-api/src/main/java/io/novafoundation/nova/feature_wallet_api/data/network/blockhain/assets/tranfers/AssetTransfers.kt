@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers
 
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -14,6 +15,7 @@ data class AssetTransfer(
     val originChainAsset: Chain.Asset,
     val destinationChain: Chain,
     val destinationChainAsset: Chain.Asset,
+    val commissionAssetToken: Token,
     val amount: BigDecimal,
 )
 

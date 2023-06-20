@@ -16,7 +16,7 @@ import io.novafoundation.nova.common.io.MainThreadExecutor
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.sequrity.BiometricService
+import io.novafoundation.nova.common.sequrity.biometry.BiometricService
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.biometry.BiometricPromptFactory
