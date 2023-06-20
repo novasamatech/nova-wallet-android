@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="8dp"
+    android:background="@drawable/bg_shimmering_container">
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeLoadingChain"
+        android:layout_width="78dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="17dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_shimmering"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeLoadingRewardsLabel"
+        android:layout_width="49dp"
+        android:layout_height="10dp"
+        android:layout_marginTop="29dp"
+        android:background="@drawable/bg_shimmering"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeLoadingChain"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeLoadingChain" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeLoadingRewardsAmount"
+        android:layout_width="129dp"
+        android:layout_height="16dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_shimmering"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeLoadingRewardsLabel"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeLoadingRewardsLabel" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeLoadingRewardsFiat"
+        android:layout_width="56dp"
+        android:layout_height="10dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="29dp"
+        android:background="@drawable/bg_shimmering"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeLoadingRewardsAmount"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeLoadingRewardsAmount" />
+
+    <View
+        android:id="@+id/itemDashboardHasStakeLoadingRightSection"
+        android:layout_width="130dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/bg_info_card_back"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_min="130dp" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeLoadingStatus"
+        android:layout_width="44dp"
+        android:layout_height="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/bg_shimmering"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeLoadingRightSection"
+        app:layout_constraintTop_toTopOf="@+id/itemDashboardHasStakeLoadingRightSection" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeLoadingStakeLabel"
+        android:layout_width="44dp"
+        android:layout_height="8dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="14dp"
+        android:background="@drawable/bg_shimmering"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeLoadingRightSection"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeLoadingChain" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeLoadingStakeAmount"
+        android:layout_width="64dp"
+        android:layout_height="10dp"
+        android:layout_marginTop="9dp"
+        android:background="@drawable/bg_shimmering"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeLoadingStakeLabel"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeLoadingStakeLabel" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeLoadingStakesFiat"
+        android:layout_width="53dp"
+        android:layout_height="8dp"
+        android:layout_marginTop="9dp"
+        android:background="@drawable/bg_shimmering"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeLoadingStakeAmount"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeLoadingStakeAmount" />
+
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeLoadingEarningsLabel"
+        android:layout_width="53dp"
+        android:layout_height="8dp"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/bg_shimmering"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeLoadingStakesFiat"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeLoadingStakesFiat" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemDashboardHasStakeLoadingEarnings"
+        android:layout_width="41dp"
+        android:layout_height="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_shimmering"
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeLoadingEarningsLabel"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeLoadingEarningsLabel" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

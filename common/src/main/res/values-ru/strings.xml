@@ -295,7 +295,9 @@
     <string name="common_optional">Необязательные</string>
     <string name="common_options_title">Выберите опцию</string>
     <string name="common_paste">Вставить</string>
+    <string name="common_per_year">/ год</string>
     <string name="common_per_year_format">%s / год</string>
+    <string name="common_per_year_long">в год</string>
     <string name="common_permission_permissions_denied_message">Для использования этого экрана необходимы запрашиваемые разрешения. Вы должны включить их в Настройках.</string>
     <string name="common_permission_permissions_denied_title">Отказано в разрешениях</string>
     <string name="common_permission_permissions_needed_message">Для использования этого экрана требуются запрашиваемые разрешения.</string>
@@ -346,6 +348,7 @@
     <string name="common_use">Использовать</string>
     <string name="common_validation_invalid_address_message">Получатель должен быть допустимым адресом %s</string>
     <string name="common_validation_invalid_address_title">Недопустимый получатель</string>
+    <string name="common_waiting">Ожидание</string>
     <string name="common_warning">Предупреждение</string>
     <string name="common_yes">Да</string>
     <string name="common_zero_amount_error">Сумма должна быть больше нуля</string>
@@ -793,6 +796,10 @@
     <string name="staking_custom_validators_settings_sort_apr">Примерная награда (% APR)</string>
     <string name="staking_custom_validators_settings_sort_apy">Примерное вознаграждение (% APY)</string>
     <string name="staking_custom_validators_update_list">Обновить свой список</string>
+    <string name="staking_dashboard_browser_stake_header">Стейкинг через DApp браузер Nova</string>
+    <string name="staking_dashboard_more_options">Больше вариантов стейкинга</string>
+    <string name="staking_dashboard_no_stake_header">Стейкайте и получайте вознаграждения</string>
+    <string name="staking_earnings_per_year">Заработок в год</string>
     <string name="staking_era_title">эра %s</string>
     <string name="staking_estimate_earning_title_v1.9.0">Расчёт доходности</string>
     <string name="staking_estimate_earning_title_v2_2_0">Расчёт доходности %s</string>
@@ -982,6 +989,7 @@
     <string name="staking_story_validator_title">Кто такой валидатор?</string>
     <string name="staking_switch_account_to_stash">Для установки контроллер аккаунта смените аккаунт на стэш.</string>
     <string name="staking_title">Стейкинг</string>
+    <string name="staking_title_format">%s стейкинг</string>
     <string name="staking_total_rewards_v1.9.0">Заработано</string>
     <string name="staking_total_staked">Всего застейкано</string>
     <string name="staking_turing_boost_threshold">Порог Boost</string>

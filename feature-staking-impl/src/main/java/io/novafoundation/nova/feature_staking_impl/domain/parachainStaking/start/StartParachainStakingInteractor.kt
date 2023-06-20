@@ -16,7 +16,7 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.FixedByteArray
@@ -41,7 +41,7 @@ class RealStartParachainStakingInteractor(
     private val accountRepository: AccountRepository,
     private val extrinsicService: ExtrinsicService,
     private val chainRegistry: ChainRegistry,
-    private val singleAssetSharedState: SingleAssetSharedState,
+    private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
     private val stakingConstantsRepository: ParachainStakingConstantsRepository,
     private val delegatorStateRepository: DelegatorStateRepository,
     private val candidatesRepository: CandidatesRepository,

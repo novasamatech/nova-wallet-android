@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.map
 
 @Suppress("OPT_IN_USAGE_FUTURE_ERROR")
 class ParachainStakingHintsUseCase(
-    private val singleAssetSharedState: SingleAssetSharedState,
+    private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
     private val resourceManager: ResourceManager,
     private val roundDurationEstimator: RoundDurationEstimator,
 ) {

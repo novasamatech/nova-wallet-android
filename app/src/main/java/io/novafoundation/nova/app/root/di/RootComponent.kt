@@ -3,6 +3,7 @@ package io.novafoundation.nova.app.root.di
 import dagger.BindsInstance
 import dagger.Component
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
+import io.novafoundation.nova.app.root.navigation.staking.relaychain.RelayStakingNavigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.di.RootActivityComponent
 import io.novafoundation.nova.app.root.presentation.main.di.MainFragmentComponent
@@ -39,6 +40,7 @@ interface RootComponent {
         fun create(
             @BindsInstance navigationHolder: NavigationHolder,
             @BindsInstance rootRouter: RootRouter,
+            @BindsInstance relayStakingNavigator: RelayStakingNavigator,
             deps: RootDependencies
         ): RootComponent
     }

@@ -51,6 +51,8 @@ infix fun BigDecimal.hasTheSaveValueAs(another: BigDecimal) = compareTo(another)
 
 fun BigInteger.intSqrt() = sqrt(toDouble()).toLong().toBigInteger()
 
+fun <T> unsafeLazy(initializer: () -> T) = lazy(LazyThreadSafetyMode.NONE, initializer)
+
 fun <T> MutableSet<T>.toImmutable(): Set<T> = Collections.unmodifiableSet(this)
 
 operator fun BigInteger.times(double: Double): BigInteger = toBigDecimal().multiply(double.toBigDecimal()).toBigInteger()
@@ -73,6 +75,8 @@ inline fun <T : Comparable<T>, R : Comparable<R>> ClosedRange<T>.map(mapper: (T)
 
 fun BigInteger?.orZero(): BigInteger = this ?: BigInteger.ZERO
 fun BigDecimal?.orZero(): BigDecimal = this ?: 0.toBigDecimal()
+
+fun Double?.orZero(): Double = this ?: 0.0
 
 fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = MathContext.DECIMAL64): BigDecimal {
     return toBigDecimal().divide(divisor.toBigDecimal(), mathContext)
@@ -264,6 +268,10 @@ fun <T> List<T>.modified(index: Int, modification: T): List<T> {
     return newList
 }
 
+fun <T> Set<T>.added(toAdd: T): Set<T> {
+    return toMutableSet().apply { add(toAdd) }
+}
+
 fun <K, V> Map<K, V>.inserted(key: K, value: V): Map<K, V> {
     return toMutableMap().apply { put(key, value) }
 }
@@ -325,3 +333,5 @@ inline fun CoroutineScope.withChildScope(action: CoroutineScope.() -> Unit) {
 
     childScope.cancel()
 }
+
+fun <T> List<T>.associateWithIndex() = withIndex().associateBy(keySelector = { it.value }, valueTransform = { it.index })

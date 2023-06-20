@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentit
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
@@ -22,14 +21,14 @@ import io.novafoundation.nova.feature_governance_impl.data.repository.RealTreasu
 import io.novafoundation.nova.feature_governance_impl.data.source.RealGovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceDAppsModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceUpdatersModule
-import io.novafoundation.nova.feature_governance_impl.di.modules.v1.GovernanceV1
-import io.novafoundation.nova.feature_governance_impl.di.modules.v1.GovernanceV1Module
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.DelegateModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumDetailsModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumListModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumUnlockModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumVoteModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumVotersModule
+import io.novafoundation.nova.feature_governance_impl.di.modules.v1.GovernanceV1
+import io.novafoundation.nova.feature_governance_impl.di.modules.v1.GovernanceV1Module
 import io.novafoundation.nova.feature_governance_impl.di.modules.v2.GovernanceV2
 import io.novafoundation.nova.feature_governance_impl.di.modules.v2.GovernanceV2Module
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.repository.DelegateCommonRepository
@@ -51,23 +50,17 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.RealTrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
-import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.SharedStateTokenUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.di.common.SelectableAssetUseCaseModule
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.state.SelectableSingleAssetSharedState
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
 @Module(
     includes = [
+        SelectableAssetUseCaseModule::class,
         GovernanceV2Module::class,
         GovernanceV1Module::class,
         GovernanceUpdatersModule::class,
@@ -105,41 +98,7 @@ class GovernanceFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideTokenUseCase(
-        tokenRepository: TokenRepository,
-        sharedState: GovernanceSharedState,
-    ): TokenUseCase = SharedStateTokenUseCase(tokenRepository, sharedState)
-
-    @Provides
-    @FeatureScope
-    fun provideAssetUseCase(
-        walletRepository: WalletRepository,
-        accountRepository: AccountRepository,
-        assetSharedState: GovernanceSharedState,
-    ): AssetUseCase = AssetUseCaseImpl(
-        walletRepository = walletRepository,
-        accountRepository = accountRepository,
-        sharedState = assetSharedState,
-    )
-
-    @Provides
-    @FeatureScope
-    fun provideAssetSelectorMixinFactory(
-        assetUseCase: AssetUseCase,
-        assetSharedState: GovernanceSharedState,
-        resourceManager: ResourceManager
-    ) = AssetSelectorFactory(
-        assetUseCase = assetUseCase,
-        singleAssetSharedState = assetSharedState,
-        resourceManager = resourceManager
-    )
-
-    @Provides
-    @FeatureScope
-    fun provideFeeLoaderMixin(
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-        tokenUseCase: TokenUseCase,
-    ): FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(tokenUseCase)
+    fun provideSelectableSharedState(governanceSharedState: GovernanceSharedState): SelectableSingleAssetSharedState<*> = governanceSharedState
 
     @Provides
     @FeatureScope

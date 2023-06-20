@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model
 
 import io.novafoundation.nova.common.utils.amountFromPlanks
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.planksFromAmount
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -16,9 +17,9 @@ data class Token(
     fun BigDecimal.toPlanks() = planksFromAmount(this)
     fun BigInteger.toAmount() = amountFromPlanks(this)
 
-    fun amountToFiat(tokenAmount: BigDecimal): BigDecimal = toFiatOrNull(tokenAmount) ?: BigDecimal.ZERO
+    fun amountToFiat(tokenAmount: BigDecimal): BigDecimal = toFiatOrNull(tokenAmount).orZero()
 
-    fun planksToFiat(tokenAmountPlanks: BigInteger): BigDecimal = planksToFiatOrNull(tokenAmountPlanks) ?: BigDecimal.ZERO
+    fun planksToFiat(tokenAmountPlanks: BigInteger): BigDecimal = planksToFiatOrNull(tokenAmountPlanks).orZero()
 }
 
 fun Token.toFiatOrNull(tokenAmount: BigDecimal): BigDecimal? = coinRateChange?.convertAmount(tokenAmount)

@@ -286,7 +286,7 @@ class EvmSignInteractor(
                 symbol = chainCurrency.symbol,
                 precision = chainCurrency.decimals,
                 buyProviders = emptyMap(),
-                staking = Chain.Asset.StakingType.UNSUPPORTED,
+                staking = emptyList(),
                 type = Chain.Asset.Type.EvmNative,
                 name = chainCurrency.name,
                 source = Chain.Asset.Source.ERC20,

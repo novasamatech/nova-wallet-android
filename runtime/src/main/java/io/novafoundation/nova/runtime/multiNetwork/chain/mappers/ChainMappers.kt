@@ -20,9 +20,18 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Nodes.NodeSelectionStrategy
 
 fun mapStakingTypeToLocal(stakingType: Chain.Asset.StakingType): String = stakingType.name
-private fun mapStakingTypeFromLocal(stakingTypeLocal: String): Chain.Asset.StakingType = enumValueOf(stakingTypeLocal)
 
-private fun mapAssetSourceFromLocal(source: AssetSourceLocal): Chain.Asset.Source {
+fun mapStakingTypesToLocal(stakingTypes: List<Chain.Asset.StakingType>): String {
+    return stakingTypes.joinToString(separator = ",", transform = ::mapStakingTypeToLocal)
+}
+
+private fun mapStakingTypeFromLocal(stakingTypesLocal: String): List<Chain.Asset.StakingType> {
+    if (stakingTypesLocal.isEmpty()) return emptyList()
+
+    return stakingTypesLocal.split(",").map(Chain.Asset.StakingType::valueOf)
+}
+
+fun mapAssetSourceFromLocal(source: AssetSourceLocal): Chain.Asset.Source {
     return when (source) {
         AssetSourceLocal.DEFAULT -> Chain.Asset.Source.DEFAULT
         AssetSourceLocal.ERC20 -> Chain.Asset.Source.ERC20
@@ -139,7 +148,7 @@ fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal {
         chainId = asset.chainId,
         name = asset.name,
         priceId = asset.priceId,
-        staking = mapStakingTypeToLocal(asset.staking),
+        staking = mapStakingTypesToLocal(asset.staking),
         type = type,
         source = mapAssetSourceToLocal(asset.source),
         buyProviders = gson.toJson(asset.buyProviders),
