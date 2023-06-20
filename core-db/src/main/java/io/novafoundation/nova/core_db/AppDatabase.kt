@@ -60,7 +60,7 @@ import io.novafoundation.nova.core_db.migrations.AddNodeSelectionStrategyField_3
 import io.novafoundation.nova.core_db.migrations.AddRuntimeFlagToChains_36_37
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AddSourceToLocalAsset_28_29
-import io.novafoundation.nova.core_db.migrations.AddStakingDashboardItems_40_41
+import io.novafoundation.nova.core_db.migrations.AddStakingDashboardItems_41_42
 import io.novafoundation.nova.core_db.migrations.AddTransferApisTable_29_30
 import io.novafoundation.nova.core_db.migrations.AddVersioningToGovernanceDapps_32_33
 import io.novafoundation.nova.core_db.migrations.AddWalletConnectSessions_39_40
@@ -186,7 +186,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddGovernanceNetworkToExternalApi_33_34, AddBrowserHostSettings_34_35)
                     .addMigrations(ExtractExternalApiToSeparateTable_35_36, AddRuntimeFlagToChains_36_37)
                     .addMigrations(AddExtrinsicContentField_37_38, AddNodeSelectionStrategyField_38_39)
-                    .addMigrations(AddWalletConnectSessions_39_40, TransferFiatAmount_40_41, AddStakingDashboardItems_40_41)
+                    .addMigrations(AddWalletConnectSessions_39_40, TransferFiatAmount_40_41, AddStakingDashboardItems_41_42)
                     .build()
             }
             return instance!!

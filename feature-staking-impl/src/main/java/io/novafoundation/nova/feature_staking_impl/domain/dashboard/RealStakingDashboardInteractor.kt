@@ -35,7 +35,6 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.Tot
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.priceOf
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.alphabeticalOrder
 import io.novafoundation.nova.runtime.ext.fullId
@@ -382,7 +381,7 @@ class RealStakingDashboardInteractor(
 
         return sortedWith(
             compareBy<AggregatedStakingDashboardOption<WithoutStake>> { it.chain.relaychainsFirstAscendingOrder }
-                .thenByDescending { it.token.priceOf(it.stakingState.availableBalance()) }
+                .thenByDescending { it.token.planksToFiat(it.stakingState.availableBalance()) }
                 .thenComparing(Comparator.comparing(AggregatedStakingDashboardOption<*>::chain, chainTotalStakeComparator))
                 .thenBy { it.chain.alphabeticalOrder }
         )
@@ -391,7 +390,7 @@ class RealStakingDashboardInteractor(
     @JvmName("sortedHasStakeByChain")
     private fun List<AggregatedStakingDashboardOption<HasStake>>.sortedByChain(): List<AggregatedStakingDashboardOption<HasStake>> {
         return sortedWith(
-            compareByDescending<AggregatedStakingDashboardOption<HasStake>> { it.token.priceOf(it.stakingState.stake) }
+            compareByDescending<AggregatedStakingDashboardOption<HasStake>> { it.token.planksToFiat(it.stakingState.stake) }
                 .thenBy { it.chain.testnetsLastAscendingOrder }
                 .thenBy { it.chain.alphabeticalOrder }
         )

@@ -1,8 +1,5 @@
 package io.novafoundation.nova.feature_wallet_impl.data.repository
 
-import io.novafoundation.nova.common.data.network.HttpExceptionHandler
-import io.novafoundation.nova.common.data.network.coingecko.PriceInfo
-import io.novafoundation.nova.common.utils.asQueryParam
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
