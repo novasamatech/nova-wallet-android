@@ -11,10 +11,11 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionRequester
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountValidForTransactionListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.SelectAddressViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -27,13 +28,15 @@ class SelectAddressModule {
         walletUiUseCase: WalletUiUseCase,
         resourceManager: ResourceManager,
         chainRegistry: ChainRegistry,
-        metaAccountGroupingInteractor: MetaAccountGroupingInteractor
+        metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
+        accountTypePresentationMapper: MetaAccountTypePresentationMapper,
     ): MetaAccountValidForTransactionListingMixinFactory {
         return MetaAccountValidForTransactionListingMixinFactory(
             walletUiUseCase = walletUiUseCase,
             resourceManager = resourceManager,
             chainRegistry = chainRegistry,
             metaAccountGroupingInteractor = metaAccountGroupingInteractor,
+            accountTypePresentationMapper = accountTypePresentationMapper
         )
     }
 

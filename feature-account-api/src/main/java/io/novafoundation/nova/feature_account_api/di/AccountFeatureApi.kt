@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_api.di
 
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
+import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.MutableSharedState
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -15,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountG
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -45,6 +47,8 @@ interface AccountFeatureApi {
 
     fun importTypeChooserMixin(): ImportTypeChooserMixin.Presentation
 
+    fun twoFactorVerificationExecutor(): TwoFactorVerificationExecutor
+
     fun biometricServiceFactory(): BiometricServiceFactory
 
     val addressInputMixinFactory: AddressInputMixinFactory
@@ -72,4 +76,6 @@ interface AccountFeatureApi {
     val languageUseCase: LanguageUseCase
 
     val selectWalletMixinFactory: SelectWalletMixin.Factory
+
+    val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider
 }

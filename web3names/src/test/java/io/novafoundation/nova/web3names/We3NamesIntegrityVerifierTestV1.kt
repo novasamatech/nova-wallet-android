@@ -1,12 +1,21 @@
 package io.novafoundation.nova.web3names
 
-import io.novafoundation.nova.web3names.data.integrity.RealWe3NamesIntegrityVerifier
+import com.google.gson.Gson
+import io.novafoundation.nova.web3names.data.endpoints.TransferRecipientsApi
+import io.novafoundation.nova.web3names.data.serviceEndpoint.ServiceEndpoint
+import io.novafoundation.nova.web3names.data.serviceEndpoint.W3NServiceEndpointHandlerV1
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.Mockito.mock
 
-class We3NamesIntegrityVerifierTest {
-    
-    private val integrityVerifier = RealWe3NamesIntegrityVerifier()
+
+class We3NamesIntegrityVerifierTestV1 {
+
+    private val endpointHandler = W3NServiceEndpointHandlerV1(
+        endpoint = mock(ServiceEndpoint::class.java),
+        transferRecipientApi = mock(TransferRecipientsApi::class.java),
+        gson = Gson()
+    )
 
     @Test
     fun `should accept valid id matching resource hash`() = runTest(
@@ -39,7 +48,7 @@ class We3NamesIntegrityVerifierTest {
         resource: String = testResource(),
         expectedOutcome: Boolean
     ) {
-        assertEquals(expectedOutcome, integrityVerifier.verifyIntegrity(endpointId, resource))
+        assertEquals(expectedOutcome, endpointHandler.verifyIntegrity(endpointId, resource))
     }
 
     private fun testResource(): String {

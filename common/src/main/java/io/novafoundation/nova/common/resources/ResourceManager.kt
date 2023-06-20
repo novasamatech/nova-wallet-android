@@ -16,6 +16,8 @@ interface ResourceManager {
 
     fun getString(res: Int, vararg arguments: Any): String
 
+    fun getText(res: Int): CharSequence
+
     fun getColor(res: Int): Int
 
     fun getQuantityString(id: Int, quantity: Int): String

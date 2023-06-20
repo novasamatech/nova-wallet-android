@@ -4,9 +4,12 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIde
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.eqBalances
 import io.novafoundation.nova.common.utils.instanceOf
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.filterOwn
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.SubstrateAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
@@ -24,15 +27,18 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.call
 class EquilibriumAssetHistory(
     private val chainRegistry: ChainRegistry,
     private val eventsRepository: EventsRepository,
+    private val walletRepository: WalletRepository,
     walletOperationsApi: SubQueryOperationsApi,
     cursorStorage: TransferCursorStorage,
-) : SubstrateAssetHistory(walletOperationsApi, cursorStorage) {
+    coinPriceRepository: CoinPriceRepository
+) : SubstrateAssetHistory(walletOperationsApi, cursorStorage, coinPriceRepository) {
 
     override suspend fun fetchOperationsForBalanceChange(
         chain: Chain,
         chainAsset: Chain.Asset,
         blockHash: String,
-        accountId: AccountId
+        accountId: AccountId,
+        currency: Currency
     ): Result<List<TransferExtrinsic>> = runCatching {
         val runtime = chainRegistry.getRuntime(chain.id)
         val extrinsicsWithEvents = eventsRepository.getExtrinsicsWithEvents(chain.id, blockHash)
@@ -41,10 +47,11 @@ class EquilibriumAssetHistory(
             .map { extrinsicWithEvents ->
                 val extrinsic = extrinsicWithEvents.extrinsic
 
+                val amount = bindNumber(extrinsic.call.arguments["value"])
                 TransferExtrinsic(
                     senderId = bindAccountIdentifier(extrinsic.signature!!.accountIdentifier),
                     recipientId = bindAccountIdentifier(extrinsic.call.arguments["to"]),
-                    amountInPlanks = bindNumber(extrinsic.call.arguments["value"]),
+                    amountInPlanks = amount,
                     hash = extrinsicWithEvents.extrinsicHash,
                     chainAsset = chainAsset,
                     status = extrinsicWithEvents.status()

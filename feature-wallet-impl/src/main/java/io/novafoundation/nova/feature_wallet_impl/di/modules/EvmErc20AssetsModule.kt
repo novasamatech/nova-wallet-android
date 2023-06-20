@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmT
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.StaticAssetSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evmErc20.EvmErc20AssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.evmErc20.EvmErc20AssetHistory
@@ -66,8 +67,9 @@ class EvmErc20AssetsModule {
     @Provides
     @FeatureScope
     fun provideHistory(
-        etherscanTransactionsApi: EtherscanTransactionsApi
-    ) = EvmErc20AssetHistory(etherscanTransactionsApi)
+        etherscanTransactionsApi: EtherscanTransactionsApi,
+        coinPriceRepository: CoinPriceRepository
+    ) = EvmErc20AssetHistory(etherscanTransactionsApi, coinPriceRepository)
 
     @Provides
     @EvmErc20Assets

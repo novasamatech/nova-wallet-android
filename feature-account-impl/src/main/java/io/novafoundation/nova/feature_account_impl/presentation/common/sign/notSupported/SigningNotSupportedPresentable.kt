@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported
 
 import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable.Payload
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +12,7 @@ interface SigningNotSupportedPresentable {
 
     class Payload(
         @DrawableRes val iconRes: Int,
-        @StringRes val messageRes: Int
+        val message: String
     )
 
     suspend fun presentSigningNotSupported(payload: Payload)

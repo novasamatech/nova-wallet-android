@@ -449,7 +449,7 @@ fun <T> accumulateFlatten(vararg flows: Flow<List<T>>): Flow<List<T>> {
     return accumulate(*flows).map { it.flatten() }
 }
 
-fun <A, B, R> unite(flowA: Flow<A>, flowB: Flow<B>, transform: (A?, B?) -> R): Flow<R> {
+fun <A, B, R> unite(flowA: Flow<A>, flowB: Flow<B>, transform: suspend (A?, B?) -> R): Flow<R> {
     var aResult: A? = null
     var bResult: B? = null
 

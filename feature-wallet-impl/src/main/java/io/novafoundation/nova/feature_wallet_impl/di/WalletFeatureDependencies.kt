@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
+import io.novafoundation.nova.core_db.dao.CoinPriceDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.core_db.dao.CurrencyDao
 import io.novafoundation.nova.core_db.dao.LockDao
@@ -31,6 +32,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -117,6 +119,8 @@ interface WalletFeatureDependencies {
 
     fun eventsRepository(): EventsRepository
 
+    fun coinPriceDao(): CoinPriceDao
+
     val fileCache: FileCache
 
     val storageCache: StorageCache
@@ -126,4 +130,6 @@ interface WalletFeatureDependencies {
     val chainAssetDao: ChainAssetDao
 
     val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+
+    val currencyRepository: CurrencyRepository
 }

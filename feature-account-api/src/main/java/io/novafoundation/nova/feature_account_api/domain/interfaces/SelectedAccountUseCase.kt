@@ -6,7 +6,9 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.asPolkadotVaultVariantOrThrow
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +24,7 @@ class SelectedAccountUseCase(
     private val accountRepository: AccountRepository,
     private val walletUiUseCase: WalletUiUseCase,
     private val addressIconGenerator: AddressIconGenerator,
+    private val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
 ) {
 
     fun selectedMetaAccountFlow(): Flow<MetaAccount> = accountRepository.selectedMetaAccountFlow()
@@ -37,10 +40,13 @@ class SelectedAccountUseCase(
     fun selectedWalletModelFlow(): Flow<SelectedWalletModel> = selectedMetaAccountFlow().map {
         val icon = walletUiUseCase.walletIcon(it, transparentBackground = false)
 
-        val typeIcon = when (it.type) {
+        val typeIcon = when (val type = it.type) {
             LightMetaAccount.Type.SECRETS -> null // no icon for secrets account
             LightMetaAccount.Type.WATCH_ONLY -> R.drawable.ic_watch_only_filled
-            LightMetaAccount.Type.PARITY_SIGNER -> R.drawable.ic_parity_signer
+            LightMetaAccount.Type.PARITY_SIGNER, LightMetaAccount.Type.POLKADOT_VAULT -> {
+                val config = polkadotVaultVariantConfigProvider.variantConfigFor(type.asPolkadotVaultVariantOrThrow())
+                config.common.iconRes
+            }
             LightMetaAccount.Type.LEDGER -> R.drawable.ic_ledger
         }
 
