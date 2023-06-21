@@ -9,13 +9,14 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.reversed
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriodType
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
+import io.novafoundation.nova.runtime.state.selectedOption
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.Flow
@@ -50,7 +51,7 @@ class DateRangeWithCurrent(
 
 class StakingPeriodViewModel(
     private val stakingRewardPeriodInteractor: StakingRewardPeriodInteractor,
-    private val singleAssetSharedState: SingleAssetSharedState,
+    private val stakingSharedState: StakingSharedState,
     private val resourceManager: ResourceManager,
     private val router: StakingRouter
 ) : BaseViewModel() {
@@ -100,17 +101,19 @@ class StakingPeriodViewModel(
     }
 
     private suspend fun getSelectedRewardPeriod(): RewardPeriod {
-        val chain = singleAssetSharedState.chain()
-        val chainAsset = singleAssetSharedState.chainAsset()
-        return stakingRewardPeriodInteractor.getRewardPeriod(chain, chainAsset)
+        val chain = stakingSharedState.chain()
+        val chainAsset = stakingSharedState.chainAsset()
+        val stakingType = stakingSharedState.selectedOption().additional.stakingType
+        return stakingRewardPeriodInteractor.getRewardPeriod(chain, chainAsset, stakingType)
     }
 
     fun onSaveClick() {
         launch {
-            val chain = singleAssetSharedState.chain()
-            val chainAsset = singleAssetSharedState.chainAsset()
+            val chain = stakingSharedState.chain()
+            val chainAsset = stakingSharedState.chainAsset()
+            val stakingType = stakingSharedState.selectedOption().additional.stakingType
             val result = mapSelectedPeriod(selectedPeriod.value, _customPeriod.value)
-            result?.let { stakingRewardPeriodInteractor.setRewardPeriod(chain, chainAsset, it) }
+            result?.let { stakingRewardPeriodInteractor.setRewardPeriod(chain, chainAsset, stakingType, it) }
             router.back()
         }
     }

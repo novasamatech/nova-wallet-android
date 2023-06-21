@@ -22,13 +22,13 @@ class StakingPeriodModule {
     @ViewModelKey(StakingPeriodViewModel::class)
     fun provideViewModel(
         stakingRewardPeriodInteractor: StakingRewardPeriodInteractor,
-        singleAssetSharedState: StakingSharedState,
+        stakingSharedState: StakingSharedState,
         resourceManager: ResourceManager,
         stakingRouter: StakingRouter
     ): ViewModel {
         return StakingPeriodViewModel(
             stakingRewardPeriodInteractor,
-            singleAssetSharedState,
+            stakingSharedState,
             resourceManager,
             stakingRouter
         )

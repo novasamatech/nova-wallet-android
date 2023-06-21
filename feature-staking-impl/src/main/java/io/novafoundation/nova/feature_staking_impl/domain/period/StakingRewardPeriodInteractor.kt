@@ -10,11 +10,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 
 interface StakingRewardPeriodInteractor {
 
-    suspend fun setRewardPeriod(chain: Chain, asset: Chain.Asset, rewardPeriod: RewardPeriod)
+    suspend fun setRewardPeriod(chain: Chain, asset: Chain.Asset, stakingType: Chain.Asset.StakingType, rewardPeriod: RewardPeriod)
 
-    suspend fun getRewardPeriod(chain: Chain, asset: Chain.Asset): RewardPeriod
+    suspend fun getRewardPeriod(chain: Chain, asset: Chain.Asset, stakingType: Chain.Asset.StakingType): RewardPeriod
 
-    fun observeRewardPeriod(chain: Chain, asset: Chain.Asset): Flow<RewardPeriod>
+    fun observeRewardPeriod(chain: Chain, asset: Chain.Asset, stakingType: Chain.Asset.StakingType): Flow<RewardPeriod>
 }
 
 class RealStakingRewardPeriodInteractor(
@@ -22,22 +22,22 @@ class RealStakingRewardPeriodInteractor(
     private val accountRepository: AccountRepository
 ) : StakingRewardPeriodInteractor {
 
-    override suspend fun setRewardPeriod(chain: Chain, asset: Chain.Asset, rewardPeriod: RewardPeriod) {
+    override suspend fun setRewardPeriod(chain: Chain, asset: Chain.Asset, stakingType: Chain.Asset.StakingType, rewardPeriod: RewardPeriod) {
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val accountId = metaAccount.accountIdIn(chain) ?: return
-        stakingPeriodRepository.setRewardPeriod(accountId, chain, asset, rewardPeriod)
+        stakingPeriodRepository.setRewardPeriod(accountId, chain, asset, stakingType, rewardPeriod)
     }
 
-    override suspend fun getRewardPeriod(chain: Chain, asset: Chain.Asset): RewardPeriod {
+    override suspend fun getRewardPeriod(chain: Chain, asset: Chain.Asset, stakingType: Chain.Asset.StakingType): RewardPeriod {
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val accountId = metaAccount.accountIdIn(chain) ?: return RewardPeriod.AllTime
-        return stakingPeriodRepository.getRewardPeriod(accountId, chain, asset)
+        return stakingPeriodRepository.getRewardPeriod(accountId, chain, asset, stakingType)
     }
 
-    override fun observeRewardPeriod(chain: Chain, asset: Chain.Asset): Flow<RewardPeriod> {
+    override fun observeRewardPeriod(chain: Chain, asset: Chain.Asset, stakingType: Chain.Asset.StakingType): Flow<RewardPeriod> {
         return accountRepository.selectedMetaAccountFlow().flatMapLatest {
             val accountId = it.accountIdIn(chain) ?: return@flatMapLatest emptyFlow()
-            stakingPeriodRepository.observeRewardPeriod(accountId, chain, asset)
+            stakingPeriodRepository.observeRewardPeriod(accountId, chain, asset, stakingType)
         }
     }
 }

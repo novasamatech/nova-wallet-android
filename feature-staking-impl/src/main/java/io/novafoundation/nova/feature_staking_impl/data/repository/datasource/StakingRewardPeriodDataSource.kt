@@ -12,31 +12,37 @@ import kotlinx.coroutines.flow.map
 
 interface StakingRewardPeriodDataSource {
 
-    suspend fun setRewardPeriod(accountId: AccountId, chain: Chain, asset: Chain.Asset, rewardPeriod: RewardPeriod)
+    suspend fun setRewardPeriod(accountId: AccountId, chain: Chain, asset: Chain.Asset, stakingType: Chain.Asset.StakingType, rewardPeriod: RewardPeriod)
 
-    suspend fun getRewardPeriod(accountId: AccountId, chain: Chain, asset: Chain.Asset): RewardPeriod
+    suspend fun getRewardPeriod(accountId: AccountId, chain: Chain, asset: Chain.Asset, stakingType: Chain.Asset.StakingType): RewardPeriod
 
-    fun observeRewardPeriod(accountId: AccountId, chain: Chain, asset: Chain.Asset): Flow<RewardPeriod>
+    fun observeRewardPeriod(accountId: AccountId, chain: Chain, asset: Chain.Asset, stakingType: Chain.Asset.StakingType): Flow<RewardPeriod>
 }
 
 class RealStakingRewardPeriodDataSource(
     private val dao: StakingRewardPeriodDao
 ) : StakingRewardPeriodDataSource {
 
-    override suspend fun setRewardPeriod(accountId: AccountId, chain: Chain, asset: Chain.Asset, rewardPeriod: RewardPeriod) {
-        val localModel = mapRewardPeriodToLocal(accountId, chain.id, asset.id, asset.staking, rewardPeriod)
+    override suspend fun setRewardPeriod(
+        accountId: AccountId,
+        chain: Chain,
+        asset: Chain.Asset,
+        stakingType: Chain.Asset.StakingType,
+        rewardPeriod: RewardPeriod
+    ) {
+        val localModel = mapRewardPeriodToLocal(accountId, chain.id, asset.id, stakingType, rewardPeriod)
         dao.insertStakingRewardPeriod(localModel)
     }
 
-    override suspend fun getRewardPeriod(accountId: AccountId, chain: Chain, asset: Chain.Asset): RewardPeriod {
-        val stakingType = mapStakingTypeToLocal(asset.staking)
-        val period = dao.getStakingRewardPeriod(accountId, chain.id, asset.id, stakingType)
+    override suspend fun getRewardPeriod(accountId: AccountId, chain: Chain, asset: Chain.Asset, stakingType: Chain.Asset.StakingType): RewardPeriod {
+        val stakingTypeStr = mapStakingTypeToLocal(stakingType)
+        val period = dao.getStakingRewardPeriod(accountId, chain.id, asset.id, stakingTypeStr)
         return mapToRewardPeriodFromLocal(period)
     }
 
-    override fun observeRewardPeriod(accountId: AccountId, chain: Chain, asset: Chain.Asset): Flow<RewardPeriod> {
-        val stakingType = mapStakingTypeToLocal(asset.staking)
-        return dao.observeStakingRewardPeriod(accountId, chain.id, asset.id, stakingType)
+    override fun observeRewardPeriod(accountId: AccountId, chain: Chain, asset: Chain.Asset, stakingType: Chain.Asset.StakingType): Flow<RewardPeriod> {
+        val stakingTypeStr = mapStakingTypeToLocal(stakingType)
+        return dao.observeStakingRewardPeriod(accountId, chain.id, asset.id, stakingTypeStr)
             .map { mapToRewardPeriodFromLocal(it) }
     }
 
