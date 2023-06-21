@@ -54,4 +54,8 @@ interface AssetsRouter {
     fun openNfts()
 
     fun finishAddTokenFlow()
+
+    fun openWalletConnectSessions(metaId: Long)
+
+    fun openWalletConnectScan()
 }

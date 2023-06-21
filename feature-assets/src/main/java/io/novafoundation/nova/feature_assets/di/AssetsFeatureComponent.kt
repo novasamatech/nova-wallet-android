@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
+import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.web3names.di.Web3NamesApi
 
@@ -103,7 +104,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
             AccountFeatureApi::class,
             CurrencyFeatureApi::class,
             CrowdloanFeatureApi::class,
-            Web3NamesApi::class
+            Web3NamesApi::class,
+            WalletConnectFeatureApi::class
         ]
     )
     interface AssetsFeatureDependenciesComponent : AssetsFeatureDependencies

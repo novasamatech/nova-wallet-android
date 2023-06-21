@@ -66,6 +66,8 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.sel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerFragment
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
+import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 import io.novafoundation.nova.splash.SplashRouter
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.Flow
@@ -78,6 +80,7 @@ object BackDelayedNavigation : DelayedNavigation
 
 class Navigator(
     private val navigationHolder: NavigationHolder,
+    private val walletConnectDelegate: WalletConnectRouter,
 ) : BaseNavigator(navigationHolder),
     SplashRouter,
     OnboardingRouter,
@@ -314,6 +317,14 @@ class Navigator(
 
     override fun finishAddTokenFlow() {
         navController?.navigate(R.id.finish_add_token_flow)
+    }
+
+    override fun openWalletConnectSessions(metaId: Long) {
+        walletConnectDelegate.openWalletConnectSessions(WalletConnectSessionsPayload(metaId = metaId))
+    }
+
+    override fun openWalletConnectScan() {
+        walletConnectDelegate.openScanPairingQrCode()
     }
 
     override fun openNfts() {

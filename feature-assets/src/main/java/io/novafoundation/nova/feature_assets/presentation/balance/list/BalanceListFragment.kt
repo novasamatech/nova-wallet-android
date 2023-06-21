@@ -121,6 +121,10 @@ class BalanceListFragment :
             }
             balanceBreakdownBottomSheet?.show()
         }
+
+        viewModel.walletConnectAccountSessionsUI.observe {
+            headerAdapter.setWalletConnectModel(it)
+        }
     }
 
     override fun assetClicked(asset: AssetModel) {
@@ -149,6 +153,10 @@ class BalanceListFragment :
 
     override fun goToNftsClicked() {
         viewModel.goToNftsClicked()
+    }
+
+    override fun walletConnectClicked() {
+        viewModel.walletConnectClicked()
     }
 
     override fun sendClicked() {

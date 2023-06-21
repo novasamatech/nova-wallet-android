@@ -49,6 +49,7 @@ import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
@@ -298,4 +299,8 @@ class CommonModule {
         preferences: Preferences,
         twoFactorVerificationExecutor: TwoFactorVerificationExecutor
     ): TwoFactorVerificationService = RealTwoFactorVerificationService(preferences, twoFactorVerificationExecutor)
+
+    @Provides
+    @ApplicationScope
+    fun provideRootScope() = RootScope()
 }
