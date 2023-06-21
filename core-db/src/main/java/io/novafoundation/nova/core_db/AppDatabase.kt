@@ -144,8 +144,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         BrowserHostSettingsLocal::class,
         WalletConnectSessionAccountLocal::class,
         CoinPriceLocal::class,
-        StakingRewardPeriodLocal::class,
-        StakingDashboardItemLocal::class
+        StakingDashboardItemLocal::class,
+        StakingRewardPeriodLocal::class
     ],
 )
 @TypeConverters(
