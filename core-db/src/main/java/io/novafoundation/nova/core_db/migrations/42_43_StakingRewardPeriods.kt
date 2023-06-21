@@ -4,6 +4,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 val StakingRewardPeriods_42_43 = object : Migration(42, 43) {
+
     override fun migrate(database: SupportSQLiteDatabase) {
         createCoinPriceTable(database)
     }
