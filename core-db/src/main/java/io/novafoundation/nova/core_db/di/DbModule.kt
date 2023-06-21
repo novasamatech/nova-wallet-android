@@ -25,6 +25,7 @@ import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.PhishingSitesDao
 import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
+import io.novafoundation.nova.core_db.dao.StakingDashboardDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
@@ -171,6 +172,12 @@ class DbModule {
     @ApplicationScope
     fun provideWalletConnectSessionsDao(appDatabase: AppDatabase): WalletConnectSessionsDao {
         return appDatabase.walletConnectSessionsDao()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideStakingDashboardDao(appDatabase: AppDatabase): StakingDashboardDao {
+        return appDatabase.stakingDashboardDao()
     }
 
     @Provides

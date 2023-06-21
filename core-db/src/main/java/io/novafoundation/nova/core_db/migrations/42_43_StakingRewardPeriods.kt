@@ -3,7 +3,7 @@ package io.novafoundation.nova.core_db.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-val StakingRewardPeriods_41_42 = object : Migration(41, 42) {
+val StakingRewardPeriods_42_43 = object : Migration(42, 43) {
     override fun migrate(database: SupportSQLiteDatabase) {
         createCoinPriceTable(database)
     }

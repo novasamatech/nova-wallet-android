@@ -350,3 +350,11 @@ fun ImageView.setImageResource(@DrawableRes imageRes: Int?) = if (imageRes == nu
 }
 
 fun EditText.moveCursorToTheEnd() = setSelection(length())
+
+fun ShimmerFrameLayout.setShimmerShown(shown: Boolean) {
+    if (shown) {
+        showShimmer(true)
+    } else {
+        hideShimmer()
+    }
+}

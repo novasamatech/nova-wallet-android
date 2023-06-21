@@ -28,6 +28,8 @@ dependencies {
     implementation project(":feature-external-sign-api")
     implementation project(':common')
 
+    implementation shimmerDep
+
     implementation coroutinesDep
 
     testImplementation jUnitDep

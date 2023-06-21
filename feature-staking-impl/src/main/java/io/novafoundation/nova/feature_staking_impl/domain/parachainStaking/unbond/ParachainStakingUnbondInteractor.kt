@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
@@ -33,7 +33,7 @@ class RealParachainStakingUnbondInteractor(
     private val extrinsicService: ExtrinsicService,
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val delegatorStateRepository: DelegatorStateRepository,
-    private val selectedAssetSharedState: SingleAssetSharedState,
+    private val selectedAssetSharedState: AnySelectedAssetOptionSharedState,
     private val collatorsUseCase: CollatorsUseCase,
 ) : ParachainStakingUnbondInteractor {
 

@@ -3,12 +3,11 @@ package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindi
 import io.novafoundation.nova.common.data.network.runtime.binding.HelperBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
-import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.storageReturnType
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
 import java.math.BigInteger
 
@@ -33,9 +32,13 @@ fun bindActiveEra(
     runtime: RuntimeSnapshot
 ): BigInteger {
     val returnType = runtime.metadata.storageReturnType("Staking", "ActiveEra")
-    val decoded = returnType.fromHexOrNull(runtime, scale) as? Struct.Instance ?: incompatible()
+    val decoded = returnType.fromHexOrNull(runtime, scale)
 
-    return bindEraIndex(decoded.getTyped("index"))
+    return bindActiveEra(decoded)
+}
+
+fun bindActiveEra(decoded: Any?): BigInteger {
+    return bindEraIndex(decoded.castToStruct().getTyped("index"))
 }
 
 /*

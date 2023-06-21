@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -494,3 +495,7 @@ fun <T> Flow<T>.observeInLifecycle(
 fun <T> Map<out T, MutableStateFlow<Boolean>>.checkEnabled(key: T) = get(key)?.value ?: false
 
 suspend inline fun <reified T> Flow<T?>.firstNotNull(): T = first { it != null } as T
+
+inline fun <T, R> Flow<IndexedValue<T>>.mapLatestIndexed(crossinline transform: suspend (T) -> R): Flow<IndexedValue<R>> {
+    return mapLatest { IndexedValue(it.index, transform(it.value)) }
+}

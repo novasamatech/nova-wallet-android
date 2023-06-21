@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -25,7 +25,7 @@ class PayoutDetailsViewModel(
     private val addressModelGenerator: AddressIconGenerator,
     private val externalActions: ExternalActions.Presentation,
     private val resourceManager: ResourceManager,
-    private val selectedAssetState: SingleAssetSharedState,
+    private val selectedAssetState: AnySelectedAssetOptionSharedState,
 ) : BaseViewModel(), ExternalActions.Presentation by externalActions {
 
     val payoutDetails = interactor.currentAssetFlow()

@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -45,7 +45,7 @@ class ConfirmRebondViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val payload: ConfirmRebondPayload,
-    private val selectedAssetState: SingleAssetSharedState,
+    private val selectedAssetState: AnySelectedAssetOptionSharedState,
     hintsMixinFactory: ResourcesHintsMixinFactory,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
@@ -142,7 +142,7 @@ class ConfirmRebondViewModel(
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.returnToMain()
+                router.returnToStakingMain()
             }
             .onFailure(::showError)
 

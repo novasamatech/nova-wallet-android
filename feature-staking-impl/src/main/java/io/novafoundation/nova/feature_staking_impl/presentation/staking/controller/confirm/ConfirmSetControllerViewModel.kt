@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.set.bondSetControllerValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -36,7 +36,7 @@ class ConfirmSetControllerViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: SetControllerValidationSystem,
-    private val selectedAssetState: SingleAssetSharedState,
+    private val selectedAssetState: AnySelectedAssetOptionSharedState,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
@@ -115,7 +115,7 @@ class ConfirmSetControllerViewModel(
         if (result.isSuccess) {
             showMessage(resourceManager.getString(R.string.staking_controller_change_success))
 
-            router.returnToMain()
+            router.returnToStakingMain()
         }
     }
 

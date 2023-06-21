@@ -36,7 +36,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -53,7 +53,7 @@ class CurrentCollatorsViewModel(
     private val resourceManager: ResourceManager,
     private val iconGenerator: AddressIconGenerator,
     private val currentCollatorsInteractor: CurrentCollatorInteractor,
-    private val selectedChainStale: SingleAssetSharedState,
+    private val selectedChainStale: AnySelectedAssetOptionSharedState,
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val collatorsUseCase: CollatorsUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,

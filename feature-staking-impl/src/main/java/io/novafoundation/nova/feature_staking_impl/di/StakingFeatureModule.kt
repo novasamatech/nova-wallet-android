@@ -69,15 +69,14 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.hints.StakingHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationProvider
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.RealStakingDashboardPresentationMapper
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
+import io.novafoundation.nova.feature_wallet_api.di.common.AssetUseCaseModule
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.AssetUseCaseImpl
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.SharedStateTokenUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
@@ -85,44 +84,12 @@ import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
+import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
-@Module
+@Module(includes = [AssetUseCaseModule::class])
 class StakingFeatureModule {
-
-    @Provides
-    @FeatureScope
-    fun provideAssetUseCase(
-        walletRepository: WalletRepository,
-        accountRepository: AccountRepository,
-        sharedState: StakingSharedState,
-    ): AssetUseCase = AssetUseCaseImpl(
-        walletRepository,
-        accountRepository,
-        sharedState
-    )
-
-    @Provides
-    fun provideAssetSelectorMixinFactory(
-        assetUseCase: AssetUseCase,
-        singleAssetSharedState: StakingSharedState,
-        resourceManager: ResourceManager
-    ): AssetSelectorFactory = AssetSelectorFactory(
-        assetUseCase,
-        singleAssetSharedState,
-        resourceManager
-    )
-
-    @Provides
-    @FeatureScope
-    fun provideTokenUseCase(
-        tokenRepository: TokenRepository,
-        sharedState: StakingSharedState,
-    ): TokenUseCase = SharedStateTokenUseCase(
-        tokenRepository,
-        sharedState
-    )
 
     @Provides
     @FeatureScope
@@ -133,10 +100,11 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideStakingSharedState(
-        chainRegistry: ChainRegistry,
-        preferences: Preferences
-    ) = StakingSharedState(chainRegistry, preferences)
+    fun provideStakingSharedState() = StakingSharedState()
+
+    @Provides
+    @FeatureScope
+    fun provideSelectableSharedState(stakingSharedState: StakingSharedState): SelectedAssetOptionSharedState<*> = stakingSharedState
 
     @Provides
     @FeatureScope
@@ -214,9 +182,6 @@ class StakingFeatureModule {
         assetUseCase: AssetUseCase,
         factory: EraTimeCalculatorFactory,
         stakingSharedComputation: StakingSharedComputation,
-        bagListRepository: BagListRepository,
-        totalIssuanceRepository: TotalIssuanceRepository,
-        stakingPeriodRepository: StakingPeriodRepository
     ) = StakingInteractor(
         walletRepository,
         accountRepository,
@@ -229,9 +194,6 @@ class StakingFeatureModule {
         assetUseCase,
         factory,
         stakingSharedComputation,
-        bagListRepository,
-        totalIssuanceRepository,
-        stakingPeriodRepository
     )
 
     @Provides
@@ -514,4 +476,10 @@ class StakingFeatureModule {
         stakingPeriodRepository,
         accountRepository
     )
+
+    @Provides
+    @FeatureScope
+    fun provideStakingDashboardPresentationMapper(resourceManager: ResourceManager): StakingDashboardPresentationMapper {
+        return RealStakingDashboardPresentationMapper(resourceManager)
+    }
 }

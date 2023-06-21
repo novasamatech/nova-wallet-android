@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.repository
 
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.model.AssetAndChainId
@@ -77,6 +78,18 @@ class WalletRepositoryImpl(
         assetsLocal.map {
             mapAssetLocalToAsset(it, chainsById.chainAsset(it.assetAndChainId))
         }
+    }
+
+    override fun supportedAssetsFlow(metaId: Long, chainAssets: List<Chain.Asset>): Flow<List<Asset>> = flowOfAll {
+        val chainAssetsById = chainAssets.associateBy { AssetAndChainId(it.chainId, it.id) }
+
+        assetCache.observeSupportedAssets(metaId).map { supportedAssets ->
+            supportedAssets.mapNotNull { assetWithToken ->
+                val chainAsset = chainAssetsById[assetWithToken.assetAndChainId] ?: return@mapNotNull null
+
+                mapAssetLocalToAsset(assetWithToken, chainAsset)
+            }
+        }.distinctUntilChanged()
     }
 
     override suspend fun syncAssetsRates(currency: Currency) {

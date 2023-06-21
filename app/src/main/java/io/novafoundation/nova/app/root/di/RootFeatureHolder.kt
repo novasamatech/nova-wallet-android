@@ -2,6 +2,7 @@ package io.novafoundation.nova.app.root.di
 
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
+import io.novafoundation.nova.app.root.navigation.staking.relaychain.RelayStakingNavigator
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -21,6 +22,7 @@ import javax.inject.Inject
 class RootFeatureHolder @Inject constructor(
     private val navigationHolder: NavigationHolder,
     private val navigator: Navigator,
+    private val relayStakingNavigator: RelayStakingNavigator,
     featureContainer: FeatureContainer
 ) : FeatureApiHolder(featureContainer) {
 
@@ -40,6 +42,6 @@ class RootFeatureHolder @Inject constructor(
             .build()
 
         return DaggerRootComponent.factory()
-            .create(navigationHolder, navigator, rootFeatureDependencies)
+            .create(navigationHolder, navigator, relayStakingNavigator, rootFeatureDependencies)
     }
 }

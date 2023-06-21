@@ -8,8 +8,10 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.StakingViewModel
@@ -21,7 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.components.ComponentsModule
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
+import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 
 @Module(includes = [ViewModelModule::class, ComponentsModule::class])
 class StakingModule {
@@ -32,7 +34,7 @@ class StakingModule {
     fun provideViewModel(
         selectedAccountUseCase: SelectedAccountUseCase,
 
-        assetSelectorMixinFactory: AssetSelectorFactory,
+        assetUseCase: AssetUseCase,
         alertsComponentFactory: AlertsComponentFactory,
         unbondingComponentFactory: UnbondingComponentFactory,
         startStakingComponentFactory: StartStakingComponentFactory,
@@ -45,10 +47,11 @@ class StakingModule {
 
         validationExecutor: ValidationExecutor,
         stakingUpdateSystem: StakingUpdateSystem,
+        stakingSharedState: StakingSharedState,
+        resourceManager: ResourceManager,
     ): ViewModel {
         return StakingViewModel(
             selectedAccountUseCase = selectedAccountUseCase,
-            assetSelectorMixinFactory = assetSelectorMixinFactory,
             alertsComponentFactory = alertsComponentFactory,
             unbondingComponentFactory = unbondingComponentFactory,
             startStakingComponentFactory = startStakingComponentFactory,
@@ -59,6 +62,9 @@ class StakingModule {
             router = router,
             validationExecutor = validationExecutor,
             stakingUpdateSystem = stakingUpdateSystem,
+            assetUseCase = assetUseCase,
+            stakingSharedState = stakingSharedState,
+            resourceManager = resourceManager
         )
     }
 

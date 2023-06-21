@@ -21,6 +21,7 @@ import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.PhishingSitesDao
 import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
+import io.novafoundation.nova.core_db.dao.StakingDashboardDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
@@ -77,4 +78,6 @@ interface DbApi {
     val currencyDao: CurrencyDao
 
     val walletConnectSessionsDao: WalletConnectSessionsDao
+
+    val stakingDashboardDao: StakingDashboardDao
 }

@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
@@ -29,6 +30,7 @@ class StakingFeatureHolder @Inject constructor(
             .dbApi(getFeature(DbApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
+            .dAppFeatureApi(getFeature(DAppFeatureApi::class.java))
             .build()
 
         return DaggerStakingFeatureComponent.factory()

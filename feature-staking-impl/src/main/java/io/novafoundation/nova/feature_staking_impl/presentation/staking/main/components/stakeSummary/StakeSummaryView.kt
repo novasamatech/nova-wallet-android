@@ -4,15 +4,13 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.utils.setCompoundDrawableTint
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
-import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_staking_impl.R
@@ -32,16 +30,16 @@ class StakeSummaryView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle) {
 
-    sealed class Status(@StringRes val textRes: Int, @ColorRes val tintRes: Int) {
+    sealed class Status(@StringRes val textRes: Int, @ColorRes val tintRes: Int, @DrawableRes val indicatorRes: Int) {
 
-        object Active : Status(R.string.common_active, R.color.text_positive)
+        object Active : Status(R.string.common_active, R.color.text_positive, R.drawable.ic_indicator_positive_pulse)
 
-        object Inactive : Status(R.string.staking_nominator_status_inactive, R.color.text_secondary)
+        object Inactive : Status(R.string.staking_nominator_status_inactive, R.color.text_negative, R.drawable.ic_indicator_negative_pulse)
 
         class Waiting(
             val timeLeft: Long,
             @StringRes customMessageFormat: Int
-        ) : Status(customMessageFormat, R.color.text_secondary)
+        ) : Status(customMessageFormat, R.color.text_secondary, R.drawable.ic_indicator_inactive_pulse)
     }
 
     init {
@@ -49,7 +47,6 @@ class StakeSummaryView @JvmOverloads constructor(
 
         with(context) {
             background = getBlockDrawable()
-            stakeSummaryStatus.background = addRipple(getRoundedCornerDrawable(fillColorRes = R.color.block_background))
         }
     }
 
@@ -59,7 +56,7 @@ class StakeSummaryView @JvmOverloads constructor(
         with(stakeSummaryStatus) {
             makeVisible()
 
-            setCompoundDrawableTint(status.tintRes)
+            setStatusIndicator(status.indicatorRes)
             setTextColorRes(status.tintRes)
 
             if (status is Status.Waiting) {

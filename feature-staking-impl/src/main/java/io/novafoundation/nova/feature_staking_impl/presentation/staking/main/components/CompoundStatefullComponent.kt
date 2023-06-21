@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
-import io.novafoundation.nova.common.utils.asLiveData
 import io.novafoundation.nova.common.utils.switchMap
 import io.novafoundation.nova.common.utils.withItemScope
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
@@ -13,7 +12,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
+import io.novafoundation.nova.runtime.state.assetWithChain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 typealias ComponentCreator<S, E, A> = (ChainWithAsset, hostContext: ComponentHostContext) -> StatefullComponent<S, E, A>
 
 class CompoundStakingComponentFactory(
-    private val singleAssetSharedState: SingleAssetSharedState,
+    private val singleAssetSharedState: SelectedAssetOptionSharedState<*>,
 ) {
 
     fun <S, E, A> create(
@@ -42,7 +42,7 @@ class CompoundStakingComponentFactory(
 }
 
 private class CompoundStakingComponent<S, E, A>(
-    singleAssetSharedState: SingleAssetSharedState,
+    singleAssetSharedState: SelectedAssetOptionSharedState<*>,
 
     private val relaychainComponentCreator: ComponentCreator<S, E, A>,
     private val parachainComponentCreator: ComponentCreator<S, E, A>,
@@ -58,7 +58,7 @@ private class CompoundStakingComponent<S, E, A>(
         }.shareInBackground()
 
     override val events: LiveData<Event<E>> = delegateFlow
-        .asLiveData(this)
+        .asLiveData()
         .switchMap { it.events }
 
     override val state: Flow<S?> = delegateFlow
@@ -72,8 +72,9 @@ private class CompoundStakingComponent<S, E, A>(
     }
 
     private fun createDelegate(assetWithChain: ChainWithAsset, childHostContext: ComponentHostContext): StatefullComponent<S, E, A> {
-        return when (assetWithChain.asset.staking) {
-            UNSUPPORTED -> UnsupportedComponent()
+        // TODO staking dashboard - switch by selected staking option
+        return when (assetWithChain.asset.staking.firstOrNull()) {
+            null, UNSUPPORTED -> UnsupportedComponent()
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainComponentCreator(assetWithChain, childHostContext)
             PARACHAIN -> parachainComponentCreator(assetWithChain, childHostContext)
             TURING -> turingComponentCreator(assetWithChain, childHostContext)

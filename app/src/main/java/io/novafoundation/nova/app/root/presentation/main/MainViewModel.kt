@@ -11,9 +11,6 @@ class MainViewModel(
     private val automaticInteractionGate: AutomaticInteractionGate,
 ) : BaseViewModel() {
 
-    val stakingAvailableLiveData = interactor.stakingAvailableFlow()
-        .asLiveData()
-
     init {
         updateNotificationsInteractor.allowInAppUpdateCheck()
         automaticInteractionGate.initialPinPassed()
