@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWall
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
-import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectSessionsModel
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAssetPlaceholder
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAvatar
@@ -35,6 +34,12 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         fun goToNftsClicked()
 
         fun walletConnectClicked()
+
+        fun sendClicked()
+
+        fun receiveClicked()
+
+        fun buyClicked()
     }
 
     private var shouldShowPlaceholder: Boolean = false
@@ -128,6 +133,9 @@ class HeaderHolder(
             balanceListNfts.setOnClickListener { handler.goToNftsClicked() }
             balanceListSearch.setOnClickListener { handler.searchClicked() }
             balanceListFilters.setOnClickListener { handler.filtersClicked() }
+            balanceListTotalBalance.onSendClick { handler.sendClicked() }
+            balanceListTotalBalance.onReceiveClick { handler.receiveClicked() }
+            balanceListTotalBalance.onBuyClick { handler.buyClicked() }
         }
     }
 

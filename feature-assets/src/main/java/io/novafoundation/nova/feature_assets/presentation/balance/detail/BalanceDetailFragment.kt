@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
+import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.setupBuyButton
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.setupBuyIntegration
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNotSupportedWarningBottomSheet
@@ -107,11 +108,10 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
     override fun subscribe(viewModel: BalanceDetailViewModel) {
         viewModel.state.observe(transfersContainer::showState)
 
-        setupBuyIntegration(
-            mixin = viewModel.buyMixin,
-            buyButton = balanceDetaiActions.buy,
-            customBuyClick = { viewModel.buyClicked() }
-        )
+        setupBuyIntegration(mixin = viewModel.buyMixin)
+        setupBuyButton(buyButton = balanceDetaiActions.buy, viewModel.buyEnabled) {
+            viewModel.buyClicked()
+        }
 
         viewModel.assetDetailsModel.observe { asset ->
             balanceDetailTokenIcon.loadTokenIcon(asset.token.configuration.iconUrl, imageLoader)

@@ -337,6 +337,29 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
+        <action
+            android:id="@+id/action_mainFragment_to_sendFlow"
+            app:destination="@id/sendFlowFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_mainFragment_to_receiveFlow"
+            app:destination="@id/receiveFlowFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_mainFragment_to_buyFlow"
+            app:destination="@id/buyFlowFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -711,6 +734,21 @@
         android:id="@+id/stakingPeriods"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.period.StakingPeriodFragment"
         android:label="StakingPeriodFragment" />
+
+    <fragment
+        android:id="@+id/sendFlowFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.send.flow.AssetSendFlowFragment"
+        android:label="AssetSendFlowFragment" />
+
+    <fragment
+        android:id="@+id/receiveFlowFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.receive.flow.AssetReceiveFlowFragment"
+        android:label="AssetReceiveFlowFragment" />
+
+    <fragment
+        android:id="@+id/buyFlowFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.buy.flow.AssetBuyFlowFragment"
+        android:label="AssetBuyFlowFragment" />
 
     <include app:graph="@navigation/manage_tokens_graph" />
 

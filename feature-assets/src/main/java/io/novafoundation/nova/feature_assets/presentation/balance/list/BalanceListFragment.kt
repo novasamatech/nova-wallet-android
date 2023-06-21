@@ -158,4 +158,16 @@ class BalanceListFragment :
     override fun walletConnectClicked() {
         viewModel.walletConnectClicked()
     }
+
+    override fun sendClicked() {
+        viewModel.sendClicked()
+    }
+
+    override fun receiveClicked() {
+        viewModel.receiveClicked()
+    }
+
+    override fun buyClicked() {
+        viewModel.buyClicked()
+    }
 }
