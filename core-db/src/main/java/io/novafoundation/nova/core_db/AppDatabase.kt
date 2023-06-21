@@ -79,7 +79,7 @@ import io.novafoundation.nova.core_db.migrations.NullableSubstrateAccountId_21_2
 import io.novafoundation.nova.core_db.migrations.NullableSubstratePublicKey_15_16
 import io.novafoundation.nova.core_db.migrations.RemoveChainForeignKeyFromChainAccount_11_12
 import io.novafoundation.nova.core_db.migrations.RemoveColorFromChains_17_18
-import io.novafoundation.nova.core_db.migrations.StakingRewardPeriods_41_42
+import io.novafoundation.nova.core_db.migrations.StakingRewardPeriods_42_43
 import io.novafoundation.nova.core_db.migrations.TransferFiatAmount_40_41
 import io.novafoundation.nova.core_db.migrations.WatchOnlyChainAccounts_16_17
 import io.novafoundation.nova.core_db.model.AccountLocal
@@ -144,7 +144,7 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         BrowserHostSettingsLocal::class,
         WalletConnectSessionAccountLocal::class,
         CoinPriceLocal::class,
-        StakingRewardPeriodLocal::class
+        StakingRewardPeriodLocal::class,
         StakingDashboardItemLocal::class
     ],
 )
@@ -191,8 +191,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(ExtractExternalApiToSeparateTable_35_36, AddRuntimeFlagToChains_36_37)
                     .addMigrations(AddExtrinsicContentField_37_38, AddNodeSelectionStrategyField_38_39)
                     .addMigrations(AddWalletConnectSessions_39_40, TransferFiatAmount_40_41)
-                    .addMigrations(StakingRewardPeriods_41_42)
-                    .addMigrations(AddWalletConnectSessions_39_40, TransferFiatAmount_40_41, AddStakingDashboardItems_41_42)
+                    .addMigrations(AddStakingDashboardItems_41_42, StakingRewardPeriods_42_43)
                     .build()
             }
             return instance!!
