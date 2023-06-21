@@ -20,6 +20,7 @@ import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.PhishingSitesDao
+import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
@@ -66,6 +67,8 @@ interface DbApi {
     fun browserHostSettingsDao(): BrowserHostSettingsDao
 
     fun coinPriceDao(): CoinPriceDao
+
+    fun stakingRewardPeriodDao(): StakingRewardPeriodDao
 
     val phishingSitesDao: PhishingSitesDao
 

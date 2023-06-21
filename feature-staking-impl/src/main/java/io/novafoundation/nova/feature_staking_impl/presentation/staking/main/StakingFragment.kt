@@ -34,7 +34,8 @@ import javax.inject.Inject
 
 class StakingFragment : BaseFragment<StakingViewModel>() {
 
-    @Inject protected lateinit var imageLoader: ImageLoader
+    @Inject
+    protected lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.period.StakingPeriodViewModel
@@ -21,11 +22,13 @@ class StakingPeriodModule {
     @ViewModelKey(StakingPeriodViewModel::class)
     fun provideViewModel(
         stakingRewardPeriodInteractor: StakingRewardPeriodInteractor,
+        singleAssetSharedState: StakingSharedState,
         resourceManager: ResourceManager,
         stakingRouter: StakingRouter
     ): ViewModel {
         return StakingPeriodViewModel(
             stakingRewardPeriodInteractor,
+            singleAssetSharedState,
             resourceManager,
             stakingRouter
         )

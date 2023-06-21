@@ -17,6 +17,4 @@ interface StakingRewardsDataSource {
     suspend fun sync(accountAddress: String, chain: Chain, chainAsset: Chain.Asset)
 
     suspend fun sync(accountAddress: String, chain: Chain, chainAsset: Chain.Asset, rewardPeriod: RewardPeriod)
-
-    suspend fun clearRewards()
 }

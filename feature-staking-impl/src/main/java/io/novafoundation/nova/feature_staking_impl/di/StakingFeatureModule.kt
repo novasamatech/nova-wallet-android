@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
+import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
@@ -495,8 +496,8 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun provideStakingRewardPeriodDataSource(
-        preferences: Preferences
-    ): StakingRewardPeriodDataSource = RealStakingRewardPeriodDataSource(preferences)
+        stakingRewardPeriodDao: StakingRewardPeriodDao
+    ): StakingRewardPeriodDataSource = RealStakingRewardPeriodDataSource(stakingRewardPeriodDao)
 
     @Provides
     @FeatureScope
@@ -508,6 +509,9 @@ class StakingFeatureModule {
     @FeatureScope
     fun provideStakingRewardInteractor(
         stakingPeriodRepository: StakingPeriodRepository,
-        stakingRewardsRepository: StakingRewardsRepository
-    ): StakingRewardPeriodInteractor = RealStakingRewardPeriodInteractor(stakingPeriodRepository, stakingRewardsRepository)
+        accountRepository: AccountRepository
+    ): StakingRewardPeriodInteractor = RealStakingRewardPeriodInteractor(
+        stakingPeriodRepository,
+        accountRepository
+    )
 }
