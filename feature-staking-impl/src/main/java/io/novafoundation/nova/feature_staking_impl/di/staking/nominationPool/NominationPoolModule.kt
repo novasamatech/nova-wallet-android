@@ -5,8 +5,8 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.RealPoolAccountDerivation
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolBalanceRepository
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolBalanceRepository
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolStateRepository
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
@@ -22,7 +22,5 @@ class NominationPoolModule {
 
     @Provides
     @FeatureScope
-    fun provideNominationPoolBalanceRepository(
-        poolAccountDerivation: PoolAccountDerivation
-    ): NominationPoolBalanceRepository = RealNominationPoolBalanceRepository(poolAccountDerivation)
+    fun provideNominationPoolBalanceRepository(): NominationPoolStateRepository = RealNominationPoolStateRepository()
 }

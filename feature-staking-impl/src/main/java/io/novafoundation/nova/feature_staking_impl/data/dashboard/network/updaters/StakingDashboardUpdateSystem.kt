@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.common.utils.inserted
-import io.novafoundation.nova.common.utils.mapLatestIndexed
+import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -17,7 +17,6 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.common.stakingChains
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.model.StakingDashboardPrimaryAccount
-import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.MultiChainStakingStats
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.StakingAccounts
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.StakingStatsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterEvent
@@ -32,10 +31,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -44,7 +43,6 @@ import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.withIndex
 import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 private const val EMPTY_OFF_CHAIN_SYNC_INDEX = -1
@@ -56,7 +54,7 @@ class RealStakingDashboardUpdateSystem(
     private val updaterFactory: StakingDashboardUpdaterFactory,
     private val sharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     private val stakingDashboardRepository: StakingDashboardRepository,
-    private val offChainSyncDebounceRate: Duration = 2.seconds
+    private val offChainSyncDebounceRate: Duration = 1.seconds
 ) : StakingDashboardUpdateSystem {
 
     override val syncedItemsFlow: MutableStateFlow<SyncingStageMap> = MutableStateFlow(emptyMap())
@@ -103,7 +101,7 @@ class RealStakingDashboardUpdateSystem(
         metaAccount: MetaAccount,
         stakingOptionsWithChain: Map<StakingOptionId, Chain>,
         stakingChains: List<Chain>
-    ): Flow<IndexedValue<MultiChainStakingStats>> {
+    ): Flow<MultiChainOffChainSyncResult> {
         return stakingDashboardRepository.stakingAccountsFlow(metaAccount.id)
             .map { stakingPrimaryAccounts -> constructStakingAccounts(stakingOptionsWithChain, metaAccount, stakingPrimaryAccounts) }
             .zipWithPrevious()
@@ -120,8 +118,13 @@ class RealStakingDashboardUpdateSystem(
             }
             .withIndex()
             .onEach { latestOffChainSyncIndex.value = it.index }
-            .debounce { (index) -> if (index == 0) 0.milliseconds else offChainSyncDebounceRate }
-            .mapLatestIndexed { stakingAccounts -> stakingStatsDataSource.fetchStakingStats(stakingAccounts, stakingChains) }
+            .throttleLast(offChainSyncDebounceRate)
+            .mapLatest { (index, stakingAccounts) ->
+                MultiChainOffChainSyncResult(
+                    index = index,
+                    multiChainStakingStats = stakingStatsDataSource.fetchStakingStats(stakingAccounts, stakingChains),
+                )
+            }
     }
 
     private fun markSyncingSecondaryFor(changedPrimaryAccounts: List<Map.Entry<StakingOptionId, AccountIdKey?>>) {

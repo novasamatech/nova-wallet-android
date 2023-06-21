@@ -2,9 +2,7 @@
 
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain
 
-import io.novafoundation.nova.common.data.network.runtime.binding.bindNullableAccountId
 import io.novafoundation.nova.common.utils.combineToPair
-import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
@@ -17,16 +15,19 @@ import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.ChainStakingStats
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.MultiChainStakingStats
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindActiveEra
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindNominationsOrNull
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedgerOrNull
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.MultiChainOffChainSyncResult
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.activeEra
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.bonded
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.ledger
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.nominators
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.staking
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -40,7 +41,7 @@ class StakingDashboardRelayStakingUpdater(
     chainAsset: Chain.Asset,
     stakingType: Chain.Asset.StakingType,
     metaAccount: MetaAccount,
-    private val stakingStatsFlow: Flow<IndexedValue<MultiChainStakingStats>>,
+    private val stakingStatsFlow: Flow<MultiChainOffChainSyncResult>,
     private val stakingDashboardCache: StakingDashboardCache,
     private val remoteStorageSource: StorageDataSource
 ) : BaseStakingDashboardUpdater(chain, chainAsset, stakingType, metaAccount) {
@@ -49,10 +50,10 @@ class StakingDashboardRelayStakingUpdater(
         val accountId = metaAccount.accountIdIn(chain)
 
         return remoteStorageSource.subscribe(chain.id, storageSubscriptionBuilder) {
-            val activeEraFlow = metadata.staking().storage("ActiveEra").observe(binding = ::bindActiveEra)
+            val activeEraFlow = metadata.staking.activeEra.observeNonNull()
 
             val baseInfo = if (accountId != null) {
-                val bondedFlow = metadata.staking().storage("Bonded").observe(accountId, binding = ::bindNullableAccountId)
+                val bondedFlow = metadata.staking.bonded.observe(accountId)
 
                 bondedFlow.flatMapLatest { maybeController ->
                     val controllerId = maybeController ?: accountId
@@ -81,7 +82,7 @@ class StakingDashboardRelayStakingUpdater(
 
     private fun subscribeToStakingState(controllerId: AccountId): Flow<RelaychainStakingBaseInfo?> {
         return remoteStorageSource.subscribe(chain.id) {
-            metadata.staking().storage("Ledger").observe(controllerId, binding = ::bindStakingLedgerOrNull).flatMapLatest { ledger ->
+            metadata.staking.ledger.observe(controllerId).flatMapLatest { ledger ->
                 if (ledger != null) {
                     subscribeToNominations(ledger.stashId).map { nominations ->
                         RelaychainStakingBaseInfo(ledger, nominations)
@@ -95,7 +96,7 @@ class StakingDashboardRelayStakingUpdater(
 
     private suspend fun subscribeToNominations(stashId: AccountId): Flow<Nominations?> {
         return remoteStorageSource.subscribe(chain.id) {
-            metadata.staking().storage("Nominators").observe(stashId, binding = ::bindNominationsOrNull)
+            metadata.staking.nominators.observe(stashId)
         }
     }
 
