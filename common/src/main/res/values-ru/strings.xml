@@ -1048,9 +1048,12 @@
     <string name="transaction_details_view_explorer">Открыть в %s</string>
     <string name="transaction_details_view_polkascan">Посмотреть в Polkascan</string>
     <string name="transaction_details_view_subscan">Просмотреть в Subscan</string>
+    <string name="transaction_history_fiat_with_time" formatted="false">%s в %s</string>
     <string name="transaction_status_completed">Успешно</string>
     <string name="transaction_status_failed">Ошибка</string>
     <string name="transaction_status_pending">В ожидании</string>
+    <string name="transfer_history_income_from">От: %s</string>
+    <string name="transfer_history_send_to">Кому: %s</string>
     <string name="transfer_title">Перевод</string>
     <string name="transfers_empty">Входящие и исходящие\nтранзакции будут отображаться здесь</string>
     <string name="transfers_empty_v2_2_0">Ваши операции появятся здесь</string>
