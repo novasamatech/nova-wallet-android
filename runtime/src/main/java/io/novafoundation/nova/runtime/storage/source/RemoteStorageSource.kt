@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.network.rpc.queryKey
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.calls.GetChildStateRequest
+import io.novafoundation.nova.core.updater.SubstrateSubscriptionBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import io.novafoundation.nova.runtime.storage.source.query.RemoteStorageQueryContext
@@ -36,8 +37,13 @@ class RemoteStorageSource(
         return response.result as? String?
     }
 
-    override suspend fun createQueryContext(chainId: String, at: BlockHash?, runtime: RuntimeSnapshot): StorageQueryContext {
-        return RemoteStorageQueryContext(bulkRetriever, getSocketService(chainId), at, runtime)
+    override suspend fun createQueryContext(
+        chainId: String,
+        at: BlockHash?,
+        runtime: RuntimeSnapshot,
+        subscriptionBuilder: SubstrateSubscriptionBuilder?
+    ): StorageQueryContext {
+        return RemoteStorageQueryContext(bulkRetriever, getSocketService(chainId), subscriptionBuilder, at, runtime)
     }
 
     private fun getSocketService(chainId: String) = chainRegistry.getSocket(chainId)

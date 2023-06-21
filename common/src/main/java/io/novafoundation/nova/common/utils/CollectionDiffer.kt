@@ -57,6 +57,29 @@ object CollectionDiffer {
 
         return Diff(added = added, updated = updated, removed = removed, all = newItems)
     }
+
+    fun <K, V> findDiff(
+        newItems: Map<K, V>,
+        oldItems: Map<K, V>,
+        forceUseNewItems: Boolean
+    ): Diff<Map.Entry<K, V>> {
+        val added = mutableListOf<Map.Entry<K, V>>()
+        val updated = mutableListOf<Map.Entry<K, V>>()
+
+        newItems.forEach { newEntry ->
+            val (key, newValue) = newEntry
+            val oldValue = oldItems[key]
+
+            when {
+                key !in oldItems -> added.add(newEntry)
+                oldValue != newValue || forceUseNewItems -> updated.add(newEntry)
+            }
+        }
+
+        val removed = oldItems.mapNotNull { entry -> entry.takeIf { entry.key !in newItems } }
+
+        return Diff(added = added, updated = updated, removed = removed, all = newItems.entries.toList())
+    }
 }
 
 fun <T, R> CollectionDiffer.Diff<T>.map(mapper: (T) -> R) = CollectionDiffer.Diff(

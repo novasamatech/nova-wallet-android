@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.storage.source
 import io.novafoundation.nova.common.data.network.rpc.childStateKey
 import io.novafoundation.nova.common.data.network.runtime.binding.Binder
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
+import io.novafoundation.nova.core.updater.SubstrateSubscriptionBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
@@ -24,7 +25,12 @@ abstract class BaseStorageSource(
 
     protected abstract suspend fun queryChildState(storageKey: String, childKey: String, chainId: String): String?
 
-    protected abstract suspend fun createQueryContext(chainId: String, at: BlockHash?, runtime: RuntimeSnapshot): StorageQueryContext
+    protected abstract suspend fun createQueryContext(
+        chainId: String,
+        at: BlockHash?,
+        runtime: RuntimeSnapshot,
+        subscriptionBuilder: SubstrateSubscriptionBuilder?
+    ): StorageQueryContext
 
     override suspend fun <T> query(
         chainId: String,
@@ -78,7 +84,7 @@ abstract class BaseStorageSource(
         query: suspend StorageQueryContext.() -> R
     ): R {
         val runtime = chainRegistry.getRuntime(chainId)
-        val context = createQueryContext(chainId, at, runtime)
+        val context = createQueryContext(chainId, at, runtime, subscriptionBuilder = null)
 
         return context.query()
     }
@@ -90,9 +96,21 @@ abstract class BaseStorageSource(
     ): Flow<R> {
         return flow {
             val runtime = chainRegistry.getRuntime(chainId)
-            val context = createQueryContext(chainId, at, runtime)
+            val context = createQueryContext(chainId, at, runtime, subscriptionBuilder = null)
 
             emitAll(context.subscribe())
         }
+    }
+
+    override suspend fun <R> subscribe(
+        chainId: String,
+        subscriptionBuilder: SubstrateSubscriptionBuilder,
+        at: BlockHash?,
+        subscribe: suspend StorageQueryContext.() -> Flow<R>
+    ): Flow<R> {
+        val runtime = chainRegistry.getRuntime(chainId)
+        val context = createQueryContext(chainId, at, runtime, subscriptionBuilder)
+
+        return subscribe(context)
     }
 }

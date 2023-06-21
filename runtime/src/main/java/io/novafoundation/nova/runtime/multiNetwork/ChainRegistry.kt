@@ -45,14 +45,6 @@ data class ChainWithAsset(
     val asset: Chain.Asset
 )
 
-@JvmInline
-value class ChainsById(val value: Map<ChainId, Chain>) : Map<ChainId, Chain> by value {
-
-    override operator fun get(key: ChainId): Chain? {
-        return value[key.removeHexPrefix()]
-    }
-}
-
 class ChainRegistry(
     private val runtimeProviderPool: RuntimeProviderPool,
     private val connectionPool: ConnectionPool,
@@ -167,6 +159,10 @@ suspend fun ChainRegistry.asset(fullChainAssetId: FullChainAssetId): Chain.Asset
 
 suspend inline fun ChainRegistry.findChain(predicate: (Chain) -> Boolean): Chain? = currentChains.first().firstOrNull(predicate)
 suspend inline fun ChainRegistry.findChains(predicate: (Chain) -> Boolean): List<Chain> = currentChains.first().filter(predicate)
+
+suspend inline fun ChainRegistry.findChainsById(predicate: (Chain) -> Boolean): ChainsById {
+    return chainsById().filterValues { chain -> predicate(chain) }.asChainsById()
+}
 
 suspend fun ChainRegistry.getRuntime(chainId: String) = getRuntimeProvider(chainId).get()
 

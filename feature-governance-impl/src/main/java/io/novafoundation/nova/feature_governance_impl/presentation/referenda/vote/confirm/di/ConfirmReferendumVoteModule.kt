@@ -36,7 +36,6 @@ class ConfirmReferendumVoteModule {
     @ViewModelKey(ConfirmReferendumVoteViewModel::class)
     fun provideViewModel(
         router: GovernanceRouter,
-        feeLoaderMixin: FeeLoaderMixin.Presentation,
         externalActions: ExternalActions.Presentation,
         governanceSharedState: GovernanceSharedState,
         hintsMixinFactory: ReferendumVoteHintsMixinFactory,

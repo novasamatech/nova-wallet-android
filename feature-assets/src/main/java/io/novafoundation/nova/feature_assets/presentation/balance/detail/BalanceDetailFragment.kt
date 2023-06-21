@@ -106,8 +106,6 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
     }
 
     override fun subscribe(viewModel: BalanceDetailViewModel) {
-        viewModel.sync()
-
         viewModel.state.observe(transfersContainer::showState)
 
         setupBuyIntegration(mixin = viewModel.buyMixin)

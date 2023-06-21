@@ -1,4 +1,4 @@
-package io.novafoundation.nova.app.root.navigation.staking
+package io.novafoundation.nova.app.root.navigation.staking.parachain
 
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
@@ -39,13 +39,11 @@ class ParachainStakingNavigator(
         commonNavigator.openAccountDetails(metaId)
     }
 
-    override fun returnToMain() {
-        commonNavigator.returnToMain()
-    }
+    override fun returnToStakingMain() = performNavigation(R.id.back_to_staking_main)
 
     override fun returnToStartStaking() = performNavigation(R.id.action_return_to_start_staking)
 
-    override fun openCurrentCollators() = performNavigation(R.id.action_mainFragment_to_currentCollatorsFragment)
+    override fun openCurrentCollators() = performNavigation(R.id.action_stakingFragment_to_currentCollatorsFragment)
 
     override fun openUnbond() = performNavigation(R.id.action_open_parachainUnbondGraph)
 
@@ -54,14 +52,14 @@ class ParachainStakingNavigator(
         args = ParachainStakingUnbondConfirmFragment.getBundle(payload)
     )
 
-    override fun openRedeem() = performNavigation(R.id.action_mainFragment_to_parachainStakingRedeemFragment)
+    override fun openRedeem() = performNavigation(R.id.action_stakingFragment_to_parachainStakingRedeemFragment)
 
     override fun openRebond(payload: ParachainStakingRebondPayload) = performNavigation(
-        actionId = R.id.action_mainFragment_to_parachainStakingRebondFragment,
+        actionId = R.id.action_stakingFragment_to_parachainStakingRebondFragment,
         args = ParachainStakingRebondFragment.getBundle(payload)
     )
 
-    override fun openSetupYieldBoost() = performNavigation(R.id.action_mainFragment_to_yieldBoostGraph)
+    override fun openSetupYieldBoost() = performNavigation(R.id.action_stakingFragment_to_yieldBoostGraph)
 
     override fun openConfirmYieldBoost(
         payload: YieldBoostConfirmPayload

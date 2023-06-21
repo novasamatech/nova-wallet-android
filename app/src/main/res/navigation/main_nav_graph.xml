@@ -103,23 +103,6 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
-
-    <action
-        android:id="@+id/action_open_parachainUnbondGraph"
-        app:destination="@id/staking_parachain_unbond"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <action
-        android:id="@+id/action_open_startParachainStakingGraph"
-        app:destination="@id/staking_parachain_start_graph"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
     <action
         android:id="@+id/action_open_sign_parity_signer"
         app:destination="@id/sign_parity_signer_graph"
@@ -235,46 +218,6 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            android:id="@+id/action_mainFragment_to_setupStakingFragment"
-            app:destination="@id/setupStakingFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_mainFragment_to_payoutsListFragment"
-            app:destination="@id/payoutsListFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_stakingBalanceFragment_to_setControllerAccountFragment"
-            app:destination="@id/setControllerAccountFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_mainFragment_to_currentValidatorsFragment"
-            app:destination="@id/currentValidatorsFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_mainFragment_to_selectRewardDestinationFragment"
-            app:destination="@id/selectRewardDestinationFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
             android:id="@+id/action_mainFragment_to_crowdloanContributeFragment"
             app:destination="@id/crowdloanContributeFragment"
             app:enterAnim="@anim/fragment_open_enter"
@@ -331,48 +274,8 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            android:id="@+id/action_mainFragment_to_customRebondFragment"
-            app:destination="@id/customRebondFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_mainFragment_to_selectUnbondFragment"
-            app:destination="@id/selectUnbondFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
             android:id="@+id/action_mainFragment_to_authorizedDAppsFragment"
             app:destination="@id/authorizedDAppsFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_mainFragment_to_currentCollatorsFragment"
-            app:destination="@id/currentCollatorsFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_mainFragment_to_parachainStakingRedeemFragment"
-            app:destination="@id/parachainStakingRedeemFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_mainFragment_to_parachainStakingRebondFragment"
-            app:destination="@id/parachainStakingRebondFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -389,14 +292,6 @@
         <action
             android:id="@+id/action_mainFragment_to_manageTokensGraph"
             app:destination="@id/manage_tokens_graph"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_mainFragment_to_yieldBoostGraph"
-            app:destination="@id/staking_parachain_yield_boost"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -427,14 +322,6 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            android:id="@+id/action_mainFragment_to_rebag"
-            app:destination="@id/rebagFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
             android:id="@+id/action_mainFragment_to_walletConnectGraph"
             app:destination="@id/wallet_connect_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
@@ -443,8 +330,8 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            android:id="@+id/action_mainFragment_to_staking_periods"
-            app:destination="@id/stakingPeriods"
+            android:id="@+id/action_mainFragment_to_stakingGraph"
+            app:destination="@id/staking_main_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -741,106 +628,6 @@
         android:label="fragment_pincode"
         tools:layout="@layout/fragment_pincode" />
 
-    <fragment
-        android:id="@+id/setupStakingFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.setup.SetupStakingFragment"
-        android:label="setupStakingFragment"
-        tools:layout="@layout/fragment_setup_staking" />
-
-    <action
-        android:id="@+id/openStartChangeValidatorsFragment"
-        app:destination="@id/startChangeValidatorsFragment"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <fragment
-        android:id="@+id/startChangeValidatorsFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.validators.change.start.StartChangeValidatorsFragment"
-        android:label="startChangeValidatorsFragment"
-        tools:layout="@layout/fragment_start_change_validators">
-
-        <action
-            android:id="@+id/action_startChangeValidatorsFragment_to_recommendedValidatorsFragment"
-            app:destination="@id/recommendedValidatorsFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_startChangeValidatorsFragment_to_selectCustomValidatorsFragment"
-            app:destination="@id/selectCustomValidatorsFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/selectCustomValidatorsFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.SelectCustomValidatorsFragment"
-        android:label="selectCustomValidatorsFragment"
-        tools:layout="@layout/fragment_select_custom_validators">
-
-        <action
-            android:id="@+id/action_selectCustomValidatorsFragment_to_reviewCustomValidatorsFragment"
-            app:destination="@id/reviewCustomValidatorsFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_selectCustomValidatorsFragment_to_settingsCustomValidatorsFragment"
-            app:destination="@id/settingsCustomValidatorsFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_selectCustomValidatorsFragment_to_searchCustomValidatorsFragment"
-            app:destination="@id/searchCustomValidatorsFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/settingsCustomValidatorsFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.settings.CustomValidatorsSettingsFragment"
-        android:label="settingsCustomValidatorsFragment"
-        tools:layout="@layout/fragment_custom_validators_settings" />
-
-    <fragment
-        android:id="@+id/searchCustomValidatorsFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.search.SearchCustomValidatorsFragment"
-        android:label="searchCustomValidatorsFragment"
-        tools:layout="@layout/fragment_search_custom_validators" />
-
-    <fragment
-        android:id="@+id/reviewCustomValidatorsFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.ReviewCustomValidatorsFragment"
-        android:label="reviewCustomValidatorsFragment"
-        tools:layout="@layout/fragment_select_custom_validators" />
-
-    <action
-        android:id="@+id/openConfirmStakingFragment"
-        app:destination="@id/confirmStakingFragment"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <fragment
-        android:id="@+id/recommendedValidatorsFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.validators.change.recommended.RecommendedValidatorsFragment"
-        android:label="recommendedValidatorsFragment"
-        tools:layout="@layout/fragment_recommended_validators" />
-
     <action
         android:id="@+id/back_to_main"
         app:enterAnim="@anim/fragment_close_enter"
@@ -848,227 +635,6 @@
         app:popEnterAnim="@anim/fragment_open_enter"
         app:popExitAnim="@anim/fragment_open_exit"
         app:popUpTo="@id/mainFragment" />
-
-    <fragment
-        android:id="@+id/confirmStakingFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.confirm.ConfirmStakingFragment"
-        android:label="confirmStakingFragment"
-        tools:layout="@layout/fragment_confirm_stake">
-        <action
-            android:id="@+id/action_confirmStakingFragment_to_confirmNominationsFragment"
-            app:destination="@id/confirmNominationsFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_confirmStakingFragment_back_to_currentValidatorsFragment"
-            app:enterAnim="@anim/fragment_close_enter"
-            app:exitAnim="@anim/fragment_close_exit"
-            app:popEnterAnim="@anim/fragment_open_enter"
-            app:popExitAnim="@anim/fragment_open_exit"
-            app:popUpTo="@id/currentValidatorsFragment" />
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/confirmNominationsFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.ConfirmNominationsFragment"
-        android:label="ConfirmNominationsFragment"
-        tools:layout="@layout/fragment_confirm_nominations" />
-
-    <action
-        android:id="@+id/open_validator_details"
-        app:destination="@id/validatorDetailsFragment"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <fragment
-        android:id="@+id/validatorDetailsFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment"
-        android:label="validatorDetailsFragment"
-        tools:layout="@layout/fragment_validator_details" />
-
-    <action
-        android:id="@+id/open_staking_story"
-        app:destination="@id/stakingStoryFragment"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <fragment
-        android:id="@+id/stakingStoryFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.story.StoryFragment"
-        android:label="StakingStoryFragment"
-        tools:layout="@layout/fragment_story" />
-
-    <fragment
-        android:id="@+id/payoutsListFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.payouts.list.PayoutsListFragment"
-        android:label="PayoutsListFragment"
-        tools:layout="@layout/fragment_payouts_list">
-
-        <action
-            android:id="@+id/action_payoutsListFragment_to_payoutDetailsFragment"
-            app:destination="@id/payoutDetailsFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/payoutDetailsFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.PayoutDetailsFragment"
-        android:label="PayoutDetailsFragment"
-        tools:layout="@layout/fragment_payout_details" />
-
-    <action
-        android:id="@+id/action_open_confirm_payout"
-        app:destination="@id/confirmPayoutFragment"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <fragment
-        android:id="@+id/confirmPayoutFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.ConfirmPayoutFragment"
-        android:label="ConfirmPayoutFragment"
-        tools:layout="@layout/fragment_confirm_payout" />
-
-    <fragment
-        android:id="@+id/setControllerAccountFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.set.SetControllerFragment"
-        android:label="SelectBondMoreFragment"
-        tools:layout="@layout/fragment_set_controller_account">
-
-        <action
-            android:id="@+id/action_stakingSetControllerAccountFragment_to_confirmSetControllerAccountFragment"
-            app:destination="@id/confirmSetControllerAccount"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/confirmSetControllerAccount"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.ConfirmSetControllerFragment"
-        android:label="ConfirmSetControllerFragment"
-        tools:layout="@layout/fragment_confirm_set_controller" />
-
-    <fragment
-        android:id="@+id/selectBondMoreFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.SelectBondMoreFragment"
-        android:label="SelectBondMoreFragment"
-        tools:layout="@layout/fragment_bond_more">
-
-        <action
-            android:id="@+id/action_selectBondMoreFragment_to_confirmBondMoreFragment"
-            app:destination="@id/confirmBondMoreFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-    </fragment>
-
-    <action
-        android:id="@+id/action_open_selectBondMoreFragment"
-        app:destination="@id/selectBondMoreFragment"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <fragment
-        android:id="@+id/confirmBondMoreFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMoreFragment"
-        android:label="ConfirmBondMoreFragment"
-        tools:layout="@layout/fragment_confirm_bond_more" />
-    <fragment
-        android:id="@+id/selectUnbondFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.select.SelectUnbondFragment"
-        android:label="SelectUnbondFragment"
-        tools:layout="@layout/fragment_select_unbond">
-
-        <action
-            android:id="@+id/action_selectUnbondFragment_to_confirmUnbondFragment"
-            app:destination="@id/confirmUnbondFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/confirmUnbondFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondFragment"
-        android:label="ConfirmUnbondFragment" />
-
-    <action
-        android:id="@+id/action_open_redeemFragment"
-        app:destination="@id/redeemFragment"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <fragment
-        android:id="@+id/redeemFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.RedeemFragment"
-        android:label="RedeemFragment" />
-
-    <action
-        android:id="@+id/action_open_confirm_rebond"
-        app:destination="@id/confirmRebondFragment"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <fragment
-        android:id="@+id/confirmRebondFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondFragment"
-        android:label="ConfirmRebondFragment"
-        tools:layout="@layout/fragment_confirm_rebond" />
-
-
-    <fragment
-        android:id="@+id/customRebondFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.custom.CustomRebondFragment"
-        android:label="CustomRebondFragment"
-        tools:layout="@layout/fragment_rebond_custom" />
-
-    <fragment
-        android:id="@+id/currentValidatorsFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.validators.current.CurrentValidatorsFragment"
-        android:label="CurrentValidatorsFragment"
-        tools:layout="@layout/fragment_current_validators" />
-
-    <fragment
-        android:id="@+id/selectRewardDestinationFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.select.SelectRewardDestinationFragment"
-        android:label="SelectRewardDestinationFragment"
-        tools:layout="@layout/fragment_select_reward_destination">
-
-        <action
-            android:id="@+id/action_selectRewardDestinationFragment_to_confirmRewardDestinationFragment"
-            app:destination="@id/confirmRewardDestinationFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/confirmRewardDestinationFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.ConfirmRewardDestinationFragment"
-        android:label="ConfirmRewardDestinationFragment" />
 
     <fragment
         android:id="@+id/crowdloanContributeFragment"
@@ -1133,10 +699,6 @@
 
     <include app:graph="@navigation/nfts_nav_graph" />
 
-    <include app:graph="@navigation/staking_parachain_start_graph" />
-
-    <include app:graph="@navigation/staking_parachain_unbond" />
-
     <dialog
         android:id="@+id/assetFiltersFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.balance.filters.AssetFiltersBottomSheetFragment"
@@ -1147,21 +709,6 @@
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.authorizedDApps.AuthorizedDAppsFragment"
         android:label="AuthorizedDAppsFragment"
         tools:layout="@layout/fragment_authorized_dapps" />
-
-    <fragment
-        android:id="@+id/currentCollatorsFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.CurrentCollatorsFragment"
-        android:label="CurrentCollatorsFragment" />
-
-    <fragment
-        android:id="@+id/parachainStakingRedeemFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.redeem.ParachainStakingRedeemFragment"
-        android:label="ParachainStakingRedeemFragment" />
-
-    <fragment
-        android:id="@+id/parachainStakingRebondFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.ParachainStakingRebondFragment"
-        android:label="ParachainStakingRebondFragment" />
 
     <fragment
         android:id="@+id/referendaFiltersFragment"
@@ -1211,8 +758,6 @@
 
     <include app:graph="@navigation/add_ledger_chain_account_graph" />
 
-    <include app:graph="@navigation/staking_parachain_yield_boost" />
-
     <include app:graph="@navigation/referendum_details_graph" />
 
     <include app:graph="@navigation/referendum_unlock_graph" />
@@ -1223,14 +768,11 @@
 
     <include app:graph="@navigation/referenda_search_graph" />
 
-    <fragment
-        android:id="@+id/rebagFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.RebagFragment"
-        android:label="RebagFragment" />
-
     <include app:graph="@navigation/wallet_connect_nav_graph" />
 
     <include app:graph="@navigation/external_sign_graph" />
+
+    <include app:graph="@navigation/staking_main_graph" />
 
     <fragment
         android:id="@+id/walletConnectScanFragment"

@@ -6,8 +6,10 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.di.staking.UpdatersModule
+import io.novafoundation.nova.feature_staking_impl.di.staking.dashboard.StakingDashboardModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.ParachainStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.unbond.StakingUnbondModule
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
@@ -15,6 +17,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.di.RebagComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.di.ConfirmStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.di.ConfirmNominationsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.di.StakingDashboardComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.di.CurrentCollatorsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.search.di.SearchCollatorComponent
@@ -67,11 +71,16 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
         UpdatersModule::class,
         StakingValidationModule::class,
         StakingUnbondModule::class,
-        ParachainStakingModule::class
+        ParachainStakingModule::class,
+        StakingDashboardModule::class,
     ]
 )
 @FeatureScope
 interface StakingFeatureComponent : StakingFeatureApi {
+
+    fun dashboardComponentFactory(): StakingDashboardComponent.Factory
+
+    fun moreStakingOptionsFactory(): MoreStakingOptionsComponent.Factory
 
     // relaychain staking
 
@@ -179,7 +188,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
             DbApi::class,
             RuntimeApi::class,
             AccountFeatureApi::class,
-            WalletFeatureApi::class
+            WalletFeatureApi::class,
+            DAppFeatureApi::class
         ]
     )
     interface StakingFeatureDependenciesComponent : StakingFeatureDependencies

@@ -29,6 +29,11 @@
 
     <string name="assets_search_placeholder">No networks or tokens with entered\nname were found</string>
 
+    <string name="transfer_history_income_from">From: %s</string>
+    <string name="transfer_history_send_to">To: %s</string>
+
+    <string name="transaction_history_fiat_with_time">%s at %s</string>
+
     <string name="referenda_list_filter_placeholder">There are no referenda with filters applied</string>
 
     <string name="pincode_biometric_switch_dialog_title">Use biometric to authorize</string>
@@ -88,6 +93,17 @@
 
     <string name="wallet_send_recipient_blocked_title">Recipient cannot accept transfer</string>
     <string name="wallet_send_recipient_blocked_message">Recipient has been blocked by token owner and cannot currently accept incoming transfers</string>
+
+    <string name="staking_title_format">%s staking</string>
+
+    <string name="staking_dashboard_more_options">More staking options</string>
+    <string name="staking_dashboard_no_stake_header">Stake and earn rewards</string>
+    <string name="staking_dashboard_browser_stake_header">Staking via Nova DApp browser</string>
+
+    <string name="common_waiting">Waiting</string>
+    <string name="common_per_year">/ year</string>
+    <string name="common_per_year_long">per year</string>
+    <string name="staking_earnings_per_year">Earnings per year</string>
 
     <string name="common_expired">Expired</string>
 

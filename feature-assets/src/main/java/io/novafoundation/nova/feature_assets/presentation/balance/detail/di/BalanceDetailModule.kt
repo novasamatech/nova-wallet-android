@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.history.mi
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryProvider
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -56,6 +57,7 @@ class BalanceDetailModule {
         assetPayload: AssetPayload,
         addressDisplayUseCase: AddressDisplayUseCase,
         chainRegistry: ChainRegistry,
+        currencyRepository: CurrencyRepository
     ): TransactionHistoryMixin {
         return TransactionHistoryProvider(
             walletInteractor = walletInteractor,
@@ -66,7 +68,8 @@ class BalanceDetailModule {
             assetsSourceRegistry = assetSourceRegistry,
             chainRegistry = chainRegistry,
             chainId = assetPayload.chainId,
-            assetId = assetPayload.chainAssetId
+            assetId = assetPayload.chainAssetId,
+            currencyRepository = currencyRepository
         )
     }
 

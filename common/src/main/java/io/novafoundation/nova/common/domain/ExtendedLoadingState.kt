@@ -6,9 +6,11 @@ import kotlinx.coroutines.flow.map
 
 sealed class ExtendedLoadingState<out T> {
 
+    companion object;
+
     object Loading : ExtendedLoadingState<Nothing>()
 
-    class Error(val exception: Throwable) : ExtendedLoadingState<Nothing>()
+    data class Error(val exception: Throwable) : ExtendedLoadingState<Nothing>()
 
     data class Loaded<T>(val data: T) : ExtendedLoadingState<T>()
 }
@@ -39,6 +41,10 @@ fun ExtendedLoadingState<*>.isLoading(): Boolean {
     return this is ExtendedLoadingState.Loading
 }
 
+fun ExtendedLoadingState<*>.isLoaded(): Boolean {
+    return this is ExtendedLoadingState.Loaded
+}
+
 suspend fun <T> FlowCollector<ExtendedLoadingState<T>>.emitLoaded(value: T) {
     emit(ExtendedLoadingState.Loaded(value))
 }
@@ -49,4 +55,30 @@ suspend fun <T> FlowCollector<ExtendedLoadingState<T>>.emitLoading() {
 
 suspend fun <T> FlowCollector<ExtendedLoadingState<T>>.emitError(throwable: Throwable) {
     emit(ExtendedLoadingState.Error(throwable))
+}
+
+fun <T> ExtendedLoadingState.Companion.fromOption(value: T?): ExtendedLoadingState<T> {
+    return if (value != null) {
+        ExtendedLoadingState.Loaded(value)
+    } else {
+        ExtendedLoadingState.Loading
+    }
+}
+
+fun <T> T.asLoaded(): ExtendedLoadingState.Loaded<T> = ExtendedLoadingState.Loaded(this)
+
+inline fun <T> ExtendedLoadingState<T>.onLoaded(action: (T) -> Unit): ExtendedLoadingState<T> {
+    if (this is ExtendedLoadingState.Loaded) {
+        action(data)
+    }
+
+    return this
+}
+
+inline fun <T> ExtendedLoadingState<T>.onNotLoaded(action: () -> Unit): ExtendedLoadingState<T> {
+    if (this !is ExtendedLoadingState.Loaded) {
+        action()
+    }
+
+    return this
 }

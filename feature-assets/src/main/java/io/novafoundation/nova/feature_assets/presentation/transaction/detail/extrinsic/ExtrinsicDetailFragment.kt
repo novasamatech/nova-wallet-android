@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.TableView
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -31,6 +32,7 @@ import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetail
 import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailStatus
 import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailToolbar
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailAmountFiat
 
 private const val KEY_EXTRINSIC = "KEY_EXTRINSIC"
 
@@ -81,6 +83,7 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
             extrinsicDetailToolbar.setTitle(time.formatDateTime())
 
             extrinsicDetailAmount.text = fee
+            extrinsicDetailAmountFiat.setTextOrHide(this.fiatFee)
         }
 
         viewModel.content.observe(::showExtrinsicContent)

@@ -28,7 +28,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -46,7 +46,7 @@ class ConfirmPayoutViewModel(
     private val validationSystem: ValidationSystem<MakePayoutPayload, PayoutValidationFailure>,
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
-    private val selectedAssetState: SingleAssetSharedState,
+    private val selectedAssetState: AnySelectedAssetOptionSharedState,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
     ExternalActions.Presentation by externalActions,
@@ -127,7 +127,7 @@ class ConfirmPayoutViewModel(
         if (result.isSuccess) {
             showMessage(resourceManager.getString(R.string.make_payout_transaction_sent))
 
-            router.returnToMain()
+            router.returnToStakingMain()
         } else {
             showError(result.requireException())
         }

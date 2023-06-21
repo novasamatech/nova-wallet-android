@@ -66,29 +66,6 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.sel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerFragment
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.ConfirmPayoutFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.PayoutDetailsFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMoreFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMorePayload
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.SelectBondMoreFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.SelectBondMorePayload
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.ConfirmSetControllerFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.ConfirmSetControllerPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingStoryModel
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.RedeemFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.RedeemPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.ConfirmRewardDestinationFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.story.StoryFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
 import io.novafoundation.nova.splash.SplashRouter
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.Flow
@@ -107,7 +84,6 @@ class Navigator(
     AccountRouter,
     AssetsRouter,
     RootRouter,
-    StakingRouter,
     CrowdloanRouter {
 
     private val navController: NavController?
@@ -197,54 +173,6 @@ class Navigator(
         navController?.navigate(destination, BackupMnemonicFragment.getBundle(payload))
     }
 
-    override fun openSetupStaking() {
-        navController?.navigate(R.id.action_mainFragment_to_setupStakingFragment)
-    }
-
-    override fun openStartChangeValidators() {
-        navController?.navigate(R.id.openStartChangeValidatorsFragment)
-    }
-
-    override fun openStory(story: StakingStoryModel) {
-        navController?.navigate(R.id.open_staking_story, StoryFragment.getBundle(story))
-    }
-
-    override fun openPayouts() {
-        navController?.navigate(R.id.action_mainFragment_to_payoutsListFragment)
-    }
-
-    override fun openPayoutDetails(payout: PendingPayoutParcelable) {
-        navController?.navigate(R.id.action_payoutsListFragment_to_payoutDetailsFragment, PayoutDetailsFragment.getBundle(payout))
-    }
-
-    override fun openConfirmPayout(payload: ConfirmPayoutPayload) {
-        navController?.navigate(R.id.action_open_confirm_payout, ConfirmPayoutFragment.getBundle(payload))
-    }
-
-    override fun openBondMore() {
-        navController?.navigate(R.id.action_open_selectBondMoreFragment, SelectBondMoreFragment.getBundle(SelectBondMorePayload()))
-    }
-
-    override fun openConfirmBondMore(payload: ConfirmBondMorePayload) {
-        navController?.navigate(R.id.action_selectBondMoreFragment_to_confirmBondMoreFragment, ConfirmBondMoreFragment.getBundle(payload))
-    }
-
-    override fun openSelectUnbond() {
-        navController?.navigate(R.id.action_mainFragment_to_selectUnbondFragment)
-    }
-
-    override fun openConfirmUnbond(payload: ConfirmUnbondPayload) {
-        navController?.navigate(R.id.action_selectUnbondFragment_to_confirmUnbondFragment, ConfirmUnbondFragment.getBundle(payload))
-    }
-
-    override fun openRedeem() {
-        navController?.navigate(R.id.action_open_redeemFragment, RedeemFragment.getBundle(RedeemPayload()))
-    }
-
-    override fun openConfirmRebond(payload: ConfirmRebondPayload) {
-        navController?.navigate(R.id.action_open_confirm_rebond, ConfirmRebondFragment.getBundle(payload))
-    }
-
     override fun openContribute(payload: ContributePayload) {
         val bundle = CrowdloanContributeFragment.getBundle(payload)
 
@@ -279,78 +207,12 @@ class Navigator(
         navigationHolder.executeBack()
     }
 
-    override fun openCustomRebond() {
-        navController?.navigate(R.id.action_mainFragment_to_customRebondFragment)
-    }
-
-    override fun openCurrentValidators() {
-        navController?.navigate(R.id.action_mainFragment_to_currentValidatorsFragment)
-    }
-
-    override fun returnToCurrentValidators() {
-        navController?.navigate(R.id.action_confirmStakingFragment_back_to_currentValidatorsFragment)
-    }
-
-    override fun openChangeRewardDestination() {
-        navController?.navigate(R.id.action_mainFragment_to_selectRewardDestinationFragment)
-    }
-
-    override fun openConfirmRewardDestination(payload: ConfirmRewardDestinationPayload) {
-        navController?.navigate(
-            R.id.action_selectRewardDestinationFragment_to_confirmRewardDestinationFragment,
-            ConfirmRewardDestinationFragment.getBundle(payload)
-        )
-    }
-
-    override fun openControllerAccount() {
-        navController?.navigate(R.id.action_stakingBalanceFragment_to_setControllerAccountFragment)
-    }
-
-    override fun openConfirmSetController(payload: ConfirmSetControllerPayload) {
-        navController?.navigate(
-            R.id.action_stakingSetControllerAccountFragment_to_confirmSetControllerAccountFragment,
-            ConfirmSetControllerFragment.getBundle(payload)
-        )
-    }
-
-    override fun openRecommendedValidators() {
-        navController?.navigate(R.id.action_startChangeValidatorsFragment_to_recommendedValidatorsFragment)
-    }
-
-    override fun openSelectCustomValidators() {
-        navController?.navigate(R.id.action_startChangeValidatorsFragment_to_selectCustomValidatorsFragment)
-    }
-
-    override fun openCustomValidatorsSettings() {
-        navController?.navigate(R.id.action_selectCustomValidatorsFragment_to_settingsCustomValidatorsFragment)
-    }
-
-    override fun openSearchCustomValidators() {
-        navController?.navigate(R.id.action_selectCustomValidatorsFragment_to_searchCustomValidatorsFragment)
-    }
-
-    override fun openReviewCustomValidators() {
-        navController?.navigate(R.id.action_selectCustomValidatorsFragment_to_reviewCustomValidatorsFragment)
-    }
-
-    override fun openConfirmStaking() {
-        navController?.navigate(R.id.openConfirmStakingFragment)
-    }
-
-    override fun openConfirmNominations() {
-        navController?.navigate(R.id.action_confirmStakingFragment_to_confirmNominationsFragment)
-    }
-
     override fun returnToMain() {
         navController?.navigate(R.id.back_to_main)
     }
 
     override fun openMoonbeamFlow(payload: ContributePayload) {
         navController?.navigate(R.id.action_mainFragment_to_moonbeamCrowdloanTermsFragment, MoonbeamCrowdloanTermsFragment.getBundle(payload))
-    }
-
-    override fun openValidatorDetails(payload: StakeTargetDetailsPayload) {
-        navController?.navigate(R.id.open_validator_details, ValidatorDetailsFragment.getBundle(payload))
     }
 
     override fun openFilter(payload: TransactionHistoryFilterPayload) = performNavigation(
@@ -490,16 +352,10 @@ class Navigator(
         }
     }
 
-    override fun openAccountDetails(metaAccountId: Long) {
-        val extras = AccountDetailsFragment.getBundle(metaAccountId)
+    override fun openAccountDetails(metaId: Long) {
+        val extras = AccountDetailsFragment.getBundle(metaId)
 
         navController?.navigate(R.id.action_open_account_details, extras)
-    }
-
-    override fun openRebag() = performNavigation(R.id.action_mainFragment_to_rebag)
-
-    override fun openStakingPeriods() {
-        performNavigation(R.id.action_mainFragment_to_staking_periods)
     }
 
     override fun openNodeDetails(nodeId: Int) {
