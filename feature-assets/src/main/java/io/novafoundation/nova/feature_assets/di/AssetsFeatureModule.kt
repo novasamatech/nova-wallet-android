@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.tokens.add.CoinGeckoLinkParser
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
@@ -47,13 +48,15 @@ class AssetsFeatureModule {
         chainRegistry: ChainRegistry,
         nftRepository: NftRepository,
         transactionHistoryRepository: TransactionHistoryRepository,
+        currencyRepository: CurrencyRepository
     ): WalletInteractor = WalletInteractorImpl(
         walletRepository = walletRepository,
         accountRepository = accountRepository,
         assetFiltersRepository = assetFiltersRepository,
         chainRegistry = chainRegistry,
         nftRepository = nftRepository,
-        transactionHistoryRepository = transactionHistoryRepository
+        transactionHistoryRepository = transactionHistoryRepository,
+        currencyRepository = currencyRepository
     )
 
     @Provides

@@ -14,7 +14,7 @@ import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.isValidAddress
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.state.GenericSingleAssetSharedState
+import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +30,7 @@ class RealDelegateSearchInteractor(
 
     override suspend fun searchDelegates(
         queryFlow: Flow<String>,
-        selectedOption: GenericSingleAssetSharedState.SupportedAssetOption<GovernanceAdditionalState>,
+        selectedOption: SelectedAssetOptionSharedState.SupportedAssetOption<GovernanceAdditionalState>,
         scope: CoroutineScope
     ): Flow<ExtendedLoadingState<List<DelegatePreview>>> {
         val chain = selectedOption.assetWithChain.chain

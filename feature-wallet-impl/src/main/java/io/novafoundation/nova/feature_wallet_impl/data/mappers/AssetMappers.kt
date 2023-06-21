@@ -7,6 +7,7 @@ import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.core_db.model.TokenWithCurrency
 import io.novafoundation.nova.feature_currency_api.presentation.mapper.mapCurrencyFromLocal
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
@@ -27,9 +28,8 @@ fun mapTokenLocalToToken(
     chainAsset: Chain.Asset,
 ): Token {
     return Token(
-        rate = tokenLocal?.rate,
         currency = mapCurrencyFromLocal(currencyLocal),
-        recentRateChange = tokenLocal?.recentRateChange,
+        coinRateChange = tokenLocal?.recentRateChange?.let { CoinRateChange(tokenLocal.recentRateChange.orZero(), tokenLocal.rate.orZero()) },
         configuration = chainAsset
     )
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.domain.model
 
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import java.math.BigDecimal
 import java.math.BigInteger
 
 data class Operation(
@@ -18,6 +19,7 @@ data class Operation(
             val hash: String,
             val content: Content,
             val fee: BigInteger,
+            val fiatFee: BigDecimal?,
             val status: Status,
         ) : Type() {
 
@@ -31,6 +33,7 @@ data class Operation(
 
         data class Reward(
             val amount: BigInteger,
+            val fiatAmount: BigDecimal?,
             val isReward: Boolean,
             val era: Int,
             val validator: String?,
@@ -40,10 +43,11 @@ data class Operation(
             val hash: String?,
             val myAddress: String,
             val amount: BigInteger,
+            val fiatAmount: BigDecimal?,
             val receiver: String,
             val sender: String,
             val status: Status,
-            val fee: BigInteger?,
+            val fee: BigInteger?
         ) : Type()
     }
 

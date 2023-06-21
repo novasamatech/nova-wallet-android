@@ -40,6 +40,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.CoinPriceInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
@@ -146,6 +147,8 @@ interface AssetsFeatureDependencies {
     fun coingeckoApi(): CoingeckoApi
 
     fun walletConnectSessionsUseCase(): WalletConnectSessionsUseCase
+
+    fun coinPriceInteractor(): CoinPriceInteractor
 
     val assetsSourceRegistry: AssetSourceRegistry
 

@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '6.3.1'
-        versionCode = 74
+        versionName = '6.4.0'
+        versionCode = 75
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -193,6 +193,8 @@ buildscript {
 
         walletConnectCoreDep = "com.walletconnect:android-core:$walletConnectCoreVersion"
         walletConnectWalletDep = "com.walletconnect:web3wallet:$walletConnectWalletVersion"
+
+        canonizationJsonDep = "io.github.erdtman:java-json-canonicalization:1.1"
     }
 
     repositories {

@@ -13,6 +13,8 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "DASHBOARD_SUBQUERY_URL", "\"https://api.subquery.network/sq/\""
     }
 
     buildTypes {
@@ -40,6 +42,7 @@ dependencies {
     implementation project(':feature-wallet-api')
     implementation project(':feature-currency-api')
     implementation project(':feature-ledger-api')
+    implementation project(':feature-dapp-api')
     implementation project(':runtime')
 
     implementation kotlinDep

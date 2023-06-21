@@ -11,6 +11,8 @@ object SubqueryExpressions {
     fun anyOf(innerExpressions: Collection<String>) = or(innerExpressions)
     fun anyOf(vararg innerExpressions: String) = or(*innerExpressions)
 
+    fun allOf(vararg innerExpressions: String) = and(*innerExpressions)
+
     fun and(vararg innerExpressions: String): String {
         return compoundExpression("and", *innerExpressions)
     }
@@ -26,7 +28,9 @@ object SubqueryExpressions {
     }
 
     private fun compoundExpression(name: String, vararg innerExpressions: String): String {
-        require(innerExpressions.isNotEmpty())
+        if (innerExpressions.isEmpty()) {
+            return ""
+        }
 
         if (innerExpressions.size == 1) {
             return innerExpressions.first()

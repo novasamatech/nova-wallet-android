@@ -43,6 +43,9 @@ abstract class TokenDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertTokens(tokens: List<TokenLocal>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertToken(token: TokenLocal)
+
     @Query(INSERT_TOKEN_WITH_SELECTED_CURRENCY)
     abstract suspend fun insertTokenWithSelectedCurrency(symbol: String)
 }

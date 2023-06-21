@@ -16,8 +16,7 @@ fun BaseFragment<*>.setupUserRewardsComponent(component: UserRewardsComponent, v
 
         userRewardsState?.selectedRewardPeriod?.let { view.setStakingPeriod(it) }
 
-        val amount = userRewardsState?.amount
-        when (amount) {
+        when (val amount = userRewardsState?.amount) {
             is LoadingState.Loaded -> view.showValue(amount.data)
             is LoadingState.Loading -> view.showLoading()
             null -> {}

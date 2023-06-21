@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +30,7 @@ class NftListInteractor(
                     nfts.map { nft ->
                         PricedNft(
                             nft = nft,
-                            nftPriceToken = tokensByUtilityAsset[nft.chain.utilityAsset]
+                            nftPriceToken = tokensByUtilityAsset[nft.chain.utilityAsset.fullId]
                         )
                     }
                 }

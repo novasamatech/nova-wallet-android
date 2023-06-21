@@ -6,7 +6,7 @@ data class ChainAssetRemote(
     val precision: Int,
     val priceId: String?,
     val name: String?,
-    val staking: String?,
+    val staking: List<String>?,
     val type: String?,
     val icon: String?,
     val buyProviders: Map<String, Map<String, Any>>?, // { "providerName": { arguments map } }

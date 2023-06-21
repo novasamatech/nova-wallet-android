@@ -278,8 +278,6 @@ class EvmSignInteractor(
         val chainCurrency = evmChain.nativeCurrency
 
         return Token(
-            rate = null,
-            recentRateChange = null,
             configuration = Chain.Asset(
                 iconUrl = evmChain.iconUrl,
                 id = 0,
@@ -288,12 +286,13 @@ class EvmSignInteractor(
                 symbol = chainCurrency.symbol,
                 precision = chainCurrency.decimals,
                 buyProviders = emptyMap(),
-                staking = Chain.Asset.StakingType.UNSUPPORTED,
+                staking = emptyList(),
                 type = Chain.Asset.Type.EvmNative,
                 name = chainCurrency.name,
                 source = Chain.Asset.Source.ERC20,
                 enabled = true
             ),
+            coinRateChange = null,
             currency = currency
         )
     }

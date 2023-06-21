@@ -48,6 +48,16 @@
                 tools:text="−0.00481 KSM" />
 
             <TextView
+                android:id="@+id/extrinsicDetailAmountFiat"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="4dp"
+                android:textColor="@color/text_secondary"
+                tools:text="$149.36" />
+
+            <TextView
                 android:id="@+id/extrinsicDetailStatus"
                 style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
                 android:layout_width="wrap_content"

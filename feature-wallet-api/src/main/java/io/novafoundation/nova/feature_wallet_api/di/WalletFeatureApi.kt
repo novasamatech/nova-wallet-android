@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.CoinPriceInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
@@ -32,6 +33,8 @@ interface WalletFeatureApi {
     fun provideWalletUpdateSystem(): UpdateSystem
 
     fun provideFeeLoaderMixinFactory(): FeeLoaderMixin.Factory
+
+    fun provideCoinPriceRateInteractor(): CoinPriceInteractor
 
     val assetSourceRegistry: AssetSourceRegistry
 

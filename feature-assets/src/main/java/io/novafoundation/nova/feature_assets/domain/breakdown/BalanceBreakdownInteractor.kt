@@ -44,7 +44,7 @@ class BalanceBreakdown(
     class BreakdownItem(val id: String, val asset: Asset, val amountInPlanks: BigInteger) {
         val tokenAmount by lazy { asset.token.amountFromPlanks(amountInPlanks) }
 
-        val fiatAmount by lazy { asset.token.priceOf(tokenAmount) }
+        val fiatAmount by lazy { asset.token.amountToFiat(tokenAmount) }
     }
 }
 
@@ -137,9 +137,9 @@ class BalanceBreakdownInteractor(
         var locks = contributionsTotal
 
         assets.forEach { asset ->
-            total += asset.token.priceOf(asset.total)
-            transferable += asset.token.priceOf(asset.transferable)
-            locks += asset.token.priceOf(asset.locked)
+            total += asset.token.amountToFiat(asset.total)
+            transferable += asset.token.amountToFiat(asset.transferable)
+            locks += asset.token.amountToFiat(asset.locked)
         }
 
         return TotalAmount(total, transferable, locks)

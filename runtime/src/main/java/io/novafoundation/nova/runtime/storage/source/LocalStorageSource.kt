@@ -2,6 +2,7 @@ package io.novafoundation.nova.runtime.storage.source
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.core.storage.StorageCache
+import io.novafoundation.nova.core.updater.SubstrateSubscriptionBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.query.LocalStorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
@@ -29,7 +30,12 @@ class LocalStorageSource(
         throw NotImplementedError("Child state queries are not yet supported in local storage")
     }
 
-    override suspend fun createQueryContext(chainId: String, at: BlockHash?, runtime: RuntimeSnapshot): StorageQueryContext {
+    override suspend fun createQueryContext(
+        chainId: String,
+        at: BlockHash?,
+        runtime: RuntimeSnapshot,
+        subscriptionBuilder: SubstrateSubscriptionBuilder?
+    ): StorageQueryContext {
         return LocalStorageQueryContext(storageCache, chainId, at, runtime)
     }
 

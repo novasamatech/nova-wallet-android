@@ -8,6 +8,12 @@ import io.novafoundation.nova.common.utils.findIsInstanceOrNull
 import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ExplorerTemplateExtractor
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -43,12 +49,33 @@ val Chain.isSubstrateBased
 val Chain.commissionAsset
     get() = utilityAsset
 
+fun Chain.Asset.supportedStakingOptions(): List<Chain.Asset.StakingType> {
+    if (staking.isEmpty()) return emptyList()
+
+    return staking.filter { it != UNSUPPORTED }
+}
+
+enum class StakingTypeGroup {
+
+    RELAYCHAIN, PARACHAIN, UNSUPPORTED
+}
+
+fun Chain.Asset.StakingType.group(): StakingTypeGroup {
+    return when (this) {
+        UNSUPPORTED -> StakingTypeGroup.UNSUPPORTED
+        RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> StakingTypeGroup.RELAYCHAIN
+        PARACHAIN, TURING -> StakingTypeGroup.PARACHAIN
+    }
+}
+
 inline fun <reified T : Chain.ExternalApi> Chain.externalApi(): T? {
     return externalApis.findIsInstanceOrNull<T>()
 }
 
+const val UTILITY_ASSET_ID = 0
+
 val Chain.Asset.isUtilityAsset: Boolean
-    get() = id == 0
+    get() = id == UTILITY_ASSET_ID
 
 private const val MOONBEAM_XC_PREFIX = "xc"
 
@@ -206,14 +233,23 @@ object ChainGeneses {
     const val MOONRIVER = "401a1f9dca3da46f5c4091016c8a2f26dcea05865116b286f60f668207d1474b"
 
     const val POLYMESH = "6fbd74e5e1d0a61d52ccfe9d4adaed16dd3a7caa37c6bc4d0c2fa12e8b2f4063"
-    const val CENTRIFUGE = "b3db41421702df9a7fcac62b53ffeac85f7853cc4e689e0b93aeb3db18c09d82"
 
     const val XX_NETWORK = "50dd5d206917bf10502c68fb4d18a59fc8aa31586f4e8856b493e43544aa82aa"
 
     const val KILT = "411f057b9107718c9624d6aa4a3f23c1653898297f3d4d529d9bb6511a39dd21"
-    const val KILT_TESTNET = "a0c6e3bac382b316a68bca7141af1fba507207594c761076847ce358aeedcc21"
 
     const val ASTAR = "9eb76c5184c4ab8679d2d5d819fdf90b9c001403e9e17da2e14b6d8aec4029c6"
+
+    const val ALEPH_ZERO = "70255b4d28de0fc4e1a193d7e175ad1ccef431598211c55538f1018651a0344e"
+    const val TERNOA = "6859c81ca95ef624c9dfe4dc6e3381c33e5d6509e35e147092bfbc780f777c4e"
+
+    const val POLKADEX = "3920bcb4960a1eef5580cd5367ff3f430eef052774f78468852f7b9cb39f8a3c"
+
+    const val CALAMARI = "4ac80c99289841dd946ef92765bf659a307d39189b3ce374a92b5f0415ee17a1"
+
+    const val TURING = "0f62b701fb12d02237a33b84818c11f621653d2b1614c777973babf4652b535d"
+
+    const val ZEITGEIST = "1bf2a2ecb4a868de66ea8610f2ce7c8c43706561b6476031315f6640fe38e060"
 }
 
 object ChainIds {

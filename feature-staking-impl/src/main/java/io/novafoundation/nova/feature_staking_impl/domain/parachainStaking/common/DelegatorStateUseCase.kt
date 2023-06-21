@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +17,7 @@ import kotlinx.coroutines.withContext
 
 class DelegatorStateUseCase(
     private val delegatorStateRepository: DelegatorStateRepository,
-    private val singleAssetSharedState: SingleAssetSharedState,
+    private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
     private val accountRepository: AccountRepository,
 ) {
 
