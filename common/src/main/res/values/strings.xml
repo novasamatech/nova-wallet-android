@@ -101,7 +101,7 @@
     <string name="common_waiting">Waiting</string>
     <string name="common_per_year">/ year</string>
     <string name="common_per_year_long">per year</string>
-    <string name="staking_earnings_per_year">Earnings per year</string>
+    <string name="staking_earnings_per_year">Estimated rewards</string>
 
     <string name="common_expired">Expired</string>
 
