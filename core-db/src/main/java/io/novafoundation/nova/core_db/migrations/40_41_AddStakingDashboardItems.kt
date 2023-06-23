@@ -18,6 +18,7 @@ val AddStakingDashboardItems_41_42 = object : Migration(41, 42) {
                 `status` TEXT,
                 `rewards` TEXT,
                 `estimatedEarnings` REAL,
+                `primaryStakingAccountId` BLOB,
                 PRIMARY KEY(`chainId`, `chainAssetId`, `stakingType`, `metaId`),
                 FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE,
                 FOREIGN KEY(`chainAssetId`, `chainId`) REFERENCES `chain_assets`(`id`, `chainId`) ON UPDATE NO ACTION ON DELETE CASCADE ,
