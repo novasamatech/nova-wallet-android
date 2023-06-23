@@ -36,11 +36,13 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
             }
         }
         
-        accumulatedRewards$chainAddressesParams {
-            nodes {
-                networkId
-                stakingType
-                amount
+        rewards$chainAddressesParams {
+            groupedAggregates(groupBy: [NETWORK_ID,  STAKING_TYPE]) {
+                sum {
+                    amount
+                }
+      
+                keys
             }
         }
     }
