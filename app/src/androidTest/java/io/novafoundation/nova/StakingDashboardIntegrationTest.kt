@@ -8,10 +8,12 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncing
 import kotlinx.coroutines.flow.launchIn
 import org.junit.Test
 import java.lang.reflect.Type
@@ -39,12 +41,14 @@ class StakingDashboardIntegrationTest: BaseIntegrationTest() {
             .collect(::logDashboard)
     }
 
-    private fun logDashboard(dashboard: StakingDashboard) {
+    private fun logDashboard(dashboard: ExtendedLoadingState<StakingDashboard>) {
+        if (dashboard !is ExtendedLoadingState.Loaded) return
+
         val serialized = gson.toJson(dashboard)
 
         val message = """
             Dashboard state:
-                Syncing items: ${dashboard.syncingItemsCount()}
+                Syncing items: ${dashboard.data.syncingItemsCount()}
                 $serialized
         """.trimIndent()
 
@@ -62,6 +66,6 @@ class StakingDashboardIntegrationTest: BaseIntegrationTest() {
     }
 
     private fun StakingDashboard.syncingItemsCount(): Int {
-        return withoutStake.count { it.syncingStage } + hasStake.count { it.syncingStage }
+        return withoutStake.count { it.syncingStage.isSyncing() } + hasStake.count { it.syncingStage.isSyncing() }
     }
 }
