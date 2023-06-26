@@ -31,7 +31,7 @@ fun mapTokenToTokenModel(token: Token): TokenModel {
         val rateChange = token.coinRateChange?.recentRateChange
 
         val changeColorRes = when {
-            rateChange == null -> R.color.text_secondary
+            rateChange == null -> R.color.text_tertiary
             rateChange.isNonNegative -> R.color.text_positive
             else -> R.color.text_negative
         }

@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="start_staking_fragment_start_staking">Start Staking</string>
+    <string name="start_staking_fragment_available_balance">Available balance: %1$s KSM (%2$s)</string>
+
+    <string name="start_staking_fragment_title_APY">Earn up to %s</string>
+    <string name="start_staking_fragment_title">%1$s\non your %2$s tokens\nper year</string>
+
+    <string name="start_staking_fragment_min_stake_condition">Stake anytime with as little as  %1$s. Your stake will actively earn rewards %2$s</string>
+    <string name="start_staking_fragment_test_network_condition">%1$s is a %2$s with %3$s</string>
+    <string name="start_staking_fragment_test_network_condition_test_network">test network</string>
+    <string name="start_staking_fragment_test_network_condition_no_token">no token value</string>
+
+    <string name="start_staking_fragment_unstake_condition">Unstake anytime, and redeem your funds %s. No rewards are earned while unstaking</string>
+
+    <string name="start_staking_fragment_reward_frequency_condition">Rewards accrue every %s and added back to the stake</string>
+    <string name="start_staking_fragment_claim_reward_frequency_condition">Rewards accrue every %s. You need to claim rewards manually</string>
+
+    <string name="start_staking_fragment_governance_participation_participate">Participate in governance</string>
+    <string name="start_staking_fragment_governance_participation">%s with your staked tokens</string>
+
+    <string name="start_staking_fragment_stake_monitoring_monitor_stake">Monitor your stake</string>
+    <string name="start_staking_fragment_stake_monitoring">Rewards &amp; staking status vary over time. %s from time to time</string>
+
+    <string name="start_staking_fragment_more_info">Find out more information about\nMoonbeam staking over at the %s</string>
+    <string name="start_staking_fragment_more_info_clicable_part">Nova Wiki</string>
+
+    <string name="start_staking_fragment_terms_of_use">See %s</string>
+    <string name="start_staking_fragment_terms_of_use_clicable_part">Terms of Use</string>
+
     <string name="account_parity_signer_sign_qr_code_expired_descrition">For security reasons generated operations valid for only %s.\nPlease generate new QR code and sign it with %s</string>
     <string name="account_parity_signer_import_scan_invalid_qr">Invalid QR code, please make sure you are scanning QR code from %s</string>
     <string name="account_parity_signer_sign_have_error">I have an error in %s</string>

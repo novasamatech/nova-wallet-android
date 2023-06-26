@@ -27,7 +27,7 @@
         android:gravity="center_vertical"
         android:includeFontPadding="false"
         android:text="@string/import_json_chains_dont_match"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         android:visibility="gone"
         app:drawableStartCompat="@drawable/ic_warning_filled"
         tools:visibility="visible" />
@@ -57,6 +57,6 @@
         android:layout_marginTop="12dp"
         android:layout_weight="1"
         android:text="@string/wallet_nickname_create_caption_v2_2_0"
-        android:textColor="@color/text_secondary" />
+        android:textColor="@color/text_tertiary" />
 
 </merge>
