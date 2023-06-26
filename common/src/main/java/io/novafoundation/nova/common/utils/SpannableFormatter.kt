@@ -25,6 +25,9 @@ object SpannableFormatter {
         while (matcher.find()) {
             matcher.group()
             val argNumber = parseArgNumber(matcher.group()) ?: i
+            if (argNumber >= args.size) {
+                continue
+            }
             val arg = args[argNumber]
             val start = matcher.start()
             val end = matcher.end()

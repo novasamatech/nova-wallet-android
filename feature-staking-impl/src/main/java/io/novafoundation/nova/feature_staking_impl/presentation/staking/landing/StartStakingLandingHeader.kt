@@ -6,8 +6,6 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.item_start_staking_landing_condition.view.itemStakingConditionIcon
-import kotlinx.android.synthetic.main.item_start_staking_landing_condition.view.itemStakingConditionText
 import kotlinx.android.synthetic.main.item_start_staking_landing_title.view.itemStakingLandingTitle
 
 class StartStakingLandingHeaderAdapter : Adapter<StartStakingLandingHeaderViewHolder>() {
@@ -39,5 +37,4 @@ class StartStakingLandingHeaderViewHolder(containerView: View) : ViewHolder(cont
             itemStakingLandingTitle.text = title
         }
     }
-
 }

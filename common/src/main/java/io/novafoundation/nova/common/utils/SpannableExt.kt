@@ -11,7 +11,6 @@ import android.text.style.ImageSpan
 import android.view.View
 import androidx.core.text.toSpannable
 
-
 fun CharSequence.toSpannable(span: Any): Spannable {
     return this.toSpannable().setFullSpan(span)
 }
@@ -25,10 +24,9 @@ fun Spannable.setFullSpan(span: Any): Spannable {
 fun Spannable.setEndSpan(span: Any): Spannable {
     val spannable = SpannableStringBuilder(this)
     spannable.append(" ")
-        .setSpan(span, length - 1, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        .setSpan(span, length, length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
     return spannable
 }
-
 
 fun clickableSpan(onClick: () -> Unit) = object : ClickableSpan() {
     override fun updateDrawState(ds: TextPaint) {

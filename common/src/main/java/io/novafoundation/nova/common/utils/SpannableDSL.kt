@@ -4,10 +4,7 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.Spanned
-import android.text.TextPaint
-import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
-import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.resources.ResourceManager

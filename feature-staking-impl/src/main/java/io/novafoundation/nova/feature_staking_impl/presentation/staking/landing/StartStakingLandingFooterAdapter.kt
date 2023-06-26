@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.SpannableFormatter
 import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
+import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setEndSpan
@@ -42,10 +43,18 @@ class StartStakingLandingFooterViewHolder(containerView: View) : RecyclerView.Vi
 
     init {
         with(itemView) {
+            val iconColor = context.getColor(R.color.chip_icon)
+            val clickablePartColor = context.getColor(R.color.text_secondary)
+            val chevronSize = 20.dp(context)
+            val chevronRight = ContextCompat.getDrawable(context, R.drawable.ic_chevron_right)
+                ?.apply {
+                    setBounds(0, 0, chevronSize, chevronSize)
+                    setTint(iconColor)
+                }
             val termsClickablePart = resources.getText(R.string.start_staking_fragment_terms_of_use_clicable_part)
-                .toSpannable(clickableSpan { })
-                .setFullSpan(colorSpan(R.color.text_secondary))
-                .setEndSpan(drawableSpan(ContextCompat.getDrawable(context, R.drawable.ic_arrow_right)!!))
+                .toSpannable(colorSpan(clickablePartColor))
+                .setFullSpan(clickableSpan { })
+                .setEndSpan(drawableSpan(chevronRight!!))
 
             itemStakingLandingFooterTermsOfUse.text = SpannableFormatter.format(
                 resources.getString(R.string.start_staking_fragment_terms_of_use),
