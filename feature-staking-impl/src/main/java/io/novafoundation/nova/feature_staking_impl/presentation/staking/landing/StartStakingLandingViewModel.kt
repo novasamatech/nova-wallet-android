@@ -44,6 +44,10 @@ class StartStakingLandingViewModel(
         stakingRouter.back()
     }
 
+    fun termsOfUseClicked() {
+        // TODO
+    }
+
     private fun createTitle(): CharSequence {
         val color = resourceManager.getColor(R.color.text_positive)
         val apy = resourceManager.getString(
@@ -68,7 +72,7 @@ class StartStakingLandingViewModel(
         }
         val clickablePart = resourceManager.getString(R.string.start_staking_fragment_more_info_clicable_part)
             .toSpannable(colorSpan(clickableTextColor))
-            .setFullSpan(clickableSpan { })
+            .setFullSpan(clickableSpan { novaWikiClicked() })
             .setEndSpan(drawableSpan(chevronRight))
 
         return SpannableFormatter.format(
@@ -155,5 +159,9 @@ class StartStakingLandingViewModel(
             iconId = R.drawable.ic_monitor_your_stake,
             text = resourceManager.getString(R.string.start_staking_fragment_stake_monitoring).formatAsSpannable(monitorStaking),
         )
+    }
+
+    private fun novaWikiClicked() {
+        // TODO
     }
 }

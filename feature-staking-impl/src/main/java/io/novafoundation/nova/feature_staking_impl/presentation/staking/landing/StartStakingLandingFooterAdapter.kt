@@ -17,12 +17,16 @@ import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.synthetic.main.item_start_staking_landing_footer.view.itemStakingLandingFooterMoreInfo
 import kotlinx.android.synthetic.main.item_start_staking_landing_footer.view.itemStakingLandingFooterTermsOfUse
 
-class StartStakingLandingFooterAdapter : RecyclerView.Adapter<StartStakingLandingFooterViewHolder>() {
+class StartStakingLandingFooterAdapter(private val handler: ClickHandler) : RecyclerView.Adapter<StartStakingLandingFooterViewHolder>() {
+
+    interface ClickHandler {
+        fun onTermsOfUseClicked()
+    }
 
     private var moreInfoText: CharSequence = ""
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StartStakingLandingFooterViewHolder {
-        return StartStakingLandingFooterViewHolder(parent.inflateChild(R.layout.item_start_staking_landing_footer))
+        return StartStakingLandingFooterViewHolder(handler, parent.inflateChild(R.layout.item_start_staking_landing_footer))
     }
 
     override fun getItemCount(): Int {
@@ -39,7 +43,10 @@ class StartStakingLandingFooterAdapter : RecyclerView.Adapter<StartStakingLandin
     }
 }
 
-class StartStakingLandingFooterViewHolder(containerView: View) : RecyclerView.ViewHolder(containerView) {
+class StartStakingLandingFooterViewHolder(
+    private val clickHandler: StartStakingLandingFooterAdapter.ClickHandler,
+    containerView: View
+) : RecyclerView.ViewHolder(containerView) {
 
     init {
         with(itemView) {
@@ -53,7 +60,7 @@ class StartStakingLandingFooterViewHolder(containerView: View) : RecyclerView.Vi
                 }
             val termsClickablePart = resources.getText(R.string.start_staking_fragment_terms_of_use_clicable_part)
                 .toSpannable(colorSpan(clickablePartColor))
-                .setFullSpan(clickableSpan { })
+                .setFullSpan(clickableSpan { clickHandler.onTermsOfUseClicked() })
                 .setEndSpan(drawableSpan(chevronRight!!))
 
             itemStakingLandingFooterTermsOfUse.text = SpannableFormatter.format(

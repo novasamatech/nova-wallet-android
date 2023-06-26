@@ -14,11 +14,11 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import kotlinx.android.synthetic.main.fragment_start_staking_landing.startStakingLandingList
 import kotlinx.android.synthetic.main.fragment_start_staking_landing.startStakingLandingToolbar
 
-class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>() {
+class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>(), StartStakingLandingFooterAdapter.ClickHandler {
 
     private val headerAdapter = StartStakingLandingHeaderAdapter()
     private val conditionsAdapter = StartStakingLandingAdapter()
-    private val footerAdapter = StartStakingLandingFooterAdapter()
+    private val footerAdapter = StartStakingLandingFooterAdapter(this)
     private val adapter = ConcatAdapter(headerAdapter, conditionsAdapter, footerAdapter)
 
     override fun onCreateView(
@@ -58,5 +58,9 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
         viewModel.moreInfoTextFlow.observe { text ->
             footerAdapter.setMoreInformationText(text)
         }
+    }
+
+    override fun onTermsOfUseClicked() {
+        viewModel.termsOfUseClicked()
     }
 }
