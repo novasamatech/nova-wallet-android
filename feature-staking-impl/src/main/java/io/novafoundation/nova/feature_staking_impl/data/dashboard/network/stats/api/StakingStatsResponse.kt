@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats
 import io.novafoundation.nova.common.data.network.subquery.GroupedAggregate
 import io.novafoundation.nova.common.data.network.subquery.SubQueryGroupedAggregates
 import io.novafoundation.nova.common.data.network.subquery.SubQueryNodes
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import java.math.BigDecimal
 
 typealias StakingStatsRewards = SubQueryGroupedAggregates<GroupedAggregate.Sum<StakingStatsResponse.AccumulatedReward>>
