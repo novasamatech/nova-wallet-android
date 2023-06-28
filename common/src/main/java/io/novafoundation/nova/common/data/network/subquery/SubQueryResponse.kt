@@ -7,3 +7,10 @@ class SubQueryResponse<T>(
 class SubQueryNodes<T>(val nodes: List<T>)
 
 class SubQueryTotalCount(val totalCount: Int)
+
+class SubQueryGroupedAggregates<T : GroupedAggregate>(val groupedAggregates: List<T>)
+
+sealed class GroupedAggregate(val keys: List<String>) {
+
+    class Sum<T>(val sum: T, keys: List<String>) : GroupedAggregate(keys)
+}
