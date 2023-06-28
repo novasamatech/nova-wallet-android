@@ -18,6 +18,7 @@ import io.novafoundation.nova.runtime.ext.supportedStakingOptions
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapStakingStringToStakingType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import java.math.BigInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -49,12 +50,11 @@ class RealStakingStatsDataSource(
                     StakingOptionId(chain.id, UTILITY_ASSET_ID, stakingType)
                 }
             }
-
             keys.associateWith { key ->
                 ChainStakingStats(
                     estimatedEarnings = earnings[key]?.maxAPY.orZero().asPerbill().toPercent(),
                     accountPresentInActiveStakers = key in activeStakers,
-                    rewards = rewards[key]?.amount.orZero()
+                    rewards = rewards[key]?.amount?.toBigInteger().orZero()
                 )
             }
         }
