@@ -38,7 +38,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.confirm.hints.Co
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -58,7 +58,7 @@ class ConfirmStakingViewModel(
     private val setupStakingInteractor: SetupStakingInteractor,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val externalActions: ExternalActions.Presentation,
-    private val selectedAssetState: SingleAssetSharedState,
+    private val selectedAssetState: AnySelectedAssetOptionSharedState,
     private val validationExecutor: ValidationExecutor,
     walletUiUseCase: WalletUiUseCase,
     hintsMixinFactory: ConfirmStakeHintsMixinFactory,
@@ -250,7 +250,7 @@ class ConfirmStakingViewModel(
             if (currentProcessState.payload is Payload.Validators) {
                 router.returnToCurrentValidators()
             } else {
-                router.returnToMain()
+                router.returnToStakingMain()
             }
         } else {
             showError(setupResult.requireException())

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.common.sequrity
+package io.novafoundation.nova.common.sequrity.biometry
 
 import kotlinx.coroutines.flow.Flow
 

@@ -11,6 +11,8 @@ import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
@@ -24,14 +26,15 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicS
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.onEach
 
 class PaymentUpdaterFactory(
     private val operationDao: OperationDao,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val scope: AccountUpdateScope,
-    private val walletRepository: WalletRepository
+    private val walletRepository: WalletRepository,
+    private val currencyRepository: CurrencyRepository
 ) {
 
     fun create(chain: Chain): PaymentUpdater {
@@ -40,7 +43,8 @@ class PaymentUpdaterFactory(
             assetSourceRegistry = assetSourceRegistry,
             scope = scope,
             chain = chain,
-            walletRepository = walletRepository
+            walletRepository = walletRepository,
+            currencyRepository = currencyRepository
         )
     }
 }
@@ -50,7 +54,8 @@ class PaymentUpdater(
     private val assetSourceRegistry: AssetSourceRegistry,
     override val scope: AccountUpdateScope,
     private val chain: Chain,
-    private val walletRepository: WalletRepository
+    private val walletRepository: WalletRepository,
+    private val currencyRepository: CurrencyRepository
 ) : Updater {
 
     override val requiredModules: List<String> = emptyList()
@@ -92,10 +97,15 @@ class PaymentUpdater(
         }
             .onFailure { logSyncError(chain, chainAsset, error = it) }
             .getOrNull()
+            ?: return null
 
-        return assetUpdateFlow
-            ?.catch { logSyncError(chain, chainAsset, error = it) }
-            ?.onEach { balanceUpdate -> assetSource.history.syncOperationsForBalanceChange(chainAsset, balanceUpdate, accountId) }
+        val currencyFlow = currencyRepository.observeSelectCurrency()
+
+        return combine(assetUpdateFlow, currencyFlow) { balanceUpdate, currency ->
+            assetSource.history.syncOperationsForBalanceChange(chainAsset, balanceUpdate, accountId, currency)
+            balanceUpdate
+        }
+            .catch { logSyncError(chain, chainAsset, error = it) }
     }
 
     private suspend fun deleteAssetIfExist(chainAssets: List<Chain.Asset>) {
@@ -106,9 +116,14 @@ class PaymentUpdater(
         Log.e(LOG_TAG, "Failed to sync balance for ${chainAsset.symbol} in ${chain.name}", error)
     }
 
-    private suspend fun AssetHistory.syncOperationsForBalanceChange(chainAsset: Chain.Asset, balanceSyncUpdate: BalanceSyncUpdate, accountId: AccountId) {
+    private suspend fun AssetHistory.syncOperationsForBalanceChange(
+        chainAsset: Chain.Asset,
+        balanceSyncUpdate: BalanceSyncUpdate,
+        accountId: AccountId,
+        currency: Currency
+    ) {
         when (balanceSyncUpdate) {
-            is BalanceSyncUpdate.CauseFetchable -> fetchOperationsForBalanceChange(chain, chainAsset, balanceSyncUpdate.blockHash, accountId)
+            is BalanceSyncUpdate.CauseFetchable -> fetchOperationsForBalanceChange(chain, chainAsset, balanceSyncUpdate.blockHash, accountId, currency)
                 .onSuccess { blockTransfers ->
                     val localOperations = blockTransfers.map { transfer -> createTransferOperationLocal(chainAsset, transfer, accountId) }
 

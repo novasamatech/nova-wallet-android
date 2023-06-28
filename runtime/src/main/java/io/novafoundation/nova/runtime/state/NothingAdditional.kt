@@ -3,7 +3,7 @@ package io.novafoundation.nova.runtime.state
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
-object NothingAdditional : AssetSharedStateAdditionalData {
+object NothingAdditional : SelectableAssetAdditionalData {
 
     override val identifier: String = "Nothing"
 

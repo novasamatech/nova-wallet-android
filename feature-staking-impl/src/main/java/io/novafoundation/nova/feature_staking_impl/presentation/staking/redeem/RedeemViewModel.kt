@@ -22,7 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.reedeem.Re
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -41,7 +41,7 @@ class RedeemViewModel(
     private val iconGenerator: AddressIconGenerator,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val externalActions: ExternalActions.Presentation,
-    private val selectedAssetState: SingleAssetSharedState,
+    private val selectedAssetState: AnySelectedAssetOptionSharedState,
     private val payload: RedeemPayload,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),

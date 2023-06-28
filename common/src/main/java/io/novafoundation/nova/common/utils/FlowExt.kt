@@ -19,6 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -26,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
@@ -33,6 +35,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -42,6 +45,7 @@ import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlin.coroutines.coroutineContext
+import kotlin.time.Duration
 
 inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = map { list ->
     list.map { item -> mapper(item) }
@@ -448,7 +452,7 @@ fun <T> accumulateFlatten(vararg flows: Flow<List<T>>): Flow<List<T>> {
     return accumulate(*flows).map { it.flatten() }
 }
 
-fun <A, B, R> unite(flowA: Flow<A>, flowB: Flow<B>, transform: (A?, B?) -> R): Flow<R> {
+fun <A, B, R> unite(flowA: Flow<A>, flowB: Flow<B>, transform: suspend (A?, B?) -> R): Flow<R> {
     var aResult: A? = null
     var bResult: B? = null
 
@@ -494,3 +498,29 @@ fun <T> Flow<T>.observeInLifecycle(
 fun <T> Map<out T, MutableStateFlow<Boolean>>.checkEnabled(key: T) = get(key)?.value ?: false
 
 suspend inline fun <reified T> Flow<T?>.firstNotNull(): T = first { it != null } as T
+
+inline fun <T, R> Flow<IndexedValue<T>>.mapLatestIndexed(crossinline transform: suspend (T) -> R): Flow<IndexedValue<R>> {
+    return mapLatest { IndexedValue(it.index, transform(it.value)) }
+}
+
+/**
+ * Emits first element from upstream and then emits last element emitted by upstream during specified time window
+ *
+ * ```
+ * flow {
+ *  for (num in 1..15) {
+ *      emit(num)
+ *      delay(25)
+ *  }
+ * }.throttleLast(100)
+ *  .onEach { println(it) }
+ *  .collect()  // Prints 1, 5, 9, 13, 15
+ *
+ * ```
+ */
+fun <T> Flow<T>.throttleLast(delay: Duration): Flow<T> = this
+    .conflate()
+    .transform {
+        emit(it)
+        delay(delay)
+    }

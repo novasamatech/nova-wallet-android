@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.parce
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
+import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -37,7 +37,7 @@ class ValidatorDetailsViewModel(
     private val iconGenerator: AddressIconGenerator,
     private val externalActions: ExternalActions.Presentation,
     private val resourceManager: ResourceManager,
-    private val selectedAssetState: SingleAssetSharedState,
+    private val selectedAssetState: AnySelectedAssetOptionSharedState,
     private val identityMixinFactory: IdentityMixin.Factory
 ) : BaseViewModel(), ExternalActions.Presentation by externalActions {
 

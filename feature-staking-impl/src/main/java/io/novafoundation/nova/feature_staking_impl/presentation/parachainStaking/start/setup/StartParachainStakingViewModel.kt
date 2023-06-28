@@ -44,7 +44,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,7 +62,6 @@ class StartParachainStakingViewModel(
     private val selectCollatorInterScreenRequester: SelectCollatorInterScreenRequester,
     private val interactor: StartParachainStakingInteractor,
     private val rewardsComponentFactory: RealParachainStakingRewardsComponentFactory,
-    private val singleAssetSharedState: SingleAssetSharedState,
     private val addressIconGenerator: AddressIconGenerator,
     private val assetUseCase: AssetUseCase,
     private val resourceManager: ResourceManager,

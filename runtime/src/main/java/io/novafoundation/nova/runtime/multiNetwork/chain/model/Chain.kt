@@ -56,7 +56,7 @@ data class Chain(
         val symbol: String,
         val precision: Int,
         val buyProviders: Map<BuyProviderId, BuyProviderArguments>,
-        val staking: StakingType,
+        val staking: List<StakingType>,
         val type: Type,
         val source: Source,
         val name: String,

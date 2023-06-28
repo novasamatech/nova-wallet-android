@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@+id/stakingDashboardFragment"
+    android:id="@+id/staking_dashboard_graph">
+
+    <fragment
+        android:id="@+id/stakingDashboardFragment"
+        tools:layout="@layout/fragment_staking_dashboard"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.StakingDashboardFragment"
+        android:label="StakingFragment">
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_stakingDashboardFragment_to_moreStakingOptionsFragment"
+            app:destination="@id/moreStakingOptionsFragment" />
+    </fragment>
+
+    <fragment
+        tools:layout="@layout/fragment_more_staking_options"
+        android:id="@+id/moreStakingOptionsFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.MoreStakingOptionsFragment"
+        android:label="MoreStakingOptionsFragment" />
+
+</navigation>

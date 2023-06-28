@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin
 
+import android.text.TextUtils
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.capitalize
@@ -11,8 +12,11 @@ import io.novafoundation.nova.feature_assets.presentation.model.ExtrinsicContent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationStatusAppearance
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
+import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
@@ -20,7 +24,10 @@ import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import java.math.BigDecimal
 import java.math.BigInteger
+
+private class EllipsizedString(val value: String, val elipsize: TextUtils.TruncateAt)
 
 private val Operation.Type.operationStatus
     get() = when (this) {
@@ -81,22 +88,30 @@ private fun String.itemToCapitalizedWords(): String {
     return split.joinToString(separator = " ") { it.capitalize() }
 }
 
-private fun mapExtrinsicContentToHeaderAndSubHeader(extrinsicContent: Content, resourceManager: ResourceManager): Pair<String, String> {
+private fun mapExtrinsicContentToHeaderAndSubHeader(extrinsicContent: Content, resourceManager: ResourceManager): Pair<String, EllipsizedString> {
     return when (extrinsicContent) {
-        is Content.ContractCall -> {
-            val header = formatContractFunctionName(extrinsicContent) ?: extrinsicContent.contractAddress
-            val subHeader = resourceManager.getString(R.string.ethereum_contract_call)
-
-            header to subHeader
-        }
+        is Content.ContractCall -> mapContractCallToHeaderAndSubHeader(extrinsicContent, resourceManager)
 
         is Content.SubstrateCall -> {
             val header = extrinsicContent.call.itemToCapitalizedWords()
             val subHeader = extrinsicContent.module.itemToCapitalizedWords()
 
-            header to subHeader
+            header to EllipsizedString(subHeader, TextUtils.TruncateAt.END)
         }
     }
+}
+
+private fun mapContractCallToHeaderAndSubHeader(content: Content.ContractCall, resourceManager: ResourceManager): Pair<String, EllipsizedString> {
+    val header = resourceManager.getString(R.string.ethereum_contract_call)
+    val functionName = formatContractFunctionName(content)
+    val subHeaderEllipsized = if (functionName?.contains("transfer") == true) {
+        EllipsizedString(functionName, TextUtils.TruncateAt.END)
+    } else {
+        val contractAddress = resourceManager.getString(R.string.transfer_history_send_to, content.contractAddress)
+        EllipsizedString(contractAddress, TextUtils.TruncateAt.END)
+    }
+
+    return header to subHeaderEllipsized
 }
 
 private fun formatContractFunctionName(extrinsicContent: Content.ContractCall): String? {
@@ -148,6 +163,7 @@ private fun substrateCallUi(
 
 fun mapOperationToOperationModel(
     chain: Chain,
+    token: Token,
     operation: Operation,
     nameIdentifier: AddressDisplayUseCase.Identifier,
     resourceManager: ResourceManager,
@@ -158,17 +174,17 @@ fun mapOperationToOperationModel(
     return with(operation) {
         when (val operationType = type) {
             is Operation.Type.Reward -> {
+                val headerResId = if (operationType.isReward) R.string.staking_reward else R.string.staking_slash
                 OperationModel(
                     id = id,
-                    formattedTime = formattedTime,
                     amount = formatAmount(chainAsset, operationType),
+                    amountDetails = mapToFiatWithTime(token, operationType.fiatAmount, formattedTime, resourceManager),
                     amountColorRes = if (operationType.isReward) R.color.text_positive else R.color.text_primary,
-                    header = resourceManager.getString(
-                        if (operationType.isReward) R.string.staking_reward else R.string.staking_slash
-                    ),
+                    header = resourceManager.getString(headerResId),
+                    subHeader = resourceManager.getString(R.string.tabbar_staking_title),
+                    subHeaderEllipsize = TextUtils.TruncateAt.END,
                     statusAppearance = statusAppearance,
                     operationIcon = resourceManager.getDrawable(R.drawable.ic_staking_filled).asIcon(),
-                    subHeader = resourceManager.getString(R.string.tabbar_staking_title),
                 )
             }
 
@@ -181,15 +197,24 @@ fun mapOperationToOperationModel(
                     else -> R.color.text_primary
                 }
 
+                val nameOrAddress = nameIdentifier.nameOrAddress(operationType.displayAddress(isIncome))
+
+                val subHeader = if (isIncome) {
+                    resourceManager.getString(R.string.transfer_history_income_from, nameOrAddress)
+                } else {
+                    resourceManager.getString(R.string.transfer_history_send_to, nameOrAddress)
+                }
+
                 OperationModel(
                     id = id,
-                    formattedTime = formattedTime,
                     amount = formatAmount(chainAsset, isIncome, operationType),
+                    amountDetails = mapToFiatWithTime(token, operationType.fiatAmount, formattedTime, resourceManager),
                     amountColorRes = amountColor,
-                    header = nameIdentifier.nameOrAddress(operationType.displayAddress(isIncome)),
+                    header = resourceManager.getString(R.string.transfer_title),
+                    subHeader = subHeader,
+                    subHeaderEllipsize = TextUtils.TruncateAt.MIDDLE,
                     statusAppearance = statusAppearance,
                     operationIcon = resourceManager.getDrawable(transferDirectionIcon(isIncome)).asIcon(),
-                    subHeader = resourceManager.getString(R.string.transfer_title),
                 )
             }
 
@@ -199,11 +224,12 @@ fun mapOperationToOperationModel(
 
                 OperationModel(
                     id = id,
-                    formattedTime = formattedTime,
                     amount = formatFee(chainAsset, operationType),
+                    amountDetails = mapToFiatWithTime(token, operationType.fiatFee, formattedTime, resourceManager),
                     amountColorRes = amountColor,
                     header = header,
-                    subHeader = subHeader,
+                    subHeader = subHeader.value,
+                    subHeaderEllipsize = subHeader.elipsize,
                     statusAppearance = statusAppearance,
                     operationIcon = operation.chainAsset.iconUrl?.asIcon() ?: R.drawable.ic_nova.asIcon()
                 )
@@ -212,10 +238,25 @@ fun mapOperationToOperationModel(
     }
 }
 
+fun mapToFiatWithTime(
+    token: Token,
+    amount: BigDecimal?,
+    time: String,
+    resourceManager: ResourceManager,
+): String {
+    val fiatAmount = amount?.formatAsCurrency(token.currency)
+    return if (fiatAmount == null) {
+        time
+    } else {
+        resourceManager.getString(R.string.transaction_history_fiat_with_time, fiatAmount, time)
+    }
+}
+
 suspend fun mapOperationToParcel(
     operation: Operation,
     chainRegistry: ChainRegistry,
     resourceManager: ResourceManager,
+    currency: Currency,
 ): OperationParcelizeModel {
     with(operation) {
         return when (val operationType = operation.type) {
@@ -233,10 +274,12 @@ suspend fun mapOperationToParcel(
                     time = time,
                     address = address,
                     hash = operationType.hash,
-                    amount = formatAmount(operation.chainAsset, isIncome, operationType),
+                    formattedAmount = formatAmount(operation.chainAsset, isIncome, operationType),
+                    formattedFiatAmount = operationType.fiatAmount?.formatAsCurrency(currency),
                     receiver = operationType.receiver,
                     sender = operationType.sender,
-                    fee = feeFormatted,
+                    fee = operationType.fee,
+                    formattedFee = feeFormatted,
                     isIncome = isIncome,
                     statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus),
                     transferDirectionIcon = transferDirectionIcon(isIncome)
@@ -252,6 +295,7 @@ suspend fun mapOperationToParcel(
                     address = address,
                     time = time,
                     amount = formatAmount(chainAsset, operationType),
+                    fiatAmount = operationType.fiatAmount?.formatAsCurrency(currency),
                     type = resourceManager.getString(typeRes),
                     era = resourceManager.getString(R.string.staking_era_index_no_prefix, operationType.era),
                     validator = operationType.validator,
@@ -267,6 +311,7 @@ suspend fun mapOperationToParcel(
                     originAddress = address,
                     content = mapExtrinsicContentToParcel(operationType, resourceManager),
                     fee = formatFee(chainAsset, operationType),
+                    fiatFee = operationType.fiatFee?.formatAsCurrency(currency),
                     statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus)
                 )
             }

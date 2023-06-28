@@ -4,11 +4,14 @@ import io.novafoundation.nova.common.data.model.CursorOrFull
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.common.data.model.asCursorOrNull
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
+import io.novafoundation.nova.feature_wallet_api.domain.model.findNearestCoinRate
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapNodeToOperation
 import io.novafoundation.nova.feature_wallet_impl.data.network.model.request.SubqueryHistoryRequest
+import io.novafoundation.nova.feature_wallet_impl.data.network.model.response.SubqueryHistoryElementResponse
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -19,7 +22,8 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 abstract class SubstrateAssetHistory(
     private val subqueryApi: SubQueryOperationsApi,
     private val cursorStorage: TransferCursorStorage,
-) : AssetHistory {
+    coinPriceRepository: CoinPriceRepository
+) : BaseAssetHistory(coinPriceRepository) {
 
     override suspend fun additionalFirstPageSync(
         chain: Chain,
@@ -37,19 +41,21 @@ abstract class SubstrateAssetHistory(
         filters: Set<TransactionFilter>,
         accountId: AccountId,
         chain: Chain,
-        chainAsset: Chain.Asset
+        chainAsset: Chain.Asset,
+        currency: Currency,
     ): DataPage<Operation> {
         val substrateTransfersApi = chain.substrateTransfersApi()
 
         return if (substrateTransfersApi != null) {
-            getOperationsSubQuery(
+            getOperationsInternal(
                 pageSize = pageSize,
                 pageOffset = pageOffset,
                 filters = filters,
                 accountId = accountId,
                 apiUrl = substrateTransfersApi.url,
                 chainAsset = chainAsset,
-                chain = chain
+                chain = chain,
+                currency = currency
             )
         } else {
             DataPage.empty()
@@ -68,13 +74,14 @@ abstract class SubstrateAssetHistory(
         }
     }
 
-    private suspend fun getOperationsSubQuery(
+    private suspend fun getOperationsInternal(
         pageSize: Int,
         pageOffset: PageOffset.Loadable,
         filters: Set<TransactionFilter>,
         accountId: AccountId,
         chain: Chain,
         chainAsset: Chain.Asset,
+        currency: Currency,
         apiUrl: String
     ): DataPage<Operation> {
         val cursor = when (pageOffset) {
@@ -91,13 +98,28 @@ abstract class SubstrateAssetHistory(
             assetType = chainAsset.type
         )
 
-        val response = subqueryApi.getOperationsHistory(apiUrl, request).data.query
+        val subqueryResponse = subqueryApi.getOperationsHistory(apiUrl, request).data.query
+        val earliestOperationTimestamp = getEarliestOperationTimestamp(subqueryResponse.historyElements)
+        val latestOperationTimestamp = getLatestOperationTimestamp(subqueryResponse.historyElements)
+        val coinPriceRange = getCoinPriceRange(chainAsset, currency, earliestOperationTimestamp, latestOperationTimestamp)
 
-        val pageInfo = response.historyElements.pageInfo
-        val operations = response.historyElements.nodes.map { mapNodeToOperation(it, chainAsset) }
+        val operations = subqueryResponse.historyElements.nodes.map { node ->
+            val coinRate = coinPriceRange.findNearestCoinRate(node.timestamp)
+            mapNodeToOperation(node, coinRate, chainAsset)
+        }
+
+        val pageInfo = subqueryResponse.historyElements.pageInfo
         val newPageOffset = PageOffset.CursorOrFull(pageInfo.endCursor)
 
         return DataPage(newPageOffset, operations)
+    }
+
+    private fun getEarliestOperationTimestamp(operations: SubqueryHistoryElementResponse.Query.HistoryElements): Long? {
+        return operations.nodes.minOfOrNull { it.timestamp }
+    }
+
+    private fun getLatestOperationTimestamp(operations: SubqueryHistoryElementResponse.Query.HistoryElements): Long? {
+        return operations.nodes.maxOfOrNull { it.timestamp }
     }
 
     private fun Chain.substrateTransfersApi(): Chain.ExternalApi.Transfers.Substrate? {
