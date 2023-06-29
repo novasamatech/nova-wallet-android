@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.OptimalAutomationRequest
+import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.TuringAutomationTask
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.TuringAutomationTasksRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
@@ -105,7 +106,7 @@ class RealYieldBoostInteractor(
                     id = it.id,
                     collator = it.collator,
                     accountMinimum = it.accountMinimum,
-                    frequency = it.frequencyInSeconds.toLong().seconds
+                    schedule = mapYieldBoostTaskSchedule(it.schedule)
                 )
             }
         }
@@ -173,5 +174,14 @@ class RealYieldBoostInteractor(
                 "task_id" to task.id.fromHex()
             )
         )
+    }
+
+    private fun mapYieldBoostTaskSchedule(task: TuringAutomationTask.Schedule): YieldBoostTask.Schedule {
+        return when (task) {
+            TuringAutomationTask.Schedule.Unknown -> YieldBoostTask.Schedule.Unknown
+            is TuringAutomationTask.Schedule.Recurring -> YieldBoostTask.Schedule.Recurring(
+                frequency = task.frequency.toLong().seconds
+            )
+        }
     }
 }
