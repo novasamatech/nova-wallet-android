@@ -23,6 +23,4 @@ interface StartStakingInteractor {
     fun observeMinStake(): Flow<BigInteger>
 
     fun observePayoutType(): Flow<PayoutType>
-
-    fun observeParticipationInGovernance(): Flow<Boolean>
 }

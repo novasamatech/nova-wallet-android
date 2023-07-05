@@ -8,12 +8,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteract
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.assetWithChain
-import io.novafoundation.nova.runtime.storage.source.LocalStorageSource
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
 import kotlin.time.Duration
 
 
@@ -49,11 +47,11 @@ class CompoundStartStakingInteractor(
             .map { it.min() }
     }
 
-    fun observeRemainingEraTime(): Flow<Duration> {
+    fun observeRemainingEraDuration(): Flow<Duration> {
         return stakingEraInteractor.observeRemainingEraTime()
     }
 
-    fun observeUnstakeTime(): Flow<Duration> {
+    fun observeUnstakeDuration(): Flow<Duration> {
         return stakingEraInteractor.observeUnstakeTime()
     }
 
@@ -62,9 +60,8 @@ class CompoundStartStakingInteractor(
     }
 
     fun observeParticipationInGovernance(): Flow<Boolean> {
-        return interactors.map { it.observeParticipationInGovernance() }
-            .combine()
-            .map { it.any() }
+        return stakingSharedState.assetWithChain
+            .map { it.chain.governance.isNotEmpty() }
     }
 
     fun observePayoutTypes(): Flow<List<PayoutType>> {

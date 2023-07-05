@@ -21,6 +21,8 @@ import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.LocalBagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
@@ -49,6 +51,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.payout.PayoutInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.RealStakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
@@ -89,6 +92,20 @@ import javax.inject.Named
 
 @Module(includes = [AssetUseCaseModule::class])
 class StakingFeatureModule {
+
+    @Provides
+    @FeatureScope
+    fun provideStakingEraInteractorFactory(
+        stakingSharedState: StakingSharedState,
+        roundDurationEstimator: RoundDurationEstimator,
+        currentRoundRepository: CurrentRoundRepository,
+        stakingInteractor: StakingInteractor
+    ) = StakingEraInteractorFactory(
+        stakingSharedState,
+        roundDurationEstimator,
+        currentRoundRepository,
+        stakingInteractor
+    )
 
     @Provides
     @FeatureScope

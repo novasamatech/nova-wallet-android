@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.SpannableFormatter
 import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
+import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatAsSpannable
@@ -22,11 +23,12 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.mo
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.state.assetWithChain
 import io.novafoundation.nova.runtime.state.chain
-import io.novafoundation.nova.runtime.state.selectedChainFlow
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlin.time.Duration
@@ -39,17 +41,37 @@ class StartStakingLandingViewModel(
     private val startStakingInteractorFactory: StartStakingInteractorFactory
 ) : BaseViewModel() {
 
-    private val minStake = stakingSharedState.selectedChainFlow().flatMapLatest {
-        startStakingInteractor.observeMinStake(it)
+    private val startStakingInteractor = stakingSharedState.assetWithChain.map {
+        startStakingInteractorFactory.create(it.chain, it.asset, coroutineScope = this)
     }
 
-    val titleFlow: Flow<CharSequence> = stakingSharedState.selectedChainFlow()
-        .map { chain ->
-            createTitle()
+    private val maxEarningRateFlow = startStakingInteractor.flatMapLatest { it.observeMaxEarningRate() }
+
+    private val availableBalanceFlow = startStakingInteractor.flatMapLatest { it.observeAvailableBalance() }
+
+    private val minStakeFlow = startStakingInteractor.flatMapLatest { it.observeMinStake() }
+    private val eraDurationFlow = startStakingInteractor.flatMapLatest { it.observeEraDuration() }
+    private val remainingEraDurationFlow = startStakingInteractor.flatMapLatest { it.observeRemainingEraDuration() }
+    private val supportedStakingTypesFlow = startStakingInteractor.flatMapLatest { it.supportedStakingTypes() }
+    private val participationInGovernanceFlow = startStakingInteractor.flatMapLatest { it.observeParticipationInGovernance() }
+    private val payoutTypesFlow = startStakingInteractor.flatMapLatest { it.observePayoutTypes() }
+    private val unstakeDurationFlow = startStakingInteractor.flatMapLatest { it.observeUnstakeDuration() }
+
+    val titleFlow: Flow<CharSequence> = stakingSharedState.assetWithChain
+        .map { chainWithAsset ->
+            createTitle(chainWithAsset.asset, Percent(22.2))
         }.shareInBackground()
 
-    val stakingConditionsUIFlow: Flow<List<StakingConditionRVItem>> = minStake.map { minStakeAmount ->
-        createConditions(minStakeAmount, stakingSharedState.chain())
+    val stakingConditionsUIFlow = combine(
+        minStakeFlow,
+        eraDurationFlow,
+        remainingEraDurationFlow,
+        supportedStakingTypesFlow,
+        participationInGovernanceFlow,
+        payoutTypesFlow,
+        unstakeDurationFlow
+    ) { minStake, eraDuration, remainingEraDuration, supportedStakingTypes, participationInGovernance, payoutTypes, unstakeDuration ->
+        createConditions(minStake, stakingSharedState.chain())
     }
 
     val moreInfoTextFlow: Flow<CharSequence> = flowOf {

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.domain.staking.start.direct
+package io.novafoundation.nova.feature_staking_impl.domain.staking.start
 
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation

@@ -1,18 +1,19 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.nomination
 
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.BaseStartStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.PayoutType
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingInteractor
-import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import java.math.BigInteger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 class NominationPoolStartStakingInteractor(
-) : StartStakingInteractor {
-
-    override fun observeMaxEarningRate(): Flow<Double> {
-        return flowOf(0.0)
-    }
+    stakingSharedState: StakingSharedState,
+    stakingSharedComputation: StakingSharedComputation,
+    coroutineScope: CoroutineScope
+) : BaseStartStakingInteractor(stakingSharedState, stakingSharedComputation, coroutineScope) {
 
     override fun observeMinStake(): Flow<BigInteger> {
         return flowOf(BigInteger.ZERO)

@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.direct.ParachainStartStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.direct.RelaychainStartStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.nomination.NominationPoolStartStakingInteractor
@@ -18,7 +19,8 @@ class StartStakingInteractorFactory(
     private val stakingSharedComputation: StakingSharedComputation,
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
-    private val stakingEraInteractorFactory: StakingEraInteractorFactory
+    private val stakingEraInteractorFactory: StakingEraInteractorFactory,
+    private val parachainNetworkInfoInteractor: ParachainNetworkInfoInteractor
 ) {
 
     fun create(chain: Chain, asset: Chain.Asset, coroutineScope: CoroutineScope): CompoundStartStakingInteractor {
@@ -32,7 +34,7 @@ class StartStakingInteractorFactory(
             when (it.group()) {
                 StakingTypeGroup.RELAYCHAIN -> createRelaychainStartStakingInteractor(coroutineScope)
                 StakingTypeGroup.PARACHAIN -> createPararchainStartStakingInteractor(coroutineScope)
-                StakingTypeGroup.NOMINATION_POOL -> createNominationPoolsStartStakingInteractor()
+                StakingTypeGroup.NOMINATION_POOL -> createNominationPoolsStartStakingInteractor(coroutineScope)
                 StakingTypeGroup.UNSUPPORTED -> null
             }
         }
@@ -50,11 +52,16 @@ class StartStakingInteractorFactory(
         return ParachainStartStakingInteractor(
             stakingSharedState = stakingSharedState,
             stakingSharedComputation = stakingSharedComputation,
-            coroutineScope = coroutineScope
+            coroutineScope = coroutineScope,
+            parachainNetworkInfoInteractor = parachainNetworkInfoInteractor
         )
     }
 
-    private fun createNominationPoolsStartStakingInteractor(): StartStakingInteractor {
-        return NominationPoolStartStakingInteractor()
+    private fun createNominationPoolsStartStakingInteractor(coroutineScope: CoroutineScope): StartStakingInteractor {
+        return NominationPoolStartStakingInteractor(
+            stakingSharedState = stakingSharedState,
+            stakingSharedComputation = stakingSharedComputation,
+            coroutineScope = coroutineScope
+        )
     }
 }

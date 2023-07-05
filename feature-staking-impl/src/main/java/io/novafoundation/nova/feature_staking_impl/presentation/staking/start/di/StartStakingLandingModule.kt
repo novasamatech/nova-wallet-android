@@ -14,15 +14,10 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.direct.DirectStartStakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.StartStakingLandingViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
-import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import javax.inject.Named
 
 @Module(includes = [ViewModelModule::class])
 class StartStakingLandingModule {
