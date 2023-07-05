@@ -18,9 +18,8 @@ android {
     }
 
     kotlinOptions {
-        freeCompilerArgs = ["-Xallow-result-return-type"]
-
         jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
     }
 }
 

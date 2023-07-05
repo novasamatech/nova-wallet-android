@@ -24,26 +24,41 @@
         android:id="@+id/itemDashboardNoStakeChainNameContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="4dp"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toTopOf="@+id/itemDashboardNoStakeChainAvailableBalance"
-        app:layout_constraintEnd_toEndOf="@+id/itemDashboardNoStakeRightBarrier"
+        app:layout_constraintEnd_toStartOf="@+id/itemDashboardNoStakeStakingType"
         app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/itemDashboardNoStakeChainIcon"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed">
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_goneMarginEnd="16dp">
 
         <TextView
             android:id="@+id/itemDashboardNoStakeChainName"
             style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline.Primary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="16dp"
             android:ellipsize="end"
+            android:includeFontPadding="false"
             android:singleLine="true"
             tools:text="Polkadot" />
 
     </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.StakingTypeBadgeView
+        android:id="@+id/itemDashboardNoStakeStakingType"
+        style="@style/Widget.Nova.StakingTypeBadge.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/itemDashboardNoStakeChainNameContainer"
+        app:layout_constraintEnd_toStartOf="@+id/itemDashboardNoStakeEarningsContainer"
+        app:layout_constraintStart_toEndOf="@+id/itemDashboardNoStakeChainNameContainer"
+        app:layout_constraintTop_toTopOf="@+id/itemDashboardNoStakeChainNameContainer"
+        tools:text="@string/nomination_pools_direct" />
 
     <TextView
         android:id="@+id/itemDashboardNoStakeChainAvailableBalance"

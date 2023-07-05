@@ -1,12 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards
 
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.turing.repository.TuringStakingRewardsRepository
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.NOMINATION_POOLS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
@@ -23,16 +24,15 @@ class ParachainStakingRewardCalculatorFactory(
 ) {
 
     suspend fun create(
-        chainAsset: Chain.Asset,
+        stakingOption: StakingOption,
         snapshots: AccountIdMap<CollatorSnapshot>
     ): ParachainStakingRewardCalculator {
-        val chainId = chainAsset.chainId
+        val chainId = stakingOption.assetWithChain.chain.id
 
-        // TODO staking dashboard - switch by selected staking option
-        return when (chainAsset.staking.firstOrNull()) {
+        return when (stakingOption.additional.stakingType) {
             PARACHAIN -> defaultCalculator(chainId, snapshots)
             TURING -> turingCalculator(chainId, snapshots)
-            null, RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, UNSUPPORTED -> {
+            NOMINATION_POOLS, RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, UNSUPPORTED -> {
                 throw IllegalStateException("Unknown staking type in ParachainStakingRewardCalculatorFactory")
             }
         }
@@ -69,13 +69,13 @@ class ParachainStakingRewardCalculatorFactory(
         collatorCommission = rewardsRepository.getCollatorCommission(chainId)
     )
 
-    suspend fun create(chainAsset: Chain.Asset): ParachainStakingRewardCalculator {
-        val chainId = chainAsset.chainId
+    suspend fun create(stakingOption: StakingOption): ParachainStakingRewardCalculator {
+        val chainId = stakingOption.assetWithChain.chain.id
 
         val roundIndex = currentRoundRepository.currentRoundInfo(chainId).current
         val snapshot = currentRoundRepository.collatorsSnapshot(chainId, roundIndex)
 
-        return create(chainAsset, snapshot)
+        return create(stakingOption, snapshot)
     }
 
     private fun AccountIdMap<CollatorSnapshot>.toCollatorList() = entries.map { (accountIdHex, snapshot) ->

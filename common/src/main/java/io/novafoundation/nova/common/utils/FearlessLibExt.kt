@@ -208,6 +208,8 @@ fun RuntimeMetadata.electionProviderMultiPhaseOrNull() = moduleOrNull(Modules.EL
 
 fun RuntimeMetadata.preImage() = module(Modules.PREIMAGE)
 
+fun RuntimeMetadata.nominationPools() = module(Modules.NOMINATION_POOLS)
+
 fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
 }
@@ -311,4 +313,6 @@ object Modules {
     const val BAG_LIST = "BagsList"
 
     const val ELECTION_PROVIDER_MULTI_PHASE = "ElectionProviderMultiPhase"
+
+    const val NOMINATION_POOLS = "NominationPools"
 }

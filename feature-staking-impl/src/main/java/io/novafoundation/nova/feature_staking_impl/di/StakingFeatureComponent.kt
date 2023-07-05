@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.di.staking.UpdatersModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.dashboard.StakingDashboardModule
+import io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool.NominationPoolModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.ParachainStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.unbond.StakingUnbondModule
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
@@ -73,6 +74,7 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
         StakingValidationModule::class,
         StakingUnbondModule::class,
         ParachainStakingModule::class,
+        NominationPoolModule::class,
         StakingDashboardModule::class,
     ]
 )

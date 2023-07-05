@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.activeB
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.ChainStakingStats
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.MultiChainStakingStats
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.MultiChainOffChainSyncResult
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindCandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindDelegatorState
@@ -36,7 +37,7 @@ class StakingDashboardParachainStakingUpdater(
     chainAsset: Chain.Asset,
     stakingType: Chain.Asset.StakingType,
     metaAccount: MetaAccount,
-    private val stakingStatsFlow: Flow<IndexedValue<MultiChainStakingStats>>,
+    private val stakingStatsFlow: Flow<MultiChainOffChainSyncResult>,
     private val stakingDashboardCache: StakingDashboardCache,
     private val remoteStorageSource: StorageDataSource
 ) : BaseStakingDashboardUpdater(chain, chainAsset, stakingType, metaAccount) {

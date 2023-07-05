@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.domain.validation.handleChainA
 import io.novafoundation.nova.feature_account_api.domain.validation.hasChainAccount
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.welcome.ParachainStakingWelcomeValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.welcome.ParachainStakingWelcomeValidationFailure.MissingEthereumAccount
@@ -24,7 +25,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.BaseStartStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.StartStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.StartStakingEvent
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
@@ -52,14 +52,14 @@ class ParachainStartStakingComponentFactory(
     }
 
     fun create(
-        assetWithChain: ChainWithAsset,
+        stakingOption: StakingOption,
         hostContext: ComponentHostContext
     ): StartStakingComponent = ParachainStartStakingComponent(
         delegatorStateUseCase = delegatorStateUseCase,
         rewardCalculatorFactory = rewardCalculatorFactory,
         resourceManager = resourceManager,
         router = router,
-        assetWithChain = assetWithChain,
+        stakingOption = stakingOption,
         hostContext = hostContext,
         validationSystem = validationSystem,
         validationExecutor = validationExecutor
@@ -74,14 +74,14 @@ private class ParachainStartStakingComponent(
 
     private val validationSystem: ParachainStakingWelcomeValidationSystem,
     private val validationExecutor: ValidationExecutor,
-    private val assetWithChain: ChainWithAsset,
+    private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
-) : BaseStartStakingComponent(assetWithChain, hostContext, resourceManager) {
+) : BaseStartStakingComponent(stakingOption, hostContext, resourceManager) {
 
-    private val rewardCalculator = async { rewardCalculatorFactory.create(assetWithChain.asset) }
+    private val rewardCalculator = async { rewardCalculatorFactory.create(stakingOption) }
 
     private val delegatorStateFlow = hostContext.selectedAccount.flatMapLatest {
-        delegatorStateUseCase.delegatorStateFlow(it, assetWithChain.chain, assetWithChain.asset)
+        delegatorStateUseCase.delegatorStateFlow(it, stakingOption.assetWithChain.chain, stakingOption.assetWithChain.asset)
     }.shareInBackground()
 
     override suspend fun maxPeriodReturnPercentage(days: Int): BigDecimal {
@@ -107,7 +107,7 @@ private class ParachainStartStakingComponent(
     override suspend fun nextClicked() {
         val payload = ParachainStakingWelcomeValidationPayload(
             account = hostContext.selectedAccount.first(),
-            chain = assetWithChain.chain
+            chain = stakingOption.assetWithChain.chain
         )
 
         validationExecutor.requireValid(

@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.ParachainStakingUnbondPreliminaryValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.ParachainStakingUnbondPreliminaryValidationSystem
@@ -27,7 +28,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.bondMore
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.unbond
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -42,12 +42,12 @@ class ParachainStakeActionsComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: ChainWithAsset,
+        stakingOption: StakingOption,
         hostContext: ComponentHostContext
     ): StakeActionsComponent = ParachainStakeActionsComponent(
         delegatorStateUseCase = delegatorStateUseCase,
         resourceManager = resourceManager,
-        assetWithChain = assetWithChain,
+        stakingOption = stakingOption,
         hostContext = hostContext,
         router = router,
         validationExecutor = validationExecutor,
@@ -60,7 +60,7 @@ internal open class ParachainStakeActionsComponent(
     private val resourceManager: ResourceManager,
     private val router: ParachainStakingRouter,
 
-    private val assetWithChain: ChainWithAsset,
+    private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
 
     private val unbondValidationSystem: ParachainStakingUnbondPreliminaryValidationSystem,
@@ -73,7 +73,7 @@ internal open class ParachainStakeActionsComponent(
 
     override val state = delegatorStateUseCase.loadDelegatingState(
         hostContext = hostContext,
-        assetWithChain = assetWithChain,
+        assetWithChain = stakingOption.assetWithChain,
         stateProducer = ::stateFor
     )
         .map { it?.dataOrNull } // we don't need loading state in this component

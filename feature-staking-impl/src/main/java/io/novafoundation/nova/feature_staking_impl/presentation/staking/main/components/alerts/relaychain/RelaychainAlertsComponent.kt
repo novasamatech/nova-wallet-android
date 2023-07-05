@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.Alert
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.Alert.ChangeValidators.Reason
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
@@ -25,7 +26,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.mainStakingValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -45,7 +45,7 @@ class RelaychainAlertsComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: ChainWithAsset,
+        stakingOption: StakingOption,
         hostContext: ComponentHostContext,
     ): AlertsComponent = RelaychainAlertsComponent(
         stakingSharedComputation = stakingSharedComputation,
@@ -54,8 +54,7 @@ class RelaychainAlertsComponentFactory(
         redeemValidationSystem = redeemValidationSystem,
         bondMoreValidationSystem = bondMoreValidationSystem,
         router = router,
-
-        assetWithChain = assetWithChain,
+        stakingOption = stakingOption,
         hostContext = hostContext
     )
 }
@@ -66,7 +65,7 @@ private class RelaychainAlertsComponent(
     private val stakingSharedComputation: StakingSharedComputation,
 
     private val hostContext: ComponentHostContext,
-    private val assetWithChain: ChainWithAsset,
+    private val stakingOption: StakingOption,
 
     private val redeemValidationSystem: StakeActionsValidationSystem,
     private val bondMoreValidationSystem: StakeActionsValidationSystem,
@@ -76,7 +75,7 @@ private class RelaychainAlertsComponent(
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
 
     private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
-        assetWithChain = assetWithChain,
+        assetWithChain = stakingOption.assetWithChain,
         scope = hostContext.scope
     )
 

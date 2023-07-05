@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.bagListLocatorOrNull
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListScoreConverter
@@ -17,7 +18,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculat
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import kotlinx.coroutines.CoroutineScope
@@ -94,13 +94,15 @@ class StakingSharedComputation(
     }
 
     suspend fun rewardCalculator(
-        chainAsset: Chain.Asset,
+        stakingOption: StakingOption,
         scope: CoroutineScope
     ): RewardCalculator {
-        val key = "REWARD_CALCULATOR:${chainAsset.chainId}:${chainAsset.id}"
+        val chainAsset = stakingOption.assetWithChain.asset
+
+        val key = "REWARD_CALCULATOR:${chainAsset.chainId}:${chainAsset.id}:${stakingOption.additional.stakingType}"
 
         return computationalCache.useCache(key, scope) {
-            rewardCalculatorFactory.create(chainAsset, scope)
+            rewardCalculatorFactory.create(stakingOption, scope)
         }
     }
 }

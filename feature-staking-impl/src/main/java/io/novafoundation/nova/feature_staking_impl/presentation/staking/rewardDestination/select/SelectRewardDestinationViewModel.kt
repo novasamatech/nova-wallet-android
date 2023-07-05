@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapRewardDestinationModelToRewardDestination
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
@@ -24,8 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDes
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.RewardDestinationParcelModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
-import io.novafoundation.nova.runtime.state.chainAsset
+import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
@@ -46,7 +46,7 @@ class SelectRewardDestinationViewModel(
     private val validationExecutor: ValidationExecutor,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val rewardDestinationMixin: RewardDestinationMixin.Presentation,
-    private val selectedAssetSharedState: AnySelectedAssetOptionSharedState,
+    private val selectedAssetSharedState: StakingSharedState,
     private val stakingSharedComputation: StakingSharedComputation,
 ) : BaseViewModel(),
     Retriable,
@@ -59,7 +59,7 @@ class SelectRewardDestinationViewModel(
 
     private val rewardCalculator = viewModelScope.async {
         stakingSharedComputation.rewardCalculator(
-            chainAsset = selectedAssetSharedState.chainAsset(),
+            stakingOption = selectedAssetSharedState.selectedOption(),
             scope = viewModelScope
         )
     }

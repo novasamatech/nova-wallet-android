@@ -162,7 +162,10 @@ class RealStakingDashboardInteractor(
                         noStake.add(noStakeAggregatedOption(chain, asset, dashboardItems, syncingStageMap))
                     }
                 } else {
-                    val hasStakeOptions = dashboardItems.mapNotNull { item -> hasStakeOption(chain, asset, item, syncingStageMap) }
+                    val hasStakingOptionsSize = dashboardItems.count { it.stakeState is StakingDashboardItem.StakeState.HasStake }
+                    val shouldShowStakingType = hasStakingOptionsSize > 1
+
+                    val hasStakeOptions = dashboardItems.mapNotNull { item -> hasStakeOption(chain, asset, shouldShowStakingType, item, syncingStageMap) }
                     hasStake.addAll(hasStakeOptions)
                 }
             }
@@ -318,7 +321,8 @@ class RealStakingDashboardInteractor(
         val flowType = if (noStakeItems.size > 1) {
             NoStake.FlowType.Aggregated(noStakeItems.map { it.stakingType })
         } else {
-            NoStake.FlowType.Single(noStakeItems.single().stakingType)
+            // aggregating means there is no staking present, hence we always hide staking type badge
+            NoStake.FlowType.Single(noStakeItems.single().stakingType, showStakingType = false)
         }
 
         return NoPriceStakingDashboardOption(
@@ -350,7 +354,7 @@ class RealStakingDashboardInteractor(
             chainAsset = chainAsset,
             stakingState = NoBalanceNoStake(
                 stats = stats,
-                flowType = NoStake.FlowType.Single(noStakeItem.stakingType)
+                flowType = NoStake.FlowType.Single(noStakeItem.stakingType, showStakingType = true)
             ),
             syncingStage = syncingStageMap.getSyncingStage(StakingOptionId(chain.id, chainAsset.id, noStakeItem.stakingType))
         )
@@ -359,6 +363,7 @@ class RealStakingDashboardInteractor(
     private fun hasStakeOption(
         chain: Chain,
         chainAsset: Chain.Asset,
+        showStakingType: Boolean,
         item: StakingDashboardItem,
         syncingStageMap: SyncingStageMap,
     ): NoPriceStakingDashboardOption<HasStake>? {
@@ -368,6 +373,7 @@ class RealStakingDashboardInteractor(
             chain = chain,
             chainAsset = chainAsset,
             stakingState = HasStake(
+                showStakingType = showStakingType,
                 stats = item.stakeState.stats.map(::mapItemStatsToOptionStats),
                 stakingType = item.stakingType,
                 stake = item.stakeState.stake
@@ -444,6 +450,7 @@ class RealStakingDashboardInteractor(
         return when (stakingType.group()) {
             StakingTypeGroup.RELAYCHAIN -> freeInPlanks
             StakingTypeGroup.PARACHAIN -> freeInPlanks
+            StakingTypeGroup.NOMINATION_POOL -> transferableInPlanks
             StakingTypeGroup.UNSUPPORTED -> Balance.ZERO
         }
     }
