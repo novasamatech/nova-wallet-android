@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.utils.formatting.formatAsChange
 import io.novafoundation.nova.common.utils.isNonNegative
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
@@ -27,18 +28,18 @@ fun GroupedList<AssetGroup, AssetWithOffChainBalance>.mapGroupedAssetsToUi(
 
 fun mapTokenToTokenModel(token: Token): TokenModel {
     return with(token) {
-        val rateChange = token.recentRateChange
+        val rateChange = token.coinRateChange?.recentRateChange
 
         val changeColorRes = when {
-            rateChange == null -> R.color.text_secondary
+            rateChange == null -> R.color.text_tertiary
             rateChange.isNonNegative -> R.color.text_positive
             else -> R.color.text_negative
         }
 
         TokenModel(
             configuration = configuration,
-            rate = (rate ?: BigDecimal.ZERO).formatAsCurrency(token.currency),
-            recentRateChange = (recentRateChange ?: BigDecimal.ZERO).formatAsChange(),
+            rate = coinRateChange?.rate.orZero().formatAsCurrency(token.currency),
+            recentRateChange = (coinRateChange?.recentRateChange ?: BigDecimal.ZERO).formatAsChange(),
             rateChangeColorRes = changeColorRes
         )
     }

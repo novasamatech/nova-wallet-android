@@ -29,7 +29,7 @@
 
     <action
         android:id="@+id/action_pin_code_access_recovery"
-        app:destination="@id/pinCodeVerificationAfterInactivity"
+        app:destination="@id/pincodeFragmentOverlay"
         app:enterAnim="@anim/fragment_close_enter"
         app:exitAnim="@anim/fragment_close_exit"
         app:popEnterAnim="@anim/fragment_open_enter"
@@ -37,7 +37,7 @@
 
     <action
         android:id="@+id/action_pin_code_two_factor_verification"
-        app:destination="@id/pincodeFragment"
+        app:destination="@id/pincodeFragmentOverlay"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -81,7 +81,7 @@
         tools:layout="@layout/fragment_pincode" />
 
     <fragment
-        android:id="@+id/pinCodeVerificationAfterInactivity"
+        android:id="@+id/pincodeFragmentOverlay"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment"
         android:label="fragment_pincode"
         app:useAdd="true"

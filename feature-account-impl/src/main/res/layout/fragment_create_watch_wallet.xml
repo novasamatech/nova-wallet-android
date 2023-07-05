@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/text_tertiary"
                 android:layout_marginEnd="16dp"
                 android:text="@string/account_watch_add_subtitle" />
 
@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/text_tertiary"
                 android:layout_marginEnd="16dp"
                 android:text="@string/account_watch_add_presets" />
 
@@ -73,7 +73,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/text_tertiary"
                 android:text="@string/account_wallet_nickname" />
 
             <io.novafoundation.nova.common.view.input.TextInputView
@@ -93,7 +93,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 android:text="@string/wallet_nickname_create_caption_v2_2_0"
-                android:textColor="@color/text_secondary" />
+                android:textColor="@color/text_tertiary" />
 
             <TextView
                 style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -102,7 +102,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="16dp"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/text_tertiary"
                 android:text="@string/common_substrate_address" />
 
             <io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputField
@@ -122,7 +122,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 android:text="@string/account_watch_add_substrate_address_description"
-                android:textColor="@color/text_secondary" />
+                android:textColor="@color/text_tertiary" />
 
             <TextView
                 style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -131,7 +131,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="16dp"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/text_tertiary"
                 android:text="@string/account_watch_add_evm_address_optional" />
 
             <io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputField
@@ -151,7 +151,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 android:text="@string/account_watch_add_evm_address_description"
-                android:textColor="@color/text_secondary" />
+                android:textColor="@color/text_tertiary" />
         </LinearLayout>
 
     </ScrollView>

@@ -5,12 +5,11 @@ import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedCo
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingInteractor
 import io.novafoundation.nova.runtime.state.assetWithChain
 import io.novafoundation.nova.runtime.state.selectedOption
-import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-abstract class DirectStartStakingInteractor(
+abstract class BaseStartStakingInteractor(
     internal val stakingSharedState: StakingSharedState,
     internal val stakingSharedComputation: StakingSharedComputation,
     internal val coroutineScope: CoroutineScope,

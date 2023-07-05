@@ -16,7 +16,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "WALLET_CONNECT_PROJECT_ID", readSecret("WALLET_CONNECT_PROJECT_ID")
+        buildConfigField "String", "WALLET_CONNECT_PROJECT_ID", readStringSecret("WALLET_CONNECT_PROJECT_ID")
     }
 
     buildTypes {

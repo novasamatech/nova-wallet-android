@@ -318,7 +318,8 @@ class SelectSendViewModel(
             originChainAsset = originChainAsset(),
             destinationChain = destination.chain,
             destinationChainAsset = destination.asset,
-            amount = amount
+            amount = amount,
+            commissionAssetToken = commissionAssetFlow.first().token
         )
     }
 

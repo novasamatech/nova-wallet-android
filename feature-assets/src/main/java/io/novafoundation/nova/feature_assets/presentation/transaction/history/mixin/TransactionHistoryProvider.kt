@@ -19,9 +19,11 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.history.mi
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.state_machine.TransactionStateMachine.Action
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.state_machine.TransactionStateMachine.State
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.model.DayHeader
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -29,6 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.first
@@ -47,7 +50,8 @@ class TransactionHistoryProvider(
     private val assetsSourceRegistry: AssetSourceRegistry,
     private val chainRegistry: ChainRegistry,
     private val chainId: ChainId,
-    private val assetId: Int
+    private val assetId: Int,
+    private val currencyRepository: CurrencyRepository
 ) : TransactionHistoryMixin, CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
     private val domainState = singleReplaySharedFlow<State>()
@@ -68,7 +72,12 @@ class TransactionHistoryProvider(
         )
     }
 
-    override val state = domainState.map(::mapOperationHistoryStateToUi)
+    private val tokenFlow = walletInteractor.assetFlow(chainId, assetId)
+        .map { it.token }
+
+    override val state = combine(domainState, tokenFlow) { state, token ->
+        mapOperationHistoryStateToUi(state, token)
+    }
         .inBackground()
         .shareIn(this, started = SharingStarted.Eagerly, replay = 1)
 
@@ -108,8 +117,10 @@ class TransactionHistoryProvider(
 
             val clickedOperation = operations.first { it.id == transactionModel.id }
 
+            val currency = currencyRepository.getSelectedCurrency()
+
             withContext(Dispatchers.Main) {
-                when (val payload = mapOperationToParcel(clickedOperation, chainRegistry, resourceManager)) {
+                when (val payload = mapOperationToParcel(clickedOperation, chainRegistry, resourceManager, currency)) {
                     is OperationParcelizeModel.Transfer -> {
                         router.openTransferDetail(payload)
                     }
@@ -185,13 +196,13 @@ class TransactionHistoryProvider(
         }
     }
 
-    private suspend fun mapOperationHistoryStateToUi(state: State): TransactionHistoryUi.State {
+    private suspend fun mapOperationHistoryStateToUi(state: State, token: Token): TransactionHistoryUi.State {
         val listState = when (state) {
             is State.Empty -> ListState.Empty
             is State.EmptyProgress -> ListState.EmptyProgress
-            is State.Data -> ListState.Data(transformDataToUi(state.data))
-            is State.FullData -> ListState.Data(transformDataToUi(state.data))
-            is State.NewPageProgress -> ListState.Data(transformDataToUi(state.data))
+            is State.Data -> ListState.Data(transformDataToUi(state.data, token))
+            is State.FullData -> ListState.Data(transformDataToUi(state.data, token))
+            is State.NewPageProgress -> ListState.Data(transformDataToUi(state.data, token))
         }
 
         return TransactionHistoryUi.State(
@@ -211,7 +222,7 @@ class TransactionHistoryProvider(
         return assetSource.history.availableOperationFilters(chainAssetAsync())
     }
 
-    private suspend fun transformDataToUi(data: List<Operation>): List<Any> {
+    private suspend fun transformDataToUi(data: List<Operation>, token: Token): List<Any> {
         val accountIdentifier = addressDisplayUseCase.createIdentifier()
         val chain = chainAsync()
 
@@ -220,7 +231,7 @@ class TransactionHistoryProvider(
                 val header = DayHeader(daysSinceEpoch)
 
                 val operationModels = operationsPerDay.map { operation ->
-                    mapOperationToOperationModel(chain, operation, accountIdentifier, resourceManager)
+                    mapOperationToOperationModel(chain, token, operation, accountIdentifier, resourceManager)
                 }
 
                 listOf(header) + operationModels

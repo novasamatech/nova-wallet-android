@@ -90,7 +90,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="@string/nft_price_not_listed"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/text_tertiary"
                 android:visibility="gone"
                 tools:visibility="visible" />
 
@@ -110,7 +110,7 @@
                 android:layout_marginStart="6dp"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/text_tertiary"
                 tools:text="($865.19)" />
         </LinearLayout>
     </LinearLayout>

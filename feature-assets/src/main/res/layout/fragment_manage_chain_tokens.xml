@@ -45,7 +45,7 @@
                 style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/text_tertiary"
                 tools:text="All networks" />
         </LinearLayout>
     </LinearLayout>

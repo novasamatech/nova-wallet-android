@@ -208,7 +208,8 @@ class ConfirmSendViewModel(
                 destinationChain = destinationChain(),
                 destinationChainAsset = destinationChainAsset(),
                 originChainAsset = chainAsset,
-                amount = transferDraft.amount
+                amount = transferDraft.amount,
+                commissionAssetToken = commissionAssetFlow.first().token,
             ),
             originFee = transferDraft.originFee,
             originCommissionAsset = commissionAssetFlow.first(),

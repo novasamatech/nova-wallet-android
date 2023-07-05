@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountG
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActionsProvider
@@ -62,6 +63,7 @@ import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherMixin
@@ -69,6 +71,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.add
 import io.novafoundation.nova.feature_account_impl.presentation.language.RealLanguageUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.identity.RealIdentityMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.RealRealSelectWalletMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.config.RealPolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
@@ -217,7 +220,20 @@ class AccountFeatureModule {
         accountRepository: AccountRepository,
         addressIconGenerator: AddressIconGenerator,
         walletUiUseCase: WalletUiUseCase,
-    ) = SelectedAccountUseCase(accountRepository, walletUiUseCase, addressIconGenerator)
+        polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider
+    ) = SelectedAccountUseCase(
+        accountRepository = accountRepository,
+        walletUiUseCase = walletUiUseCase,
+        addressIconGenerator = addressIconGenerator,
+        polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider
+    )
+
+    @Provides
+    @FeatureScope
+    fun providePolkadotVaultVariantConfigProvider(
+        resourceManager: ResourceManager,
+        appLinksProvider: AppLinksProvider
+    ): PolkadotVaultVariantConfigProvider = RealPolkadotVaultVariantConfigProvider(resourceManager, appLinksProvider)
 
     @Provides
     @FeatureScope
@@ -323,9 +339,16 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideAccountListingMixinFactory(
         walletUseCase: WalletUiUseCase,
-        resourceManager: ResourceManager,
         metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
-    ) = MetaAccountWithBalanceListingMixinFactory(walletUseCase, resourceManager, metaAccountGroupingInteractor)
+        accountTypePresentationMapper: MetaAccountTypePresentationMapper,
+    ) = MetaAccountWithBalanceListingMixinFactory(walletUseCase, metaAccountGroupingInteractor, accountTypePresentationMapper)
+
+    @Provides
+    @FeatureScope
+    fun provideAccountTypePresentationMapper(
+        resourceManager: ResourceManager,
+        polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
+    ) = MetaAccountTypePresentationMapper(resourceManager, polkadotVaultVariantConfigProvider)
 
     @Provides
     @FeatureScope

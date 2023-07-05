@@ -152,6 +152,7 @@ class StakingDashboardViewModel(
             stakingType = stakingType
         )
 
-        router.openChainStakingMain()
+        // TODO: open staking main fragment if we already have staking in chain
+        router.openStartStakingFlow()
     }
 }

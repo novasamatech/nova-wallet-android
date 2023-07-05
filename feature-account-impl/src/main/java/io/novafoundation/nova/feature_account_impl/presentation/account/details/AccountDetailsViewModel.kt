@@ -14,8 +14,12 @@ import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
+import io.novafoundation.nova.feature_account_api.domain.model.asPolkadotVaultVariantOrThrow
+import io.novafoundation.nova.feature_account_api.domain.model.isPolkadotVaultLike
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet.AccountAction
+import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
+import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.formatWithPolkadotVaultLabel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.R
@@ -52,6 +56,7 @@ class AccountDetailsViewModel(
     private val chainRegistry: ChainRegistry,
     private val importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
     private val addAccountLauncherMixin: AddAccountLauncherMixin.Presentation,
+    private val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     ImportTypeChooserMixin by importTypeChooserMixin,
@@ -101,7 +106,7 @@ class AccountDetailsViewModel(
 
     private suspend fun mapFromToTextHeader(from: AccountInChain.From): TextHeader? {
         return when (metaAccount().type) {
-            Type.LEDGER, Type.PARITY_SIGNER -> null
+            Type.LEDGER, Type.PARITY_SIGNER, Type.POLKADOT_VAULT -> null
             Type.SECRETS, Type.WATCH_ONLY -> {
                 val resId = when (from) {
                     AccountInChain.From.META_ACCOUNT -> R.string.account_shared_secret
@@ -116,7 +121,10 @@ class AccountDetailsViewModel(
     private suspend fun mapChainAccountProjectionToUi(metaAccount: LightMetaAccount, accountInChain: AccountInChain) = with(accountInChain) {
         val addressOrHint = when {
             projection != null -> projection.address
-            metaAccount.type == Type.PARITY_SIGNER -> resourceManager.getString(R.string.account_details_parity_signer_not_supported)
+            metaAccount.type.isPolkadotVaultLike() -> {
+                val polkadotVaultVariant = metaAccount.type.asPolkadotVaultVariantOrThrow()
+                resourceManager.formatWithPolkadotVaultLabel(R.string.account_details_parity_signer_not_supported, polkadotVaultVariant)
+            }
             else -> resourceManager.getString(R.string.account_no_chain_projection)
         }
 
@@ -169,7 +177,7 @@ class AccountDetailsViewModel(
         return when (accountType) {
             Type.SECRETS -> setOf(AccountAction.EXPORT, AccountAction.CHANGE)
             Type.WATCH_ONLY -> setOf(AccountAction.CHANGE)
-            Type.PARITY_SIGNER -> emptySet()
+            Type.PARITY_SIGNER, Type.POLKADOT_VAULT -> emptySet()
             Type.LEDGER -> setOf(AccountAction.CHANGE)
         }
     }
@@ -183,13 +191,18 @@ class AccountDetailsViewModel(
                 ),
                 text = resourceManager.getString(R.string.account_details_watch_only_alert)
             )
-            Type.PARITY_SIGNER -> AccountTypeAlert(
-                style = AlertView.Style(
-                    backgroundColorRes = R.color.block_background,
-                    iconRes = R.drawable.ic_parity_signer
-                ),
-                text = resourceManager.getString(R.string.account_details_parity_signer_alert)
-            )
+            Type.PARITY_SIGNER, Type.POLKADOT_VAULT -> {
+                val polkadotVaultVariant = accountType.asPolkadotVaultVariantOrThrow()
+                val variantConfig = polkadotVaultVariantConfigProvider.variantConfigFor(polkadotVaultVariant)
+
+                AccountTypeAlert(
+                    style = AlertView.Style(
+                        backgroundColorRes = R.color.block_background,
+                        iconRes = variantConfig.common.iconRes
+                    ),
+                    text = resourceManager.formatWithPolkadotVaultLabel(R.string.account_details_parity_signer_alert, polkadotVaultVariant)
+                )
+            }
             Type.SECRETS -> null
             Type.LEDGER -> AccountTypeAlert(
                 style = AlertView.Style(

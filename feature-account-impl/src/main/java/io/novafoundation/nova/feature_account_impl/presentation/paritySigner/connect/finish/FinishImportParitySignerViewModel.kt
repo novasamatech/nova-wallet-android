@@ -18,7 +18,7 @@ class FinishImportParitySignerViewModel(
 
     override fun proceed(name: String) {
         launch {
-            interactor.createWallet(name, payload.accountId)
+            interactor.createWallet(name, payload.accountId, payload.variant)
                 .onSuccess { continueBasedOnCodeStatus() }
                 .onFailure(::showError)
         }

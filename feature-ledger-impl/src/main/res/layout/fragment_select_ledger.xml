@@ -31,7 +31,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         tools:text="@string/account_ledger_select_device_description" />
 
     <androidx.recyclerview.widget.RecyclerView

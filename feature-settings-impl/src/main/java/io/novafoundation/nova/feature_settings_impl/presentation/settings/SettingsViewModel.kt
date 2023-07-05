@@ -10,8 +10,8 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.sequrity.BiometricResponse
-import io.novafoundation.nova.common.sequrity.BiometricService
+import io.novafoundation.nova.common.sequrity.biometry.BiometricResponse
+import io.novafoundation.nova.common.sequrity.biometry.BiometricService
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationResult
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService

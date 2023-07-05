@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:includeFontPadding="false"
         android:singleLine="true"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         tools:text="Title" />
 
 
@@ -68,7 +68,7 @@
         android:layout_marginTop="2dp"
         android:singleLine="true"
         android:visibility="gone"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         tools:text="$8.131" />
 
 </merge>

@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountDetailsInteractor
@@ -35,17 +36,19 @@ class AccountDetailsModule {
         chainRegistry: ChainRegistry,
         importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
         addAccountLauncherMixin: AddAccountLauncherMixin.Presentation,
+        polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
     ): ViewModel {
         return AccountDetailsViewModel(
-            interactor,
-            router,
-            iconGenerator,
-            resourceManager,
-            metaId,
-            externalActions,
-            chainRegistry,
-            importTypeChooserMixin,
-            addAccountLauncherMixin
+            interactor = interactor,
+            accountRouter = router,
+            iconGenerator = iconGenerator,
+            resourceManager = resourceManager,
+            metaId = metaId,
+            externalActions = externalActions,
+            chainRegistry = chainRegistry,
+            importTypeChooserMixin = importTypeChooserMixin,
+            addAccountLauncherMixin = addAccountLauncherMixin,
+            polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider
         )
     }
 

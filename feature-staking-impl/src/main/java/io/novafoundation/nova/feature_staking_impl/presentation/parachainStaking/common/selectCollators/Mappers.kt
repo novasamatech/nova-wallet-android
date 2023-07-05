@@ -109,12 +109,12 @@ fun ResourceManager.labeledAmountSubtitle(
 
     return if (selectionActive) {
         buildSpannable(this) {
-            appendColored(labelText, R.color.text_secondary)
+            appendColored(labelText, R.color.text_tertiary)
             appendColored(amount.token, R.color.text_primary)
         }
     } else {
         buildSpannable(this) {
-            appendColored(labelText + amount.token, R.color.text_secondary)
+            appendColored(labelText + amount.token, R.color.text_tertiary)
         }
     }
 }

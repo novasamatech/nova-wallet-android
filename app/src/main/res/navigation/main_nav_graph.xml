@@ -337,6 +337,14 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
+        <action
+            android:id="@+id/action_mainFragment_to_startStackingLanding"
+            app:destination="@id/startStakingLandingFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
     </fragment>
 
     <fragment
@@ -354,6 +362,16 @@
             app:popExitAnim="@anim/fragment_close_exit"
             app:popUpTo="@id/mainFragment"
             app:popUpToInclusive="true" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/startStakingLandingFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.landing.StartStakingLandingFragment"
+        android:label="StartStakingLandingFragment"
+        tools:layout="@layout/fragment_start_staking_landing">
+
+        <!--TODO: Start staking flow here-->
 
     </fragment>
 
