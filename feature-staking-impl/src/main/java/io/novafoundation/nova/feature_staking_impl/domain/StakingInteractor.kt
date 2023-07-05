@@ -205,6 +205,12 @@ class StakingInteractor(
         getEraTimeCalculator().eraDuration()
     }
 
+    suspend fun getRemainingEraTime() = withContext(Dispatchers.Default) {
+        val calculator = getEraTimeCalculator()
+        val activeEraIndex = stakingRepository.getActiveEraIndex(stakingSharedState.chainId())
+        calculator.calculate(activeEraIndex + ERA_OFFSET)
+    }
+
     fun selectedAccountStakingStateFlow(scope: CoroutineScope) = flowOfAll {
         val assetWithChain = stakingSharedState.chainAndAsset()
 
