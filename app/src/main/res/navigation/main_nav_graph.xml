@@ -572,7 +572,8 @@
         tools:layout="@layout/fragment_confirm_send">
 
         <action
-            android:id="@+id/finish_send_flow"
+            android:id="@+id/action_confirmTransferFragment_to_balanceDetailFragment"
+            app:destination="@+id/balanceDetailFragment"
             app:enterAnim="@anim/fragment_close_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"

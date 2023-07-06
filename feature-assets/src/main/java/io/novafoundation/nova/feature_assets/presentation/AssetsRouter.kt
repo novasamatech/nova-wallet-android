@@ -19,8 +19,6 @@ interface AssetsRouter {
 
     fun openConfirmTransfer(transferDraft: TransferDraft)
 
-    fun finishSendFlow()
-
     fun openTransferDetail(transaction: OperationParcelizeModel.Transfer)
 
     fun openExtrinsicDetail(extrinsic: OperationParcelizeModel.Extrinsic)
