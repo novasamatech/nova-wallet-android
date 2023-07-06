@@ -235,10 +235,6 @@ class Navigator(
         navController?.navigate(R.id.action_chooseAmountFragment_to_confirmTransferFragment, bundle)
     }
 
-    override fun finishSendFlow() {
-        navController?.navigate(R.id.finish_send_flow)
-    }
-
     override fun openTransferDetail(transaction: OperationParcelizeModel.Transfer) {
         val bundle = TransferDetailFragment.getBundle(transaction)
 
@@ -379,6 +375,7 @@ class Navigator(
         val action = when (navController?.currentDestination?.id) {
             R.id.mainFragment -> R.id.action_mainFragment_to_balanceDetailFragment
             R.id.assetSearchFragment -> R.id.action_assetSearchFragment_to_balanceDetailFragment
+            R.id.confirmTransferFragment -> R.id.action_confirmTransferFragment_to_balanceDetailFragment
             else -> null
         }
 
