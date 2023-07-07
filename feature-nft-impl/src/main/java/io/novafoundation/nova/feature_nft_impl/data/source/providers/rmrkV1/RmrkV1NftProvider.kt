@@ -9,10 +9,8 @@ import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_api.data.model.NftDetails
 import io.novafoundation.nova.feature_nft_impl.data.mappers.nftIssuance
 import io.novafoundation.nova.feature_nft_impl.data.mappers.nftPrice
-import io.novafoundation.nova.feature_nft_impl.data.network.distributed.FileStorageAdapter.adoptFileStorageLinkToHttps
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV1.network.RmrkV1Api
-import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
