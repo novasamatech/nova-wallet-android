@@ -29,23 +29,7 @@ class RmrkV1NftProvider(
     }
 
     override suspend fun nftFullSync(nft: Nft) {
-        val type = nft.type
-        require(type is Nft.Type.Rmrk1)
-
-        val collection = api.getCollection(type.collectionId)
-
-        val metadata = nft.metadataRaw?.let {
-            api.getIpfsMetadata(it.decodeToString().adoptFileStorageLinkToHttps())
-        }
-
-        nftDao.updateNft(nft.identifier) { local ->
-            local.copy(
-                media = metadata?.image?.adoptFileStorageLinkToHttps(),
-                label = metadata?.description,
-                issuanceTotal = collection.first().max,
-                wholeDetailsLoaded = true
-            )
-        }
+        throw UnsupportedOperationException("RmrkV1 doesn't supported")
     }
 
     override fun nftDetailsFlow(nftIdentifier: String): Flow<NftDetails> {
@@ -57,27 +41,17 @@ class RmrkV1NftProvider(
             val chain = chainRegistry.getChain(nftLocal.chainId)
             val metaAccount = accountRepository.getMetaAccount(nftLocal.metaId)
 
-            val collection = api.getCollection(nftLocal.collectionId).first()
-
-            val metadata = collection.metadata?.let {
-                api.getIpfsMetadata(it.adoptFileStorageLinkToHttps())
-            }
-
             NftDetails(
                 identifier = nftLocal.identifier,
                 chain = chain,
                 owner = metaAccount.accountIdIn(chain)!!,
-                creator = chain.accountIdOf(collection.issuer),
+                creator = null,
                 media = nftLocal.media,
                 name = nftLocal.name!!,
                 description = nftLocal.label,
                 issuance = nftIssuance(nftLocal),
                 price = nftPrice(nftLocal),
-                collection = NftDetails.Collection(
-                    id = nftLocal.collectionId,
-                    name = collection.name,
-                    media = metadata?.image?.adoptFileStorageLinkToHttps()
-                )
+                collection = null
             )
         }
     }
