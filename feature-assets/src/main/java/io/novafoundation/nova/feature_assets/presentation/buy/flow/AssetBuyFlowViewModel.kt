@@ -36,8 +36,10 @@ class AssetBuyFlowViewModel(
         return interactor.buyAssetSearch(query, totalContributedByAssetsFlow)
     }
 
-    override fun openNextScreen(assetModel: AssetModel) {
-        val chainAsset = assetModel.token.configuration
-        buyMixin.buyClicked(chainAsset)
+    override fun assetClicked(assetModel: AssetModel) {
+        validate(assetModel) {
+            val chainAsset = assetModel.token.configuration
+            buyMixin.buyClicked(chainAsset)
+        }
     }
 }
