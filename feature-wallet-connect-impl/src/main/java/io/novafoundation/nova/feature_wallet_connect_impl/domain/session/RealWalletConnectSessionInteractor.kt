@@ -179,10 +179,13 @@ class RealWalletConnectSessionInteractor(
     }
 
     private operator fun Namespace.Proposal.plus(other: Namespace.Proposal): Namespace.Proposal {
+        val mergedChains = chains.orEmpty() + other.chains.orEmpty()
+        val mergedMethods = methods + other.methods
+        val mergedEvents = events + other.events
         return Namespace.Proposal(
-            chains = chains.orEmpty() + other.chains.orEmpty(),
-            methods = methods + other.methods,
-            events = events + other.events
+            chains = mergedChains.distinct(),
+            methods = mergedMethods.distinct(),
+            events = mergedEvents.distinct()
         )
     }
 
