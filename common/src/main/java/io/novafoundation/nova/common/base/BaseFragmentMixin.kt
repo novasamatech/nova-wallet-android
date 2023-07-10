@@ -4,58 +4,24 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
-import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.utils.WithContextExtensions
-import io.novafoundation.nova.common.utils.WithLifecycleExtensions
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.view.dialog.dialog
 import kotlinx.coroutines.flow.Flow
 
-interface BaseFragmentMixin<T : BaseViewModel> : WithContextExtensions, WithLifecycleExtensions {
+interface BaseFragmentMixin<T : BaseViewModel> : BaseScreenMixin<T> {
 
     val fragment: Fragment
-
-    val viewModel: T
 
     override val providedContext: Context
         get() = fragment.requireContext()
 
     override val lifecycleOwner: LifecycleOwner
         get() = fragment.viewLifecycleOwner
-
-    fun initViews()
-
-    fun inject()
-
-    fun subscribe(viewModel: T)
-
-    fun showError(errorMessage: String) {
-        dialog(fragment.requireContext()) {
-            setTitle(fragment.getString(R.string.common_error_general_title))
-            setMessage(errorMessage)
-            setPositiveButton(R.string.common_ok) { _, _ -> }
-        }
-    }
-
-    fun showErrorWithTitle(title: String, errorMessage: String?) {
-        dialog(fragment.requireContext()) {
-            setTitle(title)
-            setMessage(errorMessage)
-            setPositiveButton(R.string.common_ok) { _, _ -> }
-        }
-    }
-
-    fun showMessage(text: String) {
-        Toast.makeText(fragment.requireContext(), text, Toast.LENGTH_SHORT)
-            .show()
-    }
 
     fun onBackPressed(action: () -> Unit) {
         val callback = object : OnBackPressedCallback(true) {

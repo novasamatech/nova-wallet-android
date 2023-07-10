@@ -1,15 +1,15 @@
 package io.novafoundation.nova.feature_wallet_connect_api.presentation
 
-import kotlinx.coroutines.CoroutineScope
+import androidx.lifecycle.LiveData
+import io.novafoundation.nova.common.utils.Event
 
 interface WalletConnectService {
 
-    interface Factory {
-
-        fun create(coroutineScope: CoroutineScope): WalletConnectService
-    }
+    val onPairErrorLiveData: LiveData<Event<Throwable>>
 
     fun connect()
 
     fun disconnect()
+
+    fun pair(uri: String)
 }

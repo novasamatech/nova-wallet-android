@@ -13,9 +13,12 @@ import io.novafoundation.nova.feature_assets.presentation.balance.filters.di.Ass
 import io.novafoundation.nova.feature_assets.presentation.balance.list.di.BalanceListComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
 import io.novafoundation.nova.feature_assets.presentation.balance.search.di.AssetSearchComponent
+import io.novafoundation.nova.feature_assets.presentation.buy.flow.di.AssetBuyFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.receive.di.ReceiveComponent
+import io.novafoundation.nova.feature_assets.presentation.receive.flow.di.AssetReceiveFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.send.amount.di.SelectSendComponent
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.di.ConfirmSendComponent
+import io.novafoundation.nova.feature_assets.presentation.send.flow.di.AssetSendFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.di.AddTokenEnterInfoComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChain.di.AddTokenSelectChainComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.di.ManageChainTokensComponent
@@ -28,6 +31,7 @@ import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
+import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.web3names.di.Web3NamesApi
 
@@ -72,6 +76,12 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
 
     fun addTokenEnterInfoComponentFactory(): AddTokenEnterInfoComponent.Factory
 
+    fun sendFlowComponent(): AssetSendFlowComponent.Factory
+
+    fun receiveFlowComponent(): AssetReceiveFlowComponent.Factory
+
+    fun buyFlowComponent(): AssetBuyFlowComponent.Factory
+
     fun inject(view: GoToNftsView)
 
     @Component.Factory
@@ -94,7 +104,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
             AccountFeatureApi::class,
             CurrencyFeatureApi::class,
             CrowdloanFeatureApi::class,
-            Web3NamesApi::class
+            Web3NamesApi::class,
+            WalletConnectFeatureApi::class
         ]
     )
     interface AssetsFeatureDependenciesComponent : AssetsFeatureDependencies

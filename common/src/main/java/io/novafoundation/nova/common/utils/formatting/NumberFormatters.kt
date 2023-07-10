@@ -154,6 +154,13 @@ fun decimalFormatterFor(pattern: String, roundingMode: RoundingMode): DecimalFor
     }
 }
 
+fun String.toAmountWithFraction(): AmountWithFraction {
+    val amountAndFraction = this.split(DECIMAL_SEPARATOR)
+    val amount = amountAndFraction[0]
+    val fraction = amountAndFraction.getOrNull(1)
+    return AmountWithFraction(amount, fraction, DECIMAL_SEPARATOR.toString())
+}
+
 fun patternWith(precision: Int) = "$DECIMAL_PATTERN_BASE${"#".repeat(precision)}"
 
 fun defaultNumberFormatter() = CompoundNumberFormatter(
