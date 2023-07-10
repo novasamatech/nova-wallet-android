@@ -18,15 +18,20 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.getColorOrNull
+import io.novafoundation.nova.common.view.parallaxCard.gyroscope.CardGyroscopeListener
 
 private const val DEVICE_ROTATION_ANGLE_RADIUS = 16f
 
 open class ParallaxCardView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), ParallaxCardBitmapBaking.OnBakingPreparedCallback {
 
     private val gyroscopeListener = CardGyroscopeListener(
-        context, TravelVector(DEVICE_ROTATION_ANGLE_RADIUS, DEVICE_ROTATION_ANGLE_RADIUS), ::onGyroscopeRotation
+        context,
+        TravelVector(DEVICE_ROTATION_ANGLE_RADIUS, DEVICE_ROTATION_ANGLE_RADIUS),
+        ::onGyroscopeRotation
     )
 
     private val frostedGlassLayer: FrostedGlassLayer = FrostedGlassLayer()
@@ -34,6 +39,8 @@ open class ParallaxCardView @JvmOverloads constructor(
     private val cardPath = Path()
     private val cardRadius = 12.dpF(context)
     private var travelOffset = TravelVector(0f, 0f)
+    private var highlightTravelPadding = 100.dpF(context)
+    private var verticalParallaxHighlightTravelPadding = 100.dpF(context)
     private var parallaxHighlihtMaxTravel = TravelVector(0f, 0f)
     private var cardHighlightMaxTravel = TravelVector(0f, 0f)
     private val parallaxTopLayerMaxTravel = TravelVector(7f, 3f)
@@ -77,8 +84,8 @@ open class ParallaxCardView @JvmOverloads constructor(
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
 
-        cardHighlightMaxTravel.set(width.toFloat() / 2, 0f)
-        parallaxHighlihtMaxTravel.set(width.toFloat(), height.toFloat() / 2)
+        cardHighlightMaxTravel.set(width.toFloat() / 2, highlightTravelPadding)
+        parallaxHighlihtMaxTravel.set(width.toFloat() / 2, height.toFloat() / 2)
 
         cardRect.setCardBounds(this)
         cardPath.applyRoundRect(cardRect, cardRadius)
@@ -135,7 +142,8 @@ open class ParallaxCardView @JvmOverloads constructor(
 
     override fun generateDefaultLayoutParams(): ConstraintLayout.LayoutParams {
         return LayoutParams(
-            ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT
+            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT
         )
     }
 
@@ -233,20 +241,20 @@ open class ParallaxCardView @JvmOverloads constructor(
     private fun updateHighlights() {
         val cardHighlightOffset = getTravelOffsetInRange(cardHighlightMaxTravel)
         val parallaxHighlightOffset = getTravelOffsetInRange(parallaxHighlihtMaxTravel)
-        helper.cardHighlightShader!!.normalizeMatrix(ScaleType.CENTER_INSIDE, cardHighlightOffset)
-        helper.cardBorderHighlightShader!!.normalizeMatrix(ScaleType.CENTER_INSIDE, cardHighlightOffset)
-        helper.parallaxHighlightShader!!.normalizeMatrix(ScaleType.CENTER, parallaxHighlightOffset)
-        helper.nestedViewBorderHighlightShader!!.normalizeMatrix(ScaleType.CENTER_INSIDE, cardHighlightOffset)
+        helper.cardHighlightShader!!.normalizeMatrix(ScaleType.CENTER_INSIDE, cardHighlightOffset, -highlightTravelPadding, -highlightTravelPadding)
+        helper.cardBorderHighlightShader!!.normalizeMatrix(ScaleType.CENTER_INSIDE, cardHighlightOffset, -highlightTravelPadding, -highlightTravelPadding)
+        helper.nestedViewBorderHighlightShader!!.normalizeMatrix(ScaleType.CENTER_INSIDE, cardHighlightOffset, -highlightTravelPadding, -highlightTravelPadding)
+        helper.parallaxHighlightShader!!.normalizeMatrix(ScaleType.CENTER, parallaxHighlightOffset, -verticalParallaxHighlightTravelPadding)
     }
 
     private fun updateParallaxBitmapBounds() {
         val paddingOffset = 19.dpF(context)
-        helper.parallaxFirstBitmap!!.normalizeBounds(ScaleType.CENTER, -paddingOffset)
-        helper.parallaxFirstBlurredBitmap!!.normalizeBounds(ScaleType.CENTER, -paddingOffset)
-        helper.parallaxSecondBitmap!!.normalizeBounds(ScaleType.CENTER, -paddingOffset)
-        helper.parallaxSecondBlurredBitmap!!.normalizeBounds(ScaleType.CENTER, -paddingOffset)
-        helper.parallaxThirdBitmap!!.normalizeBounds(ScaleType.CENTER, -paddingOffset)
-        helper.parallaxThirdBlurredBitmap!!.normalizeBounds(ScaleType.CENTER, -paddingOffset)
+        helper.parallaxFirstBitmap!!.normalizeBounds(ScaleType.CENTER, paddingVertical = -paddingOffset, paddingHorizontal = 0f)
+        helper.parallaxFirstBlurredBitmap!!.normalizeBounds(ScaleType.CENTER, paddingVertical = -paddingOffset, paddingHorizontal = 0f)
+        helper.parallaxSecondBitmap!!.normalizeBounds(ScaleType.CENTER, paddingVertical = -paddingOffset, paddingHorizontal = 0f)
+        helper.parallaxSecondBlurredBitmap!!.normalizeBounds(ScaleType.CENTER, paddingVertical = -paddingOffset, paddingHorizontal = 0f)
+        helper.parallaxThirdBitmap!!.normalizeBounds(ScaleType.CENTER, paddingVertical = -paddingOffset, paddingHorizontal = 0f)
+        helper.parallaxThirdBlurredBitmap!!.normalizeBounds(ScaleType.CENTER, paddingVertical = -paddingOffset, paddingHorizontal = 0f)
     }
 
     private fun updateFrostedGlassLayer() {

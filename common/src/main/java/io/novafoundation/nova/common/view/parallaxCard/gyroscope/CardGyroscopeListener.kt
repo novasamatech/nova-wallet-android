@@ -1,4 +1,4 @@
-package io.novafoundation.nova.common.view.parallaxCard
+package io.novafoundation.nova.common.view.parallaxCard.gyroscope
 
 import android.animation.TimeAnimator
 import android.content.Context
@@ -7,6 +7,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.core.content.ContextCompat
+import io.novafoundation.nova.common.view.parallaxCard.TravelVector
 
 private const val SECOND_IN_MILLIS = 1000f
 private const val VELOCITY = 0.1f
