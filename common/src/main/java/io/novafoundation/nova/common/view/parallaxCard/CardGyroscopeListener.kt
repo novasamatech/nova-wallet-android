@@ -10,19 +10,20 @@ import androidx.core.content.ContextCompat
 
 private const val SECOND_IN_MILLIS = 1000f
 private const val VELOCITY = 0.1f
-private const val SENSOR_Z_INDEX = 1
+private const val SENSOR_X_INDEX = 0
+private const val SENSOR_Y_INDEX = 1
 
 class CardGyroscopeListener(
     context: Context,
-    private val deviceRotationAngle: Float,
-    private val callback: (rotation: Float) -> Unit
+    private val deviceRotationAngle: TravelVector,
+    private val callback: (rotation: TravelVector) -> Unit
 ) : SensorEventListener {
 
     private val timeAnimator = TimeAnimator()
     private val sensorManager = ContextCompat.getSystemService(context, SensorManager::class.java)
 
-    private var screenRotation = 0f
-    private var deviceRotation = 0f
+    private var screenRotation = TravelVector(0f, 0f)
+    private var deviceRotation = TravelVector(0f, 0f)
     private var previousEventMillis: Long = 0
 
     init {
@@ -57,9 +58,14 @@ class CardGyroscopeListener(
     override fun onSensorChanged(event: SensorEvent) {
         val currentMillis = System.currentTimeMillis()
         val dT = (currentMillis - previousEventMillis) / SECOND_IN_MILLIS
-        val rotationDistanceInRadians = event.values[SENSOR_Z_INDEX] * dT
-        val rotationDistanceInDegrees = Math.toDegrees(rotationDistanceInRadians.toDouble())
-        deviceRotation += rotationDistanceInDegrees.toFloat()
+        val yRadians = event.values[SENSOR_Y_INDEX] * dT.toDouble()
+        val xRadians = event.values[SENSOR_X_INDEX] * dT.toDouble()
+
+        // y and x are inverted due to the device orientation
+        deviceRotation += TravelVector(
+            x = Math.toDegrees(yRadians).toFloat(),
+            y = Math.toDegrees(xRadians).toFloat()
+        )
 
         deviceRotation = deviceRotation.coerceIn(-deviceRotationAngle, deviceRotationAngle)
 

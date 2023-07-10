@@ -8,6 +8,7 @@ import android.graphics.RectF
 import android.graphics.Shader
 
 class BitmapShaderHelper(val bitmap: Bitmap) {
+
     val shader = BitmapShader(
         bitmap,
         Shader.TileMode.CLAMP,
@@ -20,9 +21,10 @@ class BitmapShaderHelper(val bitmap: Bitmap) {
     init {
         paint.shader = shader
         paint.style = Paint.Style.FILL
+        setAlpha(1f)
     }
-}
 
-class BitmapWithRect(val bitmap: Bitmap) {
-    val rect: RectF = RectF()
+    fun setAlpha(alpha: Float) {
+        paint.alpha = (alpha * 255).toInt()
+    }
 }
