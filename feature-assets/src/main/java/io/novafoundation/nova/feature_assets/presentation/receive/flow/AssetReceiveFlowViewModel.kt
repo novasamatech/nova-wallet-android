@@ -32,7 +32,13 @@ class AssetReceiveFlowViewModel(
         return interactor.searchAssetsFlow(query, totalContributedByAssetsFlow)
     }
 
-    override fun openNextScreen(assetModel: AssetModel) {
+    override fun assetClicked(assetModel: AssetModel) {
+        validate(assetModel) {
+            openNextScreen(assetModel)
+        }
+    }
+
+    private fun openNextScreen(assetModel: AssetModel) {
         val chainAsset = assetModel.token.configuration
         val assePayload = AssetPayload(chainAsset.chainId, chainAsset.id)
         router.openReceive(assePayload)
