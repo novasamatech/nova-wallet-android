@@ -46,9 +46,9 @@ open class ParallaxCardView @JvmOverloads constructor(
 
     private var parallaxHighlihtMaxTravel = TravelVector(0f, 0f)
     private var cardHighlightMaxTravel = TravelVector(0f, 0f)
-    private val parallaxTopLayerMaxTravel = TravelVector(7f, 3f)
-    private val parallaxMiddleLayerMaxTravel = TravelVector((-15).dpF(context), (-8).dpF(context))
-    private val parallaxBottomLayerMaxTravel = TravelVector((-25).dpF(context), (-19).dpF(context))
+    private val parallaxTopLayerMaxTravel = TravelVector(-7f, -3f)
+    private val parallaxMiddleLayerMaxTravel = TravelVector((15).dpF(context), (8).dpF(context))
+    private val parallaxBottomLayerMaxTravel = TravelVector((25).dpF(context), (19).dpF(context))
     private val cardBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = context.getColor(R.color.container_card_actions_border)
         strokeWidth = 2.dpF(context)
@@ -62,11 +62,7 @@ open class ParallaxCardView @JvmOverloads constructor(
     private val cardBackgroundBitmap: Bitmap
 
     init {
-        setWillNotDraw(false)
         clipToPadding = false
-        gyroscopeListener.start()
-
-        helper.setBakingPreparedCallback(this)
 
         // Implement native shadow
         outlineProvider = object : ViewOutlineProvider() {
@@ -78,6 +74,18 @@ open class ParallaxCardView @JvmOverloads constructor(
         cardBackgroundBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_parallax_card_background)
     }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        helper.setBakingPreparedCallback(this)
+
+        setWillNotDraw(false)
+
+        postDelayed({
+            gyroscopeListener.start()
+        }, 300) //Added small delay to avoid wrong parallax initial position
+    }
+
     override fun onViewRemoved(view: View?) {
         super.onViewRemoved(view)
         helper.onViewRemove()
@@ -87,8 +95,8 @@ open class ParallaxCardView @JvmOverloads constructor(
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
 
-        cardHighlightMaxTravel.set(width.toFloat() / 2, highlightPadding)
-        parallaxHighlihtMaxTravel.set(width.toFloat() / 2, height.toFloat() / 2)
+        cardHighlightMaxTravel.set(-width.toFloat() / 2, -highlightPadding)
+        parallaxHighlihtMaxTravel.set(-width.toFloat() / 2, -height.toFloat() / 2)
 
         cardRect.setCardBounds(this)
         cardPath.applyRoundRect(cardRect, cardRadius)
