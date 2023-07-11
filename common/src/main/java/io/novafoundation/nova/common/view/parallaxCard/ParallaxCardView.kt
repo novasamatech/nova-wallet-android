@@ -39,8 +39,11 @@ open class ParallaxCardView @JvmOverloads constructor(
     private val cardPath = Path()
     private val cardRadius = 12.dpF(context)
     private var travelOffset = TravelVector(0f, 0f)
-    private var highlightTravelPadding = 100.dpF(context)
-    private var verticalParallaxHighlightTravelPadding = 100.dpF(context)
+
+    //We use padding to support vertical highlight animation.
+    private var highlightPadding = 100.dpF(context)
+    private var verticalParallaxHighlightPadding = 100.dpF(context)
+
     private var parallaxHighlihtMaxTravel = TravelVector(0f, 0f)
     private var cardHighlightMaxTravel = TravelVector(0f, 0f)
     private val parallaxTopLayerMaxTravel = TravelVector(7f, 3f)
@@ -84,7 +87,7 @@ open class ParallaxCardView @JvmOverloads constructor(
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
 
-        cardHighlightMaxTravel.set(width.toFloat() / 2, highlightTravelPadding)
+        cardHighlightMaxTravel.set(width.toFloat() / 2, highlightPadding)
         parallaxHighlihtMaxTravel.set(width.toFloat() / 2, height.toFloat() / 2)
 
         cardRect.setCardBounds(this)
@@ -241,10 +244,10 @@ open class ParallaxCardView @JvmOverloads constructor(
     private fun updateHighlights() {
         val cardHighlightOffset = getTravelOffsetInRange(cardHighlightMaxTravel)
         val parallaxHighlightOffset = getTravelOffsetInRange(parallaxHighlihtMaxTravel)
-        helper.cardHighlightShader!!.normalizeMatrix(ScaleType.CENTER_INSIDE, cardHighlightOffset, -highlightTravelPadding, -highlightTravelPadding)
-        helper.cardBorderHighlightShader!!.normalizeMatrix(ScaleType.CENTER_INSIDE, cardHighlightOffset, -highlightTravelPadding, -highlightTravelPadding)
-        helper.nestedViewBorderHighlightShader!!.normalizeMatrix(ScaleType.CENTER_INSIDE, cardHighlightOffset, -highlightTravelPadding, -highlightTravelPadding)
-        helper.parallaxHighlightShader!!.normalizeMatrix(ScaleType.CENTER, parallaxHighlightOffset, -verticalParallaxHighlightTravelPadding)
+        helper.cardHighlightShader!!.normalizeMatrix(ScaleType.CENTER_INSIDE, cardHighlightOffset, -highlightPadding, -highlightPadding)
+        helper.cardBorderHighlightShader!!.normalizeMatrix(ScaleType.CENTER_INSIDE, cardHighlightOffset, -highlightPadding, -highlightPadding)
+        helper.nestedViewBorderHighlightShader!!.normalizeMatrix(ScaleType.CENTER_INSIDE, cardHighlightOffset, -highlightPadding, -highlightPadding)
+        helper.parallaxHighlightShader!!.normalizeMatrix(ScaleType.CENTER, parallaxHighlightOffset, -verticalParallaxHighlightPadding)
     }
 
     private fun updateParallaxBitmapBounds() {
