@@ -83,7 +83,7 @@ open class ParallaxCardView @JvmOverloads constructor(
 
         postDelayed({
             gyroscopeListener.start()
-        }, 300) //Added small delay to avoid wrong parallax initial position
+        }, 300) // Added small delay to avoid wrong parallax initial position
     }
 
     override fun onViewRemoved(view: View?) {
