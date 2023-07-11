@@ -33,7 +33,7 @@ class AssetSendFlowViewModel(
         return interactor.sendAssetSearch(query, totalContributedByAssetsFlow)
     }
 
-    override fun openNextScreen(assetModel: AssetModel) {
+    override fun assetClicked(assetModel: AssetModel) {
         val chainAsset = assetModel.token.configuration
         val assePayload = AssetPayload(chainAsset.chainId, chainAsset.id)
         router.openSend(assePayload)

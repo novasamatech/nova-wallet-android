@@ -380,7 +380,7 @@ class SetupYieldBoostViewModel(
         return if (collatorTask != null) {
             YieldBoostConfiguration.On(
                 threshold = collatorTask.accountMinimum,
-                frequencyInDays = collatorTask.frequencyInDays(),
+                frequencyInDays = collatorTask.frequencyInDays() ?: 0, // TODO this creates an invalid state
                 collatorIdHex = collator.accountIdHex
             )
         } else {

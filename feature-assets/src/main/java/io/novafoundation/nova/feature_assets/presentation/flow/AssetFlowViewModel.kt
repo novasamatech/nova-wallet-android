@@ -52,15 +52,15 @@ abstract class AssetFlowViewModel(
 
     abstract fun searchAssetsFlow(): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>>
 
-    fun assetClicked(assetModel: AssetModel) {
+    abstract fun assetClicked(assetModel: AssetModel)
+
+    internal fun validate(assetModel: AssetModel, onAccept: (AssetModel) -> Unit) {
         launch {
             val metaAccount = accountUseCase.getSelectedMetaAccount()
             val chainAsset = assetModel.token.configuration
             controllableAssetCheck.check(metaAccount, chainAsset) {
-                openNextScreen(assetModel)
+                onAccept(assetModel)
             }
         }
     }
-
-    abstract fun openNextScreen(assetModel: AssetModel)
 }
