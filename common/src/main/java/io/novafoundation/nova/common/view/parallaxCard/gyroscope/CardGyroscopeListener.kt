@@ -1,6 +1,5 @@
 package io.novafoundation.nova.common.view.parallaxCard.gyroscope
 
-import android.animation.TimeAnimator
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -8,11 +7,12 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.core.content.ContextCompat
 import io.novafoundation.nova.common.view.parallaxCard.TravelVector
+import kotlin.time.Duration.Companion.seconds
 
 private const val SECOND_IN_MILLIS = 1000f
-private const val VELOCITY = 0.1f
 private const val SENSOR_X_INDEX = 0
 private const val SENSOR_Y_INDEX = 1
+private val SENSOR_FREQUENCY_MICROSECONDS = (1.seconds.inWholeMicroseconds / 60).toInt()
 
 class CardGyroscopeListener(
     context: Context,
@@ -20,24 +20,17 @@ class CardGyroscopeListener(
     private val callback: (rotation: TravelVector) -> Unit
 ) : SensorEventListener {
 
-    private val timeAnimator = TimeAnimator()
     private val sensorManager = ContextCompat.getSystemService(context, SensorManager::class.java)
 
-    private var screenRotation = TravelVector(0f, 0f)
     private var deviceRotation = TravelVector(0f, 0f)
     private var previousEventMillis: Long = 0
-
-    init {
-        timeAnimator.setTimeListener(::onTimeChanged)
-    }
 
     fun start() {
         if (sensorManager != null) {
             val gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
             if (gyroscopeSensor != null) {
                 previousEventMillis = System.currentTimeMillis()
-                sensorManager.registerListener(this, gyroscopeSensor, SensorManager.SENSOR_DELAY_UI)
-                timeAnimator.start()
+                sensorManager.registerListener(this, gyroscopeSensor, SENSOR_FREQUENCY_MICROSECONDS)
             }
         }
     }
@@ -46,14 +39,7 @@ class CardGyroscopeListener(
         if (sensorManager != null) {
             previousEventMillis = System.currentTimeMillis()
             sensorManager.unregisterListener(this)
-            timeAnimator.cancel()
         }
-    }
-
-    private fun onTimeChanged(animator: TimeAnimator, totalTime: Long, deltaTime: Long) {
-        screenRotation += (deviceRotation - screenRotation) * VELOCITY
-        val resultRotation = screenRotation / deviceRotationAngle
-        callback(resultRotation)
     }
 
     override fun onSensorChanged(event: SensorEvent) {
@@ -69,6 +55,8 @@ class CardGyroscopeListener(
         )
 
         deviceRotation = deviceRotation.coerceIn(-deviceRotationAngle, deviceRotationAngle)
+
+        callback(deviceRotation / deviceRotationAngle)
 
         previousEventMillis = currentMillis
     }

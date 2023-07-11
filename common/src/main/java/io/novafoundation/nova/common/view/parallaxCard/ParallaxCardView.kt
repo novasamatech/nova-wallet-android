@@ -40,7 +40,7 @@ open class ParallaxCardView @JvmOverloads constructor(
     private val cardRadius = 12.dpF(context)
     private var travelOffset = TravelVector(0f, 0f)
 
-    //We use padding to support vertical highlight animation.
+    // We use padding to support vertical highlight animation.
     private var highlightPadding = 100.dpF(context)
     private var verticalParallaxHighlightPadding = 100.dpF(context)
 
