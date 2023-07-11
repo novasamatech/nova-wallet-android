@@ -23,11 +23,11 @@ class RmrkV1NftProvider(
 ) : NftProvider {
 
     override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
-        throw UnsupportedOperationException("RmrkV1 doesn't supported")
+        throw UnsupportedOperationException("RmrkV1 not supported")
     }
 
     override suspend fun nftFullSync(nft: Nft) {
-        throw UnsupportedOperationException("RmrkV1 doesn't supported")
+        throw UnsupportedOperationException("RmrkV1 not supported")
     }
 
     override fun nftDetailsFlow(nftIdentifier: String): Flow<NftDetails> {
