@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.view.parallaxCard.gyroscope
 
+import android.animation.TimeAnimator
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -11,6 +12,7 @@ import kotlin.time.Duration.Companion.seconds
 
 private const val SECOND_IN_MILLIS = 1000f
 private const val SENSOR_X_INDEX = 0
+private const val INTERPOLATION_VELOCITY = 0.3f
 private const val SENSOR_Y_INDEX = 1
 private val SENSOR_FREQUENCY_MICROSECONDS = (1.seconds.inWholeMicroseconds / 60).toInt()
 
@@ -21,7 +23,8 @@ class CardGyroscopeListener(
 ) : SensorEventListener {
 
     private val sensorManager = ContextCompat.getSystemService(context, SensorManager::class.java)
-
+    private val timeAnimator = TimeAnimator()
+    private var interpolatedRotation = TravelVector(0f, 0f)
     private var deviceRotation = TravelVector(0f, 0f)
     private var previousEventMillis: Long = 0
 
@@ -31,14 +34,23 @@ class CardGyroscopeListener(
             if (gyroscopeSensor != null) {
                 previousEventMillis = System.currentTimeMillis()
                 sensorManager.registerListener(this, gyroscopeSensor, SENSOR_FREQUENCY_MICROSECONDS)
+                timeAnimator.setTimeListener(::onTimerUpdate)
+                timeAnimator.start()
             }
         }
+    }
+
+    private fun onTimerUpdate(timeAnimator: TimeAnimator, totalTime: Long, deltaTime: Long) {
+        interpolatedRotation += (deviceRotation - interpolatedRotation) * INTERPOLATION_VELOCITY
+        callback(interpolatedRotation / deviceRotationAngle)
     }
 
     fun cancel() {
         if (sensorManager != null) {
             previousEventMillis = System.currentTimeMillis()
             sensorManager.unregisterListener(this)
+            timeAnimator.setTimeListener(null)
+            timeAnimator.cancel()
         }
     }
 
@@ -55,8 +67,6 @@ class CardGyroscopeListener(
         )
 
         deviceRotation = deviceRotation.coerceIn(-deviceRotationAngle, deviceRotationAngle)
-
-        callback(deviceRotation / deviceRotationAngle)
 
         previousEventMillis = currentMillis
     }
