@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.formatting.TimerValue
-import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.mapListNotNull
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.core.updater.Updater
