@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeA
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 
 class SettingsNavigator(
     navigationHolder: NavigationHolder,
@@ -41,5 +42,7 @@ class SettingsNavigator(
         walletConnectDelegate.openScanPairingQrCode()
     }
 
-    override fun openWalletConnectSessions() = performNavigation(R.id.action_mainFragment_to_walletConnectGraph)
+    override fun openWalletConnectSessions() {
+        walletConnectDelegate.openWalletConnectSessions(WalletConnectSessionsPayload(metaId = null))
+    }
 }

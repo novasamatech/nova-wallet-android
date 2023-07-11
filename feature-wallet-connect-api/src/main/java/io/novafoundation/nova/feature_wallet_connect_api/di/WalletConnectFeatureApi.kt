@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConn
 
 interface WalletConnectFeatureApi {
 
-    val walletConnectServiceFactory: WalletConnectService.Factory
+    val walletConnectService: WalletConnectService
 
     val sessionsUseCase: WalletConnectSessionsUseCase
 }

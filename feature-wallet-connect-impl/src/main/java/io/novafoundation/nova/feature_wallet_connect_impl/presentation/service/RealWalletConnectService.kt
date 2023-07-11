@@ -1,11 +1,13 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.presentation.service
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.walletconnect.android.Core
 import com.walletconnect.android.CoreClient
 import com.walletconnect.web3.wallet.client.Wallet
 import com.walletconnect.web3.wallet.client.Web3Wallet
 import io.novafoundation.nova.common.navigation.awaitResponse
+import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.inBackground
@@ -28,22 +30,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 
-internal class RealWalletConnectServiceFactory(
-    private val interactor: WalletConnectSessionInteractor,
-    private val dAppSignRequester: ExternalSignRequester,
-    private val approveSessionRequester: ApproveSessionRequester,
-) : WalletConnectService.Factory {
-
-    override fun create(coroutineScope: CoroutineScope): WalletConnectService {
-        return RealWalletConnectService(
-            parentScope = coroutineScope,
-            interactor = interactor,
-            dAppSignRequester = dAppSignRequester,
-            approveSessionRequester = approveSessionRequester
-        )
-    }
-}
-
 internal class RealWalletConnectService(
     parentScope: CoroutineScope,
     private val interactor: WalletConnectSessionInteractor,
@@ -54,6 +40,8 @@ internal class RealWalletConnectService(
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(parentScope) {
 
     private val events = Web3Wallet.sessionEventsFlow(scope = this)
+
+    override val onPairErrorLiveData: MutableLiveData<Event<Throwable>> = MutableLiveData()
 
     init {
         events.onEach {
@@ -78,6 +66,10 @@ internal class RealWalletConnectService(
         CoreClient.Relay.disconnect { error: Core.Model.Error ->
             Log.d(LOG_TAG, "Failed to disconnect to Wallet Connect: ", error.throwable)
         }
+    }
+
+    override fun pair(uri: String) {
+        Web3Wallet.pair(Wallet.Params.Pair(uri), onError = { onPairErrorLiveData.postValue(Event(it.throwable)) })
     }
 
     private suspend fun handleSessionProposal(proposal: Wallet.Model.SessionProposal) = withContext(Dispatchers.Main) {

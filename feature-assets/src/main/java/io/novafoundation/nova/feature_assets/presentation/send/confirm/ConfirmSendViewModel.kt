@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
+import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDirectionModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
@@ -33,6 +34,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -190,10 +192,23 @@ class ConfirmSendViewModel(
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.finishSendFlow()
+                finishSendFlow()
             }.onFailure(::showError)
 
         _transferSubmittingLiveData.value = false
+    }
+
+    private suspend fun finishSendFlow() {
+        val chain = originChain()
+        val payload = if (transferDraft.isCrossChain) {
+            val utilityAsset = chain.utilityAsset
+            AssetPayload(chainId = chain.id, chainAssetId = utilityAsset.id)
+        } else {
+            val chainAsset = originAsset()
+            AssetPayload(chain.id, chainAsset.id)
+        }
+
+        router.openAssetDetails(payload)
     }
 
     private suspend fun buildValidationPayload(): AssetTransferPayload {
