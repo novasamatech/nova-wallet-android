@@ -105,7 +105,7 @@ class WalletRepositoryImpl(
         if (syncingPriceIdsToSymbols.isNotEmpty()) {
             val coinPriceChanges = getAssetPrices(syncingPriceIdsToSymbols.keys, currency)
 
-            val updatedTokens = coinPriceChanges.flatMap { (priceId, coinPriceChange) ->
+            val newTokens = coinPriceChanges.flatMap { (priceId, coinPriceChange) ->
                 syncingPriceIdsToSymbols[priceId]?.let { symbols ->
                     symbols.map { symbol ->
                         TokenLocal(symbol, coinPriceChange?.rate, currency.id, coinPriceChange?.recentRateChange)
@@ -113,7 +113,9 @@ class WalletRepositoryImpl(
                 } ?: emptyList()
             }
 
-            assetCache.insertTokens(updatedTokens)
+            assetCache.updateTokens(newTokens)
+        } else {
+            assetCache.deleteAllTokens()
         }
     }
 
