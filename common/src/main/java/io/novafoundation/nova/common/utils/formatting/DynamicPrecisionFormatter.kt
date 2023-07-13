@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.utils.formatting
 import java.lang.Integer.max
 import java.math.BigDecimal
 import java.math.RoundingMode
+import kotlin.math.min
 
 class DynamicPrecisionFormatter(
     private val minPrecision: Int,
@@ -11,7 +12,8 @@ class DynamicPrecisionFormatter(
     override fun format(number: BigDecimal, roundingMode: RoundingMode): String {
         // scale() - total amount of digits after 0.,
         // precision() - amount of non-zero digits in decimal part
-        val requiredPrecision = number.scale() - number.precision() + 1
+        val zeroPrecision = number.scale() - number.precision()
+        val requiredPrecision = zeroPrecision + min(number.precision(), 3)
 
         val formattingPrecision = max(minPrecision, requiredPrecision)
 

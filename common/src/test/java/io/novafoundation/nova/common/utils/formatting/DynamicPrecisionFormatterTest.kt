@@ -7,9 +7,9 @@ class DynamicPrecisionFormatterTest {
 
     @Test
     fun `test format`() {
-        testFormatter(formatter, "0.01", "0.012")
-        testFormatter(formatter, "0.12", "0.123")
+        testFormatter(formatter, "0.123", "0.123")
         testFormatter(formatter, "0.00001", "0.00001")
-        testFormatter(formatter, "0.00001", "0.0000123")
+        testFormatter(formatter, "0.0000123", "0.0000123")
+        testFormatter(formatter, "0.0000123", "0.000012345")
     }
 }
