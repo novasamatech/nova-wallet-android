@@ -20,7 +20,6 @@ val StakingRewardPeriods_42_43 = object : Migration(42, 43) {
             `periodType` TEXT NOT NULL, 
             `customPeriodStart` INTEGER, 
             `customPeriodEnd` INTEGER, 
-            `offsetFromCurrentDate` INTEGER, 
             PRIMARY KEY(`accountId`, `chainId`, `assetId`, `stakingType`))
             """.trimIndent()
         )

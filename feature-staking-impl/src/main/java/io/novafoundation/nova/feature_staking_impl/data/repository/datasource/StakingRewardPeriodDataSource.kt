@@ -61,20 +61,19 @@ class RealStakingRewardPeriodDataSource(
             periodType = mapPeriodTypeToLocal(rewardPeriod),
             customPeriodStart = if (rewardPeriod is RewardPeriod.CustomRange) rewardPeriod.start.time else null,
             customPeriodEnd = if (rewardPeriod is RewardPeriod.CustomRange) rewardPeriod.end?.time else null,
-            offsetFromCurrentDate = if (rewardPeriod is RewardPeriod.OffsetFromCurrent) rewardPeriod.offsetMillis else null
         )
     }
 
     private fun mapToRewardPeriodFromLocal(period: StakingRewardPeriodLocal?): RewardPeriod {
-        val rewardPeriodType = mapPeriodTypeFromLocal(period)
+        val rewardPeriodType = mapPeriodTypeFromLocal(period) ?: return RewardPeriod.AllTime
+        val offsetFromCurrentDate = RewardPeriod.getOffsetByType(rewardPeriodType)
         return when (rewardPeriodType) {
-            null,
             RewardPeriodType.ALL_TIME -> RewardPeriod.AllTime
             RewardPeriodType.WEEK,
             RewardPeriodType.MONTH,
             RewardPeriodType.QUARTER,
             RewardPeriodType.HALF_YEAR,
-            RewardPeriodType.YEAR -> RewardPeriod.OffsetFromCurrent(period?.offsetFromCurrentDate ?: 0L, rewardPeriodType)
+            RewardPeriodType.YEAR -> RewardPeriod.OffsetFromCurrent(offsetFromCurrentDate, rewardPeriodType)
             RewardPeriodType.CUSTOM -> RewardPeriod.CustomRange(
                 Date(period?.customPeriodStart ?: 0L),
                 period?.customPeriodEnd?.let { Date(it) }

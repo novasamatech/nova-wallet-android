@@ -38,7 +38,6 @@
                 android:paddingEnd="4dp"
                 android:textAllCaps="false"
                 android:textColor="@color/button_text_accent"
-                android:visibility="gone"
                 app:chipIconSize="16dp"
                 app:iconEnd="@drawable/ic_chevron_right"
                 app:iconEndPadding="0dp"

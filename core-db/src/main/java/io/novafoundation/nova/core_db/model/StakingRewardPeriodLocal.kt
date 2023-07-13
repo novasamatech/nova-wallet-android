@@ -11,6 +11,5 @@ class StakingRewardPeriodLocal(
     val stakingType: String,
     val periodType: String,
     val customPeriodStart: Long?,
-    val customPeriodEnd: Long?,
-    val offsetFromCurrentDate: Long?,
+    val customPeriodEnd: Long?
 )
