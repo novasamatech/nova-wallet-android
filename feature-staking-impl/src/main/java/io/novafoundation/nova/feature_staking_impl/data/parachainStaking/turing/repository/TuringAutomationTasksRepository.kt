@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.turing.repository
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
-import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
@@ -15,6 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.turing.
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
@@ -46,11 +46,13 @@ class RealTuringAutomationTasksRepository(
     }
 
     private fun bindAutomationTasks(raw: Any?, taskId: String): TuringAutomationTask? = runCatching {
-        val action = raw.castToStruct().get<DictEnum.Entry<*>>("action") ?: incompatible()
+        val struct = raw.castToStruct()
+        val action = struct.get<DictEnum.Entry<*>>("action") ?: incompatible()
         val actionType = action.name
 
         if (actionType != "AutoCompoundDelegatedStake") return null
 
+        val schedule = struct.get<DictEnum.Entry<*>>("schedule") ?: incompatible()
         val actionValue = action.value.castToStruct()
 
         return TuringAutomationTask(
@@ -58,7 +60,16 @@ class RealTuringAutomationTasksRepository(
             delegator = bindAccountId(actionValue["delegator"]),
             collator = bindAccountId(actionValue["collator"]),
             accountMinimum = bindNumber(actionValue["account_minimum"]),
-            frequencyInSeconds = bindBlockNumber(actionValue["frequency"])
+            schedule = bindSchedule(schedule)
         )
     }.getOrNull()
+
+    private fun bindSchedule(schedule: DictEnum.Entry<*>): TuringAutomationTask.Schedule = runCatching {
+        if (schedule.name == "Recurring") {
+            val recurring = schedule.value.castToStruct().get<BigInteger>("frequency") ?: incompatible()
+            return TuringAutomationTask.Schedule.Recurring(recurring)
+        }
+
+        return TuringAutomationTask.Schedule.Unknown
+    }.getOrNull() ?: TuringAutomationTask.Schedule.Unknown
 }

@@ -26,6 +26,8 @@ interface CrowdloanRepository {
 }
 
 class ParachainMetadata(
+    val paraId: ParaId,
+    val movedToParaId: ParaId?,
     val iconLink: String,
     val name: String,
     val description: String,

@@ -7,7 +7,7 @@ class BuyTokenRegistry(providers: List<Provider<*>>) {
 
     private val providerById = providers.associateBy(Provider<*>::id)
 
-    fun availableProvidersFor(chainAsset: Chain.Asset) = chainAsset.buyProviders.keys
+    fun availableSortedProvidersFor(chainAsset: Chain.Asset) = chainAsset.buyProviders.keys
         .mapNotNull(providerById::get)
         .sortedBy { it.icon }
 

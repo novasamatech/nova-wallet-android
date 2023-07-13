@@ -78,7 +78,15 @@ class AssetCache(
         assetDao.clearAssets(localAssetIds)
     }
 
-    suspend fun insertTokens(tokens: List<TokenLocal>) = tokenDao.insertTokens(tokens)
+    suspend fun deleteAllTokens() {
+        tokenDao.deleteAll()
+    }
+
+    suspend fun updateTokens(newTokens: List<TokenLocal>) {
+        val oldTokens = tokenDao.getTokens()
+        val diff = CollectionDiffer.findDiff(newTokens, oldTokens, forceUseNewItems = false)
+        tokenDao.applyDiff(diff)
+    }
 
     suspend fun insertToken(tokens: TokenLocal) = tokenDao.insertToken(tokens)
 }

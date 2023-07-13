@@ -799,7 +799,7 @@
     <string name="staking_dashboard_browser_stake_header">Стейкинг через DApp браузер Nova</string>
     <string name="staking_dashboard_more_options">Больше вариантов стейкинга</string>
     <string name="staking_dashboard_no_stake_header">Стейкайте и получайте вознаграждения</string>
-    <string name="staking_earnings_per_year">Заработок в год</string>
+    <string name="staking_earnings_per_year">Примерная доходность</string>
     <string name="staking_era_title">эра %s</string>
     <string name="staking_estimate_earning_title_v1.9.0">Расчёт доходности</string>
     <string name="staking_estimate_earning_title_v2_2_0">Расчёт доходности %s</string>

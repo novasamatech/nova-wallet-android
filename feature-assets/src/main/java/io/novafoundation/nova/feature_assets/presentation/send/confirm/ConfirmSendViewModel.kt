@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
+import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDirectionModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
@@ -190,10 +191,17 @@ class ConfirmSendViewModel(
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.finishSendFlow()
+                finishSendFlow()
             }.onFailure(::showError)
 
         _transferSubmittingLiveData.value = false
+    }
+
+    private suspend fun finishSendFlow() {
+        val chain = originChain()
+        val chainAsset = originAsset()
+
+        router.openAssetDetails(AssetPayload(chain.id, chainAsset.id))
     }
 
     private suspend fun buildValidationPayload(): AssetTransferPayload {

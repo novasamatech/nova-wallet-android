@@ -34,6 +34,7 @@ import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
@@ -43,6 +44,7 @@ import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
+import io.novafoundation.nova.common.view.parallaxCard.BackingParallaxCardLruCache
 import jp.co.soramitsu.fearless_utils.encrypt.Signer
 import jp.co.soramitsu.fearless_utils.icon.IconGenerator
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
@@ -128,6 +130,10 @@ interface CommonApi {
     fun twoFactorVerificationService(): TwoFactorVerificationService
 
     fun twoFactorVerificationExecutor(): TwoFactorVerificationExecutor
+
+    fun rootScope(): RootScope
+
+    fun bakingParallaxCardCache(): BackingParallaxCardLruCache
 
     val systemCallExecutor: SystemCallExecutor
 

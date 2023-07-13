@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:background="@color/wallet_connections_background"
+    tools:orientation="horizontal"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <FrameLayout
+        android:id="@+id/viewWalletConnectIconContainer"
+        android:layout_width="40dp"
+        android:layout_height="40dp">
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_wallet_connect"
+            app:tint="@color/chip_icon" />
+
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/viewWalletConnectConnectionsIcon"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_connections"
+        android:layout_marginStart="8dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:tint="@color/chip_icon"/>
+
+    <TextView
+        android:id="@+id/viewWalletConnectConnectedCount"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="4dp"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:textColor="@color/chip_text"
+        android:visibility="gone"
+        tools:text="1"
+        tools:visibility="visible" />
+
+</merge>
