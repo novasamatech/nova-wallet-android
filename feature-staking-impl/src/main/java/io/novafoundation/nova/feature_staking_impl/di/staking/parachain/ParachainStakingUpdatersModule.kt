@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.ScheduledDelegationRequestsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.TotalDelegatedUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
+import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -57,7 +58,7 @@ class ParachainStakingUpdatersModule {
         storageCache: StorageCache,
         stakingSharedState: StakingSharedState,
         chainRegistry: ChainRegistry,
-        bulkRetriever: BulkRetriever,
+        @DefaultBulkRetriever bulkRetriever: BulkRetriever,
         currentRoundRepository: CurrentRoundRepository,
     ) = CurrentRoundCollatorsUpdater(
         storageCache = storageCache,

@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
-import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -56,8 +55,6 @@ interface StakingFeatureDependencies {
     fun accountRepository(): AccountRepository
 
     fun storageCache(): StorageCache
-
-    fun bulkRetriever(): BulkRetriever
 
     fun addressIconGenerator(): AddressIconGenerator
 
