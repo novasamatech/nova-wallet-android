@@ -55,7 +55,7 @@ class QueryStorageAtResponse(
     }
 }
 
-private const val DEFAULT_PAGE_SIZE = 1000
+private const val DEFAULT_PAGE_SIZE = 500
 
 class BulkRetriever(
     private val pageSize: Int = DEFAULT_PAGE_SIZE
