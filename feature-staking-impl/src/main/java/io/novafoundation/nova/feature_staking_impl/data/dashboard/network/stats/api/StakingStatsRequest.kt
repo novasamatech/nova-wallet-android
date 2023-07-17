@@ -15,12 +15,9 @@ import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 
 class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>) {
 
-    @Transient
-    private val chainAddressesParams = constructChainAddressesParams(stakingAccounts, chains)
-
     val query = """
     {
-        activeStakers$chainAddressesParams {
+        activeStakers${constructFilters(stakingAccounts, chains, rewardType = null)} {
             nodes {
                 networkId
                 stakingType
@@ -36,7 +33,17 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
             }
         }
         
-        rewards$chainAddressesParams {
+        rewards: rewards${constructFilters(stakingAccounts, chains, rewardType = "reward")} {
+            groupedAggregates(groupBy: [NETWORK_ID,  STAKING_TYPE]) {
+                sum {
+                    amount
+                }
+      
+                keys
+            }
+        }
+        
+        slashes: rewards${constructFilters(stakingAccounts, chains, rewardType = "slash")} {
             groupedAggregates(groupBy: [NETWORK_ID,  STAKING_TYPE]) {
                 sum {
                     amount
@@ -46,12 +53,12 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
             }
         }
     }
-
     """.trimIndent()
 
-    private fun constructChainAddressesParams(
+    private fun constructFilters(
         stakingAccounts: StakingAccounts,
-        chains: List<Chain>
+        chains: List<Chain>,
+        rewardType: String?
     ): String = with(SubQueryFilters) {
         val perChain = chains.mapNotNull { chain ->
             val hasTypeAndAddressOptions = hasTypeAndAddressOptions(chain, stakingAccounts)
@@ -61,7 +68,7 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
             hasNetwork(chain.id.requireHexPrefix()) and anyOf(hasTypeAndAddressOptions)
         }
 
-        val filters = anyOf(perChain)
+        val filters = if (rewardType != null) anyOf(perChain) and hasRewardType(rewardType) else ""
 
         queryParams(filter = filters)
     }
@@ -91,5 +98,9 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
 
     private fun SubQueryFilters.hasAddress(address: String): String {
         return "address" equalTo address
+    }
+
+    private fun SubQueryFilters.hasRewardType(type: String): String {
+        return "type" equalToEnum type
     }
 }
