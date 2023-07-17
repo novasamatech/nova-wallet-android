@@ -55,7 +55,6 @@ class QueryStorageAtResponse(
     }
 }
 
-
 class BulkRetriever(private val pageSize: Int) {
 
     /**
