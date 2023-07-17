@@ -68,7 +68,11 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
             hasNetwork(chain.id.requireHexPrefix()) and anyOf(hasTypeAndAddressOptions)
         }
 
-        val filters = if (rewardType != null) anyOf(perChain) and hasRewardType(rewardType) else ""
+        val filters = if (rewardType != null) {
+            anyOf(perChain) and hasRewardType(rewardType)
+        } else {
+            anyOf(perChain)
+        }
 
         queryParams(filter = filters)
     }
