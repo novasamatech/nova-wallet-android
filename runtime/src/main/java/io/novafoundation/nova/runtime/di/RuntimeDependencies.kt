@@ -27,8 +27,6 @@ interface RuntimeDependencies {
 
     fun storageDao(): StorageDao
 
-    fun bulkRetriever(): BulkRetriever
-
     fun chainDao(): ChainDao
 
     fun chainAssetDao(): ChainAssetDao

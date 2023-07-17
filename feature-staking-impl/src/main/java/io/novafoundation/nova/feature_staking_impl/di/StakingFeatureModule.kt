@@ -45,6 +45,8 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.St
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSourceImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.SubqueryStakingRewardsDataSource
+import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
+import io.novafoundation.nova.feature_staking_impl.di.staking.PayoutsBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
@@ -86,6 +88,9 @@ import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
+
+const val PAYOUTS_BULK_RETRIEVER_PAGE_SIZE = 500
+const val DEFAULT_BULK_RETRIEVER_PAGE_SIZE = 1000
 
 @Module(includes = [AssetUseCaseModule::class])
 class StakingFeatureModule {
@@ -358,10 +363,24 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
+    @DefaultBulkRetriever
+    fun provideDefaultBulkRetriever(): BulkRetriever {
+        return BulkRetriever(DEFAULT_BULK_RETRIEVER_PAGE_SIZE)
+    }
+
+    @Provides
+    @FeatureScope
+    @PayoutsBulkRetriever
+    fun providePayoutBulkRetriever(): BulkRetriever {
+        return BulkRetriever(PAYOUTS_BULK_RETRIEVER_PAGE_SIZE)
+    }
+
+    @Provides
+    @FeatureScope
     fun providePayoutRepository(
         stakingRepository: StakingRepository,
         validatorSetFetcher: SubQueryValidatorSetFetcher,
-        bulkRetriever: BulkRetriever,
+        @PayoutsBulkRetriever bulkRetriever: BulkRetriever,
         storageCache: StorageCache,
         chainRegistry: ChainRegistry,
     ): PayoutRepository {

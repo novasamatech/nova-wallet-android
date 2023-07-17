@@ -109,8 +109,6 @@ interface CommonApi {
 
     fun httpExceptionHandler(): HttpExceptionHandler
 
-    fun defaultPagedKeysRetriever(): BulkRetriever
-
     fun validationExecutor(): ValidationExecutor
 
     fun secretStoreV1(): SecretStoreV1

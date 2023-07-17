@@ -55,13 +55,8 @@ class QueryStorageAtResponse(
     }
 }
 
-private const val DEFAULT_PAGE_SIZE = 1000
-private const val PAYOUTS_PAGE_SIZE = 500
 
-class BulkRetriever(
-    private val defaultPageSize: Int = DEFAULT_PAGE_SIZE,
-    private val payoutsPageSize: Int = PAYOUTS_PAGE_SIZE
-) {
+class BulkRetriever(private val pageSize: Int) {
 
     /**
      * Retrieves all keys starting with [keyPrefix] from [at] block
@@ -84,7 +79,7 @@ class BulkRetriever(
         keys: List<String>,
         at: BlockHash? = null
     ): Map<String, String?> = withContext(Dispatchers.IO) {
-        val chunks = keys.chunked(payoutsPageSize)
+        val chunks = keys.chunked(pageSize)
 
         chunks.fold(mutableMapOf()) { acc, chunk ->
             ensureActive()
@@ -128,13 +123,13 @@ class BulkRetriever(
         while (true) {
             coroutineContext.ensureActive()
 
-            val request = GetKeysPagedRequest(prefix, defaultPageSize, currentOffset)
+            val request = GetKeysPagedRequest(prefix, pageSize, currentOffset)
 
             val page = socketService.executeAsync(request, mapper = pojoList<String>().nonNull())
 
             result += page
 
-            if (isLastPage(page, defaultPageSize)) break
+            if (isLastPage(page)) break
 
             currentOffset = page.last()
         }
@@ -142,7 +137,7 @@ class BulkRetriever(
         return result
     }
 
-    private fun isLastPage(page: List<String>, pageSize: Int) = page.size < pageSize
+    private fun isLastPage(page: List<String>) = page.size < pageSize
 }
 
 suspend fun BulkRetriever.queryKey(

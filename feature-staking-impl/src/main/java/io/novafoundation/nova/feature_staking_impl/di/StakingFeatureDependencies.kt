@@ -57,8 +57,6 @@ interface StakingFeatureDependencies {
 
     fun storageCache(): StorageCache
 
-    fun bulkRetriever(): BulkRetriever
-
     fun addressIconGenerator(): AddressIconGenerator
 
     fun appLinksProvider(): AppLinksProvider

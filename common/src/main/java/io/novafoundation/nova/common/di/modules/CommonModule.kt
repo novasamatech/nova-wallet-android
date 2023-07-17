@@ -204,12 +204,6 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun provideDefaultPagedKeysRetriever(): BulkRetriever {
-        return BulkRetriever()
-    }
-
-    @Provides
-    @ApplicationScope
     fun provideValidationExecutor(): ValidationExecutor {
         return ValidationExecutor()
     }
