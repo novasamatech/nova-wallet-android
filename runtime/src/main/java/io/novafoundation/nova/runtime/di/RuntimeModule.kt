@@ -6,7 +6,6 @@ import dagger.Provides
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.ApplicationScope
-import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.StorageDao
@@ -78,8 +77,7 @@ class RuntimeModule {
 
     @Provides
     @ApplicationScope
-    fun provideBulkRetriever(
-    ): BulkRetriever {
+    fun provideBulkRetriever(): BulkRetriever {
         return BulkRetriever(BULK_RETRIEVER_PAGE_SIZE)
     }
 
