@@ -27,7 +27,8 @@ private const val GROUPING_SEPARATOR = ','
 private const val DECIMAL_SEPARATOR = '.'
 
 private const val MIN_SCALE = 5
-private const val MIN_PRECISION = 3
+private const val AMOUNT_MIN_PRECISION = 3
+private const val TOKEN_MIN_PRECISION = 1
 const val ABBREVIATED_SCALE = 2
 
 private val dateTimeFormat = SimpleDateFormat.getDateTimeInstance()
@@ -170,7 +171,7 @@ fun defaultNumberFormatter() = CompoundNumberFormatter(
             threshold = BigDecimal.ZERO,
             divisor = BigDecimal.ONE,
             suffix = "",
-            formatter = DynamicPrecisionFormatter(minScale = MIN_SCALE, minPrecision = MIN_PRECISION)
+            formatter = DynamicPrecisionFormatter(minScale = MIN_SCALE, minPrecision = TOKEN_MIN_PRECISION)
         ),
         NumberAbbreviation(
             threshold = BigDecimal.ONE,
@@ -191,7 +192,7 @@ fun currencyFormatter() = CompoundNumberFormatter(
             threshold = BigDecimal.ZERO,
             divisor = BigDecimal.ONE,
             suffix = "",
-            formatter = DynamicPrecisionFormatter(minScale = ABBREVIATED_SCALE, minPrecision = MIN_PRECISION)
+            formatter = DynamicPrecisionFormatter(minScale = ABBREVIATED_SCALE, minPrecision = AMOUNT_MIN_PRECISION)
         ),
         NumberAbbreviation(
             threshold = BigDecimal.ONE,
