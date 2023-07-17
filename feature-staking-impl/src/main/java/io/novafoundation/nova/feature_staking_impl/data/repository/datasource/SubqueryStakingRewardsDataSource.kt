@@ -49,10 +49,6 @@ class SubqueryStakingRewardsDataSource(
         stakingTotalRewardDao.insert(totalRewardLocal)
     }
 
-    override suspend fun clearRewards() {
-        stakingTotalRewardDao.deleteAll()
-    }
-
     private fun RewardPeriod.getStartDate(): Date? {
         if (this is RewardPeriod.OffsetFromCurrent) {
             return Date(System.currentTimeMillis() - this.offsetMillis)
