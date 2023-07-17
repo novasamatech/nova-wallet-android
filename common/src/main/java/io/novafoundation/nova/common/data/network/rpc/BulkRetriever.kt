@@ -55,15 +55,17 @@ class QueryStorageAtResponse(
     }
 }
 
-private const val DEFAULT_PAGE_SIZE = 500
+private const val DEFAULT_PAGE_SIZE = 1000
+private const val PAYOUTS_PAGE_SIZE = 500
 
 class BulkRetriever(
-    private val pageSize: Int = DEFAULT_PAGE_SIZE
+    private val defaultPageSize: Int = DEFAULT_PAGE_SIZE,
+    private val payoutsPageSize: Int = PAYOUTS_PAGE_SIZE
 ) {
 
     /**
      * Retrieves all keys starting with [keyPrefix] from [at] block
-     * Returns only first [DEFAULT_PAGE_SIZE] elements in case historical querying is used ([at] is not null)
+     * Returns only first [defaultPageSize] elements in case historical querying is used ([at] is not null)
      */
     suspend fun retrieveAllKeys(
         socketService: SocketService,
@@ -82,7 +84,7 @@ class BulkRetriever(
         keys: List<String>,
         at: BlockHash? = null
     ): Map<String, String?> = withContext(Dispatchers.IO) {
-        val chunks = keys.chunked(pageSize)
+        val chunks = keys.chunked(payoutsPageSize)
 
         chunks.fold(mutableMapOf()) { acc, chunk ->
             ensureActive()
@@ -99,7 +101,7 @@ class BulkRetriever(
     }
 
     /**
-     * Note: the amount of keys returned by this method is limited by [DEFAULT_PAGE_SIZE]
+     * Note: the amount of keys returned by this method is limited by [defaultPageSize]
      * So it is should not be used for storages with big amount of entries
      */
     private suspend fun queryKeysByPrefixHistorical(
@@ -126,13 +128,13 @@ class BulkRetriever(
         while (true) {
             coroutineContext.ensureActive()
 
-            val request = GetKeysPagedRequest(prefix, DEFAULT_PAGE_SIZE, currentOffset)
+            val request = GetKeysPagedRequest(prefix, defaultPageSize, currentOffset)
 
             val page = socketService.executeAsync(request, mapper = pojoList<String>().nonNull())
 
             result += page
 
-            if (isLastPage(page)) break
+            if (isLastPage(page, defaultPageSize)) break
 
             currentOffset = page.last()
         }
@@ -140,7 +142,7 @@ class BulkRetriever(
         return result
     }
 
-    private fun isLastPage(page: List<String>) = page.size < pageSize
+    private fun isLastPage(page: List<String>, pageSize: Int) = page.size < pageSize
 }
 
 suspend fun BulkRetriever.queryKey(
