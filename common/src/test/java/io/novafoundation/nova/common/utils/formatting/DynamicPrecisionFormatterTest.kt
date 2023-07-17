@@ -3,7 +3,7 @@ package io.novafoundation.nova.common.utils.formatting
 import org.junit.Test
 
 class DynamicPrecisionFormatterTest {
-    private val formatter = DynamicPrecisionFormatter(2)
+    private val formatter = DynamicPrecisionFormatter(minScale = 2, minPrecision = 3)
 
     @Test
     fun `test format`() {
