@@ -82,6 +82,8 @@ fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = M
     return toBigDecimal().divide(divisor.toBigDecimal(), mathContext)
 }
 
+fun BigInteger.atLeastZero() = coerceAtLeast(BigInteger.ZERO)
+
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
 fun Number.daysToMillis() = TimeUnit.DAYS.toMillis(this.toLong())

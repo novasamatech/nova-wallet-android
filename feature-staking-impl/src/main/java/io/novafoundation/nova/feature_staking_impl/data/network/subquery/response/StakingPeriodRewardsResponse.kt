@@ -2,10 +2,11 @@ package io.novafoundation.nova.feature_staking_impl.data.network.subquery.respon
 
 import io.novafoundation.nova.common.data.network.subquery.GroupedAggregate
 import io.novafoundation.nova.common.data.network.subquery.SubQueryGroupedAggregates
+import io.novafoundation.nova.common.data.network.subquery.firstSum
+import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.orZero
 import java.math.BigDecimal
 import java.math.BigInteger
-import jp.co.soramitsu.fearless_utils.hash.isNegative
 
 class StakingPeriodRewardsResponse(
     val rewards: SubQueryGroupedAggregates<GroupedAggregate.Sum<RewardNode>>,
@@ -15,14 +16,13 @@ class StakingPeriodRewardsResponse(
     class RewardNode(val amount: BigDecimal)
 }
 
+val StakingPeriodRewardsResponse.RewardNode.planksAmount: BigInteger
+    get() = amount.toBigInteger()
+
 val StakingPeriodRewardsResponse.totalReward: BigInteger
     get() {
-        val end = rewards.groupedAggregates.firstOrNull()?.sum?.amount ?: return BigInteger.ZERO
-        val start = slashes.groupedAggregates.firstOrNull()?.sum?.amount
-        val total = end.toBigInteger() - start?.toBigInteger().orZero()
-        return if (total.isNegative()) {
-            return BigInteger.ZERO
-        } else {
-            total
-        }
+        val rewards = rewards.firstSum()?.planksAmount.orZero()
+        val slashes = slashes.firstSum()?.planksAmount.orZero()
+
+        return (rewards - slashes).atLeastZero()
     }
