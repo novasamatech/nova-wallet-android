@@ -71,7 +71,7 @@ class EvmErc20AssetHistory(
     }
 
     override fun isOperationSafe(operation: Operation): Boolean {
-       return !operation.isZeroTransfer()
+        return !operation.isZeroTransfer()
     }
 
     private fun mapRemoteTransferToOperation(
