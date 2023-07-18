@@ -1,14 +1,16 @@
 package io.novafoundation.nova.feature_staking_impl.data.repository.datasource
 
+import io.novafoundation.nova.common.data.network.runtime.binding.castOrNull
 import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.model.StakingRewardPeriodLocal
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
+import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod.CustomRange
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriodType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.util.Date
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.util.Date
 
 interface StakingRewardPeriodDataSource {
 
@@ -59,50 +61,51 @@ class RealStakingRewardPeriodDataSource(
             accountId = accountId,
             stakingType = mapStakingTypeToLocal(stakingType),
             periodType = mapPeriodTypeToLocal(rewardPeriod),
-            customPeriodStart = if (rewardPeriod is RewardPeriod.CustomRange) rewardPeriod.start.time else null,
-            customPeriodEnd = if (rewardPeriod is RewardPeriod.CustomRange) rewardPeriod.end?.time else null,
+            customPeriodStart = rewardPeriod.castOrNull<CustomRange>()?.start?.time,
+            customPeriodEnd = rewardPeriod.castOrNull<CustomRange>()?.end?.time,
         )
     }
 
     private fun mapToRewardPeriodFromLocal(period: StakingRewardPeriodLocal?): RewardPeriod {
         val rewardPeriodType = mapPeriodTypeFromLocal(period) ?: return RewardPeriod.AllTime
-        val offsetFromCurrentDate = RewardPeriod.getOffsetByType(rewardPeriodType)
+
         return when (rewardPeriodType) {
-            RewardPeriodType.ALL_TIME -> RewardPeriod.AllTime
-            RewardPeriodType.WEEK,
-            RewardPeriodType.MONTH,
-            RewardPeriodType.QUARTER,
-            RewardPeriodType.HALF_YEAR,
-            RewardPeriodType.YEAR -> RewardPeriod.OffsetFromCurrent(offsetFromCurrentDate, rewardPeriodType)
-            RewardPeriodType.CUSTOM -> RewardPeriod.CustomRange(
-                Date(period?.customPeriodStart ?: 0L),
-                period?.customPeriodEnd?.let { Date(it) }
+            RewardPeriodType.AllTime -> RewardPeriod.AllTime
+
+            is RewardPeriodType.Preset -> {
+                val offsetFromCurrentDate = RewardPeriod.getPresetOffset(rewardPeriodType)
+                RewardPeriod.OffsetFromCurrent(offsetFromCurrentDate, rewardPeriodType)
+            }
+
+            RewardPeriodType.Custom -> CustomRange(
+                start = Date(period?.customPeriodStart ?: 0L),
+                end = period?.customPeriodEnd?.let(::Date)
             )
         }
     }
 
     private fun mapPeriodTypeFromLocal(period: StakingRewardPeriodLocal?): RewardPeriodType? {
         return when (period?.periodType) {
-            "ALL_TIME" -> RewardPeriodType.ALL_TIME
-            "WEEK" -> RewardPeriodType.WEEK
-            "MONTH" -> RewardPeriodType.MONTH
-            "QUARTER" -> RewardPeriodType.QUARTER
-            "HALF_YEAR" -> RewardPeriodType.HALF_YEAR
-            "YEAR" -> RewardPeriodType.YEAR
-            "CUSTOM" -> RewardPeriodType.CUSTOM
+            "ALL_TIME" -> RewardPeriodType.AllTime
+            "WEEK" -> RewardPeriodType.Preset.WEEK
+            "MONTH" -> RewardPeriodType.Preset.MONTH
+            "QUARTER" -> RewardPeriodType.Preset.QUARTER
+            "HALF_YEAR" -> RewardPeriodType.Preset.HALF_YEAR
+            "YEAR" -> RewardPeriodType.Preset.YEAR
+            "CUSTOM" -> RewardPeriodType.Custom
             else -> null
         }
     }
 
     private fun mapPeriodTypeToLocal(rewardPeriod: RewardPeriod): String {
         return when (rewardPeriod.type) {
-            RewardPeriodType.ALL_TIME -> "ALL_TIME"
-            RewardPeriodType.WEEK -> "WEEK"
-            RewardPeriodType.MONTH -> "MONTH"
-            RewardPeriodType.QUARTER -> "QUARTER"
-            RewardPeriodType.HALF_YEAR -> "HALF_YEAR"
-            RewardPeriodType.YEAR -> "YEAR"
-            RewardPeriodType.CUSTOM -> "CUSTOM"
+            RewardPeriodType.AllTime -> "ALL_TIME"
+            RewardPeriodType.Preset.WEEK -> "WEEK"
+            RewardPeriodType.Preset.MONTH -> "MONTH"
+            RewardPeriodType.Preset.QUARTER -> "QUARTER"
+            RewardPeriodType.Preset.HALF_YEAR -> "HALF_YEAR"
+            RewardPeriodType.Preset.YEAR -> "YEAR"
+            RewardPeriodType.Custom -> "CUSTOM"
         }
     }
 
