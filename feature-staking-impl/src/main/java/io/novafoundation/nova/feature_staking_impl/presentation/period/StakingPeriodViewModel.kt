@@ -42,7 +42,6 @@ private val PRESETS_BY_IDS = mapOf(
     R.id.yearStakingPeriod to RewardPeriodType.Preset.YEAR,
 )
 
-
 data class CustomPeriod(
     val start: Long? = null,
     val end: Long? = null,
