@@ -14,7 +14,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "GOVERNANCE_DAPPS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/governance/v2/dapps_dev.json\""
+        buildConfigField "String", "GOVERNANCE_DAPPS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/governance/v2/dapps_dev.json\""
 
         buildConfigField "String", "DELEGATION_TUTORIAL_URL", "\"https://docs.novawallet.io/nova-wallet-wiki/governance/add-delegate-information\""
     }
@@ -24,7 +24,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            buildConfigField "String", "GOVERNANCE_DAPPS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/governance/v2/dapps.json\""
+            buildConfigField "String", "GOVERNANCE_DAPPS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/governance/v2/dapps.json\""
         }
     }
 

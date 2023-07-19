@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_assets.data.buyToken.ExternalProvider
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 private const val RAMP_APP_NAME = "Nova Wallet"
-private const val RAMP_APP_LOGO = "https://raw.githubusercontent.com/nova-wallet/branding/master/logos/Nova_Wallet_Horizontal_On_White_200px.png"
+private const val RAMP_APP_LOGO = "https://raw.githubusercontent.com/novasamatech/branding/master/logos/Nova_Wallet_Horizontal_On_White_200px.png"
 
 class RampProvider(
     private val host: String,
