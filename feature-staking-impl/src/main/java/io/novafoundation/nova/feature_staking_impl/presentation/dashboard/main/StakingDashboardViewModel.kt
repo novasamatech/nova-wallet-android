@@ -71,15 +71,19 @@ class StakingDashboardViewModel(
         val withoutStakeItem = withoutStakeItems.getOrNull(index) ?: return@launch
         val noStakeItemState = withoutStakeItem.stakingState as? NoStake ?: return@launch
 
-        when (val flowType = noStakeItemState.flowType) {
-            is NoStake.FlowType.Aggregated -> {} // TODO feature aggregated flows & nomination pools
+        val stakingType = when (val flowType = noStakeItemState.flowType) {
+            is NoStake.FlowType.Aggregated -> flowType.stakingTypes.first() // TODO handle aggregated flows
 
-            is NoStake.FlowType.Single -> openChainStaking(
-                chain = withoutStakeItem.chain,
-                chainAsset = withoutStakeItem.token.configuration,
-                stakingType = flowType.stakingType
-            )
+            is NoStake.FlowType.Single -> flowType.stakingType
         }
+
+        stakingSharedState.setSelectedOption(
+            chain = withoutStakeItem.chain,
+            chainAsset = withoutStakeItem.token.configuration,
+            stakingType = stakingType
+        )
+
+        router.openStartStakingFlow()
     }
 
     fun onMoreOptionsClicked() {
@@ -152,7 +156,6 @@ class StakingDashboardViewModel(
             stakingType = stakingType
         )
 
-        // TODO: open staking main fragment if we already have staking in chain
-        router.openStartStakingFlow()
+        router.openChainStakingMain()
     }
 }

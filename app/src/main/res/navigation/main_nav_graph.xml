@@ -339,7 +339,7 @@
 
         <action
             android:id="@+id/action_mainFragment_to_startStackingLanding"
-            app:destination="@id/startStakingLandingFragment"
+            app:destination="@id/start_staking_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -365,15 +365,7 @@
 
     </fragment>
 
-    <fragment
-        android:id="@+id/startStakingLandingFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.landing.StartStakingLandingFragment"
-        android:label="StartStakingLandingFragment"
-        tools:layout="@layout/fragment_start_staking_landing">
-
-        <!--TODO: Start staking flow here-->
-
-    </fragment>
+    <include app:graph="@navigation/start_staking_nav_graph" />
 
     <dialog
         android:id="@+id/switchWalletFragment"
