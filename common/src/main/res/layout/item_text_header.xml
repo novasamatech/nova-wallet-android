@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="16dp"
-    android:textColor="@color/text_secondary"
+    android:textColor="@color/text_tertiary"
     tools:background="@color/secondary_screen_background"
     tools:text="@tools:sample/lorem[2]">
 

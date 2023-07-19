@@ -43,6 +43,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.con
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.di.SelectBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.di.ConfirmSetControllerComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.set.di.SetControllerComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.landing.di.StartStakingLandingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.StakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.di.ConfirmRebondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.custom.di.CustomRebondComponent
@@ -97,6 +98,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun startChangeValidatorsComponentFactory(): StartChangeValidatorsComponent.Factory
 
     fun recommendedValidatorsComponentFactory(): RecommendedValidatorsComponent.Factory
+
+    fun startStakingLandingComponentFactory(): StartStakingLandingComponent.Factory
 
     fun stakingComponentFactory(): StakingComponent.Factory
 

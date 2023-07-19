@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_account_impl
 import androidx.biometric.BiometricConstants
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
-import io.novafoundation.nova.common.sequrity.BiometricResponse
-import io.novafoundation.nova.common.sequrity.BiometricService
+import io.novafoundation.nova.common.sequrity.biometry.BiometricResponse
+import io.novafoundation.nova.common.sequrity.biometry.BiometricService
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.common.sequrity.biometry.BiometricPromptFactory

@@ -34,11 +34,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:advertisementCardBackground="@drawable/ic_banner_grey_gradient"
-                app:image="@drawable/shield"
                 app:learnMore="@string/common_find_out_more"
-                app:subtitle="@string/staking_set_controller_subtitle"
-                app:title="@string/staking_set_controller_title" />
+                tools:advertisementCardBackground="@drawable/ic_banner_grey_gradient"
+                tools:image="@drawable/shield"
+                tools:subtitle="@string/staking_set_controller_subtitle"
+                tools:title="@string/staking_set_controller_title" />
 
             <io.novafoundation.nova.common.view.AlertView
                 android:id="@+id/setControllerSwitchToStashWarning"
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/staking_stash_can_hint_v2_2_0"
-                android:textColor="@color/text_secondary" />
+                android:textColor="@color/text_tertiary" />
 
             <io.novafoundation.nova.feature_account_api.view.AccountView
                 android:id="@+id/setControllerStash"
@@ -85,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/staking_controller_can_hint_v2_2_0"
-                android:textColor="@color/text_secondary" />
+                android:textColor="@color/text_tertiary" />
 
             <io.novafoundation.nova.feature_account_api.view.AccountView
                 android:id="@+id/setControllerController"

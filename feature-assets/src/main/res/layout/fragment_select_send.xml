@@ -79,7 +79,7 @@
             android:layout_marginBottom="4dp"
             android:includeFontPadding="false"
             android:text="@string/wallet_recipient"
-            android:textColor="@color/text_secondary" />
+            android:textColor="@color/text_tertiary" />
 
         <LinearLayout
             android:id="@+id/selectWallet"

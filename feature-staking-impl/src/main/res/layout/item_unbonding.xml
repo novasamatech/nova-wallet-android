@@ -30,11 +30,11 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         tools:drawableEnd="@drawable/ic_time_16"
         tools:drawablePadding="4dp"
         tools:drawableTint="@color/icon_secondary"
         tools:text="4 days left"
-        tools:textColor="@color/text_secondary" />
+        tools:textColor="@color/text_tertiary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

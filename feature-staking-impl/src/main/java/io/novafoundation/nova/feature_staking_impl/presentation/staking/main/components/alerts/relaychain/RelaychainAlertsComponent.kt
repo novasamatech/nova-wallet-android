@@ -143,7 +143,7 @@ private class RelaychainAlertsComponent(
     }
 
     private fun formatAlertTokenAmount(amount: BigDecimal, token: Token, roundingMode: RoundingMode): String {
-        val formattedFiat = token.priceOf(amount).formatAsCurrency(token.currency)
+        val formattedFiat = token.amountToFiat(amount).formatAsCurrency(token.currency)
         val formattedAmount = amount.formatTokenAmount(token.configuration, roundingMode)
 
         return buildString {

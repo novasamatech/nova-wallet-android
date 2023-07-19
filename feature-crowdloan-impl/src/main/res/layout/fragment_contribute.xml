@@ -65,7 +65,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:includeFontPadding="false"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="@color/text_tertiary"
                     tools:text="Your KSM tokens will be returned after the leasing period." />
             </LinearLayout>
 

@@ -82,7 +82,7 @@ class MoreStakingOptionsViewModel(
             stakingType = stakingType
         )
 
-        router.openChainStakingMain()
+        router.openStartStakingFlow()
     }
 
     fun goBack() {

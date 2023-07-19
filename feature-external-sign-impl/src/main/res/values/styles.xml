@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="GoNextTransactionDetailsTextAppearance">
-        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textColor">@color/text_tertiary</item>
     </style>
 </resources>

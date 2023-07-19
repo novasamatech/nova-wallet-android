@@ -3,7 +3,7 @@ package io.novafoundation.nova.core_db.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-val AddStakingDashboardItems_40_41 = object : Migration(40, 41) {
+val AddStakingDashboardItems_41_42 = object : Migration(41, 42) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(

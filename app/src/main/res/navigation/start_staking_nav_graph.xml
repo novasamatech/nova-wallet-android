@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/startStakingLandingFragment"
+    android:id="@+id/start_staking_nav_graph">
+
+    <fragment
+        android:id="@+id/startStakingLandingFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.landing.StartStakingLandingFragment"
+        android:label="StartStakingLandingFragment"
+        tools:layout="@layout/fragment_start_staking_landing">
+
+        <!--TODO: Start staking flow here-->
+
+    </fragment>
+
+</navigation>

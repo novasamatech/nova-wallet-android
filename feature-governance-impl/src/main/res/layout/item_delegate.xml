@@ -265,7 +265,7 @@
                     style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/text_secondary" />
+                    android:textColor="@color/text_tertiary" />
 
             </LinearLayout>
 

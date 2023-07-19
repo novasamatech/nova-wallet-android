@@ -36,7 +36,7 @@
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_icon_container_on_color"
                 android:padding="11dp"
-                app:tint="@color/text_secondary" />
+                app:tint="@color/text_tertiary" />
 
             <TextView
                 android:id="@+id/extrinsicDetailAmount"
@@ -46,6 +46,16 @@
                 android:layout_marginTop="16dp"
                 android:textColor="@color/text_primary"
                 tools:text="−0.00481 KSM" />
+
+            <TextView
+                android:id="@+id/extrinsicDetailAmountFiat"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="4dp"
+                android:textColor="@color/text_tertiary"
+                tools:text="$149.36" />
 
             <TextView
                 android:id="@+id/extrinsicDetailStatus"

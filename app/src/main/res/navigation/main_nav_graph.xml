@@ -337,6 +337,14 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
+        <action
+            android:id="@+id/action_mainFragment_to_startStackingLanding"
+            app:destination="@id/start_staking_nav_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
     </fragment>
 
     <fragment
@@ -356,6 +364,8 @@
             app:popUpToInclusive="true" />
 
     </fragment>
+
+    <include app:graph="@navigation/start_staking_nav_graph" />
 
     <dialog
         android:id="@+id/switchWalletFragment"

@@ -21,6 +21,7 @@ import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
+import io.novafoundation.nova.core_db.dao.CoinPriceDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.core_db.dao.CurrencyDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
@@ -59,7 +60,7 @@ import io.novafoundation.nova.core_db.migrations.AddNodeSelectionStrategyField_3
 import io.novafoundation.nova.core_db.migrations.AddRuntimeFlagToChains_36_37
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AddSourceToLocalAsset_28_29
-import io.novafoundation.nova.core_db.migrations.AddStakingDashboardItems_40_41
+import io.novafoundation.nova.core_db.migrations.AddStakingDashboardItems_41_42
 import io.novafoundation.nova.core_db.migrations.AddTransferApisTable_29_30
 import io.novafoundation.nova.core_db.migrations.AddVersioningToGovernanceDapps_32_33
 import io.novafoundation.nova.core_db.migrations.AddWalletConnectSessions_39_40
@@ -77,12 +78,14 @@ import io.novafoundation.nova.core_db.migrations.NullableSubstrateAccountId_21_2
 import io.novafoundation.nova.core_db.migrations.NullableSubstratePublicKey_15_16
 import io.novafoundation.nova.core_db.migrations.RemoveChainForeignKeyFromChainAccount_11_12
 import io.novafoundation.nova.core_db.migrations.RemoveColorFromChains_17_18
+import io.novafoundation.nova.core_db.migrations.TransferFiatAmount_40_41
 import io.novafoundation.nova.core_db.migrations.WatchOnlyChainAccounts_16_17
 import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.core_db.model.AssetLocal
 import io.novafoundation.nova.core_db.model.BalanceLockLocal
 import io.novafoundation.nova.core_db.model.BrowserHostSettingsLocal
+import io.novafoundation.nova.core_db.model.CoinPriceLocal
 import io.novafoundation.nova.core_db.model.ContributionLocal
 import io.novafoundation.nova.core_db.model.CurrencyLocal
 import io.novafoundation.nova.core_db.model.DappAuthorizationLocal
@@ -108,7 +111,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 41,
+    version = 42,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -138,6 +141,7 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         BrowserHostSettingsLocal::class,
         WalletConnectSessionAccountLocal::class,
         StakingDashboardItemLocal::class,
+        CoinPriceLocal::class
     ],
 )
 @TypeConverters(
@@ -182,7 +186,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddGovernanceNetworkToExternalApi_33_34, AddBrowserHostSettings_34_35)
                     .addMigrations(ExtractExternalApiToSeparateTable_35_36, AddRuntimeFlagToChains_36_37)
                     .addMigrations(AddExtrinsicContentField_37_38, AddNodeSelectionStrategyField_38_39)
-                    .addMigrations(AddWalletConnectSessions_39_40, AddStakingDashboardItems_40_41)
+                    .addMigrations(AddWalletConnectSessions_39_40, TransferFiatAmount_40_41, AddStakingDashboardItems_41_42)
                     .build()
             }
             return instance!!
@@ -234,4 +238,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun walletConnectSessionsDao(): WalletConnectSessionsDao
 
     abstract fun stakingDashboardDao(): StakingDashboardDao
+
+    abstract fun coinPriceDao(): CoinPriceDao
 }

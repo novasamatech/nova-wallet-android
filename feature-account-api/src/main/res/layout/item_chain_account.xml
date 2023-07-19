@@ -53,7 +53,7 @@
         android:ellipsize="middle"
         android:includeFontPadding="false"
         android:singleLine="true"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/labeledTextAction"
         app:layout_constraintHorizontal_bias="0.0"

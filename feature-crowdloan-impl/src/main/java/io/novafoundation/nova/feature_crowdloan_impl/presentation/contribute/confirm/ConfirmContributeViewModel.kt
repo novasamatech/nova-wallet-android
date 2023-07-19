@@ -90,7 +90,7 @@ class ConfirmContributeViewModel(
         .share()
 
     val enteredFiatAmountFlow = assetFlow.map { asset ->
-        asset.token.priceOf(payload.amount).formatAsCurrency(asset.token.currency)
+        asset.token.amountToFiat(payload.amount).formatAsCurrency(asset.token.currency)
     }
         .inBackground()
         .share()

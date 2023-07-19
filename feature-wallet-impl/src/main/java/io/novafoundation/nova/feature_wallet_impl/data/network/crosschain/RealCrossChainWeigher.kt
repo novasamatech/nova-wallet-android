@@ -117,7 +117,7 @@ class RealCrossChainWeigher(
     private fun CrossChainTransferConfiguration.buyExecution(): XcmV2Instruction.BuyExecution {
         return XcmV2Instruction.BuyExecution(
             fees = sendingAssetAmountOf(Balance.ZERO),
-            weightLimit = WeightLimit.Limited(Weight.ZERO)
+            weightLimit = WeightLimit.Unlimited
         )
     }
 

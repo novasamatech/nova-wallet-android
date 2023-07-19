@@ -51,8 +51,8 @@ abstract class BalancesView @JvmOverloads constructor(
         val item = TableCellView(context).apply {
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
 
-            valueSecondary.setTextColorRes(R.color.text_secondary)
-            title.setTextColorRes(R.color.text_secondary)
+            valueSecondary.setTextColorRes(R.color.text_tertiary)
+            title.setTextColorRes(R.color.text_tertiary)
 
             setTitle(titleRes)
         }

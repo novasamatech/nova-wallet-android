@@ -33,7 +33,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:text="@string/account_create_details_v2_2_0"
-        android:textColor="@color/text_secondary" />
+        android:textColor="@color/text_tertiary" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/exportSeedContentContainer"
@@ -52,7 +52,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:text="@string/recovery_raw_seed"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/text_tertiary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -64,7 +64,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:text="@string/account_seed_hex_symbols"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/text_tertiary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -91,5 +91,5 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:text="@string/account_backup_secret_caption"
-        android:textColor="@color/text_secondary" />
+        android:textColor="@color/text_tertiary" />
 </LinearLayout>

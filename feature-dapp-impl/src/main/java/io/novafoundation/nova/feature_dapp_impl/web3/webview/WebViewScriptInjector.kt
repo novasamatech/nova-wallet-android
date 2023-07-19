@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
-import android.util.Base64
 import android.webkit.WebView
 import androidx.annotation.RawRes
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -54,32 +53,9 @@ class WebViewScriptInjector(
         scriptId: String,
         into: WebView,
     ) {
-        val encoded: String = Base64.encodeToString(js.encodeToByteArray(), Base64.NO_WRAP)
-        val method = InjectionPosition.START.addMethodName
-
-        val initializationCode = """
-            var parent = document.getElementsByTagName('body').item(0);
-            var prevScripts = parent.getElementsByClassName("$scriptId")
-            console.log("Injecting $scriptId")
-            if (prevScripts.length== 0) {
-                var script = document.createElement('script');                 
-                script.type = 'text/javascript';
-                script.innerHTML = window.atob('$encoded');
-                script.className = "$scriptId";
-                parent.$method(script);
-            }
-        """.trimIndent()
-
-        // some dApps (like Astar) breaks when the this code is executing directly. Anonymous function with self-invocation fixes this
         val wrappedScript = """
             (function() {
-                if (document !== undefined && document.readyState !== 'loading') {
-                    $initializationCode
-                } else {
-                    window.addEventListener("DOMContentLoaded", function(event) {
-                     $initializationCode
-                    });
-                }
+               $js
             })();
         """.trimIndent()
 

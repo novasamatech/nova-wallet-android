@@ -144,7 +144,7 @@ class RealReferendumFormatter(
 
                 ReferendumStatusModel(
                     name = resourceManager.getString(titleRes),
-                    colorRes = R.color.text_secondary
+                    colorRes = R.color.text_tertiary
                 )
             }
             is ReferendumStatus.Ongoing.InQueue -> ReferendumStatusModel(
@@ -153,7 +153,7 @@ class RealReferendumFormatter(
                     status.position.index,
                     status.position.maxSize
                 ),
-                colorRes = R.color.text_secondary
+                colorRes = R.color.text_tertiary
             )
             is ReferendumStatus.Ongoing.Rejecting -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_not_passing),
@@ -177,11 +177,11 @@ class RealReferendumFormatter(
             )
             ReferendumStatus.NotExecuted.Cancelled -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_cancelled),
-                colorRes = R.color.text_secondary
+                colorRes = R.color.text_tertiary
             )
             ReferendumStatus.NotExecuted.TimedOut -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_timeout),
-                colorRes = R.color.text_secondary
+                colorRes = R.color.text_tertiary
             )
             ReferendumStatus.NotExecuted.Killed -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_killed),
@@ -348,7 +348,7 @@ class RealReferendumFormatter(
 
     private fun ReferendumTimeEstimation.TextStyle.Companion.regular() = ReferendumTimeEstimation.TextStyle(
         iconRes = R.drawable.ic_time_16,
-        textColorRes = R.color.text_secondary,
+        textColorRes = R.color.text_tertiary,
         iconColorRes = R.color.icon_secondary,
     )
 
@@ -409,7 +409,7 @@ class RealReferendumFormatter(
         return when (voteDirection) {
             VoteType.AYE -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_aye), R.color.text_positive)
             VoteType.NAY -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_nay), R.color.text_negative)
-            VoteType.ABSTAIN -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_abstain), R.color.text_secondary)
+            VoteType.ABSTAIN -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_abstain), R.color.text_tertiary)
         }
     }
 }

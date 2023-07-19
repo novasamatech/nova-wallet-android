@@ -116,7 +116,7 @@
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.Caption1.Secondary">
-        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textColor">@color/text_tertiary</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.Caption2">
@@ -124,7 +124,11 @@
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.Caption2.Secondary">
-        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textColor">@color/text_tertiary</item>
+    </style>
+
+    <style name="TextAppearance.NovaFoundation.Regular.Callout">
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.Caps" parent="TextAppearance.NovaFoundation.Regular">
@@ -151,7 +155,7 @@
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.Footnote.Secondary">
-        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textColor">@color/text_tertiary</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.SubHeadline">
@@ -163,7 +167,7 @@
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.SubHeadline.Secondary">
-        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textColor">@color/text_tertiary</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.Title3" parent="TextAppearance.NovaFoundation.Regular">
@@ -397,6 +401,11 @@
         <item name="android:textColor">@color/tab_item_text_color</item>
         <item name="android:textAppearance">@style/TextAppearance.NovaFoundation.Regular.Footnote
         </item>
+    </style>
+
+    <style name="Widget.Nova.WalletWithAddress" parent="">
+        <item name="labelStyle">@style/TextAppearance.NovaFoundation.Regular.SubHeadline.Primary</item>
+        <item name="messageStyle">@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary</item>
     </style>
 
     <!-- Buttons -->

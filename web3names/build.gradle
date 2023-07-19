@@ -46,6 +46,8 @@ dependencies {
 
     implementation multibaseDep
 
+    implementation canonizationJsonDep
+
     testImplementation project(':test-shared')
 
     androidTestImplementation androidTestRunnerDep

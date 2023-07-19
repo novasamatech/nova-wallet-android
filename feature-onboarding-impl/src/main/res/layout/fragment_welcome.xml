@@ -96,7 +96,7 @@
         android:layout_marginBottom="24dp"
         android:gravity="center"
         android:text="@string/onboarding_terms_and_conditions_1_v2_2_0"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         android:textColorLink="@color/text_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

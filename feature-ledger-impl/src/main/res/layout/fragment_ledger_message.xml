@@ -41,7 +41,7 @@
         android:layout_marginBottom="40dp"
         android:gravity="center_horizontal"
         android:minLines="2"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         tools:text="Press both buttons on your Nano X E426 to verify address" />
 
     <TextView
