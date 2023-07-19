@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.FileProviderImpl
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
-import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1Impl
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
@@ -49,6 +48,7 @@ import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
@@ -72,7 +72,7 @@ const val SHARED_PREFERENCES_FILE = "fearless_prefs"
 @Retention(AnnotationRetention.BINARY)
 annotation class Caching
 
-@Module
+@Module(includes = [ParallaxCardModule::class])
 class CommonModule {
 
     @Provides
@@ -203,12 +203,6 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun provideDefaultPagedKeysRetriever(): BulkRetriever {
-        return BulkRetriever()
-    }
-
-    @Provides
-    @ApplicationScope
     fun provideValidationExecutor(): ValidationExecutor {
         return ValidationExecutor()
     }
@@ -298,4 +292,8 @@ class CommonModule {
         preferences: Preferences,
         twoFactorVerificationExecutor: TwoFactorVerificationExecutor
     ): TwoFactorVerificationService = RealTwoFactorVerificationService(preferences, twoFactorVerificationExecutor)
+
+    @Provides
+    @ApplicationScope
+    fun provideRootScope() = RootScope()
 }

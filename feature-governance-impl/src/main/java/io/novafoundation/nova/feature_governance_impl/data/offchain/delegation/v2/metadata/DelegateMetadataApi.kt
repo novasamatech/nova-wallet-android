@@ -8,7 +8,7 @@ import retrofit2.http.Path
 interface DelegateMetadataApi {
 
     companion object {
-        const val BASE_URL = "https://raw.githubusercontent.com/nova-wallet/opengov-delegate-registry/master/registry/"
+        const val BASE_URL = "https://raw.githubusercontent.com/novasamatech/opengov-delegate-registry/master/registry/"
     }
 
     @GET("{fileName}")

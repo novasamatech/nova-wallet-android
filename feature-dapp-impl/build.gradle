@@ -14,7 +14,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/dapps/dapps_dev.json\""
+        buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/dapps/dapps_dev.json\""
     }
 
     buildTypes {
@@ -22,7 +22,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/dapps/dapps_full.json\""
+            buildConfigField "String", "DAPP_METADATAS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/dapps/dapps_full.json\""
         }
     }
 

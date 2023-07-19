@@ -7,11 +7,11 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
-import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
+import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
@@ -45,6 +45,8 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.St
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSourceImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.SubqueryStakingRewardsDataSource
+import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
+import io.novafoundation.nova.feature_staking_impl.di.staking.PayoutsBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
@@ -86,6 +88,9 @@ import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
+
+const val PAYOUTS_BULK_RETRIEVER_PAGE_SIZE = 500
+const val DEFAULT_BULK_RETRIEVER_PAGE_SIZE = 1000
 
 @Module(includes = [AssetUseCaseModule::class])
 class StakingFeatureModule {
@@ -358,10 +363,24 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
+    @DefaultBulkRetriever
+    fun provideDefaultBulkRetriever(): BulkRetriever {
+        return BulkRetriever(DEFAULT_BULK_RETRIEVER_PAGE_SIZE)
+    }
+
+    @Provides
+    @FeatureScope
+    @PayoutsBulkRetriever
+    fun providePayoutBulkRetriever(): BulkRetriever {
+        return BulkRetriever(PAYOUTS_BULK_RETRIEVER_PAGE_SIZE)
+    }
+
+    @Provides
+    @FeatureScope
     fun providePayoutRepository(
         stakingRepository: StakingRepository,
         validatorSetFetcher: SubQueryValidatorSetFetcher,
-        bulkRetriever: BulkRetriever,
+        @PayoutsBulkRetriever bulkRetriever: BulkRetriever,
         storageCache: StorageCache,
         chainRegistry: ChainRegistry,
     ): PayoutRepository {
@@ -457,8 +476,8 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun provideStakingRewardPeriodDataSource(
-        preferences: Preferences
-    ): StakingRewardPeriodDataSource = RealStakingRewardPeriodDataSource(preferences)
+        stakingRewardPeriodDao: StakingRewardPeriodDao
+    ): StakingRewardPeriodDataSource = RealStakingRewardPeriodDataSource(stakingRewardPeriodDao)
 
     @Provides
     @FeatureScope
@@ -470,8 +489,11 @@ class StakingFeatureModule {
     @FeatureScope
     fun provideStakingRewardInteractor(
         stakingPeriodRepository: StakingPeriodRepository,
-        stakingRewardsRepository: StakingRewardsRepository
-    ): StakingRewardPeriodInteractor = RealStakingRewardPeriodInteractor(stakingPeriodRepository, stakingRewardsRepository)
+        accountRepository: AccountRepository
+    ): StakingRewardPeriodInteractor = RealStakingRewardPeriodInteractor(
+        stakingPeriodRepository,
+        accountRepository
+    )
 
     @Provides
     @FeatureScope

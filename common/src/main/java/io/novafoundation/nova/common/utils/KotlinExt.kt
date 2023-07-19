@@ -13,6 +13,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
 import java.util.Collections
+import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
@@ -82,9 +83,9 @@ fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = M
     return toBigDecimal().divide(divisor.toBigDecimal(), mathContext)
 }
 
-fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
+fun BigInteger.atLeastZero() = coerceAtLeast(BigInteger.ZERO)
 
-fun Number.daysToMillis() = TimeUnit.DAYS.toMillis(this.toLong())
+fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
 inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fold(BigInteger.ZERO) { acc, element ->
     acc + extractor(element)
@@ -335,3 +336,11 @@ inline fun CoroutineScope.withChildScope(action: CoroutineScope.() -> Unit) {
 }
 
 fun <T> List<T>.associateWithIndex() = withIndex().associateBy(keySelector = { it.value }, valueTransform = { it.index })
+
+fun Date.atTheBeginningOfTheDay(): Date {
+    return Date(time).apply {
+        hours = 0
+        minutes = 0
+        seconds = 0
+    }
+}

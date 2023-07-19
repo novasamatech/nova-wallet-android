@@ -1,63 +1,82 @@
 package io.novafoundation.nova.feature_staking_impl.domain.period
 
-import io.novafoundation.nova.common.utils.daysToMillis
+import io.novafoundation.nova.common.utils.atTheBeginningOfTheDay
 import java.util.Date
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.milliseconds
 
 sealed interface RewardPeriod {
+
     val type: RewardPeriodType
+
     val start: Date?
+
     val end: Date?
 
     data class OffsetFromCurrent(
-        val offsetMillis: Long,
-        override val type: RewardPeriodType
+        val offset: Duration,
+        override val type: RewardPeriodType.Preset
     ) : RewardPeriod {
-        override val start: Date? = null
+
+        override val start: Date
+            get() = Date(System.currentTimeMillis() - offset.inWholeMilliseconds).atTheBeginningOfTheDay()
+
         override val end: Date? = null
     }
 
     data class CustomRange(override val start: Date, override val end: Date?) : RewardPeriod {
-        override val type = RewardPeriodType.CUSTOM
+        override val type = RewardPeriodType.Custom
     }
 
     object AllTime : RewardPeriod {
-        override val type = RewardPeriodType.ALL_TIME
+        override val type = RewardPeriodType.AllTime
+
         override val start: Date? = null
         override val end: Date? = null
     }
 
     companion object {
-        fun getOffsetByType(type: RewardPeriodType): Long {
-            return when (type) {
-                RewardPeriodType.WEEK -> 7.daysToMillis()
-                RewardPeriodType.MONTH -> 30.daysToMillis()
-                RewardPeriodType.QUARTER -> 90.daysToMillis()
-                RewardPeriodType.HALF_YEAR -> 180.daysToMillis()
-                RewardPeriodType.YEAR -> 365.daysToMillis()
-                else -> -1
+        fun getPresetOffset(type: RewardPeriodType.Preset): Duration {
+            val numberOfDays = when (type) {
+                RewardPeriodType.Preset.WEEK -> 7
+                RewardPeriodType.Preset.MONTH -> 30
+                RewardPeriodType.Preset.QUARTER -> 90
+                RewardPeriodType.Preset.HALF_YEAR -> 180
+                RewardPeriodType.Preset.YEAR -> 365
             }
+
+            return numberOfDays.days
         }
     }
 }
 
-enum class RewardPeriodType {
-    ALL_TIME,
-    WEEK,
-    MONTH,
-    QUARTER,
-    HALF_YEAR,
-    YEAR,
-    CUSTOM
+sealed interface RewardPeriodType {
+
+    object AllTime : RewardPeriodType
+
+    enum class Preset : RewardPeriodType {
+        WEEK,
+        MONTH,
+        QUARTER,
+        HALF_YEAR,
+        YEAR
+    }
+
+    object Custom : RewardPeriodType
 }
 
 fun RewardPeriod.getPeriodDays(): Long {
     return when (this) {
-        is RewardPeriod.OffsetFromCurrent -> TimeUnit.MILLISECONDS.toDays(offsetMillis)
+        is RewardPeriod.OffsetFromCurrent -> offset.inWholeDays
+
         is RewardPeriod.CustomRange -> {
             val endTime = end ?: Date()
-            TimeUnit.MILLISECONDS.toDays(endTime.time - start.time)
+            val durationMillis = endTime.time - start.time
+
+            durationMillis.milliseconds.inWholeDays
         }
+
         else -> -1
     }
 }

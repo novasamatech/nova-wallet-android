@@ -7,31 +7,40 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
-import io.novafoundation.nova.common.utils.reversed
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriodType
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import java.util.Date
-import java.util.concurrent.TimeUnit
+import io.novafoundation.nova.runtime.state.chain
+import io.novafoundation.nova.runtime.state.chainAsset
+import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.util.Date
+import java.util.concurrent.TimeUnit
 
 private val PERIOD_TYPES_TO_IDS = mapOf(
-    RewardPeriodType.ALL_TIME to R.id.allTimeStakingPeriod,
-    RewardPeriodType.WEEK to R.id.weekStakingPeriod,
-    RewardPeriodType.MONTH to R.id.monthStakingPeriod,
-    RewardPeriodType.QUARTER to R.id.quarterStakingPeriod,
-    RewardPeriodType.HALF_YEAR to R.id.halfYearStakingPeriod,
-    RewardPeriodType.YEAR to R.id.yearStakingPeriod,
-    RewardPeriodType.CUSTOM to R.id.customStakingPeriod
+    RewardPeriodType.AllTime to R.id.allTimeStakingPeriod,
+    RewardPeriodType.Preset.WEEK to R.id.weekStakingPeriod,
+    RewardPeriodType.Preset.MONTH to R.id.monthStakingPeriod,
+    RewardPeriodType.Preset.QUARTER to R.id.quarterStakingPeriod,
+    RewardPeriodType.Preset.HALF_YEAR to R.id.halfYearStakingPeriod,
+    RewardPeriodType.Preset.YEAR to R.id.yearStakingPeriod,
+    RewardPeriodType.Custom to R.id.customStakingPeriod
 )
 
-private val IDS_TO_PERIOD_TYPES = PERIOD_TYPES_TO_IDS.reversed()
+private val PRESETS_BY_IDS = mapOf(
+    R.id.weekStakingPeriod to RewardPeriodType.Preset.WEEK,
+    R.id.monthStakingPeriod to RewardPeriodType.Preset.MONTH,
+    R.id.quarterStakingPeriod to RewardPeriodType.Preset.QUARTER,
+    R.id.halfYearStakingPeriod to RewardPeriodType.Preset.HALF_YEAR,
+    R.id.yearStakingPeriod to RewardPeriodType.Preset.YEAR,
+)
 
 data class CustomPeriod(
     val start: Long? = null,
@@ -47,6 +56,7 @@ class DateRangeWithCurrent(
 
 class StakingPeriodViewModel(
     private val stakingRewardPeriodInteractor: StakingRewardPeriodInteractor,
+    private val stakingSharedState: StakingSharedState,
     private val resourceManager: ResourceManager,
     private val router: StakingRouter
 ) : BaseViewModel() {
@@ -78,14 +88,14 @@ class StakingPeriodViewModel(
 
     val saveButtonEnabledState: Flow<Boolean> = combine(selectedPeriod, _customPeriod) { id, customPeriod ->
         val selectedPeriod = mapSelectedPeriod(id, customPeriod)
-        val currentPeriod = stakingRewardPeriodInteractor.getRewardPeriod()
+        val currentPeriod = getSelectedRewardPeriod()
         selectedPeriod != null && selectedPeriod != currentPeriod
     }
         .shareInBackground()
 
     init {
         launch {
-            val rewardPeriod = stakingRewardPeriodInteractor.getRewardPeriod()
+            val rewardPeriod = getSelectedRewardPeriod()
 
             if (rewardPeriod is RewardPeriod.CustomRange) {
                 _customPeriod.value = mapCustomPeriodFromEntity(rewardPeriod)
@@ -95,10 +105,20 @@ class StakingPeriodViewModel(
         }
     }
 
+    private suspend fun getSelectedRewardPeriod(): RewardPeriod {
+        val chain = stakingSharedState.chain()
+        val chainAsset = stakingSharedState.chainAsset()
+        val stakingType = stakingSharedState.selectedOption().additional.stakingType
+        return stakingRewardPeriodInteractor.getRewardPeriod(chain, chainAsset, stakingType)
+    }
+
     fun onSaveClick() {
         launch {
+            val chain = stakingSharedState.chain()
+            val chainAsset = stakingSharedState.chainAsset()
+            val stakingType = stakingSharedState.selectedOption().additional.stakingType
             val result = mapSelectedPeriod(selectedPeriod.value, _customPeriod.value)
-            result?.let { stakingRewardPeriodInteractor.setRewardPeriod(it) }
+            result?.let { stakingRewardPeriodInteractor.setRewardPeriod(chain, chainAsset, stakingType, it) }
             router.back()
         }
     }
@@ -143,9 +163,9 @@ class StakingPeriodViewModel(
         return when {
             periodId == R.id.allTimeStakingPeriod -> RewardPeriod.AllTime
             periodId == R.id.customStakingPeriod -> mapCustomPeriodToEntity(customPeriod)
-            IDS_TO_PERIOD_TYPES.containsKey(periodId) -> {
-                val type = IDS_TO_PERIOD_TYPES.getValue(periodId)
-                RewardPeriod.OffsetFromCurrent(RewardPeriod.getOffsetByType(type), type)
+            PRESETS_BY_IDS.containsKey(periodId) -> {
+                val type = PRESETS_BY_IDS.getValue(periodId)
+                RewardPeriod.OffsetFromCurrent(RewardPeriod.getPresetOffset(type), type)
             }
             else -> null
         }

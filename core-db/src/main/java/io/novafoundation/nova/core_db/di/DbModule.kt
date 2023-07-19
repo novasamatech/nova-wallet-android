@@ -24,6 +24,7 @@ import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.PhishingSitesDao
+import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingDashboardDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
@@ -183,5 +184,11 @@ class DbModule {
     @ApplicationScope
     fun provideCoinPriceDao(appDatabase: AppDatabase): CoinPriceDao {
         return appDatabase.coinPriceDao()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideStakingRewardPeriodDao(appDatabase: AppDatabase): StakingRewardPeriodDao {
+        return appDatabase.stakingRewardPeriodDao()
     }
 }
