@@ -4,8 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.core_db.model.StakingDashboardAccountsView
+import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -30,7 +30,7 @@ interface StakingDashboardDao {
     @Query("SELECT * FROM staking_dashboard_items WHERE metaId = :metaId")
     fun dashboardItemsFlow(metaId: Long): Flow<List<StakingDashboardItemLocal>>
 
-    @Query("SELECT chainId, chainAssetId, stakingType, stakeStatusAccount from staking_dashboard_items WHERE metaId = :metaId")
+    @Query("SELECT chainId, chainAssetId, stakingType, stakeStatusAccount, rewardsAccount from staking_dashboard_items WHERE metaId = :metaId")
     fun stakingAccountsViewFlow(metaId: Long): Flow<List<StakingDashboardAccountsView>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
