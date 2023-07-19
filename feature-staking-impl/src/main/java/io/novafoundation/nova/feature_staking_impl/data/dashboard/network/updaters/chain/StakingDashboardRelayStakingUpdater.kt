@@ -114,7 +114,8 @@ class StakingDashboardRelayStakingUpdater(
                 status = secondaryInfo?.status ?: fromCache?.status,
                 rewards = secondaryInfo?.rewards ?: fromCache?.rewards,
                 estimatedEarnings = secondaryInfo?.estimatedEarnings ?: fromCache?.estimatedEarnings,
-                primaryStakingAccountId = relaychainStakingBaseInfo.stakingLedger.stashId,
+                stakeStatusAccount = relaychainStakingBaseInfo.stakingLedger.stashId,
+                rewardsAccount = relaychainStakingBaseInfo.stakingLedger.stashId,
             )
         } else {
             StakingDashboardItemLocal.notStaking(

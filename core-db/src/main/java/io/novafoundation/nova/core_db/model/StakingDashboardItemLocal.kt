@@ -43,7 +43,8 @@ class StakingDashboardItemLocal(
     val status: Status?,
     val rewards: BigInteger?,
     val estimatedEarnings: Double?,
-    val primaryStakingAccountId: AccountId?,
+    val stakeStatusAccount: AccountId?,
+    val rewardsAccount: AccountId?,
 ) {
 
     companion object {
@@ -64,7 +65,8 @@ class StakingDashboardItemLocal(
             status = null,
             rewards = null,
             estimatedEarnings = estimatedEarnings,
-            primaryStakingAccountId = null
+            stakeStatusAccount = null,
+            rewardsAccount = null
         )
 
         fun staking(
@@ -72,7 +74,8 @@ class StakingDashboardItemLocal(
             chainAssetId: Int,
             stakingType: String,
             stake: BigInteger,
-            primaryStakingAccountId: AccountId,
+            stakeStatusAccount: AccountId,
+            rewardsAccount: AccountId,
             metaId: Long,
             status: Status?,
             rewards: BigInteger?,
@@ -87,7 +90,8 @@ class StakingDashboardItemLocal(
             status = status,
             rewards = rewards,
             estimatedEarnings = estimatedEarnings,
-            primaryStakingAccountId = primaryStakingAccountId
+            stakeStatusAccount = stakeStatusAccount,
+            rewardsAccount = rewardsAccount
         )
     }
 
@@ -96,9 +100,10 @@ class StakingDashboardItemLocal(
     }
 }
 
-class StakingDashboardPrimaryAccountView(
+class StakingDashboardAccountsView(
     val chainId: String,
     val chainAssetId: Int,
     val stakingType: String,
-    val primaryStakingAccountId: AccountId?
+    val stakeStatusAccount: AccountId?,
+    val rewardsAccount: AccountId?
 )

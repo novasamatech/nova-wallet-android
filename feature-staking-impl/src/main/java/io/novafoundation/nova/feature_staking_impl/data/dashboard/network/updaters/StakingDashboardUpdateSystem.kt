@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters
 
-import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.common.utils.inserted
@@ -16,8 +15,9 @@ import io.novafoundation.nova.feature_staking_api.data.dashboard.getSyncingStage
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.SyncingStage
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.common.stakingChains
-import io.novafoundation.nova.feature_staking_impl.data.dashboard.model.StakingDashboardPrimaryAccount
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.model.StakingDashboardOptionAccounts
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.StakingAccounts
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.StakingOptionAccounts
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.StakingStatsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterEvent
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.StakingDashboardUpdaterFactory
@@ -127,7 +127,7 @@ class RealStakingDashboardUpdateSystem(
             }
     }
 
-    private fun markSyncingSecondaryFor(changedPrimaryAccounts: List<Map.Entry<StakingOptionId, AccountIdKey?>>) {
+    private fun markSyncingSecondaryFor(changedPrimaryAccounts: List<Map.Entry<StakingOptionId, StakingOptionAccounts?>>) {
         val result = syncedItemsFlow.value.toMutableMap()
 
         changedPrimaryAccounts.forEach { (stakingOptionId, _) ->
@@ -150,15 +150,18 @@ class RealStakingDashboardUpdateSystem(
     private fun constructStakingAccounts(
         stakingOptionIds: Map<StakingOptionId, Chain>,
         metaAccount: MetaAccount,
-        knownPrimaryAccounts: List<StakingDashboardPrimaryAccount>
+        knownPrimaryAccounts: List<StakingDashboardOptionAccounts>
     ): StakingAccounts {
-        val knownPrimaryAccountsByOptionId = knownPrimaryAccounts.associateBy(StakingDashboardPrimaryAccount::stakingOptionId)
+        val knownStakingAccountsByOptionId = knownPrimaryAccounts.associateBy(StakingDashboardOptionAccounts::stakingOptionId)
 
         return stakingOptionIds.mapValues { (optionId, chain) ->
-            val accountId = knownPrimaryAccountsByOptionId[optionId]?.primaryStakingAccountId?.value
-                ?: metaAccount.accountIdIn(chain)
+            val knownPrimaryAccount = knownStakingAccountsByOptionId[optionId]
+            val default = metaAccount.accountIdIn(chain) ?: return@mapValues null
 
-            accountId?.intoKey()
+            val stakeStatusAccount = knownPrimaryAccount?.stakingStatusAccount?.value ?: default
+            val rewardsAccount =  knownPrimaryAccount?.rewardsAccount?.value ?: default
+
+            StakingOptionAccounts(rewardsAccount.intoKey(), stakeStatusAccount.intoKey())
         }
     }
 

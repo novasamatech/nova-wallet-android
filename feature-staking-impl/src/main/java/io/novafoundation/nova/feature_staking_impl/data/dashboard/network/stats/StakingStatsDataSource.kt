@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats
 
-import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.subquery.SubQueryNodes
 import io.novafoundation.nova.common.utils.asPerbill
 import io.novafoundation.nova.common.utils.atLeastZero
@@ -22,8 +21,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapStakingStrin
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-
-typealias StakingAccounts = Map<StakingOptionId, AccountIdKey?>
 
 interface StakingStatsDataSource {
 

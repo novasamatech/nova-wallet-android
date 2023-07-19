@@ -125,7 +125,8 @@ class StakingDashboardNominationPoolsUpdater(
                 status = secondaryInfo?.status ?: fromCache?.status,
                 rewards = secondaryInfo?.rewards ?: fromCache?.rewards,
                 estimatedEarnings = secondaryInfo?.estimatedEarnings ?: fromCache?.estimatedEarnings,
-                primaryStakingAccountId = relaychainStakingBaseInfo.poolAggregatedState.poolStash,
+                stakeStatusAccount = relaychainStakingBaseInfo.poolAggregatedState.poolStash,
+                rewardsAccount = relaychainStakingBaseInfo.poolMember.accountId
             )
         } else {
             StakingDashboardItemLocal.notStaking(
