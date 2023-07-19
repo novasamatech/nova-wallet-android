@@ -159,7 +159,7 @@ class RealStakingDashboardUpdateSystem(
             val default = metaAccount.accountIdIn(chain) ?: return@mapValues null
 
             val stakeStatusAccount = knownPrimaryAccount?.stakingStatusAccount?.value ?: default
-            val rewardsAccount =  knownPrimaryAccount?.rewardsAccount?.value ?: default
+            val rewardsAccount = knownPrimaryAccount?.rewardsAccount?.value ?: default
 
             StakingOptionAccounts(rewardsAccount.intoKey(), stakeStatusAccount.intoKey())
         }

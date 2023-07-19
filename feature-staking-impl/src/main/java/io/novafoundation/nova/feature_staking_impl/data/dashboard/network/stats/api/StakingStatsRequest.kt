@@ -110,7 +110,7 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
     }
 
     private fun SubQueryFilters.Companion.appendFiltersSpecificToParent(baseFilters: String, filterParent: FilterParent): String {
-        return when(filterParent) {
+        return when (filterParent) {
             FilterParent.REWARD -> baseFilters and hasRewardType("reward")
             FilterParent.SLASH -> baseFilters and hasRewardType("slash")
             FilterParent.STAKING_STATUS -> baseFilters
@@ -118,7 +118,7 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
     }
 
     private fun StakingOptionAccounts.accountIdFor(filterParent: FilterParent): AccountId {
-        val accountIdKey = when(filterParent) {
+        val accountIdKey = when (filterParent) {
             FilterParent.REWARD, FilterParent.SLASH -> rewards
             FilterParent.STAKING_STATUS -> stakingStatus
         }
