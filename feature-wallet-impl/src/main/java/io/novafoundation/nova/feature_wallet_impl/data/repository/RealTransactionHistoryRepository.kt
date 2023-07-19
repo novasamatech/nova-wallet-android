@@ -17,7 +17,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapOperationLocal
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapOperationToOperationLocalDb
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import jp.co.soramitsu.fearless_utils.hash.isPositive
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -119,18 +118,8 @@ class RealTransactionHistoryRepository(
         currency: Currency
     ): DataPage<Operation> {
         val nonFiltered = getOperations(pageSize, pageOffset, filters, accountId, chain, chainAsset, currency)
-        val filtered = nonFiltered.filter { it.isSafe() }
+        val filtered = nonFiltered.filter(::isOperationSafe)
 
         return DataPage(nonFiltered.nextOffset, items = filtered)
-    }
-
-    private fun Operation.isSafe(): Boolean {
-        val txType = type
-
-        return if (txType is Operation.Type.Transfer) {
-            txType.amount.isPositive()
-        } else {
-            true
-        }
     }
 }
