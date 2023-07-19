@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.formatting.TimerValue
-import io.novafoundation.nova.common.utils.mapList
+import io.novafoundation.nova.common.utils.mapListNotNull
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -139,12 +139,17 @@ class RealContributionsInteractor(
         val expectedBlockTime = chainStateRepository.expectedBlockTimeInMillis(chain.id)
 
         return contributionsRepository.observeContributions(metaAccount, chain, asset)
-            .mapList { contribution ->
+            .mapListNotNull { contribution ->
+                val parachainMetadata = parachainMetadatas[contribution.paraId]
+                val fundInfo = fundInfos[contribution.paraId]
+                    ?: fundInfos[parachainMetadata?.movedToParaId]
+                    ?: return@mapListNotNull null
+
                 ContributionWithMetadata(
                     contribution = contribution,
                     metadata = getMetadata(
-                        fundInfo = fundInfos.getValue(contribution.paraId),
-                        parachainMetadata = parachainMetadatas[contribution.paraId],
+                        fundInfo = fundInfo,
+                        parachainMetadata = parachainMetadata,
                         blocksPerLeasePeriod = blocksPerLeasePeriod,
                         currentBlockNumber = currentBlockNumber,
                         expectedBlockTime = expectedBlockTime

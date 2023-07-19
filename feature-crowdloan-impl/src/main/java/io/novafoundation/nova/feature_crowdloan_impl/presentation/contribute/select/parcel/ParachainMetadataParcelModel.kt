@@ -4,9 +4,12 @@ import android.os.Parcelable
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import kotlinx.android.parcel.Parcelize
 import java.math.BigDecimal
+import java.math.BigInteger
 
 @Parcelize
 class ParachainMetadataParcelModel(
+    val paraId: BigInteger,
+    val movedToParaId: BigInteger?,
     val iconLink: String,
     val name: String,
     val description: String,
@@ -21,6 +24,8 @@ fun mapParachainMetadataToParcel(
     parachainMetadata: ParachainMetadata,
 ) = with(parachainMetadata) {
     ParachainMetadataParcelModel(
+        paraId = paraId,
+        movedToParaId = movedToParaId,
         iconLink = iconLink,
         name = name,
         description = description,
@@ -36,6 +41,8 @@ fun mapParachainMetadataFromParcel(
     parcelModel: ParachainMetadataParcelModel,
 ) = with(parcelModel) {
     ParachainMetadata(
+        paraId = paraId,
+        movedToParaId = movedToParaId,
         iconLink = iconLink,
         name = name,
         description = description,

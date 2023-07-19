@@ -15,9 +15,10 @@ class WalletConnectSessionsViewModel(
     private val interactor: WalletConnectSessionInteractor,
     private val walletUiUseCase: WalletUiUseCase,
     private val walletConnectSessionMapper: WalletConnectSessionMapper,
+    private val walletConnectSessionsPayload: WalletConnectSessionsPayload
 ) : BaseViewModel() {
 
-    val sessionsFlow = interactor.activeSessionsFlow()
+    val sessionsFlow = interactor.activeSessionsFlow(walletConnectSessionsPayload.metaId)
         .mapList(::mapSessionToUi)
         .shareInBackground()
 

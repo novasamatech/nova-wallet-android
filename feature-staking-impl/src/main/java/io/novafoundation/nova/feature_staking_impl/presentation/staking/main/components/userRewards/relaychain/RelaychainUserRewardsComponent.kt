@@ -58,7 +58,11 @@ private class RelaychainUserRewardsComponent(
         scope = hostContext.scope
     )
 
-    private val rewardPeriodState = rewardPeriodsInteractor.observeRewardPeriod()
+    private val rewardPeriodState = rewardPeriodsInteractor.observeRewardPeriod(
+        stakingOption.assetWithChain.chain,
+        stakingOption.assetWithChain.asset,
+        stakingOption.additional.stakingType
+    )
 
     private val rewardAmountState = selectedAccountStakingStateFlow.transformLatest { stakingState ->
         if (stakingState is StakingState.Stash) {

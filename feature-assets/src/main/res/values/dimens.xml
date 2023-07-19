@@ -2,4 +2,5 @@
 <resources>
     <dimen name="asset_image_width">64dp</dimen>
     <dimen name="asset_height">80dp</dimen>
+    <dimen name="total_balance_fraction_size">24sp</dimen>
 </resources>

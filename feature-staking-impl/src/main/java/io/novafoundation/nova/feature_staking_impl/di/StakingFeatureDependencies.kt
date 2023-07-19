@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
-import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -17,6 +16,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
+import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingDashboardDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -55,8 +55,6 @@ interface StakingFeatureDependencies {
     fun accountRepository(): AccountRepository
 
     fun storageCache(): StorageCache
-
-    fun bulkRetriever(): BulkRetriever
 
     fun addressIconGenerator(): AddressIconGenerator
 
@@ -111,6 +109,8 @@ interface StakingFeatureDependencies {
     fun feeLoaderMixinFactory(): FeeLoaderMixin.Factory
 
     fun sharedPreferences(): SharedPreferences
+
+    fun stakingRewardPeriodDao(): StakingRewardPeriodDao
 
     val amountChooserMixinFactory: AmountChooserMixin.Factory
 

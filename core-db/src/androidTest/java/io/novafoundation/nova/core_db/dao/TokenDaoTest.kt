@@ -17,7 +17,7 @@ class TokenDaoTest : DaoTest<TokenDao>(AppDatabase::tokenDao) {
     fun getTokenWhenCurrencySelected() = runBlocking {
         currencyDao.insert(createCurrency(tokenSymbol, true))
 
-        val tokenWithCurrency = dao.getToken(tokenSymbol)
+        val tokenWithCurrency = dao.getTokenWithCurrency(tokenSymbol)
 
         assert(tokenWithCurrency != null)
         assert(tokenWithCurrency?.token == null)
@@ -27,7 +27,7 @@ class TokenDaoTest : DaoTest<TokenDao>(AppDatabase::tokenDao) {
     fun getTokenWhenCurrencyNotSelected() = runBlocking {
         currencyDao.insert(createCurrency(tokenSymbol, false))
 
-        val token = dao.getToken(tokenSymbol)
+        val token = dao.getTokenWithCurrency(tokenSymbol)
 
         assert(token == null)
     }
@@ -36,7 +36,7 @@ class TokenDaoTest : DaoTest<TokenDao>(AppDatabase::tokenDao) {
     fun getTokensWhenCurrencySelected() = runBlocking {
         currencyDao.insert(createCurrency(tokenSymbol, true))
 
-        val tokensWithCurrencies = dao.getTokens(listOf(tokenSymbol))
+        val tokensWithCurrencies = dao.getTokensWithCurrency(listOf(tokenSymbol))
 
         assert(tokensWithCurrencies.isNotEmpty())
     }
@@ -45,7 +45,7 @@ class TokenDaoTest : DaoTest<TokenDao>(AppDatabase::tokenDao) {
     fun getTokensWhenCurrencyNotSelected() = runBlocking {
         currencyDao.insert(createCurrency(tokenSymbol, false))
 
-        val tokensWithCurrencies = dao.getTokens(listOf(tokenSymbol))
+        val tokensWithCurrencies = dao.getTokensWithCurrency(listOf(tokenSymbol))
 
         assert(tokensWithCurrencies.isEmpty())
     }
@@ -55,7 +55,7 @@ class TokenDaoTest : DaoTest<TokenDao>(AppDatabase::tokenDao) {
         currencyDao.insert(createCurrency(tokenSymbol, true))
 
         dao.insertTokenWithSelectedCurrency(tokenSymbol)
-        val tokenWithCurrency = dao.getToken(tokenSymbol)
+        val tokenWithCurrency = dao.getTokenWithCurrency(tokenSymbol)
         assert(tokenWithCurrency != null)
     }
 
@@ -64,7 +64,7 @@ class TokenDaoTest : DaoTest<TokenDao>(AppDatabase::tokenDao) {
         currencyDao.insert(createCurrency(tokenSymbol, false))
 
         dao.insertTokenWithSelectedCurrency(tokenSymbol)
-        val tokenWithCurrency = dao.getToken(tokenSymbol)
+        val tokenWithCurrency = dao.getTokenWithCurrency(tokenSymbol)
         assert(tokenWithCurrency == null)
     }
 }

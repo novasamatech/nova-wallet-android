@@ -48,7 +48,11 @@ private class ParachainUserRewardsComponent(
     private val resourceManager: ResourceManager
 ) : BaseRewardComponent(hostContext) {
 
-    private val rewardPeriodState = rewardPeriodsInteractor.observeRewardPeriod()
+    private val rewardPeriodState = rewardPeriodsInteractor.observeRewardPeriod(
+        stakingOption.assetWithChain.chain,
+        stakingOption.assetWithChain.asset,
+        stakingOption.additional.stakingType
+    )
 
     private val rewardAmountState = delegatorStateUseCase.loadDelegatingState(
         hostContext = hostContext,

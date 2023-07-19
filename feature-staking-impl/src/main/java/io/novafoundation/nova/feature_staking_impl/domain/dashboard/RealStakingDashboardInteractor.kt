@@ -388,6 +388,7 @@ class RealStakingDashboardInteractor(
         return sortedWith(
             compareBy<AggregatedStakingDashboardOption<WithoutStake>> { it.chain.relaychainsFirstAscendingOrder }
                 .thenByDescending { it.token.planksToFiat(it.stakingState.availableBalance()) }
+                .thenByDescending { it.stakingState.availableBalance() }
                 .thenComparing(Comparator.comparing(AggregatedStakingDashboardOption<*>::chain, chainTotalStakeComparator))
                 .thenBy { it.chain.alphabeticalOrder }
         )
@@ -397,6 +398,7 @@ class RealStakingDashboardInteractor(
     private fun List<AggregatedStakingDashboardOption<HasStake>>.sortedByChain(): List<AggregatedStakingDashboardOption<HasStake>> {
         return sortedWith(
             compareByDescending<AggregatedStakingDashboardOption<HasStake>> { it.token.planksToFiat(it.stakingState.stake) }
+                .thenByDescending { it.stakingState.stake }
                 .thenBy { it.chain.testnetsLastAscendingOrder }
                 .thenBy { it.chain.alphabeticalOrder }
         )

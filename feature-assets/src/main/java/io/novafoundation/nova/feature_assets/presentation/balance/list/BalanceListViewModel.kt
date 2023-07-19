@@ -1,5 +1,9 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.list
 
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -9,6 +13,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
+import io.novafoundation.nova.common.utils.formatting.toAmountWithFraction
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -34,11 +39,14 @@ import io.novafoundation.nova.feature_currency_api.presentation.formatters.forma
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.mapNumberOfActiveSessionsToUi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -59,7 +67,8 @@ class BalanceListViewModel(
     private val currencyInteractor: CurrencyInteractor,
     private val balanceBreakdownInteractor: BalanceBreakdownInteractor,
     private val contributionsInteractor: ContributionsInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
 ) : BaseViewModel() {
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
@@ -121,7 +130,7 @@ class BalanceListViewModel(
         val currency = selectedCurrency.first()
         TotalBalanceModel(
             isBreakdownAbailable = it.breakdown.isNotEmpty(),
-            totalBalanceFiat = it.total.formatAsCurrency(currency),
+            totalBalanceFiat = it.total.formatAsCurrency(currency).formatAsTotalBalance(),
             lockedBalanceFiat = it.locksTotal.amount.formatAsCurrency(currency)
         )
     }
@@ -135,6 +144,15 @@ class BalanceListViewModel(
         val total = it.total.formatAsCurrency(currency)
         TotalBalanceBreakdownModel(total, mapBreakdownToList(it, currency))
     }
+        .shareInBackground()
+
+    private val walletConnectAccountSessionCount = selectedMetaAccount.flatMapLatest {
+        walletConnectSessionsUseCase.activeSessionsNumberFlow(it)
+    }
+        .shareInBackground()
+
+    val walletConnectAccountSessionsUI = walletConnectAccountSessionCount
+        .map(::mapNumberOfActiveSessionsToUi)
         .shareInBackground()
 
     init {
@@ -194,6 +212,17 @@ class BalanceListViewModel(
         router.openAssetSearch()
     }
 
+    fun walletConnectClicked() {
+        launch {
+            if (walletConnectAccountSessionCount.first() > 0) {
+                val metaAccount = selectedMetaAccount.first()
+                router.openWalletConnectSessions(metaAccount.id)
+            } else {
+                router.openWalletConnectScan()
+            }
+        }
+    }
+
     fun balanceBreakdownClicked() {
         launch {
             val totalBalance = totalBalanceFlow.first()
@@ -248,5 +277,38 @@ class BalanceListViewModel(
 
             addAll(breakdown)
         }
+    }
+
+    private fun String.formatAsTotalBalance(): CharSequence {
+        val amountWithFraction = toAmountWithFraction()
+
+        val textSecondary = resourceManager.getColor(R.color.text_secondary)
+        val colorSpan = ForegroundColorSpan(textSecondary)
+        val sizeSpan = AbsoluteSizeSpan(resourceManager.getDimensionPixelSize(R.dimen.total_balance_fraction_size))
+
+        return with(amountWithFraction) {
+            val spannableBuilder = SpannableStringBuilder()
+                .append(amount)
+            if (fraction != null) {
+                spannableBuilder.append(separator + fraction)
+                val startIndex = amount.length
+                val endIndex = amount.length + separator.length + fraction!!.length
+                spannableBuilder.setSpan(colorSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                spannableBuilder.setSpan(sizeSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            spannableBuilder
+        }
+    }
+
+    fun sendClicked() {
+        router.openSendFlow()
+    }
+
+    fun receiveClicked() {
+        router.openReceiveFlow()
+    }
+
+    fun buyClicked() {
+        router.openBuyFlow()
     }
 }

@@ -109,6 +109,10 @@ class EvmNativeAssetHistory(
         return setOf(TransactionFilter.TRANSFER, TransactionFilter.EXTRINSIC)
     }
 
+    override fun isOperationSafe(operation: Operation): Boolean {
+        return true
+    }
+
     private fun TransactionReceipt?.extrinsicStatus(): ExtrinsicStatus {
         return when (this?.isStatusOK) {
             true -> ExtrinsicStatus.SUCCESS

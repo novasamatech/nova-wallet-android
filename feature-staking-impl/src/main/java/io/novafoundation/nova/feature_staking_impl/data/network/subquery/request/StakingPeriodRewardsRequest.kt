@@ -3,57 +3,43 @@ package io.novafoundation.nova.feature_staking_impl.data.network.subquery.reques
 class StakingPeriodRewardsRequest(accountAddress: String, val startTimestamp: Long?, val endTimestamp: Long?) {
     val query = """
         query {
-            start: accountRewards(
+            rewards: accountRewards(
                 filter: {
-                    address: { equalTo: "$accountAddress"} 
-                    ${startTimestampFilter()}
+                    address: { equalTo : "$accountAddress" }
+                    type: { equalTo: reward }
+                    ${getTimestampFilter()}
                 }
-                orderBy: BLOCK_NUMBER_ASC
-                first: 1
             ) {
-                nodes {
-                    accumulatedAmount
-                    amount
+                groupedAggregates(groupBy: ADDRESS) {
+                    sum {
+                        amount
+                    }
                 }
             }
             
-            end: accountRewards(
+            slashes: accountRewards(
                 filter: {
                     address: { equalTo : "$accountAddress" }
-                    ${endTimestampFilter()}
+                    type: { equalTo: slash }
+                    ${getTimestampFilter()}
                 }
-                orderBy: BLOCK_NUMBER_DESC
-                first: 1
             ) {
-                nodes {
-                    accumulatedAmount
-                    amount
+                groupedAggregates(groupBy: ADDRESS) {
+                    sum {
+                        amount
+                    }
                 }
             }
         }
     """.trimIndent()
 
-    private fun startTimestampFilter(): String {
-        if (startTimestamp != null && endTimestamp != null) {
-            return getTimestampRangeFilter()
-        } else if (startTimestamp != null) {
-            return "timestamp: { greaterThanOrEqualTo: \"$startTimestamp\" }"
+    private fun getTimestampFilter(): String {
+        val start = startTimestamp?.let { "timestamp: { greaterThanOrEqualTo: \"$it\" }" }
+        val end = endTimestamp?.let { "timestamp: { lessThanOrEqualTo: \"$it\" }" }
+        return if (startTimestamp != null && endTimestamp != null) {
+            "$start and: { $end }"
+        } else {
+            start ?: end ?: ""
         }
-
-        return ""
-    }
-
-    private fun endTimestampFilter(): String {
-        if (startTimestamp != null && endTimestamp != null) {
-            return getTimestampRangeFilter()
-        } else if (endTimestamp != null) {
-            return "timestamp: { lessThanOrEqualTo: \"$endTimestamp\" }"
-        }
-
-        return ""
-    }
-
-    private fun getTimestampRangeFilter(): String {
-        return "timestamp: { greaterThanOrEqualTo: \"$startTimestamp\" } and: { timestamp: { lessThanOrEqualTo: \"$endTimestamp\" } }"
     }
 }

@@ -43,4 +43,9 @@ interface AssetHistory {
         chain: Chain,
         chainAsset: Chain.Asset
     ): PageOffset
+
+    /**
+     * Checks if operation is not a phishing one
+     */
+    fun isOperationSafe(operation: Operation): Boolean
 }
