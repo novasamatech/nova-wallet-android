@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
@@ -30,8 +29,8 @@ class SubqueryStakingRewardsDataSource(
 
     override suspend fun sync(accountAddress: String, chain: Chain, chainAsset: Chain.Asset, rewardPeriod: RewardPeriod) {
         val stakingExternalApi = chain.stakingExternalApi() ?: return
-        val start = rewardPeriod.getStartDate()?.timestamp()
-        val end = rewardPeriod.getEndDate()?.timestamp()
+        val start = rewardPeriod.start?.timestamp()
+        val end = rewardPeriod.end?.timestamp()
 
         val response = stakingApi.getRewardsByPeriod(
             url = stakingExternalApi.url,
@@ -47,17 +46,5 @@ class SubqueryStakingRewardsDataSource(
         )
 
         stakingTotalRewardDao.insert(totalRewardLocal)
-    }
-
-    private fun RewardPeriod.getStartDate(): Date? {
-        if (this is RewardPeriod.OffsetFromCurrent) {
-            return Date(System.currentTimeMillis() - this.offsetMillis)
-        }
-
-        return start
-    }
-
-    private fun RewardPeriod.getEndDate(): Date? {
-        return end
     }
 }
