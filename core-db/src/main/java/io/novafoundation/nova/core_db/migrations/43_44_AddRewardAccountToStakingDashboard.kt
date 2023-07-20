@@ -25,7 +25,7 @@ val AddRewardAccountToStakingDashboard_43_44 = object : Migration(43, 44) {
                 `rewardsAccount` BLOB,
                 PRIMARY KEY(`chainId`, `chainAssetId`, `stakingType`, `metaId`),
                 FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE,
-                FOREIGN KEY(`chainAssetId`, `chainId`) REFERENCES `chain_assets`(`id`, `chainId`) ON UPDATE NO ACTION ON DELETE CASCADE ,
+                FOREIGN KEY(`chainAssetId`, `chainId`) REFERENCES `chain_assets`(`id`, `chainId`) ON UPDATE NO ACTION ON DELETE CASCADE,
                 FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE
             )
             """.trimIndent()
