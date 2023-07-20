@@ -20,7 +20,6 @@ interface PoolAccountDerivation {
 
     suspend fun derivePoolAccount(poolId: PoolId, derivationType: PoolAccountType, chainId: ChainId): AccountId
 
-
     /**
      * Derives pool accounts with poolId from range 1..[numberOfPools] (end-inclusive)
      */

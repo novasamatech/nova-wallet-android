@@ -35,9 +35,9 @@ val NominationPoolsApi.poolMembers: QueryableStorageEntry1<AccountId, PoolMember
     get() = storage1("PoolMembers", binding = { decoded, accountId -> bindPoolMember(decoded, accountId) })
 
 context(StorageQueryContext)
-val NominationPoolsApi.lastPoolId : QueryableStorageEntry0<BigInteger>
+val NominationPoolsApi.lastPoolId: QueryableStorageEntry0<BigInteger>
     get() = storage0("LastPoolId", binding = ::bindNumber)
 
 context(StorageQueryContext)
-val NominationPoolsApi.minJoinBond : QueryableStorageEntry0<BigInteger>
+val NominationPoolsApi.minJoinBond: QueryableStorageEntry0<BigInteger>
     get() = storage0("MinJoinBond", binding = ::bindNumber)

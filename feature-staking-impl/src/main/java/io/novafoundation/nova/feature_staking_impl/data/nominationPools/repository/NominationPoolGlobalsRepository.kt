@@ -20,7 +20,6 @@ interface NominationPoolGlobalsRepository {
     fun observeMinJoinBond(chainId: ChainId): Flow<Balance>
 }
 
-
 class RealNominationPoolGlobalsRepository(
     private val localStorageDataSource: StorageDataSource,
 ) : NominationPoolGlobalsRepository {
