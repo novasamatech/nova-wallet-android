@@ -100,7 +100,8 @@ class StakingDashboardParachainStakingUpdater(
                 status = secondaryInfo?.status ?: fromCache?.status,
                 rewards = secondaryInfo?.rewards ?: fromCache?.rewards,
                 estimatedEarnings = secondaryInfo?.estimatedEarnings ?: fromCache?.estimatedEarnings,
-                primaryStakingAccountId = parachainStakingBaseInfo.delegatorState.accountId
+                stakeStatusAccount = parachainStakingBaseInfo.delegatorState.accountId,
+                rewardsAccount = parachainStakingBaseInfo.delegatorState.accountId
             )
         } else {
             StakingDashboardItemLocal.notStaking(
