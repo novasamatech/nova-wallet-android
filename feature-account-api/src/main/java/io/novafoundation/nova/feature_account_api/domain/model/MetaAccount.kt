@@ -57,7 +57,7 @@ fun LightMetaAccount(
     override val type: LightMetaAccount.Type = type
 }
 
-class MetaAccount(
+class  MetaAccount(
     override val id: Long,
     val chainAccounts: Map<ChainId, ChainAccount>,
     override val substratePublicKey: ByteArray?,

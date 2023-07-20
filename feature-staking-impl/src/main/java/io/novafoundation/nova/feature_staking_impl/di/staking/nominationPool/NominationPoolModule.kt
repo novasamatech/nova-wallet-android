@@ -3,10 +3,22 @@ package io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.RealPoolAccountDerivation
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolMembersRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolGlobalsRepository
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolMembersRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolStateRepository
+import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.RealNominationPoolMemberUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.networkInfo.NominationPoolsNetworkInfoInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.networkInfo.RealNominationPoolsNetworkInfoInteractor
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
@@ -23,4 +35,50 @@ class NominationPoolModule {
     @Provides
     @FeatureScope
     fun provideNominationPoolBalanceRepository(): NominationPoolStateRepository = RealNominationPoolStateRepository()
+
+    @Provides
+    @FeatureScope
+    fun provideNominationPoolGlobalsRepository(
+        @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource
+    ): NominationPoolGlobalsRepository {
+        return RealNominationPoolGlobalsRepository(localStorageSource)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideNominationPoolMembersRepository(
+        @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource
+    ): NominationPoolMembersRepository {
+        return RealNominationPoolMembersRepository(localStorageSource)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideNominationPoolMembersUseCase(
+        accountRepository: AccountRepository,
+        nominationPoolMembersRepository: NominationPoolMembersRepository,
+        stakingSharedState: StakingSharedState,
+    ): NominationPoolMemberUseCase {
+        return RealNominationPoolMemberUseCase(
+            accountRepository = accountRepository,
+            stakingSharedState = stakingSharedState,
+            nominationPoolMembersRepository = nominationPoolMembersRepository
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideNetworkInfoInteractor(
+        relaychainStakingSharedComputation: StakingSharedComputation,
+        nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
+        poolAccountDerivation: PoolAccountDerivation,
+        relaychainStakingInteractor: StakingInteractor,
+        nominationPoolMemberUseCase: NominationPoolMemberUseCase,
+    ): NominationPoolsNetworkInfoInteractor = RealNominationPoolsNetworkInfoInteractor(
+        relaychainStakingSharedComputation = relaychainStakingSharedComputation,
+        nominationPoolGlobalsRepository = nominationPoolGlobalsRepository,
+        poolAccountDerivation = poolAccountDerivation,
+        relaychainStakingInteractor = relaychainStakingInteractor,
+        nominationPoolMemberUseCase = nominationPoolMemberUseCase
+    )
 }

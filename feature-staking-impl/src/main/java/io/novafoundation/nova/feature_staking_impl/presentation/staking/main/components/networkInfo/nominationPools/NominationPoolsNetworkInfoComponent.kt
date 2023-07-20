@@ -1,14 +1,11 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.parachain
+package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.nominationPools
 
 import android.util.Log
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
-import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.networkInfo.NominationPoolsNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.BaseNetworkInfoComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.NetworkInfoComponent
@@ -16,63 +13,52 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 
-class ParachainNetworkInfoComponentFactory(
-    private val interactor: ParachainNetworkInfoInteractor,
-    private val delegatorStateUseCase: DelegatorStateUseCase,
+class NominationPoolsNetworkInfoComponentFactory(
+    private val interactor: NominationPoolsNetworkInfoInteractor,
     private val resourceManager: ResourceManager,
 ) {
 
     fun create(
         stakingOption: StakingOption,
         hostContext: ComponentHostContext
-    ): NetworkInfoComponent = ParachainNetworkInfoComponent(
+    ): NetworkInfoComponent = NominationPoolsNetworkInfoComponent(
         interactor = interactor,
-        delegatorStateUseCase = delegatorStateUseCase,
         resourceManager = resourceManager,
         stakingOption = stakingOption,
-        hostContext = hostContext
+        hostContext = hostContext,
     )
 }
 
-private val NOMINATORS_TITLE_RES = R.string.staking_active_delegators
-
-private class ParachainNetworkInfoComponent(
-    private val interactor: ParachainNetworkInfoInteractor,
-    private val delegatorStateUseCase: DelegatorStateUseCase,
+private class NominationPoolsNetworkInfoComponent(
+    private val interactor: NominationPoolsNetworkInfoInteractor,
     resourceManager: ResourceManager,
 
     private val hostContext: ComponentHostContext,
     private val stakingOption: StakingOption,
 ) : BaseNetworkInfoComponent(resourceManager, hostContext.scope) {
 
-    private val delegatorStateFlow = hostContext.selectedAccount.flatMapLatest {
-        delegatorStateUseCase.delegatorStateFlow(it, stakingOption.assetWithChain.chain, stakingOption.assetWithChain.asset)
-    }.shareInBackground()
-
     init {
         updateContentState()
 
-        updateExpandedState(with = expandForceChangeFlow())
+        updateExpandedState(with = shouldBeExpandedFlow())
     }
 
     override fun initialItems(): List<NetworkInfoItem> {
-        return createNetworkInfoItems(nominatorsLabel = NOMINATORS_TITLE_RES)
+        return createNetworkInfoItems(activeNominators = null, nominatorsLabel = null)
     }
 
-    private fun expandForceChangeFlow(): Flow<Boolean> {
-        return delegatorStateFlow.map { it is DelegatorState.None }
+    private fun shouldBeExpandedFlow(): Flow<Boolean> {
+        return interactor.observeShouldShowNetworkInfo()
     }
 
     private fun updateContentState() {
         combine(
             hostContext.assetFlow,
-            interactor.observeNetworkInfo(stakingOption.assetWithChain.chain.id)
+            interactor.observeNetworkInfo(stakingOption.assetWithChain.chain.id, hostContext.scope)
         ) { asset, networkInfo ->
-            val items = createNetworkInfoItems(asset, networkInfo, nominatorsLabel = NOMINATORS_TITLE_RES)
+            val items = createNetworkInfoItems(asset, networkInfo, nominatorsLabel = null)
 
             updateState { it.copy(actions = items) }
         }

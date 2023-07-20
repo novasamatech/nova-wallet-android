@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.parachain.ParachainAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.relaychain.RelaychainAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.NetworkInfoComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.nominationPools.NominationPoolsNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.parachain.ParachainNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.relaychain.RelaychainNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsComponentFactory
@@ -27,7 +28,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.parachain.ParachainUserRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.relaychain.RelaychainUserRewardsComponentFactory
 
-@Module(includes = [RelaychainModule::class, ParachainModule::class, TuringModule::class])
+@Module(includes = [RelaychainModule::class, ParachainModule::class, TuringModule::class, NominationPoolsModule::class])
 class ComponentsModule {
 
     @Provides
@@ -43,8 +44,14 @@ class ComponentsModule {
     fun provideNetworkInfoFactory(
         relaychainComponentFactory: RelaychainNetworkInfoComponentFactory,
         parachainComponentFactory: ParachainNetworkInfoComponentFactory,
+        nominationPoolsNetworkInfoComponentFactory: NominationPoolsNetworkInfoComponentFactory,
         compoundStakingComponentFactory: CompoundStakingComponentFactory,
-    ) = NetworkInfoComponentFactory(relaychainComponentFactory, parachainComponentFactory, compoundStakingComponentFactory)
+    ) = NetworkInfoComponentFactory(
+        relaychainComponentFactory = relaychainComponentFactory,
+        parachainComponentFactory = parachainComponentFactory,
+        nominationPoolsComponentFactory = nominationPoolsNetworkInfoComponentFactory,
+        compoundStakingComponentFactory = compoundStakingComponentFactory
+    )
 
     @Provides
     @ScreenScope
