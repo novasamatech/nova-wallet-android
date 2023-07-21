@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.Date
-import java.util.concurrent.TimeUnit
 
 private val PERIOD_TYPES_TO_IDS = mapOf(
     RewardPeriodType.AllTime to R.id.allTimeStakingPeriod,
@@ -141,7 +140,7 @@ class StakingPeriodViewModel(
     fun openStartDatePicker() {
         val customPeriod = _customPeriod.value
         val currentSelectedStartTime = customPeriod.start ?: System.currentTimeMillis()
-        val endValidPeriod = customPeriod.end?.minus(TimeUnit.DAYS.toMillis(1)) ?: System.currentTimeMillis()
+        val endValidPeriod = customPeriod.end ?: System.currentTimeMillis()
         val dateRange = DateRangeWithCurrent(currentSelectedStartTime, null, endValidPeriod)
         _startDatePickerEvent.value = dateRange.event()
     }
@@ -149,7 +148,7 @@ class StakingPeriodViewModel(
     fun openEndDatePicker() {
         val customPeriod = _customPeriod.value
         val currentSelectedEndTime = customPeriod.end ?: System.currentTimeMillis()
-        val startValidPeriod = customPeriod.start?.plus(TimeUnit.DAYS.toMillis(1))
+        val startValidPeriod = customPeriod.start
         val endValidPeriod = System.currentTimeMillis()
         val dateRange = DateRangeWithCurrent(currentSelectedEndTime, startValidPeriod, endValidPeriod)
         _endDatePickerEvent.value = dateRange.event()
