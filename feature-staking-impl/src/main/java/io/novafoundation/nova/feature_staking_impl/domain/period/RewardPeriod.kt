@@ -20,6 +20,7 @@ sealed interface RewardPeriod {
         override val type: RewardPeriodType.Preset
     ) : RewardPeriod {
 
+        // Since we take the currentDate as the whole day we add 1 day to the to the start period using atTheNextDay()
         override val start: Date
             get() = Date(System.currentTimeMillis() - offset.inWholeMilliseconds).atTheNextDay()
 
@@ -71,6 +72,8 @@ fun RewardPeriod.getPeriodDays(): Long {
     return when (this) {
         is RewardPeriod.OffsetFromCurrent -> offset.inWholeDays
 
+        // Since we consider the end date as a full day we add 1 day to the end date using atTheNextDay() to calculate the true duration
+        // We also use atTheBeginningOfTheDay() for startDate to be sure that we use valid data
         is RewardPeriod.CustomRange -> {
             val endTime = end ?: Date()
             val durationMillis = endTime.atTheNextDay().time - start.atTheBeginningOfTheDay().time

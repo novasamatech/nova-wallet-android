@@ -31,8 +31,10 @@ class SubqueryStakingRewardsDataSource(
 
     override suspend fun sync(accountAddress: String, chain: Chain, chainAsset: Chain.Asset, rewardPeriod: RewardPeriod) {
         val stakingExternalApi = chain.stakingExternalApi() ?: return
-        val start = rewardPeriod.start?.atTheBeginningOfTheDay()?.timestamp()
-        val end = rewardPeriod.end?.atTheEndOfTheDay()?.timestamp()
+        val start = rewardPeriod.start?.atTheBeginningOfTheDay() // Using atTheBeginningOfTheDay() to avoid invalid data
+            ?.timestamp()
+        val end = rewardPeriod.end?.atTheEndOfTheDay() // Using atTheEndOfTheDay() since the end of the day is fully included in the period
+            ?.timestamp()
 
         val response = stakingApi.getRewardsByPeriod(
             url = stakingExternalApi.url,
