@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.repository.consensus
 
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.babe
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindCurrentSlot
@@ -22,6 +23,12 @@ class BabeSession(
         val runtime = runtimeFor(chainId)
 
         return runtime.metadata.babe().numberConstant("EpochDuration", runtime)
+    }
+
+    override suspend fun currentEpochIndex(chainId: ChainId): BigInteger {
+        return remoteStorage.query(chainId) {
+            runtime.metadata.babe().storage("EpochIndex").query(binding = ::bindNumber)
+        }
     }
 
     override suspend fun currentSlot(chainId: ChainId) = remoteStorage.queryNonNull(

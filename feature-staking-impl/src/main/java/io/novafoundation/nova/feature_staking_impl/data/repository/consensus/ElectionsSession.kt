@@ -10,4 +10,6 @@ interface ElectionsSession {
     suspend fun genesisSlot(chainId: ChainId): BigInteger
 
     suspend fun sessionLength(chainId: ChainId): BigInteger
+
+    suspend fun currentEpochIndex(chainId: ChainId): BigInteger?
 }
