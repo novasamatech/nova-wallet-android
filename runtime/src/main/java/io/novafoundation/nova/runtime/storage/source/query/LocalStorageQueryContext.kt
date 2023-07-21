@@ -35,7 +35,7 @@ class LocalStorageQueryContext(
         return storageCache.getEntry(key, chainId).content
     }
 
-    override suspend fun observeKey(key: String): Flow<String?> {
+    override fun observeKey(key: String): Flow<String?> {
         return storageCache.observeEntry(key, chainId).map { it.content }
     }
 

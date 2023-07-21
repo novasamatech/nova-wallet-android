@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.turing.TuringStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.relaychain.RelaychainStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.nominationPools.NominationPoolsStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.parachain.ParachainStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.relaychain.RelaychainStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.StartStakingComponentFactory
@@ -72,8 +73,14 @@ class ComponentsModule {
     fun provideStakeSummaryComponentFactory(
         relaychainComponentFactory: RelaychainStakeSummaryComponentFactory,
         parachainComponentFactory: ParachainStakeSummaryComponentFactory,
+        nominationPoolsStakeSummaryComponentFactory: NominationPoolsStakeSummaryComponentFactory,
         compoundStakingComponentFactory: CompoundStakingComponentFactory,
-    ) = StakeSummaryComponentFactory(relaychainComponentFactory, parachainComponentFactory, compoundStakingComponentFactory)
+    ) = StakeSummaryComponentFactory(
+        relaychainComponentFactory = relaychainComponentFactory,
+        parachainStakeSummaryComponentFactory = parachainComponentFactory,
+        nominationPoolsStakeSummaryComponentFactory = nominationPoolsStakeSummaryComponentFactory,
+        compoundStakingComponentFactory = compoundStakingComponentFactory
+    )
 
     @Provides
     @ScreenScope

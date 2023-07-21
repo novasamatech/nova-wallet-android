@@ -26,6 +26,10 @@ interface PoolAccountDerivation {
     suspend fun derivePoolAccountsRange(numberOfPools: Int, derivationType: PoolAccountType, chainId: ChainId): List<AccountId>
 }
 
+suspend fun PoolAccountDerivation.bondedAccountOf(poolId: PoolId, chainId: ChainId): AccountId {
+    return derivePoolAccount(poolId, PoolAccountType.BONDED, chainId)
+}
+
 private const val PREFIX = "modl"
 
 class RealPoolAccountDerivation(
