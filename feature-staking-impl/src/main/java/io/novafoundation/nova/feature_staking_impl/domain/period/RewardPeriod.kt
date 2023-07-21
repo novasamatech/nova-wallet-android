@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.period
 
+import io.novafoundation.nova.common.utils.atTheNextDay
 import io.novafoundation.nova.common.utils.atTheBeginningOfTheDay
 import java.util.Date
 import kotlin.time.Duration
@@ -20,7 +21,7 @@ sealed interface RewardPeriod {
     ) : RewardPeriod {
 
         override val start: Date
-            get() = Date(System.currentTimeMillis() - offset.inWholeMilliseconds).atTheBeginningOfTheDay()
+            get() = Date(System.currentTimeMillis() - offset.inWholeMilliseconds).atTheNextDay()
 
         override val end: Date? = null
     }
@@ -72,7 +73,7 @@ fun RewardPeriod.getPeriodDays(): Long {
 
         is RewardPeriod.CustomRange -> {
             val endTime = end ?: Date()
-            val durationMillis = endTime.time - start.time
+            val durationMillis = endTime.atTheNextDay().time - start.atTheBeginningOfTheDay().time
 
             durationMillis.milliseconds.inWholeDays
         }
