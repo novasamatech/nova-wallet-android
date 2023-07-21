@@ -11,7 +11,7 @@ interface StorageCachingContext {
 }
 
 context(StorageCachingContext)
-fun <T>Flow<WithRawValue<T>>.cacheValues(): Flow<T> {
+fun <T> Flow<WithRawValue<T>>.cacheValues(): Flow<T> {
     return map {
         storageCache.insert(it.raw, it.chainId)
 
