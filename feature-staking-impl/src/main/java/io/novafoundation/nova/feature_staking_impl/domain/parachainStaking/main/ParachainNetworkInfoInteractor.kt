@@ -18,9 +18,7 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import java.math.BigInteger
-import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
 class ParachainNetworkInfoInteractor(
     private val currentRoundRepository: CurrentRoundRepository,
     private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository,

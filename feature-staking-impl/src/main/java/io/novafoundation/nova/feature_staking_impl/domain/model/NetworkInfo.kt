@@ -8,7 +8,7 @@ data class NetworkInfo(
     val minimumStake: BigInteger,
     val totalStake: BigInteger,
     val stakingPeriod: StakingPeriod,
-    val nominatorsCount: Int
+    val nominatorsCount: Int?
 )
 
 sealed class StakingPeriod {

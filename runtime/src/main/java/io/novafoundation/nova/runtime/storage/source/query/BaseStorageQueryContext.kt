@@ -46,6 +46,10 @@ abstract class BaseStorageQueryContext(
 
     protected abstract suspend fun observeKeysByPrefix(prefix: String): Flow<Map<String, String?>>
 
+    override fun StorageEntry.createStorageKey(vararg keyArguments: Any?): String {
+        return storageKeyWith(keyArguments)
+    }
+
     override suspend fun StorageEntry.keys(vararg prefixArgs: Any?): List<StorageKeyComponents> {
         val prefix = storageKey(runtime, *prefixArgs)
 

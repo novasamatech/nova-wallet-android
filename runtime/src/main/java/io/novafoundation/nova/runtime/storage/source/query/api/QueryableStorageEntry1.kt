@@ -17,6 +17,9 @@ interface QueryableStorageEntry1<I, T : Any> {
 
     context(StorageQueryContext)
     suspend fun observe(argument: I): Flow<T?>
+
+    context(StorageQueryContext)
+    fun storageKey(argument: I): String
 }
 
 context(StorageQueryContext)
@@ -40,5 +43,10 @@ internal class RealQueryableStorageEntry1<I, T : Any>(
     context(StorageQueryContext)
     override suspend fun queryRaw(argument: I): String? {
         return storageEntry.queryRaw(argument)
+    }
+
+    context(StorageQueryContext)
+    override fun storageKey(argument: I): String {
+        return storageEntry.createStorageKey(argument)
     }
 }

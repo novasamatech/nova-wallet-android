@@ -19,6 +19,7 @@ class StakingUpdateSystem(
     private val parachainUpdaters: List<Updater>,
     private val commonUpdaters: List<Updater>,
     private val turingExtraUpdaters: List<Updater>,
+    private val nominationPoolsUpdaters: List<Updater>,
     chainRegistry: ChainRegistry,
     singleAssetSharedState: StakingSharedState,
     storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
@@ -30,7 +31,7 @@ class StakingUpdateSystem(
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainUpdaters
             PARACHAIN -> parachainUpdaters
             TURING -> parachainUpdaters + turingExtraUpdaters
-            NOMINATION_POOLS -> emptyList() // TODO nomination pools
+            NOMINATION_POOLS -> nominationPoolsUpdaters
         }
     }
 }

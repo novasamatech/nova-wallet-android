@@ -20,6 +20,8 @@ interface StorageQueryContext {
 
     val runtime: RuntimeSnapshot
 
+    fun StorageEntry.createStorageKey(vararg keyArguments: Any?): String
+
     suspend fun StorageEntry.keys(vararg prefixArgs: Any?): List<StorageKeyComponents>
 
     suspend fun <V> StorageEntry.observe(

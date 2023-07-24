@@ -7,6 +7,8 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
+import io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool.NominationPoolStakingUpdatersModule
+import io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool.NominationPools
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.Parachain
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.ParachainStakingUpdatersModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.turing.Turing
@@ -27,7 +29,8 @@ import javax.inject.Named
     includes = [
         RelaychainStakingUpdatersModule::class,
         ParachainStakingUpdatersModule::class,
-        TuringStakingUpdatersModule::class
+        TuringStakingUpdatersModule::class,
+        NominationPoolStakingUpdatersModule::class,
     ]
 )
 class UpdatersModule {
@@ -38,6 +41,7 @@ class UpdatersModule {
         @Relaychain relaychainUpdaters: List<@JvmSuppressWildcards Updater>,
         @Parachain parachainUpdaters: List<@JvmSuppressWildcards Updater>,
         @Turing turingUpdaters: List<@JvmSuppressWildcards Updater>,
+        @NominationPools nominationPoolsUpdaters: List<@JvmSuppressWildcards Updater>,
         blockTimeUpdater: BlockTimeUpdater,
         blockNumberUpdater: BlockNumberUpdater,
         totalIssuanceUpdater: TotalIssuanceUpdater,
@@ -51,6 +55,7 @@ class UpdatersModule {
         chainRegistry = chainRegistry,
         singleAssetSharedState = singleAssetSharedState,
         turingExtraUpdaters = turingUpdaters,
+        nominationPoolsUpdaters = nominationPoolsUpdaters,
         storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory
     )
 
