@@ -2,6 +2,8 @@
 
 package io.novafoundation.nova.common.utils
 
+import java.math.BigDecimal
+
 /**
  * Type that represents [Percent] / 100
  * This, 0.1 will represent equivalent to 10%
@@ -25,6 +27,10 @@ value class Percent(val value: Double) : Comparable<Percent> {
         return value.compareTo(other.value)
     }
 }
+
+inline fun BigDecimal.asPerbill(): Perbill = Perbill(this.toDouble())
+
+inline fun BigDecimal.asPercent(): Percent = Percent(this.toDouble())
 
 inline fun Double.asPerbill(): Perbill = Perbill(this)
 

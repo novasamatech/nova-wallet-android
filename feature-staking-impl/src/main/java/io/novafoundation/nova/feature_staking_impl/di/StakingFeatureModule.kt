@@ -96,12 +96,10 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun provideStakingEraInteractorFactory(
-        stakingSharedState: StakingSharedState,
         roundDurationEstimator: RoundDurationEstimator,
         currentRoundRepository: CurrentRoundRepository,
         stakingInteractor: StakingInteractor
     ) = StakingEraInteractorFactory(
-        stakingSharedState,
         roundDurationEstimator,
         currentRoundRepository,
         stakingInteractor

@@ -1,11 +1,18 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.direct
 
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculator
+import io.novafoundation.nova.feature_staking_impl.domain.rewards.DAYS_IN_YEAR
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.BaseStartStakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.PayoutType
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingData
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.PayoutType
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.ChainGeneses
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.assetWithChain
 import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
@@ -14,25 +21,35 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 
 class ParachainStartStakingInteractor(
-    stakingSharedState: StakingSharedState,
-    stakingSharedComputation: StakingSharedComputation,
+    stakingType: Chain.Asset.StakingType,
     coroutineScope: CoroutineScope,
-    private val parachainNetworkInfoInteractor: ParachainNetworkInfoInteractor
-) : BaseStartStakingInteractor(stakingSharedState, stakingSharedComputation, coroutineScope) {
+    accountRepository: AccountRepository,
+    walletRepository: WalletRepository,
+    private val parachainNetworkInfoInteractor: ParachainNetworkInfoInteractor,
+    private val parachainStakingRewardCalculator: ParachainStakingRewardCalculator
+) : BaseStartStakingInteractor(stakingType, accountRepository, walletRepository, coroutineScope) {
 
-    override fun observeMinStake(): Flow<BigInteger> {
-        return stakingSharedState.assetWithChain
-            .flatMapLatest { parachainNetworkInfoInteractor.observeRoundInfo(it.chain.id) }
-            .map { it.minimumStake }
+    override fun observeData(chain: Chain, asset: Asset): Flow<StartStakingData> {
+        return parachainNetworkInfoInteractor.observeRoundInfo(chain.id).map { activeEraInfo ->
+            StartStakingData(
+                availableBalance = getAvailableBalance(asset),
+                maxEarningRate = parachainStakingRewardCalculator.maximumGain(DAYS_IN_YEAR),
+                minStake = activeEraInfo.minimumStake,
+                payoutType = getPayoutType(chain),
+                participationInGovernance = chain.governance.isNotEmpty()
+            )
+        }
     }
 
-    override fun observePayoutType(): Flow<PayoutType> {
-        return stakingSharedState.assetWithChain
-            .map {
-                when (it.chain.id) {
-                    ChainGeneses.MOONBEAM -> PayoutType.Automatic.Payout
-                    else -> PayoutType.Manual
-                }
-            }
+    private fun getAvailableBalance(asset: Asset): BigInteger {
+        return asset.freeInPlanks
+    }
+
+    private fun getPayoutType(chain: Chain): PayoutType {
+        return when (chain.id) {
+            ChainGeneses.MOONBEAM,
+            ChainGeneses.MOONRIVER -> PayoutType.Automatic.Payout
+            else -> PayoutType.Manual
+        }
     }
 }

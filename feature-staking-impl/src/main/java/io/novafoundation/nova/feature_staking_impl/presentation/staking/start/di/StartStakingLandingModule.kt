@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.StartStakingLandingViewModel
@@ -24,18 +26,20 @@ class StartStakingLandingModule {
 
     @Provides
     fun provideStartStakingInteractorFactory(
-        stakingSharedState: StakingSharedState,
         stakingSharedComputation: StakingSharedComputation,
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
-        stakingEraInteractorFactory: StakingEraInteractorFactory
+        stakingEraInteractorFactory: StakingEraInteractorFactory,
+        parachainNetworkInfoInteractor: ParachainNetworkInfoInteractor,
+        parachainStakingRewardCalculatorFactory: ParachainStakingRewardCalculatorFactory
     ): StartStakingInteractorFactory {
         return StartStakingInteractorFactory(
-            stakingSharedState,
             stakingSharedComputation,
             walletRepository,
             accountRepository,
-            stakingEraInteractorFactory
+            stakingEraInteractorFactory,
+            parachainNetworkInfoInteractor,
+            parachainStakingRewardCalculatorFactory
         )
     }
 

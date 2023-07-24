@@ -155,8 +155,6 @@ fun Module.constantOrNull(name: String) = constants[name]
 
 fun RuntimeMetadata.staking() = module(Modules.STAKING)
 
-fun RuntimeMetadata.nominationPools() = module(Modules.NOMINATION_POOLS)
-
 fun RuntimeMetadata.voterListOrNull() = firstExistingModuleOrNull(Modules.VOTER_LIST, Modules.BAG_LIST)
 fun RuntimeMetadata.voterListName(): String = requireNotNull(voterListOrNull()).name
 
@@ -271,7 +269,6 @@ val SignerPayloadExtrinsic.chainId: String
 object Modules {
     const val VESTING: String = "Vesting"
     const val STAKING = "Staking"
-    const val NOMINATION_POOLS = "NominationPools"
     const val BALANCES = "Balances"
     const val EQ_BALANCES = "EqBalances"
     const val SYSTEM = "System"

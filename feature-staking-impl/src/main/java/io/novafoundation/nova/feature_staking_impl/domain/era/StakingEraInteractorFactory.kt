@@ -9,7 +9,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 
 class StakingEraInteractorFactory(
-    private val stakingSharedState: StakingSharedState,
     private val roundDurationEstimator: RoundDurationEstimator,
     private val currentRoundRepository: CurrentRoundRepository,
     private val stakingInteractor: StakingInteractor
@@ -18,7 +17,6 @@ class StakingEraInteractorFactory(
     fun create(chain: Chain): StakingEraInteractor {
         return if (chain.isParachain) {
             ParachainStakingEraInteractor(
-                stakingSharedState,
                 roundDurationEstimator,
                 currentRoundRepository
             )

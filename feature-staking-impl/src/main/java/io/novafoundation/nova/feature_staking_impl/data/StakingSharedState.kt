@@ -21,11 +21,15 @@ class StakingSharedState : SelectedAssetOptionSharedState<StakingSharedState.Opt
         chainAsset: Chain.Asset,
         stakingType: Chain.Asset.StakingType
     ) {
-        val selectedOption = SupportedAssetOption(
-            assetWithChain = ChainWithAsset(chain, chainAsset),
-            additional = OptionAdditionalData(stakingType)
-        )
+        val selectedOption = createStakingOption(chain, chainAsset, stakingType)
 
         _selectedOption.emit(selectedOption)
     }
+}
+
+fun createStakingOption(chain: Chain, chainAsset: Chain.Asset, stakingType: Chain.Asset.StakingType): StakingOption {
+    return StakingOption(
+        assetWithChain = ChainWithAsset(chain, chainAsset),
+        additional = StakingSharedState.OptionAdditionalData(stakingType)
+    )
 }
