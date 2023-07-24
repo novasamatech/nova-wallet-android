@@ -22,7 +22,7 @@ interface StorageCache {
         chainId: String
     )
 
-    suspend fun observeEntry(key: String, chainId: String): Flow<StorageEntry>
+    fun observeEntry(key: String, chainId: String): Flow<StorageEntry>
 
     /**
      * First result will be emitted when all keys are found in the cache

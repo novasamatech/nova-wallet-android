@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain
 
+import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
@@ -18,6 +19,7 @@ class StakingDashboardUpdaterFactory(
     private val remoteStorageSource: StorageDataSource,
     private val nominationPoolBalanceRepository: NominationPoolStateRepository,
     private val poolAccountDerivation: PoolAccountDerivation,
+    private val storageCache: StorageCache
 ) {
 
     fun createUpdater(
@@ -29,7 +31,7 @@ class StakingDashboardUpdaterFactory(
         return when (stakingType.group()) {
             StakingTypeGroup.RELAYCHAIN -> relayChain(chain, stakingType, metaAccount, stakingStatsFlow)
             StakingTypeGroup.PARACHAIN -> parachain(chain, stakingType, metaAccount, stakingStatsFlow)
-            StakingTypeGroup.NOMINATION_POOL -> nominationPools(chain, stakingType, metaAccount, stakingStatsFlow)
+            StakingTypeGroup.NOMINATION_POOL -> nominationPools(chain, stakingType, metaAccount, stakingStatsFlow, storageCache)
             StakingTypeGroup.UNSUPPORTED -> null
         }
     }
@@ -73,6 +75,7 @@ class StakingDashboardUpdaterFactory(
         stakingType: Chain.Asset.StakingType,
         metaAccount: MetaAccount,
         stakingStatsFlow: Flow<MultiChainOffChainSyncResult>,
+        storageCache: StorageCache,
     ): Updater {
         return StakingDashboardNominationPoolsUpdater(
             chain = chain,
@@ -83,7 +86,8 @@ class StakingDashboardUpdaterFactory(
             stakingDashboardCache = stakingDashboardCache,
             remoteStorageSource = remoteStorageSource,
             nominationPoolStateRepository = nominationPoolBalanceRepository,
-            poolAccountDerivation = poolAccountDerivation
+            poolAccountDerivation = poolAccountDerivation,
+            storageCache = storageCache
         )
     }
 }

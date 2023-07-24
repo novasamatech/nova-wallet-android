@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.Poo
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEraFlow
 import io.novafoundation.nova.feature_staking_impl.domain.model.NetworkInfo
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakingPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
@@ -46,11 +47,11 @@ class RealNominationPoolsNetworkInfoInteractor(
         sharedComputationScope: CoroutineScope
     ): Flow<NetworkInfo> {
         return combine(
-            relaychainStakingSharedComputation.electedExposuresWithActiveEraFlow(chainId, sharedComputationScope),
+            relaychainStakingSharedComputation.electedExposuresInActiveEraFlow(chainId, sharedComputationScope),
             nominationPoolGlobalsRepository.observeMinJoinBond(chainId),
             nominationPoolGlobalsRepository.lastPoolId(chainId),
             lockupDurationFlow()
-        ) { (exposures), minJoinBond, lastPoolId, lockupDuration ->
+        ) { exposures, minJoinBond, lastPoolId, lockupDuration ->
             NetworkInfo(
                 lockupPeriod = lockupDuration,
                 minimumStake = minJoinBond,

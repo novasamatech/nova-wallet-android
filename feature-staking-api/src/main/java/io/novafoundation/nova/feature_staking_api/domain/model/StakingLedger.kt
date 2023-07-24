@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_staking_api.domain.model
 
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.sumByBigInteger
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
 
@@ -20,6 +22,10 @@ fun StakingLedger.sumStaking(
     return unlocking
         .filter { condition(it) }
         .sumByBigInteger(UnlockChunk::amount)
+}
+
+fun StakingLedger?.activeBalance(): Balance {
+    return this?.active.orZero()
 }
 
 fun UnlockChunk.isUnbondingIn(activeEraIndex: BigInteger) = era > activeEraIndex

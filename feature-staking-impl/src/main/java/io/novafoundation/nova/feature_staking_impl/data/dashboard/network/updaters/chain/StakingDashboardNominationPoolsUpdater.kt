@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain
 
 import io.novafoundation.nova.common.utils.combineToPair
+import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
@@ -8,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
+import io.novafoundation.nova.feature_staking_api.domain.model.activeBalance
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.ChainStakingStats
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.MultiChainStakingStats
@@ -28,19 +31,25 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.amountOf
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.storage.cache.StorageCachingContext
+import io.novafoundation.nova.runtime.storage.cache.cacheValues
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
-import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.transformLatest
+import kotlin.coroutines.coroutineContext
 
 class StakingDashboardNominationPoolsUpdater(
     chain: Chain,
@@ -52,12 +61,17 @@ class StakingDashboardNominationPoolsUpdater(
     private val remoteStorageSource: StorageDataSource,
     private val nominationPoolStateRepository: NominationPoolStateRepository,
     private val poolAccountDerivation: PoolAccountDerivation,
-) : BaseStakingDashboardUpdater(chain, chainAsset, stakingType, metaAccount) {
+    storageCache: StorageCache,
+) : BaseStakingDashboardUpdater(chain, chainAsset, stakingType, metaAccount),
+    StorageCachingContext by StorageCachingContext(storageCache) {
 
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
         return remoteStorageSource.subscribe(chain.id, storageSubscriptionBuilder) {
             val stakingStateFlow = subscribeToStakingState()
-            val activeEraFlow = metadata.staking.activeEra.observeNonNull()
+            val activeEraFlow = metadata.staking.activeEra
+                .observeWithRaw()
+                .cacheValues()
+                .filterNotNull()
 
             combineToPair(stakingStateFlow, activeEraFlow)
         }
@@ -79,18 +93,25 @@ class StakingDashboardNominationPoolsUpdater(
     private suspend fun StorageQueryContext.subscribeToStakingState(): Flow<PoolsOnChainInfo?> {
         val accountId = metaAccount.accountIdIn(chain) ?: return flowOf(null)
 
-        val poolMemberFlow = metadata.nominationPools.poolMembers.observe(accountId)
+        val poolMemberFlow = metadata.nominationPools.poolMembers
+            .observeWithRaw(accountId)
+            .cacheValues()
 
-        val poolAggregatedStateFlow = poolMemberFlow
-            .map { it?.poolId }
-            .distinctUntilChanged()
-            .flatMapLatest(::subscribeToPoolWithBalance)
+        return flowOfAll {
+            val poolMemberFlowShared = poolMemberFlow
+                .shareIn(CoroutineScope(coroutineContext), SharingStarted.Lazily, replay = 1)
 
-        return combine(poolMemberFlow, poolAggregatedStateFlow) { poolMember, poolWithBalance ->
-            if (poolMember != null && poolWithBalance != null) {
-                PoolsOnChainInfo(poolMember, poolWithBalance)
-            } else {
-                null
+            val poolAggregatedStateFlow = poolMemberFlowShared
+                .map { it?.poolId }
+                .distinctUntilChanged()
+                .flatMapLatest(::subscribeToPoolWithBalance)
+
+            combine(poolMemberFlow, poolAggregatedStateFlow) { poolMember, poolWithBalance ->
+                if (poolMember != null && poolWithBalance != null) {
+                    PoolsOnChainInfo(poolMember, poolWithBalance)
+                } else {
+                    null
+                }
             }
         }
     }
@@ -101,10 +122,21 @@ class StakingDashboardNominationPoolsUpdater(
         val bondedPoolAccountId = poolAccountDerivation.derivePoolAccount(poolId, PoolAccountDerivation.PoolAccountType.BONDED, chain.id)
 
         return remoteStorageSource.subscribeBatched(chain.id) {
+            val bondedPoolFlow = metadata.nominationPools.bondedPools.observeWithRaw(poolId.value)
+                .cacheValues()
+                .filterNotNull()
+
+            val poolNominationsFlow = nominationPoolStateRepository.observePoolNominations(bondedPoolAccountId)
+                .cacheValues()
+
+            val activeStakeFlow = nominationPoolStateRepository.observeBondedPoolLedger(bondedPoolAccountId)
+                .cacheValues()
+                .map { it.activeBalance() }
+
             combine(
-                metadata.nominationPools.bondedPools.observeNonNull(poolId.value),
-                nominationPoolStateRepository.observePoolNominations(bondedPoolAccountId),
-                nominationPoolStateRepository.observeBondedBalance(bondedPoolAccountId),
+                bondedPoolFlow,
+                poolNominationsFlow,
+                activeStakeFlow,
             ) { bondedPool, nominations, balance ->
                 PoolAggregatedState(bondedPool, nominations, balance, bondedPoolAccountId)
             }

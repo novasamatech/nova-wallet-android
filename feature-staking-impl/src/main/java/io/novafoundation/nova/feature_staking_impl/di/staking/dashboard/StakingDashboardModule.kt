@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.StakingDashboardDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
@@ -59,7 +60,8 @@ class StakingDashboardModule {
         stakingDashboardCache: StakingDashboardCache,
         nominationPoolBalanceRepository: NominationPoolStateRepository,
         poolAccountDerivation: PoolAccountDerivation,
-    ) = StakingDashboardUpdaterFactory(stakingDashboardCache, remoteStorageSource, nominationPoolBalanceRepository, poolAccountDerivation)
+        storageCache: StorageCache
+    ) = StakingDashboardUpdaterFactory(stakingDashboardCache, remoteStorageSource, nominationPoolBalanceRepository, poolAccountDerivation, storageCache)
 
     @Provides
     @FeatureScope

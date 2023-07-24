@@ -40,7 +40,7 @@ class RemoteStorageQueryContext(
     }
 
     @Suppress("IfThenToElvis")
-    override suspend fun observeKey(key: String): Flow<String?> {
+    override fun observeKey(key: String): Flow<String?> {
         return if (subscriptionBuilder != null) {
             subscriptionBuilder.subscribe(key).map { it.value }
         } else {

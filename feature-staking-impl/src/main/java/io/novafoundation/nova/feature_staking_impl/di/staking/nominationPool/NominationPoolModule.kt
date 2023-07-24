@@ -14,11 +14,14 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.reposito
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolMembersRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.RealNominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.networkInfo.NominationPoolsNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.networkInfo.RealNominationPoolsNetworkInfoInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.stakeSummary.NominationPoolStakeSummaryInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.stakeSummary.RealNominationPoolStakeSummaryInteractor
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
@@ -34,7 +37,9 @@ class NominationPoolModule {
 
     @Provides
     @FeatureScope
-    fun provideNominationPoolBalanceRepository(): NominationPoolStateRepository = RealNominationPoolStateRepository()
+    fun provideNominationPoolBalanceRepository(
+        @Named(LOCAL_STORAGE_SOURCE) dataSource: StorageDataSource
+    ): NominationPoolStateRepository = RealNominationPoolStateRepository(dataSource)
 
     @Provides
     @FeatureScope
@@ -80,5 +85,19 @@ class NominationPoolModule {
         poolAccountDerivation = poolAccountDerivation,
         relaychainStakingInteractor = relaychainStakingInteractor,
         nominationPoolMemberUseCase = nominationPoolMemberUseCase
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideStakeSummaryInteractor(
+        nominationPoolStateRepository: NominationPoolStateRepository,
+        stakingSharedComputation: StakingSharedComputation,
+        noPoolAccountDerivation: PoolAccountDerivation,
+        eraTimeCalculatorFactory: EraTimeCalculatorFactory,
+    ): NominationPoolStakeSummaryInteractor = RealNominationPoolStakeSummaryInteractor(
+        nominationPoolStateRepository = nominationPoolStateRepository,
+        stakingSharedComputation = stakingSharedComputation,
+        noPoolAccountDerivation = noPoolAccountDerivation,
+        eraTimeCalculatorFactory = eraTimeCalculatorFactory
     )
 }
