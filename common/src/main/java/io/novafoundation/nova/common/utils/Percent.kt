@@ -6,7 +6,7 @@ import java.math.BigDecimal
 
 /**
  * Type that represents [Percent] / 100
- * This, 0.1 will represent equivalent to 10%
+ * Thus, 0.1 will represent equivalent to 10%
  */
 @JvmInline
 value class Perbill(val value: Double) : Comparable<Perbill> {

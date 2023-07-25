@@ -26,15 +26,17 @@ private const val DECIMAL_PATTERN_BASE = "###,###."
 private const val GROUPING_SEPARATOR = ','
 private const val DECIMAL_SEPARATOR = '.'
 
-private const val FULL_PRECISION = 5
-const val ABBREVIATED_PRECISION = 2
+private const val MIN_SCALE = 5
+private const val PRICE_MIN_PRECISION = 3
+private const val TOKEN_MIN_PRECISION = 1
+const val ABBREVIATED_SCALE = 2
 
 private val dateTimeFormat = SimpleDateFormat.getDateTimeInstance()
 private val dateTimeFormatISO_8601 by lazy { SimpleDateFormat(DATE_ISO_8601_FULL, Locale.getDefault()) }
 private val dateTimeFormatISO_8601_NoMs by lazy { SimpleDateFormat(DATE_ISO_8601_NO_MS, Locale.getDefault()) }
 
-private val defaultAbbreviationFormatter = FixedPrecisionFormatter(ABBREVIATED_PRECISION)
-private val defaultFullFormatter = FixedPrecisionFormatter(FULL_PRECISION)
+private val defaultAbbreviationFormatter = FixedPrecisionFormatter(ABBREVIATED_SCALE)
+private val defaultFullFormatter = FixedPrecisionFormatter(MIN_SCALE)
 
 private val thousandAbbreviation = NumberAbbreviation(
     threshold = BigDecimal("1E+3"),
@@ -154,6 +156,13 @@ fun decimalFormatterFor(pattern: String, roundingMode: RoundingMode): DecimalFor
     }
 }
 
+fun String.toAmountWithFraction(): AmountWithFraction {
+    val amountAndFraction = this.split(DECIMAL_SEPARATOR)
+    val amount = amountAndFraction[0]
+    val fraction = amountAndFraction.getOrNull(1)
+    return AmountWithFraction(amount, fraction, DECIMAL_SEPARATOR.toString())
+}
+
 fun patternWith(precision: Int) = "$DECIMAL_PATTERN_BASE${"#".repeat(precision)}"
 
 fun defaultNumberFormatter() = CompoundNumberFormatter(
@@ -162,7 +171,7 @@ fun defaultNumberFormatter() = CompoundNumberFormatter(
             threshold = BigDecimal.ZERO,
             divisor = BigDecimal.ONE,
             suffix = "",
-            formatter = DynamicPrecisionFormatter(minPrecision = FULL_PRECISION)
+            formatter = DynamicPrecisionFormatter(minScale = MIN_SCALE, minPrecision = TOKEN_MIN_PRECISION)
         ),
         NumberAbbreviation(
             threshold = BigDecimal.ONE,
@@ -183,7 +192,7 @@ fun currencyFormatter() = CompoundNumberFormatter(
             threshold = BigDecimal.ZERO,
             divisor = BigDecimal.ONE,
             suffix = "",
-            formatter = DynamicPrecisionFormatter(minPrecision = ABBREVIATED_PRECISION)
+            formatter = DynamicPrecisionFormatter(minScale = ABBREVIATED_SCALE, minPrecision = PRICE_MIN_PRECISION)
         ),
         NumberAbbreviation(
             threshold = BigDecimal.ONE,

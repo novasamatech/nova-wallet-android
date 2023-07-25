@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.b
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.filterOwn
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.SubstrateAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
@@ -27,7 +26,6 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.call
 class EquilibriumAssetHistory(
     private val chainRegistry: ChainRegistry,
     private val eventsRepository: EventsRepository,
-    private val walletRepository: WalletRepository,
     walletOperationsApi: SubQueryOperationsApi,
     cursorStorage: TransferCursorStorage,
     coinPriceRepository: CoinPriceRepository

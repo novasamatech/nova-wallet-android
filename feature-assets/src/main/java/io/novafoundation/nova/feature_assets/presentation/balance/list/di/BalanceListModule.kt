@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceLi
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -70,7 +71,8 @@ class BalanceListModule {
         currencyInteractor: CurrencyInteractor,
         balanceBreakdownInteractor: BalanceBreakdownInteractor,
         contributionsInteractor: ContributionsInteractor,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     ): ViewModel {
         return BalanceListViewModel(
             interactor,
@@ -80,7 +82,8 @@ class BalanceListModule {
             currencyInteractor,
             balanceBreakdownInteractor,
             contributionsInteractor,
-            resourceManager
+            resourceManager,
+            walletConnectSessionsUseCase
         )
     }
 

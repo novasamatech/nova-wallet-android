@@ -6,6 +6,8 @@ interface SubQueryFilters {
 
     infix fun String.equalTo(value: String) = "$this: { equalTo: \"$value\" }"
 
+    infix fun String.equalToEnum(value: String) = "$this: { equalTo: $value }"
+
     fun queryParams(
         filter: String
     ): String {

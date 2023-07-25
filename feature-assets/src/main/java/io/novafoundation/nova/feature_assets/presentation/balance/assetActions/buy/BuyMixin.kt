@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ChooseOneOfManyAwaita
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
 import io.novafoundation.nova.feature_assets.data.buyToken.ExternalProvider
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 
 interface BuyMixin {
@@ -16,18 +17,15 @@ interface BuyMixin {
     val awaitProviderChoosing: ChooseOneOfManyAwaitable<BuyProvider>
 
     val integrateWithBuyProviderEvent: LiveData<Event<IntegrationPayload>>
+    fun buyEnabledFlow(chainAsset: Chain.Asset): Flow<Boolean>
 
-    val buyEnabled: Flow<Boolean>
-
-    fun buyClicked()
+    fun buyClicked(chainAsset: Chain.Asset)
 
     interface Presentation : BuyMixin
 }
 
 fun BaseFragment<*>.setupBuyIntegration(
-    mixin: BuyMixin,
-    buyButton: View,
-    customBuyClick: (() -> Unit)? = null
+    mixin: BuyMixin
 ) {
     mixin.integrateWithBuyProviderEvent.observeEvent {
         with(it) {
@@ -45,8 +43,14 @@ fun BaseFragment<*>.setupBuyIntegration(
             onCancel = action.onCancel
         ).show()
     }
+}
 
-    buyButton.setOnClickListener { if (customBuyClick != null) customBuyClick() else mixin.buyClicked() }
+fun BaseFragment<*>.setupBuyButton(
+    buyButton: View,
+    buyEnabledFlow: Flow<Boolean>,
+    customBuyClick: (() -> Unit)
+) {
+    buyButton.setOnClickListener { customBuyClick() }
 
-    mixin.buyEnabled.observe(buyButton::setEnabled)
+    buyEnabledFlow.observe(buyButton::setEnabled)
 }

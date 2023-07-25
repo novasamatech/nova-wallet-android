@@ -51,6 +51,10 @@ inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = 
     list.map { item -> mapper(item) }
 }
 
+inline fun <T, R> Flow<List<T>>.mapListNotNull(crossinline mapper: suspend (T) -> R?) = map { list ->
+    list.mapNotNull { item -> mapper(item) }
+}
+
 /**
  * Modifies flow so that it firstly emits [LoadingState.Loading] state.
  * Then emits each element from upstream wrapped into [LoadingState.Loaded] state.
@@ -524,4 +528,3 @@ fun <T> Flow<T>.throttleLast(delay: Duration): Flow<T> = this
         emit(it)
         delay(delay)
     }
-

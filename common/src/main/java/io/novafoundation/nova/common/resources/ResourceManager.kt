@@ -34,6 +34,8 @@ interface ResourceManager {
     fun formatTime(timestamp: Long): String
 
     fun getDrawable(@DrawableRes id: Int): Drawable
+
+    fun getDimensionPixelSize(id: Int): Int
 }
 
 fun ResourceManager.formatTimeLeft(elapsedTimeInMillis: Long): String {

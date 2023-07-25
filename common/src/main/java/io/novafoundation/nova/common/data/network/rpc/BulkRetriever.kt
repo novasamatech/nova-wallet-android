@@ -55,15 +55,11 @@ class QueryStorageAtResponse(
     }
 }
 
-private const val DEFAULT_PAGE_SIZE = 1000
-
-class BulkRetriever(
-    private val pageSize: Int = DEFAULT_PAGE_SIZE
-) {
+class BulkRetriever(private val pageSize: Int) {
 
     /**
      * Retrieves all keys starting with [keyPrefix] from [at] block
-     * Returns only first [DEFAULT_PAGE_SIZE] elements in case historical querying is used ([at] is not null)
+     * Returns only first [defaultPageSize] elements in case historical querying is used ([at] is not null)
      */
     suspend fun retrieveAllKeys(
         socketService: SocketService,
@@ -99,7 +95,7 @@ class BulkRetriever(
     }
 
     /**
-     * Note: the amount of keys returned by this method is limited by [DEFAULT_PAGE_SIZE]
+     * Note: the amount of keys returned by this method is limited by [defaultPageSize]
      * So it is should not be used for storages with big amount of entries
      */
     private suspend fun queryKeysByPrefixHistorical(
@@ -126,7 +122,7 @@ class BulkRetriever(
         while (true) {
             coroutineContext.ensureActive()
 
-            val request = GetKeysPagedRequest(prefix, DEFAULT_PAGE_SIZE, currentOffset)
+            val request = GetKeysPagedRequest(prefix, pageSize, currentOffset)
 
             val page = socketService.executeAsync(request, mapper = pojoList<String>().nonNull())
 

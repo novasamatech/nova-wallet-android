@@ -6,28 +6,16 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.search.AssetSearchViewModel
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class AssetSearchModule {
-
-    @Provides
-    @ScreenScope
-    fun provideInteractor(
-        walletRepository: WalletRepository,
-        accountRepository: AccountRepository,
-        chainRegistry: ChainRegistry
-    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry)
 
     @Provides
     internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): AssetSearchViewModel {

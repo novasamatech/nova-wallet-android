@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
@@ -59,11 +60,13 @@ interface RootDependencies {
 
     fun safeModeService(): SafeModeService
 
+    fun rootScope(): RootScope
+
     val systemCallExecutor: SystemCallExecutor
 
     val contextManager: ContextManager
 
-    val walletConnectServiceFactory: WalletConnectService.Factory
+    val walletConnectService: WalletConnectService
 
     val imageLoader: ImageLoader
 

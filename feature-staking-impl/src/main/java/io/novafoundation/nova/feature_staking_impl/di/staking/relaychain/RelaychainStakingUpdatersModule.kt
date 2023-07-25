@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.historical.HistoricalUpdateMediator
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.historical.HistoricalValidatorRewardPointsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.scope.AccountStakingScope
+import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -65,7 +66,7 @@ class RelaychainStakingUpdatersModule {
     fun provideElectedNominatorsUpdater(
         sharedState: StakingSharedState,
         chainRegistry: ChainRegistry,
-        bulkRetriever: BulkRetriever,
+        @DefaultBulkRetriever bulkRetriever: BulkRetriever,
         storageCache: StorageCache,
     ) = ValidatorExposureUpdater(
         bulkRetriever,
@@ -167,7 +168,7 @@ class RelaychainStakingUpdatersModule {
     fun provideHistoricalMediator(
         sharedState: StakingSharedState,
         chainRegistry: ChainRegistry,
-        bulkRetriever: BulkRetriever,
+        @DefaultBulkRetriever bulkRetriever: BulkRetriever,
         stakingRepository: StakingRepository,
         storageCache: StorageCache,
     ) = HistoricalUpdateMediator(

@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.WalletConnectSessionInteractor
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.common.WalletConnectSessionMapper
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -25,12 +26,14 @@ class WalletConnectSessionsModule {
         interactor: WalletConnectSessionInteractor,
         walletUiUseCase: WalletUiUseCase,
         walletConnectSessionMapper: WalletConnectSessionMapper,
+        walletConnectSessionsPayload: WalletConnectSessionsPayload
     ): ViewModel {
         return WalletConnectSessionsViewModel(
             router = router,
             interactor = interactor,
             walletUiUseCase = walletUiUseCase,
-            walletConnectSessionMapper = walletConnectSessionMapper
+            walletConnectSessionMapper = walletConnectSessionMapper,
+            walletConnectSessionsPayload = walletConnectSessionsPayload
         )
     }
 
