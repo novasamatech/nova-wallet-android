@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.map
 
 class PoolScope(
     private val poolMemberUseCase: NominationPoolMemberUseCase,
-): UpdateScope<PoolId?> {
+) : UpdateScope<PoolId?> {
 
     override fun invalidationFlow(): Flow<PoolId?> {
         return poolMemberUseCase.currentPoolMemberFlow()

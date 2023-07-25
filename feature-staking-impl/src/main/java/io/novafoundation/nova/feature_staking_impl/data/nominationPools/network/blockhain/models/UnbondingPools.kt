@@ -16,7 +16,7 @@ class UnbondingPools(
 class UnbondingPool(
     override val poolPoints: PoolPoints,
     override val poolBalance: Balance
-): PoolBalanceConvertable
+) : PoolBalanceConvertable
 
 fun bindUnbondingPools(decoded: Any): UnbondingPools {
     val asStruct = decoded.castToStruct()

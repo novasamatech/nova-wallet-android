@@ -16,7 +16,7 @@ interface NominationPoolUnbondRepository {
 
 class RealNominationPoolUnbondRepository(
     private val localStorageDataSource: StorageDataSource,
-): NominationPoolUnbondRepository {
+) : NominationPoolUnbondRepository {
 
     override fun unbondingPoolsFlow(poolId: PoolId, chainId: ChainId): Flow<UnbondingPools?> {
         return localStorageDataSource.subscribe(chainId) {

@@ -37,7 +37,7 @@ class PaymentUpdaterFactory(
     private val currencyRepository: CurrencyRepository
 ) {
 
-    fun create(chain: Chain): Updater<MetaAccount>  {
+    fun create(chain: Chain): Updater<MetaAccount> {
         return PaymentUpdater(
             operationDao = operationDao,
             assetSourceRegistry = assetSourceRegistry,

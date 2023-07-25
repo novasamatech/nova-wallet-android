@@ -18,9 +18,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.Unbondings
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.from
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope.coroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlin.coroutines.coroutineContext
 
 interface NominationPoolUnbondingsInteractor {
 

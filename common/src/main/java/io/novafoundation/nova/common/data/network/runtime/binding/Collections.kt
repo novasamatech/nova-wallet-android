@@ -16,7 +16,7 @@ fun <K, V> bindMap(dynamicInstance: Any?, keyBinder: (Any?) -> K, valueBinder: (
 
     return dynamicInstance.cast<List<*>>().associateBy(
         keySelector = {
-             val (keyRaw, _) = it.cast<List<*>>()
+            val (keyRaw, _) = it.cast<List<*>>()
 
             keyBinder(keyRaw)
         },

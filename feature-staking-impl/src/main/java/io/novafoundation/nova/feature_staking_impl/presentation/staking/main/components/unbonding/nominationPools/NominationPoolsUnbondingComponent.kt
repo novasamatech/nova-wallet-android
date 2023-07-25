@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-
 class NominationPoolsUnbondingComponentFactory(
     private val poolMemberUseCase: NominationPoolMemberUseCase,
     private val interactor: NominationPoolUnbondingsInteractor,
