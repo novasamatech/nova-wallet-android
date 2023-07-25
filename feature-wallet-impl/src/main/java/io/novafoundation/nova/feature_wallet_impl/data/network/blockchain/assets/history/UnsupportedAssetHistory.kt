@@ -45,4 +45,8 @@ class UnsupportedAssetHistory : AssetHistory {
     override suspend fun getSyncedPageOffset(accountId: AccountId, chain: Chain, chainAsset: Chain.Asset): PageOffset {
         return PageOffset.FullData
     }
+
+    override fun isOperationSafe(operation: Operation): Boolean {
+        return false
+    }
 }

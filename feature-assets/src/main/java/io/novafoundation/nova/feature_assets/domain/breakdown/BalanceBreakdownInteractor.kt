@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_assets.domain.breakdown
 
-import io.novafoundation.nova.common.utils.formatting.ABBREVIATED_PRECISION
+import io.novafoundation.nova.common.utils.formatting.ABBREVIATED_SCALE
 import io.novafoundation.nova.common.utils.percentage
 import io.novafoundation.nova.common.utils.unite
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -81,7 +81,7 @@ class BalanceBreakdownInteractor(
 
                     val totalAmount = calculateTotalBalance(assets, contributionsOrEmpty)
                     val (transferablePercentage, locksPercentage) = percentage(
-                        scale = ABBREVIATED_PRECISION,
+                        scale = ABBREVIATED_SCALE,
                         totalAmount.transferableFiat,
                         totalAmount.locksFiat
                     )

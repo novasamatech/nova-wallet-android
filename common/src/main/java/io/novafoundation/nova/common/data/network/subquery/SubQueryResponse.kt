@@ -14,3 +14,7 @@ sealed class GroupedAggregate(val keys: List<String>) {
 
     class Sum<T>(val sum: T, keys: List<String>) : GroupedAggregate(keys)
 }
+
+fun <T> SubQueryGroupedAggregates<GroupedAggregate.Sum<T>>.firstSum(): T? {
+    return groupedAggregates.firstOrNull()?.sum
+}

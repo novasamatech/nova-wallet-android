@@ -140,13 +140,16 @@ class RealContributionsInteractor(
 
         return contributionsRepository.observeContributions(metaAccount, chain, asset)
             .mapListNotNull { contribution ->
-                val fundInfo = fundInfos[contribution.paraId] ?: return@mapListNotNull null
+                val parachainMetadata = parachainMetadatas[contribution.paraId]
+                val fundInfo = fundInfos[contribution.paraId]
+                    ?: fundInfos[parachainMetadata?.movedToParaId]
+                    ?: return@mapListNotNull null
 
                 ContributionWithMetadata(
                     contribution = contribution,
                     metadata = getMetadata(
                         fundInfo = fundInfo,
-                        parachainMetadata = parachainMetadatas[contribution.paraId],
+                        parachainMetadata = parachainMetadata,
                         blocksPerLeasePeriod = blocksPerLeasePeriod,
                         currentBlockNumber = currentBlockNumber,
                         expectedBlockTime = expectedBlockTime

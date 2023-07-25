@@ -73,7 +73,7 @@ android {
             versionNameSuffix '-github'
             applicationIdSuffix '.github'
 
-            buildConfigField "String", "APP_UPDATE_SOURCE_LINK", "\"https://github.com/nova-wallet/nova-wallet-android-releases/releases\""
+            buildConfigField "String", "APP_UPDATE_SOURCE_LINK", "\"https://github.com/novasamatech/nova-wallet-android-releases/releases\""
         }
         develop {
             signingConfig signingConfigs.dev
