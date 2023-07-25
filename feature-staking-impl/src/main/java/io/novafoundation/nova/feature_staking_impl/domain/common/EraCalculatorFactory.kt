@@ -57,6 +57,10 @@ class EraTimeCalculator(
     }
 }
 
+fun EraTimeCalculator.calculateDurationTill(era: EraIndex): Duration {
+    return calculate(era).toLong().milliseconds
+}
+
 class EraTimeCalculatorFactory(
     private val stakingRepository: StakingRepository,
     private val sessionRepository: SessionRepository,

@@ -20,7 +20,7 @@ class NominationPoolStakingUpdatersModule {
 
     @Provides
     @FeatureScope
-    fun provideSubPoolsUpdater(
+    fun providePoolScope(
         poolMemberUseCase: NominationPoolMemberUseCase,
     ) = PoolScope(poolMemberUseCase)
 

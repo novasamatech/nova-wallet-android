@@ -14,7 +14,9 @@ class StakingLedger(
     val claimedRewards: List<BigInteger>
 )
 
-class UnlockChunk(val amount: BigInteger, val era: BigInteger)
+class UnlockChunk(val amount: BigInteger, val era: BigInteger): EraRedeemable {
+    override val redeemEra: EraIndex = era
+}
 
 fun StakingLedger.sumStaking(
     condition: (chunk: UnlockChunk) -> Boolean
@@ -27,6 +29,3 @@ fun StakingLedger.sumStaking(
 fun StakingLedger?.activeBalance(): Balance {
     return this?.active.orZero()
 }
-
-fun UnlockChunk.isUnbondingIn(activeEraIndex: BigInteger) = era > activeEraIndex
-fun UnlockChunk.isRedeemableIn(activeEraIndex: BigInteger) = era <= activeEraIndex

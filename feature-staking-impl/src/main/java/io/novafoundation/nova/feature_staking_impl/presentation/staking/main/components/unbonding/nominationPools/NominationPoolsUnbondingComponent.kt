@@ -19,9 +19,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-const val REBOND_KIND_ALL = "All"
-const val REBOND_KIND_LAST = "Last"
-const val REBOND_KIND_CUSTOM = "Custom"
 
 class NominationPoolsUnbondingComponentFactory(
     private val poolMemberUseCase: NominationPoolMemberUseCase,
@@ -65,7 +62,7 @@ private class NominationPoolsUnbondingComponent(
 
     private fun loadUnbondings(poolMember: PoolMember): Flow<UnbondingState> {
         return combine(
-            interactor.unbondingsFlow(poolMember, stakingOption.assetWithChain.chain.id),
+            interactor.unbondingsFlow(poolMember, stakingOption, hostContext.scope),
             hostContext.assetFlow,
         ) { unbondings, asset ->
             UnbondingState.from(unbondings, asset)
