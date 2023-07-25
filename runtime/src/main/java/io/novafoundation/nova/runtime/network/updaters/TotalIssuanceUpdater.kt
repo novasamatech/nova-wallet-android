@@ -14,11 +14,11 @@ class TotalIssuanceUpdater(
     chainIdHolder: ChainIdHolder,
     storageCache: StorageCache,
     chainRegistry: ChainRegistry
-) : SingleStorageKeyUpdater<GlobalScope>(GlobalScope, chainIdHolder, chainRegistry, storageCache) {
+) : SingleStorageKeyUpdater<Unit>(GlobalScope, chainIdHolder, chainRegistry, storageCache) {
 
     override val requiredModules: List<String> = listOf(Modules.BALANCES)
 
-    override suspend fun storageKey(runtime: RuntimeSnapshot): String {
+    override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: Unit): String {
         return runtime.metadata.balances().storage("TotalIssuance").storageKey()
     }
 }

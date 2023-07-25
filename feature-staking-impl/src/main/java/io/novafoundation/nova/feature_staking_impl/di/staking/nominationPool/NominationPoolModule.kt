@@ -10,9 +10,11 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.Rea
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolMembersRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolUnbondRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolMembersRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolStateRepository
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolUnbondRepository
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
@@ -56,6 +58,12 @@ class NominationPoolModule {
     ): NominationPoolMembersRepository {
         return RealNominationPoolMembersRepository(localStorageSource)
     }
+
+    @Provides
+    @FeatureScope
+    fun provideNominationPoolUnbondRepository(
+        @Named(LOCAL_STORAGE_SOURCE) dataSource: StorageDataSource
+    ): NominationPoolUnbondRepository = RealNominationPoolUnbondRepository(dataSource)
 
     @Provides
     @FeatureScope

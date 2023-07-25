@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain
 
 import io.novafoundation.nova.core.storage.StorageCache
-import io.novafoundation.nova.core.updater.Updater
+import io.novafoundation.nova.core.updater.GlobalScopeUpdater
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.MultiChainOffChainSyncResult
@@ -27,7 +27,7 @@ class StakingDashboardUpdaterFactory(
         stakingType: Chain.Asset.StakingType,
         metaAccount: MetaAccount,
         stakingStatsFlow: Flow<MultiChainOffChainSyncResult>,
-    ): Updater? {
+    ): GlobalScopeUpdater? {
         return when (stakingType.group()) {
             StakingTypeGroup.RELAYCHAIN -> relayChain(chain, stakingType, metaAccount, stakingStatsFlow)
             StakingTypeGroup.PARACHAIN -> parachain(chain, stakingType, metaAccount, stakingStatsFlow)
@@ -41,7 +41,7 @@ class StakingDashboardUpdaterFactory(
         stakingType: Chain.Asset.StakingType,
         metaAccount: MetaAccount,
         stakingStatsFlow: Flow<MultiChainOffChainSyncResult>,
-    ): Updater {
+    ): GlobalScopeUpdater {
         return StakingDashboardRelayStakingUpdater(
             chain = chain,
             chainAsset = chain.utilityAsset,
@@ -58,7 +58,7 @@ class StakingDashboardUpdaterFactory(
         stakingType: Chain.Asset.StakingType,
         metaAccount: MetaAccount,
         stakingStatsFlow: Flow<MultiChainOffChainSyncResult>,
-    ): Updater {
+    ): GlobalScopeUpdater {
         return StakingDashboardParachainStakingUpdater(
             chain = chain,
             chainAsset = chain.utilityAsset,
@@ -76,7 +76,7 @@ class StakingDashboardUpdaterFactory(
         metaAccount: MetaAccount,
         stakingStatsFlow: Flow<MultiChainOffChainSyncResult>,
         storageCache: StorageCache,
-    ): Updater {
+    ): GlobalScopeUpdater {
         return StakingDashboardNominationPoolsUpdater(
             chain = chain,
             chainAsset = chain.utilityAsset,

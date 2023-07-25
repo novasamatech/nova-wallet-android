@@ -27,25 +27,28 @@ suspend fun StorageCache.insert(
     insert(storageEntry, chainId)
 }
 
-abstract class SingleStorageKeyUpdater<S : UpdateScope>(
-    override val scope: S,
+abstract class SingleStorageKeyUpdater<V>(
+    override val scope: UpdateScope<V>,
     private val chainIdHolder: ChainIdHolder,
     private val chainRegistry: ChainRegistry,
     private val storageCache: StorageCache
-) : Updater {
+) : Updater<V> {
 
     /**
      * @return a storage key to update. null in case updater does not want to update anything
      */
-    abstract suspend fun storageKey(runtime: RuntimeSnapshot): String?
+    abstract suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: V): String?
 
     protected open fun fallbackValue(runtime: RuntimeSnapshot): String? = null
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(
+        storageSubscriptionBuilder: SharedRequestsBuilder,
+        scopeValue: V,
+    ): Flow<Updater.SideEffect> {
         val chainId = chainIdHolder.chainId()
         val runtime = chainRegistry.getRuntime(chainId)
 
-        val storageKey = runCatching { storageKey(runtime) }.getOrNull() ?: return emptyFlow()
+        val storageKey = runCatching { storageKey(runtime, scopeValue) }.getOrNull() ?: return emptyFlow()
 
         return storageSubscriptionBuilder.subscribe(storageKey)
             .map {

@@ -40,7 +40,7 @@ class HistoricalUpdateMediator(
 
     override val requiredModules: List<String> = listOf(Modules.STAKING)
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder, scopeValue: Unit): Flow<Updater.SideEffect> {
         val chainId = stakingSharedState.chainId()
         val runtime = chainRegistry.getRuntime(chainId)
 

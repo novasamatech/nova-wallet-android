@@ -15,17 +15,17 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.network.updaters.SingleChainUpdateSystem
 
 class StakingUpdateSystem(
-    private val relaychainUpdaters: List<Updater>,
-    private val parachainUpdaters: List<Updater>,
-    private val commonUpdaters: List<Updater>,
-    private val turingExtraUpdaters: List<Updater>,
-    private val nominationPoolsUpdaters: List<Updater>,
+    private val relaychainUpdaters: List<Updater<*>>,
+    private val parachainUpdaters: List<Updater<*>>,
+    private val commonUpdaters: List<Updater<*>>,
+    private val turingExtraUpdaters: List<Updater<*>>,
+    private val nominationPoolsUpdaters: List<Updater<*>>,
     chainRegistry: ChainRegistry,
     singleAssetSharedState: StakingSharedState,
     storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : SingleChainUpdateSystem<StakingSharedState.OptionAdditionalData>(chainRegistry, singleAssetSharedState, storageSharedRequestsBuilderFactory) {
 
-    override fun getUpdaters(selectedAssetOption: StakingOption): List<Updater> {
+    override fun getUpdaters(selectedAssetOption: StakingOption): List<Updater<*>> {
         return commonUpdaters + when (selectedAssetOption.additional.stakingType) {
             UNSUPPORTED -> emptyList()
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainUpdaters

@@ -4,7 +4,6 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
-import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool.NominationPoolStakingUpdatersModule
@@ -38,10 +37,10 @@ class UpdatersModule {
     @Provides
     @FeatureScope
     fun provideStakingUpdateSystem(
-        @Relaychain relaychainUpdaters: List<@JvmSuppressWildcards Updater>,
-        @Parachain parachainUpdaters: List<@JvmSuppressWildcards Updater>,
-        @Turing turingUpdaters: List<@JvmSuppressWildcards Updater>,
-        @NominationPools nominationPoolsUpdaters: List<@JvmSuppressWildcards Updater>,
+        @Relaychain relaychainUpdaters: StakingUpdaters,
+        @Parachain parachainUpdaters: StakingUpdaters,
+        @Turing turingUpdaters: StakingUpdaters,
+        @NominationPools nominationPoolsUpdaters: StakingUpdaters,
         blockTimeUpdater: BlockTimeUpdater,
         blockNumberUpdater: BlockNumberUpdater,
         totalIssuanceUpdater: TotalIssuanceUpdater,
@@ -49,13 +48,13 @@ class UpdatersModule {
         singleAssetSharedState: StakingSharedState,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     ) = StakingUpdateSystem(
-        relaychainUpdaters = relaychainUpdaters,
-        parachainUpdaters = parachainUpdaters,
+        relaychainUpdaters = relaychainUpdaters.updaters,
+        parachainUpdaters = parachainUpdaters.updaters,
         commonUpdaters = listOf(blockTimeUpdater, blockNumberUpdater, totalIssuanceUpdater),
         chainRegistry = chainRegistry,
         singleAssetSharedState = singleAssetSharedState,
-        turingExtraUpdaters = turingUpdaters,
-        nominationPoolsUpdaters = nominationPoolsUpdaters,
+        turingExtraUpdaters = turingUpdaters.updaters,
+        nominationPoolsUpdaters = nominationPoolsUpdaters.updaters,
         storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory
     )
 

@@ -7,6 +7,7 @@ import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
@@ -56,15 +57,18 @@ class StakingLedgerUpdater(
     private val storageCache: StorageCache,
     private val assetCache: AssetCache,
     override val scope: AccountUpdateScope,
-) : StakingUpdater {
+) : StakingUpdater<MetaAccount> {
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(
+        storageSubscriptionBuilder: SharedRequestsBuilder,
+        scopeValue: MetaAccount
+    ): Flow<Updater.SideEffect> {
         val (chain, chainAsset) = stakingSharedState.assetWithChain.first()
         if (chainAsset.disabled) return emptyFlow()
 
         val runtime = chainRegistry.getRuntime(chain.id)
 
-        val currentAccountId = scope.getAccount().accountIdIn(chain) ?: return emptyFlow()
+        val currentAccountId = scopeValue.accountIdIn(chain) ?: return emptyFlow()
         val socketService = storageSubscriptionBuilder.socketService ?: return emptyFlow()
 
         val key = runtime.metadata.staking().storage("Bonded").storageKey(runtime, currentAccountId)

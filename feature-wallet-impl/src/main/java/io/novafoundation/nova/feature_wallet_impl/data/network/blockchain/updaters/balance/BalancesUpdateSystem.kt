@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.transformLatestDiffed
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core.updater.Updater
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -31,22 +32,22 @@ class BalancesUpdateSystem(
 ) : UpdateSystem {
 
     override fun start(): Flow<Updater.SideEffect> {
-        return accountUpdateScope.invalidationFlow().flatMapLatest {
+        return accountUpdateScope.invalidationFlow().flatMapLatest { metaAccount ->
             chainRegistry.currentChains.transformLatestDiffed { chain ->
-                val updater = balanceChainUpdaters(chain)
+                val updater = balanceChainUpdaters(chain, metaAccount)
                 emitAll(updater)
             }
         }.flowOn(Dispatchers.Default)
     }
 
-    private suspend fun balanceChainUpdaters(chain: Chain): Flow<Updater.SideEffect> {
+    private suspend fun balanceChainUpdaters(chain: Chain, metaAccount: MetaAccount): Flow<Updater.SideEffect> {
         return flow {
             val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
 
-            val updaters: List<Updater> = listOf(paymentUpdaterFactory.create(chain), balanceLocksUpdater.create(chain))
+            val updaters = listOf(paymentUpdaterFactory.create(chain), balanceLocksUpdater.create(chain))
             val sideEffectFlows = updaters.map { updater ->
                 try {
-                    updater.listenForUpdates(subscriptionBuilder).catch { logError(chain, it) }
+                    updater.listenForUpdates(subscriptionBuilder, metaAccount).catch { logError(chain, it) }
                 } catch (e: Exception) {
                     emptyFlow()
                 }

@@ -6,8 +6,10 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolIdRaw
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.UnbondingPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.bindBondedPool
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.bindPoolMember
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.bindUnbondingPools
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry0
@@ -41,3 +43,7 @@ val NominationPoolsApi.lastPoolId: QueryableStorageEntry0<BigInteger>
 context(StorageQueryContext)
 val NominationPoolsApi.minJoinBond: QueryableStorageEntry0<BigInteger>
     get() = storage0("MinJoinBond", binding = ::bindNumber)
+
+context(StorageQueryContext)
+val NominationPoolsApi.subPoolsStorage: QueryableStorageEntry1<PoolIdRaw, UnbondingPools>
+    get() = storage1("SubPoolsStorage", binding = { decoded, _ -> bindUnbondingPools(decoded) })

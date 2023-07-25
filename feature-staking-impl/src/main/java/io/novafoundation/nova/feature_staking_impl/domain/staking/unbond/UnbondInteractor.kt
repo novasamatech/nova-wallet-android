@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.unbond
 
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
@@ -65,8 +66,7 @@ class UnbondInteractor(
                         val leftTime = calculator.calculate(destinationEra = unbonding.era)
 
                         Unbonding.Status.Unbonding(
-                            timeLeft = leftTime.toLong(),
-                            calculatedAt = System.currentTimeMillis()
+                            timer = TimerValue.fromCurrentTime(leftTime.toLong())
                         )
                     }
 
@@ -77,7 +77,7 @@ class UnbondInteractor(
                     )
                 }
 
-                Unbondings.from(unbondings)
+                Unbondings.from(unbondings, rebondPossible = true)
             }
         }
     }

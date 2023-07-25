@@ -6,8 +6,8 @@ import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
-import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.AssetBalanceScope
+import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.AssetBalanceScope.ScopeValue
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdaterFactory
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
@@ -16,20 +16,17 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onEach
 
 class RealContributionsUpdaterFactory(
-    private val accountScope: AccountUpdateScope,
     private val contributionsRepository: ContributionsRepository,
     private val crowdloanRepository: CrowdloanRepository,
     private val contributionDao: ContributionDao
 ) : ContributionsUpdaterFactory {
 
-    override fun create(chain: Chain, assetBalanceScope: AssetBalanceScope): Updater {
+    override fun create(chain: Chain, assetBalanceScope: AssetBalanceScope): Updater<ScopeValue> {
         return ContributionsUpdater(
             assetBalanceScope,
-            accountScope,
             chain,
             contributionsRepository,
             crowdloanRepository,
@@ -40,27 +37,29 @@ class RealContributionsUpdaterFactory(
 
 class ContributionsUpdater(
     override val scope: AssetBalanceScope,
-    private val accountScope: AccountUpdateScope,
     private val chain: Chain,
     private val contributionsRepository: ContributionsRepository,
     private val crowdloanRepository: CrowdloanRepository,
     private val contributionDao: ContributionDao,
-) : Updater {
+) : Updater<ScopeValue> {
 
     override val requiredModules: List<String> = emptyList()
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
-        return scope.invalidationFlow().flatMapLatest {
-            if (it.token.configuration.enabled) {
-                sync()
+    override suspend fun listenForUpdates(
+        storageSubscriptionBuilder: SharedRequestsBuilder,
+        scopeValue: ScopeValue,
+    ): Flow<Updater.SideEffect> {
+        return flowOf {
+            if (scopeValue.asset.token.configuration.enabled) {
+                sync(scopeValue)
             } else {
-                deleteContributions(it.token.configuration)
+                deleteContributions(scopeValue.asset.token.configuration)
             }
         }.noSideAffects()
     }
 
-    private suspend fun sync(): Flow<Any> {
-        val metaAccount = accountScope.getAccount()
+    private suspend fun sync(scopeValue: ScopeValue): Flow<Any> {
+        val metaAccount = scopeValue.metaAccount
         val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
 
         val fundInfos = crowdloanRepository.allFundInfos(chain.id)

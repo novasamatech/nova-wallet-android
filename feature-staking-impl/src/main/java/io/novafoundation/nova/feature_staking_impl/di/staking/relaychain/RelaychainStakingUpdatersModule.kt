@@ -5,7 +5,6 @@ import dagger.Provides
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
-import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -31,6 +30,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.historical.HistoricalValidatorRewardPointsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.scope.AccountStakingScope
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
+import io.novafoundation.nova.feature_staking_impl.di.staking.StakingUpdaters
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -291,7 +291,7 @@ class RelaychainStakingUpdatersModule {
         bagListNodeUpdater: BagListNodeUpdater,
         counterForListNodesUpdater: CounterForListNodesUpdater,
         parachainsUpdater: ParachainsUpdater
-    ): List<Updater> = listOf(
+    ): StakingUpdaters = StakingUpdaters(
         activeEraUpdater,
         validatorExposureUpdater,
         currentEraUpdater,

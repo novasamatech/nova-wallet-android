@@ -10,6 +10,24 @@ fun <T> bindList(dynamicInstance: Any?, itemBinder: (Any?) -> T): List<T> {
     }
 }
 
+// Maps are encoded as List<Pair<K, V>>
+fun <K, V> bindMap(dynamicInstance: Any?, keyBinder: (Any?) -> K, valueBinder: (Any?) -> V): Map<K, V> {
+    if (dynamicInstance == null) return emptyMap()
+
+    return dynamicInstance.cast<List<*>>().associateBy(
+        keySelector = {
+             val (keyRaw, _) = it.cast<List<*>>()
+
+            keyBinder(keyRaw)
+        },
+        valueTransform = {
+            val (_, valueRaw) = it.cast<List<*>>()
+
+            valueBinder(valueRaw)
+        }
+    )
+}
+
 inline fun <reified T : Enum<T>> bindCollectionEnum(
     dynamicInstance: Any?,
     enumValueFromName: (String) -> T = ::enumValueOf

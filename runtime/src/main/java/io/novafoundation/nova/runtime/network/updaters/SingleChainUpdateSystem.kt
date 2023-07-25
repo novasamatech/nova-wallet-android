@@ -26,7 +26,7 @@ abstract class SingleChainUpdateSystem<A>(
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : UpdateSystem {
 
-    abstract fun getUpdaters(selectedAssetOption: SupportedAssetOption<A>): List<Updater>
+    abstract fun getUpdaters(selectedAssetOption: SupportedAssetOption<A>): List<Updater<*>>
 
     override fun start(): Flow<Updater.SideEffect> = singleAssetSharedState.selectedOption.flatMapLatest { selectedOption ->
         val chain = selectedOption.assetWithChain.chain
@@ -37,14 +37,15 @@ abstract class SingleChainUpdateSystem<A>(
 
         val updaters = getUpdaters(selectedOption)
 
-        val scopeFlows = updaters.groupBy(Updater::scope).map { (scope, scopeUpdaters) ->
-            scope.invalidationFlow().flatMapLatest {
+        val scopeFlows = updaters.groupBy(Updater<*>::scope).map { (scope, scopeUpdaters) ->
+            scope.invalidationFlow().flatMapLatest { scopeValue ->
                 val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
 
                 val updatersFlow = scopeUpdaters
                     .filter { it.requiredModules.all(runtimeMetadata::hasModule) }
                     .map { updater ->
-                        updater.listenForUpdates(subscriptionBuilder)
+                        @Suppress("UNCHECKED_CAST")
+                        (updater as Updater<Any?>).listenForUpdates(subscriptionBuilder, scopeValue)
                             .catch { Log.e(logTag, "Failed to start $selfName for ${chain.name}: ${it.message}") }
                             .flowOn(Dispatchers.Default)
                     }
@@ -64,13 +65,13 @@ abstract class SingleChainUpdateSystem<A>(
 }
 
 class ConstantSingleChainUpdateSystem(
-    private val updaters: List<Updater>,
+    private val updaters: List<Updater<*>>,
     chainRegistry: ChainRegistry,
     singleAssetSharedState: SelectedAssetOptionSharedState<*>,
     storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : SingleChainUpdateSystem<Any?>(chainRegistry, singleAssetSharedState, storageSharedRequestsBuilderFactory) {
 
-    override fun getUpdaters(selectedAssetOption: SupportedAssetOption<Any?>): List<Updater> {
+    override fun getUpdaters(selectedAssetOption: SupportedAssetOption<Any?>): List<Updater<*>> {
         return updaters
     }
 }
