@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start
 
-import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.PayoutType
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain

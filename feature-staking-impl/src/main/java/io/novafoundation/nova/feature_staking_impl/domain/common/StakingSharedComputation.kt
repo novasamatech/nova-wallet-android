@@ -115,7 +115,7 @@ class StakingSharedComputation(
         scope: CoroutineScope
     ): RewardCalculator {
         val stakingOption = createStakingOption(chain, chainAsset, stakingType)
-        
+
         return rewardCalculator(stakingOption, scope)
     }
 }
