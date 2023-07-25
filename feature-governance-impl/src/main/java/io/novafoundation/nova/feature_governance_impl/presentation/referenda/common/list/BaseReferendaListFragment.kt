@@ -19,13 +19,13 @@ abstract class BaseReferendaListFragment<V : BaseViewModel> : BaseFragment<V>(),
         observeWhenVisible { loadingState ->
             when (loadingState) {
                 is ExtendedLoadingState.Loaded -> {
-                    shimmeringAdapter.showPlaceholder(false)
+                    shimmeringAdapter.show(false)
                     submitReferenda(loadingState.data.referenda)
-                    placeholderAdapter.showPlaceholder(loadingState.data.placeholderModel != null)
+                    placeholderAdapter.show(loadingState.data.placeholderModel != null)
                     loadingState.data.placeholderModel?.let { placeholderAdapter.setPlaceholderData(it) }
                 }
                 is ExtendedLoadingState.Loading, is ExtendedLoadingState.Error -> {
-                    shimmeringAdapter.showPlaceholder(true)
+                    shimmeringAdapter.show(true)
                     submitReferenda(emptyList())
                 }
             }

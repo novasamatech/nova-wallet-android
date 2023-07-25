@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
     <string name="start_staking_fragment_start_staking">Start Staking</string>
-    <string name="start_staking_fragment_available_balance">Available balance: %1$s KSM (%2$s)</string>
+    <string name="start_staking_fragment_available_balance">Available balance: %1$s (%2$s)</string>
 
     <string name="start_staking_fragment_title_APY">Earn up to %s</string>
     <string name="start_staking_fragment_title">%1$s\non your %2$s tokens\nper year</string>
@@ -25,8 +25,11 @@
 
     <string name="start_staking_fragment_claim_reward_frequency_condition">Rewards accrue every %s. You need to claim rewards manually</string>
 
-    <string name="start_staking_fragment_governance_participation_participate">Participate in governance</string>
-    <string name="start_staking_fragment_governance_participation">%s with your staked tokens</string>
+    <string name="start_staking_fragment_governance_participation_no_conditions">%s with your staked tokens</string>
+    <string name="start_staking_fragment_governance_participation_no_conditions_accent">Participate in governance</string>
+
+    <string name="start_staking_fragment_governance_participation_with_min_amount">Stake over %1$s and %2$s with your staked tokens</string>
+    <string name="start_staking_fragment_governance_participation_with_min_amount_accent">participate in governance</string>
 
     <string name="start_staking_fragment_stake_monitoring_monitor_stake">Monitor your stake</string>
     <string name="start_staking_fragment_stake_monitoring">Rewards &amp; staking status vary over time. %s from time to time</string>

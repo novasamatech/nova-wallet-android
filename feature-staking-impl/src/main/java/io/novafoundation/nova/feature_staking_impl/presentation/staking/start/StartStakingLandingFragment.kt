@@ -7,10 +7,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
+import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import kotlinx.android.synthetic.main.fragment_start_staking_landing.startStakingLandingAvailableBalance
+import kotlinx.android.synthetic.main.fragment_start_staking_landing.startStakingLandingButton
 import kotlinx.android.synthetic.main.fragment_start_staking_landing.startStakingLandingList
 import kotlinx.android.synthetic.main.fragment_start_staking_landing.startStakingLandingToolbar
 
@@ -19,7 +24,8 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
     private val headerAdapter = StartStakingLandingHeaderAdapter()
     private val conditionsAdapter = StartStakingLandingAdapter()
     private val footerAdapter = StartStakingLandingFooterAdapter(this)
-    private val adapter = ConcatAdapter(headerAdapter, conditionsAdapter, footerAdapter)
+    private val shimmeringAdapter = CustomPlaceholderAdapter(R.layout.item_start_staking_landing_shimmering)
+    private val adapter = ConcatAdapter(shimmeringAdapter, headerAdapter, conditionsAdapter, footerAdapter)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,6 +40,8 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
         startStakingLandingToolbar.setHomeButtonListener { viewModel.backClicked() }
         startStakingLandingList.adapter = adapter
         startStakingLandingList.itemAnimator = null
+
+        startStakingLandingButton.prepareForProgress(viewLifecycleOwner)
     }
 
     override fun inject() {
@@ -47,6 +55,15 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
     }
 
     override fun subscribe(viewModel: StartStakingLandingViewModel) {
+        observeBrowserEvents(viewModel)
+
+        viewModel.isLoadingStateFlow.observe { isLoading ->
+            headerAdapter.show(!isLoading)
+            footerAdapter.show(!isLoading)
+            shimmeringAdapter.show(isLoading)
+            startStakingLandingButton.setProgress(isLoading)
+        }
+
         viewModel.titleFlow.observe { title ->
             headerAdapter.setTitle(title)
         }
@@ -57,6 +74,10 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
 
         viewModel.moreInfoTextFlow.observe { text ->
             footerAdapter.setMoreInformationText(text)
+        }
+
+        viewModel.availableBalanceTextFlow.observe {
+            startStakingLandingAvailableBalance.text = it
         }
     }
 

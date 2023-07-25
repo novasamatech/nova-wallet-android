@@ -1,7 +1,12 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start
 
+import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.SpannableFormatter
 import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
@@ -12,6 +17,7 @@ import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.setEndSpan
 import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.toSpannable
+import io.novafoundation.nova.common.utils.withLoadingShared
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -22,6 +28,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.model.StakingConditionRVItem
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.assetWithChain
 import io.novafoundation.nova.runtime.state.chain
@@ -39,8 +46,9 @@ class StartStakingLandingViewModel(
     private val stakingSharedState: StakingSharedState,
     private val resourceManager: ResourceManager,
     private val updateSystem: UpdateSystem,
-    private val startStakingInteractorFactory: StartStakingInteractorFactory
-) : BaseViewModel() {
+    private val startStakingInteractorFactory: StartStakingInteractorFactory,
+    private val appLinksProvider: AppLinksProvider
+) : BaseViewModel(), Browserable {
 
     private val startStakingInteractor = stakingSharedState.assetWithChain.map {
         startStakingInteractorFactory.create(it.chain, it.asset, coroutineScope = this)
@@ -50,18 +58,28 @@ class StartStakingLandingViewModel(
         it.observeStartStakingInfo(stakingSharedState.chain(), stakingSharedState.chainAsset())
     }
 
+    val isLoadingStateFlow = startStakingInfo.withLoadingShared()
+        .map { it.isLoading() }
+        .shareInBackground()
+
     val titleFlow: Flow<CharSequence> = startStakingInfo
         .map {
             createTitle(it.asset.token.configuration, it.maxEarningRate)
         }.shareInBackground()
 
-    val stakingConditionsUIFlow = startStakingInfo.map {
-        createConditions(it)
-    }
+    val stakingConditionsUIFlow = startStakingInfo.map { createConditions(it) }
+        .shareInBackground()
 
     val moreInfoTextFlow: Flow<CharSequence> = flowOf {
         createMoreInfoText()
     }
+
+    val availableBalanceTextFlow = startStakingInfo.map {
+        val amountModel = mapAmountToAmountModel(it.availableBalance, it.asset.token)
+        resourceManager.getString(R.string.start_staking_fragment_available_balance, amountModel.token, amountModel.fiat!!)
+    }.shareInBackground()
+
+    override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     init {
         updateSystem.start()
@@ -73,7 +91,7 @@ class StartStakingLandingViewModel(
     }
 
     fun termsOfUseClicked() {
-        // TODO
+        openBrowserEvent.value = Event(appLinksProvider.termsUrl)
     }
 
     private fun createTitle(chainAsset: Chain.Asset, earning: BigDecimal): CharSequence {
@@ -114,8 +132,8 @@ class StartStakingLandingViewModel(
             this += createTestNetworkCondition(data.chain)
             this += createMinStakeCondition(data.asset, data.minStake, data.eraInfo.remainingEraTime)
             this += createUnstakeCondition(data.eraInfo.unstakeTime)
-            this += createRewardsFrequencyCondition(data.eraInfo.eraDuration, data.minStake, data.asset, data.payoutTypes)
-            this += createGovernanceParticipatingCondition(data.participateInGovernance)
+            this += createRewardsFrequencyCondition(data.eraInfo.eraDuration, data.automaticPayoutMinAmount, data.asset, data.payoutTypes)
+            this += createGovernanceParticipatingCondition(data.asset, data.participateInGovernanceMinAmount, data.participateInGovernance)
             this += createStakeMonitoring()
         }.filterNotNull()
     }
@@ -171,7 +189,7 @@ class StartStakingLandingViewModel(
 
     private fun createRewardsFrequencyCondition(
         eraDuration: Duration,
-        automaticPayoutMinAmount: BigInteger,
+        automaticPayoutMinAmount: BigInteger?,
         asset: Asset,
         payoutTypes: List<PayoutType>
     ): StakingConditionRVItem {
@@ -185,7 +203,7 @@ class StartStakingLandingViewModel(
         } else if (payoutTypes.containsOnly(PayoutType.Manual)) {
             resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_manual).formatAsSpannable(time)
         } else {
-            val automaticPayoutFormattedAmount = automaticPayoutMinAmount.formatPlanks(asset.token.configuration)
+            val automaticPayoutFormattedAmount = automaticPayoutMinAmount?.formatPlanks(asset.token.configuration) ?: ""
             resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_automatic_and_manual)
                 .formatAsSpannable(time, automaticPayoutFormattedAmount)
         }
@@ -196,15 +214,30 @@ class StartStakingLandingViewModel(
         )
     }
 
-    private fun createGovernanceParticipatingCondition(participateInGovernance: Boolean): StakingConditionRVItem? {
+    private fun createGovernanceParticipatingCondition(
+        asset: Asset,
+        participateInGovernanceMinAmount: BigInteger?,
+        participateInGovernance: Boolean
+    ): StakingConditionRVItem? {
         if (!participateInGovernance) return null
 
         val color = resourceManager.getColor(R.color.text_positive)
-        val participation = resourceManager.getString(R.string.start_staking_fragment_governance_participation_participate).toSpannable(colorSpan(color))
+
+        val text = if (participateInGovernanceMinAmount != null) {
+            val minAmount = participateInGovernanceMinAmount.formatPlanks(asset.token.configuration)
+            val participation = resourceManager.getString(R.string.start_staking_fragment_governance_participation_with_min_amount_accent)
+                .toSpannable(colorSpan(color))
+            resourceManager.getString(R.string.start_staking_fragment_governance_participation_with_min_amount).formatAsSpannable(minAmount, participation)
+        } else {
+
+            val participation = resourceManager.getString(R.string.start_staking_fragment_governance_participation_no_conditions_accent)
+                .toSpannable(colorSpan(color))
+            resourceManager.getString(R.string.start_staking_fragment_governance_participation_no_conditions).formatAsSpannable(participation)
+        }
 
         return StakingConditionRVItem(
             iconId = R.drawable.ic_participate_in_governance,
-            text = resourceManager.getString(R.string.start_staking_fragment_governance_participation).formatAsSpannable(participation),
+            text = text,
         )
     }
 
@@ -219,7 +252,7 @@ class StartStakingLandingViewModel(
     }
 
     private fun novaWikiClicked() {
-        // TODO
+        openBrowserEvent.value = Event("TODO")
     }
 
     private fun List<PayoutType>.containsOnly(type: PayoutType): Boolean {

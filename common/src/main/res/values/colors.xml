@@ -77,7 +77,7 @@
     <color name="button_background_approve">#2FC864</color>
     <color name="button_background_reject">#E53450</color>
     <color name="button_background_inactive_on_gradient">#1A999EC7</color>
-    <color name="button_background_inactive">#181920</color>
+    <color name="button_background_inactive">#1A999EC7</color>
 
     <!-- Border Colors -->
     <color name="active_border">#1F78FF</color>

@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import io.novafoundation.nova.common.list.SingleItemAdapter
 import io.novafoundation.nova.common.utils.SpannableFormatter
 import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
@@ -17,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.synthetic.main.item_start_staking_landing_footer.view.itemStakingLandingFooterMoreInfo
 import kotlinx.android.synthetic.main.item_start_staking_landing_footer.view.itemStakingLandingFooterTermsOfUse
 
-class StartStakingLandingFooterAdapter(private val handler: ClickHandler) : RecyclerView.Adapter<StartStakingLandingFooterViewHolder>() {
+class StartStakingLandingFooterAdapter(private val handler: ClickHandler) : SingleItemAdapter<StartStakingLandingFooterViewHolder>() {
 
     interface ClickHandler {
         fun onTermsOfUseClicked()
@@ -27,10 +28,6 @@ class StartStakingLandingFooterAdapter(private val handler: ClickHandler) : Recy
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StartStakingLandingFooterViewHolder {
         return StartStakingLandingFooterViewHolder(handler, parent.inflateChild(R.layout.item_start_staking_landing_footer))
-    }
-
-    override fun getItemCount(): Int {
-        return 1
     }
 
     override fun onBindViewHolder(holder: StartStakingLandingFooterViewHolder, position: Int) {
