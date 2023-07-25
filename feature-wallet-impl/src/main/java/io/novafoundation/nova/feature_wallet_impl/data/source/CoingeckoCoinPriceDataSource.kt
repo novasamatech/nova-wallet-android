@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.source
 
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.utils.asQueryParam
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
@@ -28,8 +29,8 @@ class CoingeckoCoinPriceDataSource(
     override suspend fun getCoinRates(priceIds: Set<String>, currency: Currency): Map<String, CoinRateChange?> {
         return apiCall { coingeckoApi.getAssetPrice(priceIds.asQueryParam(), currency = currency.coingeckoId, includeRateChange = true) }
             .mapValues {
-                val price = it.value[currency.coingeckoId] ?: return@mapValues null
-                val recentRate = it.value[CoingeckoApi.getRecentRateFieldName(currency.coingeckoId)] ?: return@mapValues null
+                val price = it.value[currency.coingeckoId].orZero()
+                val recentRate = it.value[CoingeckoApi.getRecentRateFieldName(currency.coingeckoId)].orZero()
                 CoinRateChange(
                     recentRate.toBigDecimal(),
                     price.toBigDecimal()
