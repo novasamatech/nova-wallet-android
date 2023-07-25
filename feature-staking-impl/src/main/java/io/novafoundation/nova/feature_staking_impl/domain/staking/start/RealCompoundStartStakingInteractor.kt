@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 
-
 class StartStakingCompoundData(
     val chain: Chain,
     val asset: Asset,
@@ -26,13 +25,11 @@ class StartStakingCompoundData(
     val participateInGovernanceMinAmount: BigInteger?,
     val payoutTypes: List<PayoutType>,
     val automaticPayoutMinAmount: BigInteger?
-) {
-}
+)
 
 interface CompoundStartStakingInteractor {
 
     fun observeStartStakingInfo(chain: Chain, chainAsset: Chain.Asset): Flow<StartStakingCompoundData>
-
 }
 
 class RealCompoundStartStakingInteractor(

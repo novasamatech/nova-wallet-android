@@ -7,5 +7,4 @@ import kotlinx.coroutines.flow.Flow
 interface StakingEraInteractor {
 
     fun observeEraInfo(chain: Chain): Flow<StartStakingEraInfo>
-
 }

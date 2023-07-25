@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.start
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import io.novafoundation.nova.common.list.SingleItemAdapter
 import io.novafoundation.nova.common.utils.inflateChild

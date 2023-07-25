@@ -229,7 +229,6 @@ class StartStakingLandingViewModel(
                 .toSpannable(colorSpan(color))
             resourceManager.getString(R.string.start_staking_fragment_governance_participation_with_min_amount).formatAsSpannable(minAmount, participation)
         } else {
-
             val participation = resourceManager.getString(R.string.start_staking_fragment_governance_participation_no_conditions_accent)
                 .toSpannable(colorSpan(color))
             resourceManager.getString(R.string.start_staking_fragment_governance_participation_no_conditions).formatAsSpannable(participation)
