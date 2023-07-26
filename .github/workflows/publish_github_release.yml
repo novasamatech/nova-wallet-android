@@ -1,0 +1,67 @@
+name: Publish GitHub release
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      app_version:
+        description: "App version: v*.*.*"
+        default: "v*.*.*"
+        required: true
+      release_branch:
+        description: "Branch from which release will be created"
+        default: "master"
+        required: true
+      release_name:
+        description: "Name which will show in release"
+        required: true
+      release_draft:
+        description: "Would it be a draft release?"
+        type: boolean
+        required: true
+        default: true
+
+env:
+  app_version: "v6.5.1"
+  release_branch: "master"
+  release_name: "First release in our new repo"
+  release_draft: True
+
+jobs:
+  build:
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
+    with:
+      branch: master
+      gradlew-command: assembleReleaseGithub
+      keystore-file-name: github_key.jks
+    secrets: inherit
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: rickstaa/action-create-tag@v1
+        with:
+          tag: ${{ env.app_version }}
+          message: ${{ env.release_name }}
+
+      - name: Download built artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: apk
+          path: app
+
+      - name: Rename artifacts
+        run: mv app/releaseGithub/app-releaseGithub.apk app/releaseGithub/nova-wallet-android-${{ env.app_version }}-github.apk
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.app_version }}
+          name: ${{ env.release_name }}
+          draft: ${{ env.release_draft }}
+          files: app/releaseGithub/nova-wallet-android-${{ env.app_version }}-github.apk
