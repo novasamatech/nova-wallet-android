@@ -2,7 +2,6 @@ package io.novafoundation.nova.common.data.network.runtime.binding
 
 import java.math.BigDecimal
 import java.math.BigInteger
-import io.novafoundation.nova.common.utils.Perbill as PerbillTyped
 
 typealias Perbill = BigDecimal
 typealias FixedI64 = BigDecimal
@@ -24,8 +23,4 @@ fun bindFixedI64Number(value: BigInteger): FixedI64 {
 
 fun bindFixedI64(dynamic: Any?): FixedI64 {
     return bindPerbill(dynamic)
-}
-
-fun bindPerbillTyped(dynamic: Any?): PerbillTyped {
-    return PerbillTyped(bindPerbill(dynamic).toDouble())
 }
