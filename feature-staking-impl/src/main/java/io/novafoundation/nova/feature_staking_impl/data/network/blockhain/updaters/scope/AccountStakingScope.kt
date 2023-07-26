@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.runtime.state.assetWithChain
-import io.novafoundation.nova.runtime.state.chainAndAsset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -17,9 +16,9 @@ class AccountStakingScope(
     private val accountRepository: AccountRepository,
     private val accountStakingDao: AccountStakingDao,
     private val sharedStakingState: StakingSharedState
-) : UpdateScope {
+) : UpdateScope<AccountStakingLocal> {
 
-    override fun invalidationFlow(): Flow<Any> {
+    override fun invalidationFlow(): Flow<AccountStakingLocal> {
         return combineToPair(
             sharedStakingState.assetWithChain,
             accountRepository.selectedMetaAccountFlow()
@@ -29,12 +28,5 @@ class AccountStakingScope(
 
             accountStakingDao.observeDistinct(chain.id, chainAsset.id, accountId)
         }
-    }
-
-    suspend fun getAccountStaking(): AccountStakingLocal {
-        val (chain, chainAsset) = sharedStakingState.chainAndAsset()
-        val account = accountRepository.getSelectedMetaAccount()
-
-        return accountStakingDao.get(chain.id, chainAsset.id, account.accountIdIn(chain)!!)
     }
 }

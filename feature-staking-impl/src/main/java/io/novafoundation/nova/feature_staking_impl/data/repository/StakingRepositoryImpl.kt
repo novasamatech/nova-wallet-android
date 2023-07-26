@@ -56,7 +56,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
 
@@ -112,10 +111,6 @@ class StakingRepositoryImpl(
         keyBuilder = { it.metadata.activeEraStorageKey() },
         binding = { scale, runtime -> bindActiveEra(scale, runtime) }
     )
-
-    override fun electedExposuresInActiveEra(chainId: ChainId) = observeActiveEraIndex(chainId).mapLatest { activeEraIndex ->
-        getElectedValidatorsExposure(chainId, activeEraIndex) to activeEraIndex
-    }
 
     override suspend fun getElectedValidatorsExposure(chainId: ChainId, eraIndex: EraIndex) = localStorage.query(chainId) {
         runtime.metadata.staking().storage("ErasStakers").entries(

@@ -15,10 +15,10 @@ class LastPoolIdUpdater(
     stakingSharedState: StakingSharedState,
     chainRegistry: ChainRegistry,
     storageCache: StorageCache
-) : SingleStorageKeyUpdater<GlobalScope>(GlobalScope, stakingSharedState, chainRegistry, storageCache),
-    NominationPoolUpdater {
+) : SingleStorageKeyUpdater<Unit>(GlobalScope, stakingSharedState, chainRegistry, storageCache),
+    NominationPoolUpdater<Unit> {
 
-    override suspend fun storageKey(runtime: RuntimeSnapshot): String {
+    override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: Unit): String {
         return runtime.metadata.nominationPools().storage("LastPoolId").storageKey(runtime)
     }
 }

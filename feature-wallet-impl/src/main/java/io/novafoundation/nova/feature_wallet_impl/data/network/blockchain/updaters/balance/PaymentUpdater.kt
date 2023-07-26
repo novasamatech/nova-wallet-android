@@ -37,7 +37,7 @@ class PaymentUpdaterFactory(
     private val currencyRepository: CurrencyRepository
 ) {
 
-    fun create(chain: Chain): PaymentUpdater {
+    fun create(chain: Chain): Updater<MetaAccount> {
         return PaymentUpdater(
             operationDao = operationDao,
             assetSourceRegistry = assetSourceRegistry,
@@ -49,19 +49,22 @@ class PaymentUpdaterFactory(
     }
 }
 
-class PaymentUpdater(
+private class PaymentUpdater(
     private val operationDao: OperationDao,
     private val assetSourceRegistry: AssetSourceRegistry,
     override val scope: AccountUpdateScope,
     private val chain: Chain,
     private val walletRepository: WalletRepository,
     private val currencyRepository: CurrencyRepository
-) : Updater {
+) : Updater<MetaAccount> {
 
     override val requiredModules: List<String> = emptyList()
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
-        val metaAccount = scope.getAccount()
+    override suspend fun listenForUpdates(
+        storageSubscriptionBuilder: SharedRequestsBuilder,
+        scopeValue: MetaAccount,
+    ): Flow<Updater.SideEffect> {
+        val metaAccount = scopeValue
 
         val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
 

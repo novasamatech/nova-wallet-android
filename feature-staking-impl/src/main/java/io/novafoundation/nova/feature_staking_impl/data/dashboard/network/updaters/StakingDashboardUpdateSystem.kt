@@ -80,7 +80,7 @@ class RealStakingDashboardUpdateSystem(
                     val updater = updaterFactory.createUpdater(stakingChain, stakingType, metaAccount, offChainSyncFlow)
                         ?: return@mapNotNull null
 
-                    updater.listenForUpdates(sharedRequestsBuilder)
+                    updater.listenForUpdates(sharedRequestsBuilder, Unit)
                 }
 
                 sharedRequestsBuilder.subscribe(accountScope)

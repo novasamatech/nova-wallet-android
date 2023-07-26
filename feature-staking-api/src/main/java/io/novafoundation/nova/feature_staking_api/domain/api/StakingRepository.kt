@@ -58,8 +58,6 @@ interface StakingRepository {
     suspend fun maxNominators(chainId: ChainId): BigInteger?
 
     suspend fun nominatorsCount(chainId: ChainId): BigInteger?
-
-    fun electedExposuresInActiveEra(chainId: ChainId): Flow<ExposuresWithEraIndex>
 }
 
 suspend fun StakingRepository.historicalEras(chainId: ChainId): List<BigInteger> {

@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.nominationPools.NominationPoolsUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.parachain.ParachainUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.rebond.RebondKind
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.relaychain.RelaychainUnbondingComponentFactory
@@ -54,6 +55,7 @@ sealed class UnbondingAction {
 class UnbondingComponentFactory(
     private val relaychainUnbondingComponentFactory: RelaychainUnbondingComponentFactory,
     private val parachainComponentFactory: ParachainUnbondingComponentFactory,
+    private val nominationPoolsUnbondingComponentFactory: NominationPoolsUnbondingComponentFactory,
     private val compoundStakingComponentFactory: CompoundStakingComponentFactory,
 ) {
 
@@ -62,6 +64,7 @@ class UnbondingComponentFactory(
     ): UnbondingComponent = compoundStakingComponentFactory.create(
         relaychainComponentCreator = relaychainUnbondingComponentFactory::create,
         parachainComponentCreator = parachainComponentFactory::create,
+        nominationPoolsCreator = nominationPoolsUnbondingComponentFactory::create,
         hostContext = hostContext
     )
 }

@@ -42,11 +42,21 @@ class StakingSharedComputation(
     private val totalIssuanceRepository: TotalIssuanceRepository,
 ) {
 
+    fun activeEraFlow(chainId: ChainId, scope: CoroutineScope): Flow<EraIndex> {
+        val key = "ACTIVE_ERA:$chainId"
+
+        return computationalCache.useSharedFlow(key, scope) {
+            stakingRepository.observeActiveEraIndex(chainId)
+        }
+    }
+
     fun electedExposuresWithActiveEraFlow(chainId: ChainId, scope: CoroutineScope): Flow<ExposuresWithEraIndex> {
         val key = "ELECTED_EXPOSURES:$chainId"
 
         return computationalCache.useSharedFlow(key, scope) {
-            stakingRepository.electedExposuresInActiveEra(chainId)
+            activeEraFlow(chainId, scope).map { eraIndex ->
+                stakingRepository.getElectedValidatorsExposure(chainId, eraIndex) to eraIndex
+            }
         }
     }
 

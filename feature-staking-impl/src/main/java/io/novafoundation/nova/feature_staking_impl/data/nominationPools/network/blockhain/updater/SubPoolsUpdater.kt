@@ -2,30 +2,26 @@ package io.novafoundation.nova.feature_staking_impl.data.nominationPools.network
 
 import io.novafoundation.nova.common.utils.nominationPools
 import io.novafoundation.nova.core.storage.StorageCache
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
-import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.base.NominationPoolUpdater
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.scope.PoolScope
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.updaters.SingleStorageKeyUpdater
-import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 
-class PoolMemberUpdater(
-    scope: AccountUpdateScope,
+class SubPoolsUpdater(
+    poolScope: PoolScope,
     storageCache: StorageCache,
-    val stakingSharedState: StakingSharedState,
+    stakingSharedState: StakingSharedState,
     chainRegistry: ChainRegistry,
-) : SingleStorageKeyUpdater<AccountUpdateScope>(scope, stakingSharedState, chainRegistry, storageCache), NominationPoolUpdater {
+) : SingleStorageKeyUpdater<PoolId?>(poolScope, stakingSharedState, chainRegistry, storageCache), NominationPoolUpdater<PoolId?> {
 
-    override suspend fun storageKey(runtime: RuntimeSnapshot): String? {
-        val account = scope.getAccount()
-        val chain = stakingSharedState.chain()
+    override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: PoolId?): String? {
+        if (scopeValue == null) return null
 
-        val accountId = account.accountIdIn(chain) ?: return null
-
-        return runtime.metadata.nominationPools().storage("PoolMembers").storageKey(runtime, accountId)
+        return runtime.metadata.nominationPools().storage("SubPoolsStorage").storageKey(runtime, scopeValue.value)
     }
 }

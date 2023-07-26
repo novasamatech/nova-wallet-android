@@ -67,7 +67,7 @@ class UnbondingsHolder(override val containerView: View) : RecyclerView.ViewHold
                 itemUnbondStatus.setTextColorRes(R.color.text_tertiary)
                 itemUnbondStatus.setDrawableEnd(R.drawable.ic_time_16, paddingInDp = 4, tint = R.color.icon_secondary)
 
-                itemUnbondStatus.startTimer(status.timeLeft, status.calculatedAt)
+                itemUnbondStatus.startTimer(status.timer)
             }
         }
     }
