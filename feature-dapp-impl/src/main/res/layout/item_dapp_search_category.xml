@@ -8,6 +8,6 @@
     android:paddingStart="16dp"
     android:paddingTop="16dp"
     android:paddingBottom="8dp"
-    android:textColor="@color/text_tertiary"
+    android:textColor="@color/text_secondary"
     tools:background="@color/secondary_screen_background"
     tools:text="DApps" />

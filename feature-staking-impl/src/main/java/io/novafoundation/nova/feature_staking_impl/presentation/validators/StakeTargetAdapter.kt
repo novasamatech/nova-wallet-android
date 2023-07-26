@@ -142,7 +142,7 @@ class ValidatorViewHolder<V>(override val containerView: View) : RecyclerView.Vi
             }
 
             is StakeTargetModel.Scoring.OneField -> {
-                itemValidatorScoringPrimary.setTextColorRes(R.color.text_tertiary)
+                itemValidatorScoringPrimary.setTextColorRes(R.color.text_secondary)
                 itemValidatorScoringPrimary.makeVisible()
                 itemValidatorScoringSecondary.makeGone()
                 itemValidatorScoringPrimary.text = scoring.field.text

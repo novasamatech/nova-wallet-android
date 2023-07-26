@@ -40,7 +40,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
-                    app:primaryValueIconTint="@color/text_tertiary"
+                    app:primaryValueIconTint="@color/text_secondary"
                     app:title="@string/referendum_full_details_proposer" />
 
                 <io.novafoundation.nova.common.view.TableCellView
@@ -62,7 +62,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
-                    app:primaryValueIconTint="@color/text_tertiary"
+                    app:primaryValueIconTint="@color/text_secondary"
                     app:title="@string/referendum_full_details_beneficiary" />
 
                 <io.novafoundation.nova.common.view.TableCellView
@@ -114,7 +114,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
-                    app:primaryValueIconTint="@color/text_tertiary"
+                    app:primaryValueIconTint="@color/text_secondary"
                     app:title="@string/referendum_full_details_hash" />
 
             </io.novafoundation.nova.common.view.TableView>
@@ -126,7 +126,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:text="@string/referendum_full_details_parameters_json"
-                android:textColor="@color/text_tertiary" />
+                android:textColor="@color/text_secondary" />
 
             <io.novafoundation.nova.common.view.PlaceholderView
                 android:id="@+id/referendumFullDetailsPlaceholder"
@@ -146,7 +146,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:padding="12dp"
-                android:textColor="@color/text_tertiary"
+                android:textColor="@color/text_secondary"
                 android:textIsSelectable="true"
                 tools:background="@color/divider" />
 

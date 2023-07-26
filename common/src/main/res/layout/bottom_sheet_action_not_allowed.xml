@@ -36,7 +36,7 @@
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="@string/account_watch_key_missing_description"
-        android:textColor="@color/text_tertiary" />
+        android:textColor="@color/text_secondary" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/actionNotAllowedOk"

@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
-        app:primaryValueIconTint="@color/text_tertiary"
+        app:primaryValueIconTint="@color/text_secondary"
         app:title="@string/common_account" />
 
     <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView

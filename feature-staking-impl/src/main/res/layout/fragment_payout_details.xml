@@ -23,7 +23,7 @@
         android:background="@drawable/bg_icon_container_on_color"
         android:padding="11dp"
         android:src="@drawable/ic_staking_filled"
-        app:tint="@color/text_tertiary" />
+        app:tint="@color/text_secondary" />
 
     <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
         android:layout_width="match_parent"
@@ -46,7 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
-            app:primaryValueIconTint="@color/text_tertiary"
+            app:primaryValueIconTint="@color/text_secondary"
             app:title="@string/staking_reward_details_validator" />
 
         <io.novafoundation.nova.common.view.TableCellView

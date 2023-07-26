@@ -87,7 +87,7 @@
                 android:layout_marginEnd="16dp"
                 android:gravity="center_horizontal"
                 android:text="@string/dapp_confirm_authorize_subtitle"
-                android:textColor="@color/text_tertiary"
+                android:textColor="@color/text_secondary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/wcApproveSessionTitle" />

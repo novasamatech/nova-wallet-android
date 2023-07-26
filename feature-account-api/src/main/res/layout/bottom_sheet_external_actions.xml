@@ -36,7 +36,7 @@
         android:layout_marginBottom="8dp"
         android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
-        android:textColor="@color/text_tertiary"
+        android:textColor="@color/text_secondary"
         tools:text="P15cfSaBcTxNr8rV59cbhdMNCRagFr3GE6B3zZRsCp4QHHKPu" />
 
 </LinearLayout>

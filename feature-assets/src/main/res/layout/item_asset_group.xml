@@ -27,6 +27,6 @@
         android:ellipsize="end"
         android:gravity="end"
         android:maxLines="1"
-        android:textColor="@color/text_tertiary"
+        android:textColor="@color/text_secondary"
         tools:text="$703.51" />
 </LinearLayout>

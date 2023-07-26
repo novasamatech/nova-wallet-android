@@ -33,7 +33,7 @@ class AddressView @JvmOverloads constructor(
     private fun applyStyleAttrs(attrs: AttributeSet) {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.AddressView)
 
-        val textColorRes = typedArray.getResourceId(R.styleable.AddressView_android_textColor, R.color.text_tertiary)
+        val textColorRes = typedArray.getResourceId(R.styleable.AddressView_android_textColor, R.color.text_secondary)
         addressValue.setTextColorRes(textColorRes)
 
         typedArray.recycle()

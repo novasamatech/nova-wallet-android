@@ -105,7 +105,7 @@ class ConfirmContributeMoonbeamCustomization(
             titleView = TextView(into.context, null, 0, R.style.TextAppearance_NovaFoundation_Body1).apply {
                 layoutParams = injectionLayoutParams(context, topMarginDp = 12)
 
-                setTextColorRes(R.color.text_tertiary)
+                setTextColorRes(R.color.text_secondary)
             }
         )
     }

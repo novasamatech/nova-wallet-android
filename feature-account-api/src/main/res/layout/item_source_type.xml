@@ -42,7 +42,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="7dp"
-        android:textColor="@color/text_tertiary"
+        android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/itemSourceTypeTitle"
         app:layout_constraintHorizontal_bias="0.0"

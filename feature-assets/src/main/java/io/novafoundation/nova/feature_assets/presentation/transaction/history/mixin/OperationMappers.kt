@@ -192,7 +192,7 @@ fun mapOperationToOperationModel(
                 val isIncome = operationType.isIncome(chain)
 
                 val amountColor = when {
-                    operationType.status == Operation.Status.FAILED -> R.color.text_tertiary
+                    operationType.status == Operation.Status.FAILED -> R.color.text_secondary
                     isIncome -> R.color.text_positive
                     else -> R.color.text_primary
                 }
@@ -219,7 +219,7 @@ fun mapOperationToOperationModel(
             }
 
             is Operation.Type.Extrinsic -> {
-                val amountColor = if (operationType.status == Operation.Status.FAILED) R.color.text_tertiary else R.color.text_primary
+                val amountColor = if (operationType.status == Operation.Status.FAILED) R.color.text_secondary else R.color.text_primary
                 val (header, subHeader) = mapExtrinsicContentToHeaderAndSubHeader(operationType.content, resourceManager)
 
                 OperationModel(
