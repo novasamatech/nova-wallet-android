@@ -130,7 +130,7 @@ class StartStakingLandingViewModel(
     private fun createConditions(data: StartStakingCompoundData): List<StakingConditionRVItem> {
         return buildList {
             this += createTestNetworkCondition(data.chain)
-            this += createMinStakeCondition(data.asset, data.minStake, data.eraInfo.remainingEraTime)
+            this += createMinStakeCondition(data.asset, data.minStake, data.eraInfo.firstRewardReceivingDuration)
             this += createUnstakeCondition(data.eraInfo.unstakeTime)
             this += createRewardsFrequencyCondition(data.eraInfo.eraDuration, data.automaticPayoutMinAmount, data.asset, data.payoutTypes)
             this += createGovernanceParticipatingCondition(data.asset, data.participateInGovernanceMinAmount, data.participateInGovernance)

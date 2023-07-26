@@ -103,11 +103,13 @@ class StakingFeatureModule {
     fun provideStakingEraInteractorFactory(
         roundDurationEstimator: RoundDurationEstimator,
         currentRoundRepository: CurrentRoundRepository,
-        stakingInteractor: StakingInteractor
+        stakingInteractor: StakingInteractor,
+        @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource,
     ) = StakingEraInteractorFactory(
         roundDurationEstimator,
         currentRoundRepository,
-        stakingInteractor
+        stakingInteractor,
+        storageDataSource
     )
 
     @Provides

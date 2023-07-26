@@ -6,4 +6,5 @@ class StartStakingEraInfo(
     val remainingEraTime: Duration,
     val unstakeTime: Duration,
     val eraDuration: Duration,
+    val firstRewardReceivingDuration: Duration,
 )

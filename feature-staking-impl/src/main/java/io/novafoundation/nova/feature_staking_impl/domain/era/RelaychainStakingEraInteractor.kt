@@ -13,10 +13,13 @@ class RelaychainStakingEraInteractor(
 
     override fun observeEraInfo(chain: Chain): Flow<StartStakingEraInfo> {
         return flowOf {
+            val remainingEraTime = stakingInteractor.getRemainingEraTime().toLong().milliseconds
+            val eraDuration = stakingInteractor.getEraDuration()
             StartStakingEraInfo(
-                remainingEraTime = stakingInteractor.getRemainingEraTime().toLong().milliseconds,
+                remainingEraTime = remainingEraTime,
                 unstakeTime = stakingInteractor.getLockupDuration(),
-                eraDuration = stakingInteractor.getEraDuration()
+                eraDuration = eraDuration,
+                firstRewardReceivingDuration = eraDuration + remainingEraTime
             )
         }
     }
