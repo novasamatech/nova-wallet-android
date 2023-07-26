@@ -29,6 +29,9 @@ interface QueryableStorageEntry0<T : Any> {
 context(StorageQueryContext)
 fun <T : Any> QueryableStorageEntry0<T>.observeNonNull(): Flow<T> = observe().filterNotNull()
 
+context(StorageQueryContext)
+suspend fun <T : Any> QueryableStorageEntry0<T>.queryNonNull(): T = requireNotNull(query())
+
 internal class RealQueryableStorageEntry0<T : Any>(
     private val storageEntry: StorageEntry,
     private val binding: QueryableStorageBinder0<T>

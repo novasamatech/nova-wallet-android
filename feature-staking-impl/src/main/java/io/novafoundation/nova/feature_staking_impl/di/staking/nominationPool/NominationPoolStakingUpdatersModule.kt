@@ -7,6 +7,11 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.CurrentEraUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ValidatorExposureUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentEpochIndexUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentSessionIndexUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentSlotUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.EraStartSessionIndexUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.GenesisSlotUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.LastPoolIdUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.MinJoinBondUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.SubPoolsUpdater
@@ -71,11 +76,21 @@ class NominationPoolStakingUpdatersModule {
         exposureUpdater: ValidatorExposureUpdater,
         subPoolsUpdater: SubPoolsUpdater,
         currentEraUpdater: CurrentEraUpdater,
+        currentEpochIndexUpdater: CurrentEpochIndexUpdater,
+        currentSlotUpdater: CurrentSlotUpdater,
+        genesisSlotUpdater: GenesisSlotUpdater,
+        currentSessionIndexUpdater: CurrentSessionIndexUpdater,
+        eraStartSessionIndexUpdater: EraStartSessionIndexUpdater,
     ): StakingUpdaters = StakingUpdaters(
         lastPoolIdUpdater,
         minJoinBondUpdater,
         exposureUpdater,
         currentEraUpdater,
-        subPoolsUpdater
+        subPoolsUpdater,
+        currentEpochIndexUpdater,
+        currentSlotUpdater,
+        genesisSlotUpdater,
+        currentSessionIndexUpdater,
+        eraStartSessionIndexUpdater
     )
 }

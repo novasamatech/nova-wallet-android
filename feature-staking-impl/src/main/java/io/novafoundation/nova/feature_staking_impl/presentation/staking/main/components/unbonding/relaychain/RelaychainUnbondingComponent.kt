@@ -96,7 +96,7 @@ private class RelaychainUnbondingComponent(
         if (it !is StakingState.Stash) {
             emit(null)
         } else {
-            emitAll(unbondInteractor.unbondingsFlow(it).withLoading())
+            emitAll(unbondInteractor.unbondingsFlow(it, hostContext.scope).withLoading())
         }
     }
         .shareInBackground()

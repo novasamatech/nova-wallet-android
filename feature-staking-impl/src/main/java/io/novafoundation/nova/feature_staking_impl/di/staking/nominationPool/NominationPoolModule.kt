@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.reposito
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolUnbondRepository
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.RealNominationPoolMemberUseCase
@@ -102,12 +101,9 @@ class NominationPoolModule {
     fun provideUnbondingsInteractor(
         nominationPoolUnbondRepository: NominationPoolUnbondRepository,
         stakingSharedComputation: StakingSharedComputation,
-        eraTimeCalculatorFactory: EraTimeCalculatorFactory,
-        nominationPoolMemberUseCase: NominationPoolMemberUseCase,
     ): NominationPoolUnbondingsInteractor = RealNominationPoolUnbondingsInteractor(
         nominationPoolUnbondRepository = nominationPoolUnbondRepository,
         stakingSharedComputation = stakingSharedComputation,
-        eraTimeCalculatorFactory = eraTimeCalculatorFactory
     )
 
     @Provides
@@ -116,11 +112,9 @@ class NominationPoolModule {
         nominationPoolStateRepository: NominationPoolStateRepository,
         stakingSharedComputation: StakingSharedComputation,
         noPoolAccountDerivation: PoolAccountDerivation,
-        eraTimeCalculatorFactory: EraTimeCalculatorFactory,
     ): NominationPoolStakeSummaryInteractor = RealNominationPoolStakeSummaryInteractor(
         nominationPoolStateRepository = nominationPoolStateRepository,
         stakingSharedComputation = stakingSharedComputation,
         noPoolAccountDerivation = noPoolAccountDerivation,
-        eraTimeCalculatorFactory = eraTimeCalculatorFactory
     )
 }

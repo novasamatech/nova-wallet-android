@@ -6,6 +6,8 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.ElectionsSessionRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import java.math.BigInteger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -68,24 +70,37 @@ class EraTimeCalculatorFactory(
     private val electionsSessionRegistry: ElectionsSessionRegistry,
 ) {
 
-    suspend fun create(stakingOption: StakingOption): EraTimeCalculator {
+    suspend fun create(
+        stakingOption: StakingOption,
+        activeEraFlow: Flow<EraIndex>
+    ): Flow<EraTimeCalculator> {
         val chainId = stakingOption.assetWithChain.asset.chainId
         val electionsSession = electionsSessionRegistry.electionsSessionFor(stakingOption)
 
-        val activeEra = stakingRepository.getActiveEraIndex(chainId)
-        val currentSessionIndex = sessionRepository.currentSessionIndex(chainId)
+        val genesisSlot = electionsSession.genesisSlot(chainId)
 
-        return EraTimeCalculator(
-            startTimeStamp = System.currentTimeMillis().toBigInteger(),
-            eraLength = stakingRepository.eraLength(chainId),
-            blockCreationTime = chainStateRepository.predictedBlockTime(chainId),
-            currentSessionIndex = currentSessionIndex,
-            currentEpochIndex = electionsSession.currentEpochIndex(chainId) ?: currentSessionIndex,
-            sessionLength = electionsSession.sessionLength(chainId),
-            currentSlot = electionsSession.currentSlot(chainId),
-            genesisSlot = electionsSession.genesisSlot(chainId),
-            eraStartSessionIndex = stakingRepository.eraStartSessionIndex(chainId, activeEra),
-            activeEra = activeEra
-        )
+        val sessionLength = electionsSession.sessionLength(chainId)
+
+        return combine(
+            activeEraFlow,
+            sessionRepository.observeCurrentSessionIndex(chainId),
+            electionsSession.currentEpochIndexFlow(chainId),
+            electionsSession.currentSlotFlow(chainId),
+        ) { activeEra, currentSessionIndex, currentEpochIndex, currentSlot ->
+            val eraStartSessionIndex = stakingRepository.eraStartSessionIndex(chainId, activeEra)
+
+            EraTimeCalculator(
+                startTimeStamp = System.currentTimeMillis().toBigInteger(),
+                eraLength = stakingRepository.eraLength(chainId),
+                blockCreationTime = chainStateRepository.predictedBlockTime(chainId),
+                currentSessionIndex = currentSessionIndex,
+                currentEpochIndex = currentEpochIndex ?: currentSessionIndex,
+                sessionLength = sessionLength,
+                currentSlot = currentSlot,
+                genesisSlot = genesisSlot,
+                eraStartSessionIndex = eraStartSessionIndex,
+                activeEra = activeEra
+            )
+        }
     }
 }

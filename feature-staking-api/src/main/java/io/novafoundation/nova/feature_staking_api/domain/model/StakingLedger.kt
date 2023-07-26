@@ -14,7 +14,7 @@ class StakingLedger(
     val claimedRewards: List<BigInteger>
 )
 
-class UnlockChunk(val amount: BigInteger, val era: BigInteger) : EraRedeemable {
+class UnlockChunk(override val amount: BigInteger, val era: BigInteger) : EraRedeemable {
     override val redeemEra: EraIndex = era
 }
 

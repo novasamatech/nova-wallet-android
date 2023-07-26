@@ -50,7 +50,7 @@ class RealNominationPoolsNetworkInfoInteractor(
             relaychainStakingSharedComputation.electedExposuresInActiveEraFlow(chainId, sharedComputationScope),
             nominationPoolGlobalsRepository.observeMinJoinBond(chainId),
             nominationPoolGlobalsRepository.lastPoolId(chainId),
-            lockupDurationFlow()
+            lockupDurationFlow(sharedComputationScope),
         ) { exposures, minJoinBond, lastPoolId, lockupDuration ->
             NetworkInfo(
                 lockupPeriod = lockupDuration,
@@ -62,7 +62,7 @@ class RealNominationPoolsNetworkInfoInteractor(
         }
     }
 
-    private fun lockupDurationFlow() = flowOf { relaychainStakingInteractor.getLockupDuration() }
+    private fun lockupDurationFlow(sharedComputationScope: CoroutineScope) = flowOf { relaychainStakingInteractor.getLockupDuration(sharedComputationScope) }
 
     private suspend fun calculateTotalStake(
         exposures: AccountIdMap<Exposure>,
