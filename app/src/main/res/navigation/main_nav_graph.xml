@@ -367,16 +367,6 @@
 
     <fragment
         android:id="@+id/startStakingLandingFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.landing.StartStakingLandingFragment"
-        android:label="StartStakingLandingFragment"
-        tools:layout="@layout/fragment_start_staking_landing">
-
-        <!--TODO: Start staking flow here-->
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/startStakingLandingFragment"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.start.StartStakingLandingFragment"
         android:label="StartStakingLandingFragment"
         tools:layout="@layout/fragment_start_staking_landing">
