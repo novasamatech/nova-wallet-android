@@ -7,22 +7,22 @@
     <com.facebook.shimmer.ShimmerFrameLayout
         android:layout_width="28dp"
         android:layout_height="28dp"
-        android:layout_marginStart="18dp"
-        android:layout_marginBottom="18dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginBottom="2dp"
         android:background="@drawable/bg_shimmering_circle" />
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:layout_width="155dp"
         android:layout_height="10dp"
         android:layout_marginBottom="18dp"
-        android:layout_marginStart="64dp"
+        android:layout_marginStart="48dp"
         android:layout_marginTop="7dp"
         android:background="@drawable/bg_shimmering" />
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:layout_width="126dp"
         android:layout_height="10dp"
-        android:layout_marginStart="64dp"
+        android:layout_marginStart="48dp"
         android:layout_gravity="bottom"
         android:background="@drawable/bg_shimmering" />
 
