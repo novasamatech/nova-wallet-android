@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     tools:background="@color/secondary_screen_background"
-    android:textColor="@color/text_secondary"
+    android:textColor="@color/text_tertiary"
     tools:text="@string/common_required"
     android:layout_marginStart="16dp"
     style="@style/TextAppearance.NovaFoundation.Regular.Footnote"

@@ -15,7 +15,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="@string/wallet_balance_unbonding_v1_9_0"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

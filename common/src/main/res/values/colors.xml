@@ -13,6 +13,7 @@
     <!-- Text Colors -->
     <color name="text_primary">#E0FFFFFF</color>
     <color name="text_secondary">#A3FFFFFF</color>
+    <color name="text_tertiary">#7AFFFFFF</color>
     <color name="button_text">#E0FFFFFF</color>
     <color name="chip_text">#A3FFFFFF</color>
     <color name="button_text_inactive">#52FFFFFF</color>

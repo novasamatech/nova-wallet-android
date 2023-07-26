@@ -120,7 +120,7 @@
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.Caption1.Secondary">
-        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textColor">@color/text_tertiary</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.Caption2">
@@ -128,7 +128,7 @@
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.Caption2.Secondary">
-        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textColor">@color/text_tertiary</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.Callout">
@@ -159,7 +159,7 @@
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.Footnote.Secondary">
-        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textColor">@color/text_tertiary</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.SubHeadline">
@@ -171,7 +171,7 @@
     </style>
 
     <style name="TextAppearance.NovaFoundation.Regular.SubHeadline.Secondary">
-        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textColor">@color/text_tertiary</item>
     </style>
 
     <style name="TextAppearance.NovaFoundation.Title3" parent="TextAppearance.NovaFoundation.Regular">

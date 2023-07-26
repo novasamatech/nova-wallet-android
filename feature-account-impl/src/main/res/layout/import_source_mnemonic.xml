@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/account_import_mnemonic_subtitle"
-        android:textColor="@color/text_secondary" />
+        android:textColor="@color/text_tertiary" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/importMnemonicContentContainer"
@@ -32,7 +32,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:text="@string/recovery_passphrase"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/text_tertiary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -62,7 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:text="@string/account_import_mnemonic_hint"
-        android:textColor="@color/text_secondary" />
+        android:textColor="@color/text_tertiary" />
 
     <io.novafoundation.nova.common.view.InputField
         android:id="@+id/importMnemonicUsernameInput"
@@ -80,6 +80,6 @@
         android:layout_marginTop="12dp"
         android:layout_weight="1"
         android:text="@string/wallet_nickname_create_caption_v2_2_0"
-        android:textColor="@color/text_secondary" />
+        android:textColor="@color/text_tertiary" />
 
 </merge>
