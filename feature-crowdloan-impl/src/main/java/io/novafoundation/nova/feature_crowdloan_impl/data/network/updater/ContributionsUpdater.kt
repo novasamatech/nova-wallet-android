@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.data.network.updater
 
 import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.ContributionDao
@@ -49,7 +50,7 @@ class ContributionsUpdater(
         storageSubscriptionBuilder: SharedRequestsBuilder,
         scopeValue: ScopeValue,
     ): Flow<Updater.SideEffect> {
-        return flowOf {
+        return flowOfAll {
             if (scopeValue.asset.token.configuration.enabled) {
                 sync(scopeValue)
             } else {
