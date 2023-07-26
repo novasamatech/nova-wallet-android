@@ -20,4 +20,3 @@ val RuntimeMetadata.session: SessionRuntimeApi
 context(StorageQueryContext)
 val SessionRuntimeApi.currentIndex: QueryableStorageEntry0<BigInteger>
     get() = storage0("CurrentIndex", binding = ::bindSessionIndex)
-

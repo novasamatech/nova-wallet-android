@@ -59,7 +59,7 @@ class RealNominationPoolStakeSummaryInteractor(
             val totalStaked = bondedPoolState.amountOf(poolMember.points)
 
             val stakeSummaryFlow = flow { determineStakeStatus(stakingOption, eraStakers, activeEra, poolNominations, poolStash, sharedComputationScope) }
-                .map { status -> StakeSummary( status, totalStaked) }
+                .map { status -> StakeSummary(status, totalStaked) }
 
             emitAll(stakeSummaryFlow)
         }

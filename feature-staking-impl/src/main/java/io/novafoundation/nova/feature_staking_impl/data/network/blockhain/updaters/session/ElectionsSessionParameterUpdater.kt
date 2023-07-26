@@ -16,7 +16,7 @@ abstract class ElectionsSessionParameterUpdater(
     private val stakingSharedState: StakingSharedState,
     chainRegistry: ChainRegistry,
     storageCache: StorageCache
-): SingleStorageKeyUpdater<Unit>(GlobalScope, stakingSharedState, chainRegistry, storageCache) {
+) : SingleStorageKeyUpdater<Unit>(GlobalScope, stakingSharedState, chainRegistry, storageCache) {
 
     protected abstract suspend fun ElectionsSession.updaterStorageKey(chainId: ChainId): String?
 

@@ -17,7 +17,7 @@ class EraStartSessionIndexUpdater(
     storageCache: StorageCache,
     stakingSharedState: StakingSharedState,
     chainRegistry: ChainRegistry,
-) : SingleStorageKeyUpdater<EraIndex>(activeEraScope,stakingSharedState, chainRegistry, storageCache),
+) : SingleStorageKeyUpdater<EraIndex>(activeEraScope, stakingSharedState, chainRegistry, storageCache),
     StakingUpdater<EraIndex> {
 
     override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: EraIndex): String {

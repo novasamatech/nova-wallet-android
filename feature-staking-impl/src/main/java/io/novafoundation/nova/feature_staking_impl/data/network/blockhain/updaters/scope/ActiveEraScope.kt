@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.Flow
 class ActiveEraScope(
     private val stakingSharedComputation: StakingSharedComputation,
     private val stakingSharedState: StakingSharedState,
-): UpdateScope<EraIndex> {
+) : UpdateScope<EraIndex> {
 
     override fun invalidationFlow(): Flow<EraIndex?> {
-       return withFlowScope { flowScope ->
-           val chainId = stakingSharedState.chainId()
+        return withFlowScope { flowScope ->
+            val chainId = stakingSharedState.chainId()
 
-           stakingSharedComputation.activeEraFlow(chainId, flowScope)
-       }
+            stakingSharedComputation.activeEraFlow(chainId, flowScope)
+        }
     }
 }

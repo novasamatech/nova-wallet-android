@@ -34,7 +34,7 @@ class BabeSession(
         }
     }
 
-    override fun currentSlotFlow(chainId: ChainId)= localStorage.subscribe(chainId) {
+    override fun currentSlotFlow(chainId: ChainId) = localStorage.subscribe(chainId) {
         metadata.babe.currentSlot.observeNonNull()
     }
 

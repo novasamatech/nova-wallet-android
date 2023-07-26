@@ -45,4 +45,4 @@ val StakingRuntimeApi.activeEra: QueryableStorageEntry0<EraIndex>
 
 context(StorageQueryContext)
 val StakingRuntimeApi.erasStartSessionIndex: QueryableStorageEntry1<EraIndex, BigInteger>
-    get() = storage1("ErasStartSessionIndex", binding = { decoded, _ -> bindSessionIndex(decoded) } )
+    get() = storage1("ErasStartSessionIndex", binding = { decoded, _ -> bindSessionIndex(decoded) })
