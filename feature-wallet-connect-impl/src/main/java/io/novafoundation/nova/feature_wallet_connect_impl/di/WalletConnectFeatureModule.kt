@@ -7,6 +7,7 @@ import io.novafoundation.nova.caip.caip2.Caip2Parser
 import io.novafoundation.nova.caip.caip2.Caip2Resolver
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_external_sign_api.domain.sign.evm.EvmTypedMessageParser
@@ -22,7 +23,7 @@ import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.request
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.WalletConnectRequest
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.evm.EvmWalletConnectRequestFactory
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.polkadot.PolkadotWalletConnectRequestFactory
-import io.novafoundation.nova.feature_wallet_connect_impl.presentation.service.RealWalletConnectServiceFactory
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.service.RealWalletConnectService
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.ApproveSessionCommunicator
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.common.RealWalletConnectSessionMapper
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.common.WalletConnectSessionMapper
@@ -77,12 +78,14 @@ class WalletConnectFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideWalletConnectServiceFactory(
+    fun provideWalletConnectService(
+        rootScope: RootScope,
         interactor: WalletConnectSessionInteractor,
         dAppSignRequester: ExternalSignCommunicator,
         approveSessionCommunicator: ApproveSessionCommunicator,
-    ): WalletConnectService.Factory {
-        return RealWalletConnectServiceFactory(
+    ): WalletConnectService {
+        return RealWalletConnectService(
+            parentScope = rootScope,
             interactor = interactor,
             dAppSignRequester = dAppSignRequester,
             approveSessionRequester = approveSessionCommunicator

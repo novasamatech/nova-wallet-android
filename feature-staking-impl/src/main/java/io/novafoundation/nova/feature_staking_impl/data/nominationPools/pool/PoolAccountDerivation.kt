@@ -19,6 +19,15 @@ interface PoolAccountDerivation {
     }
 
     suspend fun derivePoolAccount(poolId: PoolId, derivationType: PoolAccountType, chainId: ChainId): AccountId
+
+    /**
+     * Derives pool accounts with poolId from range 1..[numberOfPools] (end-inclusive)
+     */
+    suspend fun derivePoolAccountsRange(numberOfPools: Int, derivationType: PoolAccountType, chainId: ChainId): List<AccountId>
+}
+
+suspend fun PoolAccountDerivation.bondedAccountOf(poolId: PoolId, chainId: ChainId): AccountId {
+    return derivePoolAccount(poolId, PoolAccountType.BONDED, chainId)
 }
 
 private const val PREFIX = "modl"
@@ -29,12 +38,31 @@ class RealPoolAccountDerivation(
 
     override suspend fun derivePoolAccount(poolId: PoolId, derivationType: PoolAccountType, chainId: ChainId): AccountId {
         val prefixBytes = PREFIX.encodeToByteArray()
-        val palletId = localDataSource.query(chainId) {
-            metadata.nominationPools().constant("PalletId").value
-        }
+        val palletId = palletId(chainId)
         val poolIdBytes = uint32.toByteArray(poolId.value.toInt().toUInt())
 
-        return (prefixBytes + palletId + derivationType.derivationIndex + poolIdBytes).copyOf(newSize = 32)
+        return (prefixBytes + palletId + derivationType.derivationIndex + poolIdBytes).truncateToAccountId()
+    }
+
+    override suspend fun derivePoolAccountsRange(numberOfPools: Int, derivationType: PoolAccountType, chainId: ChainId): List<AccountId> {
+        val prefixBytes = PREFIX.encodeToByteArray()
+        val palletId = palletId(chainId)
+        val derivationTypeIndex = derivationType.derivationIndex
+        val commonPrefix = prefixBytes + palletId + derivationTypeIndex
+
+        return (1..numberOfPools).map { poolId ->
+            val poolIdBytes = uint32.toByteArray(poolId.toUInt())
+
+            (commonPrefix + poolIdBytes).truncateToAccountId()
+        }
+    }
+
+    private fun ByteArray.truncateToAccountId(): AccountId = copyOf(newSize = 32)
+
+    private suspend fun palletId(chainId: ChainId): ByteArray {
+        return localDataSource.query(chainId) {
+            metadata.nominationPools().constant("PalletId").value
+        }
     }
 
     private val PoolAccountType.derivationIndex: Byte

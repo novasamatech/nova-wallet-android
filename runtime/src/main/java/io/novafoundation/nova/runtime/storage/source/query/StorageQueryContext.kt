@@ -20,12 +20,19 @@ interface StorageQueryContext {
 
     val runtime: RuntimeSnapshot
 
+    fun StorageEntry.createStorageKey(vararg keyArguments: Any?): String
+
     suspend fun StorageEntry.keys(vararg prefixArgs: Any?): List<StorageKeyComponents>
 
-    suspend fun <V> StorageEntry.observe(
+    fun <V> StorageEntry.observe(
         vararg keyArguments: Any?,
         binding: DynamicInstanceBinder<V>
     ): Flow<V>
+
+    fun <V> StorageEntry.observeWithRaw(
+        vararg keyArguments: Any?,
+        binding: DynamicInstanceBinder<V>
+    ): Flow<WithRawValue<V>>
 
     suspend fun <K, V> StorageEntry.observe(
         keysArguments: List<List<Any?>>,

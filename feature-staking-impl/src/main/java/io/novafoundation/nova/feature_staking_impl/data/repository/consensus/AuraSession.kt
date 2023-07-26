@@ -26,6 +26,10 @@ class AuraSession(
             ?: SESSION_PERIOD_DEFAULT.toBigInteger()
     }
 
+    override suspend fun currentEpochIndex(chainId: ChainId): BigInteger? {
+        return null
+    }
+
     override suspend fun currentSlot(chainId: ChainId) = remoteStorage.query(chainId) {
         val bestBlock = runtime.metadata.system().storage("Number").query(binding = ::bindNumber)
 

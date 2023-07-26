@@ -288,7 +288,7 @@ class StakingInteractor(
             stakingSharedComputation.activeEraInfo(chainId, scope),
             walletRepository.assetFlow(state.accountId, chainAsset)
         ) { activeEraInfo, asset ->
-            val totalStaked = asset.bonded
+            val totalStaked = asset.bondedInPlanks
 
             val rewardedNominatorsPerValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 

@@ -4,9 +4,10 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.recyclerview.widget.DiffUtil
+import io.novafoundation.nova.common.domain.onLoaded
+import io.novafoundation.nova.common.domain.onNotLoaded
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
-import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.view.TableCellView
 
 class NetworkInfoAdapter : BaseListAdapter<NetworkInfoItem, NetworkInfoHolder>(DiffCallback()) {
@@ -42,10 +43,9 @@ class NetworkInfoHolder(override val containerView: TableCellView) : BaseViewHol
     fun bind(item: NetworkInfoItem, isLast: Boolean) = with(containerView) {
         setTitle(item.title)
 
-        when (val content = item.content) {
-            is LoadingState.Loaded -> showValue(content.data.primary, content.data.secondary)
-            is LoadingState.Loading -> showProgress()
-        }
+        item.content
+            .onLoaded { showValue(it.primary, it.secondary) }
+            .onNotLoaded { showProgress() }
 
         setDividerVisible(!isLast)
     }

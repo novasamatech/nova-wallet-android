@@ -136,12 +136,16 @@ class RealWalletConnectSessionInteractor(
         return walletConnectSessionRepository.getSessionAccount(sessionTopic)
     }
 
-    override fun activeSessionsFlow(): Flow<List<WalletConnectSession>> {
+    override fun activeSessionsFlow(metaId: Long?): Flow<List<WalletConnectSession>> {
         return walletConnectSessionRepository.allSessionAccountsFlow().map { sessionAccounts ->
             val activeSessions = Web3Wallet.getListOfActiveSessions()
-            val allMetaAccounts = accountRepository.allMetaAccounts()
+            val metaAccounts = if (metaId == null) {
+                accountRepository.allMetaAccounts()
+            } else {
+                listOf(accountRepository.getMetaAccount(metaId))
+            }
 
-            createWalletSessions(activeSessions, allMetaAccounts, sessionAccounts)
+            createWalletSessions(activeSessions, metaAccounts, sessionAccounts)
         }
     }
 
@@ -179,10 +183,13 @@ class RealWalletConnectSessionInteractor(
     }
 
     private operator fun Namespace.Proposal.plus(other: Namespace.Proposal): Namespace.Proposal {
+        val mergedChains = chains.orEmpty() + other.chains.orEmpty()
+        val mergedMethods = methods + other.methods
+        val mergedEvents = events + other.events
         return Namespace.Proposal(
-            chains = chains.orEmpty() + other.chains.orEmpty(),
-            methods = methods + other.methods,
-            events = events + other.events
+            chains = mergedChains.distinct(),
+            methods = mergedMethods.distinct(),
+            events = mergedEvents.distinct()
         )
     }
 

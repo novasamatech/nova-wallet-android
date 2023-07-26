@@ -19,8 +19,6 @@ interface AssetsRouter {
 
     fun openConfirmTransfer(transferDraft: TransferDraft)
 
-    fun finishSendFlow()
-
     fun openTransferDetail(transaction: OperationParcelizeModel.Transfer)
 
     fun openExtrinsicDetail(extrinsic: OperationParcelizeModel.Extrinsic)
@@ -45,7 +43,17 @@ interface AssetsRouter {
 
     fun openAddTokenSelectChain()
 
+    fun openSendFlow()
+
+    fun openReceiveFlow()
+
+    fun openBuyFlow()
+
     fun openNfts()
 
     fun finishAddTokenFlow()
+
+    fun openWalletConnectSessions(metaId: Long)
+
+    fun openWalletConnectScan()
 }

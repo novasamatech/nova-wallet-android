@@ -11,7 +11,7 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField "String", "SLIP_44_COINS_BASE_URL", "\"https://raw.githubusercontent.com/nova-wallet/nova-utils/master/assets/slip44.json\""
+        buildConfigField "String", "SLIP_44_COINS_BASE_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/assets/slip44.json\""
     }
 
     buildTypes {

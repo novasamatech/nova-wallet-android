@@ -5,6 +5,8 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMet
 fun mapParachainMetadataRemoteToParachainMetadata(parachainMetadata: ParachainMetadataRemote) =
     with(parachainMetadata) {
         ParachainMetadata(
+            paraId = paraid,
+            movedToParaId = movedToParaId,
             iconLink = icon,
             name = name,
             description = description,

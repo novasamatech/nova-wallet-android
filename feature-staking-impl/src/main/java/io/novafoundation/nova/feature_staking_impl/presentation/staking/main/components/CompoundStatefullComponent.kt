@@ -31,11 +31,13 @@ class CompoundStakingComponentFactory(
         relaychainComponentCreator: ComponentCreator<S, E, A>,
         parachainComponentCreator: ComponentCreator<S, E, A>,
         turingComponentCreator: ComponentCreator<S, E, A> = parachainComponentCreator,
+        nominationPoolsCreator: ComponentCreator<S, E, A> = { _, _ -> UnsupportedComponent() },
         hostContext: ComponentHostContext,
     ): StatefullComponent<S, E, A> = CompoundStakingComponent(
         relaychainComponentCreator = relaychainComponentCreator,
         parachainComponentCreator = parachainComponentCreator,
         turingComponentCreator = turingComponentCreator,
+        nominationPoolsCreator = nominationPoolsCreator,
         singleAssetSharedState = stakingSharedState,
         hostContext = hostContext
     )
@@ -47,6 +49,7 @@ private class CompoundStakingComponent<S, E, A>(
     private val relaychainComponentCreator: ComponentCreator<S, E, A>,
     private val parachainComponentCreator: ComponentCreator<S, E, A>,
     private val turingComponentCreator: ComponentCreator<S, E, A>,
+    private val nominationPoolsCreator: ComponentCreator<S, E, A>,
     private val hostContext: ComponentHostContext,
 ) : StatefullComponent<S, E, A>, CoroutineScope by hostContext.scope, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
 
@@ -77,8 +80,7 @@ private class CompoundStakingComponent<S, E, A>(
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainComponentCreator(stakingOption, childHostContext)
             PARACHAIN -> parachainComponentCreator(stakingOption, childHostContext)
             TURING -> turingComponentCreator(stakingOption, childHostContext)
-            // TODO nomination pools
-            NOMINATION_POOLS -> UnsupportedComponent()
+            NOMINATION_POOLS -> nominationPoolsCreator(stakingOption, childHostContext)
         }
     }
 }

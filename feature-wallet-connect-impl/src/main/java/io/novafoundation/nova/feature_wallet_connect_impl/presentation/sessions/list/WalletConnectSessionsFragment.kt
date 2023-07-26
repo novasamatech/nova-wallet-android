@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -19,6 +20,12 @@ import kotlinx.android.synthetic.main.fragment_wc_sessions.wcSessionsToolbar
 import javax.inject.Inject
 
 class WalletConnectSessionsFragment : BaseFragment<WalletConnectSessionsViewModel>(), WalletConnectSessionsAdapter.Handler {
+
+    companion object {
+
+        private const val KEY_PAYLOAD = "WalletConnectSessionsFragment.Payload"
+        fun getBundle(payload: WalletConnectSessionsPayload) = bundleOf(KEY_PAYLOAD to payload)
+    }
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
@@ -47,7 +54,7 @@ class WalletConnectSessionsFragment : BaseFragment<WalletConnectSessionsViewMode
             WalletConnectFeatureApi::class.java
         )
             .walletConnectSessionsComponentFactory()
-            .create(this)
+            .create(this, argument(KEY_PAYLOAD))
             .inject(this)
     }
 

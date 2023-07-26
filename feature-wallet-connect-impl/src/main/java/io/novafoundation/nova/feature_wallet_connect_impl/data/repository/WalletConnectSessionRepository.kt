@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_connect_impl.data.repository
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 import io.novafoundation.nova.core_db.model.WalletConnectSessionAccountLocal
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.model.WalletConnectSessionAccount
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -17,11 +18,16 @@ interface WalletConnectSessionRepository {
 
     fun allSessionAccountsFlow(): Flow<List<WalletConnectSessionAccount>>
 
+    fun sessionAccountsByMetaIdFlow(metaId: Long): Flow<List<WalletConnectSessionAccount>>
+
     fun numberOfSessionAccountsFlow(): Flow<Int>
+
+    fun numberOfSessionAccountsFlow(metaAccount: MetaAccount): Flow<Int>
 
     suspend fun numberOfSessionAccounts(): Int
 
     fun sessionAccountFlow(sessionTopic: String): Flow<WalletConnectSessionAccount?>
+
     suspend fun removeAllSessionsOtherThan(activeSessionTopics: List<String>)
 }
 
@@ -45,8 +51,16 @@ class RealWalletConnectSessionRepository(
         return dao.allSessionsFlow().mapList(::mapSessionFromLocal)
     }
 
+    override fun sessionAccountsByMetaIdFlow(metaId: Long): Flow<List<WalletConnectSessionAccount>> {
+        return dao.sessionsByMetaIdFlow(metaId).mapList(::mapSessionFromLocal)
+    }
+
     override fun numberOfSessionAccountsFlow(): Flow<Int> {
         return dao.numberOfSessionsFlow()
+    }
+
+    override fun numberOfSessionAccountsFlow(metaAccount: MetaAccount): Flow<Int> {
+        return dao.numberOfSessionsFlow(metaAccount.id)
     }
 
     override suspend fun numberOfSessionAccounts(): Int {

@@ -60,14 +60,7 @@ private class ParachainNetworkInfoComponent(
     }
 
     override fun initialItems(): List<NetworkInfoItem> {
-        return createNetworkInfoItems(
-            totalStaked = null,
-            minimumStake = null,
-            activeNominators = null,
-            unstakingPeriod = null,
-            stakingPeriod = null,
-            nominatorsLabel = NOMINATORS_TITLE_RES
-        )
+        return createNetworkInfoItems(nominatorsLabel = NOMINATORS_TITLE_RES)
     }
 
     private fun expandForceChangeFlow(): Flow<Boolean> {

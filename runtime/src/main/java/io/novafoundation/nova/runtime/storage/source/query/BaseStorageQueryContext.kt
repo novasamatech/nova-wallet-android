@@ -25,6 +25,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKeys
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
+import io.novafoundation.nova.core.model.StorageEntry as StorageEntryValue
 
 abstract class BaseStorageQueryContext(
     override val chainId: ChainId,
@@ -40,11 +41,15 @@ abstract class BaseStorageQueryContext(
 
     protected abstract suspend fun queryKey(key: String, at: BlockHash?): String?
 
-    protected abstract suspend fun observeKey(key: String): Flow<String?>
+    protected abstract fun observeKey(key: String): Flow<String?>
 
     protected abstract suspend fun observeKeys(keys: List<String>): Flow<Map<String, String?>>
 
     protected abstract suspend fun observeKeysByPrefix(prefix: String): Flow<Map<String, String?>>
+
+    override fun StorageEntry.createStorageKey(vararg keyArguments: Any?): String {
+        return storageKeyWith(keyArguments)
+    }
 
     override suspend fun StorageEntry.keys(vararg prefixArgs: Any?): List<StorageKeyComponents> {
         val prefix = storageKey(runtime, *prefixArgs)
@@ -139,18 +144,31 @@ abstract class BaseStorageQueryContext(
         return queryKey(storageKey, at)
     }
 
-    override suspend fun <V> StorageEntry.observe(
+    override fun <V> StorageEntry.observe(
         vararg keyArguments: Any?,
         binding: DynamicInstanceBinder<V>
     ): Flow<V> {
         val storageKey = storageKeyWith(keyArguments)
 
         return observeKey(storageKey).map { scale ->
-            val dynamicInstance = scale?.let {
-                type.value?.fromHex(runtime, scale)
-            }
+            decodeStorageValue(scale, binding)
+        }
+    }
 
-            binding(dynamicInstance)
+    override fun <V> StorageEntry.observeWithRaw(
+        vararg keyArguments: Any?,
+        binding: DynamicInstanceBinder<V>
+    ): Flow<WithRawValue<V>> {
+        val storageKey = storageKeyWith(keyArguments)
+
+        return observeKey(storageKey).map { scale ->
+            val decoded = decodeStorageValue(scale, binding)
+
+            WithRawValue(
+                raw = StorageEntryValue(storageKey, scale),
+                chainId = chainId,
+                value = decoded
+            )
         }
     }
 
@@ -193,6 +211,17 @@ abstract class BaseStorageQueryContext(
         val rawValue = type!!.fromByteArrayOrIncompatible(value, runtime)
 
         return binding(rawValue)
+    }
+
+    private fun <V> StorageEntry.decodeStorageValue(
+        scale: String?,
+        binding: DynamicInstanceBinder<V>
+    ): V {
+        val dynamicInstance = scale?.let {
+            type.value?.fromHex(runtime, scale)
+        }
+
+        return binding(dynamicInstance)
     }
 
     private fun StorageEntry.storageKeyWith(keyArguments: Array<out Any?>): String {

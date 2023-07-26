@@ -66,6 +66,8 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.sel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerFragment
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
+import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 import io.novafoundation.nova.splash.SplashRouter
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.Flow
@@ -78,6 +80,7 @@ object BackDelayedNavigation : DelayedNavigation
 
 class Navigator(
     private val navigationHolder: NavigationHolder,
+    private val walletConnectDelegate: WalletConnectRouter,
 ) : BaseNavigator(navigationHolder),
     SplashRouter,
     OnboardingRouter,
@@ -232,10 +235,6 @@ class Navigator(
         navController?.navigate(R.id.action_chooseAmountFragment_to_confirmTransferFragment, bundle)
     }
 
-    override fun finishSendFlow() {
-        navController?.navigate(R.id.finish_send_flow)
-    }
-
     override fun openTransferDetail(transaction: OperationParcelizeModel.Transfer) {
         val bundle = TransferDetailFragment.getBundle(transaction)
 
@@ -295,6 +294,18 @@ class Navigator(
         navController?.navigate(R.id.action_manageTokensFragment_to_addTokenSelectChainFragment)
     }
 
+    override fun openSendFlow() {
+        navController?.navigate(R.id.action_mainFragment_to_sendFlow)
+    }
+
+    override fun openReceiveFlow() {
+        navController?.navigate(R.id.action_mainFragment_to_receiveFlow)
+    }
+
+    override fun openBuyFlow() {
+        navController?.navigate(R.id.action_mainFragment_to_buyFlow)
+    }
+
     override fun openAddTokenEnterInfo(payload: AddTokenEnterInfoPayload) {
         val args = AddTokenEnterInfoFragment.getBundle(payload)
         navController?.navigate(R.id.action_addTokenSelectChainFragment_to_addTokenEnterInfoFragment, args)
@@ -302,6 +313,14 @@ class Navigator(
 
     override fun finishAddTokenFlow() {
         navController?.navigate(R.id.finish_add_token_flow)
+    }
+
+    override fun openWalletConnectSessions(metaId: Long) {
+        walletConnectDelegate.openWalletConnectSessions(WalletConnectSessionsPayload(metaId = metaId))
+    }
+
+    override fun openWalletConnectScan() {
+        walletConnectDelegate.openScanPairingQrCode()
     }
 
     override fun openNfts() {
@@ -356,6 +375,7 @@ class Navigator(
         val action = when (navController?.currentDestination?.id) {
             R.id.mainFragment -> R.id.action_mainFragment_to_balanceDetailFragment
             R.id.assetSearchFragment -> R.id.action_assetSearchFragment_to_balanceDetailFragment
+            R.id.confirmTransferFragment -> R.id.action_confirmTransferFragment_to_balanceDetailFragment
             else -> null
         }
 

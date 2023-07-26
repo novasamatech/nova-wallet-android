@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.firstLoaded
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboardUpdateSystem
@@ -28,6 +29,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 class StakingDashboardViewModel(
     private val interactor: StakingDashboardInteractor,
@@ -37,6 +40,7 @@ class StakingDashboardViewModel(
     private val router: StakingRouter,
     private val stakingSharedState: StakingSharedState,
     private val presentationMapper: StakingDashboardPresentationMapper,
+    private val dashboardUpdatePeriod: Duration = 200.milliseconds
 ) : BaseViewModel() {
 
     val walletUi = accountUseCase.selectedWalletModelFlow()
@@ -46,6 +50,7 @@ class StakingDashboardViewModel(
         .shareInBackground()
 
     val stakingDashboardUiFlow = stakingDashboardFlow
+        .throttleLast(dashboardUpdatePeriod)
         .map { dashboardLoading -> dashboardLoading.map(::mapDashboardToUi) }
         .shareInBackground()
 
@@ -71,15 +76,19 @@ class StakingDashboardViewModel(
         val withoutStakeItem = withoutStakeItems.getOrNull(index) ?: return@launch
         val noStakeItemState = withoutStakeItem.stakingState as? NoStake ?: return@launch
 
-        when (val flowType = noStakeItemState.flowType) {
-            is NoStake.FlowType.Aggregated -> {} // TODO feature aggregated flows & nomination pools
+        val stakingType = when (val flowType = noStakeItemState.flowType) {
+            is NoStake.FlowType.Aggregated -> flowType.stakingTypes.first() // TODO handle aggregated flows
 
-            is NoStake.FlowType.Single -> openChainStaking(
-                chain = withoutStakeItem.chain,
-                chainAsset = withoutStakeItem.token.configuration,
-                stakingType = flowType.stakingType
-            )
+            is NoStake.FlowType.Single -> flowType.stakingType
         }
+
+        stakingSharedState.setSelectedOption(
+            chain = withoutStakeItem.chain,
+            chainAsset = withoutStakeItem.token.configuration,
+            stakingType = stakingType
+        )
+
+        router.openStartStakingFlow()
     }
 
     fun onMoreOptionsClicked() {
@@ -152,7 +161,6 @@ class StakingDashboardViewModel(
             stakingType = stakingType
         )
 
-        // TODO: open staking main fragment if we already have staking in chain
-        router.openStartStakingFlow()
+        router.openChainStakingMain()
     }
 }

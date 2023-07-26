@@ -35,6 +35,7 @@ import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.PhishingSitesDao
 import io.novafoundation.nova.core_db.dao.StakingDashboardDao
+import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
@@ -57,6 +58,7 @@ import io.novafoundation.nova.core_db.migrations.AddLocks_22_23
 import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
 import io.novafoundation.nova.core_db.migrations.AddNodeSelectionStrategyField_38_39
+import io.novafoundation.nova.core_db.migrations.AddRewardAccountToStakingDashboard_43_44
 import io.novafoundation.nova.core_db.migrations.AddRuntimeFlagToChains_36_37
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AddSourceToLocalAsset_28_29
@@ -78,6 +80,7 @@ import io.novafoundation.nova.core_db.migrations.NullableSubstrateAccountId_21_2
 import io.novafoundation.nova.core_db.migrations.NullableSubstratePublicKey_15_16
 import io.novafoundation.nova.core_db.migrations.RemoveChainForeignKeyFromChainAccount_11_12
 import io.novafoundation.nova.core_db.migrations.RemoveColorFromChains_17_18
+import io.novafoundation.nova.core_db.migrations.StakingRewardPeriods_42_43
 import io.novafoundation.nova.core_db.migrations.TransferFiatAmount_40_41
 import io.novafoundation.nova.core_db.migrations.WatchOnlyChainAccounts_16_17
 import io.novafoundation.nova.core_db.model.AccountLocal
@@ -97,6 +100,7 @@ import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.PhishingAddressLocal
 import io.novafoundation.nova.core_db.model.PhishingSiteLocal
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
+import io.novafoundation.nova.core_db.model.StakingRewardPeriodLocal
 import io.novafoundation.nova.core_db.model.StorageEntryLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.core_db.model.TotalRewardLocal
@@ -111,7 +115,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 42,
+    version = 44,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -140,8 +144,9 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         GovernanceDAppLocal::class,
         BrowserHostSettingsLocal::class,
         WalletConnectSessionAccountLocal::class,
+        CoinPriceLocal::class,
         StakingDashboardItemLocal::class,
-        CoinPriceLocal::class
+        StakingRewardPeriodLocal::class
     ],
 )
 @TypeConverters(
@@ -186,7 +191,9 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddGovernanceNetworkToExternalApi_33_34, AddBrowserHostSettings_34_35)
                     .addMigrations(ExtractExternalApiToSeparateTable_35_36, AddRuntimeFlagToChains_36_37)
                     .addMigrations(AddExtrinsicContentField_37_38, AddNodeSelectionStrategyField_38_39)
-                    .addMigrations(AddWalletConnectSessions_39_40, TransferFiatAmount_40_41, AddStakingDashboardItems_41_42)
+                    .addMigrations(AddWalletConnectSessions_39_40, TransferFiatAmount_40_41)
+                    .addMigrations(AddStakingDashboardItems_41_42, StakingRewardPeriods_42_43)
+                    .addMigrations(AddRewardAccountToStakingDashboard_43_44)
                     .build()
             }
             return instance!!
@@ -240,4 +247,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun stakingDashboardDao(): StakingDashboardDao
 
     abstract fun coinPriceDao(): CoinPriceDao
+
+    abstract fun stakingRewardPeriodDao(): StakingRewardPeriodDao
 }

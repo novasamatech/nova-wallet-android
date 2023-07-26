@@ -23,7 +23,7 @@ class TokenRepositoryImpl(
 
         val symbols = chainAssets.map { it.symbol }.distinct()
 
-        return tokenDao.observeTokens(symbols).map { tokens ->
+        return tokenDao.observeTokensWithCurrency(symbols).map { tokens ->
             val tokensBySymbol = tokens.associateBy { it.token?.tokenSymbol }
             val currency = tokens.first().currency
 
@@ -41,13 +41,13 @@ class TokenRepositoryImpl(
     }
 
     override suspend fun getToken(chainAsset: Chain.Asset): Token = withContext(Dispatchers.Default) {
-        val tokenLocal = tokenDao.getToken(chainAsset.symbol)!!
+        val tokenLocal = tokenDao.getTokenWithCurrency(chainAsset.symbol)!!
 
         mapTokenWithCurrencyToToken(tokenLocal, chainAsset)
     }
 
     override fun observeToken(chainAsset: Chain.Asset): Flow<Token> {
-        return tokenDao.observeToken(chainAsset.symbol)
+        return tokenDao.observeTokenWithCurrency(chainAsset.symbol)
             .map {
                 mapTokenWithCurrencyToToken(it, chainAsset)
             }
