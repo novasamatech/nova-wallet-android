@@ -174,6 +174,10 @@ fun RuntimeMetadata.uniques() = module(Modules.UNIQUES)
 fun RuntimeMetadata.babe() = module(Modules.BABE)
 fun RuntimeMetadata.elections() = module(Modules.ELECTIONS)
 
+fun RuntimeMetadata.electionsOrNull() = moduleOrNull(Modules.ELECTIONS)
+
+fun RuntimeMetadata.committeeManagementOrNull() = moduleOrNull("CommitteeManagement")
+
 fun RuntimeMetadata.babeOrNull() = moduleOrNull(Modules.BABE)
 
 fun RuntimeMetadata.timestampOrNull() = moduleOrNull(Modules.TIMESTAMP)
