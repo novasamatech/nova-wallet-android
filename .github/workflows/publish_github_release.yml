@@ -29,12 +29,11 @@ env:
 
 jobs:
   build:
-    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@feat/move_github_publication_flow
     with:
       branch: master
       gradlew-command: assembleReleaseGithub
       keystore-file-name: github_key.jks
-      keystore-file-base64: ${{ secrets.BASE64_GITHUB_KEYSTORE_FILE }}
     secrets: inherit
 
   create-release:

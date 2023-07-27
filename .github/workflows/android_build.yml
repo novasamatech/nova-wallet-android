@@ -10,7 +10,7 @@ on:
       gradlew-command:
         required: false
         type: string
-        default: false
+        default: "false"
       run-tests:
         required: false
         type: boolean
@@ -18,10 +18,11 @@ on:
       keystore-file-name:
         required: false
         type: string
-        default: false
+        default: "false"
       keystore-file-base64:
         required: false
         type: string
+        default: "false"
     secrets:
       ACALA_PROD_AUTH_TOKEN:
         required: true
@@ -94,6 +95,8 @@ env:
   CI_GITHUB_KEYSTORE_PASS: ${{ secrets.CI_GITHUB_KEYSTORE_PASS }}
   CI_GITHUB_KEYSTORE_KEY_ALIAS: ${{ secrets.CI_GITHUB_KEYSTORE_KEY_ALIAS }}
   CI_GITHUB_KEYSTORE_KEY_PASS: ${{ secrets.CI_GITHUB_KEYSTORE_KEY_PASS }}
+  CI_GITHUB_KEYSTORE_KEY_FILE: ${{ secrets.BASE64_GITHUB_KEYSTORE_FILE }}
+
 
 jobs:
   build-app:
@@ -113,14 +116,21 @@ jobs:
         if: ${{ inputs.run-tests }} == "true"
         run: ./gradlew runTest
 
-      - name: 🔐 Getting sign key
-        if: ${{ !startsWith(inputs.keystore-file-name, 'false') }}
-        id: write_file
+      - name: 🔐 Getting github sign key
+        if: ${{ startsWith(inputs.keystore-file-name, 'github_key.jks') }}
         uses: timheuer/base64-to-file@v1.1
         with:
           fileName: ${{ inputs.keystore-file-name }}
           fileDir: './app/'
-          encodedString: ${{ inputs.keystore-file-base64 }}
+          encodedString: ${{ env.CI_GITHUB_KEYSTORE_KEY_FILE }}
+      
+      - name: 🔐 Getting market sign key
+        if: ${{ startsWith(inputs.keystore-file-name, 'market_key.jks') }}
+        uses: timheuer/base64-to-file@v1.1
+        with:
+          fileName: ${{ inputs.keystore-file-name }}
+          fileDir: './app/'
+          encodedString: ${{ env.CI_MARKET_KEY_FILE }}
 
       - name: 🏗 Build app
         if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
