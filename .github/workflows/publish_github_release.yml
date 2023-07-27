@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@feat/move_github_publication_flow
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
     with:
       branch: master
       gradlew-command: assembleReleaseGithub
