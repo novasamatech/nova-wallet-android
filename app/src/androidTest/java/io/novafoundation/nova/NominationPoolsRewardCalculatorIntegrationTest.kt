@@ -38,7 +38,7 @@ class NominationPoolsRewardCalculatorIntegrationTest : BaseIntegrationTest() {
         val rewardCalculator = nominationPoolRewardCalculatorFactory.create(stakingOption, sharedComputationScope = this)
 
         Log.d("NominationPoolsRewardCalculatorIntegrationTest", "Max APY: ${rewardCalculator.maxAPY}")
-        Log.d("NominationPoolsRewardCalculatorIntegrationTest", "APY for Nova Pool: ${rewardCalculator.apyFor(PoolId(54.toBigInteger()))}")
+        Log.d("NominationPoolsRewardCalculatorIntegrationTest", "APY for Nova Pool: ${rewardCalculator.apyFor(54)}")
     }
 
     private fun NominationPoolRewardCalculator.apyFor(poolId: Int): Double? {

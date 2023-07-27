@@ -13,7 +13,7 @@ class BondedPool(
 
 class PoolCommission(val current: Current?) {
 
-        class Current(val perbill: Perbill)
+    class Current(val perbill: Perbill)
 }
 
 fun bindBondedPool(decoded: Any, poolId: PoolId): BondedPool {

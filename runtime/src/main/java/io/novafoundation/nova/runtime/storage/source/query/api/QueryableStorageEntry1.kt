@@ -18,7 +18,7 @@ interface QueryableStorageEntry1<I, T : Any> {
     suspend fun <K> multi(keys: List<I>, keyTransform: (I) -> K): Map<K, T?>
 
     context(StorageQueryContext)
-    suspend  fun multi(keys: List<I>): Map<I, T?>
+    suspend fun multi(keys: List<I>): Map<I, T?>
 
     context(StorageQueryContext)
     suspend fun queryRaw(argument: I): String?
@@ -77,7 +77,7 @@ internal class RealQueryableStorageEntry1<I, T : Any>(
         return storageEntry.entries(
             keysArguments = keys.wrapSingleArgumentKeys(),
             keyExtractor = { (key: Any?) -> keyTransform(key as I) },
-            binding =  { decoded, key -> decoded?.let { binding(it, reverseKeyLookup.getValue(key)) } }
+            binding = { decoded, key -> decoded?.let { binding(it, reverseKeyLookup.getValue(key)) } }
         )
     }
 
@@ -85,7 +85,7 @@ internal class RealQueryableStorageEntry1<I, T : Any>(
     override suspend fun multi(keys: List<I>): Map<I, T?> {
         return storageEntry.singleArgumentEntries(
             keysArguments = keys,
-            binding =  { decoded, key -> decoded?.let { binding(it, key) } }
+            binding = { decoded, key -> decoded?.let { binding(it, key) } }
         )
     }
 }
