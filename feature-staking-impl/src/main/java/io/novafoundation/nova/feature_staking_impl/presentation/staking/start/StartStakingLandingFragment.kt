@@ -7,9 +7,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.isLoaded
+import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -37,7 +42,7 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
 
     override fun initViews() {
         startStakingLandingToolbar.applyStatusBarInsets()
-        startStakingLandingToolbar.setHomeButtonListener { viewModel.backClicked() }
+        startStakingLandingToolbar.setHomeButtonListener { viewModel.back() }
         startStakingLandingList.adapter = adapter
         startStakingLandingList.itemAnimator = null
 
@@ -57,27 +62,33 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
     override fun subscribe(viewModel: StartStakingLandingViewModel) {
         observeBrowserEvents(viewModel)
 
-        viewModel.isLoadingStateFlow.observe { isLoading ->
-            headerAdapter.show(!isLoading)
-            footerAdapter.show(!isLoading)
-            shimmeringAdapter.show(isLoading)
-            startStakingLandingButton.setProgress(isLoading)
-        }
+        viewModel.modelFlow.observe {
+            val isLoaded = it.isLoaded()
 
-        viewModel.titleFlow.observe { title ->
-            headerAdapter.setTitle(title)
-        }
+            headerAdapter.show(isLoaded)
+            footerAdapter.show(isLoaded)
+            shimmeringAdapter.show(it.isLoading())
+            startStakingLandingButton.setProgress(it.isLoading())
 
-        viewModel.stakingConditionsUIFlow.observe { items ->
-            conditionsAdapter.submitList(items)
-        }
-
-        viewModel.moreInfoTextFlow.observe { text ->
-            footerAdapter.setMoreInformationText(text)
+            when (it) {
+                is ExtendedLoadingState.Loaded<StartStakingInfoModel> -> {
+                    headerAdapter.setTitle(it.data.title)
+                    conditionsAdapter.submitList(it.data.conditions)
+                    footerAdapter.setMoreInformationText(it.data.moreInfo)
+                }
+                is ExtendedLoadingState.Error -> {
+                    dialog(providedContext) {
+                        setTitle(providedContext.getString(io.novafoundation.nova.common.R.string.common_error_general_title))
+                        it.exception.message?.let { setMessage(it) }
+                        setPositiveButton(io.novafoundation.nova.common.R.string.common_ok) { _, _ -> viewModel.back() }
+                    }
+                }
+                else -> {}
+            }
         }
 
         viewModel.availableBalanceTextFlow.observe {
-            startStakingLandingAvailableBalance.text = it
+            startStakingLandingAvailableBalance.text = it.dataOrNull
         }
     }
 

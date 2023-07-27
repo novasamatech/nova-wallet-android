@@ -18,10 +18,11 @@
 
     <string name="start_staking_fragment_agregated_reward_frequency_condition">Rewards accrue %1$s. Stake over %2$s for automatic rewards payout, otherwise you need to claim rewards manually</string>
 
-    <string name="start_staking_fragment_reward_frequency_condition_restake_only">Rewards accrue every %s and added back to the stake</string>
+    <string name="start_staking_fragment_reward_frequency_condition_restake_only">Rewards accrue every %s. You will receive them automatically or manual</string>
     <string name="start_staking_fragment_reward_frequency_condition_payout_only">Rewards accrue every %s and added to the transferable balance</string>
     <string name="start_staking_fragment_reward_frequency_condition_automatic_and_manual">Rewards accrue %1$s. Stake over %2$s for automatic rewards payout, otherwise you need to claim rewards manually</string>
-    <string name="start_staking_fragment_reward_frequency_condition_manual">Rewards accrue every %s hours. You need to claim rewards manually</string>
+    <string name="start_staking_fragment_reward_frequency_condition_manual">Rewards accrue every %s. You need to claim rewards manually</string>
+    <string name="start_staking_fragment_reward_frequency_condition_fallback">Rewards accrue every %s</string>
 
     <string name="start_staking_fragment_claim_reward_frequency_condition">Rewards accrue every %s. You need to claim rewards manually</string>
 

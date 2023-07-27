@@ -14,6 +14,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 
+sealed interface ParticipationInGovernance {
+    class Participate(val minAmount: BigInteger?) : ParticipationInGovernance
+    object NotParticipate : ParticipationInGovernance
+}
+
 class StartStakingCompoundData(
     val chain: Chain,
     val asset: Asset,
@@ -21,8 +26,7 @@ class StartStakingCompoundData(
     val maxEarningRate: BigDecimal,
     val minStake: BigInteger,
     val eraInfo: StartStakingEraInfo,
-    val participateInGovernance: Boolean,
-    val participateInGovernanceMinAmount: BigInteger?,
+    val participationInGovernance: ParticipationInGovernance,
     val payoutTypes: List<PayoutType>,
     val automaticPayoutMinAmount: BigInteger?
 )
@@ -41,35 +45,41 @@ class RealCompoundStartStakingInteractor(
 
     override fun observeStartStakingInfo(chain: Chain, chainAsset: Chain.Asset): Flow<StartStakingCompoundData> {
         return accountRepository.selectedMetaAccountFlow()
-            .flatMapLatest { metaId ->
-                val asset = walletRepository.getAsset(metaId.id, chainAsset)
-
-                val startStakingDataFlow = interactors.map { it.observeData(chain, asset!!) }
+            .flatMapLatest { metaAccount -> walletRepository.assetFlow(metaAccount.id, chainAsset) }
+            .flatMapLatest { asset ->
+                val startStakingDataFlow = interactors.map { it.observeData(chain, asset) }
                     .combineList()
 
                 val eraInfoData = stakingEraInteractor.observeEraInfo(chain)
 
                 combine(startStakingDataFlow, eraInfoData) { startStakingData, startStakingEraInfo ->
-
-                    val participationGovernanceMinAmount = startStakingData.filter { it.participationInGovernance }
-                        .minOfOrNull { it.minStake }
-
                     val automaticPayoutMinAmount = startStakingData.filter { it.payoutType is PayoutType.Automatic }
                         .minOfOrNull { it.minStake }
 
                     StartStakingCompoundData(
                         chain = chain,
-                        asset = asset!!,
+                        asset = asset,
                         availableBalance = startStakingData.map { it.availableBalance }.min(),
                         maxEarningRate = startStakingData.map { it.maxEarningRate }.max(),
                         minStake = startStakingData.map { it.minStake }.min(),
                         eraInfo = startStakingEraInfo,
-                        participateInGovernance = startStakingData.map { it.participationInGovernance }.any { it },
-                        participateInGovernanceMinAmount = participationGovernanceMinAmount,
+                        participationInGovernance = getParticipationInGovernance(startStakingData),
                         payoutTypes = startStakingData.map { it.payoutType }.distinct(),
                         automaticPayoutMinAmount = automaticPayoutMinAmount
                     )
                 }
             }
+    }
+
+    private fun getParticipationInGovernance(startStakingData: List<StartStakingData>): ParticipationInGovernance {
+        val participationInGovernanceData = startStakingData.filter { it.participationInGovernance }
+
+        return when {
+            participationInGovernanceData.isNotEmpty() -> {
+                val minAmount = participationInGovernanceData.minOfOrNull { it.minStake }
+                ParticipationInGovernance.Participate(minAmount)
+            }
+            else -> ParticipationInGovernance.NotParticipate
+        }
     }
 }

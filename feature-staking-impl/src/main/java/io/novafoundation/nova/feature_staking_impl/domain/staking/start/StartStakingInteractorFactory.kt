@@ -24,55 +24,43 @@ class StartStakingInteractorFactory(
     private val parachainStakingRewardCalculatorFactory: ParachainStakingRewardCalculatorFactory
 ) {
 
-    suspend fun create(chain: Chain, asset: Chain.Asset, coroutineScope: CoroutineScope): CompoundStartStakingInteractor {
-        val interactors = createInteractors(chain, asset, coroutineScope)
-        val stakingEraInteractor = stakingEraInteractorFactory.create(chain)
+    suspend fun create(chain: Chain, chainAsset: Chain.Asset, coroutineScope: CoroutineScope): CompoundStartStakingInteractor {
+        val interactors = createInteractors(chain, chainAsset, coroutineScope)
+        val stakingEraInteractor = stakingEraInteractorFactory.create(chainAsset)
         return RealCompoundStartStakingInteractor(walletRepository, accountRepository, interactors, stakingEraInteractor)
     }
 
     private suspend fun createInteractors(chain: Chain, asset: Chain.Asset, coroutineScope: CoroutineScope): List<StartStakingInteractor> {
-        return asset.staking.mapNotNull {
-            when (it.group()) {
-                StakingTypeGroup.RELAYCHAIN -> createRelaychainStartStakingInteractor(coroutineScope)
-                StakingTypeGroup.PARACHAIN -> createPararchainStartStakingInteractor(coroutineScope, chain, asset, it)
-                StakingTypeGroup.NOMINATION_POOL -> createNominationPoolsStartStakingInteractor(coroutineScope)
+        return asset.staking.mapNotNull { stakingType ->
+            when (stakingType.group()) {
+                StakingTypeGroup.RELAYCHAIN -> createRelaychainStartStakingInteractor(coroutineScope, stakingType)
+                StakingTypeGroup.PARACHAIN -> createPararchainStartStakingInteractor(chain, asset, stakingType)
+                StakingTypeGroup.NOMINATION_POOL -> createNominationPoolsStartStakingInteractor()
                 StakingTypeGroup.UNSUPPORTED -> null
             }
         }
     }
 
-    private fun createRelaychainStartStakingInteractor(coroutineScope: CoroutineScope): StartStakingInteractor {
+    private fun createRelaychainStartStakingInteractor(coroutineScope: CoroutineScope, stakingType: Chain.Asset.StakingType): StartStakingInteractor {
         return RelaychainStartStakingInteractor(
             stakingSharedComputation = stakingSharedComputation,
-            accountRepository = accountRepository,
-            walletRepository = walletRepository,
             coroutineScope = coroutineScope,
-            stakingType = Chain.Asset.StakingType.RELAYCHAIN
+            stakingType = stakingType
         )
     }
 
     private suspend fun createPararchainStartStakingInteractor(
-        coroutineScope: CoroutineScope,
         chain: Chain,
         asset: Chain.Asset,
         stakingType: Chain.Asset.StakingType
     ): StartStakingInteractor {
         return ParachainStartStakingInteractor(
-            accountRepository = accountRepository,
-            walletRepository = walletRepository,
-            coroutineScope = coroutineScope,
             parachainNetworkInfoInteractor = parachainNetworkInfoInteractor,
-            stakingType = Chain.Asset.StakingType.PARACHAIN,
             parachainStakingRewardCalculator = parachainStakingRewardCalculatorFactory.create(createStakingOption(chain, asset, stakingType))
         )
     }
 
-    private fun createNominationPoolsStartStakingInteractor(coroutineScope: CoroutineScope): StartStakingInteractor {
-        return NominationPoolStartStakingInteractor(
-            accountRepository = accountRepository,
-            walletRepository = walletRepository,
-            coroutineScope = coroutineScope,
-            stakingType = Chain.Asset.StakingType.NOMINATION_POOLS
-        )
+    private fun createNominationPoolsStartStakingInteractor(): StartStakingInteractor {
+        return NominationPoolStartStakingInteractor()
     }
 }
