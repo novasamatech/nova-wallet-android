@@ -1,0 +1,28 @@
+name: Bump app version from tag
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  update:
+    name: Update app version
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Mandatory to use the extract version from tag action
+
+      - name: Extract version from tag
+        uses: damienaicheh/extract-version-from-tag-action@v1.0.0
+
+      - name: Write app version to secrets
+        uses: hmanzur/actions-set-secret@v2.0.0
+        with:
+          name: 'ANDROID_APP_VERSION'
+          value: '${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}'
+          repository: nova-wallet/nova-wallet-ios
+          token: ${{ secrets.WRITE_SECRET_PAT }}

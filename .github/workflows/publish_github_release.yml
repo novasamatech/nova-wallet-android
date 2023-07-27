@@ -1,6 +1,9 @@
 name: Publish GitHub release
 
 on:
+  push:
+    branches:
+      ['master']
   pull_request:
   workflow_dispatch:
     inputs:
@@ -28,7 +31,29 @@ env:
   release_draft: True
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      version_changed: ${{ steps.changed.outputs.test }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Version in build.gradle
+        run: |
+          versionName=$(grep "versionName" build.gradle | grep -o "'.*'")
+          versionName=${versionName//\'/}
+          echo Version in gradle file: $versionName
+          echo "GRADLE_APP_VERSION=$versionName" >> "$GITHUB_ENV"
+
+      - name: Was version changed?
+        id: changed
+        run: echo "${{ env.GRADLE_APP_VERSION }}=${{ secrets.ANDROID_APP_VERSION }}" >> "$GITHUB_OUTPUT"
+
+
   build:
+    needs: check
+    if: needs.check.result == 'true'
     uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@feat/move_github_publication_flow
     with:
       branch: master
