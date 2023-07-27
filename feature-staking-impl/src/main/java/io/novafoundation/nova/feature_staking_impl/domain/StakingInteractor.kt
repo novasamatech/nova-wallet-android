@@ -57,6 +57,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 val ERA_OFFSET = 1.toBigInteger()
 
@@ -203,6 +204,12 @@ class StakingInteractor(
 
     suspend fun getEraDuration() = withContext(Dispatchers.Default) {
         getEraTimeCalculator().eraDuration()
+    }
+
+    suspend fun getFirstRewardReceivingDelay() = withContext(Dispatchers.Default) {
+        val remainingEraTime = getRemainingEraTime().toLong().milliseconds
+        val eraDuration = getEraDuration()
+        remainingEraTime + eraDuration
     }
 
     suspend fun getRemainingEraTime() = withContext(Dispatchers.Default) {

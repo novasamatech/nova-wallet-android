@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.LocalBagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
@@ -102,14 +101,10 @@ class StakingFeatureModule {
     @FeatureScope
     fun provideStakingEraInteractorFactory(
         roundDurationEstimator: RoundDurationEstimator,
-        currentRoundRepository: CurrentRoundRepository,
-        stakingInteractor: StakingInteractor,
-        @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+        stakingInteractor: StakingInteractor
     ) = StakingEraInteractorFactory(
         roundDurationEstimator,
-        currentRoundRepository,
-        stakingInteractor,
-        storageDataSource
+        stakingInteractor
     )
 
     @Provides
