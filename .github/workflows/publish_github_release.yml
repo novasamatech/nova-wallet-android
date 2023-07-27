@@ -34,6 +34,7 @@ jobs:
       branch: master
       gradlew-command: assembleReleaseGithub
       keystore-file-name: github_key.jks
+      keystore-file-base64: ${{ secrets.BASE64_GITHUB_KEYSTORE_FILE }}
     secrets: inherit
 
   create-release:
