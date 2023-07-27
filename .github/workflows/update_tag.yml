@@ -1,28 +1,55 @@
-name: Bump app version from tag
+name: Bump app version
 
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      ['master']
+  pull_request:
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      version_changed: ${{ steps.changed.outputs.text }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Version in build.gradle
+        run: |
+          versionName=$(grep "versionName" build.gradle | grep -o "'.*'")
+          versionName=${versionName//\'/}
+          echo Version in gradle file: $versionName
+          echo "GRADLE_APP_VERSION=$versionName" >> "$GITHUB_ENV"
+
+      - name: Was version changed?
+        id: changed
+        run: |
+          if [[ ${{ env.GRADLE_APP_VERSION }} == ${{ secrets.ANDROID_APP_VERSION }} ]]; then
+            echo "text=false" >> $GITHUB_OUTPUT
+          else
+            echo "text=true" >> $GITHUB_OUTPUT
+          fi
+
   update:
+    needs: check
+    if: needs.check.outputs.version_changed == 'true'
     name: Update app version
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # Mandatory to use the extract version from tag action
 
-      - name: Extract version from tag
-        uses: damienaicheh/extract-version-from-tag-action@v1.0.0
+      - uses: rickstaa/action-create-tag@v1
+        with:
+          tag: 'v${{ env.GRADLE_APP_VERSION }}'
+          message: Release v${{ env.GRADLE_APP_VERSION }}
 
       - name: Write app version to secrets
         uses: hmanzur/actions-set-secret@v2.0.0
         with:
           name: 'ANDROID_APP_VERSION'
-          value: '${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}'
-          repository: nova-wallet/nova-wallet-ios
+          value: ${{ env.GRADLE_APP_VERSION }}
+          repository: novasamatech/nova-wallet-android
           token: ${{ secrets.WRITE_SECRET_PAT }}
