@@ -17,11 +17,11 @@ import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingStory
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.erasStartSessionIndex
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.ledger
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.staking
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindActiveEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindCurrentEra
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindErasStartSessionIndex
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindExposure
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindHistoryDepth
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindMaxNominators
@@ -41,6 +41,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.observeNonNull
+import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
@@ -69,12 +70,9 @@ class StakingRepositoryImpl(
 ) : StakingRepository {
 
     override suspend fun eraStartSessionIndex(chainId: ChainId, currentEra: BigInteger): EraIndex {
-        val runtime = runtimeFor(chainId)
-        return remoteStorage.queryNonNull( // Index of session from with the era started
-            keyBuilder = { it.metadata.staking().storage("ErasStartSessionIndex").storageKey(runtime, currentEra) },
-            binding = ::bindErasStartSessionIndex,
-            chainId = chainId
-        )
+        return localStorage.query(chainId) {
+            metadata.staking.erasStartSessionIndex.queryNonNull(currentEra)
+        }
     }
 
     override suspend fun eraLength(chainId: ChainId): BigInteger {

@@ -151,13 +151,15 @@ class StakingFeatureModule {
         accountRepository: AccountRepository,
         bagListRepository: BagListRepository,
         totalIssuanceRepository: TotalIssuanceRepository,
+        eraTimeCalculatorFactory: EraTimeCalculatorFactory
     ) = StakingSharedComputation(
         stakingRepository = stakingRepository,
         computationalCache = computationalCache,
         rewardCalculatorFactory = rewardCalculatorFactory,
         accountRepository = accountRepository,
         bagListRepository = bagListRepository,
-        totalIssuanceRepository = totalIssuanceRepository
+        totalIssuanceRepository = totalIssuanceRepository,
+        eraTimeCalculatorFactory = eraTimeCalculatorFactory
     )
 
     @Provides
@@ -184,7 +186,6 @@ class StakingFeatureModule {
         payoutRepository: PayoutRepository,
         stakingSharedState: StakingSharedState,
         assetUseCase: AssetUseCase,
-        factory: EraTimeCalculatorFactory,
         stakingSharedComputation: StakingSharedComputation,
     ) = StakingInteractor(
         walletRepository,
@@ -196,7 +197,6 @@ class StakingFeatureModule {
         stakingSharedState,
         payoutRepository,
         assetUseCase,
-        factory,
         stakingSharedComputation,
     )
 
@@ -204,14 +204,14 @@ class StakingFeatureModule {
     @FeatureScope
     fun provideAuraConsensus(
         chainRegistry: ChainRegistry,
-        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+        @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource,
     ) = AuraSession(chainRegistry, storageDataSource)
 
     @Provides
     @FeatureScope
     fun provideBabeConsensus(
         chainRegistry: ChainRegistry,
-        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+        @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource,
     ) = BabeSession(storageDataSource, chainRegistry)
 
     @Provides
@@ -224,7 +224,7 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun provideSessionRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+        @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource,
     ): SessionRepository = RealSessionRepository(storageDataSource)
 
     @Provides

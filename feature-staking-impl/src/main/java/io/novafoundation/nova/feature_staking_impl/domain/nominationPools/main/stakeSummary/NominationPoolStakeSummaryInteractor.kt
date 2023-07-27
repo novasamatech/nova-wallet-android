@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.bondedAccountOf
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
-import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakeSummary
@@ -20,7 +19,11 @@ import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.combineTransform
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlin.time.Duration.Companion.milliseconds
 
 interface NominationPoolStakeSummaryInteractor {
@@ -36,7 +39,6 @@ class RealNominationPoolStakeSummaryInteractor(
     private val nominationPoolStateRepository: NominationPoolStateRepository,
     private val stakingSharedComputation: StakingSharedComputation,
     private val noPoolAccountDerivation: PoolAccountDerivation,
-    private val eraTimeCalculatorFactory: EraTimeCalculatorFactory,
 ) : NominationPoolStakeSummaryInteractor {
 
     override fun stakeSummaryFlow(
@@ -47,40 +49,46 @@ class RealNominationPoolStakeSummaryInteractor(
         val chainId = stakingOption.assetWithChain.chain.id
         val poolStash = noPoolAccountDerivation.bondedAccountOf(poolMember.poolId, chainId)
 
-        combine(
+        combineTransform(
             nominationPoolStateRepository.observeParticipatingBondedPool(poolMember.poolId, chainId),
             nominationPoolStateRepository.observeParticipatingPoolNominations(poolStash, chainId),
             nominationPoolStateRepository.observeParticipatingBondedBalance(poolStash, chainId),
             stakingSharedComputation.electedExposuresWithActiveEraFlow(chainId, sharedComputationScope)
         ) { bondedPool, poolNominations, bondedPoolBalance, (eraStakers, activeEra) ->
             val bondedPoolState = BondedPoolState(bondedPool, bondedPoolBalance)
+            val totalStaked = bondedPoolState.amountOf(poolMember.points)
 
-            StakeSummary(
-                totalStaked = bondedPoolState.amountOf(poolMember.points),
-                status = determineStakeStatus(stakingOption, eraStakers, activeEra, poolNominations, poolStash)
-            )
+            val stakeSummaryFlow = flow { determineStakeStatus(stakingOption, eraStakers, activeEra, poolNominations, poolStash, sharedComputationScope) }
+                .map { status -> StakeSummary(status, totalStaked) }
+
+            emitAll(stakeSummaryFlow)
         }
     }
 
-    private suspend fun determineStakeStatus(
+    private suspend fun FlowCollector<PoolMemberStatus>.determineStakeStatus(
         stakingOption: StakingOption,
         eraStakers: AccountIdMap<Exposure>,
         activeEra: EraIndex,
         poolNominations: Nominations?,
-        poolStash: AccountId
-    ): PoolMemberStatus {
-        return when {
-            eraStakers.isPoolStaking(poolStash, poolNominations) -> PoolMemberStatus.Active
+        poolStash: AccountId,
+        sharedComputationScope: CoroutineScope
+    ) {
+        when {
+            eraStakers.isPoolStaking(poolStash, poolNominations) -> emit(PoolMemberStatus.Active)
 
             poolNominations != null && poolNominations.isWaiting(activeEra) -> {
                 val nominationsEffectiveEra = poolNominations.submittedInEra + EraIndex.ONE
-                val eraTimeCalculator = eraTimeCalculatorFactory.create(stakingOption)
-                val waitingTime = eraTimeCalculator.calculate(nominationsEffectiveEra)
 
-                PoolMemberStatus.Waiting(waitingTime.toLong().milliseconds)
+                val statusFlow = stakingSharedComputation.eraCalculatorFlow(stakingOption, sharedComputationScope).map { eraTimerCalculator ->
+                    val waitingTime = eraTimerCalculator.calculate(nominationsEffectiveEra)
+
+                    PoolMemberStatus.Waiting(waitingTime.toLong().milliseconds)
+                }
+
+                emitAll(statusFlow)
             }
 
-            else -> PoolMemberStatus.Inactive
+            else -> emit(PoolMemberStatus.Inactive)
         }
     }
 
