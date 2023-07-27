@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.receive.model.QrSharingPayload
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.synthetic.main.fragment_receive.receiveFrom
 import kotlinx.android.synthetic.main.fragment_receive.receiveQrCode
 import kotlinx.android.synthetic.main.fragment_receive.receiveShare
@@ -23,6 +24,7 @@ import kotlinx.android.synthetic.main.fragment_receive.receiveToolbar
 import javax.inject.Inject
 
 private const val KEY_PAYLOAD = "KEY_PAYLOAD"
+private const val KEY_CHAIN_ID = "KEY_CHAIN"
 
 class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
 
@@ -33,6 +35,10 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
 
         fun getBundle(assetPayload: AssetPayload) = Bundle().apply {
             putParcelable(KEY_PAYLOAD, assetPayload)
+        }
+
+        fun getBundle(chainId: ChainId) = Bundle().apply {
+            putString(KEY_CHAIN_ID, chainId)
         }
     }
 
@@ -61,7 +67,7 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
             AssetsFeatureApi::class.java
         )
             .receiveComponentFactory()
-            .create(this, argument(KEY_PAYLOAD))
+            .create(this, argument(KEY_PAYLOAD), argument(KEY_CHAIN_ID))
             .inject(this)
     }
 

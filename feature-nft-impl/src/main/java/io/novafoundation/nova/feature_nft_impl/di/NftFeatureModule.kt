@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.Uni
 import io.novafoundation.nova.feature_nft_impl.di.modules.RmrkV1Module
 import io.novafoundation.nova.feature_nft_impl.di.modules.RmrkV2Module
 import io.novafoundation.nova.feature_nft_impl.di.modules.UniquesModule
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(
@@ -46,11 +47,13 @@ class NftFeatureModule {
         jobOrchestrator: JobOrchestrator,
         nftDao: NftDao,
         httpExceptionHandler: HttpExceptionHandler,
+        storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
     ): NftRepository = NftRepositoryImpl(
         nftProvidersRegistry = nftProvidersRegistry,
         chainRegistry = chainRegistry,
         jobOrchestrator = jobOrchestrator,
         nftDao = nftDao,
-        exceptionHandler = httpExceptionHandler
+        exceptionHandler = httpExceptionHandler,
+        storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory
     )
 }

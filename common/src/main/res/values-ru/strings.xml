@@ -287,6 +287,8 @@
     <string name="common_none">Нет</string>
     <string name="common_not_enough_funds_message">К сожалению, у вас недостаточно средств для оплаты сетевого сбора.</string>
     <string name="common_not_enough_funds_title">Недостаточный баланс</string>
+    <string name="common_nft_absent_title">NFT отсутствует</string>
+    <string name="common_nft_absent_message">К сожалению, выбранная NFT не принадлежит текущему кошельку</string>
     <string name="common_off">Выкл</string>
     <string name="common_ok">OK</string>
     <string name="common_ok_back">Хорошо, назад</string>
@@ -1132,7 +1134,8 @@
     <string name="wallet_nickname_create_caption_v2_2_0">Примеры имён: Мой аккаунт, Валидатор, Dotsama краудлоуны, и т.д.</string>
     <string name="wallet_receive_description">Поделитесь этим QR-кодом с отправителем</string>
     <string name="wallet_receive_description_v2_2_0">Покажите QR код отправителю для сканирования</string>
-    <string name="wallet_receive_share_message" formatted="false">Мой %s адрес для получения %s:</string>
+    <string name="wallet_receive_share_message_token" formatted="false">Мой %s адрес для получения %s:</string>
+    <string name="wallet_receive_share_message" formatted="false">Мой %s адрес:</string>
     <string name="wallet_receive_share_qr">Поделиться</string>
     <string name="wallet_recipient">Получатель</string>
     <string name="wallet_search_empty_title">Убедитесь, что адрес\nиз правильной сети</string>
@@ -1189,4 +1192,7 @@
     <string name="yield_boost_stake_increase_time">Частота увеличения стейка</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost будет автоматически стейкать %s все мои переводные токены выше %s</string>
     <string name="yiled_boost_yield_boosted">С Yield Boost</string>
+    <string name="nft_receive">Получить</string>
+    <string name="nft_send">Отправить</string>
+    <string name="nft_search_hint">Поиск по названию NFT или коллекции</string>
 </resources>

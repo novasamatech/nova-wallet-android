@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_nft_impl.domain.nft.list.NftListInteractor
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.list.NftListViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 @Module(includes = [ViewModelModule::class])
 class NftListModule {
@@ -25,11 +26,13 @@ class NftListModule {
     fun provideInteractor(
         accountRepository: AccountRepository,
         nftRepository: NftRepository,
-        tokenRepository: TokenRepository
+        tokenRepository: TokenRepository,
+        chainStateRepository: ChainStateRepository
     ) = NftListInteractor(
         accountRepository = accountRepository,
         tokenRepository = tokenRepository,
-        nftRepository = nftRepository
+        nftRepository = nftRepository,
+        chainStateRepository = chainStateRepository
     )
 
     @Provides

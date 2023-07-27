@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_assets.presentation.receive.model.QrSharin
 import io.novafoundation.nova.feature_assets.presentation.receive.model.TokenReceiver
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -36,7 +37,8 @@ class ReceiveViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
     private val externalActions: ExternalActions.Presentation,
-    private val assetPayload: AssetPayload,
+    private val assetPayload: AssetPayload?,
+    private val chainId: ChainId?,
     private val chainRegistry: ChainRegistry,
     selectedAccountUseCase: SelectedAccountUseCase,
     private val router: AssetsRouter,
@@ -44,12 +46,18 @@ class ReceiveViewModel(
 
     private val selectedMetaAccountFlow = selectedAccountUseCase.selectedMetaAccountFlow()
 
-    private val chainWithAssetAsync by lazyAsync {
-        chainRegistry.chainWithAsset(assetPayload.chainId, assetPayload.chainAssetId)
+    private val assetAsync by lazyAsync {
+        assetPayload?.let {
+            chainRegistry.chainWithAsset(assetPayload.chainId, assetPayload.chainAssetId).asset
+        }
+    }
+    private val chainAsync by lazyAsync {
+        val chainId = assetPayload?.chainId ?: chainId.orEmpty()
+        chainRegistry.getChain(chainId)
     }
 
     val qrBitmapFlow = flowOf {
-        val qrString = interactor.getQrCodeSharingString(assetPayload.chainId)
+        val qrString = interactor.getQrCodeSharingString(assetPayload?.chainId ?: chainId.orEmpty())
 
         qrCodeGenerator.generateQrBitmap(qrString)
     }
@@ -58,22 +66,26 @@ class ReceiveViewModel(
 
     val receiver = selectedMetaAccountFlow
         .map {
-            val (chain, chainAsset) = chainWithAssetAsync()
+            val chain = chainAsync()
+            val chainAsset = assetAsync()
             val address = it.addressIn(chain)!!
 
             TokenReceiver(
                 addressModel = addressIconGenerator.createAddressModel(chain, address, AddressIconGenerator.SIZE_BIG, it.name),
                 chain = mapChainToUi(chain),
-                chainAssetIcon = chainAsset.iconUrl
+                chainAssetIcon = chainAsset?.iconUrl ?: chain.icon
             )
         }
         .inBackground()
         .share()
 
     val toolbarTitle = flowOf {
-        val (_, chainAsset) = chainWithAssetAsync()
-
-        resourceManager.getString(R.string.wallet_asset_receive_token, chainAsset.symbol)
+        val asset = assetAsync()
+        if (asset != null) {
+            resourceManager.getString(R.string.wallet_asset_receive_token, asset.symbol)
+        } else {
+            resourceManager.getString(R.string.wallet_asset_receive)
+        }
     }
         .inBackground()
         .share()
@@ -83,7 +95,7 @@ class ReceiveViewModel(
 
     fun recipientClicked() = launch {
         val accountAddress = receiver.first().addressModel.address
-        val (chain, _) = chainWithAssetAsync()
+        val chain = chainAsync()
 
         externalActions.showExternalActions(ExternalActions.Type.Address(accountAddress), chain)
     }
@@ -95,7 +107,8 @@ class ReceiveViewModel(
     fun shareButtonClicked() = launch {
         val qrBitmap = qrBitmapFlow.first()
         val address = receiver.first().addressModel.address
-        val (chain, chainAsset) = chainWithAssetAsync()
+        val chain = chainAsync()
+        val chainAsset = assetAsync()
 
         viewModelScope.launch {
             interactor.generateTempQrFile(qrBitmap)
@@ -108,10 +121,16 @@ class ReceiveViewModel(
         }
     }
 
-    private fun generateShareMessage(chain: Chain, tokenType: Chain.Asset, address: String): String {
-        return resourceManager.getString(R.string.wallet_receive_share_message).format(
-            chain.name,
-            tokenType.symbol
-        ) + " " + address
+    private fun generateShareMessage(chain: Chain, tokenType: Chain.Asset?, address: String): String {
+        return if (tokenType == null) {
+            resourceManager.getString(R.string.wallet_receive_share_message).format(
+                chain.name
+            )
+        } else {
+            resourceManager.getString(R.string.wallet_receive_share_message_token).format(
+                chain.name,
+                tokenType.symbol
+            )
+        } + " " + address
     }
 }

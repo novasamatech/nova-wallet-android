@@ -40,7 +40,8 @@ class ChainStateRepository(
     suspend fun expectedBlockTimeInMillis(chainId: ChainId): BigInteger {
         val runtime = chainRegistry.getRuntime(chainId)
 
-        return runtime.metadata.babe().numberConstant("ExpectedBlockTime", runtime)
+        return runtime.metadata.babeOrNull()?.numberConstant("ExpectedBlockTime", runtime)
+            ?: fallbackBlockTime(runtime)
     }
 
     suspend fun predictedBlockTime(chainId: ChainId): BigInteger {

@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.R
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.view.setPriceOrHide
+import kotlinx.android.synthetic.main.fragment_nft_details.assetActionsSend
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsChain
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsCollection
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsCreator
@@ -49,7 +50,10 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
     lateinit var imageLoader: ImageLoader
 
     private val contentViews by lazy(LazyThreadSafetyMode.NONE) {
-        listOf(nftDetailsMedia, nftDetailsTitle, nftDetailsDescription, nftDetailsIssuance, nftDetailsPrice, nftDetailsTable)
+        listOf(
+            nftDetailsMedia, nftDetailsTitle, nftDetailsDescription, nftDetailsIssuance,
+            nftDetailsPrice, nftDetailsTable, assetActionsSend
+        )
     }
 
     override fun onCreateView(
@@ -66,6 +70,7 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
 
         nftDetailsOnwer.setOnClickListener { viewModel.ownerClicked() }
         nftDetailsCreator.setOnClickListener { viewModel.creatorClicked() }
+        assetActionsSend.setOnClickListener { viewModel.assetActionSend() }
 
         nftDetailsCollection.valuePrimary.ellipsize = TextUtils.TruncateAt.END
 
@@ -114,6 +119,7 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
                 nftDetailsCreator.makeGone()
             }
 
+            assetActionsSend.makeVisible()
             nftDetailsChain.showChain(it.network)
         }
 

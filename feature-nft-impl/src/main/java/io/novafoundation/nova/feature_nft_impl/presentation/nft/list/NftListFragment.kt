@@ -12,6 +12,8 @@ import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.R
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureComponent
+import kotlinx.android.synthetic.main.fragment_nft_list.nftActionsReceive
+import kotlinx.android.synthetic.main.fragment_nft_list.nftActionsSend
 import kotlinx.android.synthetic.main.fragment_nft_list.nftListBack
 import kotlinx.android.synthetic.main.fragment_nft_list.nftListCounter
 import kotlinx.android.synthetic.main.fragment_nft_list.nftListNfts
@@ -19,12 +21,12 @@ import kotlinx.android.synthetic.main.fragment_nft_list.nftListRefresh
 import kotlinx.android.synthetic.main.fragment_nft_list.nftListToolbar
 import javax.inject.Inject
 
-class NftListFragment : BaseFragment<NftListViewModel>(), NftAdapter.Handler {
+class NftListFragment : BaseFragment<NftListViewModel>(), NftGridAdapter.Handler {
 
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    private val adapter by lazy(LazyThreadSafetyMode.NONE) { NftAdapter(imageLoader, this) }
+    private val adapter by lazy(LazyThreadSafetyMode.NONE) { NftGridAdapter(imageLoader, this) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,6 +39,8 @@ class NftListFragment : BaseFragment<NftListViewModel>(), NftAdapter.Handler {
     override fun initViews() {
         nftListToolbar.applyStatusBarInsets()
         nftListBack.setOnClickListener { viewModel.backClicked() }
+        nftActionsSend.setOnClickListener { viewModel.onNftSendClick() }
+        nftActionsReceive.setOnClickListener { viewModel.onNftReceiveClick() }
 
         nftListNfts.setHasFixedSize(true)
         nftListNfts.adapter = adapter

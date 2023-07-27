@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_nft_impl.presentation.nft.details
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -16,6 +17,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddr
 import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_nft_impl.domain.nft.details.NftDetailsInteractor
 import io.novafoundation.nova.feature_nft_impl.domain.nft.details.PricedNftDetails
+import io.novafoundation.nova.feature_nft_impl.presentation.NftPayload
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatIssuance
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -103,5 +105,18 @@ class NftDetailsViewModel(
 
     fun backClicked() {
         router.back()
+    }
+
+    fun assetActionSend() {
+        viewModelScope.launch {
+            val nftDetails = nftDetailsFlow.first().nftDetails
+
+            router.openInputAddressNftFromNftList(
+                nftPayload = NftPayload(
+                    chainId = nftDetails.chain.id,
+                    identifier = nftIdentifier
+                )
+            )
+        }
     }
 }

@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_nft_api.data.model
 
+import android.os.Parcelable
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import kotlinx.android.parcel.Parcelize
 import java.math.BigInteger
 
 class Nft(
@@ -34,16 +36,20 @@ class Nft(
         class Limited(val max: Int, val edition: Int) : Issuance()
     }
 
-    sealed class Type(val key: Key) {
+    sealed class Type(val key: Key): Parcelable {
 
-        enum class Key {
+        @Parcelize
+        enum class Key: Parcelable {
             UNIQUES, RMRKV1, RMRKV2
         }
 
+        @Parcelize
         class Uniques(val instanceId: BigInteger, val collectionId: BigInteger) : Type(Key.UNIQUES)
 
+        @Parcelize
         class Rmrk1(val instanceId: String, val collectionId: String) : Type(Key.RMRKV1)
 
+        @Parcelize
         class Rmrk2(val collectionId: String) : Type(Key.RMRKV2)
     }
 }

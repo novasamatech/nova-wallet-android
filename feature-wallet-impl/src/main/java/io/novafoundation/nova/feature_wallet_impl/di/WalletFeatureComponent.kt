@@ -7,6 +7,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
+import io.novafoundation.nova.feature_wallet_impl.di.modules.WalletFeatureModule
 import io.novafoundation.nova.feature_wallet_impl.di.modules.AssetsModule
 import io.novafoundation.nova.feature_wallet_impl.di.modules.BalanceLocksModule
 import io.novafoundation.nova.feature_wallet_impl.di.modules.ValidationsModule
