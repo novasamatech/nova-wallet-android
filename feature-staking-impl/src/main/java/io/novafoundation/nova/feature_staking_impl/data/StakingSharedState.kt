@@ -26,6 +26,10 @@ class StakingSharedState : SelectedAssetOptionSharedState<StakingSharedState.Opt
             additional = OptionAdditionalData(stakingType)
         )
 
-        _selectedOption.emit(selectedOption)
+        setSelectedOption(selectedOption)
+    }
+
+    suspend fun setSelectedOption(option: StakingOption) {
+        _selectedOption.emit(option)
     }
 }

@@ -15,7 +15,9 @@ import kotlinx.coroutines.flow.map
 
 interface NominationPoolGlobalsRepository {
 
-    fun lastPoolId(chainId: ChainId): Flow<PoolId>
+    fun lastPoolIdFlow(chainId: ChainId): Flow<PoolId>
+
+    suspend fun lastPoolId(chainId: ChainId): PoolId
 
     fun observeMinJoinBond(chainId: ChainId): Flow<Balance>
 }
@@ -24,10 +26,18 @@ class RealNominationPoolGlobalsRepository(
     private val localStorageDataSource: StorageDataSource,
 ) : NominationPoolGlobalsRepository {
 
-    override fun lastPoolId(chainId: ChainId): Flow<PoolId> {
+    override fun lastPoolIdFlow(chainId: ChainId): Flow<PoolId> {
         return localStorageDataSource.subscribe(chainId) {
             metadata.nominationPools.lastPoolId.observeNonNull()
                 .map(::PoolId)
+        }
+    }
+
+    override suspend fun lastPoolId(chainId: ChainId): PoolId {
+        return localStorageDataSource.query(chainId) {
+            val poolIdRaw = metadata.nominationPools.lastPoolId.query()
+
+            PoolId(poolIdRaw!!)
         }
     }
 

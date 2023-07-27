@@ -5,7 +5,9 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ActiveEraUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.CurrentEraUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ParachainsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ValidatorExposureUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentEpochIndexUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentSessionIndexUpdater
@@ -75,22 +77,26 @@ class NominationPoolStakingUpdatersModule {
         minJoinBondUpdater: MinJoinBondUpdater,
         exposureUpdater: ValidatorExposureUpdater,
         subPoolsUpdater: SubPoolsUpdater,
+        activeEraUpdater: ActiveEraUpdater,
         currentEraUpdater: CurrentEraUpdater,
         currentEpochIndexUpdater: CurrentEpochIndexUpdater,
         currentSlotUpdater: CurrentSlotUpdater,
         genesisSlotUpdater: GenesisSlotUpdater,
         currentSessionIndexUpdater: CurrentSessionIndexUpdater,
         eraStartSessionIndexUpdater: EraStartSessionIndexUpdater,
+        parachainsUpdater: ParachainsUpdater,
     ): StakingUpdaters = StakingUpdaters(
         lastPoolIdUpdater,
         minJoinBondUpdater,
         exposureUpdater,
+        activeEraUpdater,
         currentEraUpdater,
         subPoolsUpdater,
         currentEpochIndexUpdater,
         currentSlotUpdater,
         genesisSlotUpdater,
         currentSessionIndexUpdater,
-        eraStartSessionIndexUpdater
+        eraStartSessionIndexUpdater,
+        parachainsUpdater
     )
 }
