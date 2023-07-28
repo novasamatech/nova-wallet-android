@@ -9,6 +9,8 @@ import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.StorageDao
+import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
+import io.novafoundation.nova.runtime.call.RealMultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicSerializers
@@ -116,8 +118,9 @@ class RuntimeModule {
     @Provides
     @ApplicationScope
     fun provideSubstrateCalls(
-        chainRegistry: ChainRegistry
-    ) = RpcCalls(chainRegistry)
+        chainRegistry: ChainRegistry,
+        multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi
+    ) = RpcCalls(chainRegistry, multiChainRuntimeCallsApi)
 
     @Provides
     @ApplicationScope
@@ -182,4 +185,8 @@ class RuntimeModule {
     @Provides
     @ApplicationScope
     fun provideStorageSharedRequestBuilderFactory(chainRegistry: ChainRegistry) = StorageSharedRequestsBuilderFactory(chainRegistry)
+
+    @Provides
+    @ApplicationScope
+    fun provideMultiChainRuntimeCallsApi(chainRegistry: ChainRegistry): MultiChainRuntimeCallsApi = RealMultiChainRuntimeCallsApi(chainRegistry)
 }
