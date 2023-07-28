@@ -12,7 +12,8 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
@@ -21,9 +22,24 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartSta
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.StartStakingLandingViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class StartStakingLandingModule {
+
+    @Provides
+    fun provideStartStakingLandingUpdateSystemFactory(
+        stakingUpdaters: StakingUpdaters,
+        chainRegistry: ChainRegistry,
+        storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+    ): StakingLandingInfoUpdateSystemFactory {
+        return StakingLandingInfoUpdateSystemFactory(
+            stakingUpdaters,
+            chainRegistry,
+            storageSharedRequestsBuilderFactory
+        )
+    }
 
     @Provides
     fun provideStartStakingInteractorFactory(
@@ -51,7 +67,7 @@ class StartStakingLandingModule {
         stakingRouter: StakingRouter,
         stakingSharedState: StakingSharedState,
         resourceManager: ResourceManager,
-        updateSystem: StakingUpdateSystem,
+        updateSystemFactory: StakingLandingInfoUpdateSystemFactory,
         startStakingInteractorFactory: StartStakingInteractorFactory,
         appLinksProvider: AppLinksProvider
     ): ViewModel {
@@ -59,7 +75,7 @@ class StartStakingLandingModule {
             stakingRouter,
             stakingSharedState,
             resourceManager,
-            updateSystem,
+            updateSystemFactory,
             startStakingInteractorFactory,
             appLinksProvider
         )

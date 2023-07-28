@@ -17,9 +17,9 @@ import io.novafoundation.nova.common.utils.setEndSpan
 import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.common.utils.withLoadingShared
-import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.ParticipationInGovernance
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingCompoundData
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingInteractorFactory
@@ -50,7 +50,7 @@ class StartStakingLandingViewModel(
     private val stakingRouter: StakingRouter,
     private val stakingSharedState: StakingSharedState,
     private val resourceManager: ResourceManager,
-    private val updateSystem: UpdateSystem,
+    private val updateSystemFactory: StakingLandingInfoUpdateSystemFactory,
     private val startStakingInteractorFactory: StartStakingInteractorFactory,
     private val appLinksProvider: AppLinksProvider
 ) : BaseViewModel(), Browserable {
@@ -81,7 +81,8 @@ class StartStakingLandingViewModel(
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     init {
-        updateSystem.start()
+        updateSystemFactory.create(stakingSharedState.assetWithChain)
+            .start()
             .launchIn(this)
     }
 
