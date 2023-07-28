@@ -12,9 +12,14 @@ import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
-import java.util.Collections
+import java.util.Date
 import java.util.UUID
+import java.util.Collections
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
+import kotlin.Comparator
+import kotlin.collections.HashMap
+import kotlin.collections.LinkedHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.sqrt
@@ -82,9 +87,9 @@ fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = M
     return toBigDecimal().divide(divisor.toBigDecimal(), mathContext)
 }
 
-fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
+fun BigInteger.atLeastZero() = coerceAtLeast(BigInteger.ZERO)
 
-fun Number.daysToMillis() = TimeUnit.DAYS.toMillis(this.toLong())
+fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
 inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fold(BigInteger.ZERO) { acc, element ->
     acc + extractor(element)
@@ -335,3 +340,43 @@ inline fun CoroutineScope.withChildScope(action: CoroutineScope.() -> Unit) {
 }
 
 fun <T> List<T>.associateWithIndex() = withIndex().associateBy(keySelector = { it.value }, valueTransform = { it.index })
+
+fun Date.atTheBeginningOfTheDay(): Date {
+    val calendar = Calendar.getInstance().apply {
+        time = this@atTheBeginningOfTheDay
+        resetDay()
+    }
+
+    return calendar.toDate()
+}
+
+fun Date.atTheEndOfTheDay(): Date {
+    val calendar = Calendar.getInstance().apply {
+        time = this@atTheEndOfTheDay
+        set(Calendar.HOUR_OF_DAY, 23)
+        set(Calendar.MINUTE, 59)
+        set(Calendar.SECOND, 59)
+        set(Calendar.MILLISECOND, 999)
+    }
+
+    return calendar.toDate()
+}
+
+fun Date.atTheNextDay(): Date {
+    val calendar = Calendar.getInstance().apply {
+        time = this@atTheNextDay
+        add(Calendar.DAY_OF_MONTH, 1)
+        resetDay()
+    }
+
+    return calendar.toDate()
+}
+
+fun Calendar.toDate(): Date = Date(time.time)
+
+fun Calendar.resetDay() {
+    set(Calendar.HOUR_OF_DAY, 0)
+    set(Calendar.MINUTE, 0)
+    set(Calendar.SECOND, 0)
+    set(Calendar.MILLISECOND, 0)
+}

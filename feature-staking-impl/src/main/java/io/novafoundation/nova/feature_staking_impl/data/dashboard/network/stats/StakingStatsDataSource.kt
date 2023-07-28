@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.subquery.SubQueryNodes
 import io.novafoundation.nova.common.utils.asPerbill
+import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.retryUntilDone
@@ -13,6 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.StakingStatsResponse.AccumulatedReward
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.StakingStatsResponse.WithStakingId
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.StakingStatsRewards
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.UTILITY_ASSET_ID
 import io.novafoundation.nova.runtime.ext.supportedStakingOptions
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -42,6 +44,7 @@ class RealStakingStatsDataSource(
 
             val earnings = response.stakingApies.associatedById()
             val rewards = response.rewards.associatedById()
+            val slashes = response.slashes.associatedById()
             val activeStakers = response.activeStakers.associatedById()
 
             val keys = stakingChains.flatMap { chain ->
@@ -49,14 +52,21 @@ class RealStakingStatsDataSource(
                     StakingOptionId(chain.id, UTILITY_ASSET_ID, stakingType)
                 }
             }
+
             keys.associateWith { key ->
+                val totalReward = rewards.getPlanks(key) - slashes.getPlanks(key)
+
                 ChainStakingStats(
                     estimatedEarnings = earnings[key]?.maxAPY.orZero().asPerbill().toPercent(),
                     accountPresentInActiveStakers = key in activeStakers,
-                    rewards = rewards[key]?.amount?.toBigInteger().orZero()
+                    rewards = totalReward.atLeastZero()
                 )
             }
         }
+    }
+
+    private fun Map<StakingOptionId, AccumulatedReward>.getPlanks(key: StakingOptionId): Balance {
+        return get(key)?.amount?.toBigInteger().orZero()
     }
 
     private fun <T : WithStakingId> SubQueryNodes<T>.associatedById(): Map<StakingOptionId, T> {

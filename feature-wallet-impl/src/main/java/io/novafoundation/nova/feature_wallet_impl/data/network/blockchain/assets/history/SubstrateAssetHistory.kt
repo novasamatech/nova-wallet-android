@@ -74,6 +74,10 @@ abstract class SubstrateAssetHistory(
         }
     }
 
+    override fun isOperationSafe(operation: Operation): Boolean {
+        return true
+    }
+
     private suspend fun getOperationsInternal(
         pageSize: Int,
         pageOffset: PageOffset.Loadable,

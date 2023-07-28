@@ -12,4 +12,5 @@ class ParachainMetadataRemote(
     val customFlow: String?,
     val website: String,
     val extras: Map<String, String>?,
+    val movedToParaId: BigInteger?,
 )

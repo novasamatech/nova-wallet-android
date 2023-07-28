@@ -34,7 +34,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -200,15 +199,9 @@ class ConfirmSendViewModel(
 
     private suspend fun finishSendFlow() {
         val chain = originChain()
-        val payload = if (transferDraft.isCrossChain) {
-            val utilityAsset = chain.utilityAsset
-            AssetPayload(chainId = chain.id, chainAssetId = utilityAsset.id)
-        } else {
-            val chainAsset = originAsset()
-            AssetPayload(chain.id, chainAsset.id)
-        }
+        val chainAsset = originAsset()
 
-        router.openAssetDetails(payload)
+        router.openAssetDetails(AssetPayload(chain.id, chainAsset.id))
     }
 
     private suspend fun buildValidationPayload(): AssetTransferPayload {

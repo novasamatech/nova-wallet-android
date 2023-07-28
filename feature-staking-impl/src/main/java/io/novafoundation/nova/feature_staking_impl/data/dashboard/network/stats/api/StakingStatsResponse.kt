@@ -10,7 +10,8 @@ typealias StakingStatsRewards = SubQueryGroupedAggregates<GroupedAggregate.Sum<S
 class StakingStatsResponse(
     val activeStakers: SubQueryNodes<ActiveStaker>,
     val stakingApies: SubQueryNodes<StakingApy>,
-    val rewards: SubQueryGroupedAggregates<GroupedAggregate.Sum<AccumulatedReward>>
+    val rewards: SubQueryGroupedAggregates<GroupedAggregate.Sum<AccumulatedReward>>,
+    val slashes: SubQueryGroupedAggregates<GroupedAggregate.Sum<AccumulatedReward>>
 ) {
 
     interface WithStakingId {

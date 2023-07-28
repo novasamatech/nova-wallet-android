@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsState
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.ext.supportedStakingOptions
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -48,7 +49,11 @@ private class ParachainUserRewardsComponent(
     private val resourceManager: ResourceManager
 ) : BaseRewardComponent(hostContext) {
 
-    private val rewardPeriodState = rewardPeriodsInteractor.observeRewardPeriod()
+    private val rewardPeriodState = rewardPeriodsInteractor.observeRewardPeriod(
+        assetWithChain.chain,
+        assetWithChain.asset,
+        assetWithChain.asset.supportedStakingOptions().first()
+    )
 
     private val rewardAmountState = delegatorStateUseCase.loadDelegatingState(
         hostContext = hostContext,

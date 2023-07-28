@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.findNearestCoinRate
+import io.novafoundation.nova.feature_wallet_api.domain.model.isZeroTransfer
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.EvmAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanTransactionsApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanAccountTransfer
@@ -67,6 +68,10 @@ class EvmErc20AssetHistory(
 
     override fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter> {
         return setOf(TransactionFilter.TRANSFER)
+    }
+
+    override fun isOperationSafe(operation: Operation): Boolean {
+        return !operation.isZeroTransfer()
     }
 
     private fun mapRemoteTransferToOperation(

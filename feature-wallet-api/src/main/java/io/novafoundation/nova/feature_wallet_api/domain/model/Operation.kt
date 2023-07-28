@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model
 
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -64,6 +65,10 @@ data class Operation(
 
 fun Operation.Type.satisfies(filters: Set<TransactionFilter>): Boolean {
     return matchingTransactionFilter() in filters
+}
+
+fun Operation.isZeroTransfer(): Boolean {
+    return type is Operation.Type.Transfer && type.amount.isZero
 }
 
 private fun Operation.Type.matchingTransactionFilter(): TransactionFilter {
