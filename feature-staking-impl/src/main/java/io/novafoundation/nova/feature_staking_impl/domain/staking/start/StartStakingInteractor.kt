@@ -8,7 +8,6 @@ import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 
 class StartStakingData(
-    val availableBalance: BigInteger,
     val maxEarningRate: BigDecimal,
     val minStake: BigInteger,
     val payoutType: PayoutType,
@@ -18,4 +17,6 @@ class StartStakingData(
 interface StartStakingInteractor {
 
     fun observeData(chain: Chain, asset: Asset): Flow<StartStakingData>
+
+    fun getAvailableBalance(asset: Asset): BigInteger
 }

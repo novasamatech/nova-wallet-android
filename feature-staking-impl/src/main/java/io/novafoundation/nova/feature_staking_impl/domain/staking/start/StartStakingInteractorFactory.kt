@@ -12,7 +12,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.nominati
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.CoroutineScope
 
 class StartStakingInteractorFactory(
@@ -21,13 +23,16 @@ class StartStakingInteractorFactory(
     private val accountRepository: AccountRepository,
     private val stakingEraInteractorFactory: StakingEraInteractorFactory,
     private val parachainNetworkInfoInteractor: ParachainNetworkInfoInteractor,
-    private val parachainStakingRewardCalculatorFactory: ParachainStakingRewardCalculatorFactory
+    private val parachainStakingRewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
+    private val chainRegistry: ChainRegistry
 ) {
 
-    suspend fun create(chain: Chain, chainAsset: Chain.Asset, coroutineScope: CoroutineScope): CompoundStartStakingInteractor {
+    suspend fun create(chainId: ChainId, assetId: Int, coroutineScope: CoroutineScope): CompoundStartStakingInteractor {
+        val chain = chainRegistry.getChain(chainId)
+        val chainAsset = chain.assetsById.getValue(assetId)
         val interactors = createInteractors(chain, chainAsset, coroutineScope)
         val stakingEraInteractor = stakingEraInteractorFactory.create(chainAsset)
-        return RealCompoundStartStakingInteractor(walletRepository, accountRepository, interactors, stakingEraInteractor)
+        return RealCompoundStartStakingInteractor(chain, chainAsset, walletRepository, accountRepository, interactors, stakingEraInteractor)
     }
 
     private suspend fun createInteractors(chain: Chain, asset: Chain.Asset, coroutineScope: CoroutineScope): List<StartStakingInteractor> {

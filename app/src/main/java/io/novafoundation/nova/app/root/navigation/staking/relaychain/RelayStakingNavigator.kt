@@ -24,11 +24,15 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.R
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.RedeemPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.ConfirmRewardDestinationFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.StartStakingLandingFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.story.StoryFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class RelayStakingNavigator(
     navigationHolder: NavigationHolder,
@@ -107,7 +111,10 @@ class RelayStakingNavigator(
 
     override fun openChainStakingMain() = performNavigation(R.id.action_mainFragment_to_stakingGraph)
 
-    override fun openStartStakingFlow() = performNavigation(R.id.action_mainFragment_to_startStackingLanding)
+    override fun openStartStakingLanding(chainId: ChainId, assetId: ChainAssetId) {
+        val bundle = StartStakingLandingFragment.getBundle(StartStakingLandingPayload(chainId, assetId))
+        performNavigation(R.id.action_mainFragment_to_startStackingLanding, bundle)
+    }
 
     override fun openSetupStaking() {
         performNavigation(R.id.action_stakingFragment_to_setupStakingFragment)

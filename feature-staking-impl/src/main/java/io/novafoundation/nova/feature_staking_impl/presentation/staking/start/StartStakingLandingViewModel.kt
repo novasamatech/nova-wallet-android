@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.SpannableFormatter
 import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.drawableSpan
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatAsSpannable
 import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.setEndSpan
@@ -18,7 +19,6 @@ import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.common.utils.withLoadingShared
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.ParticipationInGovernance
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingCompoundData
@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartSta
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.PayoutType
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.model.StakingConditionRVItem
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -38,6 +39,8 @@ import java.math.BigInteger
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlin.time.Duration
 
 class StartStakingInfoModel(
@@ -48,19 +51,20 @@ class StartStakingInfoModel(
 
 class StartStakingLandingViewModel(
     private val stakingRouter: StakingRouter,
-    private val stakingSharedState: StakingSharedState,
     private val resourceManager: ResourceManager,
     private val updateSystemFactory: StakingLandingInfoUpdateSystemFactory,
     private val startStakingInteractorFactory: StartStakingInteractorFactory,
-    private val appLinksProvider: AppLinksProvider
+    private val appLinksProvider: AppLinksProvider,
+    private val startStakingLandingPayload: StartStakingLandingPayload
 ) : BaseViewModel(), Browserable {
 
-    private val startStakingInteractor = stakingSharedState.assetWithChain.map {
-        startStakingInteractorFactory.create(it.chain, it.asset, coroutineScope = this)
+
+    private val startStakingInteractor = flowOf {
+        startStakingInteractorFactory.create(startStakingLandingPayload.chainId, startStakingLandingPayload.assetId, coroutineScope = this)
     }.shareInBackground()
 
-    private val startStakingInfo = startStakingInteractor.flatMapLatest {
-        it.observeStartStakingInfo(stakingSharedState.chain(), stakingSharedState.chainAsset())
+    private val startStakingInfo = startStakingInteractor.flatMapLatest { interactor ->
+        interactor.observeStartStakingInfo()
     }.withLoadingShared()
         .shareInBackground()
 
@@ -73,15 +77,19 @@ class StartStakingLandingViewModel(
             )
         }.shareInBackground()
 
-    val availableBalanceTextFlow = startStakingInfo.mapLoading {
-        val amountModel = mapAmountToAmountModel(it.availableBalance, it.asset.token)
+    val availableBalance = startStakingInteractor.flatMapLatest { interactor ->
+        interactor.observeAvailableBalance()
+    }.shareInBackground()
+
+    val availableBalanceTextFlow = availableBalance.map { availableBalance ->
+        val amountModel = mapAmountToAmountModel(availableBalance.availableBalance, availableBalance.asset.token)
         resourceManager.getString(R.string.start_staking_fragment_available_balance, amountModel.token, amountModel.fiat!!)
     }.shareInBackground()
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     init {
-        updateSystemFactory.create(stakingSharedState.assetWithChain)
+        updateSystemFactory.create(startStakingLandingPayload.chainId, startStakingLandingPayload.assetId)
             .start()
             .launchIn(this)
     }

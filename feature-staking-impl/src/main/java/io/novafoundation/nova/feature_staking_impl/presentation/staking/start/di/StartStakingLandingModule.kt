@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewar
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.StartStakingLandingViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -48,7 +49,8 @@ class StartStakingLandingModule {
         accountRepository: AccountRepository,
         stakingEraInteractorFactory: StakingEraInteractorFactory,
         parachainNetworkInfoInteractor: ParachainNetworkInfoInteractor,
-        parachainStakingRewardCalculatorFactory: ParachainStakingRewardCalculatorFactory
+        parachainStakingRewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
+        chainRegistry: ChainRegistry
     ): StartStakingInteractorFactory {
         return StartStakingInteractorFactory(
             stakingSharedComputation,
@@ -56,7 +58,8 @@ class StartStakingLandingModule {
             accountRepository,
             stakingEraInteractorFactory,
             parachainNetworkInfoInteractor,
-            parachainStakingRewardCalculatorFactory
+            parachainStakingRewardCalculatorFactory,
+            chainRegistry
         )
     }
 
@@ -65,19 +68,19 @@ class StartStakingLandingModule {
     @ViewModelKey(StartStakingLandingViewModel::class)
     fun provideViewModel(
         stakingRouter: StakingRouter,
-        stakingSharedState: StakingSharedState,
         resourceManager: ResourceManager,
         updateSystemFactory: StakingLandingInfoUpdateSystemFactory,
         startStakingInteractorFactory: StartStakingInteractorFactory,
-        appLinksProvider: AppLinksProvider
+        appLinksProvider: AppLinksProvider,
+        startStakingLandingPayload: StartStakingLandingPayload
     ): ViewModel {
         return StartStakingLandingViewModel(
             stakingRouter,
-            stakingSharedState,
             resourceManager,
             updateSystemFactory,
             startStakingInteractorFactory,
-            appLinksProvider
+            appLinksProvider,
+            startStakingLandingPayload
         )
     }
 
