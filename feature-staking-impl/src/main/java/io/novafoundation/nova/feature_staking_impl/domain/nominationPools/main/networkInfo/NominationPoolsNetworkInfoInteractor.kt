@@ -2,12 +2,11 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.
 
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation.PoolAccountType
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.deriveAllBondedPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
@@ -49,7 +48,7 @@ class RealNominationPoolsNetworkInfoInteractor(
         return combine(
             relaychainStakingSharedComputation.electedExposuresInActiveEraFlow(chainId, sharedComputationScope),
             nominationPoolGlobalsRepository.observeMinJoinBond(chainId),
-            nominationPoolGlobalsRepository.lastPoolId(chainId),
+            nominationPoolGlobalsRepository.lastPoolIdFlow(chainId),
             lockupDurationFlow(sharedComputationScope),
         ) { exposures, minJoinBond, lastPoolId, lockupDuration ->
             NetworkInfo(
@@ -69,9 +68,7 @@ class RealNominationPoolsNetworkInfoInteractor(
         lastPoolId: PoolId,
         chainId: ChainId,
     ): Balance {
-        val numberOfPools = lastPoolId.value.toInt()
-        val allPoolAccountIds = poolAccountDerivation.derivePoolAccountsRange(numberOfPools, PoolAccountType.BONDED, chainId)
-            .mapToSet { it.intoKey() }
+        val allPoolAccountIds = poolAccountDerivation.deriveAllBondedPools(lastPoolId, chainId).values
 
         return exposures.values.sumOf { exposure ->
             exposure.others.sumOf { nominatorExposure ->

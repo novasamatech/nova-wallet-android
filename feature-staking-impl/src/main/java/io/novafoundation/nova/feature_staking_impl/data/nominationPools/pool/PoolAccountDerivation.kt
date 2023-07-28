@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool
 
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.constant
 import io.novafoundation.nova.common.utils.nominationPools
 import io.novafoundation.nova.common.utils.toByteArray
@@ -23,11 +25,15 @@ interface PoolAccountDerivation {
     /**
      * Derives pool accounts with poolId from range 1..[numberOfPools] (end-inclusive)
      */
-    suspend fun derivePoolAccountsRange(numberOfPools: Int, derivationType: PoolAccountType, chainId: ChainId): List<AccountId>
+    suspend fun derivePoolAccountsRange(numberOfPools: Int, derivationType: PoolAccountType, chainId: ChainId): Map<PoolId, AccountIdKey>
 }
 
 suspend fun PoolAccountDerivation.bondedAccountOf(poolId: PoolId, chainId: ChainId): AccountId {
     return derivePoolAccount(poolId, PoolAccountType.BONDED, chainId)
+}
+
+suspend fun PoolAccountDerivation.deriveAllBondedPools(lastPoolId: PoolId, chainId: ChainId): Map<PoolId, AccountIdKey> {
+    return derivePoolAccountsRange(numberOfPools = lastPoolId.value.toInt(), PoolAccountType.BONDED, chainId)
 }
 
 private const val PREFIX = "modl"
@@ -44,17 +50,20 @@ class RealPoolAccountDerivation(
         return (prefixBytes + palletId + derivationType.derivationIndex + poolIdBytes).truncateToAccountId()
     }
 
-    override suspend fun derivePoolAccountsRange(numberOfPools: Int, derivationType: PoolAccountType, chainId: ChainId): List<AccountId> {
+    override suspend fun derivePoolAccountsRange(numberOfPools: Int, derivationType: PoolAccountType, chainId: ChainId): Map<PoolId, AccountIdKey> {
         val prefixBytes = PREFIX.encodeToByteArray()
         val palletId = palletId(chainId)
         val derivationTypeIndex = derivationType.derivationIndex
         val commonPrefix = prefixBytes + palletId + derivationTypeIndex
 
-        return (1..numberOfPools).map { poolId ->
-            val poolIdBytes = uint32.toByteArray(poolId.toUInt())
+        return (1..numberOfPools).associateBy(
+            keySelector = { PoolId(it.toBigInteger()) },
+            valueTransform = { poolId ->
+                val poolIdBytes = uint32.toByteArray(poolId.toUInt())
 
-            (commonPrefix + poolIdBytes).truncateToAccountId()
-        }
+                (commonPrefix + poolIdBytes).truncateToAccountId().intoKey()
+            }
+        )
     }
 
     private fun ByteArray.truncateToAccountId(): AccountId = copyOf(newSize = 32)

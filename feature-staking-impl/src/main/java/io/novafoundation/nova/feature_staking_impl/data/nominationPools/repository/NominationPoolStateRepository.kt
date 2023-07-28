@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository
 
+import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
 import io.novafoundation.nova.feature_staking_api.domain.model.activeBalance
@@ -34,10 +35,13 @@ interface NominationPoolStateRepository {
     fun observeParticipatingPoolNominations(poolAccount: AccountId, chainId: ChainId): Flow<Nominations?>
 
     fun observeParticipatingBondedPool(poolId: PoolId, chainId: ChainId): Flow<BondedPool>
+
+    suspend fun getPoolCommissions(poolIds: Set<PoolId>, chainId: ChainId): Map<PoolId, Perbill?>
 }
 
 class RealNominationPoolStateRepository(
-    private val localStorage: StorageDataSource
+    private val localStorage: StorageDataSource,
+    private val remoteStorage: StorageDataSource,
 ) : NominationPoolStateRepository {
 
     context(StorageQueryContext)
@@ -65,6 +69,16 @@ class RealNominationPoolStateRepository(
     override fun observeParticipatingBondedPool(poolId: PoolId, chainId: ChainId): Flow<BondedPool> {
         return localStorage.subscribe(chainId) {
             metadata.nominationPools.bondedPools.observeNonNull(poolId.value)
+        }
+    }
+
+    override suspend fun getPoolCommissions(poolIds: Set<PoolId>, chainId: ChainId): Map<PoolId, Perbill?> {
+        return remoteStorage.query(chainId) {
+            metadata.nominationPools.bondedPools.multi(
+                keys = poolIds.map { it.value },
+                keyTransform = { PoolId(it) }
+            )
+                .mapValues { (_, bondedPool) -> bondedPool?.commission?.current?.perbill }
         }
     }
 }

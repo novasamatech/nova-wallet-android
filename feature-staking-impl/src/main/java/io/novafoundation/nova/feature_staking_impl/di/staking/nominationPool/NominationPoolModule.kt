@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.RealNominationPoolMemberUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.networkInfo.NominationPoolsNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.networkInfo.RealNominationPoolsNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.stakeSummary.NominationPoolStakeSummaryInteractor
@@ -26,6 +27,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.s
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.unbondings.NominationPoolUnbondingsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.unbondings.RealNominationPoolUnbondingsInteractor
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -41,8 +43,12 @@ class NominationPoolModule {
     @Provides
     @FeatureScope
     fun provideNominationPoolBalanceRepository(
-        @Named(LOCAL_STORAGE_SOURCE) dataSource: StorageDataSource
-    ): NominationPoolStateRepository = RealNominationPoolStateRepository(dataSource)
+        @Named(LOCAL_STORAGE_SOURCE) localDataSource: StorageDataSource,
+        @Named(REMOTE_STORAGE_SOURCE) remoteDataSource: StorageDataSource
+    ): NominationPoolStateRepository = RealNominationPoolStateRepository(
+        localStorage = localDataSource,
+        remoteStorage = remoteDataSource
+    )
 
     @Provides
     @FeatureScope
@@ -117,4 +123,20 @@ class NominationPoolModule {
         stakingSharedComputation = stakingSharedComputation,
         noPoolAccountDerivation = noPoolAccountDerivation,
     )
+
+    @Provides
+    @FeatureScope
+    fun provideNominationPoolRewardCalculatorFactory(
+        stakingSharedComputation: StakingSharedComputation,
+        poolAccountDerivation: PoolAccountDerivation,
+        nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
+        nominationPoolStateRepository: NominationPoolStateRepository,
+    ): NominationPoolRewardCalculatorFactory {
+        return NominationPoolRewardCalculatorFactory(
+            sharedStakingSharedComputation = stakingSharedComputation,
+            poolAccountDerivation = poolAccountDerivation,
+            nominationPoolGlobalsRepository = nominationPoolGlobalsRepository,
+            nominationPoolStateRepository = nominationPoolStateRepository
+        )
+    }
 }
