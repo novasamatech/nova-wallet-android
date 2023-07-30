@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2
 
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.core.model.StorageChange
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository

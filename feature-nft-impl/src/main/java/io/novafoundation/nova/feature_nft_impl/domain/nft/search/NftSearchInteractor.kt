@@ -34,7 +34,14 @@ class NftSearchInteractor @Inject constructor(
     }
 
     private suspend fun mapNftToNftDetails(nfts: List<Nft>): List<NftDetails> {
-        return nfts.mapNotNull { nftRepository.nftDetails(it.identifier).firstOrNull() }
+        return nfts
+            .onEach { nft ->
+                val nftLocal = nftRepository.getLocalNft(nft.identifier)
+                if (!nftLocal.wholeDetailsLoaded) {
+                    nftRepository.fullNftSync(nft)
+                }
+            }
+            .mapNotNull { nftRepository.nftDetails(it.identifier).firstOrNull() }
     }
 
     private fun List<SendNftListItem>.filterByQuery(query: String): List<SendNftListItem> {

@@ -21,7 +21,6 @@ import io.novafoundation.nova.feature_nft_impl.data.network.distributed.FileStor
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.network.IpfsApi
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
-import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -39,14 +38,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import java.math.BigInteger
 
 class UniquesNftProvider(
     private val remoteStorage: StorageDataSource,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
-    private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     private val nftDao: NftDao,
     private val ipfsApi: IpfsApi,
 ) : NftProvider {
