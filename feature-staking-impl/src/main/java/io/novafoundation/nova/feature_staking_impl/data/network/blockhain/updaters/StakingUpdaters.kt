@@ -23,7 +23,7 @@ class StakingUpdaters(
     }
 
     fun getUpdaters(stakingTypes: List<StakingType>): List<Updater> {
-        return commonUpdaters + stakingTypes.flatMap { getUpdatersByType(it) }
+        return commonUpdaters + stakingTypes.flatMap { getUpdatersByType(it) }.toSet()
     }
 
     private fun getUpdatersByType(stakingType: StakingType): List<Updater> {

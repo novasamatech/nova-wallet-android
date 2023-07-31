@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.c
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
@@ -16,7 +17,7 @@ interface StakingRouter {
 
     fun openChainStakingMain()
 
-    fun openStartStakingLanding(chainId: ChainId, assetId: ChainAssetId)
+    fun openStartStakingLanding(chainId: ChainId, assetId: ChainAssetId, stakingTypes: List<Chain.Asset.StakingType>)
 
     fun openSetupStaking()
 
@@ -80,9 +81,11 @@ interface StakingRouter {
     fun openAccountDetails(metaAccountId: Long)
 
     fun openRebag()
+
     fun openDAppBrowser(url: String)
 
     fun openMoreStakingOptions()
+
     fun backInStakingTab()
 
     fun openStakingPeriods()

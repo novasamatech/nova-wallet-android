@@ -222,6 +222,10 @@ class PrimaryButton @JvmOverloads constructor(
         drawable.draw(canvas)
         return bitmap
     }
+
+    fun setButtonColor(color: Int) {
+        background.setTint(color)
+    }
 }
 
 fun PrimaryButton.setProgress(show: Boolean) {

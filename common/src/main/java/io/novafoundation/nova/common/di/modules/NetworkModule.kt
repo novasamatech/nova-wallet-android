@@ -56,6 +56,7 @@ class NetworkModule {
             twitter = BuildConfig.TWITTER_URL,
             rateApp = BuildConfig.RATE_URL,
             website = BuildConfig.WEBSITE_URL,
+            wikiBase = BuildConfig.NOVA_WALLET_WIKI_BASE,
             github = BuildConfig.GITHUB_URL,
             email = BuildConfig.EMAIL,
             youtube = BuildConfig.YOUTUBE_URL,

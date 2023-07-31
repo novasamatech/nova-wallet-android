@@ -27,16 +27,26 @@ class StartStakingInteractorFactory(
     private val chainRegistry: ChainRegistry
 ) {
 
-    suspend fun create(chainId: ChainId, assetId: Int, coroutineScope: CoroutineScope): CompoundStartStakingInteractor {
+    suspend fun create(
+        chainId: ChainId,
+        assetId: Int,
+        stakingTypes: List<Chain.Asset.StakingType>,
+        coroutineScope: CoroutineScope
+    ): CompoundStartStakingInteractor {
         val chain = chainRegistry.getChain(chainId)
         val chainAsset = chain.assetsById.getValue(assetId)
-        val interactors = createInteractors(chain, chainAsset, coroutineScope)
+        val interactors = createInteractors(chain, chainAsset, stakingTypes, coroutineScope)
         val stakingEraInteractor = stakingEraInteractorFactory.create(chainAsset)
         return RealCompoundStartStakingInteractor(chain, chainAsset, walletRepository, accountRepository, interactors, stakingEraInteractor)
     }
 
-    private suspend fun createInteractors(chain: Chain, asset: Chain.Asset, coroutineScope: CoroutineScope): List<StartStakingInteractor> {
-        return asset.staking.mapNotNull { stakingType ->
+    private suspend fun createInteractors(
+        chain: Chain,
+        asset: Chain.Asset,
+        stakingTypes: List<Chain.Asset.StakingType>,
+        coroutineScope: CoroutineScope
+    ): List<StartStakingInteractor> {
+        return stakingTypes.mapNotNull { stakingType ->
             when (stakingType.group()) {
                 StakingTypeGroup.RELAYCHAIN -> createRelaychainStartStakingInteractor(coroutineScope, stakingType)
                 StakingTypeGroup.PARACHAIN -> createPararchainStartStakingInteractor(chain, asset, stakingType)

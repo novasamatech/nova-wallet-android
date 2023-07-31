@@ -86,6 +86,7 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
                     headerAdapter.setTitle(it.data.title)
                     conditionsAdapter.submitList(it.data.conditions)
                     footerAdapter.setMoreInformationText(it.data.moreInfo)
+                    startStakingLandingButton.setButtonColor(it.data.buttonColor)
                 }
                 is ExtendedLoadingState.Error -> {
                     dialog(providedContext) {

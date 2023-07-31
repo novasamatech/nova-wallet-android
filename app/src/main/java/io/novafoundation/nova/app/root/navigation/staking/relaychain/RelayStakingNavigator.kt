@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.c
 import io.novafoundation.nova.feature_staking_impl.presentation.story.StoryFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
@@ -111,8 +112,8 @@ class RelayStakingNavigator(
 
     override fun openChainStakingMain() = performNavigation(R.id.action_mainFragment_to_stakingGraph)
 
-    override fun openStartStakingLanding(chainId: ChainId, assetId: ChainAssetId) {
-        val bundle = StartStakingLandingFragment.getBundle(StartStakingLandingPayload(chainId, assetId))
+    override fun openStartStakingLanding(chainId: ChainId, assetId: ChainAssetId, stakingTypes: List<Chain.Asset.StakingType>) {
+        val bundle = StartStakingLandingFragment.getBundle(StartStakingLandingPayload(chainId, assetId, stakingTypes))
         performNavigation(R.id.action_mainFragment_to_startStackingLanding, bundle)
     }
 

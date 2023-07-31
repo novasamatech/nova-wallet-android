@@ -41,6 +41,8 @@ data class Chain(
 
     data class Additional(
         val defaultTip: BigInteger?,
+        val themeColor: String?,
+        val stakingWiki: String?,
     )
 
     data class Types(

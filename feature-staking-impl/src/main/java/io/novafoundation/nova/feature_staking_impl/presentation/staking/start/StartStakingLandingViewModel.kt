@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start
 
+import android.graphics.Color
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
@@ -31,22 +32,18 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.state.assetWithChain
-import io.novafoundation.nova.runtime.state.chain
-import io.novafoundation.nova.runtime.state.chainAsset
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import kotlin.time.Duration
 
 class StartStakingInfoModel(
     val title: CharSequence,
     val conditions: List<StakingConditionRVItem>,
-    val moreInfo: CharSequence
+    val moreInfo: CharSequence,
+    val buttonColor: Int
 )
 
 class StartStakingLandingViewModel(
@@ -58,9 +55,13 @@ class StartStakingLandingViewModel(
     private val startStakingLandingPayload: StartStakingLandingPayload
 ) : BaseViewModel(), Browserable {
 
-
     private val startStakingInteractor = flowOf {
-        startStakingInteractorFactory.create(startStakingLandingPayload.chainId, startStakingLandingPayload.assetId, coroutineScope = this)
+        startStakingInteractorFactory.create(
+            startStakingLandingPayload.chainId,
+            startStakingLandingPayload.assetId,
+            startStakingLandingPayload.stakingTypes,
+            coroutineScope = this
+        )
     }.shareInBackground()
 
     private val startStakingInfo = startStakingInteractor.flatMapLatest { interactor ->
@@ -70,10 +71,12 @@ class StartStakingLandingViewModel(
 
     val modelFlow = startStakingInfo
         .mapLoading {
+            val themeColor = getThemeColor(it.chain)
             StartStakingInfoModel(
-                title = createTitle(it.asset.token.configuration, it.maxEarningRate),
-                conditions = createConditions(it),
-                moreInfo = createMoreInfoText()
+                title = createTitle(it.asset.token.configuration, it.maxEarningRate, themeColor),
+                conditions = createConditions(it, themeColor),
+                moreInfo = createMoreInfoText(it.chain),
+                buttonColor = themeColor
             )
         }.shareInBackground()
 
@@ -89,7 +92,7 @@ class StartStakingLandingViewModel(
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     init {
-        updateSystemFactory.create(startStakingLandingPayload.chainId, startStakingLandingPayload.assetId)
+        updateSystemFactory.create(startStakingLandingPayload.chainId, startStakingLandingPayload.stakingTypes)
             .start()
             .launchIn(this)
     }
@@ -102,12 +105,11 @@ class StartStakingLandingViewModel(
         openBrowserEvent.value = Event(appLinksProvider.termsUrl)
     }
 
-    private fun createTitle(chainAsset: Chain.Asset, earning: BigDecimal): CharSequence {
-        val color = resourceManager.getColor(R.color.text_positive)
+    private fun createTitle(chainAsset: Chain.Asset, earning: BigDecimal, themeColor: Int): CharSequence {
         val apy = resourceManager.getString(
             R.string.start_staking_fragment_title_APY,
             earning.formatFractionAsPercentage()
-        ).toSpannable(colorSpan(color))
+        ).toSpannable(colorSpan(themeColor))
 
         return SpannableFormatter.format(
             resourceManager.getString(R.string.start_staking_fragment_title),
@@ -116,7 +118,7 @@ class StartStakingLandingViewModel(
         )
     }
 
-    private fun createMoreInfoText(): CharSequence {
+    private fun createMoreInfoText(chain: Chain): CharSequence {
         val iconColor = resourceManager.getColor(R.color.chip_icon)
         val clickableTextColor = resourceManager.getColor(R.color.text_secondary)
         val chevronSize = resourceManager.measureInPx(20)
@@ -126,7 +128,7 @@ class StartStakingLandingViewModel(
         }
         val clickablePart = resourceManager.getString(R.string.start_staking_fragment_more_info_clicable_part)
             .toSpannable(colorSpan(clickableTextColor))
-            .setFullSpan(clickableSpan { novaWikiClicked() })
+            .setFullSpan(clickableSpan { novaWikiClicked(chain.additional?.stakingWiki) })
             .setEndSpan(drawableSpan(chevronRight))
 
         return SpannableFormatter.format(
@@ -135,28 +137,26 @@ class StartStakingLandingViewModel(
         )
     }
 
-    private fun createConditions(data: StartStakingCompoundData): List<StakingConditionRVItem> {
+    private fun createConditions(data: StartStakingCompoundData, themeColor: Int): List<StakingConditionRVItem> {
         return listOfNotNull(
-            createTestNetworkCondition(data.chain),
-            createMinStakeCondition(data.asset, data.minStake, data.eraInfo.remainingEraTime),
-            createUnstakeCondition(data.eraInfo.unstakeTime),
-            createRewardsFrequencyCondition(data.eraInfo.eraDuration, data.automaticPayoutMinAmount, data.asset, data.payoutTypes),
-            createGovernanceParticipatingCondition(data.asset, data.participationInGovernance),
-            createStakeMonitoring()
+            createTestNetworkCondition(data.chain, themeColor),
+            createMinStakeCondition(data.asset, data.minStake, data.eraInfo.remainingEraTime, themeColor),
+            createUnstakeCondition(data.eraInfo.unstakeTime, themeColor),
+            createRewardsFrequencyCondition(data.eraInfo.eraDuration, data.automaticPayoutMinAmount, data.asset, data.payoutTypes, themeColor),
+            createGovernanceParticipatingCondition(data.asset, data.participationInGovernance, themeColor),
+            createStakeMonitoring(themeColor)
         )
     }
 
-    private fun createTestNetworkCondition(chain: Chain): StakingConditionRVItem? {
+    private fun createTestNetworkCondition(chain: Chain, themeColor: Int): StakingConditionRVItem? {
         if (!chain.isTestNet) {
             return null
         }
-
-        val color = resourceManager.getColor(R.color.text_positive)
-        val chainName = chain.name.toSpannable(colorSpan(color))
+        val chainName = chain.name.toSpannable(colorSpan(themeColor))
         val testNetwork = resourceManager.getString(R.string.start_staking_fragment_test_network_condition_test_network)
-            .toSpannable(colorSpan(color))
+            .toSpannable(colorSpan(themeColor))
         val noTokenValue = resourceManager.getString(R.string.start_staking_fragment_test_network_condition_no_token)
-            .toSpannable(colorSpan(color))
+            .toSpannable(colorSpan(themeColor))
 
         return StakingConditionRVItem(
             iconId = R.drawable.ic_test_network,
@@ -167,15 +167,15 @@ class StartStakingLandingViewModel(
     private fun createMinStakeCondition(
         asset: Asset,
         minStakeAmount: BigInteger,
-        eraDuration: Duration
+        eraDuration: Duration,
+        themeColor: Int
     ): StakingConditionRVItem {
-        val color = resourceManager.getColor(R.color.text_positive)
         val minStake = minStakeAmount.formatPlanks(asset.token.configuration)
-            .toSpannable(colorSpan(color))
+            .toSpannable(colorSpan(themeColor))
         val time = resourceManager.getString(
             R.string.start_staking_fragment_min_stake_condition_duration,
             resourceManager.formatDuration(eraDuration, false)
-        ).toSpannable(colorSpan(color))
+        ).toSpannable(colorSpan(themeColor))
 
         return StakingConditionRVItem(
             iconId = R.drawable.ic_stake_anytime,
@@ -183,12 +183,14 @@ class StartStakingLandingViewModel(
         )
     }
 
-    private fun createUnstakeCondition(unstakeDuration: Duration): StakingConditionRVItem {
-        val color = resourceManager.getColor(R.color.text_positive)
+    private fun createUnstakeCondition(
+        unstakeDuration: Duration,
+        themeColor: Int
+    ): StakingConditionRVItem {
         val time = resourceManager.getString(
             R.string.start_staking_fragment_unstake_condition_duration,
             resourceManager.formatDuration(unstakeDuration, false)
-        ).toSpannable(colorSpan(color))
+        ).toSpannable(colorSpan(themeColor))
         return StakingConditionRVItem(
             iconId = R.drawable.ic_unstake_anytime,
             text = resourceManager.getString(R.string.start_staking_fragment_unstake_condition).formatAsSpannable(time),
@@ -199,10 +201,10 @@ class StartStakingLandingViewModel(
         eraDuration: Duration,
         automaticPayoutMinAmount: BigInteger?,
         asset: Asset,
-        payoutTypes: List<PayoutType>
+        payoutTypes: List<PayoutType>,
+        themeColor: Int
     ): StakingConditionRVItem {
-        val color = resourceManager.getColor(R.color.text_positive)
-        val time = resourceManager.formatDuration(eraDuration, false).toSpannable(colorSpan(color))
+        val time = resourceManager.formatDuration(eraDuration, false).toSpannable(colorSpan(themeColor))
 
         val text = when {
             payoutTypes.containsOnly(PayoutType.Automatic.Restake) -> {
@@ -233,20 +235,19 @@ class StartStakingLandingViewModel(
 
     private fun createGovernanceParticipatingCondition(
         asset: Asset,
-        participationInGovernance: ParticipationInGovernance
+        participationInGovernance: ParticipationInGovernance,
+        themeColor: Int
     ): StakingConditionRVItem? {
         if (participationInGovernance !is ParticipationInGovernance.Participate) return null
-
-        val color = resourceManager.getColor(R.color.text_positive)
 
         val text = if (participationInGovernance.minAmount != null) {
             val minAmount = participationInGovernance.minAmount.formatPlanks(asset.token.configuration)
             val participation = resourceManager.getString(R.string.start_staking_fragment_governance_participation_with_min_amount_accent)
-                .toSpannable(colorSpan(color))
+                .toSpannable(colorSpan(themeColor))
             resourceManager.getString(R.string.start_staking_fragment_governance_participation_with_min_amount).formatAsSpannable(minAmount, participation)
         } else {
             val participation = resourceManager.getString(R.string.start_staking_fragment_governance_participation_no_conditions_accent)
-                .toSpannable(colorSpan(color))
+                .toSpannable(colorSpan(themeColor))
             resourceManager.getString(R.string.start_staking_fragment_governance_participation_no_conditions).formatAsSpannable(participation)
         }
 
@@ -256,9 +257,8 @@ class StartStakingLandingViewModel(
         )
     }
 
-    private fun createStakeMonitoring(): StakingConditionRVItem {
-        val color = resourceManager.getColor(R.color.text_positive)
-        val monitorStaking = resourceManager.getString(R.string.start_staking_fragment_stake_monitoring_monitor_stake).toSpannable(colorSpan(color))
+    private fun createStakeMonitoring(themeColor: Int): StakingConditionRVItem {
+        val monitorStaking = resourceManager.getString(R.string.start_staking_fragment_stake_monitoring_monitor_stake).toSpannable(colorSpan(themeColor))
 
         return StakingConditionRVItem(
             iconId = R.drawable.ic_monitor_your_stake,
@@ -266,8 +266,8 @@ class StartStakingLandingViewModel(
         )
     }
 
-    private fun novaWikiClicked() {
-        openBrowserEvent.value = Event("TODO")
+    private fun novaWikiClicked(stakingWiki: String?) {
+        openBrowserEvent.value = Event(stakingWiki ?: appLinksProvider.wikiBase)
     }
 
     private fun List<PayoutType>.containsOnly(type: PayoutType): Boolean {
@@ -276,5 +276,10 @@ class StartStakingLandingViewModel(
 
     private fun List<PayoutType>.containsManualAndAutomatic(): Boolean {
         return contains(PayoutType.Manual) && any { it is PayoutType.Automatic } && size == 2
+    }
+
+    private fun getThemeColor(chain: Chain): Int {
+        return chain.additional?.themeColor?.let { Color.parseColor(it) }
+            ?: resourceManager.getColor(R.color.text_positive)
     }
 }
