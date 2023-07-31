@@ -4,13 +4,16 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.networkInfo.NominationPoolsNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.stakeSummary.NominationPoolStakeSummaryInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.unbondings.NominationPoolUnbondingsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.userRewards.NominationPoolsUserRewardsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.nominationPools.NominationPoolsNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.nominationPools.NominationPoolsStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.nominationPools.NominationPoolsUnbondingComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.nominationPools.NominationPoolUserRewardsComponentFactory
 
 @Module
 class NominationPoolsModule {
@@ -29,9 +32,9 @@ class NominationPoolsModule {
     @ScreenScope
     fun provideStakeSummaryComponentFactory(
         interactor: NominationPoolStakeSummaryInteractor,
-        pollMemberUseCase: NominationPoolMemberUseCase
+        sharedComputation: NominationPoolSharedComputation,
     ) = NominationPoolsStakeSummaryComponentFactory(
-        poolMemberUseCase = pollMemberUseCase,
+        nominationPoolSharedComputation = sharedComputation,
         interactor = interactor
     )
 
@@ -39,9 +42,23 @@ class NominationPoolsModule {
     @ScreenScope
     fun provideUnbondComponentFactory(
         interactor: NominationPoolUnbondingsInteractor,
-        pollMemberUseCase: NominationPoolMemberUseCase
+        sharedComputation: NominationPoolSharedComputation,
     ) = NominationPoolsUnbondingComponentFactory(
-        poolMemberUseCase = pollMemberUseCase,
+        nominationPoolSharedComputation = sharedComputation,
         interactor = interactor
+    )
+
+    @Provides
+    @ScreenScope
+    fun provideUserRewardsComponentFactory(
+        nominationPoolSharedComputation: NominationPoolSharedComputation,
+        interactor: NominationPoolsUserRewardsInteractor,
+        rewardPeriodsInteractor: StakingRewardPeriodInteractor,
+        resourceManager: ResourceManager
+    ) = NominationPoolUserRewardsComponentFactory(
+        nominationPoolSharedComputation = nominationPoolSharedComputation,
+        interactor = interactor,
+        rewardPeriodsInteractor = rewardPeriodsInteractor,
+        resourceManager = resourceManager
     )
 }

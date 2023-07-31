@@ -48,11 +48,8 @@ private class ParachainUserRewardsComponent(
     private val resourceManager: ResourceManager
 ) : BaseRewardComponent(hostContext) {
 
-    private val rewardPeriodState = rewardPeriodsInteractor.observeRewardPeriod(
-        stakingOption.assetWithChain.chain,
-        stakingOption.assetWithChain.asset,
-        stakingOption.additional.stakingType
-    )
+    private val rewardPeriodState = rewardPeriodsInteractor.observeRewardPeriod(stakingOption)
+        .shareInBackground()
 
     private val rewardAmountState = delegatorStateUseCase.loadDelegatingState(
         hostContext = hostContext,
@@ -67,15 +64,16 @@ private class ParachainUserRewardsComponent(
     ) { rewardAmount, rewardPeriod ->
         rewardAmount?.let {
             UserRewardsState(
-                rewardAmount,
-                mapRewardPeriodToString(resourceManager, rewardPeriod)
+                amount = rewardAmount,
+                claimableRewards = null,
+                selectedRewardPeriod = mapRewardPeriodToString(resourceManager, rewardPeriod)
             )
         }
     }
         .shareInBackground()
 
     private fun rewardsFlow(delegatorState: DelegatorState.Delegator): Flow<AmountModel> = combine(
-        interactor.observeRewards(delegatorState, stakingOption.assetWithChain.chain, stakingOption.assetWithChain.asset),
+        interactor.observeRewards(delegatorState, stakingOption),
         hostContext.assetFlow
     ) { totalReward, asset ->
         mapAmountToAmountModel(totalReward, asset)
@@ -83,7 +81,7 @@ private class ParachainUserRewardsComponent(
 
     private fun syncStakingRewards(delegatorState: DelegatorState.Delegator) {
         rewardPeriodState.onEach {
-            interactor.syncRewards(delegatorState, stakingOption.assetWithChain.chain, stakingOption.assetWithChain.asset, it)
+            interactor.syncRewards(delegatorState, stakingOption, it)
         }.launchIn(this)
     }
 }

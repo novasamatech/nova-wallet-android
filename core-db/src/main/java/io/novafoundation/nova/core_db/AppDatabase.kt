@@ -63,6 +63,7 @@ import io.novafoundation.nova.core_db.migrations.AddRuntimeFlagToChains_36_37
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AddSourceToLocalAsset_28_29
 import io.novafoundation.nova.core_db.migrations.AddStakingDashboardItems_41_42
+import io.novafoundation.nova.core_db.migrations.AddStakingTypeToTotalRewards_44_45
 import io.novafoundation.nova.core_db.migrations.AddTransferApisTable_29_30
 import io.novafoundation.nova.core_db.migrations.AddVersioningToGovernanceDapps_32_33
 import io.novafoundation.nova.core_db.migrations.AddWalletConnectSessions_39_40
@@ -115,7 +116,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 44,
+    version = 45,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -193,7 +194,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddExtrinsicContentField_37_38, AddNodeSelectionStrategyField_38_39)
                     .addMigrations(AddWalletConnectSessions_39_40, TransferFiatAmount_40_41)
                     .addMigrations(AddStakingDashboardItems_41_42, StakingRewardPeriods_42_43)
-                    .addMigrations(AddRewardAccountToStakingDashboard_43_44)
+                    .addMigrations(AddRewardAccountToStakingDashboard_43_44, AddStakingTypeToTotalRewards_44_45)
                     .build()
             }
             return instance!!

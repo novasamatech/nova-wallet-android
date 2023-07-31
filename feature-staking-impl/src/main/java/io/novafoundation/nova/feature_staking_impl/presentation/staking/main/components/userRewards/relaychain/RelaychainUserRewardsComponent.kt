@@ -58,11 +58,8 @@ private class RelaychainUserRewardsComponent(
         scope = hostContext.scope
     )
 
-    private val rewardPeriodState = rewardPeriodsInteractor.observeRewardPeriod(
-        stakingOption.assetWithChain.chain,
-        stakingOption.assetWithChain.asset,
-        stakingOption.additional.stakingType
-    )
+    private val rewardPeriodState = rewardPeriodsInteractor.observeRewardPeriod(stakingOption)
+        .shareInBackground()
 
     private val rewardAmountState = selectedAccountStakingStateFlow.transformLatest { stakingState ->
         if (stakingState is StakingState.Stash) {
@@ -80,8 +77,9 @@ private class RelaychainUserRewardsComponent(
     ) { rewardAmount, rewardPeriod ->
         rewardAmount?.let {
             UserRewardsState(
-                rewardAmount,
-                mapRewardPeriodToString(resourceManager, rewardPeriod)
+                amount = rewardAmount,
+                claimableRewards = null,
+                selectedRewardPeriod = mapRewardPeriodToString(resourceManager, rewardPeriod)
             )
         }
     }
@@ -91,7 +89,7 @@ private class RelaychainUserRewardsComponent(
     }
 
     private fun rewardsFlow(stakingState: StakingState.Stash): Flow<LoadingState<AmountModel>> = combine(
-        stakingInteractor.observeUserRewards(stakingState, stakingOption.assetWithChain.chain, stakingOption.assetWithChain.asset),
+        stakingInteractor.observeUserRewards(stakingState, stakingOption),
         hostContext.assetFlow
     ) { totalReward, asset ->
         mapAmountToAmountModel(totalReward, asset)
@@ -100,7 +98,7 @@ private class RelaychainUserRewardsComponent(
     private fun syncStakingRewards() {
         val stashAccountStakingStateFlow = selectedAccountStakingStateFlow.filterIsInstance<StakingState.Stash>()
         combine(stashAccountStakingStateFlow, rewardPeriodState) { staking, period ->
-            stakingInteractor.syncStakingRewards(staking, stakingOption.assetWithChain.chain, stakingOption.assetWithChain.asset, period)
+            stakingInteractor.syncStakingRewards(staking, stakingOption, period)
         }
             .inBackground()
             .launchIn(this)
