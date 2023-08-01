@@ -164,10 +164,14 @@ class PrimaryButton @JvmOverloads constructor(
     }
 
     private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.PrimaryButton) { typedArray ->
-        val appearance = typedArray.getEnum(R.styleable.PrimaryButton_appearance, Appearance.PRIMARY)
         size = typedArray.getEnum(R.styleable.PrimaryButton_size, Size.LARGE)
+        setTextAppearance(size.textAppearance)
+
+        // we set textColor since `setTextAppearance` above overrides it and sets to default one
+        val textColor = typedArray.getColorStateList(R.styleable.PrimaryButton_android_textColor)
+        setTextColor(textColor)
+
         minimumHeight = size.heightDp.dp(context)
-        requestLayout()
 
         typedArray.getDrawable(R.styleable.PrimaryButton_iconSrc)?.let { icon = drawableToBitmap(it) }
         icon?.let { icon ->
@@ -178,7 +182,7 @@ class PrimaryButton @JvmOverloads constructor(
             iconDestRect = Rect()
         }
 
-        setTextAppearance(size.textAppearance)
+        val appearance = typedArray.getEnum(R.styleable.PrimaryButton_appearance, Appearance.PRIMARY)
         setAppearance(appearance, cornerSizeDp = size.cornerSizeDp)
     }
 
