@@ -66,7 +66,7 @@ class UserRewardsView @JvmOverloads constructor(
     }
 
     fun setClaimableRewardsState(pendingRewardsState: LoadingState<ClaimableRewards>?) {
-        when(pendingRewardsState) {
+        when (pendingRewardsState) {
             null, is LoadingState.Loading -> userRewardsPendingGroup.makeGone()
             is LoadingState.Loaded -> {
                 val claimableRewards = pendingRewardsState.data

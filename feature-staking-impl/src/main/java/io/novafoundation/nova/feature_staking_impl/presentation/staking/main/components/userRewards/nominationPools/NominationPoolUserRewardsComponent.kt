@@ -86,7 +86,7 @@ private class NominationPoolUserRewardsComponent(
         val claimable = rewardsState.flatMap { poolRewards ->
             poolRewards.claimable.map { claimable ->
                 UserRewardsState.ClaimableRewards(
-                    amountModel = mapAmountToAmountModel(claimable, asset) ,
+                    amountModel = mapAmountToAmountModel(claimable, asset),
                     canClaim = claimable.isPositive()
                 )
             }

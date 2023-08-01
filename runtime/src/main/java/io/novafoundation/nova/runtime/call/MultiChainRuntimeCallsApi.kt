@@ -12,7 +12,7 @@ interface MultiChainRuntimeCallsApi {
 
 internal class RealMultiChainRuntimeCallsApi(
     private val chainRegistry: ChainRegistry
-): MultiChainRuntimeCallsApi {
+) : MultiChainRuntimeCallsApi {
 
     override suspend fun forChain(chainId: ChainId): RuntimeCallsApi {
         val runtime = chainRegistry.getRuntime(chainId)

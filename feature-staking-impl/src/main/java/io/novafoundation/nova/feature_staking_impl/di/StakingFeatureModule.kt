@@ -42,7 +42,6 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.Ele
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.RealElectionsSessionRegistry
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.RealStakingRewardPeriodDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingRewardPeriodDataSource
-import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.StakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSourceImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.DirectStakingRewardsDataSource
@@ -117,7 +116,6 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun provideStakingStoriesDataSource(): StakingStoriesDataSource = StakingStoriesDataSourceImpl()
-
 
     @Provides
     @FeatureScope

@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.map
 
 abstract class BaseStakingRewardsDataSource(
     private val stakingTotalRewardDao: StakingTotalRewardDao,
-): StakingRewardsDataSource {
+) : StakingRewardsDataSource {
 
     override fun totalRewardsFlow(accountId: AccountId, stakingOptionId: StakingOptionId): Flow<TotalReward> {
         val stakingTypeRaw = mapStakingTypeToStakingString(stakingOptionId.stakingType) ?: return emptyFlow()
@@ -26,7 +26,7 @@ abstract class BaseStakingRewardsDataSource(
             .map(::mapTotalRewardLocalToTotalReward)
     }
 
-    protected suspend fun saveTotalReward(totalReward: Balance, accountId: AccountId, stakingOption: StakingOption){
+    protected suspend fun saveTotalReward(totalReward: Balance, accountId: AccountId, stakingOption: StakingOption) {
         val stakingTypeRaw = mapStakingTypeToStakingString(stakingOption.additional.stakingType) ?: return
 
         val totalRewardLocal = TotalRewardLocal(

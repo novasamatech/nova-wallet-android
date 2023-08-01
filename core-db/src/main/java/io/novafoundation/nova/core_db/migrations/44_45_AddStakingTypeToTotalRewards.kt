@@ -3,7 +3,6 @@ package io.novafoundation.nova.core_db.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-
 val AddStakingTypeToTotalRewards_44_45 = object : Migration(44, 45) {
 
     override fun migrate(database: SupportSQLiteDatabase) {

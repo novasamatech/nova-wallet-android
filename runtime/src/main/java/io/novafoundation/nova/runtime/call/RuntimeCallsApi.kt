@@ -12,7 +12,6 @@ import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import jp.co.soramitsu.fearless_utils.wsrpc.executeAsync
 import jp.co.soramitsu.fearless_utils.wsrpc.mappers.pojo
 
-
 typealias RuntimeTypeName = String
 typealias RuntimeTypeValue = Any?
 
@@ -40,7 +39,7 @@ interface RuntimeCallsApi {
 internal class RealRuntimeCallsApi(
     override val runtime: RuntimeSnapshot,
     private val socketService: SocketService,
-): RuntimeCallsApi {
+) : RuntimeCallsApi {
 
     override suspend fun <R> call(
         section: String,

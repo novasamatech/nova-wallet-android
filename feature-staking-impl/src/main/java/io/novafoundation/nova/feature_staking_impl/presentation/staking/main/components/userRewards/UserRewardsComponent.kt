@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards
 
 import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
@@ -31,7 +30,7 @@ sealed class UserRewardsEvent {
 
 sealed class UserRewardsAction {
 
-    object ClaimRewardsClicked: UserRewardsAction()
+    object ClaimRewardsClicked : UserRewardsAction()
 
     object UserRewardPeriodClicked : UserRewardsAction()
 }

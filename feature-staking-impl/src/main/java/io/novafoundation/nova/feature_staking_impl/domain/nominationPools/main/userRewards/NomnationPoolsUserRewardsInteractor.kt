@@ -32,7 +32,7 @@ interface NominationPoolsUserRewardsInteractor {
 class RealNominationPoolsUserRewardsInteractor(
     private val repository: NominationPoolMembersRepository,
     private val stakingRewardsRepository: StakingRewardsRepository,
-): NominationPoolsUserRewardsInteractor {
+) : NominationPoolsUserRewardsInteractor {
 
     override fun rewardsFlow(accountId: AccountId, stakingOptionId: StakingOptionId): Flow<NominationPoolRewards> {
         return combine(

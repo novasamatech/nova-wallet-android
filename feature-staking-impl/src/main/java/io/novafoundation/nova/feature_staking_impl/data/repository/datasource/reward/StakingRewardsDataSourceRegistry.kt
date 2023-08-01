@@ -11,10 +11,10 @@ interface StakingRewardsDataSourceRegistry {
 class RealStakingRewardsDataSourceRegistry(
     private val directStakingRewardsDataSource: StakingRewardsDataSource,
     private val poolStakingRewardsDataSource: StakingRewardsDataSource
-): StakingRewardsDataSourceRegistry {
+) : StakingRewardsDataSourceRegistry {
 
     override fun getDataSourceFor(stakingOptionId: StakingOptionId): StakingRewardsDataSource {
-        return when(stakingOptionId.stakingType) {
+        return when (stakingOptionId.stakingType) {
             StakingType.NOMINATION_POOLS -> poolStakingRewardsDataSource
             else -> directStakingRewardsDataSource
         }

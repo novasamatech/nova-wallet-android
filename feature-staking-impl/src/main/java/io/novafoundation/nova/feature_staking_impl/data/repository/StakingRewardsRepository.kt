@@ -18,7 +18,7 @@ interface StakingRewardsRepository {
 
 class RealStakingRewardsRepository(
     private val dataSourceRegistry: StakingRewardsDataSourceRegistry,
-): StakingRewardsRepository {
+) : StakingRewardsRepository {
 
     override fun totalRewardFlow(accountId: AccountId, stakingOptionId: StakingOptionId): Flow<TotalReward> {
         return sourceFor(stakingOptionId).totalRewardsFlow(accountId, stakingOptionId)
