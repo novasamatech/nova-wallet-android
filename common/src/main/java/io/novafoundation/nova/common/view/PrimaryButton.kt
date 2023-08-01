@@ -109,17 +109,6 @@ class PrimaryButton @JvmOverloads constructor(
         attrs?.let(this::applyAttrs)
     }
 
-//    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-//        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
-//
-//        var newHeightMeasureSpec = heightMeasureSpec
-//        if (heightMode == MeasureSpec.AT_MOST) {
-//            newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(size.heightDp.dp(context), heightMode)
-//        }
-//
-//        super.onMeasure(widthMeasureSpec, newHeightMeasureSpec)
-//    }
-
     fun prepareForProgress(lifecycleOwner: LifecycleOwner) {
         lifecycleOwner.bindProgressButton(this)
 
