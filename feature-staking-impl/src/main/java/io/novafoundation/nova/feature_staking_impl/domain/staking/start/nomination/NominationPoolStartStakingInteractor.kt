@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.Pa
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 class NominationPoolStartStakingInteractor(
