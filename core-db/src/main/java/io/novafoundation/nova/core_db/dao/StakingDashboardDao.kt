@@ -33,17 +33,6 @@ interface StakingDashboardDao {
     @Query("SELECT chainId, chainAssetId, stakingType, stakeStatusAccount, rewardsAccount FROM staking_dashboard_items WHERE metaId = :metaId")
     fun stakingAccountsViewFlow(metaId: Long): Flow<List<StakingDashboardAccountsView>>
 
-    @Query(
-        """
-        SELECT estimatedEarnings FROM staking_dashboard_items WHERE 
-            metaId = :metaId 
-            AND chainId = :chainId 
-            AND chainAssetId = :chainAssetId 
-            AND stakingType = :stakingType
-        """
-    )
-    fun estimatedEarning(metaId: Long, chainId: String, chainAssetId: Int, stakingType: String): Flow<Double?>
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertItem(dashboardItemLocal: StakingDashboardItemLocal)
 }
