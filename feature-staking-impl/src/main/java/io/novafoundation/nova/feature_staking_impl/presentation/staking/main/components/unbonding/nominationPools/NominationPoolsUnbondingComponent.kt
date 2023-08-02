@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.unbondings.NominationPoolUnbondingsInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.nominationPools.loadPoolMemberState
@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class NominationPoolsUnbondingComponentFactory(
-    private val poolMemberUseCase: NominationPoolMemberUseCase,
+    private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val interactor: NominationPoolUnbondingsInteractor,
 ) {
 
@@ -28,7 +28,7 @@ class NominationPoolsUnbondingComponentFactory(
         stakingOption: StakingOption,
         hostContext: ComponentHostContext,
     ): UnbondingComponent = NominationPoolsUnbondingComponent(
-        poolMemberUseCase = poolMemberUseCase,
+        nominationPoolSharedComputation = nominationPoolSharedComputation,
         interactor = interactor,
         hostContext = hostContext,
         stakingOption = stakingOption
@@ -36,7 +36,7 @@ class NominationPoolsUnbondingComponentFactory(
 }
 
 private class NominationPoolsUnbondingComponent(
-    private val poolMemberUseCase: NominationPoolMemberUseCase,
+    private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val interactor: NominationPoolUnbondingsInteractor,
 
     private val stakingOption: StakingOption,
@@ -47,7 +47,11 @@ private class NominationPoolsUnbondingComponent(
 
     override val events = MutableLiveData<Event<UnbondingEvent>>()
 
-    override val state = poolMemberUseCase.loadPoolMemberState(hostContext, ::loadUnbondings)
+    override val state = nominationPoolSharedComputation.loadPoolMemberState(
+        hostContext = hostContext,
+        chain = stakingOption.assetWithChain.chain,
+        stateProducer = ::loadUnbondings
+    )
         .shareInBackground()
 
     override fun onAction(action: UnbondingAction) {

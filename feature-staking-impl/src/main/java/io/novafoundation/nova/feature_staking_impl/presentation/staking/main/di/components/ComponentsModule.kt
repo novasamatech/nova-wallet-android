@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.parachain.ParachainUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.relaychain.RelaychainUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.nominationPools.NominationPoolUserRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.parachain.ParachainUserRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.relaychain.RelaychainUserRewardsComponentFactory
 
@@ -110,6 +111,12 @@ class ComponentsModule {
     fun provideUserRewardsComponentFactory(
         relaychainComponentFactory: RelaychainUserRewardsComponentFactory,
         parachainComponentFactory: ParachainUserRewardsComponentFactory,
+        nominationPoolUserRewardsComponentFactory: NominationPoolUserRewardsComponentFactory,
         compoundStakingComponentFactory: CompoundStakingComponentFactory,
-    ) = UserRewardsComponentFactory(relaychainComponentFactory, parachainComponentFactory, compoundStakingComponentFactory)
+    ) = UserRewardsComponentFactory(
+        relaychainComponentFactory = relaychainComponentFactory,
+        parachainComponentFactory = parachainComponentFactory,
+        nominationPoolsComponentFactory = nominationPoolUserRewardsComponentFactory,
+        compoundStakingComponentFactory = compoundStakingComponentFactory
+    )
 }

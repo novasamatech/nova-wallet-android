@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -15,9 +16,11 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.reposito
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolMembersRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolUnbondRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.RealNominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.networkInfo.NominationPoolsNetworkInfoInteractor
@@ -26,6 +29,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.s
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.stakeSummary.RealNominationPoolStakeSummaryInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.unbondings.NominationPoolUnbondingsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.unbondings.RealNominationPoolUnbondingsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.userRewards.NominationPoolsUserRewardsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.userRewards.RealNominationPoolsUserRewardsInteractor
+import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -61,9 +67,10 @@ class NominationPoolModule {
     @Provides
     @FeatureScope
     fun provideNominationPoolMembersRepository(
-        @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource
+        @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
+        multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
     ): NominationPoolMembersRepository {
-        return RealNominationPoolMembersRepository(localStorageSource)
+        return RealNominationPoolMembersRepository(localStorageSource, multiChainRuntimeCallsApi)
     }
 
     @Provides
@@ -139,4 +146,20 @@ class NominationPoolModule {
             nominationPoolStateRepository = nominationPoolStateRepository
         )
     }
+
+    @Provides
+    @FeatureScope
+    fun provideNominationPoolSharedComputation(
+        computationalCache: ComputationalCache,
+        nominationPoolMemberUseCase: NominationPoolMemberUseCase,
+    ): NominationPoolSharedComputation {
+        return NominationPoolSharedComputation(computationalCache, nominationPoolMemberUseCase)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideUserRewardsInteractor(
+        repository: NominationPoolMembersRepository,
+        stakingRewardsRepository: StakingRewardsRepository,
+    ): NominationPoolsUserRewardsInteractor = RealNominationPoolsUserRewardsInteractor(repository, stakingRewardsRepository)
 }

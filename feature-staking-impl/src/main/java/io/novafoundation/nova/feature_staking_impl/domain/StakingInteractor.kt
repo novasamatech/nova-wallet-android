@@ -13,7 +13,9 @@ import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposur
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.fullId
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapAccountToStakingAccount
 import io.novafoundation.nova.feature_staking_impl.data.model.Payout
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
@@ -37,7 +39,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.assetWithChain
 import io.novafoundation.nova.runtime.state.chain
@@ -120,12 +121,11 @@ class StakingInteractor(
 
     suspend fun syncStakingRewards(
         stakingState: StakingState.Stash,
-        chain: Chain,
-        chainAsset: Chain.Asset,
+        stakingOption: StakingOption,
         period: RewardPeriod
     ) = withContext(Dispatchers.IO) {
         runCatching {
-            stakingRewardsRepository.sync(stakingState.stashAddress, chain, chainAsset, period)
+            stakingRewardsRepository.sync(stakingState.stashId, stakingOption, period)
         }
     }
 
@@ -182,10 +182,9 @@ class StakingInteractor(
 
     fun observeUserRewards(
         state: StakingState.Stash,
-        chain: Chain,
-        chainAsset: Chain.Asset,
+        stakingOption: StakingOption,
     ): Flow<TotalReward> {
-        return stakingRewardsRepository.totalRewardFlow(state.stashAddress, chain.id, chainAsset.id)
+        return stakingRewardsRepository.totalRewardFlow(state.stashId, stakingOption.fullId)
     }
 
     fun observeNetworkInfoState(chainId: ChainId, scope: CoroutineScope): Flow<NetworkInfo> = flow {
