@@ -13,7 +13,8 @@ class NftDetailsModel(
     val collection: Collection?,
     val owner: AddressModel,
     val creator: AddressModel?,
-    val network: ChainUi
+    val network: ChainUi,
+    val isSupportedForSend: Boolean
 ) {
 
     class Collection(

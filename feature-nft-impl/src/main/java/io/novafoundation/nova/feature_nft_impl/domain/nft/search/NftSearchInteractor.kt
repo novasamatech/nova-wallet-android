@@ -21,7 +21,10 @@ class NftSearchInteractor @Inject constructor(
 
     fun sendNftSearch(queryFlow: Flow<String>): Flow<Map<Chain, List<SendNftListItem>>> {
         return combine(getUserNfts(), queryFlow) { nfts, query ->
-            mapNftToNftDetails(nfts)
+            val supportedNfts = nfts
+                .filter { nftRepository.isNftTypeSupportedForSend(it.type) }
+
+            mapNftToNftDetails(supportedNfts)
                 .map(::mapNftDetailsToListItem)
                 .filterByQuery(query)
                 .groupBy { nftDetails -> nftDetails.chain }

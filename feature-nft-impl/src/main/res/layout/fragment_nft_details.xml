@@ -78,9 +78,11 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/wallet_asset_send"
+                android:visibility="gone"
                 android:layout_gravity="center_horizontal"
                 app:drawableTopCompat="@drawable/ic_send"
-                tools:drawableTop="@drawable/ic_send" />
+                tools:drawableTop="@drawable/ic_send"
+                tools:visibility="visible" />
 
         </LinearLayout>
 

@@ -121,6 +121,12 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
 
             assetActionsSend.makeVisible()
             nftDetailsChain.showChain(it.network)
+
+            if (it.isSupportedForSend) {
+                assetActionsSend.makeVisible()
+            } else {
+                assetActionsSend.makeGone()
+            }
         }
 
         viewModel.exitingErrorLiveData.observeEvent {

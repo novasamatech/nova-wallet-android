@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_nft_impl.domain.nft.details
 
+import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Price
@@ -27,5 +28,9 @@ class NftDetailsInteractor(
                 )
             }
         }
+    }
+
+    fun isNftTypeSupportedForSend(nftType: Nft.Type): Boolean {
+        return nftRepository.isNftTypeSupportedForSend(nftType)
     }
 }

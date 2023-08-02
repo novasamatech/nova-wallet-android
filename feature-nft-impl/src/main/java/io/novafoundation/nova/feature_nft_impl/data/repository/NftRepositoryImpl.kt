@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -139,7 +138,12 @@ class NftRepositoryImpl(
         return pendingSendTransactionsNftIds.asStateFlow()
     }
 
+    override fun isNftTypeSupportedForSend(nftType: Nft.Type): Boolean {
+        return nftType::class in supportedSendNftTypes
+    }
+
     companion object {
+        private val supportedSendNftTypes = setOf(Nft.Type.Uniques::class)
         private val pendingSendTransactionsNftIds = MutableStateFlow(setOf<String>())
     }
 }

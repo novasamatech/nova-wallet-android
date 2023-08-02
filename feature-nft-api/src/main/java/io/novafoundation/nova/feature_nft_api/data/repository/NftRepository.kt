@@ -28,4 +28,6 @@ interface NftRepository {
     fun removeOldPendingTransactions(myNftIds: List<String>)
 
     fun getPendingSendTransactionsNftIds(): Flow<Set<String>>
+
+    fun isNftTypeSupportedForSend(nftType: Nft.Type): Boolean
 }
