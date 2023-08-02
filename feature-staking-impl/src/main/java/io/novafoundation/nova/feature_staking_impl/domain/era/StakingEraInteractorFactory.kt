@@ -9,13 +9,12 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class StakingEraInteractorFactory(
     private val roundDurationEstimator: RoundDurationEstimator,
-    private val currentRoundRepository: CurrentRoundRepository,
     private val stakingInteractor: StakingInteractor
 ) {
 
     fun create(chainAsset: Chain.Asset): StakingEraInteractor {
         return when {
-            chainAsset.hasStakingTypeGroup(StakingTypeGroup.PARACHAIN) -> ParachainStakingEraInteractor(roundDurationEstimator, currentRoundRepository)
+            chainAsset.hasStakingTypeGroup(StakingTypeGroup.PARACHAIN) -> ParachainStakingEraInteractor(roundDurationEstimator)
             chainAsset.hasStakingTypeGroup(StakingTypeGroup.RELAYCHAIN) -> RelaychainStakingEraInteractor(stakingInteractor)
             else -> UnsupportedStakingEraInteractor()
         }
