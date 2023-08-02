@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.StartStakingEraInfo
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
-import kotlin.time.Duration.Companion.milliseconds
 
 class RelaychainStakingEraInteractor(
     private val stakingInteractor: StakingInteractor
@@ -13,10 +12,11 @@ class RelaychainStakingEraInteractor(
 
     override fun observeEraInfo(chain: Chain): Flow<StartStakingEraInfo> {
         return flowOf {
+            val eraDuration = stakingInteractor.getEraDuration()
             StartStakingEraInfo(
-                remainingEraTime = stakingInteractor.getRemainingEraTime().toLong().milliseconds,
                 unstakeTime = stakingInteractor.getLockupDuration(),
-                eraDuration = stakingInteractor.getEraDuration()
+                eraDuration = eraDuration,
+                firstRewardReceivingDuration = stakingInteractor.getFirstRewardReceivingDelay()
             )
         }
     }
