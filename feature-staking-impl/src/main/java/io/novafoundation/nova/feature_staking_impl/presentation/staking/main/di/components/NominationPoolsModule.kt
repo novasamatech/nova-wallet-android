@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
@@ -69,8 +70,12 @@ class NominationPoolsModule {
     fun provideYourPoolComponentFactory(
         nominationPoolSharedComputation: NominationPoolSharedComputation,
         interactor: NominationPoolYourPoolInteractor,
+        addressIconGenerator: AddressIconGenerator,
+        resourceManager: ResourceManager,
     ) = NominationPoolsYourPoolComponentFactory(
         nominationPoolSharedComputation = nominationPoolSharedComputation,
         interactor = interactor,
+        addressIconGenerator = addressIconGenerator,
+        resourceManager = resourceManager
     )
 }

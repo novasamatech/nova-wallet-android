@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository
 
 import io.novafoundation.nova.common.utils.Perbill
+import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
 import io.novafoundation.nova.feature_staking_api.domain.model.activeBalance
@@ -8,9 +9,12 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.le
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.nominators
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.staking
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.bondedPools
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.metadata
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.nominationPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.BondedPool
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMetadata
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolImageDataSource
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -36,12 +40,17 @@ interface NominationPoolStateRepository {
 
     fun observeParticipatingBondedPool(poolId: PoolId, chainId: ChainId): Flow<BondedPool>
 
+    fun observePoolMetadata(poolId: PoolId, chainId: ChainId): Flow<PoolMetadata?>
+
+    suspend fun getPoolIcon(poolId: PoolId, chainId: ChainId): Icon?
+
     suspend fun getPoolCommissions(poolIds: Set<PoolId>, chainId: ChainId): Map<PoolId, Perbill?>
 }
 
 class RealNominationPoolStateRepository(
     private val localStorage: StorageDataSource,
     private val remoteStorage: StorageDataSource,
+    private val poolImageDataSource: PoolImageDataSource,
 ) : NominationPoolStateRepository {
 
     context(StorageQueryContext)
@@ -70,6 +79,16 @@ class RealNominationPoolStateRepository(
         return localStorage.subscribe(chainId) {
             metadata.nominationPools.bondedPools.observeNonNull(poolId.value)
         }
+    }
+
+    override fun observePoolMetadata(poolId: PoolId, chainId: ChainId): Flow<PoolMetadata?> {
+        return localStorage.subscribe(chainId) {
+            metadata.nominationPools.metadata.observe(poolId.value)
+        }
+    }
+
+    override suspend fun getPoolIcon(poolId: PoolId, chainId: ChainId): Icon? {
+        return poolImageDataSource.getPoolIcon(poolId, chainId)
     }
 
     override suspend fun getPoolCommissions(poolIds: Set<PoolId>, chainId: ChainId): Map<PoolId, Perbill?> {

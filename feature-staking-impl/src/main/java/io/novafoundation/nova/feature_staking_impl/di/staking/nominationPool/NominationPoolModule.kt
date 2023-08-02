@@ -7,6 +7,8 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolImageDataSource
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PredefinedPoolImageDataSource
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.RealPoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolMembersRepository
@@ -50,12 +52,18 @@ class NominationPoolModule {
 
     @Provides
     @FeatureScope
+    fun providePoolImageDataSource(): PoolImageDataSource = PredefinedPoolImageDataSource()
+
+    @Provides
+    @FeatureScope
     fun provideNominationPoolBalanceRepository(
         @Named(LOCAL_STORAGE_SOURCE) localDataSource: StorageDataSource,
-        @Named(REMOTE_STORAGE_SOURCE) remoteDataSource: StorageDataSource
+        @Named(REMOTE_STORAGE_SOURCE) remoteDataSource: StorageDataSource,
+        poolImageDataSource: PoolImageDataSource,
     ): NominationPoolStateRepository = RealNominationPoolStateRepository(
         localStorage = localDataSource,
-        remoteStorage = remoteDataSource
+        remoteStorage = remoteDataSource,
+        poolImageDataSource = poolImageDataSource,
     )
 
     @Provides
@@ -168,5 +176,7 @@ class NominationPoolModule {
     @Provides
     @FeatureScope
     fun provideYourPoolInteractor(
-    ): NominationPoolYourPoolInteractor = RealNominationPoolYourPoolInteractor()
+        poolAccountDerivation: PoolAccountDerivation,
+        poolStateRepository: NominationPoolStateRepository,
+    ): NominationPoolYourPoolInteractor = RealNominationPoolYourPoolInteractor(poolAccountDerivation, poolStateRepository)
 }

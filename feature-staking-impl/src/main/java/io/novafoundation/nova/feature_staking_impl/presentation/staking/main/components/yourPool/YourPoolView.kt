@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.synthetic.main.view_your_pool.view.yourPoolContentGroup
@@ -31,7 +32,7 @@ class YourPoolView @JvmOverloads constructor(
         View.inflate(context, R.layout.view_your_pool, this)
 
         with(context) {
-            background = getBlockDrawable()
+            background = addRipple(getBlockDrawable())
         }
     }
 
