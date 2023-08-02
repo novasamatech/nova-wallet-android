@@ -14,13 +14,18 @@ import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 
 sealed interface ParticipationInGovernance {
-    class Participate(val minAmount: BigInteger?) : ParticipationInGovernance
+    class Participate(val minAmount: BigInteger?, val isParticipationInGovernanceHasSmallestMinStake: Boolean) : ParticipationInGovernance
     object NotParticipate : ParticipationInGovernance
 }
+
+class Payouts(
+    val payoutTypes: List<PayoutType>,
+    val automaticPayoutMinAmount: BigInteger?,
+    val isAutomaticPayoutHasSmallestMinStake: Boolean
+)
 
 class StartStakingCompoundData(
     val chain: Chain,
@@ -29,8 +34,7 @@ class StartStakingCompoundData(
     val minStake: BigInteger,
     val eraInfo: StartStakingEraInfo,
     val participationInGovernance: ParticipationInGovernance,
-    val payoutTypes: List<PayoutType>,
-    val automaticPayoutMinAmount: BigInteger?
+    val payouts: Payouts
 )
 
 class LandingAvailableBalance(val asset: Asset, val availableBalance: BigInteger)
@@ -61,9 +65,6 @@ class RealCompoundStartStakingInteractor(
                 val eraInfoData = stakingEraInteractor.observeEraInfo(chain)
 
                 combine(startStakingDataFlow, eraInfoData) { startStakingData, startStakingEraInfo ->
-                    val automaticPayoutMinAmount = startStakingData.filter { it.payoutType is PayoutType.Automatic }
-                        .minOfOrNull { it.minStake }
-
                     StartStakingCompoundData(
                         chain = chain,
                         asset = asset,
@@ -71,8 +72,7 @@ class RealCompoundStartStakingInteractor(
                         minStake = startStakingData.map { it.minStake }.min(),
                         eraInfo = startStakingEraInfo,
                         participationInGovernance = getParticipationInGovernance(startStakingData),
-                        payoutTypes = startStakingData.map { it.payoutType }.distinct(),
-                        automaticPayoutMinAmount = automaticPayoutMinAmount
+                        payouts = getPayouts(startStakingData)
                     )
                 }
             }
@@ -95,10 +95,28 @@ class RealCompoundStartStakingInteractor(
 
         return when {
             participationInGovernanceData.isNotEmpty() -> {
-                val minAmount = participationInGovernanceData.minOfOrNull { it.minStake }
-                ParticipationInGovernance.Participate(minAmount)
+                val minAmount = participationInGovernanceData.minOf { it.minStake }
+                val isParticipationInGovernanceHasSmallestMinStake = startStakingData.all { it.minStake >= minAmount }
+                ParticipationInGovernance.Participate(minAmount, isParticipationInGovernanceHasSmallestMinStake)
             }
             else -> ParticipationInGovernance.NotParticipate
         }
+    }
+
+    private fun getPayouts(startStakingData: List<StartStakingData>): Payouts {
+        val automaticPayoutMinAmount = startStakingData.filter { it.payoutType is PayoutType.Automatic }
+            .minOfOrNull { it.minStake }
+
+        return Payouts(
+            payoutTypes = startStakingData.map { it.payoutType }.distinct(),
+            automaticPayoutMinAmount = automaticPayoutMinAmount,
+            isAutomaticPayoutHasSmallestMinStake = isAutomaticPayoutHasSmallestMinStake(startStakingData, automaticPayoutMinAmount)
+        )
+    }
+
+    private fun isAutomaticPayoutHasSmallestMinStake(startStakingData: List<StartStakingData>, automaticPayoutMinAmount: BigInteger?): Boolean {
+        if (automaticPayoutMinAmount == null) return false
+
+        return startStakingData.all { it.minStake >= automaticPayoutMinAmount }
     }
 }

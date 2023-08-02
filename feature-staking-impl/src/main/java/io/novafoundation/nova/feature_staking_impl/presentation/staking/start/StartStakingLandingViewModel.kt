@@ -22,6 +22,7 @@ import io.novafoundation.nova.common.utils.withLoadingShared
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.ParticipationInGovernance
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.Payouts
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingCompoundData
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.PayoutType
@@ -142,7 +143,7 @@ class StartStakingLandingViewModel(
             createTestNetworkCondition(data.chain, themeColor),
             createMinStakeCondition(data.asset, data.minStake, data.eraInfo.remainingEraTime, themeColor),
             createUnstakeCondition(data.eraInfo.unstakeTime, themeColor),
-            createRewardsFrequencyCondition(data.eraInfo.eraDuration, data.automaticPayoutMinAmount, data.asset, data.payoutTypes, themeColor),
+            createRewardsFrequencyCondition(data.eraInfo.eraDuration, data.payouts, data.asset, themeColor),
             createGovernanceParticipatingCondition(data.asset, data.participationInGovernance, themeColor),
             createStakeMonitoring(themeColor)
         )
@@ -199,25 +200,28 @@ class StartStakingLandingViewModel(
 
     private fun createRewardsFrequencyCondition(
         eraDuration: Duration,
-        automaticPayoutMinAmount: BigInteger?,
+        payouts: Payouts,
         asset: Asset,
-        payoutTypes: List<PayoutType>,
         themeColor: Int
     ): StakingConditionRVItem {
-        val time = resourceManager.formatDuration(eraDuration, false).toSpannable(colorSpan(themeColor))
+        val time = resourceManager.getString(
+            R.string.start_staking_fragment_reward_frequency_condition_duration,
+            resourceManager.formatDuration(eraDuration, false)
+        ).toSpannable(colorSpan(themeColor))
 
+        val payoutTypes = payouts.payoutTypes
         val text = when {
-            payoutTypes.containsOnly(PayoutType.Automatic.Restake) -> {
+            isRestakeOnlyCase(payouts) -> {
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_restake_only).formatAsSpannable(time)
             }
-            payoutTypes.containsOnly(PayoutType.Automatic.Payout) -> {
+            isPayoutsOnlyCase(payouts) -> {
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_payout_only).formatAsSpannable(time)
             }
             payoutTypes.containsOnly(PayoutType.Manual) -> {
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_manual).formatAsSpannable(time)
             }
             payoutTypes.containsManualAndAutomatic() -> {
-                val automaticPayoutFormattedAmount = automaticPayoutMinAmount?.formatPlanks(asset.token.configuration) ?: ""
+                val automaticPayoutFormattedAmount = payouts.automaticPayoutMinAmount?.formatPlanks(asset.token.configuration) ?: ""
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_automatic_and_manual)
                     .formatAsSpannable(time, automaticPayoutFormattedAmount)
             }
@@ -276,6 +280,16 @@ class StartStakingLandingViewModel(
 
     private fun List<PayoutType>.containsManualAndAutomatic(): Boolean {
         return contains(PayoutType.Manual) && any { it is PayoutType.Automatic } && size == 2
+    }
+
+    private fun isRestakeOnlyCase(payouts: Payouts): Boolean {
+        return payouts.payoutTypes.containsOnly(PayoutType.Automatic.Restake) ||
+            payouts.payoutTypes.contains(PayoutType.Automatic.Restake) && payouts.isAutomaticPayoutHasSmallestMinStake
+    }
+
+    private fun isPayoutsOnlyCase(payouts: Payouts): Boolean {
+        return payouts.payoutTypes.containsOnly(PayoutType.Automatic.Payout) ||
+            payouts.payoutTypes.contains(PayoutType.Automatic.Payout) && payouts.isAutomaticPayoutHasSmallestMinStake
     }
 
     private fun getThemeColor(chain: Chain): Int {

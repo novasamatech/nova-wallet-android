@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start
 
+import android.text.method.LinkMovementMethod
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -64,6 +65,9 @@ class StartStakingLandingFooterViewHolder(
                 resources.getString(R.string.start_staking_fragment_terms_of_use),
                 termsClickablePart
             )
+
+            itemStakingLandingFooterTermsOfUse.movementMethod = LinkMovementMethod.getInstance()
+            itemStakingLandingFooterMoreInfo.movementMethod = LinkMovementMethod.getInstance()
         }
     }
 

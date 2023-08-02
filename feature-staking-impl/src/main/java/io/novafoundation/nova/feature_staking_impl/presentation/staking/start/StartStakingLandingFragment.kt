@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isLoaded
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
