@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 
 class NominationPoolsNetworkInfoComponentFactory(
@@ -51,9 +50,7 @@ private class NominationPoolsNetworkInfoComponent(
     }
 
     private fun shouldBeExpandedFlow(): Flow<Boolean> {
-//        return interactor.observeShouldShowNetworkInfo()
-        // TODO test code!! remove
-        return flowOf(true)
+        return interactor.observeShouldShowNetworkInfo()
     }
 
     private fun updateContentState() {

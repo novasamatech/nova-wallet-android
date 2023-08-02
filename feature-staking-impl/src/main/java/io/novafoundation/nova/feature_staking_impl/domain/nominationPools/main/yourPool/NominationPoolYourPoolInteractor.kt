@@ -1,0 +1,6 @@
+package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool
+
+interface NominationPoolYourPoolInteractor
+
+
+class RealNominationPoolYourPoolInteractor : NominationPoolYourPoolInteractor

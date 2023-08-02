@@ -31,6 +31,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.u
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.unbondings.RealNominationPoolUnbondingsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.userRewards.NominationPoolsUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.userRewards.RealNominationPoolsUserRewardsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.NominationPoolYourPoolInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.RealNominationPoolYourPoolInteractor
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -162,4 +164,9 @@ class NominationPoolModule {
         repository: NominationPoolMembersRepository,
         stakingRewardsRepository: StakingRewardsRepository,
     ): NominationPoolsUserRewardsInteractor = RealNominationPoolsUserRewardsInteractor(repository, stakingRewardsRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideYourPoolInteractor(
+    ): NominationPoolYourPoolInteractor = RealNominationPoolYourPoolInteractor()
 }

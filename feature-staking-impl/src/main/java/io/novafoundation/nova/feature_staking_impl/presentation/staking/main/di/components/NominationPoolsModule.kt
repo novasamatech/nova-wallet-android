@@ -9,11 +9,13 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.n
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.stakeSummary.NominationPoolStakeSummaryInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.unbondings.NominationPoolUnbondingsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.userRewards.NominationPoolsUserRewardsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.NominationPoolYourPoolInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.nominationPools.NominationPoolsNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.nominationPools.NominationPoolsStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.nominationPools.NominationPoolsUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.nominationPools.NominationPoolUserRewardsComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.nominationPools.NominationPoolsYourPoolComponentFactory
 
 @Module
 class NominationPoolsModule {
@@ -60,5 +62,15 @@ class NominationPoolsModule {
         interactor = interactor,
         rewardPeriodsInteractor = rewardPeriodsInteractor,
         resourceManager = resourceManager
+    )
+
+    @Provides
+    @ScreenScope
+    fun provideYourPoolComponentFactory(
+        nominationPoolSharedComputation: NominationPoolSharedComputation,
+        interactor: NominationPoolYourPoolInteractor,
+    ) = NominationPoolsYourPoolComponentFactory(
+        nominationPoolSharedComputation = nominationPoolSharedComputation,
+        interactor = interactor,
     )
 }

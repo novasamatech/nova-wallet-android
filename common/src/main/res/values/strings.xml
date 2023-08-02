@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="nomination_pools_your_pool">Your pool</string>
+
     <string name="nomination_pools_pool">Pool</string>
     <string name="nomination_pools_direct">Direct</string>
 
