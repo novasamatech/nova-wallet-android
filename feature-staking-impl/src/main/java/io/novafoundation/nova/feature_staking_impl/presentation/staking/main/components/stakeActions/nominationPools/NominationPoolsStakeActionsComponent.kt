@@ -40,7 +40,7 @@ class NominationPoolsStakeActionsComponentFactory(
     )
 }
 
-internal open class NominationPoolsStakeActionsComponent(
+private open class NominationPoolsStakeActionsComponent(
     nominationPoolSharedComputation: NominationPoolSharedComputation,
     stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
