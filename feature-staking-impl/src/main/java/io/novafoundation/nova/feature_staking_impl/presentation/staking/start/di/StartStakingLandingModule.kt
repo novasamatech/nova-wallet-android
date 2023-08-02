@@ -13,6 +13,9 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
@@ -49,6 +52,7 @@ class StartStakingLandingModule {
         stakingEraInteractorFactory: StakingEraInteractorFactory,
         parachainNetworkInfoInteractor: ParachainNetworkInfoInteractor,
         parachainStakingRewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
+        nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
         chainRegistry: ChainRegistry
     ): StartStakingInteractorFactory {
         return StartStakingInteractorFactory(
@@ -58,6 +62,7 @@ class StartStakingLandingModule {
             stakingEraInteractorFactory,
             parachainNetworkInfoInteractor,
             parachainStakingRewardCalculatorFactory,
+            nominationPoolGlobalsRepository,
             chainRegistry
         )
     }

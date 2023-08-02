@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
@@ -24,6 +25,7 @@ class StartStakingInteractorFactory(
     private val stakingEraInteractorFactory: StakingEraInteractorFactory,
     private val parachainNetworkInfoInteractor: ParachainNetworkInfoInteractor,
     private val parachainStakingRewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
+    private val nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
     private val chainRegistry: ChainRegistry
 ) {
 
@@ -76,6 +78,8 @@ class StartStakingInteractorFactory(
     }
 
     private fun createNominationPoolsStartStakingInteractor(): StartStakingInteractor {
-        return NominationPoolStartStakingInteractor()
+        return NominationPoolStartStakingInteractor(
+            nominationPoolGlobalsRepository = nominationPoolGlobalsRepository
+        )
     }
 }
