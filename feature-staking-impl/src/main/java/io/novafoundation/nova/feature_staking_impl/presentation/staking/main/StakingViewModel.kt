@@ -46,8 +46,7 @@ class StakingViewModel(
     stakingUpdateSystem: UpdateSystem,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
-    ExternalActions by externalActionsMixin
-{
+    ExternalActions by externalActionsMixin {
 
     private val selectedAssetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()

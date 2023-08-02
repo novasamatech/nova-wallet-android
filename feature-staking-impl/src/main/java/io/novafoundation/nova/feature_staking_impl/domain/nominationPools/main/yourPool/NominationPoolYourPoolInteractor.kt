@@ -28,12 +28,12 @@ interface NominationPoolYourPoolInteractor {
 class RealNominationPoolYourPoolInteractor(
     private val poolAccountDerivation: PoolAccountDerivation,
     private val poolStateRepository: NominationPoolStateRepository,
-): NominationPoolYourPoolInteractor {
-    override fun yourPoolFlow(poolId: PoolId, chainId: ChainId):  Flow<YourPool> {
+) : NominationPoolYourPoolInteractor {
+    override fun yourPoolFlow(poolId: PoolId, chainId: ChainId): Flow<YourPool> {
         return flowOfAll {
             val stashAccountId = poolAccountDerivation.bondedAccountOf(poolId, chainId)
             val icon = poolStateRepository.getPoolIcon(poolId, chainId)
-            
+
             poolStateRepository.observePoolMetadata(poolId, chainId).map { poolMetadata ->
                 YourPool(
                     id = poolId,

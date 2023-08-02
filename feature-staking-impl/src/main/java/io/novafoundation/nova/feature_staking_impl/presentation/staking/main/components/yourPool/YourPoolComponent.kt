@@ -36,7 +36,7 @@ class YourPoolComponentFactory(
     ): YourPoolComponent = compoundStakingComponentFactory.create(
         relaychainComponentCreator = UnsupportedComponent.creator(),
         parachainComponentCreator = UnsupportedComponent.creator(),
-        nominationPoolsCreator =nominationPoolsFactory::create,
+        nominationPoolsCreator = nominationPoolsFactory::create,
         hostContext = hostContext
     )
 }

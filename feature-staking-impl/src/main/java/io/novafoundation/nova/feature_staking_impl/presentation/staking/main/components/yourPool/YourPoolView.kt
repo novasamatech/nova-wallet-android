@@ -41,7 +41,7 @@ class YourPoolView @JvmOverloads constructor(
     }
 
     fun showYourPoolState(yourPoolState: LoadingState<YourPoolComponentState>) {
-        when(yourPoolState) {
+        when (yourPoolState) {
             is LoadingState.Loaded -> showLoaded(yourPoolState.data)
             is LoadingState.Loading -> showLoading()
         }
