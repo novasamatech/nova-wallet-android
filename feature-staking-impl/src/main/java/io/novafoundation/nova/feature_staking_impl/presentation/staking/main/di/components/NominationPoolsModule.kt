@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.u
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.NominationPoolYourPoolInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.nominationPools.NominationPoolsNetworkInfoComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.nominationPools.NominationPoolsStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.nominationPools.NominationPoolsStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.nominationPools.NominationPoolsUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.nominationPools.NominationPoolUserRewardsComponentFactory
@@ -76,6 +77,16 @@ class NominationPoolsModule {
         nominationPoolSharedComputation = nominationPoolSharedComputation,
         interactor = interactor,
         addressIconGenerator = addressIconGenerator,
+        resourceManager = resourceManager
+    )
+
+    @Provides
+    @ScreenScope
+    fun provideStakeActionsComponentFactory(
+        resourceManager: ResourceManager,
+        sharedComputation: NominationPoolSharedComputation,
+    ) = NominationPoolsStakeActionsComponentFactory(
+        nominationPoolSharedComputation = sharedComputation,
         resourceManager = resourceManager
     )
 }

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.nominationPools.NominationPoolsStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.ParachainStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.turing.TuringStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.relaychain.RelaychainStakeActionsComponentFactory
@@ -24,6 +25,7 @@ class StakeActionsComponentFactory(
     private val relaychainComponentFactory: RelaychainStakeActionsComponentFactory,
     private val parachainComponentFactory: ParachainStakeActionsComponentFactory,
     private val turingComponentFactory: TuringStakeActionsComponentFactory,
+    private val nominationPoolsComponentFactory: NominationPoolsStakeActionsComponentFactory,
     private val compoundStakingComponentFactory: CompoundStakingComponentFactory,
 ) {
 
@@ -32,6 +34,7 @@ class StakeActionsComponentFactory(
     ): StakeActionsComponent = compoundStakingComponentFactory.create(
         relaychainComponentCreator = relaychainComponentFactory::create,
         parachainComponentCreator = parachainComponentFactory::create,
+        nominationPoolsCreator = nominationPoolsComponentFactory::create,
         turingComponentCreator = turingComponentFactory::create,
         hostContext = hostContext
     )

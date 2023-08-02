@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.parachain.ParachainNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.relaychain.RelaychainNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.nominationPools.NominationPoolsStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.ParachainStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.turing.TuringStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.relaychain.RelaychainStakeActionsComponentFactory
@@ -64,11 +65,13 @@ class ComponentsModule {
         relaychainComponentFactory: RelaychainStakeActionsComponentFactory,
         parachainComponentFactory: ParachainStakeActionsComponentFactory,
         turingStakeActionsComponentFactory: TuringStakeActionsComponentFactory,
+        nominationPoolsStakeActionsComponentFactory: NominationPoolsStakeActionsComponentFactory,
         compoundStakingComponentFactory: CompoundStakingComponentFactory,
     ) = StakeActionsComponentFactory(
         relaychainComponentFactory = relaychainComponentFactory,
         parachainComponentFactory = parachainComponentFactory,
         turingComponentFactory = turingStakeActionsComponentFactory,
+        nominationPoolsComponentFactory = nominationPoolsStakeActionsComponentFactory,
         compoundStakingComponentFactory = compoundStakingComponentFactory
     )
 
