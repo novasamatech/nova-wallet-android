@@ -18,11 +18,12 @@ class UnlockChunk(override val amount: BigInteger, val era: BigInteger) : EraRed
     override val redeemEra: EraIndex = era
 }
 
-fun StakingLedger.sumStaking(
+fun List<UnlockChunk>.totalRedeemableIn(activeEra: EraIndex): Balance = sumStaking { it.isRedeemableIn(activeEra) }
+
+fun List<UnlockChunk>.sumStaking(
     condition: (chunk: UnlockChunk) -> Boolean
 ): BigInteger {
-    return unlocking
-        .filter { condition(it) }
+    return filter { condition(it) }
         .sumByBigInteger(UnlockChunk::amount)
 }
 
