@@ -35,8 +35,6 @@ fun UnbondingPools?.unlockChunksFor(poolMember: PoolMember): List<UnlockChunk> {
     }
 }
 
-
-
 fun bindUnbondingPools(decoded: Any): UnbondingPools {
     val asStruct = decoded.castToStruct()
 

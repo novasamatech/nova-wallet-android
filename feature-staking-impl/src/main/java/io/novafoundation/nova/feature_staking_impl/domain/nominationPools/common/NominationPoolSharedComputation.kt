@@ -30,7 +30,7 @@ class NominationPoolSharedComputation(
     }
 
     fun participatingBondedPoolFlow(poolId: PoolId, chainId: ChainId, scope: CoroutineScope): Flow<BondedPool> {
-        val key = "BONDED_POOL:${chainId}:${poolId.value}"
+        val key = "BONDED_POOL:$chainId:${poolId.value}"
 
         return computationalCache.useSharedFlow(key, scope) {
             nominationPoolStateRepository.observeParticipatingBondedPool(poolId, chainId)
@@ -38,7 +38,7 @@ class NominationPoolSharedComputation(
     }
 
     fun unbondingPoolsFlow(poolId: PoolId, chainId: ChainId, scope: CoroutineScope): Flow<UnbondingPools?> {
-        val key = "UNBONDING_POOLS:${chainId}:${poolId.value}"
+        val key = "UNBONDING_POOLS:$chainId:${poolId.value}"
 
         return computationalCache.useSharedFlow(key, scope) {
             nominationPoolUnbondRepository.unbondingPoolsFlow(poolId, chainId)
@@ -51,7 +51,7 @@ class NominationPoolSharedComputation(
         chainId: ChainId,
         scope: CoroutineScope
     ): Flow<Nominations?> {
-        val key = "POOL_NOMINATION:${chainId}:${poolId.value}"
+        val key = "POOL_NOMINATION:$chainId:${poolId.value}"
 
         return computationalCache.useSharedFlow(key, scope) {
             nominationPoolStateRepository.observeParticipatingPoolNominations(poolStash, chainId)

@@ -95,7 +95,6 @@ class RealNominationPoolsAlertsInteractor(
         }
     }
 
-
     private class AlertsResolutionContext(
         val eraStakers: AccountIdMap<Exposure>,
         val activeEra: EraIndex,

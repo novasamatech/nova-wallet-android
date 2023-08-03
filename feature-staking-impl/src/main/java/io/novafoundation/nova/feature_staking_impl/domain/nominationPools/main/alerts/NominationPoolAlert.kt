@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 
 sealed class NominationPoolAlert {
 
-    object WaitingForNextEra: NominationPoolAlert()
+    object WaitingForNextEra : NominationPoolAlert()
 
-    class RedeemTokens(val amount: Balance): NominationPoolAlert()
+    class RedeemTokens(val amount: Balance) : NominationPoolAlert()
 }
