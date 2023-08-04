@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="nomination_pools_pool_destroying_error_message">Cannot perform specified operation since pool is in destroying state. It will be closed soon.</string>
+    <string name="nomination_pools_pool_destroying_error_title">Pool is destroying</string>
+
+    <string name="nomination_pools_pending_claim_hint_format">Your rewards (%s) will also be claimed and added to your free balance</string>
+
     <string name="nomination_pools_your_pool_format">Your pool (#%s)</string>
     <string name="nomination_pools_your_pool">Your pool</string>
 

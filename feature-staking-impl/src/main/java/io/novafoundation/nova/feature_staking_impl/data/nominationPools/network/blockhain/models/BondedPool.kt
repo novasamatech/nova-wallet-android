@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models
 
+import io.novafoundation.nova.common.data.network.runtime.binding.bindCollectionEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.bindPerbillTyped
 import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
@@ -9,11 +10,17 @@ class BondedPool(
     val poolId: PoolId,
     val points: PoolPoints,
     val commission: PoolCommission,
+    val state: PoolState
 )
 
 class PoolCommission(val current: Current?) {
 
     class Current(val perbill: Perbill)
+}
+
+enum class PoolState {
+
+    Open, Blocked, Destroying
 }
 
 fun bindBondedPool(decoded: Any, poolId: PoolId): BondedPool {
@@ -22,7 +29,8 @@ fun bindBondedPool(decoded: Any, poolId: PoolId): BondedPool {
     return BondedPool(
         points = bindPoolPoints(asStruct["points"]),
         poolId = poolId,
-        commission = bindPoolCommission(asStruct["commission"])
+        commission = bindPoolCommission(asStruct["commission"]),
+        state = bindCollectionEnum(asStruct["state"])
     )
 }
 

@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.u
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.userRewards.NominationPoolsUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.NominationPoolYourPoolInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.nominationPools.NominationPoolsAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.nominationPools.NominationPoolsNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.nominationPools.NominationPoolsStakeActionsComponentFactory
@@ -87,9 +88,11 @@ class NominationPoolsModule {
     fun provideStakeActionsComponentFactory(
         resourceManager: ResourceManager,
         sharedComputation: NominationPoolSharedComputation,
+        router: NominationPoolsRouter
     ) = NominationPoolsStakeActionsComponentFactory(
         nominationPoolSharedComputation = sharedComputation,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        router = router
     )
 
     @Provides
