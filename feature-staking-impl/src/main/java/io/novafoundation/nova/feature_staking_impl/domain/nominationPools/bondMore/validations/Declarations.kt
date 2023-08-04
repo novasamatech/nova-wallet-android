@@ -8,7 +8,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmoun
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 
 typealias NominationPoolsBondMoreValidationSystem = ValidationSystem<NominationPoolsBondMoreValidationPayload, NominationPoolsBondMoreValidationFailure>
-typealias NominationPoolsBondMoreValidationSystemBuilder = ValidationSystemBuilder<NominationPoolsBondMoreValidationPayload, NominationPoolsBondMoreValidationFailure>
+typealias NominationPoolsBondMoreValidationSystemBuilder =
+    ValidationSystemBuilder<NominationPoolsBondMoreValidationPayload, NominationPoolsBondMoreValidationFailure>
 
 fun ValidationSystem.Companion.nominationPoolsBondMore(
     poolStateValidationFactory: PoolStateValidationFactory,
