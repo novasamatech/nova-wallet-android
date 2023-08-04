@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
@@ -31,19 +32,20 @@ class NominationPoolsSetupBondMoreViewModel(
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: NominationPoolsBondMoreValidationSystem,
-    private val feeLoaderMixin: FeeLoaderMixin.Presentation,
+    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     private val poolMemberUseCase: NominationPoolMemberUseCase,
     assetUseCase: AssetUseCase,
     hintsFactory: NominationPoolsBondMoreHintsFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
-    Validatable by validationExecutor,
-    FeeLoaderMixin by feeLoaderMixin {
+    Validatable by validationExecutor {
 
     private val showNextProgress = MutableStateFlow(false)
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
+
+    val originFeeMixin = feeLoaderMixinFactory.create(assetFlow)
 
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
@@ -79,7 +81,7 @@ class NominationPoolsSetupBondMoreViewModel(
     }
 
     private fun listenFee() {
-        feeLoaderMixin.connectWith(
+        originFeeMixin.connectWith(
             inputSource = amountChooserMixin.backPressuredAmount,
             scope = this,
             feeConstructor = { amount ->
@@ -91,7 +93,7 @@ class NominationPoolsSetupBondMoreViewModel(
     private fun maybeGoToNext() = launch {
         showNextProgress.value = true
 
-        val fee = feeLoaderMixin.awaitFee()
+        val fee = originFeeMixin.awaitFee()
 
         val payload = NominationPoolsBondMoreValidationPayload(
             fee = fee,

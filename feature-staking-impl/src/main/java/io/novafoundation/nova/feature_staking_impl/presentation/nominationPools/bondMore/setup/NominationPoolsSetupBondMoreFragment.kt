@@ -53,7 +53,7 @@ class NominationPoolsSetupBondMoreFragment : BaseFragment<NominationPoolsSetupBo
     override fun subscribe(viewModel: NominationPoolsSetupBondMoreViewModel) {
         observeValidations(viewModel)
         setupAmountChooser(viewModel.amountChooserMixin, nominationPoolsBondMoreAmount)
-        setupFeeLoading(viewModel, nominationPoolsBondMoreFee)
+        setupFeeLoading(viewModel.originFeeMixin, nominationPoolsBondMoreFee)
         observeHints(viewModel.hintsMixin, nominationPoolsBondMoreHints)
 
         viewModel.buttonState.observe(nominationPoolsBondMoreContinue::setState)
