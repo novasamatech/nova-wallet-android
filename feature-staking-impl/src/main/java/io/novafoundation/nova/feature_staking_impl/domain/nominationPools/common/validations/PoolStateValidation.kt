@@ -32,8 +32,8 @@ fun <T, S> PoolStateValidationFactory.validateNotDestroying(
 ) {
     validatePoolState(
         poolId = poolId,
-        chainId  = chainId,
-        stateValid = { it != PoolState.Destroying  },
+        chainId = chainId,
+        stateValid = { it != PoolState.Destroying },
         error = error
     )
 }
@@ -44,7 +44,7 @@ class PoolStateValidation<T, S>(
     private val chainId: (T) -> ChainId,
     private val stateValid: (PoolState) -> Boolean,
     private val error: (T) -> S
-): Validation<T, S> {
+) : Validation<T, S> {
 
     override suspend fun validate(value: T): ValidationStatus<S> {
         val bondedPool = poolStateRepository.getParticipatingBondedPool(poolId(value), chainId(value))

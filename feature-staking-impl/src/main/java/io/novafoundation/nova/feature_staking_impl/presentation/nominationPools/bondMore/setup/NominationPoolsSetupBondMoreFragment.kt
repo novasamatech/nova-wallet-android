@@ -23,7 +23,7 @@ import kotlinx.android.synthetic.main.fragment_nomination_pools_bond_more.nomina
 import kotlinx.android.synthetic.main.fragment_nomination_pools_bond_more.nominationPoolsBondMoreToolbar
 
 class NominationPoolsSetupBondMoreFragment : BaseFragment<NominationPoolsSetupBondMoreViewModel>() {
-    
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

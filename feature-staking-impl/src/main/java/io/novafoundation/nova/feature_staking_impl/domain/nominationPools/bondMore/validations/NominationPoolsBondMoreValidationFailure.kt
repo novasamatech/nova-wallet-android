@@ -10,11 +10,11 @@ sealed class NominationPoolsBondMoreValidationFailure {
         override val chainAsset: Chain.Asset,
         override val availableToPayFees: BigDecimal,
         override val fee: BigDecimal
-    ): NominationPoolsBondMoreValidationFailure(), NotEnoughToPayFeesError
+    ) : NominationPoolsBondMoreValidationFailure(), NotEnoughToPayFeesError
 
-    object NotEnoughToBond: NominationPoolsBondMoreValidationFailure()
+    object NotEnoughToBond : NominationPoolsBondMoreValidationFailure()
 
-    object NotPositiveAmount: NominationPoolsBondMoreValidationFailure()
+    object NotPositiveAmount : NominationPoolsBondMoreValidationFailure()
 
-    object PoolIsDestroying: NominationPoolsBondMoreValidationFailure()
+    object PoolIsDestroying : NominationPoolsBondMoreValidationFailure()
 }

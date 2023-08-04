@@ -11,7 +11,6 @@ value class NominationPoolsCalls(val extrinsicBuilder: ExtrinsicBuilder)
 val ExtrinsicBuilder.nominationPools: NominationPoolsCalls
     get() = NominationPoolsCalls(this)
 
-
 fun NominationPoolsCalls.bondExtra(source: NominationPoolBondExtraSource) {
     extrinsicBuilder.call(
         Modules.NOMINATION_POOLS,

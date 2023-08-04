@@ -20,7 +20,6 @@ fun nominationPoolsBondMoreValidationFailure(
 
         NotEnoughToBond -> resourceManager.amountIsTooBig()
 
-
         NotPositiveAmount -> resourceManager.zeroAmount()
 
         PoolIsDestroying -> resourceManager.getString(R.string.nomination_pools_pool_destroying_error_title) to

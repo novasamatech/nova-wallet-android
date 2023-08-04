@@ -17,7 +17,7 @@ interface NominationPoolsBondMoreInteractor {
 class RealNominationPoolsBondMoreInteractor(
     private val extrinsicService: ExtrinsicService,
     private val stakingSharedState: StakingSharedState,
-): NominationPoolsBondMoreInteractor {
+) : NominationPoolsBondMoreInteractor {
 
     override suspend fun estimateFee(bondMoreAmount: Balance): Balance {
         return extrinsicService.estimateFee(stakingSharedState.chain()) {

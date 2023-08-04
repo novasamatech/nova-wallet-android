@@ -20,7 +20,7 @@ class RealNominationPoolHintsUseCase(
     private val poolMembersRepository: NominationPoolMembersRepository,
     private val accountRepository: AccountRepository,
     private val resourceManager: ResourceManager,
-): NominationPoolHintsUseCase {
+) : NominationPoolHintsUseCase {
 
     override suspend fun rewardsWillBeClaimedHint(): String? = runCatching {
         val account = accountRepository.getSelectedMetaAccount()
