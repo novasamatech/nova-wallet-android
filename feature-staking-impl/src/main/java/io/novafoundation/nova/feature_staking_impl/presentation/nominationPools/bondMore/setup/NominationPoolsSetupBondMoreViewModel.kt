@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMo
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.validations.nominationPoolsBondMoreValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.NominationPoolsConfirmBondMorePayload
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.hints.NominationPoolsBondMoreHintsFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -115,6 +116,11 @@ class NominationPoolsSetupBondMoreViewModel(
     }
 
     private fun openConfirm(validationPayload: NominationPoolsBondMoreValidationPayload) {
-        showMessage("Ready to open confirm")
+        val confirmPayload = NominationPoolsConfirmBondMorePayload(
+            amount = validationPayload.amount,
+            fee = validationPayload.fee
+        )
+
+        router.openConfirmBondMore(confirmPayload)
     }
 }
