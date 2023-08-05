@@ -109,6 +109,10 @@ class SettingsViewModel(
         router.openWallets()
     }
 
+    fun nftsClicked() {
+        router.openNftList()
+    }
+
     fun currenciesClicked() {
         router.openCurrencies()
     }

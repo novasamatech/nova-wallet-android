@@ -746,6 +746,7 @@
     <string name="settings_community">Сообщество</string>
     <string name="settings_email">Написать разработчикам</string>
     <string name="settings_general">Основные</string>
+    <string name="settings_more">Больше</string>
     <string name="settings_pin_code_verification_confirmation_message">Каждая операция подписи на кошельках с парой ключей (созданной в кошельке nova или импортированной) должна требовать проверки PIN-кода перед созданием подписи</string>
     <string name="settings_pin_code_verification_confirmation_title">Запрашивать аутентификацию для подписи операций</string>
     <string name="settings_preferences">Предпочтения</string>

@@ -23,9 +23,6 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftContent
 import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftIssuance
 import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftMedia
-import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftPriceFiat
-import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftPricePlaceholder
-import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftPriceToken
 import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftShimmer
 import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftTitle
 
@@ -116,21 +113,6 @@ class NftHolder(
 
                 itemNftIssuance.text = content.data.issuance
                 itemNftTitle.text = content.data.title
-
-                val price = content.data.price
-
-                if (price != null) {
-                    itemNftPriceFiat.makeVisible()
-                    itemNftPriceToken.makeVisible()
-                    itemNftPricePlaceholder.makeGone()
-
-                    itemNftPriceToken.text = price.token
-                    itemNftPriceFiat.text = price.fiat
-                } else {
-                    itemNftPriceFiat.makeGone()
-                    itemNftPriceToken.makeGone()
-                    itemNftPricePlaceholder.makeVisible()
-                }
             }
         }
 
