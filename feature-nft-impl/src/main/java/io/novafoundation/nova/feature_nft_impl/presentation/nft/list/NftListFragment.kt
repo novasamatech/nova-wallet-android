@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.GridLayoutManager
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -12,8 +13,6 @@ import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.R
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureComponent
-import kotlinx.android.synthetic.main.fragment_nft_list.nftActionsReceive
-import kotlinx.android.synthetic.main.fragment_nft_list.nftActionsSend
 import kotlinx.android.synthetic.main.fragment_nft_list.nftListBack
 import kotlinx.android.synthetic.main.fragment_nft_list.nftListCounter
 import kotlinx.android.synthetic.main.fragment_nft_list.nftListNfts
@@ -39,10 +38,14 @@ class NftListFragment : BaseFragment<NftListViewModel>(), NftGridAdapter.Handler
     override fun initViews() {
         nftListToolbar.applyStatusBarInsets()
         nftListBack.setOnClickListener { viewModel.backClicked() }
-        nftActionsSend.setOnClickListener { viewModel.onNftSendClick() }
-        nftActionsReceive.setOnClickListener { viewModel.onNftReceiveClick() }
 
+        val layoutManager = nftListNfts.layoutManager as GridLayoutManager
         nftListNfts.setHasFixedSize(true)
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return if (position == 0) 2 else 1
+            }
+        }
         nftListNfts.adapter = adapter
         nftListNfts.itemAnimator = null
 
@@ -74,5 +77,13 @@ class NftListFragment : BaseFragment<NftListViewModel>(), NftGridAdapter.Handler
 
     override fun loadableItemShown(item: NftListItem) {
         viewModel.loadableNftShown(item)
+    }
+
+    override fun sendClicked() {
+        viewModel.onNftSendClick()
+    }
+
+    override fun receiveClicked() {
+        viewModel.onNftReceiveClick()
     }
 }
