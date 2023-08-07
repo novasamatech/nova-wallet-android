@@ -20,6 +20,19 @@ val PoolBalanceConvertable.balanceToPointsRatio: BigDecimal
         return poolBalance.divideToDecimal(poolPoints.value)
     }
 
+val PoolBalanceConvertable.pointsToBalanceRatio: BigDecimal
+    get() {
+        if (poolBalance.isZero) return BigDecimal.ZERO
+
+        return poolPoints.value.divideToDecimal(poolBalance)
+    }
+
 fun PoolBalanceConvertable.amountOf(memberPoints: PoolPoints): Balance {
     return (balanceToPointsRatio * memberPoints.value.toBigDecimal()).toBigInteger()
+}
+
+fun PoolBalanceConvertable.pointsOf(amount: Balance): PoolPoints {
+    val pointsRaw = (pointsToBalanceRatio * amount.toBigDecimal()).toBigInteger()
+
+    return PoolPoints(pointsRaw)
 }

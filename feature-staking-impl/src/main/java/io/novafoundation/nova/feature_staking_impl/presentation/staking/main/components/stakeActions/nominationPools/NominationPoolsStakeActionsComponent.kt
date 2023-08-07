@@ -74,7 +74,7 @@ private open class NominationPoolsStakeActionsComponent(
     private fun navigateToAction(action: ManageStakeAction) {
         when (action.id) {
             SYSTEM_MANAGE_STAKING_BOND_MORE -> router.openSetupBondMore()
-            SYSTEM_MANAGE_STAKING_UNBOND -> {} // TODO unbond flow
+            SYSTEM_MANAGE_STAKING_UNBOND -> router.openSetupUnbond()
         }
     }
 

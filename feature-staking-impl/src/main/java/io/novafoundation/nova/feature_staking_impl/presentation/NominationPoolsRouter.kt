@@ -8,5 +8,8 @@ interface NominationPoolsRouter : ReturnableRouter {
     fun openSetupBondMore()
 
     fun openConfirmBondMore(payload: NominationPoolsConfirmBondMorePayload)
+
+    fun openSetupUnbond()
+
     fun returnToStakingMain()
 }

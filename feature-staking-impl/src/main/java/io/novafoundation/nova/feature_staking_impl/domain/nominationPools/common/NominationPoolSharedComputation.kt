@@ -8,11 +8,16 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.UnbondingPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolUnbondRepository
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.BondedPoolState
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlin.coroutines.coroutineContext
 
 class NominationPoolSharedComputation(
     private val computationalCache: ComputationalCache,
@@ -45,7 +50,7 @@ class NominationPoolSharedComputation(
         }
     }
 
-    fun participatingPoolNominations(
+    fun participatingPoolNominationsFlow(
         poolStash: AccountId,
         poolId: PoolId,
         chainId: ChainId,
@@ -57,4 +62,34 @@ class NominationPoolSharedComputation(
             nominationPoolStateRepository.observeParticipatingPoolNominations(poolStash, chainId)
         }
     }
+
+    fun participatingBondedBalanceFlow(
+        poolStash: AccountId,
+        poolId: PoolId,
+        chainId: ChainId,
+        scope: CoroutineScope
+    ): Flow<Balance> {
+        val key = "POOL_BONDED_BALANCE:$chainId:${poolId.value}"
+
+        return computationalCache.useSharedFlow(key, scope) {
+            nominationPoolStateRepository.observeParticipatingBondedBalance(poolStash, chainId)
+        }
+    }
 }
+
+fun NominationPoolSharedComputation.participatingBondedPoolStateFlow(
+    poolStash: AccountId,
+    poolId: PoolId,
+    chainId: ChainId,
+    scope: CoroutineScope
+): Flow<BondedPoolState> = combine(
+    participatingBondedPoolFlow(poolId, chainId, scope),
+    participatingBondedBalanceFlow(poolStash, poolId, chainId, scope),
+    ::BondedPoolState
+)
+
+suspend fun NominationPoolSharedComputation.getParticipatingBondedPoolState(
+    poolStash: AccountId,
+    poolId: PoolId,
+    chainId: ChainId
+): BondedPoolState = participatingBondedPoolStateFlow(poolStash, poolId, chainId, CoroutineScope(coroutineContext)).first()

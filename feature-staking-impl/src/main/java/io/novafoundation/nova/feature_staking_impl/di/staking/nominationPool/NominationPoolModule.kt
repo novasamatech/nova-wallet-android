@@ -7,6 +7,8 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.datasource.KnownMaxUnlockingOverwrites
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.datasource.RealKnownMaxUnlockingOverwrites
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolImageDataSource
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PredefinedPoolImageDataSource
@@ -19,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.reposito
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolMembersRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.RealNominationPoolUnbondRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
@@ -73,10 +76,16 @@ class NominationPoolModule {
 
     @Provides
     @FeatureScope
+    fun provideKnownMaxUnlockingOverwrites(): KnownMaxUnlockingOverwrites = RealKnownMaxUnlockingOverwrites()
+
+    @Provides
+    @FeatureScope
     fun provideNominationPoolGlobalsRepository(
-        @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource
+        @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
+        knownMaxUnlockingOverwrites: KnownMaxUnlockingOverwrites,
+        stakingRepository: StakingConstantsRepository,
     ): NominationPoolGlobalsRepository {
-        return RealNominationPoolGlobalsRepository(localStorageSource)
+        return RealNominationPoolGlobalsRepository(localStorageSource, knownMaxUnlockingOverwrites, stakingRepository)
     }
 
     @Provides
@@ -137,12 +146,10 @@ class NominationPoolModule {
     @Provides
     @FeatureScope
     fun provideStakeSummaryInteractor(
-        nominationPoolStateRepository: NominationPoolStateRepository,
         stakingSharedComputation: StakingSharedComputation,
         poolAccountDerivation: PoolAccountDerivation,
         nominationPoolSharedComputation: NominationPoolSharedComputation,
     ): NominationPoolStakeSummaryInteractor = RealNominationPoolStakeSummaryInteractor(
-        nominationPoolStateRepository = nominationPoolStateRepository,
         stakingSharedComputation = stakingSharedComputation,
         poolAccountDerivation = poolAccountDerivation,
         nominationPoolSharedComputation = nominationPoolSharedComputation

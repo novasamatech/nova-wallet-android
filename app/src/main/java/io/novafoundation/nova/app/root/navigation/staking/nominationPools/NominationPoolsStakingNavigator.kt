@@ -11,12 +11,14 @@ class NominationPoolsStakingNavigator(
     navigationHolder: NavigationHolder,
 ) : BaseNavigator(navigationHolder), NominationPoolsRouter {
 
-    override fun openSetupBondMore() = performNavigation(R.id.action_stakingFragment_to_bondMoreGraph)
+    override fun openSetupBondMore() = performNavigation(R.id.action_stakingFragment_to_PoolsBondMoreGraph)
 
     override fun openConfirmBondMore(payload: NominationPoolsConfirmBondMorePayload) = performNavigation(
         actionId = R.id.action_nominationPoolsSetupBondMoreFragment_to_nominationPoolsConfirmBondMoreFragment,
         args = NominationPoolsConfirmBondMoreFragment.getBundle(payload)
     )
+
+    override fun openSetupUnbond() = performNavigation(R.id.action_stakingFragment_to_PoolsUnbondGraph)
 
     override fun returnToStakingMain() = performNavigation(R.id.back_to_staking_main)
 }

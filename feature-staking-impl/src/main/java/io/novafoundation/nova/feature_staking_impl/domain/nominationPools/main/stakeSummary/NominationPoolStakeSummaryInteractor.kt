@@ -9,13 +9,12 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.bondedAccountOf
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakeSummary
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.participatingBondedPoolStateFlow
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.poolState.isPoolStaking
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.BondedPoolState
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.amountOf
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
@@ -37,7 +36,6 @@ interface NominationPoolStakeSummaryInteractor {
 }
 
 class RealNominationPoolStakeSummaryInteractor(
-    private val nominationPoolStateRepository: NominationPoolStateRepository,
     private val stakingSharedComputation: StakingSharedComputation,
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val poolAccountDerivation: PoolAccountDerivation,
@@ -52,12 +50,10 @@ class RealNominationPoolStakeSummaryInteractor(
         val poolStash = poolAccountDerivation.bondedAccountOf(poolMember.poolId, chainId)
 
         combineTransform(
-            nominationPoolSharedComputation.participatingBondedPoolFlow(poolMember.poolId, chainId, sharedComputationScope),
-            nominationPoolSharedComputation.participatingPoolNominations(poolStash, poolMember.poolId, chainId, sharedComputationScope),
-            nominationPoolStateRepository.observeParticipatingBondedBalance(poolStash, chainId),
+            nominationPoolSharedComputation.participatingBondedPoolStateFlow(poolStash, poolMember.poolId, chainId, sharedComputationScope),
+            nominationPoolSharedComputation.participatingPoolNominationsFlow(poolStash, poolMember.poolId, chainId, sharedComputationScope),
             stakingSharedComputation.electedExposuresWithActiveEraFlow(chainId, sharedComputationScope)
-        ) { bondedPool, poolNominations, bondedPoolBalance, (eraStakers, activeEra) ->
-            val bondedPoolState = BondedPoolState(bondedPool, bondedPoolBalance)
+        ) { bondedPoolState, poolNominations, (eraStakers, activeEra) ->
             val totalStaked = bondedPoolState.amountOf(poolMember.points)
 
             val stakeSummaryFlow = flow { determineStakeStatus(stakingOption, eraStakers, activeEra, poolNominations, poolStash, sharedComputationScope) }
