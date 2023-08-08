@@ -57,7 +57,7 @@ class NominationPoolsSetupUnbondFragment : BaseFragment<NominationPoolsSetupUnbo
         setupAmountChooser(viewModel.amountChooserMixin, nominationPoolsUnbondAmount)
         setupFeeLoading(viewModel.originFeeMixin, nominationPoolsUnbondFee)
         observeHints(viewModel.hintsMixin, nominationPoolsUnbondHints)
-        
+
         viewModel.transferableBalance.observe(nominationPoolsUnbondTransferable::showAmount)
 
         viewModel.buttonState.observe(nominationPoolsUnbondContinue::setState)

@@ -39,7 +39,6 @@ class RealNominationPoolsUnbondInteractor(
     private val poolAccountDerivation: PoolAccountDerivation,
 ) : NominationPoolsUnbondInteractor {
 
-
     override fun bondedPoolStateFlow(poolId: PoolId, computationScope: CoroutineScope): Flow<BondedPoolState> {
         return flowOfAll {
             val chainId = stakingSharedState.chainId()

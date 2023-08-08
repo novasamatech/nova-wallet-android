@@ -19,7 +19,8 @@ sealed class NominationPoolsUnbondValidationFailure {
 
     object NotPositiveAmount : NominationPoolsUnbondValidationFailure()
 
-    class PartialUnbondLeavesLessThanMinBond(override val errorContext: CrossMinimumBalanceValidation.ErrorContext) : NominationPoolsUnbondValidationFailure(),
+    class PartialUnbondLeavesLessThanMinBond(override val errorContext: CrossMinimumBalanceValidation.ErrorContext) :
+        NominationPoolsUnbondValidationFailure(),
         CrossMinimumBalanceValidationFailure
 
     class PoolUnlockChunksLimitReached(val timeTillNextAvailableSlot: Duration) : NominationPoolsUnbondValidationFailure()

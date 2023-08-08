@@ -62,7 +62,6 @@ class NominationPoolsSetupUnbondViewModel(
     }
         .shareInBackground()
 
-
     private val stakedBalance = combine(bondedPoolStateFlow, poolMemberFlow) { bondedPool, poolMember ->
         bondedPool.amountOf(poolMember.points)
     }.shareInBackground()

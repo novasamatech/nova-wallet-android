@@ -16,15 +16,13 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationFailure.PoolUnlockChunksLimitReached
 import io.novafoundation.nova.runtime.state.selectedOption
 
-
-
 class PoolUnlockChunksLimitValidation(
     private val stakingConstantsRepository: StakingConstantsRepository,
     private val stakingRepository: StakingRepository,
     private val stakingSharedComputation: StakingSharedComputation,
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val stakingSharedState: StakingSharedState,
-): NominationPoolsUnbondValidation {
+) : NominationPoolsUnbondValidation {
 
     override suspend fun validate(value: NominationPoolsUnbondValidationPayload): ValidationStatus<NominationPoolsUnbondValidationFailure> {
         val stakingOption = stakingSharedState.selectedOption()
@@ -66,7 +64,7 @@ class PoolMemberUnlockChunksLimitValidation(
     private val stakingRepository: StakingRepository,
     private val nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
     private val stakingSharedState: StakingSharedState,
-): NominationPoolsUnbondValidation {
+) : NominationPoolsUnbondValidation {
 
     override suspend fun validate(value: NominationPoolsUnbondValidationPayload): ValidationStatus<NominationPoolsUnbondValidationFailure> {
         val stakingOption = stakingSharedState.selectedOption()

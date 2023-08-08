@@ -11,7 +11,8 @@ sealed class UnbondValidationFailure {
 
     object ZeroUnbond : UnbondValidationFailure()
 
-    class BondedWillCrossExistential(override val errorContext: CrossMinimumBalanceValidation.ErrorContext) : UnbondValidationFailure(),
+    class BondedWillCrossExistential(override val errorContext: CrossMinimumBalanceValidation.ErrorContext) :
+        UnbondValidationFailure(),
         CrossMinimumBalanceValidationFailure
 
     class UnbondLimitReached(val limit: Int) : UnbondValidationFailure()

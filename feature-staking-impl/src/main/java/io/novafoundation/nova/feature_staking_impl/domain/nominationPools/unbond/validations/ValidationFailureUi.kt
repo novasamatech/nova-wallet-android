@@ -18,12 +18,12 @@ fun nominationPoolsUnbondValidationFailure(
     failure: NominationPoolsUnbondValidationFailure,
     resourceManager: ResourceManager
 ): TitleAndMessage {
-    return when(failure){
+    return when (failure) {
         is NotEnoughBalanceToPayFees -> handleNotEnoughFeeError(failure, resourceManager)
 
-        NotEnoughToUnbond ->  resourceManager.amountIsTooBig()
+        NotEnoughToUnbond -> resourceManager.amountIsTooBig()
 
-        NotPositiveAmount ->  resourceManager.zeroAmount()
+        NotPositiveAmount -> resourceManager.zeroAmount()
 
         is PartialUnbondLeavesLessThanMinBond -> failure.formatWith(resourceManager)
 
@@ -38,7 +38,6 @@ fun nominationPoolsUnbondValidationFailure(
         }
     }
 }
-
 
 fun nominationPoolsUnbondValidationPayloadAutoFix(
     payload: NominationPoolsUnbondValidationPayload,
