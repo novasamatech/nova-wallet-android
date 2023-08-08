@@ -1,18 +1,24 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.setup
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.validations.NominationPoolsBondMoreValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.amountOf
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.NominationPoolsUnbondInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.nominationPoolsUnbondValidationFailure
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.nominationPoolsUnbondValidationPayloadAutoFix
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.hints.NominationPoolsUnbondHintsFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
@@ -21,6 +27,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToA
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -30,7 +37,7 @@ class NominationPoolsSetupUnbondViewModel(
     private val interactor: NominationPoolsUnbondInteractor,
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
-    private val validationSystem: NominationPoolsBondMoreValidationSystem,
+    private val validationSystem: NominationPoolsUnbondValidationSystem,
     private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     private val poolMemberUseCase: NominationPoolMemberUseCase,
     assetUseCase: AssetUseCase,
@@ -107,33 +114,32 @@ class NominationPoolsSetupUnbondViewModel(
     private fun maybeGoToNext() = launch {
         showNextProgress.value = true
 
-        val fee = originFeeMixin.awaitFee()
+        val asset = assetFlow.first()
+        val stakedBalance = asset.token.amountFromPlanks(stakedBalance.first())
 
-//        val payload = NominationPoolsBondMoreValidationPayload(
-//            fee = fee,
-//            amount = amountChooserMixin.amount.first(),
-//            poolMember = poolMemberFlow.first(),
-//            asset = assetFlow.first()
-//        )
-//
-//        validationExecutor.requireValid(
-//            validationSystem = validationSystem,
-//            payload = payload,
-//            validationFailureTransformer = { nominationPoolsBondMoreValidationFailure(it, resourceManager) },
-//            progressConsumer = showNextProgress.progressConsumer()
-//        ) {
-//            showNextProgress.value = false
-//
-//            openConfirm(payload)
-//        }
-//    }
+        val payload = NominationPoolsUnbondValidationPayload(
+            fee = originFeeMixin.awaitFee(),
+            poolMember = poolMemberFlow.first(),
+            stakedBalance = stakedBalance,
+            asset = asset,
+            sharedComputationScope = viewModelScope,
+            amount = amountChooserMixin.amount.first()
+        )
 
-//    private fun openConfirm(validationPayload: NominationPoolsBondMoreValidationPayload) {
-//        val confirmPayload = NominationPoolsConfirmBondMorePayload(
-//            amount = validationPayload.amount,
-//            fee = validationPayload.fee
-//        )
-//
-//        router.openConfirmBondMore(confirmPayload)
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { nominationPoolsUnbondValidationFailure(it, resourceManager) },
+            autoFixPayload = ::nominationPoolsUnbondValidationPayloadAutoFix,
+            progressConsumer = showNextProgress.progressConsumer()
+        ) { updatedPayload ->
+            showNextProgress.value = false
+
+            openConfirm(updatedPayload)
+        }
+    }
+
+    private fun openConfirm(validationPayload: NominationPoolsUnbondValidationPayload) {
+        showMessage("Ready to unbond ${mapAmountToAmountModel(validationPayload.amount, validationPayload.asset).token}")
     }
 }

@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
-import io.novafoundation.nova.feature_staking_api.domain.model.activeBalance
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.ledger
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.nominators
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.staking
@@ -15,7 +14,6 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMetadata
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolImageDataSource
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
@@ -25,7 +23,6 @@ import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 interface NominationPoolStateRepository {
 
@@ -35,7 +32,7 @@ interface NominationPoolStateRepository {
     context(StorageQueryContext)
     fun observePoolNominations(poolAccount: AccountId): Flow<WithRawValue<Nominations?>>
 
-    fun observeParticipatingBondedBalance(poolAccount: AccountId, chainId: ChainId): Flow<Balance>
+    fun observeParticipatingPoolLedger(poolAccount: AccountId, chainId: ChainId): Flow<StakingLedger?>
 
     fun observeParticipatingPoolNominations(poolAccount: AccountId, chainId: ChainId): Flow<Nominations?>
 
@@ -66,9 +63,9 @@ class RealNominationPoolStateRepository(
         return metadata.staking.nominators.observeWithRaw(poolAccount)
     }
 
-    override fun observeParticipatingBondedBalance(poolAccount: AccountId, chainId: ChainId): Flow<Balance> {
+    override fun observeParticipatingPoolLedger(poolAccount: AccountId, chainId: ChainId): Flow<StakingLedger?> {
         return localStorage.subscribe(chainId) {
-            metadata.staking.ledger.observe(poolAccount).map { it.activeBalance() }
+            metadata.staking.ledger.observe(poolAccount)
         }
     }
 

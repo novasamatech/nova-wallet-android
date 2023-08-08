@@ -178,12 +178,14 @@ class NominationPoolModule {
         nominationPoolMemberUseCase: NominationPoolMemberUseCase,
         nominationPoolStateRepository: NominationPoolStateRepository,
         nominationPoolUnbondRepository: NominationPoolUnbondRepository,
+        poolAccountDerivation: PoolAccountDerivation,
     ): NominationPoolSharedComputation {
         return NominationPoolSharedComputation(
             computationalCache = computationalCache,
             nominationPoolMemberUseCase = nominationPoolMemberUseCase,
             nominationPoolStateRepository = nominationPoolStateRepository,
-            nominationPoolUnbondRepository = nominationPoolUnbondRepository
+            nominationPoolUnbondRepository = nominationPoolUnbondRepository,
+            poolAccountDerivation = poolAccountDerivation
         )
     }
 

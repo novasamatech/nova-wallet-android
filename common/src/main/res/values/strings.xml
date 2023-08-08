@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="nomination_pools_pool_reached_unbondings_limit_title">Too many people are unstaking from your pool</string>
+    <string name="nomination_pools_pool_reached_unbondings_limit_message">There are currently no free spots in unstaking queue for your pool. Please try again in %s</string>
+
+    <!--    <string name="staking_unbond_crossed_existential">After operation the resulting bonded balance will be less than minimal balance. It will cause the whole bonded balance to be unbonded.</string>-->
+    <string name="staking_unbond_crossed_existential">When unstaking partially, you should leave at least %s in stake. Do you want to perform full unstake by unstaking remaining %s as well?</string>
+    <string name="staking_unbond_crossed_existential_title">Too small amount remains in stake</string>
+
     <string name="nomination_pools_pool_destroying_error_message">Cannot perform specified operation since pool is in destroying state. It will be closed soon.</string>
     <string name="nomination_pools_pool_destroying_error_title">Pool is destroying</string>
 
@@ -1408,7 +1415,6 @@
     <string name="staking_title">Staking</string>
     <string name="staking_total_rewards_v1.9.0">Rewarded</string>
     <string name="staking_total_staked">Total staked</string>
-    <string name="staking_unbond_crossed_existential">After operation the resulting bonded balance will be less than minimal balance. It will cause the whole bonded balance to be unbonded.</string>
     <string name="staking_unbond_v1_9_0">Unstake</string>
     <string name="staking_unbonding_empty_list_v1_9_0">Unstaking transactions will appear here</string>
     <string name="staking_unbonding_empty_list_v2_2_0">Unstaking transactions will be displayed here</string>

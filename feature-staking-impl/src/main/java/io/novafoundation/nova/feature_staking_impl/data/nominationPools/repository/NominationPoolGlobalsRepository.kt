@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository
 
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.datasource.KnownMaxUnlockingOverwrites
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.lastPoolId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.minJoinBond
@@ -25,6 +26,8 @@ interface NominationPoolGlobalsRepository {
     suspend fun maxUnlockChunks(chainId: ChainId): BigInteger
 
     fun observeMinJoinBond(chainId: ChainId): Flow<Balance>
+
+    suspend fun minJoinBond(chainId: ChainId): Balance
 }
 
 class RealNominationPoolGlobalsRepository(
@@ -60,6 +63,14 @@ class RealNominationPoolGlobalsRepository(
             metadata.nominationPools.minJoinBond
                 .observe()
                 .filterNotNull()
+        }
+    }
+
+    override suspend fun minJoinBond(chainId: ChainId): Balance {
+        return localStorageDataSource.query(chainId) {
+            metadata.nominationPools.minJoinBond
+                .query()
+                .orZero()
         }
     }
 }
