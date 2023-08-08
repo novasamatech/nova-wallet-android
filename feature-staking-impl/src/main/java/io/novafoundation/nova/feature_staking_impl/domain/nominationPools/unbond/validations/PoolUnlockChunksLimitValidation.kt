@@ -77,10 +77,10 @@ class PoolMemberUnlockChunksLimitValidation(
 
         val maxUnlockingChunks = nominationPoolGlobalsRepository.maxUnlockChunks(chainId).toInt()
 
-        val poolUnlockChunks = value.poolMember.unbondingEras.keys
+        val poolMemberUnlockChunks = value.poolMember.unbondingEras.keys
 
-        val unlockListHasFreePlaces = poolUnlockChunks.size < maxUnlockingChunks
-        val targetUnbondEraPresentInUnlockingList = unbondEra in poolUnlockChunks
+        val unlockListHasFreePlaces = poolMemberUnlockChunks.size < maxUnlockingChunks
+        val targetUnbondEraPresentInUnlockingList = unbondEra in poolMemberUnlockChunks
 
         val canAddNewUnlockChunk = unlockListHasFreePlaces || targetUnbondEraPresentInUnlockingList
 
