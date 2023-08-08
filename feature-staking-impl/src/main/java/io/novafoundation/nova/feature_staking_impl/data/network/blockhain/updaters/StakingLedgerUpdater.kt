@@ -157,8 +157,8 @@ class StakingLedgerUpdater(
     ) {
         assetCache.updateAsset(accountId, chainAsset) { cached ->
 
-            val redeemable = stakingLedger.sumStaking { it.isRedeemableIn(era) }
-            val unbonding = stakingLedger.sumStaking { it.isUnbondingIn(era) }
+            val redeemable = stakingLedger.unlocking.sumStaking { it.isRedeemableIn(era) }
+            val unbonding = stakingLedger.unlocking.sumStaking { it.isUnbondingIn(era) }
 
             cached.copy(
                 redeemableInPlanks = redeemable,

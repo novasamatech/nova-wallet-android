@@ -6,12 +6,14 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.alerts.NominationPoolsAlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.networkInfo.NominationPoolsNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.stakeSummary.NominationPoolStakeSummaryInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.unbondings.NominationPoolUnbondingsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.userRewards.NominationPoolsUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.NominationPoolYourPoolInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.nominationPools.NominationPoolsAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.nominationPools.NominationPoolsNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.nominationPools.NominationPoolsStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.nominationPools.NominationPoolsStakeSummaryComponentFactory
@@ -87,6 +89,18 @@ class NominationPoolsModule {
         sharedComputation: NominationPoolSharedComputation,
     ) = NominationPoolsStakeActionsComponentFactory(
         nominationPoolSharedComputation = sharedComputation,
+        resourceManager = resourceManager
+    )
+
+    @Provides
+    @ScreenScope
+    fun provideAlertsComponentFactory(
+        nominationPoolSharedComputation: NominationPoolSharedComputation,
+        interactor: NominationPoolsAlertsInteractor,
+        resourceManager: ResourceManager,
+    ) = NominationPoolsAlertsComponentFactory(
+        nominationPoolSharedComputation = nominationPoolSharedComputation,
+        interactor = interactor,
         resourceManager = resourceManager
     )
 }

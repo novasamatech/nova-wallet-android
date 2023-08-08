@@ -25,6 +25,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.RealNominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.alerts.NominationPoolsAlertsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.alerts.RealNominationPoolsAlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.networkInfo.NominationPoolsNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.networkInfo.RealNominationPoolsNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.stakeSummary.NominationPoolStakeSummaryInteractor
@@ -122,10 +124,10 @@ class NominationPoolModule {
     @Provides
     @FeatureScope
     fun provideUnbondingsInteractor(
-        nominationPoolUnbondRepository: NominationPoolUnbondRepository,
+        nominationPoolSharedComputation: NominationPoolSharedComputation,
         stakingSharedComputation: StakingSharedComputation,
     ): NominationPoolUnbondingsInteractor = RealNominationPoolUnbondingsInteractor(
-        nominationPoolUnbondRepository = nominationPoolUnbondRepository,
+        nominationPoolSharedComputation = nominationPoolSharedComputation,
         stakingSharedComputation = stakingSharedComputation,
     )
 
@@ -134,11 +136,13 @@ class NominationPoolModule {
     fun provideStakeSummaryInteractor(
         nominationPoolStateRepository: NominationPoolStateRepository,
         stakingSharedComputation: StakingSharedComputation,
-        noPoolAccountDerivation: PoolAccountDerivation,
+        poolAccountDerivation: PoolAccountDerivation,
+        nominationPoolSharedComputation: NominationPoolSharedComputation,
     ): NominationPoolStakeSummaryInteractor = RealNominationPoolStakeSummaryInteractor(
         nominationPoolStateRepository = nominationPoolStateRepository,
         stakingSharedComputation = stakingSharedComputation,
-        noPoolAccountDerivation = noPoolAccountDerivation,
+        poolAccountDerivation = poolAccountDerivation,
+        nominationPoolSharedComputation = nominationPoolSharedComputation
     )
 
     @Provides
@@ -162,8 +166,15 @@ class NominationPoolModule {
     fun provideNominationPoolSharedComputation(
         computationalCache: ComputationalCache,
         nominationPoolMemberUseCase: NominationPoolMemberUseCase,
+        nominationPoolStateRepository: NominationPoolStateRepository,
+        nominationPoolUnbondRepository: NominationPoolUnbondRepository,
     ): NominationPoolSharedComputation {
-        return NominationPoolSharedComputation(computationalCache, nominationPoolMemberUseCase)
+        return NominationPoolSharedComputation(
+            computationalCache = computationalCache,
+            nominationPoolMemberUseCase = nominationPoolMemberUseCase,
+            nominationPoolStateRepository = nominationPoolStateRepository,
+            nominationPoolUnbondRepository = nominationPoolUnbondRepository
+        )
     }
 
     @Provides
@@ -179,4 +190,16 @@ class NominationPoolModule {
         poolAccountDerivation: PoolAccountDerivation,
         poolStateRepository: NominationPoolStateRepository,
     ): NominationPoolYourPoolInteractor = RealNominationPoolYourPoolInteractor(poolAccountDerivation, poolStateRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideAlertsInteractor(
+        nominationPoolsSharedComputation: NominationPoolSharedComputation,
+        stakingSharedComputation: StakingSharedComputation,
+        poolAccountDerivation: PoolAccountDerivation,
+    ): NominationPoolsAlertsInteractor = RealNominationPoolsAlertsInteractor(
+        nominationPoolsSharedComputation = nominationPoolsSharedComputation,
+        stakingSharedComputation = stakingSharedComputation,
+        poolAccountDerivation = poolAccountDerivation
+    )
 }
