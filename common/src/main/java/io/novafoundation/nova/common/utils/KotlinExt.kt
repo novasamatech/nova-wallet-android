@@ -67,6 +67,9 @@ val BigDecimal.isPositive: Boolean
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 
+val BigInteger.isNonPositive: Boolean
+    get() = signum() <= 0
+
 val BigInteger.isZero: Boolean
     get() = signum() == 0
 

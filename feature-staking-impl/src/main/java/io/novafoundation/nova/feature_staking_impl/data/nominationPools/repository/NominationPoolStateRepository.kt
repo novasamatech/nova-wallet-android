@@ -21,6 +21,7 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.WithRawValue
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
+import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
@@ -39,6 +40,8 @@ interface NominationPoolStateRepository {
     fun observeParticipatingPoolNominations(poolAccount: AccountId, chainId: ChainId): Flow<Nominations?>
 
     fun observeParticipatingBondedPool(poolId: PoolId, chainId: ChainId): Flow<BondedPool>
+
+    suspend fun getParticipatingBondedPool(poolId: PoolId, chainId: ChainId): BondedPool
 
     fun observePoolMetadata(poolId: PoolId, chainId: ChainId): Flow<PoolMetadata?>
 
@@ -78,6 +81,12 @@ class RealNominationPoolStateRepository(
     override fun observeParticipatingBondedPool(poolId: PoolId, chainId: ChainId): Flow<BondedPool> {
         return localStorage.subscribe(chainId) {
             metadata.nominationPools.bondedPools.observeNonNull(poolId.value)
+        }
+    }
+
+    override suspend fun getParticipatingBondedPool(poolId: PoolId, chainId: ChainId): BondedPool {
+        return localStorage.query(chainId) {
+            metadata.nominationPools.bondedPools.queryNonNull(poolId.value)
         }
     }
 

@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_BOND_MORE
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_UNBOND
+import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.nominationPools.loadPoolMemberState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.ManageStakeAction
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class NominationPoolsStakeActionsComponentFactory(
+    private val router: NominationPoolsRouter,
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val resourceManager: ResourceManager,
 ) {
@@ -37,12 +39,14 @@ class NominationPoolsStakeActionsComponentFactory(
         stakingOption = stakingOption,
         hostContext = hostContext,
         nominationPoolSharedComputation = nominationPoolSharedComputation,
+        router = router
     )
 }
 
 private open class NominationPoolsStakeActionsComponent(
     nominationPoolSharedComputation: NominationPoolSharedComputation,
     stakingOption: StakingOption,
+    private val router: NominationPoolsRouter,
     private val hostContext: ComponentHostContext,
     private val resourceManager: ResourceManager,
 ) : StakeActionsComponent,
@@ -69,7 +73,7 @@ private open class NominationPoolsStakeActionsComponent(
 
     private fun navigateToAction(action: ManageStakeAction) {
         when (action.id) {
-            SYSTEM_MANAGE_STAKING_BOND_MORE -> {} // TODO bond more flow
+            SYSTEM_MANAGE_STAKING_BOND_MORE -> router.openSetupBondMore()
             SYSTEM_MANAGE_STAKING_UNBOND -> {} // TODO unbond flow
         }
     }

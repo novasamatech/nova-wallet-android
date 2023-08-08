@@ -138,6 +138,13 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
+        <action
+            android:id="@+id/action_stakingFragment_to_bondMoreGraph"
+            app:destination="@id/nomination_pools_bond_more_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -486,4 +493,6 @@
         android:id="@+id/rebagFragment"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.RebagFragment"
         android:label="RebagFragment" />
+
+    <include app:graph="@navigation/nomination_pools_bond_more_graph" />
 </navigation>

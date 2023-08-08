@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool.Nom
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.ParachainStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.unbond.StakingUnbondModule
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.di.RebagComponent
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.confirm.di.Confi
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.di.ConfirmNominationsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.di.StakingDashboardComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.setup.di.NominationPoolsSetupBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.di.CurrentCollatorsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.search.di.SearchCollatorComponent
@@ -176,6 +178,10 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun confirmYieldBoostComponentFactory(): YieldBoostConfirmComponent.Factory
 
+    // nomination pools
+
+    fun nominationPoolsStakingSetupBondMore(): NominationPoolsSetupBondMoreComponent.Factory
+
     @Component.Factory
     interface Factory {
 
@@ -185,6 +191,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
             @BindsInstance parachainStaking: ParachainStakingRouter,
             @BindsInstance selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
             @BindsInstance selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
+
+            @BindsInstance nominationPoolsRouter: NominationPoolsRouter,
 
             deps: StakingFeatureDependencies
         ): StakingFeatureComponent

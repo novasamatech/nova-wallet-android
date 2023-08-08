@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
@@ -24,6 +25,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedCo
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.RealNominationPoolMemberUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.hints.NominationPoolHintsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.hints.RealNominationPoolHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.alerts.NominationPoolsAlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.alerts.RealNominationPoolsAlertsInteractor
@@ -43,7 +46,7 @@ import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
-@Module
+@Module(includes = [NominationPoolsValidationsModule::class])
 class NominationPoolModule {
 
     @Provides
@@ -201,5 +204,19 @@ class NominationPoolModule {
         nominationPoolsSharedComputation = nominationPoolsSharedComputation,
         stakingSharedComputation = stakingSharedComputation,
         poolAccountDerivation = poolAccountDerivation
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideHintsUseCase(
+        stakingSharedState: StakingSharedState,
+        poolMembersRepository: NominationPoolMembersRepository,
+        accountRepository: AccountRepository,
+        resourceManager: ResourceManager,
+    ): NominationPoolHintsUseCase = RealNominationPoolHintsUseCase(
+        stakingSharedState = stakingSharedState,
+        poolMembersRepository = poolMembersRepository,
+        accountRepository = accountRepository,
+        resourceManager = resourceManager
     )
 }
