@@ -22,7 +22,7 @@ fun ValidationSystem.Companion.nominationPoolsUnbond(
 
     enoughToPayFees()
 
-    positiveBond()
+    positiveUnbond()
 
     unbondValidationFactory.partialUnbondLeavesMinBond()
 }
@@ -49,7 +49,7 @@ private fun NominationPoolsUnbondValidationSystemBuilder.enoughToUnbond() {
     )
 }
 
-private fun NominationPoolsUnbondValidationSystemBuilder.positiveBond() {
+private fun NominationPoolsUnbondValidationSystemBuilder.positiveUnbond() {
     positiveAmount(
         amount = { it.amount },
         error = { NominationPoolsUnbondValidationFailure.NotPositiveAmount }
