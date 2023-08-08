@@ -7,6 +7,8 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolImageDataSource
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PredefinedPoolImageDataSource
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.RealPoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolMembersRepository
@@ -31,6 +33,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.u
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.unbondings.RealNominationPoolUnbondingsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.userRewards.NominationPoolsUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.userRewards.RealNominationPoolsUserRewardsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.NominationPoolYourPoolInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.RealNominationPoolYourPoolInteractor
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -48,12 +52,18 @@ class NominationPoolModule {
 
     @Provides
     @FeatureScope
+    fun providePoolImageDataSource(): PoolImageDataSource = PredefinedPoolImageDataSource()
+
+    @Provides
+    @FeatureScope
     fun provideNominationPoolBalanceRepository(
         @Named(LOCAL_STORAGE_SOURCE) localDataSource: StorageDataSource,
-        @Named(REMOTE_STORAGE_SOURCE) remoteDataSource: StorageDataSource
+        @Named(REMOTE_STORAGE_SOURCE) remoteDataSource: StorageDataSource,
+        poolImageDataSource: PoolImageDataSource,
     ): NominationPoolStateRepository = RealNominationPoolStateRepository(
         localStorage = localDataSource,
-        remoteStorage = remoteDataSource
+        remoteStorage = remoteDataSource,
+        poolImageDataSource = poolImageDataSource,
     )
 
     @Provides
@@ -162,4 +172,11 @@ class NominationPoolModule {
         repository: NominationPoolMembersRepository,
         stakingRewardsRepository: StakingRewardsRepository,
     ): NominationPoolsUserRewardsInteractor = RealNominationPoolsUserRewardsInteractor(repository, stakingRewardsRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideYourPoolInteractor(
+        poolAccountDerivation: PoolAccountDerivation,
+        poolStateRepository: NominationPoolStateRepository,
+    ): NominationPoolYourPoolInteractor = RealNominationPoolYourPoolInteractor(poolAccountDerivation, poolStateRepository)
 }

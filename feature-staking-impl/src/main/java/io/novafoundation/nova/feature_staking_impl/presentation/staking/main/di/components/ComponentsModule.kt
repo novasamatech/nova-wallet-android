@@ -30,6 +30,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.nominationPools.NominationPoolUserRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.parachain.ParachainUserRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.relaychain.RelaychainUserRewardsComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.YourPoolComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.nominationPools.NominationPoolsYourPoolComponentFactory
 
 @Module(includes = [RelaychainModule::class, ParachainModule::class, TuringModule::class, NominationPoolsModule::class])
 class ComponentsModule {
@@ -119,4 +121,11 @@ class ComponentsModule {
         nominationPoolsComponentFactory = nominationPoolUserRewardsComponentFactory,
         compoundStakingComponentFactory = compoundStakingComponentFactory
     )
+
+    @Provides
+    @ScreenScope
+    fun provideYourPoolComponentFactory(
+        nominationPoolsFactory: NominationPoolsYourPoolComponentFactory,
+        compoundFactory: CompoundStakingComponentFactory,
+    ) = YourPoolComponentFactory(nominationPoolsFactory, compoundFactory)
 }

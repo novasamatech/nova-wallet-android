@@ -16,10 +16,11 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.GenesisSlotUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.LastPoolIdUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.MinJoinBondUpdater
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.PoolMetadataUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.SubPoolsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.scope.PoolScope
 import io.novafoundation.nova.feature_staking_impl.di.staking.StakingUpdaters
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
@@ -28,8 +29,9 @@ class NominationPoolStakingUpdatersModule {
     @Provides
     @FeatureScope
     fun providePoolScope(
-        poolMemberUseCase: NominationPoolMemberUseCase,
-    ) = PoolScope(poolMemberUseCase)
+        nominationPoolSharedComputation: NominationPoolSharedComputation,
+        stakingSharedState: StakingSharedState
+    ) = PoolScope(nominationPoolSharedComputation, stakingSharedState)
 
     @Provides
     @FeatureScope
@@ -70,11 +72,26 @@ class NominationPoolStakingUpdatersModule {
     )
 
     @Provides
+    @FeatureScope
+    fun providePoolMetadataUpdater(
+        poolScope: PoolScope,
+        storageCache: StorageCache,
+        stakingSharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+    ) = PoolMetadataUpdater(
+        poolScope = poolScope,
+        storageCache = storageCache,
+        stakingSharedState = stakingSharedState,
+        chainRegistry = chainRegistry
+    )
+
+    @Provides
     @NominationPools
     @FeatureScope
     fun provideNominationPoolStakingUpdaters(
         lastPoolIdUpdater: LastPoolIdUpdater,
         minJoinBondUpdater: MinJoinBondUpdater,
+        poolMetadataUpdater: PoolMetadataUpdater,
         exposureUpdater: ValidatorExposureUpdater,
         subPoolsUpdater: SubPoolsUpdater,
         activeEraUpdater: ActiveEraUpdater,
@@ -88,6 +105,7 @@ class NominationPoolStakingUpdatersModule {
     ): StakingUpdaters = StakingUpdaters(
         lastPoolIdUpdater,
         minJoinBondUpdater,
+        poolMetadataUpdater,
         exposureUpdater,
         activeEraUpdater,
         currentEraUpdater,
