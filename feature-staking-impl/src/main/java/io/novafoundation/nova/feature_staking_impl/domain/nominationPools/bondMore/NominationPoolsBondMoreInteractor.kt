@@ -6,12 +6,14 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.calls.nominationPools
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.state.chain
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 interface NominationPoolsBondMoreInteractor {
 
     suspend fun estimateFee(bondMoreAmount: Balance): Balance
 
-    suspend fun submitExtrinsic(bondMoreAmount: Balance): Result<String>
+    suspend fun bondMore(bondMoreAmount: Balance): Result<String>
 }
 
 class RealNominationPoolsBondMoreInteractor(
@@ -20,14 +22,18 @@ class RealNominationPoolsBondMoreInteractor(
 ) : NominationPoolsBondMoreInteractor {
 
     override suspend fun estimateFee(bondMoreAmount: Balance): Balance {
-        return extrinsicService.estimateFee(stakingSharedState.chain()) {
-            nominationPools.bondExtra(bondMoreAmount)
+        return withContext(Dispatchers.IO) {
+            extrinsicService.estimateFee(stakingSharedState.chain()) {
+                nominationPools.bondExtra(bondMoreAmount)
+            }
         }
     }
 
-    override suspend fun submitExtrinsic(bondMoreAmount: Balance): Result<String> {
-        return extrinsicService.submitExtrinsicWithSelectedWallet(stakingSharedState.chain()) {
-            nominationPools.bondExtra(bondMoreAmount)
+    override suspend fun bondMore(bondMoreAmount: Balance): Result<String> {
+        return withContext(Dispatchers.IO) {
+            extrinsicService.submitExtrinsicWithSelectedWallet(stakingSharedState.chain()) {
+                nominationPools.bondExtra(bondMoreAmount)
+            }
         }
     }
 }
