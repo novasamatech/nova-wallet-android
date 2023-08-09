@@ -93,5 +93,15 @@
         "version": "6.7.0",
         "severity": "Major",
         "time": "2023-07-20T12:00:00Z"
+    },
+    {
+        "version": "6.7.1",
+        "severity": "Normal",
+        "time": "2023-07-26T12:00:00Z"
+    },
+    {
+        "version": "6.7.2",
+        "severity": "Critical",
+        "time": "2023-07-26T15:00:00Z"
     }
 ]
