@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.alerts.NominationPoolAlert
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.alerts.NominationPoolsAlertsInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.AlertModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.AlertsAction
@@ -26,6 +27,7 @@ class NominationPoolsAlertsComponentFactory(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val interactor: NominationPoolsAlertsInteractor,
     private val resourceManager: ResourceManager,
+    private val router: NominationPoolsRouter,
 ) {
 
     fun create(
@@ -36,11 +38,13 @@ class NominationPoolsAlertsComponentFactory(
         stakingOption = stakingOption,
         hostContext = hostContext,
         nominationPoolSharedComputation = nominationPoolSharedComputation,
-        interactor = interactor
+        interactor = interactor,
+        router = router,
     )
 }
 
 private open class NominationPoolsAlertsComponent(
+    private val router: NominationPoolsRouter,
     private val interactor: NominationPoolsAlertsInteractor,
     private val resourceManager: ResourceManager,
     nominationPoolSharedComputation: NominationPoolSharedComputation,
@@ -70,7 +74,7 @@ private open class NominationPoolsAlertsComponent(
     }
 
     private fun openRedeem() {
-        // TODO redeem flow
+        router.openRedeem()
     }
 
     private fun mapAlertToAlertModel(alert: NominationPoolAlert, asset: Asset): AlertModel {

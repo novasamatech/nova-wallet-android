@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.unbondings.NominationPoolUnbondingsInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.nominationPools.loadPoolMemberState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingAction
@@ -22,6 +23,7 @@ import kotlinx.coroutines.launch
 class NominationPoolsUnbondingComponentFactory(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val interactor: NominationPoolUnbondingsInteractor,
+    private val router: NominationPoolsRouter,
 ) {
 
     fun create(
@@ -31,11 +33,13 @@ class NominationPoolsUnbondingComponentFactory(
         nominationPoolSharedComputation = nominationPoolSharedComputation,
         interactor = interactor,
         hostContext = hostContext,
-        stakingOption = stakingOption
+        stakingOption = stakingOption,
+        router = router
     )
 }
 
 private class NominationPoolsUnbondingComponent(
+    private val router: NominationPoolsRouter,
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val interactor: NominationPoolUnbondingsInteractor,
 
@@ -73,6 +77,6 @@ private class NominationPoolsUnbondingComponent(
     }
 
     fun redeemClicked() {
-        // TODO
+        router.openRedeem()
     }
 }

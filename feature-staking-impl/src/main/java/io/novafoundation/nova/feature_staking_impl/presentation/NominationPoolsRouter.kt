@@ -14,5 +14,9 @@ interface NominationPoolsRouter : ReturnableRouter {
 
     fun openConfirmUnbond(payload: NominationPoolsConfirmUnbondPayload)
 
+    fun openRedeem()
+
     fun returnToStakingMain()
+
+    fun returnToMain()
 }

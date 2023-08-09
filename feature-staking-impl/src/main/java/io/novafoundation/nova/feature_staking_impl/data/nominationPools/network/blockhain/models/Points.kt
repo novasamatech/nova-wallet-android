@@ -4,7 +4,10 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import java.math.BigInteger
 
 @JvmInline
-value class PoolPoints(val value: BigInteger)
+value class PoolPoints(val value: BigInteger) {
+
+    operator fun plus(other: PoolPoints): PoolPoints = PoolPoints(value + other.value)
+}
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun bindPoolPoints(decoded: Any?) = PoolPoints(bindNumber(decoded))

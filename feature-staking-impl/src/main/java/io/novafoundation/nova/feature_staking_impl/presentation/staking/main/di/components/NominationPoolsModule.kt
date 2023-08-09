@@ -50,9 +50,11 @@ class NominationPoolsModule {
     fun provideUnbondComponentFactory(
         interactor: NominationPoolUnbondingsInteractor,
         sharedComputation: NominationPoolSharedComputation,
+        router: NominationPoolsRouter,
     ) = NominationPoolsUnbondingComponentFactory(
         nominationPoolSharedComputation = sharedComputation,
-        interactor = interactor
+        interactor = interactor,
+        router = router
     )
 
     @Provides
@@ -101,9 +103,11 @@ class NominationPoolsModule {
         nominationPoolSharedComputation: NominationPoolSharedComputation,
         interactor: NominationPoolsAlertsInteractor,
         resourceManager: ResourceManager,
+        router: NominationPoolsRouter,
     ) = NominationPoolsAlertsComponentFactory(
         nominationPoolSharedComputation = nominationPoolSharedComputation,
         interactor = interactor,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        router = router
     )
 }
