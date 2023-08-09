@@ -52,7 +52,7 @@ class RealNominationPoolsUnbondInteractor(
                 nominationPoolSharedComputation.participatingBondedPoolStateFlow(stash, poolId, chainId, computationScope).map { bondedPoolState ->
                     PoolMemberState(bondedPoolState, poolMember)
                 }
-        }
+            }
     }
 
     override suspend fun estimateFee(poolMember: PoolMember, amount: Balance): Balance {
