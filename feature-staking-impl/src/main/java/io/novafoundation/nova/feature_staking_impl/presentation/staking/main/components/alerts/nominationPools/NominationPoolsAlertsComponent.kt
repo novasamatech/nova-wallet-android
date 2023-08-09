@@ -58,7 +58,6 @@ private open class NominationPoolsAlertsComponent(
         hostContext = hostContext,
         chain = stakingOption.assetWithChain.chain,
         stateProducer = ::constructAlertsState,
-        distinctUntilChanged = { old, new -> old?.poolId == new?.poolId }
     )
         .shareInBackground()
 
