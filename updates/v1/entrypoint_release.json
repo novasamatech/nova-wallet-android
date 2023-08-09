@@ -1,0 +1,97 @@
+[
+    {
+        "version": "5.3.0",
+        "severity": "Major",
+        "time": "2023-03-13T12:00:00Z"
+    },
+    {
+        "version": "5.4.0",
+        "severity": "Critical",
+        "time": "2023-03-15T12:00:00Z"
+    },
+    {
+        "version": "6.0.0",
+        "severity": "Major",
+        "time": "2023-03-28T12:00:00Z"
+    },
+    {
+        "version": "6.0.1",
+        "severity": "Critical",
+        "time": "2023-04-03T12:00:00Z"
+    },
+    {
+        "version": "6.0.2",
+        "severity": "Critical",
+        "time": "2023-04-11T12:00:00Z"
+    },
+    {
+        "version": "6.0.3",
+        "severity": "Critical",
+        "time": "2023-04-15T12:00:00Z"
+    },
+    {
+        "version": "6.1.0",
+        "severity": "Major",
+        "time": "2023-04-21T12:00:00Z"
+    },
+    {
+        "version": "6.1.2",
+        "severity": "Critical",
+        "time": "2023-05-03T12:00:00Z"
+    },
+    {
+        "version": "6.2.0",
+        "severity": "Major",
+        "time": "2023-05-11T12:00:00Z"
+    },
+    {
+        "version": "6.2.1",
+        "severity": "Normal",
+        "time": "2023-05-19T12:00:00Z"
+    },
+    {
+        "version": "6.3.0",
+        "severity": "Major",
+        "time": "2023-05-25T12:00:00Z"
+    },
+    {
+        "version": "6.3.1",
+        "severity": "Critical",
+        "time": "2023-05-31T12:00:00Z"
+    },
+    {
+        "version": "6.4.0",
+        "severity": "Major",
+        "time": "2023-06-16T12:00:00Z"
+    },
+    {
+        "version": "6.5.0",
+        "severity": "Major",
+        "time": "2023-06-27T12:00:00Z"
+    },
+    {
+        "version": "6.5.1",
+        "severity": "Critical",
+        "time": "2023-06-27T14:00:00Z"
+    },
+    {
+        "version": "6.5.2",
+        "severity": "Critical",
+        "time": "2023-06-28T12:00:00Z"
+    },
+    {
+        "version": "6.5.3",
+        "severity": "Critical",
+        "time": "2023-06-29T12:00:00Z"
+    },
+    {
+        "version": "6.6.0",
+        "severity": "Major",
+        "time": "2023-07-11T12:00:00Z"
+    },
+    {
+        "version": "6.7.0",
+        "severity": "Major",
+        "time": "2023-07-20T12:00:00Z"
+    }
+]
