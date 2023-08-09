@@ -8,14 +8,14 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.amountOf
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.NominationPoolsUnbondInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.stakedBalance
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.nominationPoolsUnbondValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.nominationPoolsUnbondValidationPayloadAutoFix
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.confirm.NominationPoolsConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.hints.NominationPoolsUnbondHintsFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -26,9 +26,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -38,8 +36,7 @@ class NominationPoolsSetupUnbondViewModel(
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: NominationPoolsUnbondValidationSystem,
-    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-    private val poolMemberUseCase: NominationPoolMemberUseCase,
+    feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     assetUseCase: AssetUseCase,
     hintsFactory: NominationPoolsUnbondHintsFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
@@ -53,18 +50,12 @@ class NominationPoolsSetupUnbondViewModel(
 
     val originFeeMixin = feeLoaderMixinFactory.create(assetFlow)
 
-    private val poolMemberFlow = poolMemberUseCase.currentPoolMemberFlow()
-        .filterNotNull()
+    private val poolMemberStateFlow = interactor.poolMemberStateFlow(viewModelScope)
         .shareInBackground()
 
-    private val bondedPoolStateFlow = poolMemberFlow.flatMapLatest { poolMember ->
-        interactor.bondedPoolStateFlow(poolMember.poolId, computationScope = this)
-    }
-        .shareInBackground()
+    private val poolMemberFlow = poolMemberStateFlow.map { it.poolMember }
 
-    private val stakedBalance = combine(bondedPoolStateFlow, poolMemberFlow) { bondedPool, poolMember ->
-        bondedPool.amountOf(poolMember.points)
-    }.shareInBackground()
+    private val stakedBalance = poolMemberStateFlow.map { it.stakedBalance }
 
     val transferableBalance = assetFlow.map {
         mapAmountToAmountModel(it.transferable, it)
@@ -138,7 +129,12 @@ class NominationPoolsSetupUnbondViewModel(
         }
     }
 
-    private fun openConfirm(validationPayload: NominationPoolsUnbondValidationPayload) {
-        showMessage("Ready to unbond ${mapAmountToAmountModel(validationPayload.amount, validationPayload.asset).token}")
+    private fun openConfirm(validationPayload: NominationPoolsUnbondValidationPayload) = launch {
+        val confirmPayload = NominationPoolsConfirmUnbondPayload(
+            amount = validationPayload.amount,
+            fee = validationPayload.fee
+        )
+
+        router.openConfirmUnbond(confirmPayload)
     }
 }

@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.Poo
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.hints.NominationPoolHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.NominationPoolsUnbondInteractor
@@ -48,9 +49,16 @@ class NominationPoolsCommonUnbondModule {
         extrinsicService: ExtrinsicService,
         stakingSharedState: StakingSharedState,
         nominationPoolSharedComputation: NominationPoolSharedComputation,
-        poolAccountDerivation: PoolAccountDerivation
+        poolAccountDerivation: PoolAccountDerivation,
+        poolMemberUseCase: NominationPoolMemberUseCase,
     ): NominationPoolsUnbondInteractor {
-        return RealNominationPoolsUnbondInteractor(extrinsicService, stakingSharedState, nominationPoolSharedComputation, poolAccountDerivation)
+        return RealNominationPoolsUnbondInteractor(
+            extrinsicService = extrinsicService,
+            stakingSharedState = stakingSharedState,
+            nominationPoolSharedComputation = nominationPoolSharedComputation,
+            poolAccountDerivation = poolAccountDerivation,
+            poolMemberUseCase = poolMemberUseCase
+        )
     }
 
     @Provides
