@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.runtime.ethereum.EvmRpcException
+import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -33,6 +34,7 @@ internal class RealEvmTransactionService(
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
     private val signerProvider: SignerProvider,
+    private val gasPriceProviderFactory: GasPriceProviderFactory,
 ) : EvmTransactionService {
 
     override suspend fun calculateFee(
@@ -50,7 +52,7 @@ internal class RealEvmTransactionService(
         val txBuilder = EvmTransactionBuilder().apply(building)
         val txForFee = txBuilder.buildForFee(submittingAddress)
 
-        val gasPrice = web3Api.gasPrice()
+        val gasPrice = gasPriceProviderFactory.createKnown(chainId).getGasPrice()
 
         return gasPrice * web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
     }
@@ -69,7 +71,7 @@ internal class RealEvmTransactionService(
         val txBuilder = EvmTransactionBuilder().apply(building)
         val txForFee = txBuilder.buildForFee(submittingAddress)
 
-        val gasPrice = web3Api.gasPrice()
+        val gasPrice = gasPriceProviderFactory.createKnown(chainId).getGasPrice()
         val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
         val nonce = web3Api.getNonce(submittingAddress)
 
@@ -105,8 +107,6 @@ internal class RealEvmTransactionService(
             .sendSuspend()
             .transactionCount
     }
-
-    private suspend fun Web3Api.gasPrice(): BigInteger = ethGasPrice().sendSuspend().gasPrice
 
     private suspend fun Web3Api.gasLimitOrDefault(tx: Transaction, default: BigInteger): BigInteger = try {
         ethEstimateGas(tx).sendSuspend().amountUsed
