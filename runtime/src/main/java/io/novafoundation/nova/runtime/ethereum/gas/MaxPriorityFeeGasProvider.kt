@@ -5,7 +5,7 @@ import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameterName
 import java.math.BigInteger
 
-class MaxPriorityFeeGasProvider(private val api: Web3j): GasPriceProvider {
+class MaxPriorityFeeGasProvider(private val api: Web3j) : GasPriceProvider {
 
     override suspend fun getGasPrice(): BigInteger {
         val baseFeePerGas = api.getLatestBaseFeePerGas()

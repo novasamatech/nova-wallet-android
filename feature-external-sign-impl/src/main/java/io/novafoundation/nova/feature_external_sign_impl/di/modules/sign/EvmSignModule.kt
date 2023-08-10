@@ -25,7 +25,7 @@ class EvmSignModule {
         okHttpClient: OkHttpClient,
         chainRegistry: ChainRegistry,
         gasPriceProviderFactory: GasPriceProviderFactory,
-        ): EvmApiFactory {
+    ): EvmApiFactory {
         return EvmApiFactory(okHttpClient, chainRegistry, gasPriceProviderFactory)
     }
 

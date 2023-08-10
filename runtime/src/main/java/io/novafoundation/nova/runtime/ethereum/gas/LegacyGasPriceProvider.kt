@@ -7,6 +7,6 @@ import java.math.BigInteger
 class LegacyGasPriceProvider(private val api: Web3j) : GasPriceProvider {
 
     override suspend fun getGasPrice(): BigInteger {
-       return api.ethGasPrice().sendSuspend().gasPrice
+        return api.ethGasPrice().sendSuspend().gasPrice
     }
 }

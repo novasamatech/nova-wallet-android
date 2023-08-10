@@ -6,4 +6,3 @@ interface GasPriceProvider {
 
     suspend fun getGasPrice(): BigInteger
 }
-

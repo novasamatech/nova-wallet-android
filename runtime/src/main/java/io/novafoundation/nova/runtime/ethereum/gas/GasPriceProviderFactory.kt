@@ -20,7 +20,7 @@ interface GasPriceProviderFactory {
 
 class RealGasPriceProviderFactory(
     private val chainRegistry: ChainRegistry
-): GasPriceProviderFactory {
+) : GasPriceProviderFactory {
 
     override suspend fun createKnown(chainId: ChainId): GasPriceProvider {
         val api = chainRegistry.awaitCallEthereumApiOrThrow(chainId)
