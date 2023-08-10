@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
-        app:titleText="@string/staking_redeem" />
+        app:titleText="@string/nomination_pool_claim_rewards" />
 
     <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
         android:id="@+id/nominationPoolsClaimRewardsAmount"
