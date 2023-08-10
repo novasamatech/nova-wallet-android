@@ -16,6 +16,8 @@ interface NominationPoolsRouter : ReturnableRouter {
 
     fun openRedeem()
 
+    fun openClaimRewards()
+
     fun returnToStakingMain()
 
     fun returnToMain()

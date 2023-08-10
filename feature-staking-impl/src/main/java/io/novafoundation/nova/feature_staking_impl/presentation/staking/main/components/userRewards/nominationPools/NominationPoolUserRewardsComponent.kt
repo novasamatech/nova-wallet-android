@@ -10,10 +10,12 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.userRewards.NominationPoolsUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.period.mapRewardPeriodToString
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.nominationPools.loadPoolMemberState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.BaseRewardComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsAction
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsState
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -25,6 +27,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 
 class NominationPoolUserRewardsComponentFactory(
+    private val router: NominationPoolsRouter,
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val interactor: NominationPoolsUserRewardsInteractor,
     private val rewardPeriodsInteractor: StakingRewardPeriodInteractor,
@@ -40,11 +43,13 @@ class NominationPoolUserRewardsComponentFactory(
         stakingOption = stakingOption,
         hostContext = hostContext,
         rewardPeriodsInteractor = rewardPeriodsInteractor,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        router = router
     )
 }
 
 private class NominationPoolUserRewardsComponent(
+    private val router: NominationPoolsRouter,
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val interactor: NominationPoolsUserRewardsInteractor,
     private val stakingOption: StakingOption,
@@ -68,6 +73,14 @@ private class NominationPoolUserRewardsComponent(
         stateProducer = ::rewardsFlow,
         distinctUntilChanged = poolMemberDiffing,
     )
+
+    override fun onAction(action: UserRewardsAction) {
+        if (action is UserRewardsAction.ClaimRewardsClicked) {
+            router.openClaimRewards()
+        } else {
+            super.onAction(action)
+        }
+    }
 
     init {
         launchRewardsSync()

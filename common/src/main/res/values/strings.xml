@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="nomination_pools_claim_rewards_restake_subtitle">Your tokens will be added back to the stake</string>
+
     <string name="nomination_pools_pool_reached_unbondings_limit_title">Too many people are unstaking from your pool</string>
     <string name="nomination_pools_pool_reached_unbondings_limit_message">There are currently no free spots in unstaking queue for your pool. Please try again in %s</string>
 
