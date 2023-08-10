@@ -32,19 +32,19 @@ class RealNominationPoolsClaimRewardsInteractor(
     private val poolMembersRepository: NominationPoolMembersRepository,
     private val stakingSharedState: StakingSharedState,
     private val extrinsicService: ExtrinsicService,
-): NominationPoolsClaimRewardsInteractor {
+) : NominationPoolsClaimRewardsInteractor {
 
     override fun pendingRewardsFlow(): Flow<Balance> {
         return poolMemberUseCase.currentPoolMemberFlow()
             .filterNotNull()
             .distinctUntilChangedBy { it.lastRecordedRewardCounter }
-            .mapLatest {poolMember ->
+            .mapLatest { poolMember ->
                 poolMembersRepository.getPendingRewards(poolMember.accountId, stakingSharedState.chainId())
             }
     }
 
     override suspend fun estimateFee(shouldRestake: Boolean): Balance {
-        return withContext(Dispatchers.IO){
+        return withContext(Dispatchers.IO) {
             extrinsicService.estimateFee(stakingSharedState.chain()) {
                 claimRewards(shouldRestake)
             }

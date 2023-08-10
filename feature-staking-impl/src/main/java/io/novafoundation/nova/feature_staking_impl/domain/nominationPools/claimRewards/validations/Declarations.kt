@@ -5,7 +5,8 @@ import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_staking_impl.domain.common.validation.profitableAction
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 
-typealias NominationPoolsClaimRewardsValidationSystem = ValidationSystem<NominationPoolsClaimRewardsValidationPayload, NominationPoolsClaimRewardsValidationFailure>
+typealias NominationPoolsClaimRewardsValidationSystem =
+    ValidationSystem<NominationPoolsClaimRewardsValidationPayload, NominationPoolsClaimRewardsValidationFailure>
 typealias NominationPoolsClaimRewardsValidationSystemBuilder =
     ValidationSystemBuilder<NominationPoolsClaimRewardsValidationPayload, NominationPoolsClaimRewardsValidationFailure>
 

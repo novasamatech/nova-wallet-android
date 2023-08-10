@@ -10,7 +10,7 @@ class ProfitableActionValidation<P, E>(
     val amount: P.() -> BigDecimal,
     val fee: P.() -> BigDecimal,
     val error: (P) -> E
-): Validation<P, E> {
+) : Validation<P, E> {
 
     override suspend fun validate(value: P): ValidationStatus<E> {
         val isProfitable = value.fee() < value.amount()
