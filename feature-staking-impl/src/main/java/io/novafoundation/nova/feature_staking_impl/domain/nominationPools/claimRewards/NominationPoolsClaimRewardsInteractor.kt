@@ -11,10 +11,12 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.state.chain
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.withContext
 
 interface NominationPoolsClaimRewardsInteractor {
 
@@ -42,14 +44,18 @@ class RealNominationPoolsClaimRewardsInteractor(
     }
 
     override suspend fun estimateFee(shouldRestake: Boolean): Balance {
-        return extrinsicService.estimateFee(stakingSharedState.chain()) {
-            claimRewards(shouldRestake)
+        return withContext(Dispatchers.IO){
+            extrinsicService.estimateFee(stakingSharedState.chain()) {
+                claimRewards(shouldRestake)
+            }
         }
     }
 
     override suspend fun claimRewards(shouldRestake: Boolean): Result<String> {
-        return extrinsicService.submitExtrinsicWithSelectedWallet(stakingSharedState.chain()) {
-            claimRewards(shouldRestake)
+        return withContext(Dispatchers.IO) {
+            extrinsicService.submitExtrinsicWithSelectedWallet(stakingSharedState.chain()) {
+                claimRewards(shouldRestake)
+            }
         }
     }
 
