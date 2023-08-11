@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="asset_add_evm_token_already_exist_title">This token already exists</string>
+<!--    <string name="asset_add_evm_token_already_exist_title">This token already exist</string>-->
+    <string name="asset_add_evm_token_already_exist_modifiable_message">The entered contract address is present in Nova as a %s token. Are you sure you want to modify it?</string>
+
     <string name="account_parity_signer_sign_qr_code_expired_descrition">For security reasons generated operations valid for only %s.\nPlease generate new QR code and sign it with %s</string>
     <string name="account_parity_signer_import_scan_invalid_qr">Invalid QR code, please make sure you are scanning QR code from %s</string>
     <string name="account_parity_signer_sign_have_error">I have an error in %s</string>
@@ -356,7 +360,6 @@
 
     <string name="manage_assets_add_token">Add token</string>
 
-    <string name="asset_add_evm_token_already_exist_title">This token already exist</string>
     <string name="asset_add_evm_token_already_exist_message">The entered contract address is present in Nova as a %s token.</string>
 
     <string name="asset_add_evm_token_invalid_contract_address_title">Invalid contract address</string>
