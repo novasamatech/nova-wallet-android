@@ -12,14 +12,11 @@ import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
+import java.util.Calendar
+import java.util.Collections
 import java.util.Date
 import java.util.UUID
-import java.util.Collections
-import java.util.Calendar
 import java.util.concurrent.TimeUnit
-import kotlin.Comparator
-import kotlin.collections.HashMap
-import kotlin.collections.LinkedHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.sqrt
@@ -176,6 +173,12 @@ fun List<Double>.median(): Double = sorted().let {
     val middleLeft = it[(it.size - 1) / 2] // will be same as middleRight if list size is odd
 
     (middleLeft + middleRight) / 2
+}
+
+fun Collection<BigInteger>.average(): BigInteger {
+    if (isEmpty()) throw NoSuchFieldException("Collection is empty")
+
+    return sum() / size.toBigInteger()
 }
 
 fun generateLinearSequence(initial: Int, step: Int) = generateSequence(initial) { it + step }
