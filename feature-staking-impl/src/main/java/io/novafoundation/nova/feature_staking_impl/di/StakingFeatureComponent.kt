@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.d
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.di.NominationPoolsConfirmBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.setup.di.NominationPoolsSetupBondMoreComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.redeem.di.NominationPoolsRedeemComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.confirm.di.NominationPoolsConfirmUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.setup.di.NominationPoolsSetupUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
@@ -190,6 +191,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun nominationPoolsStakingSetupUnbond(): NominationPoolsSetupUnbondComponent.Factory
 
     fun nominationPoolsStakingConfirmUnbond(): NominationPoolsConfirmUnbondComponent.Factory
+
+    fun nominationPoolsStakingRedeem(): NominationPoolsRedeemComponent.Factory
 
     @Component.Factory
     interface Factory {

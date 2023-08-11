@@ -12,3 +12,6 @@ class Unbonding(val id: String, val amount: BigInteger, val status: Status) {
         object Redeemable : Status()
     }
 }
+
+val Unbonding.isRedeemable: Boolean
+    get() = status is Unbonding.Status.Redeemable

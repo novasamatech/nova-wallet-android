@@ -34,6 +34,7 @@ class UnbondingsAdapter : ListAdapter<UnbondingModel, UnbondingsHolder>(Unbondin
         resolvePayload(holder, position, payloads) {
             when (it) {
                 UnbondingModel::status -> holder.bindStatus(item)
+                UnbondingModel::amountModel -> holder.bindAmount(item)
             }
         }
     }
@@ -48,11 +49,13 @@ class UnbondingsAdapter : ListAdapter<UnbondingModel, UnbondingsHolder>(Unbondin
 
 class UnbondingsHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
-    @ExperimentalTime
     fun bind(unbonding: UnbondingModel) = with(containerView) {
         bindStatus(unbonding)
+        bindAmount(unbonding)
+    }
 
-        itemUnbondAmount.text = unbonding.amountModel.token
+    fun bindAmount(unbonding: UnbondingModel) {
+        containerView.itemUnbondAmount.text = unbonding.amountModel.token
     }
 
     fun bindStatus(unbonding: UnbondingModel) = with(containerView) {
@@ -73,7 +76,7 @@ class UnbondingsHolder(override val containerView: View) : RecyclerView.ViewHold
     }
 }
 
-private val PAYLOAD_GENERATOR = PayloadGenerator(UnbondingModel::status)
+private val PAYLOAD_GENERATOR = PayloadGenerator(UnbondingModel::status, UnbondingModel::amountModel)
 
 private class UnbondingModelDiffCallback : DiffUtil.ItemCallback<UnbondingModel>() {
 

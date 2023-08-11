@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.unbond
 
 import io.novafoundation.nova.common.utils.formatting.toTimerValue
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
-import io.novafoundation.nova.feature_staking_api.domain.model.EraRedeemable
+import io.novafoundation.nova.feature_staking_api.domain.model.RedeemableAmount
 import io.novafoundation.nova.feature_staking_api.domain.model.isRedeemableIn
 import io.novafoundation.nova.feature_staking_api.domain.model.isUnbondingIn
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 fun StakingSharedComputation.constructUnbondingList(
-    eraRedeemables: List<EraRedeemable>,
+    eraRedeemables: List<RedeemableAmount>,
     activeEra: EraIndex,
     stakingOption: StakingOption,
     sharedComputationScope: CoroutineScope,

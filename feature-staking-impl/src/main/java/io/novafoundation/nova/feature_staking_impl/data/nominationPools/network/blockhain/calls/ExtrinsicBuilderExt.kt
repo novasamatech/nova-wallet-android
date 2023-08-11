@@ -7,6 +7,7 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import java.math.BigInteger
 
 @JvmInline
 value class NominationPoolsCalls(val extrinsicBuilder: ExtrinsicBuilder)
@@ -35,6 +36,17 @@ fun NominationPoolsCalls.unbond(unbondAccount: AccountId, unbondPoints: PoolPoin
         arguments = mapOf(
             "member_account" to AddressInstanceConstructor.constructInstance(extrinsicBuilder.runtime.typeRegistry, unbondAccount),
             "unbonding_points" to unbondPoints.value
+        )
+    )
+}
+
+fun NominationPoolsCalls.withdrawUnbonded(memberAccount: AccountId, numberOfSlashingSpans: BigInteger) {
+    extrinsicBuilder.call(
+        moduleName = Modules.NOMINATION_POOLS,
+        callName = "withdraw_unbonded",
+        arguments = mapOf(
+            "member_account" to AddressInstanceConstructor.constructInstance(extrinsicBuilder.runtime.typeRegistry, memberAccount),
+            "num_slashing_spans" to numberOfSlashingSpans
         )
     )
 }

@@ -3,6 +3,7 @@ package io.novafoundation.nova.app.root.navigation.staking.nominationPools
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
+import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.NominationPoolsConfirmBondMoreFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.NominationPoolsConfirmBondMorePayload
@@ -11,6 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 
 class NominationPoolsStakingNavigator(
     navigationHolder: NavigationHolder,
+    private val commonNavigator: Navigator,
 ) : BaseNavigator(navigationHolder), NominationPoolsRouter {
 
     override fun openSetupBondMore() = performNavigation(R.id.action_stakingFragment_to_PoolsBondMoreGraph)
@@ -25,7 +27,12 @@ class NominationPoolsStakingNavigator(
         args = NominationPoolsConfirmUnbondFragment.getBundle(payload)
     )
 
+    override fun openRedeem() = performNavigation(R.id.action_stakingFragment_to_PoolsRedeemFragment)
+
     override fun openSetupUnbond() = performNavigation(R.id.action_stakingFragment_to_PoolsUnbondGraph)
 
     override fun returnToStakingMain() = performNavigation(R.id.back_to_staking_main)
+    override fun returnToMain() {
+        commonNavigator.returnToMain()
+    }
 }
