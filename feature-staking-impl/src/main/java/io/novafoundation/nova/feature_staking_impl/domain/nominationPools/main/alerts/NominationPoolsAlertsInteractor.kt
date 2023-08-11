@@ -51,7 +51,7 @@ class RealNominationPoolsAlertsInteractor(
             val poolStash = poolAccountDerivation.bondedAccountOf(poolId, chain.id)
 
             combine(
-                nominationPoolsSharedComputation.participatingPoolNominations(poolStash, poolId, chain.id, shareComputationScope),
+                nominationPoolsSharedComputation.participatingPoolNominationsFlow(poolStash, poolId, chain.id, shareComputationScope),
                 nominationPoolsSharedComputation.unbondingPoolsFlow(poolId, chain.id, shareComputationScope),
                 stakingSharedComputation.electedExposuresWithActiveEraFlow(chain.id, shareComputationScope),
             ) { poolNominations, unbondingPools, (eraStakers, activeEra) ->

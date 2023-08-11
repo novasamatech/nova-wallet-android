@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nomination_pools_unbond_graph"
+    app:startDestination="@+id/nominationPoolsSetupUnbondFragment">
+
+
+    <fragment
+        tools:layout="@layout/fragment_nomination_pools_setup_unbond"
+        android:id="@+id/nominationPoolsSetupUnbondFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.setup.NominationPoolsSetupUnbondFragment"
+        android:label="NominationPoolsSetupUnbondFragment" />
+</navigation>

@@ -138,7 +138,16 @@ fun StakingSharedComputation.electedExposuresInActiveEraFlow(chainId: ChainId, s
     return electedExposuresWithActiveEraFlow(chainId, scope).map { (exposures, _) -> exposures }
 }
 
+suspend fun StakingSharedComputation.getActiveEra(chainId: ChainId, scope: CoroutineScope): EraIndex {
+    return activeEraFlow(chainId, scope).first()
+}
+
 suspend fun StakingSharedComputation.minStake(
     chainId: ChainId,
     scope: CoroutineScope
 ): Balance = activeEraInfo(chainId, scope).first().minStake
+
+suspend fun StakingSharedComputation.eraTimeCalculator(
+    stakingOption: StakingOption,
+    scope: CoroutineScope
+) = eraCalculatorFlow(stakingOption, scope).first()

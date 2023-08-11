@@ -88,6 +88,8 @@ fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = M
 
 fun BigInteger.atLeastZero() = coerceAtLeast(BigInteger.ZERO)
 
+fun BigDecimal.atLeastZero() = coerceAtLeast(BigDecimal.ZERO)
+
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
 inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fold(BigInteger.ZERO) { acc, element ->
