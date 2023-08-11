@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.setup.di
+package io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.confirm.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -10,43 +10,52 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.NominationPoolsUnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.common.di.NominationPoolsCommonUnbondModule
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.confirm.NominationPoolsConfirmUnbondPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.confirm.NominationPoolsConfirmUnbondViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.hints.NominationPoolsUnbondHintsFactory
-import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.setup.NominationPoolsSetupUnbondViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
 @Module(includes = [ViewModelModule::class, NominationPoolsCommonUnbondModule::class])
-class NominationPoolsSetupUnbondModule {
+class NominationPoolsConfirmUnbondModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(NominationPoolsSetupUnbondViewModel::class)
+    @ViewModelKey(NominationPoolsConfirmUnbondViewModel::class)
     fun provideViewModel(
         router: NominationPoolsRouter,
         interactor: NominationPoolsUnbondInteractor,
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
         validationSystem: NominationPoolsUnbondValidationSystem,
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        payload: NominationPoolsConfirmUnbondPayload,
+        walletUiUseCase: WalletUiUseCase,
+        selectedAccountUseCase: SelectedAccountUseCase,
+        stakingSharedState: StakingSharedState,
+        externalActions: ExternalActions.Presentation,
         assetUseCase: AssetUseCase,
         hintsFactory: NominationPoolsUnbondHintsFactory,
-        amountChooserMixinFactory: AmountChooserMixin.Factory,
     ): ViewModel {
-        return NominationPoolsSetupUnbondViewModel(
+        return NominationPoolsConfirmUnbondViewModel(
             router = router,
             interactor = interactor,
             resourceManager = resourceManager,
             validationExecutor = validationExecutor,
             validationSystem = validationSystem,
-            feeLoaderMixinFactory = feeLoaderMixinFactory,
+            payload = payload,
+            walletUiUseCase = walletUiUseCase,
+            selectedAccountUseCase = selectedAccountUseCase,
+            stakingSharedState = stakingSharedState,
+            externalActions = externalActions,
             assetUseCase = assetUseCase,
-            hintsFactory = hintsFactory,
-            amountChooserMixinFactory = amountChooserMixinFactory
+            hintsFactory = hintsFactory
         )
     }
 
@@ -54,7 +63,7 @@ class NominationPoolsSetupUnbondModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): NominationPoolsSetupUnbondViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(NominationPoolsSetupUnbondViewModel::class.java)
+    ): NominationPoolsConfirmUnbondViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(NominationPoolsConfirmUnbondViewModel::class.java)
     }
 }

@@ -5,10 +5,25 @@
     android:id="@+id/nomination_pools_unbond_graph"
     app:startDestination="@+id/nominationPoolsSetupUnbondFragment">
 
-
     <fragment
-        tools:layout="@layout/fragment_nomination_pools_setup_unbond"
         android:id="@+id/nominationPoolsSetupUnbondFragment"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.setup.NominationPoolsSetupUnbondFragment"
-        android:label="NominationPoolsSetupUnbondFragment" />
+        android:label="NominationPoolsSetupUnbondFragment"
+        tools:layout="@layout/fragment_nomination_pools_setup_unbond">
+
+        <action
+            android:id="@+id/action_nominationPoolsSetupUnbondFragment_to_nominationPoolsConfirmUnbondFragment"
+            app:destination="@id/nominationPoolsConfirmUnbondFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nominationPoolsConfirmUnbondFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.confirm.NominationPoolsConfirmUnbondFragment"
+        android:label="NominationPoolsConfirmUnbondFragment"
+        tools:layout="@layout/fragment_nomination_pools_confirm_unbond" />
+
 </navigation>

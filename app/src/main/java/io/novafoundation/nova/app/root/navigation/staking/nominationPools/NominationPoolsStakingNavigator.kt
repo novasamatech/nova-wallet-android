@@ -6,6 +6,8 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.NominationPoolsConfirmBondMoreFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.NominationPoolsConfirmBondMorePayload
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.confirm.NominationPoolsConfirmUnbondFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.confirm.NominationPoolsConfirmUnbondPayload
 
 class NominationPoolsStakingNavigator(
     navigationHolder: NavigationHolder,
@@ -16,6 +18,11 @@ class NominationPoolsStakingNavigator(
     override fun openConfirmBondMore(payload: NominationPoolsConfirmBondMorePayload) = performNavigation(
         actionId = R.id.action_nominationPoolsSetupBondMoreFragment_to_nominationPoolsConfirmBondMoreFragment,
         args = NominationPoolsConfirmBondMoreFragment.getBundle(payload)
+    )
+
+    override fun openConfirmUnbond(payload: NominationPoolsConfirmUnbondPayload) = performNavigation(
+        actionId = R.id.action_nominationPoolsSetupUnbondFragment_to_nominationPoolsConfirmUnbondFragment,
+        args = NominationPoolsConfirmUnbondFragment.getBundle(payload)
     )
 
     override fun openSetupUnbond() = performNavigation(R.id.action_stakingFragment_to_PoolsUnbondGraph)
