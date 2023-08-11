@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
@@ -22,9 +23,10 @@ class EvmSignModule {
     @FeatureScope
     fun provideEthereumApiFactory(
         okHttpClient: OkHttpClient,
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
+        gasPriceProviderFactory: GasPriceProviderFactory,
     ): EvmApiFactory {
-        return EvmApiFactory(okHttpClient, chainRegistry)
+        return EvmApiFactory(okHttpClient, chainRegistry, gasPriceProviderFactory)
     }
 
     @Provides
