@@ -51,6 +51,14 @@ fun NominationPoolsCalls.withdrawUnbonded(memberAccount: AccountId, numberOfSlas
     )
 }
 
+fun NominationPoolsCalls.claimPayout() {
+    extrinsicBuilder.call(
+        moduleName = Modules.NOMINATION_POOLS,
+        callName = "claim_payout",
+        arguments = emptyMap()
+    )
+}
+
 private fun NominationPoolBondExtraSource.prepareForEncoding(): DictEnum.Entry<*> {
     return when (this) {
         is NominationPoolBondExtraSource.FreeBalance -> DictEnum.Entry("FreeBalance", amount)

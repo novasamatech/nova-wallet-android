@@ -63,12 +63,14 @@ class NominationPoolsModule {
         nominationPoolSharedComputation: NominationPoolSharedComputation,
         interactor: NominationPoolsUserRewardsInteractor,
         rewardPeriodsInteractor: StakingRewardPeriodInteractor,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        router: NominationPoolsRouter,
     ) = NominationPoolUserRewardsComponentFactory(
         nominationPoolSharedComputation = nominationPoolSharedComputation,
         interactor = interactor,
         rewardPeriodsInteractor = rewardPeriodsInteractor,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        router = router
     )
 
     @Provides
