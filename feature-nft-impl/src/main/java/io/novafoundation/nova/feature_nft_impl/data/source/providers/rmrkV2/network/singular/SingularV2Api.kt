@@ -21,4 +21,7 @@ interface SingularV2Api {
 
     @GET
     suspend fun getIpfsMetadata(@Url url: String): SingularV2CollectionMetadata
+
+    @GET
+    suspend fun getIpfsMetadataString(@Url url: String): String
 }

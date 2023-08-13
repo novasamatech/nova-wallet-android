@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_nft_impl.di.modules
 
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -28,5 +29,6 @@ class UniquesModule {
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         nftDao: NftDao,
         ipfsApi: IpfsApi,
-    ) = UniquesNftProvider(remoteStorageSource, accountRepository, chainRegistry, nftDao, ipfsApi)
+        gson: Gson
+    ) = UniquesNftProvider(remoteStorageSource, accountRepository, chainRegistry, nftDao, ipfsApi, gson)
 }

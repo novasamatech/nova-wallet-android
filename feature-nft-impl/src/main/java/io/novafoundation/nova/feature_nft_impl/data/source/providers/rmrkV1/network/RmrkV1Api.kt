@@ -15,4 +15,7 @@ interface RmrkV1Api {
 
     @GET
     suspend fun getIpfsMetadata(@Url url: String): RmrkV1NftMetadataRemote
+
+    @GET
+    suspend fun getIpfsMetadataString(@Url url: String): String
 }

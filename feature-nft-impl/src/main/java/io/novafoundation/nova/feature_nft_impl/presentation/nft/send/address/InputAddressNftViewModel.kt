@@ -14,10 +14,10 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_nft_impl.data.network.blockchain.nfts.transfers.NftTransferModel
 import io.novafoundation.nova.feature_nft_impl.data.network.blockchain.nfts.transfers.NftTransferPayload
+import io.novafoundation.nova.feature_nft_impl.domain.common.mapNftCollectionForUi
 import io.novafoundation.nova.feature_nft_impl.domain.nft.details.NftDetailsInteractor
 import io.novafoundation.nova.feature_nft_impl.domain.nft.send.NftSendInteractor
 import io.novafoundation.nova.feature_nft_impl.presentation.NftPayload
-import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatIssuance
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.send.NftTransferDraft
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.send.mapNftTransferValidationFailureToUI
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -55,8 +55,9 @@ class InputAddressNftViewModel(
     val nftName = nftDetailsFlow.map {
         it.nftDetails.name
     }
-    val nftIssuance = nftDetailsFlow.map {
-        resourceManager.formatIssuance(it.nftDetails.issuance)
+    val nftCollectionName = nftDetailsFlow.map {
+        val collection = it.nftDetails.collection
+        mapNftCollectionForUi(collection?.name, collection?.id)
     }
 
     private val chainFlow = nftDetailsFlow
@@ -181,7 +182,7 @@ class InputAddressNftViewModel(
             recipientAddress = validPayload.transfer.recipient,
             chainId = chainFlow.first().id,
             name = nftDetails.name,
-            issuance = nftIssuance.first()
+            collectionName = nftCollectionName.first()
         )
         router.openConfirmScreen(transferDraft)
     }

@@ -61,7 +61,9 @@ class RmrkV1NftProvider(
                 issuance = nftIssuance(nftLocal),
                 price = nftPrice(nftLocal),
                 collection = null,
-                type = mapNftLocalToNftType(nftLocal)
+                type = mapNftLocalToNftType(nftLocal),
+                tags = emptyList(),
+                attributes = emptyList()
             )
         }
     }

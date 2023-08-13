@@ -23,7 +23,7 @@ import kotlinx.android.synthetic.main.fragment_input_address_nft.inputAddressNex
 import kotlinx.android.synthetic.main.fragment_input_address_nft.inputAddressRecipient
 import kotlinx.android.synthetic.main.fragment_input_address_nft.inputAddressToolbar
 import kotlinx.android.synthetic.main.fragment_input_address_nft.inputAddressWallet
-import kotlinx.android.synthetic.main.fragment_input_address_nft.nftIssuance
+import kotlinx.android.synthetic.main.fragment_input_address_nft.nftCollectionName
 import kotlinx.android.synthetic.main.fragment_input_address_nft.nftName
 
 private const val KEY_NFT_PAYLOAD = "KEY_NFT_PAYLOAD"
@@ -80,8 +80,8 @@ class InputAddressNftFragment : BaseFragment<InputAddressNftViewModel>() {
         viewModel.nftName.observe {
             nftName.text = it
         }
-        viewModel.nftIssuance.observe {
-            nftIssuance.text = it
+        viewModel.nftCollectionName.observe {
+            nftCollectionName.text = it
         }
     }
 }

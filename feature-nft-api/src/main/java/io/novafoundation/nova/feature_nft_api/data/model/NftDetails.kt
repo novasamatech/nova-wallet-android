@@ -15,12 +15,19 @@ class NftDetails(
     val issuance: Nft.Issuance,
     val price: BigInteger?,
     val collection: Collection?,
-    val type: Nft.Type
+    val type: Nft.Type,
+    val tags: List<String>,
+    val attributes: List<Attribute>
 ) {
 
     class Collection(
         val id: String,
         val name: String? = null,
         val media: String? = null
+    )
+
+    class Attribute(
+        val label: String,
+        val value: String
     )
 }

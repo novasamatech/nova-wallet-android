@@ -4,11 +4,9 @@ import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
-import io.novafoundation.nova.feature_nft_api.data.model.NftDetails
 import io.novafoundation.nova.feature_nft_impl.R
 import io.novafoundation.nova.feature_nft_impl.domain.nft.list.PricedNft
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.list.NftListItem
-import io.novafoundation.nova.feature_nft_impl.domain.nft.search.SendNftListItem
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 
 fun ResourceManager.formatIssuance(issuance: Nft.Issuance): String {
@@ -41,7 +39,7 @@ fun ResourceManager.mapNftToListItem(pricedNft: PricedNft): NftListItem {
             LoadingState.Loaded(
                 NftListItem.Content(
                     issuance = issuanceFormatted,
-                    title = details.name ?: pricedNft.nft.instanceId ?: pricedNft.nft.collectionId,
+                    title = mapNftNameForUi(details.name, pricedNft.nft.instanceId),
                     price = amountModel,
                     media = details.media
                 )
@@ -53,4 +51,8 @@ fun ResourceManager.mapNftToListItem(pricedNft: PricedNft): NftListItem {
         identifier = pricedNft.nft.identifier,
         content = content
     )
+}
+
+fun mapNftNameForUi(name: String?, instanceId: String?): String {
+    return name ?: "NFT ID: $instanceId"
 }

@@ -905,8 +905,10 @@
     <string name="common_price">Price</string>
 
     <string name="nft_collection">Collection</string>
+    <string name="nft_token">Token</string>
     <string name="nft_owned_by">Owned by</string>
     <string name="nft_created_by">Created by</string>
+    <string name="nft_price">Price</string>
 
     <string name="nft_issuance_unlimited">Unlimited series</string>
     <string name="nft_issuance_limited_format">#%s Edition of %s</string>

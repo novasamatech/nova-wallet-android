@@ -7,4 +7,7 @@ interface IpfsApi {
 
     @GET
     suspend fun getIpfsMetadata(@Url url: String): UniquesMetadata
+
+    @GET
+    suspend fun getIpfsMetadataString(@Url url: String): String
 }

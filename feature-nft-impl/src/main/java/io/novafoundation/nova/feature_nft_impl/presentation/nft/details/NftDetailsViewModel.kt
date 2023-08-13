@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.AddressD
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_nft_api.data.model.NftDetails
 import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_nft_impl.domain.nft.details.NftDetailsInteractor
 import io.novafoundation.nova.feature_nft_impl.domain.nft.details.PricedNftDetails
@@ -95,7 +96,7 @@ class NftDetailsViewModel(
             collection = nftDetails.collection?.let {
                 NftDetailsModel.Collection(
                     name = it.name ?: it.id,
-                    media = it.media,
+                    media = it.media
                 )
             },
             owner = createAddressModel(nftDetails.owner, nftDetails.chain),
@@ -103,8 +104,19 @@ class NftDetailsViewModel(
                 createAddressModel(it, nftDetails.chain)
             },
             network = mapChainToUi(nftDetails.chain),
-            isSupportedForSend = nftSupportedForSend
+            isSupportedForSend = nftSupportedForSend,
+            tags = nftDetails.tags,
+            attributes = mapAttributes(nftDetails.attributes)
         )
+    }
+
+    private fun mapAttributes(attributes: List<NftDetails.Attribute>): List<NftDetailsModel.Attribute> {
+        return attributes.map {
+            NftDetailsModel.Attribute(
+                label = it.label,
+                value = it.value
+            )
+        }
     }
 
     private suspend fun createAddressModel(accountId: AccountId, chain: Chain) = addressIconGenerator.createAddressModel(

@@ -45,6 +45,7 @@ dependencies {
     implementation androidDep
     implementation materialDep
     implementation constraintDep
+    implementation flexBoxDep
 
     implementation coroutinesDep
     implementation coroutinesAndroidDep

@@ -25,7 +25,7 @@ import kotlinx.android.synthetic.main.fragment_confirm_nft_send.confirmSendRecip
 import kotlinx.android.synthetic.main.fragment_confirm_nft_send.confirmSendSender
 import kotlinx.android.synthetic.main.fragment_confirm_nft_send.confirmSendToolbar
 import kotlinx.android.synthetic.main.fragment_confirm_nft_send.confirmSendWallet
-import kotlinx.android.synthetic.main.fragment_confirm_nft_send.nftIssuance
+import kotlinx.android.synthetic.main.fragment_confirm_nft_send.nftCollectionName
 import kotlinx.android.synthetic.main.fragment_confirm_nft_send.nftName
 
 private const val KEY_DRAFT = "KEY_DRAFT"
@@ -72,7 +72,7 @@ class ConfirmNftSendFragment : BaseFragment<ConfirmNftSendViewModel>() {
         setupFeeLoading(viewModel.originFeeMixin, confirmSendOriginFee)
 
         nftName.text = viewModel.transferDraft.name
-        nftIssuance.text = viewModel.transferDraft.issuance
+        nftCollectionName.text = viewModel.transferDraft.collectionName
 
         viewModel.recipientModel.observe(confirmSendRecipient::showAddress)
         viewModel.senderModel.observe(confirmSendSender::showAddress)

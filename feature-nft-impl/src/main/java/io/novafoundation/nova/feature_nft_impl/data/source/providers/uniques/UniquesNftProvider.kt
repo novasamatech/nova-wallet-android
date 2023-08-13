@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques
 
+import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
@@ -19,7 +20,9 @@ import io.novafoundation.nova.feature_nft_impl.data.mappers.mapNftLocalToNftType
 import io.novafoundation.nova.feature_nft_impl.data.mappers.nftIssuance
 import io.novafoundation.nova.feature_nft_impl.data.network.distributed.FileStorageAdapter.adoptFileStorageLinkToHttps
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.common.mapJsonToAttributes
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.network.IpfsApi
+import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.mapNftNameForUi
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -46,6 +49,7 @@ class UniquesNftProvider(
     private val chainRegistry: ChainRegistry,
     private val nftDao: NftDao,
     private val ipfsApi: IpfsApi,
+    private val gson: Gson
 ) : NftProvider {
 
     override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
@@ -104,6 +108,7 @@ class UniquesNftProvider(
                     name = null,
                     label = null,
                     media = null,
+                    tags = null,
 
                     wholeDetailsLoaded = false
                 )
@@ -114,20 +119,28 @@ class UniquesNftProvider(
     }
 
     override suspend fun nftFullSync(nft: Nft) {
-        if (nft.metadataRaw == null) {
-            nftDao.markFullSynced(nft.identifier)
+        nftFullSync(nft.metadataRaw, nft.identifier)
+    }
 
+    private suspend fun nftFullSync(
+        metadataRaw: ByteArray?,
+        identifier: String
+    ) {
+        if (metadataRaw == null) {
+            nftDao.markFullSynced(identifier)
             return
         }
 
-        val metadataLink = nft.metadataRaw!!.decodeToString().adoptFileStorageLinkToHttps()
+        val metadataLink = metadataRaw.decodeToString().adoptFileStorageLinkToHttps()
         val metadata = ipfsApi.getIpfsMetadata(metadataLink)
 
-        nftDao.updateNft(nft.identifier) { local ->
+        nftDao.updateNft(identifier) { local ->
             local.copy(
                 name = metadata.name!!,
                 media = metadata.image?.adoptFileStorageLinkToHttps(),
                 label = metadata.description,
+                tags = metadata.tags?.let { gson.toJson(it) },
+                attributes = metadata.attributes?.let { gson.toJson(it) },
                 wholeDetailsLoaded = true
             )
         }
@@ -157,15 +170,18 @@ class UniquesNftProvider(
 
     override fun nftDetailsFlow(nftIdentifier: String): Flow<NftDetails> {
         return flowOf {
-            val nftLocal = nftDao.getNft(nftIdentifier)
-            require(nftLocal.wholeDetailsLoaded) {
+            val notSyncedNftLocal = nftDao.getNft(nftIdentifier)
+            require(notSyncedNftLocal.wholeDetailsLoaded) {
                 "Cannot load details of non fully-synced NFT"
             }
 
-            val chain = chainRegistry.getChain(nftLocal.chainId)
-            val metaAccount = accountRepository.getMetaAccount(nftLocal.metaId)
+            nftFullSync(notSyncedNftLocal.metadata, notSyncedNftLocal.identifier)
+            val syncedNftLocal = nftDao.getNft(nftIdentifier)
 
-            val classId = nftLocal.collectionId.toBigInteger()
+            val chain = chainRegistry.getChain(syncedNftLocal.chainId)
+            val metaAccount = accountRepository.getMetaAccount(syncedNftLocal.metaId)
+
+            val classId = syncedNftLocal.collectionId.toBigInteger()
 
             remoteStorage.query(chain.id) {
                 val classMetadataStorage = runtime.metadata.uniques().storage("ClassMetadataOf")
@@ -178,13 +194,13 @@ class UniquesNftProvider(
                 val classMetadataPointer = bindMetadata(queryResults.singleValueOf(classMetadataStorage))
 
                 val collection = if (classMetadataPointer == null) {
-                    NftDetails.Collection(nftLocal.collectionId)
+                    NftDetails.Collection(syncedNftLocal.collectionId)
                 } else {
                     val url = classMetadataPointer.decodeToString().adoptFileStorageLinkToHttps()
                     val classMetadata = ipfsApi.getIpfsMetadata(url)
 
                     NftDetails.Collection(
-                        id = nftLocal.collectionId,
+                        id = syncedNftLocal.collectionId,
                         name = classMetadata.name,
                         media = classMetadata.image?.adoptFileStorageLinkToHttps()
                     )
@@ -194,17 +210,23 @@ class UniquesNftProvider(
                 val classIssuer = bindAccountId(classIssuerRaw.cast<Struct.Instance>()["issuer"])
 
                 NftDetails(
-                    identifier = nftLocal.identifier,
+                    identifier = syncedNftLocal.identifier,
                     chain = chain,
                     owner = metaAccount.accountIdIn(chain)!!,
                     creator = classIssuer,
-                    media = nftLocal.media,
-                    name = nftLocal.name ?: nftLocal.instanceId!!,
-                    description = nftLocal.label,
-                    issuance = nftIssuance(nftLocal),
-                    price = nftLocal.price,
+                    media = syncedNftLocal.media,
+                    name = mapNftNameForUi(syncedNftLocal.name, syncedNftLocal.instanceId),
+                    description = syncedNftLocal.label,
+                    issuance = nftIssuance(syncedNftLocal),
+                    price = syncedNftLocal.price,
                     collection = collection,
-                    type = mapNftLocalToNftType(nftLocal)
+                    type = mapNftLocalToNftType(syncedNftLocal),
+                    tags = if (syncedNftLocal.tags == null) {
+                        emptyList()
+                    } else {
+                        gson.fromJson(syncedNftLocal.tags, List::class.java) as List<String>
+                    },
+                    attributes = mapJsonToAttributes(gson, syncedNftLocal.attributes),
                 )
             }
         }

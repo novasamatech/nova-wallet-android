@@ -43,13 +43,14 @@
             android:textColor="@color/text_primary"
             tools:text="Honeybird" />
 
-        <io.novafoundation.nova.feature_nft_impl.presentation.nft.common.NftIssuanceView
-            android:id="@+id/nftDetailsIssuance"
-            android:layout_width="wrap_content"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tagsRecyclerView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            tools:text="#11 Edition of 9978" />
+            android:layout_marginTop="1dp"
+            tools:itemCount="1"
+            tools:listitem="@layout/item_nft_tag"
+            android:paddingHorizontal="14dp"/>
 
         <TextView
             android:id="@+id/nftDetailsDescription"
@@ -86,6 +87,16 @@
 
         </LinearLayout>
 
+        <io.novafoundation.nova.common.view.TableView
+            android:id="@+id/nftAttributesTable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+        </io.novafoundation.nova.common.view.TableView>
+
         <io.novafoundation.nova.feature_wallet_api.presentation.view.PriceSectionView
             android:id="@+id/nftDetailsPrice"
             android:layout_width="match_parent"
@@ -109,6 +120,12 @@
                 app:title="@string/nft_collection" />
 
             <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/nftDetailsIssuance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/nft_token" />
+
+            <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/nftDetailsOnwer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -129,6 +146,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:title="@string/common_network" />
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/nftDetailsTokenPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/nft_price" />
+
         </io.novafoundation.nova.common.view.TableView>
     </LinearLayout>
 </ScrollView>
