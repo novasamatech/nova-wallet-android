@@ -25,11 +25,13 @@ interface NftRepository {
 
     suspend fun getLocalNft(nftIdentifier: String): NftLocal
 
-    fun onNftSendTransactionSubmitted(nftId: String)
+    suspend fun getLocalNftOrNull(nftIdentifier: String): NftLocal?
 
-    fun removeOldPendingTransactions(myNftIds: List<String>)
+    fun onNftSendTransactionSubmitted(nftLocal: NftLocal)
 
-    fun getPendingSendTransactionsNftIds(): Flow<Set<String>>
+    fun removeOldPendingTransactions(myNftIds: List<NftLocal>)
+
+    fun getPendingSendTransactionsNftLocals(): Flow<Set<NftLocal>>
 
     fun isNftTypeSupportedForSend(nftType: Nft.Type): Boolean
 }

@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -99,6 +100,10 @@ class NftRepositoryImpl(
         return nftDao.getNft(nftIdentifier)
     }
 
+    override suspend fun getLocalNftOrNull(nftIdentifier: String): NftLocal? {
+        return nftDao.getNftOrNull(nftIdentifier)
+    }
+
     override suspend fun initialNftSync(
         metaAccount: MetaAccount,
         forceOverwrite: Boolean,
@@ -139,20 +144,20 @@ class NftRepositoryImpl(
         }
     }
 
-    override fun onNftSendTransactionSubmitted(nftId: String) {
-        pendingSendTransactionsNftIds.value = pendingSendTransactionsNftIds.value.toMutableSet().apply {
-            add(nftId)
+    override fun onNftSendTransactionSubmitted(nftLocal: NftLocal) {
+        pendingSendTransactionsNftLocals.value = pendingSendTransactionsNftLocals.value.toMutableSet().apply {
+            add(nftLocal)
         }
     }
 
-    override fun removeOldPendingTransactions(myNftIds: List<String>) {
-        pendingSendTransactionsNftIds.value = pendingSendTransactionsNftIds.value.toMutableSet().apply {
-            toList().forEach { _ -> removeIf { it in myNftIds } }
+    override fun removeOldPendingTransactions(myNftIds: List<NftLocal>) {
+        pendingSendTransactionsNftLocals.value = pendingSendTransactionsNftLocals.value.toMutableSet().apply {
+            toList().forEach { _ -> removeIf { it.identifier in myNftIds.map { it.identifier } } }
         }
     }
 
-    override fun getPendingSendTransactionsNftIds(): Flow<Set<String>> {
-        return pendingSendTransactionsNftIds.asStateFlow()
+    override fun getPendingSendTransactionsNftLocals(): Flow<Set<NftLocal>> {
+        return pendingSendTransactionsNftLocals.asStateFlow()
     }
 
     override fun isNftTypeSupportedForSend(nftType: Nft.Type): Boolean {
@@ -161,6 +166,6 @@ class NftRepositoryImpl(
 
     companion object {
         private val supportedSendNftTypes = setOf(Nft.Type.Uniques::class)
-        private val pendingSendTransactionsNftIds = MutableStateFlow(setOf<String>())
+        private val pendingSendTransactionsNftLocals = MutableStateFlow(setOf<NftLocal>())
     }
 }

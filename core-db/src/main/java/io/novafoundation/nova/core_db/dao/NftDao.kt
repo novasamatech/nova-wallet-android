@@ -32,6 +32,9 @@ abstract class NftDao {
     @Query("SELECT * FROM nfts WHERE identifier = :nftIdentifier")
     abstract suspend fun getNft(nftIdentifier: String): NftLocal
 
+    @Query("SELECT * FROM nfts WHERE identifier = :nftIdentifier")
+    abstract suspend fun getNftOrNull(nftIdentifier: String): NftLocal?
+
     @Query("SELECT type FROM nfts WHERE identifier = :nftIdentifier")
     abstract suspend fun getNftType(nftIdentifier: String): NftLocal.Type
 

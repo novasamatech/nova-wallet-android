@@ -20,6 +20,7 @@ import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_nft_impl.R
 import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.item_nft_collection_name.view.itemCollectionName
 import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftContent
 import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftMedia
 import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftShimmer
@@ -27,6 +28,7 @@ import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftTitle
 import kotlinx.android.synthetic.main.item_nft_list_actions.view.nftActionsReceive
 import kotlinx.android.synthetic.main.item_nft_list_actions.view.nftActionsSend
 import kotlinx.android.synthetic.main.item_nft_grid.view.nftCollectionName
+import kotlinx.coroutines.withContext
 
 class NftGridAdapter(
     private val imageLoader: ImageLoader,
@@ -35,14 +37,16 @@ class NftGridAdapter(
 
     companion object {
         private const val TYPE_ACTIONS = 1
-        private const val TYPE_NFT = 2
+        private const val TYPE_DIVIDER = 2
+        private const val TYPE_COLLECTION = 3
+        private const val TYPE_NFT = 4
     }
 
     interface Handler {
 
-        fun itemClicked(item: NftListItem)
+        fun itemClicked(item: NftListItem.NftListCard)
 
-        fun loadableItemShown(item: NftListItem)
+        fun loadableItemShown(item: NftListItem.NftListCard)
 
         fun sendClicked()
 
@@ -50,10 +54,11 @@ class NftGridAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == 0) {
-            TYPE_ACTIONS
-        } else {
-            TYPE_NFT
+        return when (getItem(position)) {
+            NftListItem.Actions -> TYPE_ACTIONS
+            is NftListItem.NftCollection -> TYPE_COLLECTION
+            NftListItem.Divider -> TYPE_DIVIDER
+            is NftListItem.NftListCard -> TYPE_NFT
         }
     }
 
@@ -61,6 +66,12 @@ class NftGridAdapter(
         return when (viewType) {
             TYPE_ACTIONS -> {
                 ActionsHolder(parent.inflateChild(R.layout.item_nft_list_actions), handler)
+            }
+            TYPE_COLLECTION -> {
+                CollectionHolder(parent.inflateChild(R.layout.item_nft_collection_name))
+            }
+            TYPE_DIVIDER -> {
+                DividerHolder(parent.inflateChild(R.layout.item_divider))
             }
             TYPE_NFT -> {
                 NftHolder(parent.inflateChild(R.layout.item_nft_grid), imageLoader, handler)
@@ -70,8 +81,15 @@ class NftGridAdapter(
     }
 
     override fun onBindViewHolder(holder: NftGridListHolder, position: Int) {
-        if (holder is NftHolder) {
-            holder.bind(getItem(position))
+        when (holder) {
+            is ActionsHolder -> {}
+            is CollectionHolder -> {
+                holder.bind(getItem(position) as NftListItem.NftCollection)
+            }
+            is DividerHolder -> {}
+            is NftHolder -> {
+                holder.bind(getItem(position) as NftListItem.NftListCard)
+            }
         }
     }
 
@@ -85,7 +103,17 @@ class NftGridAdapter(
 private object DiffCallback : DiffUtil.ItemCallback<NftListItem>() {
 
     override fun areItemsTheSame(oldItem: NftListItem, newItem: NftListItem): Boolean {
-        return oldItem.identifier == newItem.identifier
+        return when {
+            oldItem is NftListItem.Actions && newItem is NftListItem.Actions -> {
+                return true
+            }
+            oldItem is NftListItem.NftListCard && newItem is NftListItem.NftListCard -> {
+                oldItem.identifier == newItem.identifier
+            }
+            else -> {
+                false
+            }
+        }
     }
 
     override fun areContentsTheSame(oldItem: NftListItem, newItem: NftListItem): Boolean {
@@ -108,6 +136,19 @@ class ActionsHolder(
     }
 }
 
+class CollectionHolder(
+    override val containerView: View,
+) : NftGridListHolder(containerView) {
+
+    fun bind(item: NftListItem.NftCollection) = with(containerView) {
+        itemCollectionName.text = item.name
+    }
+}
+
+class DividerHolder(
+    override val containerView: View,
+) : NftGridListHolder(containerView)
+
 class NftHolder(
     override val containerView: View,
     private val imageLoader: ImageLoader,
@@ -126,16 +167,19 @@ class NftHolder(
         itemNftMedia.clear()
     }
 
-    fun bind(item: NftListItem) = with(containerView) {
+    fun bind(item: NftListItem.NftListCard) = with(containerView) {
         when (val content = item.content) {
             is LoadingState.Loading -> {
                 itemNftShimmer.makeVisible()
                 itemNftShimmer.startShimmer()
                 itemNftContent.makeGone()
-
-                itemHandler.loadableItemShown(item)
             }
             is LoadingState.Loaded -> {
+
+                if (!content.data.wholeDetailsLoaded) {
+                    itemHandler.loadableItemShown(item)
+                }
+
                 itemNftShimmer.makeGone()
                 itemNftShimmer.stopShimmer()
                 itemNftContent.makeVisible()
@@ -157,7 +201,13 @@ class NftHolder(
                     )
                 }
 
-                nftCollectionName.text = content.data.collectionName
+                val collectionName = content.data.collectionName
+                if (collectionName != null) {
+                    nftCollectionName.makeVisible()
+                    nftCollectionName.text = content.data.collectionName
+                } else {
+                    nftCollectionName.makeGone()
+                }
                 itemNftTitle.text = content.data.title
             }
         }

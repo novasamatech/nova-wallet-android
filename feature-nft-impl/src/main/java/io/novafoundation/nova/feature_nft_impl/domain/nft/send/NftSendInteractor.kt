@@ -41,9 +41,10 @@ class NftSendInteractor @Inject constructor(
     }
 
     suspend fun performTransfer(transfer: NftTransferModel): Result<String> {
+        val nftLocal = nftRepository.getLocalNft(transfer.nftId)
         return getNftTransfers(transfer).performTransfer(transfer)
             .onSuccess {
-                nftRepository.onNftSendTransactionSubmitted(transfer.nftId)
+                nftRepository.onNftSendTransactionSubmitted(nftLocal)
             }
     }
 

@@ -15,6 +15,7 @@ class Nft(
     val metadataRaw: ByteArray?,
     val details: Details,
     val type: Type,
+    val wholeDetailsLoaded: Boolean
 ) {
 
     sealed class Details {

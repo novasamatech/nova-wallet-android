@@ -17,7 +17,7 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="262dp"
+            android:layout_height="200dp"
             android:background="@drawable/bg_shimmering" />
 
     </com.facebook.shimmer.ShimmerFrameLayout>
@@ -27,7 +27,8 @@
         android:id="@+id/itemNftContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="12dp">
 
         <ImageView
             android:id="@+id/itemNftMedia"
@@ -60,7 +61,6 @@
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
             android:layout_marginTop="4dp"
-            android:layout_marginBottom="12dp"
             android:layout_marginHorizontal="8dp"
             android:maxLines="1"
             android:ellipsize="end"

@@ -32,10 +32,12 @@ class NftListInteractor(
     fun userNftsFlow(): Flow<List<PricedNft>> {
         return accountRepository.selectedMetaAccountFlow()
             .flatMapLatest(nftRepository::allNftWithMetadataFlow)
-            .map { nfts -> nfts.sortedBy { it.identifier } }
+            .map { nfts ->
+                nfts.sortedBy { it.identifier }
+            }
             .onEach {
                 nftRepository.removeOldPendingTransactions(
-                    myNftIds = it.map { it.identifier }
+                    myNftIds = it.map { nftRepository.getLocalNft(it.identifier) }
                 )
             }
             .flatMapLatest { nfts ->
@@ -62,7 +64,7 @@ class NftListInteractor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun subscribeNftOwnerChanged(): Flow<Unit> {
-        return nftRepository.getPendingSendTransactionsNftIds()
+        return nftRepository.getPendingSendTransactionsNftLocals()
             .flatMapLatest(::subscribeNftsOwnerAddresses)
             .onEach {
                 val blockTimeInMillis = chainStateRepository.expectedBlockTimeInMillis(it.chainId)
@@ -71,10 +73,9 @@ class NftListInteractor(
             }.map {}
     }
 
-    private suspend fun subscribeNftsOwnerAddresses(nftIds: Set<String>): Flow<NftLocal> {
+    private suspend fun subscribeNftsOwnerAddresses(nftLocals: Set<NftLocal>): Flow<NftLocal> {
         val myAccountAddress = accountRepository.getSelectedMetaAccount().substrateAccountId?.toHexString()
-        return nftIds.map { nftId ->
-            val nftLocal = nftRepository.getLocalNft(nftId)
+        return nftLocals.map { nftLocal ->
             nftRepository.subscribeNftOwnerAddress(nftLocal)
                 .distinctUntilChanged()
                 .filter { ownerAddress -> myAccountAddress != ownerAddress }

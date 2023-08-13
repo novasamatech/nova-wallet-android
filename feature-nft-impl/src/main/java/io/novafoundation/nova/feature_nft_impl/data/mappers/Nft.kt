@@ -47,18 +47,6 @@ fun mapNftLocalToNft(
 
     val type = mapNftLocalToNftType(nftLocal)
 
-    val details = if (nftLocal.wholeDetailsLoaded) {
-        Nft.Details.Loaded(
-            name = nftLocal.name,
-            label = nftLocal.label,
-            media = nftLocal.media,
-            price = nftPrice(nftLocal),
-            collectionName = collectionName
-        )
-    } else {
-        Nft.Details.Loadable
-    }
-
     return Nft(
         identifier = nftLocal.identifier,
         instanceId = nftLocal.instanceId,
@@ -67,7 +55,14 @@ fun mapNftLocalToNft(
         owner = metaAccount.accountIdIn(chain)!!,
         metadataRaw = nftLocal.metadata,
         type = type,
-        details = details
+        details = Nft.Details.Loaded(
+            name = nftLocal.name,
+            label = nftLocal.label,
+            media = nftLocal.media,
+            price = nftPrice(nftLocal),
+            collectionName = collectionName
+        ),
+        wholeDetailsLoaded = nftLocal.wholeDetailsLoaded
     )
 }
 
