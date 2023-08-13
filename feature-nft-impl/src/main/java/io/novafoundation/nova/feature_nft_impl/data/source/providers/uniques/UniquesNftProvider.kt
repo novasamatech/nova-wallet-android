@@ -22,7 +22,7 @@ import io.novafoundation.nova.feature_nft_impl.data.network.distributed.FileStor
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.common.mapJsonToAttributes
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.network.IpfsApi
-import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.mapNftNameForUi
+import io.novafoundation.nova.feature_nft_impl.domain.common.mapNftNameForUi
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -116,6 +116,32 @@ class UniquesNftProvider(
         }
 
         nftDao.insertNftsDiff(NftLocal.Type.UNIQUES, metaAccount.id, newNfts, forceOverwrite)
+    }
+
+    override suspend fun getCollectionName(
+        collectionId: String,
+        chainId: ChainId?
+    ): String? {
+        if (chainId == null) return null
+
+        val classId = collectionId.toBigInteger()
+        return remoteStorage.query(chainId) {
+            val classMetadataStorage = runtime.metadata.uniques().storage("ClassMetadataOf")
+            val classStorage = runtime.metadata.uniques().storage("Class")
+
+            val queryResults = multi {
+                classMetadataStorage.queryKey(classId)
+                classStorage.queryKey(classId)
+            }
+            val classMetadataPointer = bindMetadata(queryResults.singleValueOf(classMetadataStorage))
+
+            classMetadataPointer?.let {
+                val url = classMetadataPointer.decodeToString().adoptFileStorageLinkToHttps()
+                val classMetadata = ipfsApi.getIpfsMetadata(url)
+
+                classMetadata.name
+            }
+        }
     }
 
     override suspend fun nftFullSync(nft: Nft) {

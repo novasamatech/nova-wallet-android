@@ -16,3 +16,7 @@ fun mapNftDetailsToListItem(nftDetails: NftDetails): SendNftListItem {
 fun mapNftCollectionForUi(collectionName: String?, collectionId: String?): String {
     return collectionName ?: "NFT Collection ID: $collectionId"
 }
+
+fun mapNftNameForUi(name: String?, instanceId: String?): String {
+    return name ?: "NFT ID: $instanceId"
+}

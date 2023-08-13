@@ -21,7 +21,7 @@ class Nft(
 
         class Loaded(
             val price: BigInteger?,
-            val issuance: Issuance,
+            val collectionName: String?,
             val name: String?,
             val label: String?,
             val media: String?,

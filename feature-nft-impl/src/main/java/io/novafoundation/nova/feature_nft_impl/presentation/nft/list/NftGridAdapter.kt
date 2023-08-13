@@ -21,10 +21,10 @@ import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_nft_impl.R
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftContent
-import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftIssuance
 import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftMedia
 import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftShimmer
 import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftTitle
+import kotlinx.android.synthetic.main.item_nft_grid.view.nftCollectionName
 
 class NftGridAdapter(
     private val imageLoader: ImageLoader,
@@ -111,7 +111,7 @@ class NftHolder(
                     )
                 }
 
-                itemNftIssuance.text = content.data.issuance
+                nftCollectionName.text = content.data.collectionName
                 itemNftTitle.text = content.data.title
             }
         }

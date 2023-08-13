@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV1.netw
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 
 class RmrkV1NftProvider(
@@ -66,5 +67,9 @@ class RmrkV1NftProvider(
                 attributes = emptyList()
             )
         }
+    }
+
+    override suspend fun getCollectionName(collectionId: String, chainId: ChainId?): String? {
+        return null
     }
 }

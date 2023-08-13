@@ -31,7 +31,7 @@ class NftListInteractor(
 
     fun userNftsFlow(): Flow<List<PricedNft>> {
         return accountRepository.selectedMetaAccountFlow()
-            .flatMapLatest(nftRepository::allNftFlow)
+            .flatMapLatest(nftRepository::allNftWithMetadataFlow)
             .map { nfts -> nfts.sortedBy { it.identifier } }
             .onEach {
                 nftRepository.removeOldPendingTransactions(

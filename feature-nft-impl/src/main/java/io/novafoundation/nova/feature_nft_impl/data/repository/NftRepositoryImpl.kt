@@ -44,13 +44,30 @@ class NftRepositoryImpl(
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
 ) : NftRepository {
 
+    override fun allNftWithMetadataFlow(metaAccount: MetaAccount): Flow<List<Nft>> {
+        return nftDao.nftsFlow(metaAccount.id)
+            .map { nftsLocal ->
+                val chainsById = chainRegistry.chainsById.first()
+
+                nftsLocal.mapNotNull { nftLocal ->
+
+                    val nftTypeKey = mapNftTypeLocalToTypeKey(nftDao.getNftType(nftLocal.identifier))
+                    val nftProvider = nftProvidersRegistry.get(nftTypeKey)
+                    val chain = chainsById[nftLocal.chainId]
+                    val collectionName = nftProvider.getCollectionName(nftLocal.collectionId, chain?.id)
+
+                    mapNftLocalToNft(chainsById, metaAccount, nftLocal, collectionName)
+                }
+            }
+    }
+
     override fun allNftFlow(metaAccount: MetaAccount): Flow<List<Nft>> {
         return nftDao.nftsFlow(metaAccount.id)
             .map { nftsLocal ->
                 val chainsById = chainRegistry.chainsById.first()
 
                 nftsLocal.mapNotNull { nftLocal ->
-                    mapNftLocalToNft(chainsById, metaAccount, nftLocal)
+                    mapNftLocalToNft(chainsById, metaAccount, nftLocal, null)
                 }
             }
     }

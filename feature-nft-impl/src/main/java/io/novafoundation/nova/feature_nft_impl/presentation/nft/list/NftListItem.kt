@@ -9,7 +9,7 @@ data class NftListItem(
 ) {
 
     data class Content(
-        val issuance: String,
+        val collectionName: String,
         val title: String,
         val price: AmountModel?,
         val media: String?,

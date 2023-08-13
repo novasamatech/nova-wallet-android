@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_nft_impl.data.network.distributed.FileStor
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.common.mapJsonToAttributes
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.singular.SingularV2Api
-import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.mapNftNameForUi
+import io.novafoundation.nova.feature_nft_impl.domain.common.mapNftNameForUi
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -151,6 +151,17 @@ class RmrkV2NftProvider(
                 attributes = mapJsonToAttributes(gson, syncedNftLocal.attributes)
             )
         }
+    }
+
+    override suspend fun getCollectionName(
+        collectionId: String,
+        chainId: ChainId?
+    ): String? {
+        val collection = singularV2Api.getCollection(collectionId).first()
+        val collectionMetadata = collection.metadata?.let {
+            singularV2Api.getIpfsMetadata(it.adoptFileStorageLinkToHttps())
+        }
+        return collectionMetadata?.name
     }
 
     private fun localIdentifier(chainId: ChainId, remoteId: String): String {

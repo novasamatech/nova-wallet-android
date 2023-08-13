@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface NftRepository {
 
+    fun allNftWithMetadataFlow(metaAccount: MetaAccount): Flow<List<Nft>>
+
     fun allNftFlow(metaAccount: MetaAccount): Flow<List<Nft>>
 
     fun nftDetails(nftId: String): Flow<NftDetails>

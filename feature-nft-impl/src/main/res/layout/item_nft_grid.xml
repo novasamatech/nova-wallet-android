@@ -53,17 +53,18 @@
             android:textColor="@color/text_primary"
             tools:text="Honeybird" />
 
-        <io.novafoundation.nova.feature_nft_impl.presentation.nft.common.NftIssuanceView
-            android:id="@+id/itemNftIssuance"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/nftCollectionName"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:includeFontPadding="false"
             android:layout_marginTop="4dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginBottom="12dp"
+            android:layout_marginHorizontal="8dp"
+            android:maxLines="1"
             android:ellipsize="end"
-            android:singleLine="true"
-            tools:text="#11 Edition of 9978" />
+            tools:text="Bored Ape Collection" />
 
     </LinearLayout>
 </FrameLayout>
