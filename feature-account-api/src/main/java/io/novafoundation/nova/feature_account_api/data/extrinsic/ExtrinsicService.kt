@@ -65,5 +65,5 @@ interface ExtrinsicService {
         formExtrinsic: FormMultiExtrinsic,
     ): BigInteger
 
-    suspend fun estimateFee(chainId: ChainId, extrinsic: String): BigInteger
+    suspend fun estimateFee(chainId: ChainId, extrinsic: String): Fee
 }

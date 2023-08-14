@@ -120,14 +120,14 @@ class RealExtrinsicService(
         extrinsicBuilder.formExtrinsic()
         val extrinsic = extrinsicBuilder.build()
 
-        return estimateFee(chain.id, extrinsic)
+        return estimateFee(chain.id, extrinsic).amount
     }
 
     override suspend fun estimateFeeV2(chain: Chain, formExtrinsic: suspend ExtrinsicBuilder.() -> Unit): Fee {
         return InlineFee(estimateFee(chain, formExtrinsic))
     }
 
-    override suspend fun estimateFee(chainId: ChainId, extrinsic: String): BigInteger {
+    override suspend fun estimateFee(chainId: ChainId, extrinsic: String): Fee {
         val baseFee = rpcCalls.getExtrinsicFee(chainId, extrinsic).partialFee
 
         val runtime = chainRegistry.getRuntime(chainId)
@@ -137,7 +137,7 @@ class RealExtrinsicService(
 
         val tip = decodedExtrinsic.tip().orZero()
 
-        return tip + baseFee
+        return InlineFee(tip + baseFee)
     }
 
     override suspend fun estimateMultiFee(chain: Chain, formExtrinsic: FormMultiExtrinsic): BigInteger {
@@ -145,7 +145,7 @@ class RealExtrinsicService(
 
         val extrinsics = constructSplitExtrinsics(chain, formExtrinsic, feeExtrinsicBuilderSequence)
 
-        val separateFees = extrinsics.map { estimateFee(chain.id, it) }
+        val separateFees = extrinsics.map { estimateFee(chain.id, it).amount }
 
         return separateFees.sum()
     }
