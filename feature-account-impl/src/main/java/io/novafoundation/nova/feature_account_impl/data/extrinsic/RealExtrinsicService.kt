@@ -11,6 +11,8 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWithOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsicWithOrigin
+import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.model.InlineFee
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
@@ -119,6 +121,10 @@ class RealExtrinsicService(
         val extrinsic = extrinsicBuilder.build()
 
         return estimateFee(chain.id, extrinsic)
+    }
+
+    override suspend fun estimateFeeV2(chain: Chain, formExtrinsic: suspend ExtrinsicBuilder.() -> Unit): Fee {
+        return InlineFee(estimateFee(chain, formExtrinsic))
     }
 
     override suspend fun estimateFee(chainId: ChainId, extrinsic: String): BigInteger {

@@ -33,10 +33,12 @@ fun mapAmountToAmountModel(
 
 fun mapAmountToAmountModel(
     amountInPlanks: BigInteger,
-    token: Token
+    token: Token,
+    includeZeroFiat: Boolean = true,
 ): AmountModel = mapAmountToAmountModel(
     amount = token.amountFromPlanks(amountInPlanks),
-    token = token
+    token = token,
+    includeZeroFiat = includeZeroFiat
 )
 
 fun mapAmountToAmountModel(

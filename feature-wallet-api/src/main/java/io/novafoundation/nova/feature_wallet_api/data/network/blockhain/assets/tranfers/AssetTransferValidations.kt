@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeChangeDetectedFailure
 import io.novafoundation.nova.feature_wallet_api.domain.validation.NotEnoughToPayFeesError
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -55,10 +56,12 @@ sealed class AssetTransferValidationFailure {
     object NonPositiveAmount : AssetTransferValidationFailure()
 
     object RecipientCannotAcceptTransfer : AssetTransferValidationFailure()
+
+    class FeeChangeDetected(override val payload: FeeChangeDetectedFailure.Payload): AssetTransferValidationFailure(), FeeChangeDetectedFailure
 }
 
 data class AssetTransferPayload(
-    val transfer: AssetTransfer,
+    val transfer: WeightedAssetTransfer,
     val originFee: BigDecimal,
     val crossChainFee: BigDecimal?,
     val originCommissionAsset: Asset,

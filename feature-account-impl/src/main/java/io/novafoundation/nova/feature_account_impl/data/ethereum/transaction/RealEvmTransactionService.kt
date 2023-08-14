@@ -1,10 +1,13 @@
 package io.novafoundation.nova.feature_account_impl.data.ethereum.transaction
 
+import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionBuilding
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionHash
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
+import io.novafoundation.nova.feature_account_api.data.model.EvmFee
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -42,7 +45,7 @@ internal class RealEvmTransactionService(
         origin: TransactionOrigin,
         fallbackGasLimit: BigInteger,
         building: EvmTransactionBuilding
-    ): BigInteger {
+    ): Fee {
         val web3Api = chainRegistry.awaitCallEthereumApiOrThrow(chainId)
         val chain = chainRegistry.getChain(chainId)
 
@@ -53,12 +56,14 @@ internal class RealEvmTransactionService(
         val txForFee = txBuilder.buildForFee(submittingAddress)
 
         val gasPrice = gasPriceProviderFactory.createKnown(chainId).getGasPrice()
+        val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
 
-        return gasPrice * web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
+        return EvmFee(gasLimit, gasPrice)
     }
 
     override suspend fun transact(
         chainId: ChainId,
+        presetFee: Fee?,
         origin: TransactionOrigin,
         fallbackGasLimit: BigInteger,
         building: EvmTransactionBuilding
@@ -69,13 +74,18 @@ internal class RealEvmTransactionService(
 
         val web3Api = chainRegistry.awaitCallEthereumApiOrThrow(chainId)
         val txBuilder = EvmTransactionBuilder().apply(building)
-        val txForFee = txBuilder.buildForFee(submittingAddress)
 
-        val gasPrice = gasPriceProviderFactory.createKnown(chainId).getGasPrice()
-        val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
+        val evmFee = presetFee?.castOrNull<EvmFee>() ?: run {
+            val txForFee = txBuilder.buildForFee(submittingAddress)
+            val gasPrice = gasPriceProviderFactory.createKnown(chainId).getGasPrice()
+            val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
+
+            EvmFee(gasLimit, gasPrice)
+        }
+
         val nonce = web3Api.getNonce(submittingAddress)
 
-        val txForSign = txBuilder.buildForSign(nonce = nonce, gasPrice = gasPrice, gasLimit = gasLimit)
+        val txForSign = txBuilder.buildForSign(nonce = nonce, gasPrice = evmFee.gasPrice, gasLimit = evmFee.gasLimit)
         val toSubmit = signTransaction(txForSign, submittingMetaAccount, chain)
 
         web3Api.sendTransaction(toSubmit)

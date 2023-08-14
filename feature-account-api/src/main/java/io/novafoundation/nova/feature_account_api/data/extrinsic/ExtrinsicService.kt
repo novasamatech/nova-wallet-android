@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_api.data.extrinsic
 
 import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -53,6 +54,11 @@ interface ExtrinsicService {
         chain: Chain,
         formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
     ): BigInteger
+
+    suspend fun estimateFeeV2(
+        chain: Chain,
+        formExtrinsic: suspend ExtrinsicBuilder.() -> Unit,
+    ): Fee
 
     suspend fun estimateMultiFee(
         chain: Chain,
