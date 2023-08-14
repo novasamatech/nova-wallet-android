@@ -10,7 +10,7 @@ import java.math.BigInteger
 
 sealed class ConfirmDAppOperationValidationFailure {
 
-    class FeeSpikeDetected(override val payload: FeeChangeDetectedFailure.Payload) :  ConfirmDAppOperationValidationFailure(), FeeChangeDetectedFailure
+    class FeeSpikeDetected(override val payload: FeeChangeDetectedFailure.Payload) : ConfirmDAppOperationValidationFailure(), FeeChangeDetectedFailure
 }
 
 data class ConfirmDAppOperationValidationPayload(

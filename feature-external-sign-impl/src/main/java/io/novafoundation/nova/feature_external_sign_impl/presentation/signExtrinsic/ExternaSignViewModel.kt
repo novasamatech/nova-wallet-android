@@ -168,7 +168,10 @@ class ExternaSignViewModel(
         router.back()
     }
 
-    private fun validationFailureToUi(failure: ValidationStatus.NotValid<ConfirmDAppOperationValidationFailure>, actions: ValidationFlowActions): TransformedFailure? {
+    private fun validationFailureToUi(
+        failure: ValidationStatus.NotValid<ConfirmDAppOperationValidationFailure>,
+        actions: ValidationFlowActions
+    ): TransformedFailure? {
         return when (val reason = failure.reason) {
             is ConfirmDAppOperationValidationFailure.FeeSpikeDetected -> originFeeMixin?.let {
                 handleFeeSpikeDetected(
@@ -181,7 +184,10 @@ class ExternaSignViewModel(
         }
     }
 
-    private fun autoFixPayload(payload: ConfirmDAppOperationValidationPayload, failure: ConfirmDAppOperationValidationFailure): ConfirmDAppOperationValidationPayload {
+    private fun autoFixPayload(
+        payload: ConfirmDAppOperationValidationPayload,
+        failure: ConfirmDAppOperationValidationFailure
+    ): ConfirmDAppOperationValidationPayload {
         return when (failure) {
             is ConfirmDAppOperationValidationFailure.FeeSpikeDetected -> payload.copy(decimalFee = failure.payload.newFee)
         }
