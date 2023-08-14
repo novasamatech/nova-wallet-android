@@ -74,9 +74,8 @@ fun <P, E> ValidationSystemBuilder<P, E>.checkForFeeChanges(
 
             DecimalFee(
                 fee = newFee,
-                decimalAmount =  chainAsset(payload).amountFromPlanks(newFee.amount)
+                decimalAmount = chainAsset(payload).amountFromPlanks(newFee.amount)
             )
-
         },
         currentFee = currentFee,
         error = error,

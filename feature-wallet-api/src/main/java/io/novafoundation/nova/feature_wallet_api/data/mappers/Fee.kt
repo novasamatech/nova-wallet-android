@@ -32,6 +32,6 @@ fun mapFeeToFeeModel(
     feeAmount: BigDecimal,
     token: Token,
     includeZeroFiat: Boolean = true
-) : FeeModel {
+): FeeModel {
     return mapFeeToFeeModel(InlineFee(token.planksFromAmount(feeAmount)), token, includeZeroFiat)
 }

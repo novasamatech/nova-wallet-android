@@ -57,7 +57,7 @@ sealed class AssetTransferValidationFailure {
 
     object RecipientCannotAcceptTransfer : AssetTransferValidationFailure()
 
-    class FeeChangeDetected(override val payload: FeeChangeDetectedFailure.Payload): AssetTransferValidationFailure(), FeeChangeDetectedFailure
+    class FeeChangeDetected(override val payload: FeeChangeDetectedFailure.Payload) : AssetTransferValidationFailure(), FeeChangeDetectedFailure
 }
 
 data class AssetTransferPayload(

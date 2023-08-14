@@ -91,13 +91,13 @@ interface FeeLoaderMixin : Retriable {
     }
 }
 
-suspend fun FeeLoaderMixin.awaitDecimalFee(): DecimalFee =  feeLiveData.asFlow()
+suspend fun FeeLoaderMixin.awaitDecimalFee(): DecimalFee = feeLiveData.asFlow()
     .filterIsInstance<FeeStatus.Loaded>()
     .first().feeModel.decimalFee
 
 suspend fun FeeLoaderMixin.awaitOptionalDecimalFee(): DecimalFee? = feeLiveData.asFlow()
     .transform { feeStatus ->
-        when(feeStatus) {
+        when (feeStatus) {
             is FeeStatus.Loaded -> emit(feeStatus.feeModel.decimalFee)
             FeeStatus.NoFee -> emit(null)
             else -> {} // skip

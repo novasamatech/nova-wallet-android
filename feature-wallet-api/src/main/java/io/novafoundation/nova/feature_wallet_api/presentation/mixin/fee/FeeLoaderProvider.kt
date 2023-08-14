@@ -122,7 +122,6 @@ class FeeLoaderProvider(
         }
     }
 
-
     override fun requireOptionalFee(
         block: (BigDecimal?) -> Unit,
         onError: (title: String, message: String) -> Unit

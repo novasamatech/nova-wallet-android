@@ -29,7 +29,7 @@ class BaseAssetTransfer(
     override val destinationChainAsset: Chain.Asset,
     override val commissionAssetToken: Token,
     override val amount: BigDecimal,
-): AssetTransfer
+) : AssetTransfer
 
 data class WeightedAssetTransfer(
     override val sender: MetaAccount,
@@ -41,9 +41,9 @@ data class WeightedAssetTransfer(
     override val commissionAssetToken: Token,
     override val amount: BigDecimal,
     val decimalFee: DecimalFee,
-): AssetTransfer {
+) : AssetTransfer {
 
-    constructor(assetTransfer: AssetTransfer, fee: DecimalFee): this(
+    constructor(assetTransfer: AssetTransfer, fee: DecimalFee) : this(
         sender = assetTransfer.sender,
         recipient = assetTransfer.recipient,
         originChain = assetTransfer.originChain,

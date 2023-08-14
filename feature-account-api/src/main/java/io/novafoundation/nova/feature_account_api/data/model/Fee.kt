@@ -7,9 +7,9 @@ interface Fee {
     val amount: BigInteger
 }
 
-data class EvmFee(val gasLimit: BigInteger, val gasPrice: BigInteger): Fee {
+data class EvmFee(val gasLimit: BigInteger, val gasPrice: BigInteger) : Fee {
     override val amount = gasLimit * gasPrice
 }
 
 @JvmInline
-value class InlineFee(override val amount: BigInteger): Fee
+value class InlineFee(override val amount: BigInteger) : Fee

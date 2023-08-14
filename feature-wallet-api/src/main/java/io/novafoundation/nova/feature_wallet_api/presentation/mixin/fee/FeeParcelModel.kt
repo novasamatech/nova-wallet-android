@@ -18,24 +18,23 @@ class EvmFeeParcelModel(
     val gasLimit: BigInteger,
     val gasPrice: BigInteger,
     override val amount: BigDecimal
-): FeeParcelModel
+) : FeeParcelModel
 
 @Parcelize
 class SimpleFeeParcelModel(
     val planks: BigInteger,
     override val amount: BigDecimal
-): FeeParcelModel
-
+) : FeeParcelModel
 
 fun mapFeeToParcel(decimalFee: DecimalFee): FeeParcelModel {
-    return when(val fee = decimalFee.fee) {
+    return when (val fee = decimalFee.fee) {
         is EvmFee -> EvmFeeParcelModel(gasLimit = fee.gasLimit, gasPrice = fee.gasPrice, amount = decimalFee.decimalAmount)
         else -> SimpleFeeParcelModel(decimalFee.fee.amount, decimalFee.decimalAmount)
     }
 }
 
 fun mapFeeFromParcel(parcelFee: FeeParcelModel): DecimalFee {
-    val fee = when(parcelFee) {
+    val fee = when (parcelFee) {
         is EvmFeeParcelModel -> EvmFee(gasLimit = parcelFee.gasLimit, gasPrice = parcelFee.gasPrice)
         is SimpleFeeParcelModel -> InlineFee(parcelFee.planks)
     }
