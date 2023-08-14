@@ -21,7 +21,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
-private val FEE_RATIO_THRESHOLD = 1.5.toBigDecimal()
+// TODO update testing threshold!!
+private val FEE_RATIO_THRESHOLD = 0.toBigDecimal()
 
 class FeeChangeValidation<P, E>(
     private val calculateFee: suspend (P) -> DecimalFee,
@@ -104,7 +105,13 @@ fun CoroutineScope.handleFeeSpikeDetected(
             customStyle = R.style.AccentNegativeAlertDialogTheme_Reversed,
             okAction = DialogAction(
                 title = resourceManager.getString(R.string.common_proceed),
-                action = actions::resumeFlow
+                action = {
+                    launch {
+                        feeLoaderMixin.setFee(error.payload.newFee.fee)
+
+                        actions.resumeFlow()
+                    }
+                }
             ),
             cancelAction = DialogAction(
                 title = resourceManager.getString(R.string.common_refresh_fee),
