@@ -21,8 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
-// TODO update testing threshold!!
-private val FEE_RATIO_THRESHOLD = 0.toBigDecimal()
+private val FEE_RATIO_THRESHOLD = 1.5.toBigDecimal()
 
 class FeeChangeValidation<P, E>(
     private val calculateFee: suspend (P) -> DecimalFee,
