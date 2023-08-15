@@ -67,6 +67,9 @@ val BigDecimal.isPositive: Boolean
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 
+val BigInteger.isNonPositive: Boolean
+    get() = signum() <= 0
+
 val BigInteger.isZero: Boolean
     get() = signum() == 0
 
@@ -84,6 +87,8 @@ fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = M
 }
 
 fun BigInteger.atLeastZero() = coerceAtLeast(BigInteger.ZERO)
+
+fun BigDecimal.atLeastZero() = coerceAtLeast(BigDecimal.ZERO)
 
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 

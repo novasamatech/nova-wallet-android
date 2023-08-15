@@ -11,16 +11,22 @@ fun BaseFragment<*>.setupUserRewardsComponent(component: UserRewardsComponent, v
         component.onAction(UserRewardsAction.UserRewardPeriodClicked)
     }
 
+    view.setClaimClickListener {
+        component.onAction(UserRewardsAction.ClaimRewardsClicked)
+    }
+
     component.state.observe { userRewardsState ->
         view.setVisible(userRewardsState != null)
 
         userRewardsState?.selectedRewardPeriod?.let { view.setStakingPeriod(it) }
 
         when (val amount = userRewardsState?.amount) {
-            is LoadingState.Loaded -> view.showValue(amount.data)
-            is LoadingState.Loading -> view.showLoading()
+            is LoadingState.Loaded -> view.showRewards(amount.data)
+            is LoadingState.Loading -> view.showPendingRewardsLoading()
             null -> {}
         }
+
+        view.setClaimableRewardsState(userRewardsState?.claimableRewards)
     }
 
     component.events.observeEvent {

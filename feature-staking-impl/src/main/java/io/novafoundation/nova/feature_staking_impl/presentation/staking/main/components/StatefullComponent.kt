@@ -7,10 +7,10 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlin.coroutines.resume
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 interface StatefullComponent<STATE, EVENT, ACTION> {
 
@@ -28,6 +28,11 @@ interface StatefullComponent<STATE, EVENT, ACTION> {
 }
 
 class UnsupportedComponent<S, E, A> : StatefullComponent<S, E, A> {
+    companion object {
+
+        fun <S, E, A> creator(): ComponentCreator<S, E, A> = { _, _ -> UnsupportedComponent() }
+    }
+
     override val events = MutableLiveData<Event<E>>()
 
     override val state: Flow<S?> = flowOf(null)

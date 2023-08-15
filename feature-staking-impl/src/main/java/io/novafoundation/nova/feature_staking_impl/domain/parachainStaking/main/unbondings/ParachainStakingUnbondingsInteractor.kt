@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.unbondi
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.toTimerValue
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.Unbondings
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.from
@@ -73,10 +74,7 @@ class ParachainStakingUnbondingsInteractor(
                     } else {
                         val calculatedDuration = durationCalculator.timeTillRound(scheduledDelegationRequest.whenExecutable)
 
-                        Unbonding.Status.Unbonding(
-                            timeLeft = calculatedDuration.duration.toLongMilliseconds(),
-                            calculatedAt = calculatedDuration.calculatedAt
-                        )
+                        Unbonding.Status.Unbonding(calculatedDuration.toTimerValue())
                     }
 
                     Unbonding(
@@ -86,7 +84,7 @@ class ParachainStakingUnbondingsInteractor(
                     )
                 }
 
-            Unbondings.from(unbondingsList)
+            Unbondings.from(unbondingsList, rebondPossible = true)
         }
 
         emitAll(unbondingsFlow)

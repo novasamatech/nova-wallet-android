@@ -3,7 +3,7 @@
 
     <!-- SemiBold -->
 
-    <style name="TextAppearance.NovaFoundation.SemiBold" parent="TextAppearance.AppCompat.Title">
+    <style name="TextAppearance.NovaFoundation.SemiBold" parent="">
         <item name="android:fontFamily">?attr/fontSemiBold</item>
     </style>
 
@@ -241,14 +241,17 @@
 
     <!-- Buttons -->
 
-    <style name="Widget.Nova.Button" parent="Widget.AppCompat.Button">
+    <style name="Widget.Nova.Button" parent="">
         <item name="size">large</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:includeFontPadding">false</item>
         <item name="android:stateListAnimator">@null</item>
         <item name="android:textColor">@color/button_text_colors</item>
-        <item name="android:textAllCaps">false</item>
         <item name="android:letterSpacing">0.02</item>
-        <item name="android:textSize">?attr/textSizeB1</item>
-        <item name="android:fontFamily">?attr/fontBold</item>
     </style>
 
     <style name="Widget.Nova.Button.Iconic">

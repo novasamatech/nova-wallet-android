@@ -42,13 +42,35 @@ class StakingSharedComputation(
     private val accountRepository: AccountRepository,
     private val bagListRepository: BagListRepository,
     private val totalIssuanceRepository: TotalIssuanceRepository,
+    private val eraTimeCalculatorFactory: EraTimeCalculatorFactory,
 ) {
+
+    fun eraCalculatorFlow(stakingOption: StakingOption, scope: CoroutineScope): Flow<EraTimeCalculator> {
+        val chainId = stakingOption.assetWithChain.chain.id
+        val key = "ERA_TIME_CALCULATOR:$chainId"
+
+        return computationalCache.useSharedFlow(key, scope) {
+            val activeEraFlow = activeEraFlow(chainId, scope)
+
+            eraTimeCalculatorFactory.create(stakingOption, activeEraFlow)
+        }
+    }
+
+    fun activeEraFlow(chainId: ChainId, scope: CoroutineScope): Flow<EraIndex> {
+        val key = "ACTIVE_ERA:$chainId"
+
+        return computationalCache.useSharedFlow(key, scope) {
+            stakingRepository.observeActiveEraIndex(chainId)
+        }
+    }
 
     fun electedExposuresWithActiveEraFlow(chainId: ChainId, scope: CoroutineScope): Flow<ExposuresWithEraIndex> {
         val key = "ELECTED_EXPOSURES:$chainId"
 
         return computationalCache.useSharedFlow(key, scope) {
-            stakingRepository.electedExposuresInActiveEra(chainId)
+            activeEraFlow(chainId, scope).map { eraIndex ->
+                stakingRepository.getElectedValidatorsExposure(chainId, eraIndex) to eraIndex
+            }
         }
     }
 
@@ -129,7 +151,16 @@ fun StakingSharedComputation.electedExposuresInActiveEraFlow(chainId: ChainId, s
     return electedExposuresWithActiveEraFlow(chainId, scope).map { (exposures, _) -> exposures }
 }
 
+suspend fun StakingSharedComputation.getActiveEra(chainId: ChainId, scope: CoroutineScope): EraIndex {
+    return activeEraFlow(chainId, scope).first()
+}
+
 suspend fun StakingSharedComputation.minStake(
     chainId: ChainId,
     scope: CoroutineScope
 ): Balance = activeEraInfo(chainId, scope).first().minStake
+
+suspend fun StakingSharedComputation.eraTimeCalculator(
+    stakingOption: StakingOption,
+    scope: CoroutineScope
+) = eraCalculatorFlow(stakingOption, scope).first()

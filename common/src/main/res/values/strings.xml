@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="nomination_pool_claim_rewards">Claim rewards</string>
+    <string name="nomination_pools_claim_rewards_restake_subtitle">Your tokens will be added back to the stake</string>
+
+    <string name="nomination_pools_pool_reached_unbondings_limit_title">Too many people are unstaking from your pool</string>
+    <string name="nomination_pools_pool_reached_unbondings_limit_message">There are currently no free spots in unstaking queue for your pool. Please try again in %s</string>
+
+    <!--    <string name="staking_unbond_crossed_existential">After operation the resulting bonded balance will be less than minimal balance. It will cause the whole bonded balance to be unbonded.</string>-->
+    <string name="staking_unbond_crossed_existential">When unstaking partially, you should leave at least %s in stake. Do you want to perform full unstake by unstaking remaining %s as well?</string>
+    <string name="staking_unbond_crossed_existential_title">Too small amount remains in stake</string>
+
+    <string name="nomination_pools_pool_destroying_error_message">Cannot perform specified operation since pool is in destroying state. It will be closed soon.</string>
+    <string name="nomination_pools_pool_destroying_error_title">Pool is destroying</string>
+
+    <string name="nomination_pools_pending_claim_hint_format">Your rewards (%s) will also be claimed and added to your free balance</string>
+
+    <string name="nomination_pools_your_pool_format">Your pool (#%s)</string>
+    <string name="nomination_pools_your_pool">Your pool</string>
+
+    <string name="nomination_pools_pool">Pool</string>
+    <string name="nomination_pools_direct">Direct</string>
 
     <string name="start_staking_fragment_start_staking">Start Staking</string>
     <string name="start_staking_fragment_available_balance">Available balance: %1$s (%2$s)</string>
@@ -41,8 +61,6 @@
 
     <string name="start_staking_fragment_terms_of_use">See %s</string>
     <string name="start_staking_fragment_terms_of_use_clicable_part">Terms of Use</string>
-    <string name="nomination_pools_pool">Pool</string>
-    <string name="nomination_pools_direct">Direct</string>
 
     <string name="account_parity_signer_sign_qr_code_expired_descrition">For security reasons generated operations valid for only %s.\nPlease generate new QR code and sign it with %s</string>
     <string name="account_parity_signer_import_scan_invalid_qr">Invalid QR code, please make sure you are scanning QR code from %s</string>
@@ -1413,7 +1431,6 @@
     <string name="staking_title">Staking</string>
     <string name="staking_total_rewards_v1.9.0">Rewarded</string>
     <string name="staking_total_staked">Total staked</string>
-    <string name="staking_unbond_crossed_existential">After operation the resulting bonded balance will be less than minimal balance. It will cause the whole bonded balance to be unbonded.</string>
     <string name="staking_unbond_v1_9_0">Unstake</string>
     <string name="staking_unbonding_empty_list_v1_9_0">Unstaking transactions will appear here</string>
     <string name="staking_unbonding_empty_list_v2_2_0">Unstaking transactions will be displayed here</string>

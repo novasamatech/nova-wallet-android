@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutReposit
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealParasRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealSessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingPeriodRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingVersioningRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
@@ -42,10 +43,12 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.Ele
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.RealElectionsSessionRegistry
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.RealStakingRewardPeriodDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingRewardPeriodDataSource
-import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSourceImpl
-import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.SubqueryStakingRewardsDataSource
+import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.DirectStakingRewardsDataSource
+import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.PoolStakingRewardsDataSource
+import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.RealStakingRewardsDataSourceRegistry
+import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.StakingRewardsDataSourceRegistry
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.di.staking.PayoutsBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -128,16 +131,6 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideStakingRewardsSubqueryDataSource(
-        stakingApi: StakingApi,
-        stakingTotalRewardDao: StakingTotalRewardDao,
-    ): StakingRewardsDataSource = SubqueryStakingRewardsDataSource(
-        stakingApi = stakingApi,
-        stakingTotalRewardDao = stakingTotalRewardDao
-    )
-
-    @Provides
-    @FeatureScope
     fun provideStakingRepository(
         accountStakingDao: AccountStakingDao,
         @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
@@ -163,13 +156,15 @@ class StakingFeatureModule {
         accountRepository: AccountRepository,
         bagListRepository: BagListRepository,
         totalIssuanceRepository: TotalIssuanceRepository,
+        eraTimeCalculatorFactory: EraTimeCalculatorFactory
     ) = StakingSharedComputation(
         stakingRepository = stakingRepository,
         computationalCache = computationalCache,
         rewardCalculatorFactory = rewardCalculatorFactory,
         accountRepository = accountRepository,
         bagListRepository = bagListRepository,
-        totalIssuanceRepository = totalIssuanceRepository
+        totalIssuanceRepository = totalIssuanceRepository,
+        eraTimeCalculatorFactory = eraTimeCalculatorFactory
     )
 
     @Provides
@@ -196,7 +191,6 @@ class StakingFeatureModule {
         payoutRepository: PayoutRepository,
         stakingSharedState: StakingSharedState,
         assetUseCase: AssetUseCase,
-        factory: EraTimeCalculatorFactory,
         stakingSharedComputation: StakingSharedComputation,
     ) = StakingInteractor(
         walletRepository,
@@ -208,7 +202,6 @@ class StakingFeatureModule {
         stakingSharedState,
         payoutRepository,
         assetUseCase,
-        factory,
         stakingSharedComputation,
     )
 
@@ -216,14 +209,14 @@ class StakingFeatureModule {
     @FeatureScope
     fun provideAuraConsensus(
         chainRegistry: ChainRegistry,
-        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+        @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource,
     ) = AuraSession(chainRegistry, storageDataSource)
 
     @Provides
     @FeatureScope
     fun provideBabeConsensus(
         chainRegistry: ChainRegistry,
-        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+        @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource,
     ) = BabeSession(storageDataSource, chainRegistry)
 
     @Provides
@@ -236,7 +229,7 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun provideSessionRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+        @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource,
     ): SessionRepository = RealSessionRepository(storageDataSource)
 
     @Provides
@@ -355,10 +348,40 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideDirectStakingRewardsDataSource(
+        stakingApi: StakingApi,
+        stakingTotalRewardDao: StakingTotalRewardDao,
+    ) = DirectStakingRewardsDataSource(
+        stakingApi = stakingApi,
+        stakingTotalRewardDao = stakingTotalRewardDao
+    )
+
+    @Provides
+    @FeatureScope
+    fun providePoolStakingRewardsDataSource(
+        stakingApi: StakingApi,
+        stakingTotalRewardDao: StakingTotalRewardDao,
+    ) = PoolStakingRewardsDataSource(
+        stakingApi = stakingApi,
+        stakingTotalRewardDao = stakingTotalRewardDao
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideStakingRewardsDataSourceRegistry(
+        directStakingRewardsDataSource: DirectStakingRewardsDataSource,
+        poolStakingRewardsDataSource: PoolStakingRewardsDataSource
+    ): StakingRewardsDataSourceRegistry = RealStakingRewardsDataSourceRegistry(
+        directStakingRewardsDataSource = directStakingRewardsDataSource,
+        poolStakingRewardsDataSource = poolStakingRewardsDataSource
+    )
+
+    @Provides
+    @FeatureScope
     fun provideStakingRewardsRepository(
-        rewardDataSource: StakingRewardsDataSource,
+        rewardsDataSourceRegistry: StakingRewardsDataSourceRegistry
     ): StakingRewardsRepository {
-        return StakingRewardsRepository(rewardDataSource)
+        return RealStakingRewardsRepository(rewardsDataSourceRegistry)
     }
 
     @Provides

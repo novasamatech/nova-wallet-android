@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.stakeSummary.NominationPoolStakeSummaryInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.stakeSummary.PoolMemberStatus
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 
 class NominationPoolsStakeSummaryComponentFactory(
-    private val poolMemberUseCase: NominationPoolMemberUseCase,
+    private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val interactor: NominationPoolStakeSummaryInteractor,
 ) {
 
@@ -29,21 +29,22 @@ class NominationPoolsStakeSummaryComponentFactory(
     ): StakeSummaryComponent = NominationPoolsStakeSummaryComponent(
         stakingOption = stakingOption,
         hostContext = hostContext,
-        poolMemberUseCase = poolMemberUseCase,
+        nominationPoolSharedComputation = nominationPoolSharedComputation,
         interactor = interactor
     )
 }
 
 private class NominationPoolsStakeSummaryComponent(
-    poolMemberUseCase: NominationPoolMemberUseCase,
+    nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val interactor: NominationPoolStakeSummaryInteractor,
 
     private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
 ) : BaseStakeSummaryComponent(hostContext.scope) {
 
-    override val state: Flow<StakeSummaryState?> = poolMemberUseCase.loadPoolMemberState(
+    override val state: Flow<StakeSummaryState?> = nominationPoolSharedComputation.loadPoolMemberState(
         hostContext = hostContext,
+        chain = stakingOption.assetWithChain.chain,
         stateProducer = ::poolMemberStakeSummary
     )
         .shareInBackground()

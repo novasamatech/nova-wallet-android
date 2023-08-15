@@ -99,6 +99,14 @@ fun <T> List<Flow<T>>.mergeIfMultiple(): Flow<T> = when (size) {
     else -> merge()
 }
 
+inline fun <T> withFlowScope(crossinline block: suspend (scope: CoroutineScope) -> Flow<T>): Flow<T> {
+    return flowOfAll {
+        val flowScope = CoroutineScope(coroutineContext)
+
+        block(flowScope)
+    }
+}
+
 fun <T1, T2> combineToPair(flow1: Flow<T1>, flow2: Flow<T2>): Flow<Pair<T1, T2>> = combine(flow1, flow2, ::Pair)
 
 /**

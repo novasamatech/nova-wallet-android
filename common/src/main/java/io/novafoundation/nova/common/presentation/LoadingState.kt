@@ -35,6 +35,14 @@ inline fun <T, R> LoadingState<T>.map(mapper: (T) -> R): LoadingState<R> {
 }
 
 @Suppress("UNCHECKED_CAST")
+inline fun <T, R> LoadingState<T>.flatMap(mapper: (T) -> LoadingState<R>): LoadingState<R> {
+    return when (this) {
+        is LoadingState.Loading<*> -> this as LoadingState.Loading<R>
+        is LoadingState.Loaded<T> -> mapper(data)
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
 inline fun <T, V> Flow<LoadingState<T>>.mapLoading(crossinline mapper: suspend (T) -> V): Flow<LoadingState<V>> {
     return map { loadingState -> loadingState.map { mapper(it) } }
 }

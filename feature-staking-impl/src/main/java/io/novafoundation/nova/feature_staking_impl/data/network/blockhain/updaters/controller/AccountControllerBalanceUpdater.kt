@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
+import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.scope.AccountStakingScope
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
@@ -26,17 +27,20 @@ class AccountControllerBalanceUpdater(
     private val sharedState: StakingSharedState,
     private val chainRegistry: ChainRegistry,
     private val assetCache: AssetCache,
-) : Updater {
+) : Updater<AccountStakingLocal> {
 
     override val requiredModules: List<String> = listOf(Modules.SYSTEM, Modules.STAKING)
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(
+        storageSubscriptionBuilder: SharedRequestsBuilder,
+        scopeValue: AccountStakingLocal
+    ): Flow<Updater.SideEffect> {
         val (chain, chainAsset) = sharedState.chainAndAsset()
         if (chainAsset.disabled) return emptyFlow()
 
         val runtime = chainRegistry.getRuntime(chain.id)
 
-        val accountStaking = scope.getAccountStaking()
+        val accountStaking = scopeValue
         val stakingAccessInfo = accountStaking.stakingAccessInfo ?: return emptyFlow()
 
         val controllerId = stakingAccessInfo.controllerId

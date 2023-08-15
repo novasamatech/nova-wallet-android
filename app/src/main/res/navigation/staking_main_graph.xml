@@ -138,6 +138,37 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
+        <action
+            android:id="@+id/action_stakingFragment_to_PoolsBondMoreGraph"
+            app:destination="@id/nomination_pools_bond_more_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_stakingFragment_to_PoolsUnbondGraph"
+            app:destination="@+id/nomination_pools_unbond_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_stakingFragment_to_PoolsRedeemFragment"
+            app:destination="@+id/nominationPoolsRedeemFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_stakingFragment_to_PoolsClaimRewardsFragment"
+            app:destination="@+id/nominationPoolsClaimRewardsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -486,4 +517,19 @@
         android:id="@+id/rebagFragment"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.RebagFragment"
         android:label="RebagFragment" />
+
+    <include app:graph="@navigation/nomination_pools_bond_more_graph" />
+
+    <include app:graph="@navigation/nomination_pools_unbond_graph" />
+
+
+    <fragment
+        android:id="@+id/nominationPoolsRedeemFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.redeem.NominationPoolsRedeemFragment"
+        android:label="NominationPoolsRedeemFragment" />
+
+    <fragment
+        android:id="@+id/nominationPoolsClaimRewardsFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.claimRewards.NominationPoolsClaimRewardsFragment"
+        android:label="NominationPoolsClaimRewardsFragment" />
 </navigation>

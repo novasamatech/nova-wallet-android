@@ -8,11 +8,15 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.di.staking.UpdatersModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.dashboard.StakingDashboardModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool.NominationPoolModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.ParachainStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.unbond.StakingUnbondModule
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.di.RebagComponent
@@ -20,6 +24,12 @@ import io.novafoundation.nova.feature_staking_impl.presentation.confirm.di.Confi
 import io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.di.ConfirmNominationsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.di.StakingDashboardComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.di.NominationPoolsConfirmBondMoreComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.setup.di.NominationPoolsSetupBondMoreComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.claimRewards.di.NominationPoolsClaimRewardsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.redeem.di.NominationPoolsRedeemComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.confirm.di.NominationPoolsConfirmUnbondComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.setup.di.NominationPoolsSetupUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.di.CurrentCollatorsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.search.di.SearchCollatorComponent
@@ -173,6 +183,20 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun confirmYieldBoostComponentFactory(): YieldBoostConfirmComponent.Factory
 
+    // nomination pools
+
+    fun nominationPoolsStakingSetupBondMore(): NominationPoolsSetupBondMoreComponent.Factory
+
+    fun nominationPoolsStakingConfirmBondMore(): NominationPoolsConfirmBondMoreComponent.Factory
+
+    fun nominationPoolsStakingSetupUnbond(): NominationPoolsSetupUnbondComponent.Factory
+
+    fun nominationPoolsStakingConfirmUnbond(): NominationPoolsConfirmUnbondComponent.Factory
+
+    fun nominationPoolsStakingRedeem(): NominationPoolsRedeemComponent.Factory
+
+    fun nominationPoolsStakingClaimRewards(): NominationPoolsClaimRewardsComponent.Factory
+
     @Component.Factory
     interface Factory {
 
@@ -182,6 +206,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
             @BindsInstance parachainStaking: ParachainStakingRouter,
             @BindsInstance selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
             @BindsInstance selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
+
+            @BindsInstance nominationPoolsRouter: NominationPoolsRouter,
 
             deps: StakingFeatureDependencies
         ): StakingFeatureComponent
@@ -198,4 +224,10 @@ interface StakingFeatureComponent : StakingFeatureApi {
         ]
     )
     interface StakingFeatureDependenciesComponent : StakingFeatureDependencies
+
+    val nominationPoolRewardCalculatorFactory: NominationPoolRewardCalculatorFactory
+
+    val stakingUpdateSystem: StakingUpdateSystem
+
+    val stakingSharedState: StakingSharedState
 }

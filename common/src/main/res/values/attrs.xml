@@ -121,11 +121,14 @@
         <attr name="size" format="enum">
             <enum name="large" value="0" />
             <enum name="small" value="1" />
+            <enum name="extra_small" value="2" />
         </attr>
 
         <attr name="iconSrc" format="reference" />
         <attr name="iconSize" format="dimension" />
         <attr name="iconPadding" format="dimension" />
+
+        <attr name="android:textColor" />
     </declare-styleable>
 
     <declare-styleable name="PlaceholderView">

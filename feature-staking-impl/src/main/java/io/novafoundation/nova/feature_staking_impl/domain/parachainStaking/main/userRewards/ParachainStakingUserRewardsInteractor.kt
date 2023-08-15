@@ -1,11 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.userRewards
 
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
-import io.novafoundation.nova.feature_staking_api.domain.model.parachain.address
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
+import io.novafoundation.nova.feature_staking_impl.data.fullId
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -18,21 +18,19 @@ class ParachainStakingUserRewardsInteractor(
 
     suspend fun syncRewards(
         delegator: DelegatorState.Delegator,
-        chain: Chain,
-        chainAsset: Chain.Asset,
+        stakingOption: StakingOption,
         rewardPeriod: RewardPeriod
     ): Result<*> = withContext(Dispatchers.Default) {
         runCatching {
-            stakingRewardsRepository.sync(delegator.address(), chain, chainAsset, rewardPeriod)
+            stakingRewardsRepository.sync(delegator.accountId, stakingOption, rewardPeriod)
         }
     }
 
     fun observeRewards(
         delegator: DelegatorState.Delegator,
-        chain: Chain,
-        chainAsset: Chain.Asset
+        stakingOption: StakingOption,
     ) = flow {
-        val rewardsFlow = stakingRewardsRepository.totalRewardFlow(delegator.address(), chain.id, chainAsset.id)
+        val rewardsFlow = stakingRewardsRepository.totalRewardFlow(delegator.accountId, stakingOption.fullId)
 
         emitAll(rewardsFlow)
     }

@@ -47,7 +47,7 @@ class BlockTimeUpdater(
 
     override val requiredModules: List<String> = emptyList()
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder, scopeValue: Unit): Flow<Updater.SideEffect> {
         val chainId = chainIdHolder.chainId()
         val runtime = chainRegistry.getRuntime(chainId)
         val storage = runtime.metadata.system().storage("Number")

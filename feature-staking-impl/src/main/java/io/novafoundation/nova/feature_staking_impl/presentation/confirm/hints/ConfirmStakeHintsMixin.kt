@@ -46,7 +46,7 @@ private class ConfirmStakeHintsMixin(
         rewardPeriodHint(),
         stakingHintsUseCase.noRewardDurationUnstakingHint(),
         stakingHintsUseCase.redeemHint(),
-        stakingHintsUseCase.unstakingDurationHint(),
+        stakingHintsUseCase.unstakingDurationHint(coroutineScope),
     )
 
     private fun changeValidatorsHints(): List<String> = listOf(
@@ -58,7 +58,7 @@ private class ConfirmStakeHintsMixin(
     }
 
     private suspend fun rewardPeriodHint(): String {
-        val eraDuration = interactor.getEraDuration()
+        val eraDuration = interactor.getEraDuration(coroutineScope)
         val formattedDuration = resourceManager.formatDuration(eraDuration)
 
         return resourceManager.getString(R.string.staking_hint_rewards_format_v2_2_0, formattedDuration)
