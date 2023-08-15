@@ -7,6 +7,7 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool.NominationPoolStakingUpdatersModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool.NominationPools
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.Parachain
@@ -37,25 +38,35 @@ class UpdatersModule {
 
     @Provides
     @FeatureScope
-    fun provideStakingUpdateSystem(
+    fun provideStakingUpdaters(
         @Relaychain relaychainUpdaters: List<@JvmSuppressWildcards Updater>,
         @Parachain parachainUpdaters: List<@JvmSuppressWildcards Updater>,
         @Turing turingUpdaters: List<@JvmSuppressWildcards Updater>,
         @NominationPools nominationPoolsUpdaters: List<@JvmSuppressWildcards Updater>,
         blockTimeUpdater: BlockTimeUpdater,
         blockNumberUpdater: BlockNumberUpdater,
-        totalIssuanceUpdater: TotalIssuanceUpdater,
+        totalIssuanceUpdater: TotalIssuanceUpdater
+    ): StakingUpdaters {
+        return StakingUpdaters(
+            relaychainUpdaters = relaychainUpdaters,
+            parachainUpdaters = parachainUpdaters,
+            commonUpdaters = listOf(blockTimeUpdater, blockNumberUpdater, totalIssuanceUpdater),
+            turingExtraUpdaters = turingUpdaters,
+            nominationPoolsUpdaters = nominationPoolsUpdaters
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideStakingUpdateSystem(
+        stakingUpdaters: StakingUpdaters,
         chainRegistry: ChainRegistry,
         singleAssetSharedState: StakingSharedState,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     ) = StakingUpdateSystem(
-        relaychainUpdaters = relaychainUpdaters,
-        parachainUpdaters = parachainUpdaters,
-        commonUpdaters = listOf(blockTimeUpdater, blockNumberUpdater, totalIssuanceUpdater),
+        stakingUpdaters = stakingUpdaters,
         chainRegistry = chainRegistry,
         singleAssetSharedState = singleAssetSharedState,
-        turingExtraUpdaters = turingUpdaters,
-        nominationPoolsUpdaters = nominationPoolsUpdaters,
         storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory
     )
 

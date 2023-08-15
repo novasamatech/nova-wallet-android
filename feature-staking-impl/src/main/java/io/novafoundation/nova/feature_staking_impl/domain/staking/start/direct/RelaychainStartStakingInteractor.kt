@@ -23,7 +23,6 @@ class RelaychainStartStakingInteractor(
     override fun observeData(chain: Chain, asset: Asset): Flow<StartStakingData> {
         return stakingSharedComputation.activeEraInfo(chain.id, coroutineScope).map { activeEraInfo ->
             StartStakingData(
-                availableBalance = getAvailableBalance(asset),
                 maxEarningRate = calculateEarningRate(chain, asset.token.configuration, stakingType),
                 minStake = activeEraInfo.minStake,
                 payoutType = PayoutType.Automatic.Restake,
@@ -32,7 +31,7 @@ class RelaychainStartStakingInteractor(
         }
     }
 
-    private fun getAvailableBalance(asset: Asset): BigInteger {
+    override fun getAvailableBalance(asset: Asset): BigInteger {
         return asset.freeInPlanks
     }
 

@@ -20,7 +20,6 @@ class ParachainStartStakingInteractor(
     override fun observeData(chain: Chain, asset: Asset): Flow<StartStakingData> {
         return parachainNetworkInfoInteractor.observeRoundInfo(chain.id).map { activeEraInfo ->
             StartStakingData(
-                availableBalance = getAvailableBalance(asset),
                 maxEarningRate = parachainStakingRewardCalculator.maximumGain(DAYS_IN_YEAR),
                 minStake = activeEraInfo.minimumStake,
                 payoutType = getPayoutType(),
@@ -29,7 +28,7 @@ class ParachainStartStakingInteractor(
         }
     }
 
-    private fun getAvailableBalance(asset: Asset): BigInteger {
+    override fun getAvailableBalance(asset: Asset): BigInteger {
         return asset.freeInPlanks
     }
 

@@ -11,8 +11,8 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
@@ -21,10 +21,26 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewar
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.StartStakingLandingViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class StartStakingLandingModule {
+
+    @Provides
+    fun provideStartStakingLandingUpdateSystemFactory(
+        stakingUpdaters: StakingUpdaters,
+        chainRegistry: ChainRegistry,
+        storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+    ): StakingLandingInfoUpdateSystemFactory {
+        return StakingLandingInfoUpdateSystemFactory(
+            stakingUpdaters,
+            chainRegistry,
+            storageSharedRequestsBuilderFactory
+        )
+    }
 
     @Provides
     fun provideStartStakingInteractorFactory(
@@ -34,7 +50,8 @@ class StartStakingLandingModule {
         stakingEraInteractorFactory: StakingEraInteractorFactory,
         parachainNetworkInfoInteractor: ParachainNetworkInfoInteractor,
         parachainStakingRewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
-        nominationPoolGlobalsRepository: NominationPoolGlobalsRepository
+        nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
+        chainRegistry: ChainRegistry
     ): StartStakingInteractorFactory {
         return StartStakingInteractorFactory(
             stakingSharedComputation,
@@ -43,7 +60,8 @@ class StartStakingLandingModule {
             stakingEraInteractorFactory,
             parachainNetworkInfoInteractor,
             parachainStakingRewardCalculatorFactory,
-            nominationPoolGlobalsRepository
+            nominationPoolGlobalsRepository,
+            chainRegistry
         )
     }
 
@@ -52,19 +70,19 @@ class StartStakingLandingModule {
     @ViewModelKey(StartStakingLandingViewModel::class)
     fun provideViewModel(
         stakingRouter: StakingRouter,
-        stakingSharedState: StakingSharedState,
         resourceManager: ResourceManager,
-        updateSystem: StakingUpdateSystem,
+        updateSystemFactory: StakingLandingInfoUpdateSystemFactory,
         startStakingInteractorFactory: StartStakingInteractorFactory,
-        appLinksProvider: AppLinksProvider
+        appLinksProvider: AppLinksProvider,
+        startStakingLandingPayload: StartStakingLandingPayload
     ): ViewModel {
         return StartStakingLandingViewModel(
             stakingRouter,
-            stakingSharedState,
             resourceManager,
-            updateSystem,
+            updateSystemFactory,
             startStakingInteractorFactory,
-            appLinksProvider
+            appLinksProvider,
+            startStakingLandingPayload
         )
     }
 

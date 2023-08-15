@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
-import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MoreStakingOptions
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDApp
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -37,17 +37,15 @@ class MoreStakingOptionsViewModel(
     fun onInAppStakingItemClicked(index: Int) = launch {
         val withoutStakeItems = moreStakingOptionsFlow.first().inAppStaking
         val withoutStakeItem = withoutStakeItems.getOrNull(index) ?: return@launch
-        val noStakeItemState = withoutStakeItem.stakingState as? NoStake ?: return@launch
 
-        when (val flowType = noStakeItemState.flowType) {
-            is NoStake.FlowType.Aggregated -> {} // TODO feature aggregated flows & nomination pools
+        val noStakeItemState = withoutStakeItem.stakingState as? AggregatedStakingDashboardOption.NoStake ?: return@launch
 
-            is NoStake.FlowType.Single -> openChainStaking(
-                chain = withoutStakeItem.chain,
-                chainAsset = withoutStakeItem.token.configuration,
-                stakingType = flowType.stakingType
-            )
+        val stakingTypes = when (val flowType = noStakeItemState.flowType) {
+            is AggregatedStakingDashboardOption.NoStake.FlowType.Aggregated -> flowType.stakingTypes
+            is AggregatedStakingDashboardOption.NoStake.FlowType.Single -> listOf(flowType.stakingType)
         }
+
+        openChainStaking(withoutStakeItem.chain, withoutStakeItem.token.configuration, stakingTypes)
     }
 
     fun onBrowserStakingItemClicked(item: StakingDAppModel) = launch {
@@ -71,18 +69,10 @@ class MoreStakingOptionsViewModel(
         }
     }
 
-    private suspend fun openChainStaking(
-        chain: Chain,
-        chainAsset: Chain.Asset,
-        stakingType: Chain.Asset.StakingType
-    ) {
-        stakingSharedState.setSelectedOption(
-            chain = chain,
-            chainAsset = chainAsset,
-            stakingType = stakingType
-        )
+    private suspend fun openChainStaking(chain: Chain, chainAsset: Chain.Asset, stakingTypes: List<Chain.Asset.StakingType>) {
+        stakingSharedState.setSelectedOption(chain, chainAsset, stakingTypes.first())
 
-        router.openStartStakingFlow()
+        router.openStartStakingLanding(chain.id, chainAsset.id, stakingTypes)
     }
 
     fun goBack() {

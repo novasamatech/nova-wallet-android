@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isLoaded
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
@@ -19,12 +18,23 @@ import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.model.StartStakingLandingPayload
 import kotlinx.android.synthetic.main.fragment_start_staking_landing.startStakingLandingAvailableBalance
 import kotlinx.android.synthetic.main.fragment_start_staking_landing.startStakingLandingButton
 import kotlinx.android.synthetic.main.fragment_start_staking_landing.startStakingLandingList
 import kotlinx.android.synthetic.main.fragment_start_staking_landing.startStakingLandingToolbar
 
 class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>(), StartStakingLandingFooterAdapter.ClickHandler {
+
+    companion object {
+        private const val KEY_PAYLOAD = "payload"
+
+        fun getBundle(payload: StartStakingLandingPayload): Bundle {
+            return Bundle().apply {
+                putParcelable(KEY_PAYLOAD, payload)
+            }
+        }
+    }
 
     private val headerAdapter = StartStakingLandingHeaderAdapter()
     private val conditionsAdapter = StartStakingLandingAdapter()
@@ -55,7 +65,7 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
             StakingFeatureApi::class.java
         )
             .startStakingLandingComponentFactory()
-            .create(this)
+            .create(this, argument(KEY_PAYLOAD))
             .inject(this)
     }
 
@@ -75,6 +85,7 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
                     headerAdapter.setTitle(it.data.title)
                     conditionsAdapter.submitList(it.data.conditions)
                     footerAdapter.setMoreInformationText(it.data.moreInfo)
+                    startStakingLandingButton.setButtonColor(it.data.buttonColor)
                 }
                 is ExtendedLoadingState.Error -> {
                     dialog(providedContext) {
@@ -88,7 +99,7 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
         }
 
         viewModel.availableBalanceTextFlow.observe {
-            startStakingLandingAvailableBalance.text = it.dataOrNull
+            startStakingLandingAvailableBalance.text = it
         }
     }
 

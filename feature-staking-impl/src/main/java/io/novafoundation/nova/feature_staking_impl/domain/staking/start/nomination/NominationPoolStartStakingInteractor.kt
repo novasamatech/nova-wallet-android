@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartSta
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.PayoutType
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -17,12 +18,15 @@ class NominationPoolStartStakingInteractor(
         return nominationPoolGlobalsRepository.observeMinJoinBond(chain.id)
             .map { minJoinBond ->
                 StartStakingData(
-                    availableBalance = asset.freeInPlanks,
                     maxEarningRate = 0.toBigDecimal(), // TODO: not implemented yet
                     minStake = minJoinBond,
                     payoutType = PayoutType.Manual,
                     participationInGovernance = false
                 )
             }
+    }
+
+    override fun getAvailableBalance(asset: Asset): BigInteger {
+        return asset.transferableInPlanks
     }
 }
