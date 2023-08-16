@@ -140,7 +140,6 @@ class StakeActionsValidationsModule {
         validate(controllerRequiredValidation)
     }
 
-
     @FeatureScope
     @Named(SYSTEM_MANAGE_REWARD_DESTINATION)
     @Provides
