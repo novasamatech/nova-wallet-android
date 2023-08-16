@@ -1,0 +1,44 @@
+name: Bump app version
+
+on:
+  push:
+    branches:
+      ['master']
+
+jobs:
+  update-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Version in build.gradle
+        run: |
+          versionName=$(grep "versionName" build.gradle | grep -o "'.*'")
+          versionName=${versionName//\'/}
+          echo Version in gradle file: $versionName
+          echo "GRADLE_APP_VERSION=$versionName" >> "$GITHUB_ENV"
+
+      - name: Was version changed?
+        id: version
+        run: |
+          if [[ ${{ env.GRADLE_APP_VERSION }} == ${{ secrets.ANDROID_APP_VERSION }} ]]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: rickstaa/action-create-tag@v1
+        if: steps.version.outputs.changed == 'true'
+        with:
+          tag: 'v${{ env.GRADLE_APP_VERSION }}'
+          message: Release v${{ env.GRADLE_APP_VERSION }}
+
+      - name: Write app version to secrets
+        if: steps.version.outputs.changed == 'true'
+        uses: hmanzur/actions-set-secret@v2.0.0
+        with:
+          name: 'ANDROID_APP_VERSION'
+          value: ${{ env.GRADLE_APP_VERSION }}
+          repository: novasamatech/nova-wallet-android
+          token: ${{ secrets.WRITE_SECRET_PAT }}

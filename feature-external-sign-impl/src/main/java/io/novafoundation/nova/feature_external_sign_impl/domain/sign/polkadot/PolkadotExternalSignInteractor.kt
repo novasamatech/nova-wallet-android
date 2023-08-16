@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.intFromHex
 import io.novafoundation.nova.common.validation.EmptyValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
@@ -48,7 +49,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
-import java.math.BigInteger
 
 class PolkadotSignInteractorFactory(
     private val extrinsicService: ExtrinsicService,
@@ -116,7 +116,7 @@ class PolkadotExternalSignInteractor(
         }
     }
 
-    override suspend fun performOperation(): ExternalSignCommunicator.Response? = withContext(Dispatchers.Default) {
+    override suspend fun performOperation(upToDateFee: Fee?): ExternalSignCommunicator.Response? = withContext(Dispatchers.Default) {
         runCatching {
             when (signPayload) {
                 is PolkadotSignPayload.Json -> signExtrinsic(signPayload)
@@ -139,7 +139,7 @@ class PolkadotExternalSignInteractor(
         }
     }
 
-    override suspend fun calculateFee(): BigInteger? = withContext(Dispatchers.Default) {
+    override suspend fun calculateFee(): Fee? = withContext(Dispatchers.Default) {
         require(signPayload is PolkadotSignPayload.Json)
 
         val chain = signPayload.chainOrNull() ?: return@withContext null

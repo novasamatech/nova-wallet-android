@@ -25,5 +25,5 @@ interface CoingeckoApi {
         @Query("ids") priceIds: String,
         @Query("vs_currencies") currency: String,
         @Query("include_24hr_change") includeRateChange: Boolean
-    ): Map<String, Map<String, Double>>
+    ): Map<String, Map<String, Double?>>
 }

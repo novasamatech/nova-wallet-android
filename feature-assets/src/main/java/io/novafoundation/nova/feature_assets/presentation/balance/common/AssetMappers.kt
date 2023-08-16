@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.utils.formatting.formatAsChange
 import io.novafoundation.nova.common.utils.isNonNegative
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_assets.R
@@ -31,7 +32,7 @@ fun mapTokenToTokenModel(token: Token): TokenModel {
         val rateChange = token.coinRateChange?.recentRateChange
 
         val changeColorRes = when {
-            rateChange == null -> R.color.text_tertiary
+            rateChange == null || rateChange.isZero -> R.color.text_tertiary
             rateChange.isNonNegative -> R.color.text_positive
             else -> R.color.text_negative
         }

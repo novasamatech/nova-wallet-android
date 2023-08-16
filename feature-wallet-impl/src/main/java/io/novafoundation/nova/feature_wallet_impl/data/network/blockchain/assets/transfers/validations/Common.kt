@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.AmountProducer
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
+import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
 import io.novafoundation.nova.feature_wallet_api.domain.validation.doNotCrossExistentialDeposit
 import io.novafoundation.nova.feature_wallet_api.domain.validation.enoughTotalToStayAboveED
 import io.novafoundation.nova.feature_wallet_api.domain.validation.notPhishingAccount
@@ -48,6 +49,18 @@ fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAbove
     total = { it.originCommissionAsset.total },
     existentialDeposit = { assetSourceRegistry.existentialDeposit(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
     error = { AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(it.transfer.originChain.commissionAsset) }
+)
+
+fun AssetTransfersValidationSystemBuilder.checkForFeeChanges(
+    assetSourceRegistry: AssetSourceRegistry
+) = checkForFeeChanges(
+    calculateFee = {
+        val transfers = assetSourceRegistry.sourceFor(it.transfer.originChainAsset).transfers
+        transfers.calculateFee(it.transfer)
+    },
+    currentFee = { it.originFee },
+    chainAsset = { it.transfer.commissionAssetToken.configuration },
+    error = AssetTransferValidationFailure::FeeChangeDetected
 )
 
 fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDeposit(
