@@ -11,3 +11,4 @@ Developed by former Fearless Wallet team & based on open source work under Apach
 
 ## License
 Nova Wallet Android is available under the Apache 2.0 license. See the LICENSE file for more info.
+© Novasama Technologies GmbH 2023
