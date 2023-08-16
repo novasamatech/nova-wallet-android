@@ -49,7 +49,7 @@ inline fun <K, V> List<V>.associateByMultiple(keysExtractor: (V) -> Iterable<K>)
 fun ByteArray.startsWith(prefix: ByteArray): Boolean {
     if (prefix.size > size) return false
 
-    prefix.forEachIndexed { index, byte  ->
+    prefix.forEachIndexed { index, byte ->
         if (get(index) != byte) return false
     }
 

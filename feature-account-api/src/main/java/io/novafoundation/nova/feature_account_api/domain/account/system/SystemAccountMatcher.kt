@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_api.domain.account.system
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 interface SystemAccountMatcher {
-    
+
     companion object
 
     fun isSystemAccount(accountId: AccountId): Boolean

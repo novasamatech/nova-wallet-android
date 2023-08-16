@@ -16,7 +16,7 @@ class SystemAccountRecipientValidation<P, E>(
     private val accountId: (P) -> AccountId?,
     private val error: (AccountId) -> E,
     private val matcher: SystemAccountMatcher = SystemAccountMatcher.default(),
-) : Validation<P, E>{
+) : Validation<P, E> {
 
     override suspend fun validate(value: P): ValidationStatus<E> {
         val accountId = accountId(value) ?: return valid()
@@ -34,9 +34,7 @@ fun <P, E> ValidationSystemBuilder<P, E>.notSystemAccount(
     validate(SystemAccountRecipientValidation(accountId, error))
 }
 
-
 fun handleSystemAccountValidationFailure(resourceManager: ResourceManager): TitleAndMessage {
     return resourceManager.getString(R.string.send_recipient_system_account_title) to
         resourceManager.getString(R.string.send_recipient_system_account_message)
 }
-

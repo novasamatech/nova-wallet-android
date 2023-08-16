@@ -4,9 +4,9 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class CompoundSystemAccountMatcher(
     private val delegates: List<SystemAccountMatcher>
-): SystemAccountMatcher {
+) : SystemAccountMatcher {
 
-    constructor(vararg delegates: SystemAccountMatcher): this(delegates.toList())
+    constructor(vararg delegates: SystemAccountMatcher) : this(delegates.toList())
 
     override fun isSystemAccount(accountId: AccountId): Boolean {
         return delegates.any { it.isSystemAccount(accountId) }
