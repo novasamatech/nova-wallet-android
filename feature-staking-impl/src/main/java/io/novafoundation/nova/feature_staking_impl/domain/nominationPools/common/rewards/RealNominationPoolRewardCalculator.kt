@@ -59,7 +59,7 @@ private class RealNominationPoolRewardCalculator(
     private val directStakingDelegate: RewardCalculator,
     private val exposures: AccountIdMap<Exposure>,
     private val commissions: Map<PoolId, Perbill?>,
-    private val poolStashesById: Map<PoolId, AccountIdKey>,
+    poolStashesById: Map<PoolId, AccountIdKey>,
 ) : NominationPoolRewardCalculator {
 
     private val poolIdsByStashes: AccountIdKeyMap<PoolId> = poolStashesById.reversed()

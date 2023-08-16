@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.direct.ParachainStartStakingInteractor
@@ -28,7 +29,8 @@ class StartStakingInteractorFactory(
     private val parachainNetworkInfoInteractor: ParachainNetworkInfoInteractor,
     private val parachainStakingRewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
     private val nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
-    private val chainRegistry: ChainRegistry
+    private val nominationPoolSharedComputation: NominationPoolSharedComputation,
+    private val chainRegistry: ChainRegistry,
 ) {
 
     suspend fun create(
@@ -63,7 +65,7 @@ class StartStakingInteractorFactory(
             when (stakingType.group()) {
                 StakingTypeGroup.RELAYCHAIN -> createRelaychainStartStakingInteractor(coroutineScope, stakingOption)
                 StakingTypeGroup.PARACHAIN -> createParachainStartStakingInteractor(stakingOption)
-                StakingTypeGroup.NOMINATION_POOL -> createNominationPoolsStartStakingInteractor(stakingOption)
+                StakingTypeGroup.NOMINATION_POOL -> createNominationPoolsStartStakingInteractor(coroutineScope, stakingOption)
                 StakingTypeGroup.UNSUPPORTED -> null
             }
         }
@@ -87,10 +89,12 @@ class StartStakingInteractorFactory(
         )
     }
 
-    private fun createNominationPoolsStartStakingInteractor(stakingOption: StakingOption): StartStakingInteractor {
+    private fun createNominationPoolsStartStakingInteractor(coroutineScope: CoroutineScope, stakingOption: StakingOption): StartStakingInteractor {
         return NominationPoolStartStakingInteractor(
             nominationPoolGlobalsRepository = nominationPoolGlobalsRepository,
-            stakingOption = stakingOption
+            stakingOption = stakingOption,
+            scope = coroutineScope,
+            nominationPoolSharedComputation = nominationPoolSharedComputation
         )
     }
 }

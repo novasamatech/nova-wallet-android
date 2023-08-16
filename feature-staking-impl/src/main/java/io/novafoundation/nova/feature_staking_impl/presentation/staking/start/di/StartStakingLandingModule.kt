@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingInteractorFactory
@@ -51,17 +52,19 @@ class StartStakingLandingModule {
         parachainNetworkInfoInteractor: ParachainNetworkInfoInteractor,
         parachainStakingRewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
         nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
+        nominationPoolSharedComputation: NominationPoolSharedComputation,
         chainRegistry: ChainRegistry
     ): StartStakingInteractorFactory {
         return StartStakingInteractorFactory(
-            stakingSharedComputation,
-            walletRepository,
-            accountRepository,
-            stakingEraInteractorFactory,
-            parachainNetworkInfoInteractor,
-            parachainStakingRewardCalculatorFactory,
-            nominationPoolGlobalsRepository,
-            chainRegistry
+            stakingSharedComputation = stakingSharedComputation,
+            walletRepository = walletRepository,
+            accountRepository = accountRepository,
+            stakingEraInteractorFactory = stakingEraInteractorFactory,
+            parachainNetworkInfoInteractor = parachainNetworkInfoInteractor,
+            parachainStakingRewardCalculatorFactory = parachainStakingRewardCalculatorFactory,
+            nominationPoolGlobalsRepository = nominationPoolGlobalsRepository,
+            nominationPoolSharedComputation = nominationPoolSharedComputation,
+            chainRegistry = chainRegistry
         )
     }
 

@@ -179,13 +179,15 @@ class NominationPoolModule {
         nominationPoolStateRepository: NominationPoolStateRepository,
         nominationPoolUnbondRepository: NominationPoolUnbondRepository,
         poolAccountDerivation: PoolAccountDerivation,
+        nominationPoolRewardCalculatorFactory: NominationPoolRewardCalculatorFactory,
     ): NominationPoolSharedComputation {
         return NominationPoolSharedComputation(
             computationalCache = computationalCache,
             nominationPoolMemberUseCase = nominationPoolMemberUseCase,
             nominationPoolStateRepository = nominationPoolStateRepository,
             nominationPoolUnbondRepository = nominationPoolUnbondRepository,
-            poolAccountDerivation = poolAccountDerivation
+            poolAccountDerivation = poolAccountDerivation,
+            nominationPoolRewardCalculatorFactory = nominationPoolRewardCalculatorFactory
         )
     }
 
