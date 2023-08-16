@@ -4,6 +4,9 @@
     <string name="common_fee_changed_message">The estimated network fee %s is much higher than the default network fee (%s). This might be due to temporary network congestion. You can refresh to wait for a lower network fee.</string>
     <string name="common_refresh_fee">Refresh fee</string>
 
+    <string name="send_recipient_system_account_title">Recipient is a system account</string>
+    <string name="send_recipient_system_account_message">Recipient is a system account. It is not controlled by any company or individual. Are you sure you still want to perform this transfer?</string>
+
     <string name="asset_add_evm_token_already_exist_title">This token already exists</string>
 <!--    <string name="asset_add_evm_token_already_exist_title">This token already exist</string>-->
     <string name="asset_add_evm_token_already_exist_modifiable_message">The entered contract address is present in Nova as a %s token. Are you sure you want to modify it?</string>
