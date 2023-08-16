@@ -24,7 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.turing.repository.TuringStakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
-import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.start.StartParachainStakingFlowModule
+import io.novafoundation.nova.feature_staking_impl.domain.start.StartParachainStakingFlowModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.turing.TuringStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.unbond.ParachainStakingUnbondModule
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider

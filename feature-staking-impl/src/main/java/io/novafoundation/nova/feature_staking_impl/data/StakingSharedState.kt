@@ -16,6 +16,9 @@ val StakingOption.fullId
 val StakingOption.components: Triple<Chain, Chain.Asset, Chain.Asset.StakingType>
     get() = Triple(assetWithChain.chain, assetWithChain.asset, additional.stakingType)
 
+val StakingOption.chain: Chain
+    get() = assetWithChain.chain
+
 class StakingSharedState : SelectedAssetOptionSharedState<StakingSharedState.OptionAdditionalData> {
 
     class OptionAdditionalData(val stakingType: Chain.Asset.StakingType)

@@ -14,7 +14,7 @@ class StakingUpdateSystem(
     storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : SingleChainUpdateSystem<StakingSharedState.OptionAdditionalData>(chainRegistry, singleAssetSharedState, storageSharedRequestsBuilderFactory) {
 
-    override fun getUpdaters(selectedAssetOption: StakingOption): List<Updater> {
+    override fun getUpdaters(selectedAssetOption: StakingOption): Collection<Updater<*>> {
         return stakingUpdaters.getUpdaters(selectedAssetOption.additional.stakingType)
     }
 }

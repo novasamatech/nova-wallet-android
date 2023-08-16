@@ -18,7 +18,7 @@ import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.setEndSpan
 import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.toSpannable
-import io.novafoundation.nova.common.utils.withLoadingShared
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.ParticipationInGovernance
@@ -33,11 +33,11 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigDecimal
-import java.math.BigInteger
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import java.math.BigDecimal
+import java.math.BigInteger
 import kotlin.time.Duration
 
 class StartStakingInfoModel(
@@ -67,7 +67,8 @@ class StartStakingLandingViewModel(
 
     private val startStakingInfo = startStakingInteractor.flatMapLatest { interactor ->
         interactor.observeStartStakingInfo()
-    }.withLoadingShared()
+    }
+        .withSafeLoading()
         .shareInBackground()
 
     val modelFlow = startStakingInfo
@@ -81,7 +82,7 @@ class StartStakingLandingViewModel(
             )
         }.shareInBackground()
 
-    val availableBalance = startStakingInteractor.flatMapLatest { interactor ->
+    private val availableBalance = startStakingInteractor.flatMapLatest { interactor ->
         interactor.observeAvailableBalance()
     }.shareInBackground()
 

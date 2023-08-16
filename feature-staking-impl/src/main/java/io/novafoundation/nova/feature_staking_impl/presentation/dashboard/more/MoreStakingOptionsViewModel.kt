@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashbo
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MoreStakingOptions
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDApp
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.allStakingTypes
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
@@ -40,10 +41,7 @@ class MoreStakingOptionsViewModel(
 
         val noStakeItemState = withoutStakeItem.stakingState as? AggregatedStakingDashboardOption.NoStake ?: return@launch
 
-        val stakingTypes = when (val flowType = noStakeItemState.flowType) {
-            is AggregatedStakingDashboardOption.NoStake.FlowType.Aggregated -> flowType.stakingTypes
-            is AggregatedStakingDashboardOption.NoStake.FlowType.Single -> listOf(flowType.stakingType)
-        }
+        val stakingTypes = noStakeItemState.flowType.allStakingTypes
 
         openChainStaking(withoutStakeItem.chain, withoutStakeItem.token.configuration, stakingTypes)
     }

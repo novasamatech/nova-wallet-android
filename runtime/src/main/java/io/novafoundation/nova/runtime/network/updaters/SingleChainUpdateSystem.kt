@@ -16,7 +16,7 @@ abstract class SingleChainUpdateSystem<A>(
     storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : ChainUpdaterGroupUpdateSystem(chainRegistry, storageSharedRequestsBuilderFactory) {
 
-    abstract fun getUpdaters(selectedAssetOption: SupportedAssetOption<A>): List<Updater>
+    abstract fun getUpdaters(selectedAssetOption: SupportedAssetOption<A>): Collection<Updater<*>>
 
     override fun start(): Flow<Updater.SideEffect> = singleAssetSharedState.selectedOption.flatMapLatest { selectedOption ->
         val chain = selectedOption.assetWithChain.chain
@@ -28,13 +28,13 @@ abstract class SingleChainUpdateSystem<A>(
 }
 
 class ConstantSingleChainUpdateSystem(
-    private val updaters: List<Updater>,
+    private val updaters: List<Updater<*>>,
     chainRegistry: ChainRegistry,
     singleAssetSharedState: SelectedAssetOptionSharedState<*>,
     storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : SingleChainUpdateSystem<Any?>(chainRegistry, singleAssetSharedState, storageSharedRequestsBuilderFactory) {
 
-    override fun getUpdaters(selectedAssetOption: SupportedAssetOption<Any?>): List<Updater> {
+    override fun getUpdaters(selectedAssetOption: SupportedAssetOption<Any?>): List<Updater<*>> {
         return updaters
     }
 }

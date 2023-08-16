@@ -24,20 +24,21 @@ abstract class ChainUpdaterGroupUpdateSystem(
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : UpdateSystem {
 
-    protected suspend fun runUpdaters(chain: Chain, updaters: Collection<Updater>): Flow<Updater.SideEffect> {
+    protected suspend fun runUpdaters(chain: Chain, updaters: Collection<Updater<*>>): Flow<Updater.SideEffect> {
         val runtimeMetadata = chainRegistry.getRuntime(chain.id).metadata
 
         val logTag = this@ChainUpdaterGroupUpdateSystem.LOG_TAG
         val selfName = this@ChainUpdaterGroupUpdateSystem::class.java.simpleName
 
-        val scopeFlows = updaters.groupBy(Updater::scope).map { (scope, scopeUpdaters) ->
-            scope.invalidationFlow().flatMapLatest {
+        val scopeFlows = updaters.groupBy(Updater<*>::scope).map { (scope, scopeUpdaters) ->
+            scope.invalidationFlow().flatMapLatest { scopeValue ->
                 val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
 
                 val updatersFlow = scopeUpdaters
                     .filter { it.requiredModules.all(runtimeMetadata::hasModule) }
                     .map { updater ->
-                        updater.listenForUpdates(subscriptionBuilder)
+                        @Suppress("UNCHECKED_CAST")
+                        (updater as Updater<Any?>).listenForUpdates(subscriptionBuilder, scopeValue)
                             .catch { Log.e(logTag, "Failed to start $selfName for ${chain.name}: ${it.message}") }
                             .flowOn(Dispatchers.Default)
                     }

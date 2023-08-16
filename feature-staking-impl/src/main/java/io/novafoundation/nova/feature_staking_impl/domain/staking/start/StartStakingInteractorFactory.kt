@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
@@ -16,6 +17,7 @@ import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.CoroutineScope
 
 class StartStakingInteractorFactory(
@@ -35,11 +37,18 @@ class StartStakingInteractorFactory(
         stakingTypes: List<Chain.Asset.StakingType>,
         coroutineScope: CoroutineScope
     ): CompoundStartStakingInteractor {
-        val chain = chainRegistry.getChain(chainId)
-        val chainAsset = chain.assetsById.getValue(assetId)
+        val (chain, chainAsset) = chainRegistry.chainWithAsset(chainId, assetId)
         val interactors = createInteractors(chain, chainAsset, stakingTypes, coroutineScope)
-        val stakingEraInteractor = stakingEraInteractorFactory.create(chainAsset)
-        return RealCompoundStartStakingInteractor(chain, chainAsset, walletRepository, accountRepository, interactors, stakingEraInteractor)
+        val stakingEraInteractor = stakingEraInteractorFactory.create(chain, chainAsset, coroutineScope)
+
+        return RealCompoundStartStakingInteractor(
+            chain = chain,
+            chainAsset = chainAsset,
+            walletRepository = walletRepository,
+            accountRepository = accountRepository,
+            interactors = interactors,
+            stakingEraInteractor = stakingEraInteractor,
+        )
     }
 
     private suspend fun createInteractors(
@@ -49,37 +58,39 @@ class StartStakingInteractorFactory(
         coroutineScope: CoroutineScope
     ): List<StartStakingInteractor> {
         return stakingTypes.mapNotNull { stakingType ->
+            val stakingOption = createStakingOption(chain, asset, stakingType)
+
             when (stakingType.group()) {
-                StakingTypeGroup.RELAYCHAIN -> createRelaychainStartStakingInteractor(coroutineScope, stakingType)
-                StakingTypeGroup.PARACHAIN -> createPararchainStartStakingInteractor(chain, asset, stakingType)
-                StakingTypeGroup.NOMINATION_POOL -> createNominationPoolsStartStakingInteractor()
+                StakingTypeGroup.RELAYCHAIN -> createRelaychainStartStakingInteractor(coroutineScope, stakingOption)
+                StakingTypeGroup.PARACHAIN -> createParachainStartStakingInteractor(stakingOption)
+                StakingTypeGroup.NOMINATION_POOL -> createNominationPoolsStartStakingInteractor(stakingOption)
                 StakingTypeGroup.UNSUPPORTED -> null
             }
         }
     }
 
-    private fun createRelaychainStartStakingInteractor(coroutineScope: CoroutineScope, stakingType: Chain.Asset.StakingType): StartStakingInteractor {
+    private fun createRelaychainStartStakingInteractor(coroutineScope: CoroutineScope, stakingOption: StakingOption): StartStakingInteractor {
         return RelaychainStartStakingInteractor(
             stakingSharedComputation = stakingSharedComputation,
             coroutineScope = coroutineScope,
-            stakingType = stakingType
+            stakingOption = stakingOption
         )
     }
 
-    private suspend fun createPararchainStartStakingInteractor(
-        chain: Chain,
-        asset: Chain.Asset,
-        stakingType: Chain.Asset.StakingType
+    private suspend fun createParachainStartStakingInteractor(
+        stakingOption: StakingOption
     ): StartStakingInteractor {
         return ParachainStartStakingInteractor(
             parachainNetworkInfoInteractor = parachainNetworkInfoInteractor,
-            parachainStakingRewardCalculator = parachainStakingRewardCalculatorFactory.create(createStakingOption(chain, asset, stakingType))
+            parachainStakingRewardCalculator = parachainStakingRewardCalculatorFactory.create(stakingOption),
+            stakingOption = stakingOption
         )
     }
 
-    private fun createNominationPoolsStartStakingInteractor(): StartStakingInteractor {
+    private fun createNominationPoolsStartStakingInteractor(stakingOption: StakingOption): StartStakingInteractor {
         return NominationPoolStartStakingInteractor(
-            nominationPoolGlobalsRepository = nominationPoolGlobalsRepository
+            nominationPoolGlobalsRepository = nominationPoolGlobalsRepository,
+            stakingOption = stakingOption
         )
     }
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_api.domain.dashboard.model
 
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.Percent
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake.FlowType
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.SyncingStage
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -48,6 +49,12 @@ class AggregatedStakingDashboardOption<out S>(
         SYNCING_ALL, SYNCING_SECONDARY, SYNCED
     }
 }
+
+val FlowType.allStakingTypes: List<Chain.Asset.StakingType>
+    get() = when (this) {
+        is FlowType.Aggregated -> stakingTypes
+        is FlowType.Single -> listOf(stakingType)
+    }
 
 fun SyncingStage.isSyncing(): Boolean {
     return this != SyncingStage.SYNCED

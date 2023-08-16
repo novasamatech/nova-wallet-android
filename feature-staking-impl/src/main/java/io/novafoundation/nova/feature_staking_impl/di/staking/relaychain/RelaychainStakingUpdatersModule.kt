@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.MinBondUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ParachainsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLedgerUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ValidatorExposureUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.controller.AccountControllerBalanceUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.historical.HistoricalTotalValidatorRewardUpdater
@@ -37,7 +38,6 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.GenesisSlotUpdater
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.ElectionsSessionRegistry
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
-import io.novafoundation.nova.feature_staking_impl.di.staking.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -384,7 +384,7 @@ class RelaychainStakingUpdatersModule {
         genesisSlotUpdater: GenesisSlotUpdater,
         currentSessionIndexUpdater: CurrentSessionIndexUpdater,
         eraStartSessionIndexUpdater: EraStartSessionIndexUpdater,
-    ): StakingUpdaters = StakingUpdaters(
+    ) = StakingUpdaters.Group(
         activeEraUpdater,
         validatorExposureUpdater,
         currentEraUpdater,

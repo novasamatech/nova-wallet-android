@@ -6,9 +6,9 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.turing.TuringAdditionalIssuanceUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.turing.TuringAutomationTasksUpdater
-import io.novafoundation.nova.feature_staking_impl.di.staking.StakingUpdaters
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -51,5 +51,5 @@ class TuringStakingUpdatersModule {
     fun provideTuringExtraUpdaters(
         turingAdditionalIssuanceUpdater: TuringAdditionalIssuanceUpdater,
         turingAutomationTasksUpdater: TuringAutomationTasksUpdater,
-    ): StakingUpdaters = StakingUpdaters(turingAdditionalIssuanceUpdater, turingAutomationTasksUpdater)
+    ) = StakingUpdaters.Group(turingAdditionalIssuanceUpdater, turingAutomationTasksUpdater)
 }

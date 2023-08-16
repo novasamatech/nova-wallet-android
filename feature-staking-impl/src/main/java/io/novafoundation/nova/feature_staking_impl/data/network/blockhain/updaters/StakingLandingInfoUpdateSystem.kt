@@ -44,7 +44,7 @@ class StakingLandingInfoUpdateSystem(
         runUpdaters(chain, updaters)
     }.flowOn(Dispatchers.Default)
 
-    private fun getUpdaters(): Collection<Updater> {
+    private fun getUpdaters(): Collection<Updater<*>> {
         return stakingUpdaters.getUpdaters(stakingTypes)
     }
 }

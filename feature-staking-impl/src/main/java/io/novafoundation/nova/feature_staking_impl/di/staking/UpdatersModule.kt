@@ -4,7 +4,6 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
-import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
@@ -25,6 +24,7 @@ import io.novafoundation.nova.runtime.network.updaters.TotalIssuanceUpdater
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
+import javax.inject.Qualifier
 
 @Module(
     includes = [
@@ -37,20 +37,27 @@ import javax.inject.Named
 class UpdatersModule {
 
     @Provides
+    @CommonUpdaters
     @FeatureScope
-    fun provideStakingUpdaters(
-        @Relaychain relaychainUpdaters: List<@JvmSuppressWildcards Updater>,
-        @Parachain parachainUpdaters: List<@JvmSuppressWildcards Updater>,
-        @Turing turingUpdaters: List<@JvmSuppressWildcards Updater>,
-        @NominationPools nominationPoolsUpdaters: List<@JvmSuppressWildcards Updater>,
+    fun provideCommonUpdaters(
         blockTimeUpdater: BlockTimeUpdater,
         blockNumberUpdater: BlockNumberUpdater,
         totalIssuanceUpdater: TotalIssuanceUpdater
+    ) = StakingUpdaters.Group(blockTimeUpdater, blockNumberUpdater, totalIssuanceUpdater)
+
+    @Provides
+    @FeatureScope
+    fun provideStakingUpdaters(
+        @Relaychain relaychainUpdaters: StakingUpdaters.Group,
+        @Parachain parachainUpdaters: StakingUpdaters.Group,
+        @Turing turingUpdaters: StakingUpdaters.Group,
+        @NominationPools nominationPoolsUpdaters: StakingUpdaters.Group,
+        @CommonUpdaters commonUpdaters: StakingUpdaters.Group
     ): StakingUpdaters {
         return StakingUpdaters(
             relaychainUpdaters = relaychainUpdaters,
             parachainUpdaters = parachainUpdaters,
-            commonUpdaters = listOf(blockTimeUpdater, blockNumberUpdater, totalIssuanceUpdater),
+            commonUpdaters = commonUpdaters,
             turingExtraUpdaters = turingUpdaters,
             nominationPoolsUpdaters = nominationPoolsUpdaters
         )
@@ -99,3 +106,7 @@ class UpdatersModule {
         chainRegistry
     )
 }
+
+@Qualifier
+@Retention(AnnotationRetention.SOURCE)
+annotation class CommonUpdaters

@@ -2,10 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start
 
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.PayoutType
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 import java.math.BigInteger
-import kotlinx.coroutines.flow.Flow
 
 class StartStakingData(
     val maxEarningRate: BigDecimal,
@@ -16,7 +15,7 @@ class StartStakingData(
 
 interface StartStakingInteractor {
 
-    fun observeData(chain: Chain, asset: Asset): Flow<StartStakingData>
+    fun observeData(): Flow<StartStakingData>
 
     fun getAvailableBalance(asset: Asset): BigInteger
 }
