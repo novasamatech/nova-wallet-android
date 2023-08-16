@@ -32,7 +32,7 @@ class ValidationExecutor : Validatable {
         validationSystem: ValidationSystem<P, S>,
         payload: P,
         errorDisplayer: (Throwable) -> Unit,
-        validationFailureTransformerCustom: (ValidationStatus.NotValid<S>, ValidationFlowActions) -> TransformedFailure,
+        validationFailureTransformerCustom: (ValidationStatus.NotValid<S>, ValidationFlowActions) -> TransformedFailure?,
         progressConsumer: ProgressConsumer? = null,
         autoFixPayload: (original: P, failureStatus: S) -> P = { original, _ -> original },
         block: (P) -> Unit,
@@ -65,9 +65,13 @@ class ValidationExecutor : Validatable {
                                 confirmWarning = validationFlowActions::resumeFlow
                             )
                         }
+
+                        null -> null
                     }
 
-                    validationFailureEvent.value = Event(eventPayload)
+                    eventPayload?.let {
+                        validationFailureEvent.value = Event(eventPayload)
+                    }
                 }
             )
     }

@@ -1,14 +1,17 @@
 package io.novafoundation.nova.feature_external_sign_impl.presentation.signExtrinsic
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.ValidationFlowActions
+import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator.Response
@@ -20,8 +23,10 @@ import io.novafoundation.nova.feature_external_sign_impl.R
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationFailure
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationPayload
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpikeDetected
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalDecimalFee
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -93,21 +98,23 @@ class ExternaSignViewModel(
 
     fun acceptClicked() = launch {
         val validationPayload = ConfirmDAppOperationValidationPayload(
-            token = commissionTokenFlow?.first()
+            token = commissionTokenFlow?.first(),
+            decimalFee = originFeeMixin?.awaitOptionalDecimalFee()
         )
 
         validationExecutor.requireValid(
             validationSystem = interactor.validationSystem,
             payload = validationPayload,
-            validationFailureTransformer = ::validationFailureToUi,
+            validationFailureTransformerCustom = ::validationFailureToUi,
+            autoFixPayload = ::autoFixPayload,
             progressConsumer = _performingOperationInProgress.progressConsumer()
         ) {
-            performOperation()
+            performOperation(it.decimalFee?.fee)
         }
     }
 
-    private fun performOperation() = launch {
-        interactor.performOperation()?.let { response ->
+    private fun performOperation(upToDateFee: Fee?) = launch {
+        interactor.performOperation(upToDateFee)?.let { response ->
             responder.respond(response)
 
             exit()
@@ -117,7 +124,7 @@ class ExternaSignViewModel(
     }
 
     private fun maybeLoadFee() {
-        originFeeMixin?.loadFee(
+        originFeeMixin?.loadFeeV2(
             coroutineScope = this,
             feeConstructor = { interactor.calculateFee() },
             onRetryCancelled = {}
@@ -155,18 +162,34 @@ class ExternaSignViewModel(
         }
     }
 
-    fun exit() = launch {
+    private fun exit() = launch {
         interactor.shutdown()
 
         router.back()
     }
 
-    private fun validationFailureToUi(failure: ConfirmDAppOperationValidationFailure): TitleAndMessage {
-        return when (failure) {
-            ConfirmDAppOperationValidationFailure.NotEnoughBalanceToPayFees -> {
-                resourceManager.getString(R.string.common_not_enough_funds_title) to
-                    resourceManager.getString(R.string.common_not_enough_funds_message)
+    private fun validationFailureToUi(
+        failure: ValidationStatus.NotValid<ConfirmDAppOperationValidationFailure>,
+        actions: ValidationFlowActions
+    ): TransformedFailure? {
+        return when (val reason = failure.reason) {
+            is ConfirmDAppOperationValidationFailure.FeeSpikeDetected -> originFeeMixin?.let {
+                handleFeeSpikeDetected(
+                    error = reason,
+                    resourceManager = resourceManager,
+                    feeLoaderMixin = originFeeMixin,
+                    actions = actions
+                )
             }
+        }
+    }
+
+    private fun autoFixPayload(
+        payload: ConfirmDAppOperationValidationPayload,
+        failure: ConfirmDAppOperationValidationFailure
+    ): ConfirmDAppOperationValidationPayload {
+        return when (failure) {
+            is ConfirmDAppOperationValidationFailure.FeeSpikeDetected -> payload.copy(decimalFee = failure.payload.newFee)
         }
     }
 

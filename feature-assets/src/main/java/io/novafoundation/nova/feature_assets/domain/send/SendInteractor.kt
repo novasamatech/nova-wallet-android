@@ -1,8 +1,11 @@
 package io.novafoundation.nova.feature_assets.domain.send
 
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.model.InlineFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.isCrossChain
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
@@ -25,7 +28,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
-import java.math.BigInteger
 
 class SendInteractor(
     private val chainRegistry: ChainRegistry,
@@ -66,7 +68,7 @@ class SendInteractor(
         crossChainTransfersRepository.syncConfiguration()
     }
 
-    suspend fun getOriginFee(transfer: AssetTransfer): BigInteger = withContext(Dispatchers.Default) {
+    suspend fun getOriginFee(transfer: AssetTransfer): Fee = withContext(Dispatchers.Default) {
         if (transfer.isCrossChain) {
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
 
@@ -76,19 +78,21 @@ class SendInteractor(
         }
     }
 
-    suspend fun getCrossChainFee(transfer: AssetTransfer): BigInteger? = if (transfer.isCrossChain) {
-        withContext(Dispatchers.Default) {
+    suspend fun getCrossChainFee(transfer: AssetTransfer): Fee? = if (transfer.isCrossChain) {
+        val feePlanks = withContext(Dispatchers.Default) {
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
             val crossChainFee = crossChainWeigher.estimateFee(config)
 
             crossChainFee.reserve.orZero() + crossChainFee.destination.orZero()
         }
+
+        InlineFee(feePlanks)
     } else {
         null
     }
 
     suspend fun performTransfer(
-        transfer: AssetTransfer,
+        transfer: WeightedAssetTransfer,
         originFee: BigDecimal,
         crossChainFee: BigDecimal?,
     ): Result<*> = withContext(Dispatchers.Default) {
