@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.di.staking.parachain.start
+package io.novafoundation.nova.feature_staking_impl.domain.start
 
 import dagger.Module
 import dagger.Provides

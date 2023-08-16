@@ -18,7 +18,7 @@ interface StakingDashboardDao {
             AND chainId = :chainId
             AND chainAssetId = :chainAssetId
             AND stakingType = :stakingType
-    """
+        """
     )
     suspend fun getDashboardItem(
         chainId: String,
@@ -30,7 +30,7 @@ interface StakingDashboardDao {
     @Query("SELECT * FROM staking_dashboard_items WHERE metaId = :metaId")
     fun dashboardItemsFlow(metaId: Long): Flow<List<StakingDashboardItemLocal>>
 
-    @Query("SELECT chainId, chainAssetId, stakingType, stakeStatusAccount, rewardsAccount from staking_dashboard_items WHERE metaId = :metaId")
+    @Query("SELECT chainId, chainAssetId, stakingType, stakeStatusAccount, rewardsAccount FROM staking_dashboard_items WHERE metaId = :metaId")
     fun stakingAccountsViewFlow(metaId: Long): Flow<List<StakingDashboardAccountsView>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

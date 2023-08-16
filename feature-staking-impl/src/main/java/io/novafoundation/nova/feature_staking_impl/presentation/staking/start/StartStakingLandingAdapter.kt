@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.staking.landing
+package io.novafoundation.nova.feature_staking_impl.presentation.staking.start
 
 import android.view.View
 import android.view.ViewGroup
@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.landing.model.StakingConditionRVItem
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.model.StakingConditionRVItem
 import kotlinx.android.synthetic.main.item_start_staking_landing_condition.view.itemStakingConditionIcon
 import kotlinx.android.synthetic.main.item_start_staking_landing_condition.view.itemStakingConditionText
 

@@ -80,9 +80,9 @@ abstract class SelectDelegationTracksFragment<V : SelectDelegationTracksViewMode
             selectDelegationTracksProgress.isVisible = it is ExtendedLoadingState.Loading
             when (it) {
                 is ExtendedLoadingState.Error -> {}
-                is ExtendedLoadingState.Loading -> placeholderAdapter.showPlaceholder(false)
+                is ExtendedLoadingState.Loading -> placeholderAdapter.show(false)
                 is ExtendedLoadingState.Loaded -> {
-                    placeholderAdapter.showPlaceholder(it.data.isEmpty())
+                    placeholderAdapter.show(it.data.isEmpty())
                     tracksAdapter.submitList(it.data)
                 }
             }

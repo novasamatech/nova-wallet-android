@@ -16,6 +16,9 @@ val StakingOption.fullId
 val StakingOption.components: Triple<Chain, Chain.Asset, Chain.Asset.StakingType>
     get() = Triple(assetWithChain.chain, assetWithChain.asset, additional.stakingType)
 
+val StakingOption.chain: Chain
+    get() = assetWithChain.chain
+
 class StakingSharedState : SelectedAssetOptionSharedState<StakingSharedState.OptionAdditionalData> {
 
     class OptionAdditionalData(val stakingType: Chain.Asset.StakingType)
@@ -28,10 +31,7 @@ class StakingSharedState : SelectedAssetOptionSharedState<StakingSharedState.Opt
         chainAsset: Chain.Asset,
         stakingType: Chain.Asset.StakingType
     ) {
-        val selectedOption = SupportedAssetOption(
-            assetWithChain = ChainWithAsset(chain, chainAsset),
-            additional = OptionAdditionalData(stakingType)
-        )
+        val selectedOption = createStakingOption(chain, chainAsset, stakingType)
 
         setSelectedOption(selectedOption)
     }
@@ -39,4 +39,11 @@ class StakingSharedState : SelectedAssetOptionSharedState<StakingSharedState.Opt
     suspend fun setSelectedOption(option: StakingOption) {
         _selectedOption.emit(option)
     }
+}
+
+fun createStakingOption(chain: Chain, chainAsset: Chain.Asset, stakingType: Chain.Asset.StakingType): StakingOption {
+    return StakingOption(
+        assetWithChain = ChainWithAsset(chain, chainAsset),
+        additional = StakingSharedState.OptionAdditionalData(stakingType)
+    )
 }
