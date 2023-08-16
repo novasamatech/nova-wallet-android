@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.validation.CompositeValidation
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -16,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.main.MainS
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.MainStakingUnlockingLimitValidation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_REWARD_DESTINATION
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_BOND_MORE
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_REBAG
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_REBOND
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_REDEEM
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_UNBOND
@@ -127,6 +129,17 @@ class StakeActionsValidationsModule {
             )
         )
     )
+
+    @FeatureScope
+    @Named(SYSTEM_MANAGE_STAKING_REBAG)
+    @Provides
+    fun provideRebagValidationSystem(
+        @Named(BALANCE_REQUIRED_CONTROLLER)
+        controllerRequiredValidation: MainStakingAccountRequiredValidation
+    ): StakeActionsValidationSystem = ValidationSystem {
+        validate(controllerRequiredValidation)
+    }
+
 
     @FeatureScope
     @Named(SYSTEM_MANAGE_REWARD_DESTINATION)
