@@ -134,10 +134,10 @@ class StakeActionsValidationsModule {
     @Named(SYSTEM_MANAGE_STAKING_REBAG)
     @Provides
     fun provideRebagValidationSystem(
-        @Named(BALANCE_REQUIRED_CONTROLLER)
-        controllerRequiredValidation: MainStakingAccountRequiredValidation
+        @Named(BALANCE_REQUIRED_STASH)
+        stashRequiredValidation: MainStakingAccountRequiredValidation
     ): StakeActionsValidationSystem = ValidationSystem {
-        validate(controllerRequiredValidation)
+        validate(stashRequiredValidation)
     }
 
     @FeatureScope
