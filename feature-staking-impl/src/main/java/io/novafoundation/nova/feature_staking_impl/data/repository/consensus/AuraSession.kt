@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.repository.consensus
 
-import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.committeeManagementOrNull
 import io.novafoundation.nova.common.utils.electionsOrNull
 import io.novafoundation.nova.common.utils.numberConstantOrNull
