@@ -8,36 +8,52 @@
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/stakingTargetIconShimmerContainer"
+        android:id="@+id/stakingTargetIconShimmer"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginStart="12dp"
+        android:layout_marginVertical="14dp"
         android:background="@drawable/bg_shimerring_6"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_goneMarginStart="12dp">
+        app:layout_goneMarginStart="12dp" />
 
-        <ImageView
-            android:id="@+id/stakingTargetIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:visibility="gone"
-            tools:visibility="visible" />
+    <ImageView
+        android:id="@+id/stakingTargetIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="12dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginStart="12dp"
+        tools:visibility="visible" />
 
-        <TextView
-            android:id="@+id/stakingTargetQuantity"
-            style="@style/TextAppearance.NovaFoundation.Regular.Caption2"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:gravity="center"
-            android:textColor="@color/text_tertiary"
-            android:visibility="gone"
-            tools:background="@color/chips_background"
-            tools:text="24"
-            tools:visibility="visible" />
+    <TextView
+        android:id="@+id/stakingTargetQuantity"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption2"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="12dp"
+        android:gravity="center"
+        android:textColor="@color/text_tertiary"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginStart="12dp"
+        tools:background="@color/chips_background"
+        tools:text="24"
+        tools:visibility="visible" />
 
-    </com.facebook.shimmer.ShimmerFrameLayout>
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/stakingTargetIconBarrier"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:barrierDirection="end"
+        app:constraint_referenced_ids="stakingTargetIconShimmer, stakingTargetIcon, stakingTargetQuantity" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -48,45 +64,44 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/stakingTargetChevron"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@id/stakingTargetIconShimmerContainer"
+        app:layout_constraintStart_toEndOf="@id/stakingTargetIconBarrier"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/stakingTargetTitleShimmering"
+        <TextView
+            android:id="@+id/stakingTargetTitle"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_shimmering"
-            app:shimmer_fixed_height="10dp"
-            app:shimmer_fixed_width="80dp">
+            android:textColor="@color/text_primary"
+            tools:text="Validators" />
 
-            <TextView
-                android:id="@+id/stakingTargetTitle"
-                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/text_primary"
-                tools:text="Validators" />
-
-        </com.facebook.shimmer.ShimmerFrameLayout>
-
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/stakingTargetSubtitleShimmering"
+        <TextView
+            android:id="@+id/stakingTargetSubtitle"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_shimmering"
-            app:shimmer_fixed_height="8dp"
-            app:shimmer_fixed_width="100dp">
+            android:textColor="@color/text_positive"
+            tools:text="Recommended" />
 
-            <TextView
-                android:id="@+id/stakingTargetSubtitle"
-                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/text_positive"
-                tools:text="Recommended" />
-
-        </com.facebook.shimmer.ShimmerFrameLayout>
     </LinearLayout>
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/stakingTargetTitleShimmering"
+        android:layout_width="80dp"
+        android:layout_height="10dp"
+        android:layout_marginStart="12dp"
+        android:background="@drawable/bg_shimmering"
+        app:layout_constraintStart_toEndOf="@id/stakingTargetIconBarrier"
+        app:layout_constraintTop_toTopOf="@+id/stakingTargetIconShimmer" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/stakingTargetSubtitleShimmering"
+        android:layout_width="100dp"
+        android:layout_height="8dp"
+        android:layout_marginStart="12dp"
+        android:background="@drawable/bg_shimmering"
+        app:layout_constraintBottom_toBottomOf="@+id/stakingTargetIconShimmer"
+        app:layout_constraintStart_toEndOf="@id/stakingTargetIconBarrier" />
 
     <ImageView
         android:id="@+id/stakingTargetChevron"

@@ -3,7 +3,10 @@ package io.novafoundation.nova.feature_staking_impl.presentation.view.stakingTyp
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
+import androidx.core.view.updateLayoutParams
 import com.google.android.material.card.MaterialCardView
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.dpF
@@ -27,18 +30,23 @@ class StakingTypeView @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.view_staking_type, this)
-        setBackgroundColorRes(R.color.secondary_screen_background)
+        setCardBackgroundColor(context.getColor(R.color.secondary_screen_background))
         strokeColor = context.getColor(R.color.staking_type_card_border)
         strokeWidth = 1.dp(context)
         radius = 12.dpF(context)
+        cardElevation = 0f
     }
 
     fun setBackgroundRes(@DrawableRes resId: Int) {
-        stakingTypeBackground.setImageResource(resId)
+        val drawable = ContextCompat.getDrawable(context, resId) ?: return
+        stakingTypeBackground.setImageDrawable(drawable)
+        stakingTypeBackground.updateLayoutParams<FrameLayout.LayoutParams> {
+            this.height = drawable.intrinsicHeight
+        }
     }
 
     fun select(isSelected: Boolean) {
-        stakingTypeRadioButton.isSelected = isSelected
+        stakingTypeRadioButton.isChecked = isSelected
         strokeColor = if (isSelected) {
             context.getColor(R.color.active_border)
         } else {
@@ -48,7 +56,7 @@ class StakingTypeView @JvmOverloads constructor(
 
     fun setModel(stakingTypeModel: StakingTypeModel) {
         stakingTypeTitle.text = stakingTypeModel.title
-        stakingTypeConditions.text = stakingTypeModel.conditions.joinToString(separator = "/n") { it }
+        stakingTypeConditions.text = stakingTypeModel.conditions.joinToString(separator = "\n") { it }
 
         when (stakingTypeModel.stakingTarget) {
             null -> stakingTypeTarget.makeGone()

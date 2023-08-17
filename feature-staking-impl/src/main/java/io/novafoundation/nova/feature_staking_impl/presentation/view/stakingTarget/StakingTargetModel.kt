@@ -5,7 +5,7 @@ import androidx.annotation.ColorRes
 class StakingTargetModel(
     val title: String,
     val subtitle: String?,
-    @ColorRes val subtitleColor: Int,
+    @ColorRes val subtitleColorRes: Int,
     val icon: Icon?
 ) {
 

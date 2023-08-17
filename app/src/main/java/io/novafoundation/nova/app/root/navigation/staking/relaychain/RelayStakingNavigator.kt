@@ -118,7 +118,7 @@ class RelayStakingNavigator(
     }
 
     override fun openSetupStaking() {
-        performNavigation(R.id.action_open_setup_staking_type)
+        performNavigation(R.id.action_stakingFragment_to_setupStakingFragment)
     }
 
     override fun openStartChangeValidators() {
@@ -188,6 +188,6 @@ class RelayStakingNavigator(
     }
 
     override fun openSetupStakingType() {
-        performNavigation(R.id.action_stakingDashboardFragment_to_moreStakingOptionsFragment)
+        performNavigation(R.id.action_stakingLandingFragment_to_setupStakingTypeFragment)
     }
 }
