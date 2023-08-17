@@ -44,6 +44,5 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>() {
     }
 
     override fun subscribe(viewModel: SetupStakingTypeViewModel) {
-
     }
 }

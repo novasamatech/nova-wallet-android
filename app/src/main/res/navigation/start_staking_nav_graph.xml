@@ -27,7 +27,6 @@
         android:label="SetupStakingTypeFragment"
         tools:layout="@layout/fragment_setup_staking_type">
 
-        <!--TODO: Start staking flow here-->
-
     </fragment>
+    
 </navigation>

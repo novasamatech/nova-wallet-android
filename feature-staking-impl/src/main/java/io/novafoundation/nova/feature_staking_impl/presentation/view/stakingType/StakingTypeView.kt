@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.utils.setBackgroundColorRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.synthetic.main.view_staking_type.view.stakingTypeBackground
@@ -20,7 +19,6 @@ import kotlinx.android.synthetic.main.view_staking_type.view.stakingTypeConditio
 import kotlinx.android.synthetic.main.view_staking_type.view.stakingTypeRadioButton
 import kotlinx.android.synthetic.main.view_staking_type.view.stakingTypeTarget
 import kotlinx.android.synthetic.main.view_staking_type.view.stakingTypeTitle
-
 
 class StakingTypeView @JvmOverloads constructor(
     context: Context,

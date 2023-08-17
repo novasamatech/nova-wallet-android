@@ -5,6 +5,4 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 
 class SetupStakingTypeViewModel(
     private val router: StakingRouter
-) : BaseViewModel() {
-
-}
+) : BaseViewModel()

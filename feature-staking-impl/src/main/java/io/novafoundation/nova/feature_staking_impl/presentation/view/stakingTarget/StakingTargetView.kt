@@ -20,7 +20,6 @@ import kotlinx.android.synthetic.main.view_staking_target.view.stakingTargetSubt
 import kotlinx.android.synthetic.main.view_staking_target.view.stakingTargetTitle
 import kotlinx.android.synthetic.main.view_staking_target.view.stakingTargetTitleShimmering
 
-
 class StakingTargetView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
