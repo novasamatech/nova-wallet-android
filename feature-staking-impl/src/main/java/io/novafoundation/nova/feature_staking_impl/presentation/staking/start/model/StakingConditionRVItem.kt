@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.staking.landing.model
+package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.model
 
 import androidx.annotation.DrawableRes
 

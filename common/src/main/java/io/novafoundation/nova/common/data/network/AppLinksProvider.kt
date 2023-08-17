@@ -20,6 +20,7 @@ class AppLinksProvider(
     val paritySignerTroubleShooting: String,
     val polkadotVaultTroubleShooting: String,
     val ledgerBluetoothGuide: String,
+    val wikiBase: String,
 ) {
 
     fun getTwitterAccountUrl(

@@ -3,7 +3,11 @@ package io.novafoundation.nova.common.list
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 
-abstract class PlaceholderAdapter<T : ViewHolder> : RecyclerView.Adapter<T>() {
+abstract class SingleItemAdapter<T : ViewHolder>() : RecyclerView.Adapter<T>() {
+
+    constructor(isShownByDefault: Boolean) : this() {
+        showPlaceholder = true
+    }
 
     protected var showPlaceholder = false
         private set
@@ -12,7 +16,7 @@ abstract class PlaceholderAdapter<T : ViewHolder> : RecyclerView.Adapter<T>() {
         return if (showPlaceholder) 1 else 0
     }
 
-    fun showPlaceholder(show: Boolean) {
+    fun show(show: Boolean) {
         if (showPlaceholder != show) {
             showPlaceholder = show
             if (show) {

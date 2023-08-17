@@ -141,6 +141,12 @@ suspend fun ChainRegistry.chainWithAssetOrNull(chainId: String, assetId: Int): C
     return ChainWithAsset(chain, chainAsset)
 }
 
+suspend fun ChainRegistry.assetOrNull(fullChainAssetId: FullChainAssetId): Chain.Asset? {
+    val chain = getChainOrNull(fullChainAssetId.chainId) ?: return null
+
+    return chain.assetsById[fullChainAssetId.assetId]
+}
+
 suspend fun ChainRegistry.chainWithAsset(chainId: String, assetId: Int): ChainWithAsset {
     val chain = chainsById.first().getValue(chainId)
 

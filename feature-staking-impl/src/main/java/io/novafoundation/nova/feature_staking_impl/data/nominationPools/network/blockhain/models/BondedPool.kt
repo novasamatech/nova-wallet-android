@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.utils.Perbill
 class BondedPool(
     val poolId: PoolId,
     val points: PoolPoints,
-    val commission: PoolCommission,
+    val commission: PoolCommission?,
     val state: PoolState
 )
 
@@ -29,12 +29,12 @@ fun bindBondedPool(decoded: Any, poolId: PoolId): BondedPool {
     return BondedPool(
         points = bindPoolPoints(asStruct["points"]),
         poolId = poolId,
-        commission = bindPoolCommission(asStruct["commission"]),
+        commission = asStruct.get<Any?>("commission")?.let(::bindPoolCommission),
         state = bindCollectionEnum(asStruct["state"])
     )
 }
 
-fun bindPoolCommission(decoded: Any?): PoolCommission {
+fun bindPoolCommission(decoded: Any): PoolCommission {
     val asStruct = decoded.castToStruct()
 
     return PoolCommission(

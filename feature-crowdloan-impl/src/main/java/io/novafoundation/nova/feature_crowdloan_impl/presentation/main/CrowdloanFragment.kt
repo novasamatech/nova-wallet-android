@@ -69,15 +69,15 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel>(), CrowdloanAdapter.H
 
         viewModel.crowdloanModelsFlow.observe { loadingState ->
             // GONE state does not trigger re-render on data change (i.e. when we want to drop outdated list)
-            shimmeringAdapter.showPlaceholder(loadingState is LoadingState.Loading)
+            shimmeringAdapter.show(loadingState is LoadingState.Loading)
 
             if (loadingState is LoadingState.Loaded) {
                 adapter.submitList(loadingState.data)
-                placeholderAdapter.showPlaceholder(loadingState.data.isEmpty())
+                placeholderAdapter.show(loadingState.data.isEmpty())
             } else {
                 // to prevent outdated information appear for a moment between next chunk submitted and rendered
                 adapter.submitList(emptyList())
-                placeholderAdapter.showPlaceholder(false)
+                placeholderAdapter.show(false)
             }
         }
 

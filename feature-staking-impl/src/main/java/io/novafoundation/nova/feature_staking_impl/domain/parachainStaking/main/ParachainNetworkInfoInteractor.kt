@@ -19,6 +19,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import java.math.BigInteger
 
+class ParachainRoundInfo(
+    val minimumStake: BigInteger,
+    val nominatorsCount: Int
+)
+
 class ParachainNetworkInfoInteractor(
     private val currentRoundRepository: CurrentRoundRepository,
     private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
@@ -26,11 +31,29 @@ class ParachainNetworkInfoInteractor(
 ) {
 
     fun observeNetworkInfo(chainId: ChainId): Flow<NetworkInfo> = flow {
-        val systemForcedMinStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
-        val maxRewardedDelegatorsPerCollator = parachainStakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
+        val realtimeChanges = combine(
+            currentRoundRepository.totalStakedFlow(chainId),
+            roundDurationEstimator.unstakeDurationFlow(chainId),
+            observeRoundInfo(chainId)
+        ) { totalStaked, lockupPeriodDuration, roundInfo ->
+            NetworkInfo(
+                lockupPeriod = lockupPeriodDuration,
+                minimumStake = roundInfo.minimumStake,
+                totalStake = totalStaked,
+                stakingPeriod = StakingPeriod.Unlimited,
+                nominatorsCount = roundInfo.nominatorsCount
+            )
+        }
 
-        val realtimeChanges = currentRoundRepository.currentRoundInfoFlow(chainId).flatMapLatest {
+        emitAll(realtimeChanges)
+    }
+
+    fun observeRoundInfo(chainId: ChainId): Flow<ParachainRoundInfo> {
+        return currentRoundRepository.currentRoundInfoFlow(chainId).flatMapLatest {
             val currentCollatorSnapshot = currentRoundRepository.collatorsSnapshot(chainId, it.current)
+
+            val systemForcedMinStake = parachainStakingConstantsRepository.systemForcedMinStake(chainId)
+            val maxRewardedDelegatorsPerCollator = parachainStakingConstantsRepository.maxRewardedDelegatorsPerCollator(chainId)
 
             val minimumStake = currentCollatorSnapshot.minimumStake(systemForcedMinStake, maxRewardedDelegatorsPerCollator)
             val nominatorsCount = currentCollatorSnapshot.activeDelegatorsCount()
@@ -39,17 +62,12 @@ class ParachainNetworkInfoInteractor(
                 currentRoundRepository.totalStakedFlow(chainId),
                 roundDurationEstimator.unstakeDurationFlow(chainId)
             ) { totalStaked, lockupPeriodDuration ->
-                NetworkInfo(
-                    lockupPeriod = lockupPeriodDuration,
+                ParachainRoundInfo(
                     minimumStake = minimumStake,
-                    totalStake = totalStaked,
-                    stakingPeriod = StakingPeriod.Unlimited,
                     nominatorsCount = nominatorsCount
                 )
             }
         }
-
-        emitAll(realtimeChanges)
     }
 
     private fun AccountIdMap<CollatorSnapshot>.activeDelegatorsCount(): Int {

@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ActiveEraUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.CurrentEraUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ParachainsUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ValidatorExposureUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentEpochIndexUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentSessionIndexUpdater
@@ -19,7 +20,6 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.PoolMetadataUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.SubPoolsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.scope.PoolScope
-import io.novafoundation.nova.feature_staking_impl.di.staking.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -102,7 +102,7 @@ class NominationPoolStakingUpdatersModule {
         currentSessionIndexUpdater: CurrentSessionIndexUpdater,
         eraStartSessionIndexUpdater: EraStartSessionIndexUpdater,
         parachainsUpdater: ParachainsUpdater,
-    ): StakingUpdaters = StakingUpdaters(
+    ) = StakingUpdaters.Group(
         lastPoolIdUpdater,
         minJoinBondUpdater,
         poolMetadataUpdater,

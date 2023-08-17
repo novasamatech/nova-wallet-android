@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.LocalBagListRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
@@ -54,6 +55,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.payout.PayoutInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.RealStakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
@@ -97,6 +99,18 @@ const val DEFAULT_BULK_RETRIEVER_PAGE_SIZE = 1000
 
 @Module(includes = [AssetUseCaseModule::class])
 class StakingFeatureModule {
+
+    @Provides
+    @FeatureScope
+    fun provideStakingEraInteractorFactory(
+        roundDurationEstimator: RoundDurationEstimator,
+        stakingSharedComputation: StakingSharedComputation,
+        stakingConstantsRepository: StakingConstantsRepository
+    ) = StakingEraInteractorFactory(
+        roundDurationEstimator = roundDurationEstimator,
+        stakingSharedComputation = stakingSharedComputation,
+        stakingConstantsRepository = stakingConstantsRepository
+    )
 
     @Provides
     @FeatureScope

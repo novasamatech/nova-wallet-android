@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.common
 
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
@@ -22,15 +23,11 @@ class EraTimeCalculator(
     private val currentSlot: BigInteger,
     private val genesisSlot: BigInteger,
     private val eraStartSessionIndex: BigInteger,
-    private val activeEra: EraIndex,
+    val activeEra: EraIndex,
 ) {
 
     fun calculate(destinationEra: EraIndex? = null): BigInteger {
-        val epochStartSlot = currentEpochIndex * sessionLength + genesisSlot
-        val sessionProgress = currentSlot - epochStartSlot
-
-        val eraProgress = (currentSessionIndex - eraStartSessionIndex) * sessionLength + sessionProgress
-        val eraRemained = eraLength * sessionLength - eraProgress
+        val eraRemained = remainingEraBlocks()
 
         val finishTimeStamp = System.currentTimeMillis().toBigInteger()
         // Doing math takes very long time. By finishing all requests and calculations the time will be outdated for ~5 seconds
@@ -46,10 +43,15 @@ class EraTimeCalculator(
         }
     }
 
-    fun eraDuration(): Duration {
-        val inMillis = (blockCreationTime * eraLength * sessionLength).toLong()
+    /**
+     * Duration till the end of current active era
+     */
+    fun remainingEraDuration(): Duration {
+        return (remainingEraBlocks() * blockCreationTime).toDuration()
+    }
 
-        return inMillis.milliseconds
+    fun eraDuration(): Duration {
+        return (blockCreationTime * eraLength * sessionLength).toDuration()
     }
 
     fun calculateTillEraSet(destinationEra: EraIndex): BigInteger {
@@ -57,6 +59,21 @@ class EraTimeCalculator(
         val tillEraStart = calculate(destinationEra)
         return tillEraStart - sessionDuration
     }
+
+    private fun BigInteger.toDuration() = toLong().milliseconds
+
+    private fun remainingEraBlocks(): BlockNumber {
+        val epochStartSlot = currentEpochIndex * sessionLength + genesisSlot
+        val sessionProgress = currentSlot - epochStartSlot
+
+        val eraProgress = (currentSessionIndex - eraStartSessionIndex) * sessionLength + sessionProgress
+
+        return eraLength * sessionLength - eraProgress
+    }
+}
+
+fun EraTimeCalculator.erasDuration(numberOfEras: BigInteger): Duration {
+    return eraDuration() * numberOfEras.toInt()
 }
 
 fun EraTimeCalculator.calculateDurationTill(era: EraIndex): Duration {

@@ -12,6 +12,7 @@ import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
+import java.util.Calendar
 import java.util.Collections
 import java.util.Date
 import java.util.UUID
@@ -72,10 +73,6 @@ val BigInteger.isNonPositive: Boolean
 
 val BigInteger.isZero: Boolean
     get() = signum() == 0
-
-inline fun <T : Comparable<T>, R : Comparable<R>> ClosedRange<T>.map(mapper: (T) -> R): ClosedRange<R> {
-    return mapper(start)..mapper(endInclusive)
-}
 
 fun BigInteger?.orZero(): BigInteger = this ?: BigInteger.ZERO
 fun BigDecimal?.orZero(): BigDecimal = this ?: 0.toBigDecimal()
@@ -177,6 +174,12 @@ fun List<Double>.median(): Double = sorted().let {
     val middleLeft = it[(it.size - 1) / 2] // will be same as middleRight if list size is odd
 
     (middleLeft + middleRight) / 2
+}
+
+fun Collection<BigInteger>.average(): BigInteger {
+    if (isEmpty()) throw NoSuchFieldException("Collection is empty")
+
+    return sum() / size.toBigInteger()
 }
 
 fun generateLinearSequence(initial: Int, step: Int) = generateSequence(initial) { it + step }
@@ -343,9 +346,41 @@ inline fun CoroutineScope.withChildScope(action: CoroutineScope.() -> Unit) {
 fun <T> List<T>.associateWithIndex() = withIndex().associateBy(keySelector = { it.value }, valueTransform = { it.index })
 
 fun Date.atTheBeginningOfTheDay(): Date {
-    return Date(time).apply {
-        hours = 0
-        minutes = 0
-        seconds = 0
+    val calendar = Calendar.getInstance().apply {
+        time = this@atTheBeginningOfTheDay
+        resetDay()
     }
+
+    return calendar.toDate()
+}
+
+fun Date.atTheEndOfTheDay(): Date {
+    val calendar = Calendar.getInstance().apply {
+        time = this@atTheEndOfTheDay
+        set(Calendar.HOUR_OF_DAY, 23)
+        set(Calendar.MINUTE, 59)
+        set(Calendar.SECOND, 59)
+        set(Calendar.MILLISECOND, 999)
+    }
+
+    return calendar.toDate()
+}
+
+fun Date.atTheNextDay(): Date {
+    val calendar = Calendar.getInstance().apply {
+        time = this@atTheNextDay
+        add(Calendar.DAY_OF_MONTH, 1)
+        resetDay()
+    }
+
+    return calendar.toDate()
+}
+
+fun Calendar.toDate(): Date = Date(time.time)
+
+fun Calendar.resetDay() {
+    set(Calendar.HOUR_OF_DAY, 0)
+    set(Calendar.MINUTE, 0)
+    set(Calendar.SECOND, 0)
+    set(Calendar.MILLISECOND, 0)
 }

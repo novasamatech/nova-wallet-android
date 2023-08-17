@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.HasStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.allStakingTypes
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingPrimary
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingSecondary
 import io.novafoundation.nova.feature_staking_impl.R
@@ -76,19 +77,13 @@ class StakingDashboardViewModel(
         val withoutStakeItem = withoutStakeItems.getOrNull(index) ?: return@launch
         val noStakeItemState = withoutStakeItem.stakingState as? NoStake ?: return@launch
 
-        val stakingType = when (val flowType = noStakeItemState.flowType) {
-            is NoStake.FlowType.Aggregated -> flowType.stakingTypes.first() // TODO handle aggregated flows
+        val stakingTypes = noStakeItemState.flowType.allStakingTypes
+        val chain = withoutStakeItem.chain
+        val chainAsset = withoutStakeItem.token.configuration
 
-            is NoStake.FlowType.Single -> flowType.stakingType
-        }
+        stakingSharedState.setSelectedOption(chain, chainAsset, stakingTypes.first())
 
-        stakingSharedState.setSelectedOption(
-            chain = withoutStakeItem.chain,
-            chainAsset = withoutStakeItem.token.configuration,
-            stakingType = stakingType
-        )
-
-        router.openStartStakingFlow()
+        router.openStartStakingLanding(chain.id, chainAsset.id, stakingTypes)
     }
 
     fun onMoreOptionsClicked() {

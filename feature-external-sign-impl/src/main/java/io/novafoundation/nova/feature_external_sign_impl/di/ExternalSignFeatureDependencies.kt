@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenReposito
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
+import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import okhttp3.OkHttpClient
 
@@ -58,4 +59,6 @@ interface ExternalSignFeatureDependencies {
     val validationExecutor: ValidationExecutor
 
     val signerProvider: SignerProvider
+
+    val gasPriceProviderFactory: GasPriceProviderFactory
 }

@@ -20,6 +20,8 @@ private const val TESTNET_OPTION = "testnet"
 private const val NO_SUBSTRATE_RUNTIME = "noSubstrateRuntime"
 
 private const val CHAIN_ADDITIONAL_TIP = "defaultTip"
+private const val CHAIN_THEME_COLOR = "themeColor"
+private const val CHAIN_STAKING_WIKI = "stakingWiki"
 
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
@@ -34,7 +36,9 @@ fun mapRemoteChainToLocal(
 
     val additional = chainRemote.additional?.let {
         Chain.Additional(
-            defaultTip = (it[CHAIN_ADDITIONAL_TIP] as? String)?.toBigInteger()
+            defaultTip = (it[CHAIN_ADDITIONAL_TIP] as? String)?.toBigInteger(),
+            themeColor = (it[CHAIN_THEME_COLOR] as? String),
+            stakingWiki = (it[CHAIN_STAKING_WIKI] as? String)
         )
     }
 

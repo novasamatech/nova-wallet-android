@@ -77,11 +77,11 @@ class MainDAppFragment :
         viewModel.shownDAppsStateFlow.observe { state ->
             when (state) {
                 is LoadingState.Loaded -> {
-                    dappsShimmering.showPlaceholder(false)
+                    dappsShimmering.show(false)
                     dappListAdapter.submitList(state.data)
                 }
                 is LoadingState.Loading -> {
-                    dappsShimmering.showPlaceholder(true)
+                    dappsShimmering.show(true)
                     dappListAdapter.submitList(listOf())
                 }
                 else -> {}

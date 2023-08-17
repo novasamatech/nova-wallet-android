@@ -24,12 +24,6 @@ class RealChainAssetRepository(
         chainAssetDao.insertAsset(localAsset)
     }
 
-    override suspend fun getAssetSymbol(id: FullChainAssetId): String? {
-        val existingAsset = chainAssetDao.getAsset(id.assetId, id.chainId)
-
-        return existingAsset?.symbol
-    }
-
     override suspend fun getEnabledAssets(): List<Chain.Asset> {
         return chainAssetDao.getEnabledAssets().map { mapChainAssetLocalToAsset(it, gson) }
     }
