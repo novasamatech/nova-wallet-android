@@ -107,7 +107,7 @@ class RelayStakingNavigator(
 
     override fun openChainStakingMain() = performNavigation(R.id.action_mainFragment_to_stakingGraph)
 
-    override fun openStartStakingFlow() = performNavigation(R.id.action_mainFragment_to_startStackingLanding)
+    override fun openStartStakingFlow() = performNavigation(R.id.action_open_setup_staking_type)
 
     override fun openSetupStaking() {
         performNavigation(R.id.action_stakingFragment_to_setupStakingFragment)
@@ -177,5 +177,9 @@ class RelayStakingNavigator(
 
     override fun openStakingPeriods() {
         performNavigation(R.id.action_stakingFragment_to_staking_periods)
+    }
+
+    override fun openSetupStakingType() {
+        performNavigation(R.id.action_stakingDashboardFragment_to_moreStakingOptionsFragment)
     }
 }
