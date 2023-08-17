@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.view.stakingTyp
 import io.novafoundation.nova.feature_staking_impl.presentation.view.stakingTarget.StakingTargetModel
 
 class StakingTypeModel(
-    val title: String,
     val isSelectable: Boolean,
     val conditions: List<String>,
     val stakingTarget: StakingTarget?,

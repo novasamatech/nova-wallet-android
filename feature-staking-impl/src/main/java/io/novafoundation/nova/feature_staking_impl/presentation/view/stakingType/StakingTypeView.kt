@@ -37,6 +37,10 @@ class StakingTypeView @JvmOverloads constructor(
         cardElevation = 0f
     }
 
+    fun setTitle(title: String) {
+        stakingTypeTitle.text = title
+    }
+
     fun setBackgroundRes(@DrawableRes resId: Int) {
         val drawable = ContextCompat.getDrawable(context, resId) ?: return
         stakingTypeBackground.setImageDrawable(drawable)
@@ -55,7 +59,6 @@ class StakingTypeView @JvmOverloads constructor(
     }
 
     fun setModel(stakingTypeModel: StakingTypeModel) {
-        stakingTypeTitle.text = stakingTypeModel.title
         stakingTypeConditions.text = stakingTypeModel.conditions.joinToString(separator = "\n") { it }
 
         when (stakingTypeModel.stakingTarget) {
