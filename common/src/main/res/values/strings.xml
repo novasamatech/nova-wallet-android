@@ -8,7 +8,6 @@
     <string name="send_recipient_system_account_message">Recipient is a system account. It is not controlled by any company or individual.\nAre you sure you still want to perform this transfer?</string>
 
     <string name="asset_add_evm_token_already_exist_title">This token already exists</string>
-<!--    <string name="asset_add_evm_token_already_exist_title">This token already exist</string>-->
     <string name="asset_add_evm_token_already_exist_modifiable_message">The entered contract address is present in Nova as a %s token. Are you sure you want to modify it?</string>
 
     <string name="account_parity_signer_sign_qr_code_expired_descrition">For security reasons generated operations valid for only %s.\nPlease generate new QR code and sign it with %s</string>
