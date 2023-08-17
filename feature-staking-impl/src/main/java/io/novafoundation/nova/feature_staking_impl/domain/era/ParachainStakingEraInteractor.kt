@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.StartStakingEraInfo
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.model.StartStakingEraInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 

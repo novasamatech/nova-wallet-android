@@ -24,8 +24,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.R
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.RedeemPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.ConfirmRewardDestinationFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.StartStakingLandingFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.model.StartStakingLandingPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.StartStakingLandingFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.story.StoryFragment

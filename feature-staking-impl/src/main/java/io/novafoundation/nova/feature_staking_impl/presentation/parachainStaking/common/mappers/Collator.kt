@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_staking_impl.R
@@ -12,7 +13,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mappers.rewardsT
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.rewardsToScoring
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.stakeToScoring
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel.ColoredText
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetStakeParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetStakeParcelModel.Active.UserStakeInfo
