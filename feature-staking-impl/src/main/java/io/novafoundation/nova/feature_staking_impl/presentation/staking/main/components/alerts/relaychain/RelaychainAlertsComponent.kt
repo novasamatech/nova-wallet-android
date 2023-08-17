@@ -40,6 +40,7 @@ class RelaychainAlertsComponentFactory(
     private val resourceManager: ResourceManager,
     private val redeemValidationSystem: StakeActionsValidationSystem,
     private val bondMoreValidationSystem: StakeActionsValidationSystem,
+    private val rebagValidationSystem: StakeActionsValidationSystem,
     private val router: StakingRouter,
     private val stakingSharedComputation: StakingSharedComputation,
 ) {
@@ -53,6 +54,7 @@ class RelaychainAlertsComponentFactory(
         alertsInteractor = alertsInteractor,
         redeemValidationSystem = redeemValidationSystem,
         bondMoreValidationSystem = bondMoreValidationSystem,
+        rebagValidationSystem = rebagValidationSystem,
         router = router,
         stakingOption = stakingOption,
         hostContext = hostContext
@@ -69,6 +71,7 @@ private class RelaychainAlertsComponent(
 
     private val redeemValidationSystem: StakeActionsValidationSystem,
     private val bondMoreValidationSystem: StakeActionsValidationSystem,
+    private val rebagValidationSystem: StakeActionsValidationSystem,
     private val router: StakingRouter,
 ) : AlertsComponent,
     CoroutineScope by hostContext.scope,
@@ -137,7 +140,7 @@ private class RelaychainAlertsComponent(
             Alert.Rebag -> AlertModel(
                 resourceManager.getString(R.string.staking_alert_rebag_title),
                 resourceManager.getString(R.string.staking_alert_rebag_message),
-                AlertModel.Type.CallToAction { router.openRebag() }
+                AlertModel.Type.CallToAction(::rebagClicked)
             )
         }
     }
@@ -159,6 +162,10 @@ private class RelaychainAlertsComponent(
 
     private fun redeemAlertClicked() = requireValidManageStakingAction(redeemValidationSystem) {
         router.openRedeem()
+    }
+
+    private fun rebagClicked() = requireValidManageStakingAction(rebagValidationSystem) {
+        router.openRebag()
     }
 
     private fun requireValidManageStakingAction(

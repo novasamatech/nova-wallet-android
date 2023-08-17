@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.repository.consensus
 
-import io.novafoundation.nova.common.utils.elections
+import io.novafoundation.nova.common.utils.committeeManagementOrNull
+import io.novafoundation.nova.common.utils.electionsOrNull
 import io.novafoundation.nova.common.utils.numberConstantOrNull
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.number
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.system
@@ -26,7 +27,8 @@ class AuraSession(
     override suspend fun sessionLength(chainId: ChainId): BigInteger {
         val runtime = runtimeFor(chainId)
 
-        return runtime.metadata.elections().numberConstantOrNull("SessionPeriod", runtime)
+        return runtime.metadata.electionsOrNull()?.numberConstantOrNull("SessionPeriod", runtime)
+            ?: runtime.metadata.committeeManagementOrNull()?.numberConstantOrNull("SessionPeriod", runtime)
             ?: SESSION_PERIOD_DEFAULT.toBigInteger()
     }
 

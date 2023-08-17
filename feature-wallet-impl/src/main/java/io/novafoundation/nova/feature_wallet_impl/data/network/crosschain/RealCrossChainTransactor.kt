@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
@@ -62,8 +63,8 @@ class RealCrossChainTransactor(
         )
     }
 
-    override suspend fun estimateOriginFee(configuration: CrossChainTransferConfiguration, transfer: AssetTransfer): BigInteger {
-        return extrinsicService.estimateFee(transfer.originChain) {
+    override suspend fun estimateOriginFee(configuration: CrossChainTransferConfiguration, transfer: AssetTransfer): Fee {
+        return extrinsicService.estimateFeeV2(transfer.originChain) {
             crossChainTransfer(configuration, transfer, crossChainFee = Balance.ZERO)
         }
     }

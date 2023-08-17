@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward
 
+import io.novafoundation.nova.common.utils.atTheBeginningOfTheDay
+import io.novafoundation.nova.common.utils.atTheEndOfTheDay
 import io.novafoundation.nova.common.utils.timestamp
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
@@ -22,8 +24,10 @@ class DirectStakingRewardsDataSource(
         val stakingExternalApi = chain.stakingExternalApi() ?: return
         val address = chain.addressOf(accountId)
 
-        val start = rewardPeriod.start?.timestamp()
-        val end = rewardPeriod.end?.timestamp()
+        val start = rewardPeriod.start?.atTheBeginningOfTheDay() // Using atTheBeginningOfTheDay() to avoid invalid data
+            ?.timestamp()
+        val end = rewardPeriod.end?.atTheEndOfTheDay() // Using atTheEndOfTheDay() since the end of the day is fully included in the period
+            ?.timestamp()
 
         val response = stakingApi.getRewardsByPeriod(
             url = stakingExternalApi.url,

@@ -149,8 +149,9 @@ class StakingDashboardRelayStakingUpdater(
     ): Status? {
         return when {
             baseInfo == null -> null
+            baseInfo.nominations == null -> Status.INACTIVE
             chainStakingStats.accountPresentInActiveStakers -> Status.ACTIVE
-            baseInfo.nominations != null && baseInfo.nominations.isWaiting(activeEra) -> Status.WAITING
+            baseInfo.nominations.isWaiting(activeEra) -> Status.WAITING
             else -> Status.INACTIVE
         }
     }
