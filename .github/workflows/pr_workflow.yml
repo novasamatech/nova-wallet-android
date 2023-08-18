@@ -19,7 +19,8 @@ jobs:
           fi
       
       - name: Output check result
-        run: echo "Output: ${{ steps.checkRef.outputs.ref_contains_rc }}"
+        run: |
+          echo "Output: ${{ steps.checkRef.outputs.ref_contains_rc }}"
 
   build:
     runs-on: ubuntu-latest
