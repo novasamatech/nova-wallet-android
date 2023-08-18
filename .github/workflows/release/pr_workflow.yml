@@ -1,0 +1,23 @@
+name: PR Workflow
+
+on:
+  pull_request:
+    branches:
+      - '*/rc/*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if comment contains "Release notes"
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const comment = github.event.pull_request.comments.find(c => c.body.includes('Release notes'));
+            if (!comment) {
+              console.log('No comment found with "Release notes"');
+              throw new Error('Missing release notes');
+            } else {
+              console.log('Comment found with "Release notes"');
+            }
