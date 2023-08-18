@@ -1,16 +1,32 @@
 name: PR Workflow
 
 on:
-  pull_request:
+  push:
     branches:
-      - '*/rc/*'
+      - 'develop' # master
 
 jobs:
+  checkRef:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check if "rc" is present in github.ref
+        run: |
+          if [[ "${{ github.ref }}" == *"rc"* ]]; then
+            echo "::set-output name=ref_contains_rc::true"
+          else
+            echo "::set-output name=ref_contains_rc::false"
+          fi
+      
+      - name: Output check result
+        run: echo "Output: ${{ steps.checkRef.outputs.ref_contains_rc }}"
+
   build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Check if comment contains "Release notes"
+        if: github.ref == 'refs/heads/master'
         uses: actions/github-script@v4
         with:
           script: |
