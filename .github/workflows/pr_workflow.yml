@@ -10,12 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - uses: actions/checkout@v2
       - name: Check if "rc" is present in github.ref
         run: |
           if [[ "${{ github.ref }}" == *"rc"* ]]; then
-            echo "::set-output name=ref_contains_rc::true"
+            echo "::set-output name=ref_contains_rc::1"
           else
-            echo "::set-output name=ref_contains_rc::false"
+            echo "::set-output name=ref_contains_rc::0"
           fi
       
       - name: Output check result
