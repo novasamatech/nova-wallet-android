@@ -22,12 +22,22 @@ class SingularV2NftRemote(
     val symbol: String,
 )
 
-class SingularV2CollectionMetadata(
-    val name: String,
+data class SingularV2CollectionMetadata(
+    val name: String?,
     val description: String?,
 
     @SerializedName("image", alternate = ["mediaUri"])
     val image: String?,
     val tags: List<String>?,
     val attributes: List<MetadataAttribute>?
-)
+) {
+    companion object {
+        val Default = SingularV2CollectionMetadata(
+            name = null,
+            description = null,
+            image = null,
+            tags = null,
+            attributes = null
+        )
+    }
+}

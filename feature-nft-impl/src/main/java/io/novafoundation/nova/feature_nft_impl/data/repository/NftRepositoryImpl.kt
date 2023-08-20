@@ -17,6 +17,7 @@ import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFacto
 import io.novafoundation.nova.runtime.ethereum.subscribe
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +28,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -45,21 +45,35 @@ class NftRepositoryImpl(
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
 ) : NftRepository {
 
+    private val collectionNames: MutableMap<String, String?> = mutableMapOf()
+
     override fun allNftWithMetadataFlow(metaAccount: MetaAccount): Flow<List<Nft>> {
         return nftDao.nftsFlow(metaAccount.id)
             .map { nftsLocal ->
                 val chainsById = chainRegistry.chainsById.first()
 
                 nftsLocal.mapNotNull { nftLocal ->
-
-                    val nftTypeKey = mapNftTypeLocalToTypeKey(nftDao.getNftType(nftLocal.identifier))
-                    val nftProvider = nftProvidersRegistry.get(nftTypeKey)
-                    val chain = chainsById[nftLocal.chainId]
-                    val collectionName = nftProvider.getCollectionName(nftLocal.collectionId, chain?.id)
-
+                    val collectionName = getCollectionName(nftLocal, chainsById)
                     mapNftLocalToNft(chainsById, metaAccount, nftLocal, collectionName)
                 }
             }
+    }
+
+    private suspend fun getCollectionName(
+        nftLocal: NftLocal,
+        chainsById: Map<ChainId, Chain>
+    ): String? {
+        val nftTypeKey = mapNftTypeLocalToTypeKey(nftLocal.type)
+        val nftProvider = nftProvidersRegistry.get(nftTypeKey)
+        val chain = chainsById[nftLocal.chainId]
+        val collectionId = nftLocal.collectionId
+        return if (collectionNames.containsKey(collectionId)) {
+            collectionNames[collectionId]
+        } else {
+            nftProvider.getCollectionName(collectionId, chain?.id).apply {
+                collectionNames[collectionId] = this
+            }
+        }
     }
 
     override fun allNftFlow(metaAccount: MetaAccount): Flow<List<Nft>> {
@@ -75,7 +89,8 @@ class NftRepositoryImpl(
 
     override fun nftDetails(nftId: String): Flow<NftDetails> {
         return flow {
-            val nftTypeKey = mapNftTypeLocalToTypeKey(nftDao.getNftType(nftId))
+            val nftType = nftDao.getNftType(nftId)
+            val nftTypeKey = mapNftTypeLocalToTypeKey(nftType)
             val nftProvider = nftProvidersRegistry.get(nftTypeKey)
 
             emitAll(nftProvider.nftDetailsFlow(nftId))
@@ -87,7 +102,7 @@ class NftRepositoryImpl(
             val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(nftLocal.chainId)
             nftLocal to subscriptionBuilder
         }.flatMapConcat { (nftLocal, subscriptionBuilder) ->
-            val nftTypeKey = mapNftTypeLocalToTypeKey(nftDao.getNftType(nftLocal.identifier))
+            val nftTypeKey = mapNftTypeLocalToTypeKey(nftLocal.type)
             val nftProvider = nftProvidersRegistry.get(nftTypeKey)
             nftProvider.subscribeNftOwnerAddress(
                 subscriptionBuilder,
@@ -150,9 +165,9 @@ class NftRepositoryImpl(
         }
     }
 
-    override fun removeOldPendingTransactions(myNftIds: List<NftLocal>) {
+    override fun removeOldPendingTransactions(nftLocal: NftLocal) {
         pendingSendTransactionsNftLocals.value = pendingSendTransactionsNftLocals.value.toMutableSet().apply {
-            toList().forEach { _ -> removeIf { it.identifier in myNftIds.map { it.identifier } } }
+            toList().forEach { _ -> removeIf { it.identifier == nftLocal.identifier } }
         }
     }
 

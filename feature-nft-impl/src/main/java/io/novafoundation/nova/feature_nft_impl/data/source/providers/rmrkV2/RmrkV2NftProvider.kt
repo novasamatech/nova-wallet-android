@@ -15,14 +15,17 @@ import io.novafoundation.nova.feature_nft_impl.data.mappers.nftIssuance
 import io.novafoundation.nova.feature_nft_impl.data.mappers.nftPrice
 import io.novafoundation.nova.feature_nft_impl.data.network.distributed.FileStorageAdapter.adoptFileStorageLinkToHttps
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.common.MetadataLimits
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.common.mapJsonToAttributes
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.singular.SingularV2Api
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.singular.SingularV2CollectionMetadata
 import io.novafoundation.nova.feature_nft_impl.domain.common.mapNftNameForUi
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import jnr.ffi.annotations.Meta
 import kotlinx.coroutines.flow.Flow
 
 class RmrkV2NftProvider(
@@ -81,10 +84,19 @@ class RmrkV2NftProvider(
         collectionId: String,
         identifier: String
     ) {
-        val metadata = metadataRaw?.let {
-            val metadataLink = it.decodeToString().adoptFileStorageLinkToHttps()
+        val metadata = runCatching {
+            metadataRaw?.let {
+                val metadataLink = it.decodeToString().adoptFileStorageLinkToHttps()
 
-            singularV2Api.getIpfsMetadata(metadataLink)
+                singularV2Api.getIpfsMetadata(metadataLink)
+            }
+        }.getOrDefault(SingularV2CollectionMetadata.Default)?.run {
+            copy(
+                name = name?.take(MetadataLimits.NFT_NAME_LIMIT),
+                description = description?.take(MetadataLimits.DESCRIPTION_LIMIT),
+                tags = tags?.take(MetadataLimits.TAGS_LIMIT),
+                attributes = attributes?.take(MetadataLimits.ATTRIBUTES_LIMIT)
+            )
         }
 
         val collection = singularV2Api.getCollection(collectionId).first()
@@ -94,13 +106,13 @@ class RmrkV2NftProvider(
             val image = local.media ?: metadata?.image?.adoptFileStorageLinkToHttps()
 
             local.copy(
-                media = image,
-                issuanceTotal = collection.max,
+                media = image ?: local.name,
+                issuanceTotal = collection.max ?: local.issuanceTotal,
                 name = metadata?.name ?: local.name,
                 label = metadata?.description ?: local.label,
                 wholeDetailsLoaded = true,
-                tags = metadata?.tags?.let { gson.toJson(it) },
-                attributes = metadata?.attributes?.let { gson.toJson(it) }
+                tags = metadata?.tags?.let { gson.toJson(it) } ?: local.tags,
+                attributes = metadata?.attributes?.let { gson.toJson(it) } ?: local.attributes
             )
         }
     }
@@ -108,9 +120,6 @@ class RmrkV2NftProvider(
     override fun nftDetailsFlow(nftIdentifier: String): Flow<NftDetails> {
         return flowOf {
             val notSyncedNftLocal = nftDao.getNft(nftIdentifier)
-            require(notSyncedNftLocal.wholeDetailsLoaded) {
-                "Cannot load details of non fully-synced NFT"
-            }
 
             nftFullSync(
                 notSyncedNftLocal.metadata,
@@ -162,6 +171,7 @@ class RmrkV2NftProvider(
             singularV2Api.getIpfsMetadata(it.adoptFileStorageLinkToHttps())
         }
         return collectionMetadata?.name
+            ?.take(MetadataLimits.COLLECTION_NAME_LIMIT)
     }
 
     private fun localIdentifier(chainId: ChainId, remoteId: String): String {

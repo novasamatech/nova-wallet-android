@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
@@ -34,11 +35,6 @@ class NftListInteractor(
             .flatMapLatest(nftRepository::allNftWithMetadataFlow)
             .map { nfts ->
                 nfts.sortedBy { it.identifier }
-            }
-            .onEach {
-                nftRepository.removeOldPendingTransactions(
-                    myNftIds = it.map { nftRepository.getLocalNft(it.identifier) }
-                )
             }
             .flatMapLatest { nfts ->
                 val allUtilityAssets = nfts.map { it.chain.utilityAsset }.distinct()
@@ -70,6 +66,7 @@ class NftListInteractor(
                 val blockTimeInMillis = chainStateRepository.expectedBlockTimeInMillis(it.chainId)
                 delay(blockTimeInMillis.toLong())
                 syncNftsList()
+                nftRepository.removeOldPendingTransactions(it)
             }.map {}
     }
 

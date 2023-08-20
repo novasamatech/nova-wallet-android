@@ -566,10 +566,9 @@
     <string name="network_info_title">Информация ноды</string>
     <string name="network_status_connecting">Подключение…</string>
     <string name="nft_collection">Коллекция</string>
-    <string name="nft_token">Токен</string>
+    <string name="nft_token">Токен ID</string>
     <string name="nft_created_by">Создатель</string>
     <string name="nft_price">Цена</string>
-    <string name="nft_issuance_limited_format" formatted="false">#%s Издание из %s</string>
     <string name="nft_issuance_unlimited">Неограниченная серия</string>
     <string name="nft_owned_by">Владелец</string>
     <string name="nft_price_not_listed">Без цены</string>

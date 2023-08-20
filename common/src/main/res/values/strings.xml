@@ -905,13 +905,12 @@
     <string name="common_price">Price</string>
 
     <string name="nft_collection">Collection</string>
-    <string name="nft_token">Token</string>
+    <string name="nft_token">Token ID</string>
     <string name="nft_owned_by">Owned by</string>
     <string name="nft_created_by">Created by</string>
     <string name="nft_price">Price</string>
 
     <string name="nft_issuance_unlimited">Unlimited series</string>
-    <string name="nft_issuance_limited_format">#%s Edition of %s</string>
     <string name="nft_your_nfts">Your NFTs</string>
 
     <string name="wallet_assets_empty">Your assets will appear here.\nMake sure the "Hide zero balances" filter is turned off</string>

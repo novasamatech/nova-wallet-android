@@ -29,7 +29,7 @@ interface NftRepository {
 
     fun onNftSendTransactionSubmitted(nftLocal: NftLocal)
 
-    fun removeOldPendingTransactions(myNftIds: List<NftLocal>)
+    fun removeOldPendingTransactions(nftLocal: NftLocal)
 
     fun getPendingSendTransactionsNftLocals(): Flow<Set<NftLocal>>
 
