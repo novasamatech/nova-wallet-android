@@ -60,6 +60,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.c
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.di.RedeemComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.di.ConfirmRewardDestinationComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.select.di.SelectRewardDestinationComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.di.SetupStakingTypeComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.di.ConfirmUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.select.di.SelectUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.story.di.StoryComponent
@@ -94,6 +95,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun dashboardComponentFactory(): StakingDashboardComponent.Factory
 
     fun moreStakingOptionsFactory(): MoreStakingOptionsComponent.Factory
+
+    fun setupStakingType(): SetupStakingTypeComponent.Factory
 
     // relaychain staking
 

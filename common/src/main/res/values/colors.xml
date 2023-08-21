@@ -91,6 +91,7 @@
     <color name="mnemonic_border_active">#29999EC7</color>
     <color name="mnemonic_border_inactive">#3D999EC7</color>
     <color name="container_card_actions_border">#0A999EC7</color>
+    <color name="staking_type_card_border">#3D999EC7</color>
 
     <!-- Divider Colors -->
     <color name="divider">#29999EC7</color>

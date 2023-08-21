@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="staking_type_title">Staking Type</string>
+    <string name="setup_staking_type_pool_staking">Pool staking</string>
+    <string name="setup_staking_type_direct_staking">Direct staking</string>
+
     <string name="common_fee_changed_title">Network fee is too high</string>
     <string name="common_fee_changed_message">The estimated network fee %s is much higher than the default network fee (%s). This might be due to temporary network congestion. You can refresh to wait for a lower network fee.</string>
     <string name="common_refresh_fee">Refresh fee</string>
