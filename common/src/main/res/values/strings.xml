@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="start_staking_selection_validators_subtitle">Validators: %d (max %d)</string>
+    <string name="common_recommended">Recommended</string>
+
     <string name="staking_type_title">Staking Type</string>
     <string name="setup_staking_type_pool_staking">Pool staking</string>
     <string name="setup_staking_type_direct_staking">Direct staking</string>

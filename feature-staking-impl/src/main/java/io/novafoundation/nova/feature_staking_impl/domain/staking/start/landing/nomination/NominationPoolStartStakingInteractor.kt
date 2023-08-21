@@ -24,7 +24,7 @@ class NominationPoolStartStakingInteractor(
             val minJoinBond = nominationPoolSharedComputation.minJoinBond(stakingOption.chain.id, scope)
 
             StartStakingData(
-                maxEarningRate = rewardCalculator.maxAPY.toBigDecimal(),
+                maxEarningRate = rewardCalculator.maxAPY,
                 minStake = minJoinBond,
                 payoutType = PayoutType.Manual,
                 participationInGovernance = false

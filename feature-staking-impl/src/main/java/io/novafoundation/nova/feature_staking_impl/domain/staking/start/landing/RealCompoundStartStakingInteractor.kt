@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing
 
+import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractor
@@ -12,7 +13,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import java.math.BigDecimal
 import java.math.BigInteger
 import io.novafoundation.nova.common.utils.combine as combineList
 
@@ -30,7 +30,7 @@ class Payouts(
 class StartStakingCompoundData(
     val chain: Chain,
     val asset: Asset,
-    val maxEarningRate: BigDecimal,
+    val maxEarningRate: Perbill,
     val minStake: BigInteger,
     val eraInfo: StartStakingEraInfo,
     val participationInGovernance: ParticipationInGovernance,

@@ -24,16 +24,11 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.R
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.RedeemPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.ConfirmRewardDestinationFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.StartStakingLandingFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.story.StoryFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class RelayStakingNavigator(
     navigationHolder: NavigationHolder,
@@ -112,11 +107,6 @@ class RelayStakingNavigator(
 
     override fun openChainStakingMain() = performNavigation(R.id.action_mainFragment_to_stakingGraph)
 
-    override fun openStartStakingLanding(chainId: ChainId, assetId: ChainAssetId, stakingTypes: List<Chain.Asset.StakingType>) {
-        val bundle = StartStakingLandingFragment.getBundle(StartStakingLandingPayload(chainId, assetId, stakingTypes))
-        performNavigation(R.id.action_mainFragment_to_startStackingLanding, bundle)
-    }
-
     override fun openSetupStaking() {
         performNavigation(R.id.action_stakingFragment_to_setupStakingFragment)
     }
@@ -185,9 +175,5 @@ class RelayStakingNavigator(
 
     override fun openStakingPeriods() {
         performNavigation(R.id.action_stakingFragment_to_staking_periods)
-    }
-
-    override fun openSetupStakingType() {
-        performNavigation(R.id.action_stakingLandingFragment_to_setupStakingTypeFragment)
     }
 }

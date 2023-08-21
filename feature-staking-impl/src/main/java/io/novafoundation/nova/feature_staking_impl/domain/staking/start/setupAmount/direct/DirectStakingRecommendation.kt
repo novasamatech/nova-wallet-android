@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.direct
 
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
-import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.StartMultiStakingSelection
@@ -25,15 +24,16 @@ class DirectStakingRecommendation(
     }
 
     override suspend fun recommendedSelection(): StartMultiStakingSelection {
-        val recommendationSettings = recommendationSettingsProvider.await().defaultSettings()
+        val provider = recommendationSettingsProvider.await()
+        val recommendationSettings = provider.defaultSettings()
         val recommendator = recommendator.await()
 
         val recommendedValidators = recommendator.recommendations(recommendationSettings)
 
         return DirectStakingSelection(
             validators = recommendedValidators,
-            stakingType = stakingOption.additional.stakingType,
-            chain = stakingOption.chain
+            validatorsLimit = provider.maximumValidatorsPerNominator,
+            stakingOption = stakingOption
         )
     }
 }

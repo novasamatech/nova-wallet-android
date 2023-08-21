@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MultiSt
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
 import io.novafoundation.nova.feature_staking_impl.data.constructStakingOption
 import io.novafoundation.nova.feature_staking_impl.data.constructStakingOptions
+import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.RecommendableMultiStakingSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.SelectionTypeSource
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStore
@@ -42,7 +43,7 @@ class MultiStakingSelectionTypeProviderFactory(
     }
 }
 
-class RealMultiStakingSelectionTypeProvider(
+private class RealMultiStakingSelectionTypeProvider(
     private val selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
     private val candidateOptionIds: MultiStakingOptionIds,
     private val scope: CoroutineScope,
@@ -67,7 +68,7 @@ class RealMultiStakingSelectionTypeProvider(
         return when (currentSelection?.source) {
             null, SelectionTypeSource.Automatic -> createAutomaticSelection(selectionStore)
 
-            is SelectionTypeSource.Manual -> createManualSelection(currentSelection.selection.stakingType)
+            is SelectionTypeSource.Manual -> createManualSelection(currentSelection.selection.stakingOption.stakingType)
         }
     }
 
@@ -103,7 +104,7 @@ class RealMultiStakingSelectionTypeProvider(
             this == null || source is SelectionTypeSource.Automatic -> -1
 
             // when manual is selected we only care about staking type when constructing `MultiStakingSelectionType`
-            source is SelectionTypeSource.Manual -> selection.stakingType.ordinal
+            source is SelectionTypeSource.Manual -> selection.stakingOption.stakingType.ordinal
 
             // in case we forgot to include something there - prevent false positive equivalence check
             else -> hashCode()

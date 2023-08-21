@@ -15,6 +15,9 @@ val StakingOption.components: Triple<Chain, Chain.Asset, Chain.Asset.StakingType
 val StakingOption.chain: Chain
     get() = assetWithChain.chain
 
+val StakingOption.stakingType: Chain.Asset.StakingType
+    get() = additional.stakingType
+
 suspend fun ChainRegistry.constructStakingOptions(stakingOptionId: MultiStakingOptionIds): List<StakingOption> {
     val (chain, asset) = chainWithAsset(stakingOptionId.chainId, stakingOptionId.chainAssetId)
 

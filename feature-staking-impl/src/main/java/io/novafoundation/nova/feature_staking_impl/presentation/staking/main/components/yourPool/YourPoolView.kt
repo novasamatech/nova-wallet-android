@@ -51,8 +51,8 @@ class YourPoolView @JvmOverloads constructor(
         yourPoolContentGroup.makeVisible()
         yourPoolLoadingGroup.makeGone()
 
-        yourPoolIcon.setIcon(yourPoolState.poolIcon, imageLoader)
-        yourPoolName.text = yourPoolState.poolAccount.nameOrAddress
+        yourPoolIcon.setIcon(yourPoolState.display.icon, imageLoader)
+        yourPoolName.text = yourPoolState.display.title
         yourPoolTitle.text = yourPoolState.title
     }
 

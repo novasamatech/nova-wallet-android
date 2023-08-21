@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.direct
 
+import io.novafoundation.nova.common.utils.Perbill
+import io.novafoundation.nova.common.utils.asPerbill
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.components
@@ -13,7 +15,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.math.BigDecimal
 import java.math.BigInteger
 
 class RelaychainStartStakingInteractor(
@@ -39,10 +40,11 @@ class RelaychainStartStakingInteractor(
         return asset.freeInPlanks
     }
 
-    private suspend fun calculateEarningRate(): BigDecimal {
+    private suspend fun calculateEarningRate(): Perbill {
         val (chain, chainAsset, stakingType) = stakingOption.components
 
         return stakingSharedComputation.rewardCalculator(chain, chainAsset, stakingType, coroutineScope)
             .calculateMaxPeriodReturns(DAYS_IN_YEAR)
+            .asPerbill()
     }
 }

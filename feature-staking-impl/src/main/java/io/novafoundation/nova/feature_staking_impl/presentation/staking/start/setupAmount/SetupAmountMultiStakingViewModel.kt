@@ -2,11 +2,15 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.s
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.currentSelectionFlow
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.selectionType.MultiStakingSelectionTypeProviderFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.toStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.model.StakingPropertiesModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -19,13 +23,15 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 
 class SetupAmountMultiStakingViewModel(
-    private val multiStakingSelectionTypeProviderFactory: MultiStakingSelectionTypeProviderFactory,
-    private val payload: SetupAmountMultiStakingPayload,
-    private val assetUseCase: ArbitraryAssetUseCase,
-    private val amountChooserMixinFactory: AmountChooserMixin.Factory,
-    private val selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
+    private val multiStakingSelectionFormatter: MultiStakingSelectionFormatter,
+    private val resourceManager: ResourceManager,
+    private val router: StartMultiStakingRouter,
+    multiStakingSelectionTypeProviderFactory: MultiStakingSelectionTypeProviderFactory,
+    assetUseCase: ArbitraryAssetUseCase,
+    amountChooserMixinFactory: AmountChooserMixin.Factory,
+    selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
+    payload: SetupAmountMultiStakingPayload
 ) : BaseViewModel() {
-
     private val multiStakingSelectionTypeProvider = multiStakingSelectionTypeProviderFactory.create(
         scope = viewModelScope,
         candidateOptionsIds = payload.availableStakingOptions.toStakingOptionIds()
@@ -67,8 +73,21 @@ class SetupAmountMultiStakingViewModel(
         when {
             currentSelection == null && amountEmpty -> StakingPropertiesModel.Hidden
             currentSelection == null -> StakingPropertiesModel.Loading
-            else -> StakingPropertiesModel.Loading // TODO construct loaded state
+            else -> {
+                val content = StakingPropertiesModel.Content(
+                    estimatedReward = currentSelection.selection.apy.format(),
+                    selection = multiStakingSelectionFormatter.formatForSetupAmount(currentSelection)
+                )
+
+                StakingPropertiesModel.Loaded(content)
+            }
         }
+    }.shareInBackground()
+
+    val title = currentAssetFlow.map {
+        val tokenSymbol = it.token.configuration.symbol
+
+        resourceManager.getString(R.string.staking_stake_format, tokenSymbol)
     }.shareInBackground()
 
     init {
@@ -83,5 +102,9 @@ class SetupAmountMultiStakingViewModel(
         }
             .inBackground()
             .launchIn(viewModelScope)
+    }
+
+    fun back() {
+        router.back()
     }
 }

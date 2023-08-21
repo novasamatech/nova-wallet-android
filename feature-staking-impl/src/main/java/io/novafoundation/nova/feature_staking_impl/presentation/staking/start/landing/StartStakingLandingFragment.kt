@@ -57,6 +57,7 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
         startStakingLandingList.itemAnimator = null
 
         startStakingLandingButton.prepareForProgress(viewLifecycleOwner)
+        startStakingLandingButton.setOnClickListener { viewModel.continueClicked() }
     }
 
     override fun inject() {

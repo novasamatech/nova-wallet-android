@@ -8,12 +8,14 @@ import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.common.utils.SpannableFormatter
 import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatAsSpannable
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.setEndSpan
 import io.novafoundation.nova.common.utils.setFullSpan
@@ -26,10 +28,11 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingCompoundData
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.model.PayoutType
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.toStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StakingConditionRVItem
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.SetupAmountMultiStakingPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -49,7 +52,7 @@ class StartStakingInfoModel(
 )
 
 class StartStakingLandingViewModel(
-    private val stakingRouter: StakingRouter,
+    private val router: StartMultiStakingRouter,
     private val resourceManager: ResourceManager,
     private val updateSystemFactory: StakingLandingInfoUpdateSystemFactory,
     private val startStakingInteractorFactory: StartStakingInteractorFactory,
@@ -101,17 +104,21 @@ class StartStakingLandingViewModel(
     }
 
     fun back() {
-        stakingRouter.back()
+        router.back()
+    }
+
+    fun continueClicked() {
+        router.openSetupAmount(SetupAmountMultiStakingPayload(availableStakingOptionsPayload))
     }
 
     fun termsOfUseClicked() {
         openBrowserEvent.value = Event(appLinksProvider.termsUrl)
     }
 
-    private fun createTitle(chainAsset: Chain.Asset, earning: BigDecimal, themeColor: Int): CharSequence {
+    private fun createTitle(chainAsset: Chain.Asset, earning: Perbill, themeColor: Int): CharSequence {
         val apy = resourceManager.getString(
             R.string.start_staking_fragment_title_APY,
-            earning.formatFractionAsPercentage()
+            earning.format()
         ).toSpannable(colorSpan(themeColor))
 
         return SpannableFormatter.format(

@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingInteractorFactory
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.StartStakingLandingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -72,7 +72,7 @@ class StartStakingLandingModule {
     @IntoMap
     @ViewModelKey(StartStakingLandingViewModel::class)
     fun provideViewModel(
-        stakingRouter: StakingRouter,
+        router: StartMultiStakingRouter,
         resourceManager: ResourceManager,
         updateSystemFactory: StakingLandingInfoUpdateSystemFactory,
         startStakingInteractorFactory: StartStakingInteractorFactory,
@@ -80,12 +80,12 @@ class StartStakingLandingModule {
         startStakingLandingPayload: StartStakingLandingPayload
     ): ViewModel {
         return StartStakingLandingViewModel(
-            stakingRouter,
-            resourceManager,
-            updateSystemFactory,
-            startStakingInteractorFactory,
-            appLinksProvider,
-            startStakingLandingPayload
+            router = router,
+            resourceManager = resourceManager,
+            updateSystemFactory = updateSystemFactory,
+            startStakingInteractorFactory = startStakingInteractorFactory,
+            appLinksProvider = appLinksProvider,
+            startStakingLandingPayload = startStakingLandingPayload
         )
     }
 

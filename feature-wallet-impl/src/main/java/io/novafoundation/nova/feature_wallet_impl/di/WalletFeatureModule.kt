@@ -17,6 +17,8 @@ import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryAssetUseCase
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -295,4 +297,12 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideCoinPriceInteractor(coinPriceRepository: CoinPriceRepository) = CoinPriceInteractor(coinPriceRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideArbitraryAssetUseCase(
+        accountRepository: AccountRepository,
+        walletRepository: WalletRepository,
+        chainRegistry: ChainRegistry
+    ): ArbitraryAssetUseCase = RealArbitraryAssetUseCase(accountRepository, walletRepository, chainRegistry)
 }

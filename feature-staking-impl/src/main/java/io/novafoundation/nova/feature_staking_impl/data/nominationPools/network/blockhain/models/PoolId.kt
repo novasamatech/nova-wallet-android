@@ -11,3 +11,5 @@ typealias PoolIdRaw = BigInteger
 fun bindPoolId(decoded: Any?): PoolId {
     return PoolId(bindNumber(decoded))
 }
+
+fun PoolId(id: Int) = PoolId(id.toBigInteger())

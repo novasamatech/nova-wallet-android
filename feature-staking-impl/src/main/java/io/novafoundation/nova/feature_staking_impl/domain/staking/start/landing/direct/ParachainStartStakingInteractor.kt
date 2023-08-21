@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.direct
 
+import io.novafoundation.nova.common.utils.asPerbill
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
@@ -24,7 +25,7 @@ class ParachainStartStakingInteractor(
 
         return parachainNetworkInfoInteractor.observeRoundInfo(chain.id).map { activeEraInfo ->
             StartStakingData(
-                maxEarningRate = parachainStakingRewardCalculator.maximumGain(DAYS_IN_YEAR),
+                maxEarningRate = parachainStakingRewardCalculator.maximumGain(DAYS_IN_YEAR).asPerbill(),
                 minStake = activeEraInfo.minimumStake,
                 payoutType = getPayoutType(),
                 participationInGovernance = chain.governance.isNotEmpty()

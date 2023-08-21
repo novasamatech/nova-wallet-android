@@ -2,13 +2,10 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.common.utils.shareInBackground
-import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
@@ -16,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.NominationPoolYourPoolInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.nominationPools.loadPoolMemberState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.YourPoolAction
@@ -31,15 +29,15 @@ import kotlinx.coroutines.launch
 class NominationPoolsYourPoolComponentFactory(
     private val interactor: NominationPoolYourPoolInteractor,
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
-    private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
+    private val poolDisplayFormatter: PoolDisplayFormatter,
 ) {
 
     fun create(stakingOption: StakingOption, hostContext: ComponentHostContext): NominationPoolsYourPoolComponent {
         return NominationPoolsYourPoolComponent(
             nominationPoolSharedComputation = nominationPoolSharedComputation,
             interactor = interactor,
-            addressIconGenerator = addressIconGenerator,
+            poolDisplayFormatter = poolDisplayFormatter,
             resourceManager = resourceManager,
             hostContext = hostContext,
             stakingOption = stakingOption,
@@ -50,10 +48,10 @@ class NominationPoolsYourPoolComponentFactory(
 class NominationPoolsYourPoolComponent(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val interactor: NominationPoolYourPoolInteractor,
-    private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
     private val hostContext: ComponentHostContext,
     private val stakingOption: StakingOption,
+    private val poolDisplayFormatter: PoolDisplayFormatter,
 ) : YourPoolComponent, CoroutineScope by hostContext.scope {
 
     override val events: LiveData<Event<YourPoolEvent>> = MutableLiveData()
@@ -75,13 +73,10 @@ class NominationPoolsYourPoolComponent(
         val chain = stakingOption.assetWithChain.chain
 
         return interactor.yourPoolFlow(poolMember.poolId, chain.id).map { yourPool ->
-            val name = yourPool.metadata?.title
-            val poolAccount = addressIconGenerator.createAccountAddressModel(chain, yourPool.stashAccountId, name)
-
             YourPoolComponentState(
-                poolAccount = poolAccount,
                 poolId = yourPool.id,
-                poolIcon = yourPool.icon ?: poolAccount.image.asIcon(),
+                display = poolDisplayFormatter.format(yourPool, chain),
+                poolStash = yourPool.stashAccountId,
                 title = formatPoolTitle(yourPool.id)
             )
         }
@@ -92,9 +87,9 @@ class NominationPoolsYourPoolComponent(
     }
 
     private fun handlePoolInfoClicked() = launch {
-        val poolAccount = state.first()?.dataOrNull?.poolAccount ?: return@launch
+        val poolAccount = state.first()?.dataOrNull?.poolStash ?: return@launch
         val chain = stakingOption.assetWithChain.chain
 
-        hostContext.externalActions.showAddressActions(poolAccount.address, chain)
+        hostContext.externalActions.showAddressActions(poolAccount, chain)
     }
 }

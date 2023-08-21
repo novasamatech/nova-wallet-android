@@ -14,7 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 
 class NominationPoolStakingPropertiesFactory(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
-    ): SingleStakingPropertiesFactory {
+) : SingleStakingPropertiesFactory {
 
     override fun createProperties(scope: CoroutineScope, stakingOption: StakingOption): SingleStakingProperties {
         return NominationPoolStakingProperties(
@@ -29,13 +29,13 @@ private class NominationPoolStakingProperties(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val sharedComputationScope: CoroutineScope,
     private val stakingOption: StakingOption,
-): SingleStakingProperties {
+) : SingleStakingProperties {
 
     override fun availableBalance(asset: Asset): Balance {
         return asset.transferableInPlanks
     }
 
-    override val recommendation: SingleStakingRecommendation = NominationPoolRecommendation()
+    override val recommendation: SingleStakingRecommendation = NominationPoolRecommendation(stakingOption)
 
     override val validationSystem: StartMultiStakingValidationSystem = ValidationSystem {
         // TODO
