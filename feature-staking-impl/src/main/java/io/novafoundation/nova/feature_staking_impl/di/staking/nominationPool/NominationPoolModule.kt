@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -43,6 +44,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.u
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.userRewards.RealNominationPoolsUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.NominationPoolYourPoolInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.RealNominationPoolYourPoolInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.RealPoolDisplayFormatter
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -61,6 +64,12 @@ class NominationPoolModule {
     @Provides
     @FeatureScope
     fun providePoolImageDataSource(): PoolImageDataSource = PredefinedPoolImageDataSource()
+
+    @Provides
+    @FeatureScope
+    fun providePoolDisplayFormatter(
+        addressIconGenerator: AddressIconGenerator
+    ): PoolDisplayFormatter = RealPoolDisplayFormatter(addressIconGenerator)
 
     @Provides
     @FeatureScope
@@ -180,6 +189,7 @@ class NominationPoolModule {
         nominationPoolUnbondRepository: NominationPoolUnbondRepository,
         poolAccountDerivation: PoolAccountDerivation,
         nominationPoolRewardCalculatorFactory: NominationPoolRewardCalculatorFactory,
+        nominationPoolGlobalsRepository: NominationPoolGlobalsRepository
     ): NominationPoolSharedComputation {
         return NominationPoolSharedComputation(
             computationalCache = computationalCache,
@@ -187,7 +197,8 @@ class NominationPoolModule {
             nominationPoolStateRepository = nominationPoolStateRepository,
             nominationPoolUnbondRepository = nominationPoolUnbondRepository,
             poolAccountDerivation = poolAccountDerivation,
-            nominationPoolRewardCalculatorFactory = nominationPoolRewardCalculatorFactory
+            nominationPoolRewardCalculatorFactory = nominationPoolRewardCalculatorFactory,
+            nominationPoolGlobalsRepository = nominationPoolGlobalsRepository
         )
     }
 

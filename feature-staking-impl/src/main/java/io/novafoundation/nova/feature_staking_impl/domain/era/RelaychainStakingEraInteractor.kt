@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConsta
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.erasDuration
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.StartStakingEraInfo
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.model.StartStakingEraInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboar
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.StakingDashboardViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.components.ComponentsModule
@@ -32,6 +33,7 @@ class StakingDashboardModule {
         router: StakingRouter,
         stakingSharedState: StakingSharedState,
         presentationMapper: StakingDashboardPresentationMapper,
+        startMultiStakingRouter: StartMultiStakingRouter,
     ): ViewModel {
         return StakingDashboardViewModel(
             interactor = interactor,
@@ -40,7 +42,8 @@ class StakingDashboardModule {
             stakingDashboardUpdateSystem = dashboardUpdateSystem,
             router = router,
             stakingSharedState = stakingSharedState,
-            presentationMapper = presentationMapper
+            presentationMapper = presentationMapper,
+            startMultiStakingRouter = startMultiStakingRouter,
         )
     }
 

@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data
 
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
-import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.findStakingTypeBackingNominationPools
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
@@ -9,15 +9,6 @@ import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState.Suppo
 import kotlinx.coroutines.flow.Flow
 
 typealias StakingOption = SupportedAssetOption<StakingSharedState.OptionAdditionalData>
-
-val StakingOption.fullId
-    get() = StakingOptionId(chainId = assetWithChain.chain.id, assetWithChain.asset.id, additional.stakingType)
-
-val StakingOption.components: Triple<Chain, Chain.Asset, Chain.Asset.StakingType>
-    get() = Triple(assetWithChain.chain, assetWithChain.asset, additional.stakingType)
-
-val StakingOption.chain: Chain
-    get() = assetWithChain.chain
 
 class StakingSharedState : SelectedAssetOptionSharedState<StakingSharedState.OptionAdditionalData> {
 
@@ -46,4 +37,13 @@ fun createStakingOption(chain: Chain, chainAsset: Chain.Asset, stakingType: Chai
         assetWithChain = ChainWithAsset(chain, chainAsset),
         additional = StakingSharedState.OptionAdditionalData(stakingType)
     )
+}
+
+fun StakingOption.unwrapNominationPools(): StakingOption {
+    return if (stakingType == Chain.Asset.StakingType.NOMINATION_POOLS) {
+        val backingType = assetWithChain.asset.findStakingTypeBackingNominationPools()
+        copy(additional = StakingSharedState.OptionAdditionalData(backingType))
+    } else {
+        this
+    }
 }

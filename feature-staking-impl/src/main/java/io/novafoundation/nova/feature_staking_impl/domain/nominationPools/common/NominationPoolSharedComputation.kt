@@ -12,11 +12,13 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.UnbondingPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.bondedAccountOf
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolUnbondRepository
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.BondedPoolState
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -32,6 +34,7 @@ class NominationPoolSharedComputation(
     private val nominationPoolMemberUseCase: NominationPoolMemberUseCase,
     private val nominationPoolStateRepository: NominationPoolStateRepository,
     private val nominationPoolUnbondRepository: NominationPoolUnbondRepository,
+    private val nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
     private val poolAccountDerivation: PoolAccountDerivation,
     private val nominationPoolRewardCalculatorFactory: NominationPoolRewardCalculatorFactory,
 ) {
@@ -104,6 +107,17 @@ class NominationPoolSharedComputation(
 
         return computationalCache.useCache(key, scope) {
             nominationPoolRewardCalculatorFactory.create(stakingOption, scope)
+        }
+    }
+
+    suspend fun minJoinBond(
+        chainId: ChainId,
+        scope: CoroutineScope
+    ): Balance {
+        val key = "NOMINATION_POOLS_MIN_JOIN_BOND"
+
+        return computationalCache.useCache(key, scope) {
+            nominationPoolGlobalsRepository.minJoinBond(chainId)
         }
     }
 }

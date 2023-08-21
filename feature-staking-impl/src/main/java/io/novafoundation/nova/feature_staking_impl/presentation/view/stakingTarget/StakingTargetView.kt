@@ -6,13 +6,15 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.presentation.setColoredTextOrHide
+import io.novafoundation.nova.common.utils.getRippleMask
+import io.novafoundation.nova.common.utils.getRoundedCornerDrawable
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeGoneViews
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.makeVisibleViews
-import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.utils.withRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.synthetic.main.view_staking_target.view.stakingTargetIcon
@@ -36,7 +38,9 @@ class StakingTargetView @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_staking_target, this)
 
-        background = context.getRoundedCornerDrawable(fillColorRes = R.color.block_background, cornerSizeInDp = 8)
+        background = getRoundedCornerDrawable(fillColorRes = R.color.block_background, cornerSizeDp = 8)
+            .withRippleMask(getRippleMask(cornerSizeDp = 8))
+
         stakingTargetQuantity.background = context.getRoundedCornerDrawable(fillColorRes = R.color.chips_background, cornerSizeInDp = 6)
     }
 
@@ -47,8 +51,9 @@ class StakingTargetView @JvmOverloads constructor(
 
     fun setModel(stakingTargetModel: StakingTargetModel) {
         stakingTargetTitle.text = stakingTargetModel.title
-        stakingTargetSubtitle.setTextOrHide(stakingTargetModel.subtitle)
-        stakingTargetSubtitle.setTextColorRes(stakingTargetModel.subtitleColorRes)
+        stakingTargetTitle.makeVisible()
+
+        stakingTargetSubtitle.setColoredTextOrHide(stakingTargetModel.subtitle)
 
         makeGoneViews(stakingTargetTitleShimmering, stakingTargetSubtitleShimmering, stakingTargetIconShimmer)
 

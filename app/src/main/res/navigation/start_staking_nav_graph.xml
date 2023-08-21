@@ -7,13 +7,13 @@
 
     <fragment
         android:id="@+id/startStakingLandingFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.start.StartStakingLandingFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.StartStakingLandingFragment"
         android:label="StartStakingLandingFragment"
         tools:layout="@layout/fragment_start_staking_landing">
 
         <action
-            android:id="@+id/action_stakingLandingFragment_to_setupStakingTypeFragment"
-            app:destination="@id/setupStakingType"
+            android:id="@+id/action_startStakingLandingFragment_to_setupAmountMultiStakingFragment"
+            app:destination="@id/setupAmountMultiStakingFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -25,8 +25,20 @@
         android:id="@+id/setupStakingType"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.SetupStakingTypeFragment"
         android:label="SetupStakingTypeFragment"
-        tools:layout="@layout/fragment_setup_staking_type">
+        tools:layout="@layout/fragment_setup_staking_type" />
 
+    <fragment
+        android:id="@+id/setupAmountMultiStakingFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.SetupAmountMultiStakingFragment"
+        android:label="SetupAmountMultiStakingFragment"
+        tools:layout="@layout/fragment_start_multi_staking_amount">
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_setupAmountMultiStakingFragment_to_setupStakingType"
+            app:destination="@id/setupStakingType" />
     </fragment>
-    
+
 </navigation>

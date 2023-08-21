@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
+import io.novafoundation.nova.common.presentation.setColoredText
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
@@ -145,8 +146,7 @@ class ValidatorViewHolder<V>(override val containerView: View) : RecyclerView.Vi
                 itemValidatorScoringPrimary.setTextColorRes(R.color.text_tertiary)
                 itemValidatorScoringPrimary.makeVisible()
                 itemValidatorScoringSecondary.makeGone()
-                itemValidatorScoringPrimary.text = scoring.field.text
-                itemValidatorScoringPrimary.setTextColorRes(scoring.field.colorRes)
+                itemValidatorScoringPrimary.setColoredText(scoring.field)
             }
 
             is StakeTargetModel.Scoring.TwoFields -> {
