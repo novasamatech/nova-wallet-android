@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.commo
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.Perbill
+import io.novafoundation.nova.common.utils.asPerbill
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.reversed
@@ -64,18 +65,18 @@ private class RealNominationPoolRewardCalculator(
 
     private val poolIdsByStashes: AccountIdKeyMap<PoolId> = poolStashesById.reversed()
 
-    private val apyByPoolStash: Map<PoolId, Double> = constructPoolsApy()
+    private val apyByPoolStash: Map<PoolId, Perbill> = constructPoolsApy()
 
-    override val maxAPY: Double = apyByPoolStash
+    override val maxAPY: Perbill = apyByPoolStash
         .values
         .maxOrNull()
         .orZero()
 
-    override fun apyFor(poolId: PoolId): Double? {
+    override fun apyFor(poolId: PoolId): Perbill? {
         return apyByPoolStash[poolId]
     }
 
-    private fun constructPoolsApy(): Map<PoolId, Double> {
+    private fun constructPoolsApy(): Map<PoolId, Perbill> {
         val activeValidatorsByPoolStash = exposures.findPoolsValidators(poolIdsByStashes.keys)
 
         return activeValidatorsByPoolStash.mapValuesNotNull { (poolStash, nominators) ->
@@ -83,7 +84,7 @@ private class RealNominationPoolRewardCalculator(
         }
     }
 
-    private fun calculatePoolApy(poolId: PoolId, poolValidatorsIdsHex: List<String>): Double? {
+    private fun calculatePoolApy(poolId: PoolId, poolValidatorsIdsHex: List<String>): Perbill? {
         if (poolValidatorsIdsHex.isEmpty()) return null
 
         val commission = commissions[poolId]?.value.orZero()
@@ -92,7 +93,9 @@ private class RealNominationPoolRewardCalculator(
             directStakingDelegate.getApyFor(validatorIdHex).toDouble()
         }
 
-        return maxApyAcrossValidators * (1.0 - commission)
+        val apy = maxApyAcrossValidators * (1.0 - commission)
+
+        return apy.asPerbill()
     }
 
     private fun AccountIdMap<Exposure>.findPoolsValidators(poolStashes: Set<AccountIdKey>): Map<PoolId, List<String>> {

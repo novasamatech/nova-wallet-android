@@ -39,3 +39,5 @@ inline fun Double.asPercent(): Percent = Percent(this)
 inline fun Percent.toPerbill(): Perbill = Perbill(value / 100)
 
 inline fun Perbill.toPercent(): Percent = Percent(value * 100)
+
+inline fun Perbill?.orZero(): Perbill = this ?: Perbill(0.0)

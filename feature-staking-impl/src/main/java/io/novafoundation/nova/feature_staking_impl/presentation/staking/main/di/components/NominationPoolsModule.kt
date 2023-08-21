@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
@@ -14,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.u
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.NominationPoolYourPoolInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.nominationPools.NominationPoolsAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.nominationPools.NominationPoolsNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.nominationPools.NominationPoolsStakeActionsComponentFactory
@@ -78,13 +78,13 @@ class NominationPoolsModule {
     fun provideYourPoolComponentFactory(
         nominationPoolSharedComputation: NominationPoolSharedComputation,
         interactor: NominationPoolYourPoolInteractor,
-        addressIconGenerator: AddressIconGenerator,
         resourceManager: ResourceManager,
+        poolDisplayFormatter: PoolDisplayFormatter,
     ) = NominationPoolsYourPoolComponentFactory(
         nominationPoolSharedComputation = nominationPoolSharedComputation,
         interactor = interactor,
-        addressIconGenerator = addressIconGenerator,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        poolDisplayFormatter = poolDisplayFormatter
     )
 
     @Provides

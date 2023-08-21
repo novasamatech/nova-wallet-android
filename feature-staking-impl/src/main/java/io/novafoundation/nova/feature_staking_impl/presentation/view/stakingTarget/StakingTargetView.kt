@@ -4,12 +4,17 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import coil.ImageLoader
+import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.presentation.setColoredTextOrHide
+import io.novafoundation.nova.common.utils.getRippleMask
+import io.novafoundation.nova.common.utils.getRoundedCornerDrawable
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeGoneViews
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.makeVisibleViews
-import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.utils.withRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.synthetic.main.view_staking_target.view.stakingTargetIcon
@@ -26,10 +31,16 @@ class StakingTargetView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
+    private val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
+        FeatureUtils.getCommonApi(context).imageLoader()
+    }
+
     init {
         View.inflate(context, R.layout.view_staking_target, this)
 
-        background = context.getRoundedCornerDrawable(fillColorRes = R.color.block_background, cornerSizeInDp = 8)
+        background = getRoundedCornerDrawable(fillColorRes = R.color.block_background, cornerSizeDp = 8)
+            .withRippleMask(getRippleMask(cornerSizeDp = 8))
+
         stakingTargetQuantity.background = context.getRoundedCornerDrawable(fillColorRes = R.color.chips_background, cornerSizeInDp = 6)
     }
 
@@ -40,21 +51,22 @@ class StakingTargetView @JvmOverloads constructor(
 
     fun setModel(stakingTargetModel: StakingTargetModel) {
         stakingTargetTitle.text = stakingTargetModel.title
-        stakingTargetSubtitle.setTextOrHide(stakingTargetModel.subtitle)
-        stakingTargetSubtitle.setTextColorRes(stakingTargetModel.subtitleColorRes)
+        stakingTargetTitle.makeVisible()
+
+        stakingTargetSubtitle.setColoredTextOrHide(stakingTargetModel.subtitle)
 
         makeGoneViews(stakingTargetTitleShimmering, stakingTargetSubtitleShimmering, stakingTargetIconShimmer)
 
-        when (stakingTargetModel.icon) {
-            is StakingTargetModel.Icon.Drawable -> {
+        when (val icon = stakingTargetModel.icon) {
+            is StakingTargetModel.TargetIcon.Icon -> {
                 stakingTargetQuantity.makeGone()
                 stakingTargetIcon.makeVisible()
-                stakingTargetIcon.setImageDrawable(stakingTargetModel.icon.drawable)
+                stakingTargetIcon.setIcon(icon.icon, imageLoader)
             }
-            is StakingTargetModel.Icon.Quantity -> {
+            is StakingTargetModel.TargetIcon.Quantity -> {
                 stakingTargetIcon.makeGone()
                 stakingTargetQuantity.makeVisible()
-                stakingTargetQuantity.text = stakingTargetModel.icon.quantity
+                stakingTargetQuantity.text = icon.quantity
             }
             null -> {
                 makeGoneViews(stakingTargetIcon, stakingTargetQuantity)

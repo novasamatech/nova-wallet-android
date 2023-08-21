@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.change
 
-import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.address.AddressModel
+import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 
 typealias ValidatorModel = StakeTargetModel<Validator>
@@ -15,11 +15,6 @@ data class StakeTargetModel<V>(
     val isChecked: Boolean?,
     val stakeTarget: V,
 ) {
-
-    data class ColoredText(
-        val text: String,
-        @ColorRes val colorRes: Int,
-    )
 
     data class Subtitle(
         val label: String,
