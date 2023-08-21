@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 
 class ManualMultiStakingSelectionType(
     private val selectedType: SingleStakingProperties,
-): MultiStakingSelectionType {
+) : MultiStakingSelectionType {
 
     override suspend fun validationSystem(): StartMultiStakingValidationSystem {
         return selectedType.validationSystem

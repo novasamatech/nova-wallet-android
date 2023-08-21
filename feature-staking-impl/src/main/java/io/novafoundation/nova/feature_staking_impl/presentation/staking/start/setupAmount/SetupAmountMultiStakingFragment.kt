@@ -20,7 +20,6 @@ import kotlinx.android.synthetic.main.fragment_start_multi_staking_amount.startM
 import kotlinx.android.synthetic.main.fragment_start_multi_staking_amount.startMultiStakingSetupAmountSelection
 import kotlinx.android.synthetic.main.fragment_start_multi_staking_amount.startMultiStakingSetupAmountToolbar
 
-
 class SetupAmountMultiStakingFragment : BaseFragment<SetupAmountMultiStakingViewModel>() {
 
     companion object {
@@ -68,7 +67,7 @@ class SetupAmountMultiStakingFragment : BaseFragment<SetupAmountMultiStakingView
     }
 
     private fun showStakingProperties(properties: StakingPropertiesModel) {
-        when(properties) {
+        when (properties) {
             StakingPropertiesModel.Hidden -> {
                 makeGoneViews(startMultiStakingSetupAmountSelection, startMultiStakingSetupAmountRewards)
             }

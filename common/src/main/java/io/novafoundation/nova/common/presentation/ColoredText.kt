@@ -10,7 +10,6 @@ data class ColoredText(
     @ColorRes val colorRes: Int,
 )
 
-
 fun TextView.setColoredText(coloredText: ColoredText) {
     text = coloredText.text
     setTextColorRes(coloredText.colorRes)

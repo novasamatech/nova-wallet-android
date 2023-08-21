@@ -19,7 +19,7 @@ class DirectStakingPropertiesFactory(
     private val validatorRecommendatorFactory: ValidatorRecommendatorFactory,
     private val recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
     private val stakingSharedComputation: StakingSharedComputation,
-): SingleStakingPropertiesFactory {
+) : SingleStakingPropertiesFactory {
 
     override fun createProperties(scope: CoroutineScope, stakingOption: StakingOption): SingleStakingProperties {
         return DirectStakingProperties(
@@ -38,7 +38,7 @@ private class DirectStakingProperties(
     private val stakingOption: StakingOption,
     private val scope: CoroutineScope,
     private val stakingSharedComputation: StakingSharedComputation,
-): SingleStakingProperties {
+) : SingleStakingProperties {
 
     override fun availableBalance(asset: Asset): Balance {
         return asset.freeInPlanks
@@ -50,7 +50,6 @@ private class DirectStakingProperties(
         stakingOption = stakingOption,
         scope = scope
     )
-
 
     override val validationSystem: StartMultiStakingValidationSystem = ValidationSystem {
         // TODO validations

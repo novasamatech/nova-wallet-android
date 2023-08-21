@@ -108,7 +108,6 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun setupStakingType(): SetupStakingTypeComponent.Factory
 
-
     // relaychain staking
 
     fun searchCustomValidatorsComponentFactory(): SearchCustomValidatorsComponent.Factory

@@ -14,11 +14,11 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 class NominationPoolSelection(
     val pool: NominationPool,
     override val stakingOption: StakingOption,
-): StartMultiStakingSelection {
+) : StartMultiStakingSelection {
 
     override val apy: Perbill = pool.apy.orZero()
 
     override fun ExtrinsicBuilder.startStaking(amount: Balance, chain: Chain, metaAccount: MetaAccount) {
-       // TODO
+        // TODO
     }
 }

@@ -6,4 +6,3 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class SetupAmountMultiStakingPayload(val availableStakingOptions: AvailableStakingOptionsPayload) : Parcelable
-

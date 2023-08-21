@@ -13,7 +13,6 @@ interface StartMultiStakingSelectionStore {
     fun updateSelection(multiStakingSelection: RecommendableMultiStakingSelection)
 }
 
-
 class RealStartMultiStakingSelectionStore : StartMultiStakingSelectionStore {
 
     override val currentSelectionFlow = MutableStateFlow<RecommendableMultiStakingSelection?>(null)

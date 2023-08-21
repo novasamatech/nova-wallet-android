@@ -20,7 +20,7 @@ class DirectStakingSelection(
     val validators: List<Validator>,
     val validatorsLimit: Int,
     override val stakingOption: StakingOption,
-): StartMultiStakingSelection {
+) : StartMultiStakingSelection {
 
     override val apy = validators.maxOf { it.electedInfo?.apy.orZero().asPerbill() }
 

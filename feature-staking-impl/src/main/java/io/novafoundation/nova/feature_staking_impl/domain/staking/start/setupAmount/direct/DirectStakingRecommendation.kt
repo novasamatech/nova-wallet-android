@@ -13,7 +13,7 @@ class DirectStakingRecommendation(
     private val recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
     private val stakingOption: StakingOption,
     private val scope: CoroutineScope,
-): SingleStakingRecommendation {
+) : SingleStakingRecommendation {
 
     private val recommendator = scope.async {
         validatorRecommendatorFactory.create(scope)

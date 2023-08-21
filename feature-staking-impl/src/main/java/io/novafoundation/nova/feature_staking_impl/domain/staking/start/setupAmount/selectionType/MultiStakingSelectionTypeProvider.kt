@@ -99,7 +99,7 @@ private class RealMultiStakingSelectionTypeProvider(
     }
 
     private fun Chain.Asset.StakingType.multiStakingPriority(): Int {
-        return when(group()) {
+        return when (group()) {
             StakingTypeGroup.RELAYCHAIN -> 0
             StakingTypeGroup.NOMINATION_POOL -> 1
             else -> 2

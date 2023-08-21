@@ -13,7 +13,7 @@ class StartMultiStakingNavigator(
     navigationHolder: NavigationHolder,
 ) : BaseNavigator(navigationHolder), StartMultiStakingRouter {
 
-    override fun openStartStakingLanding(payload: StartStakingLandingPayload) =performNavigation(
+    override fun openStartStakingLanding(payload: StartStakingLandingPayload) = performNavigation(
         actionId = R.id.action_mainFragment_to_startStackingLanding,
         args = StartStakingLandingFragment.getBundle(payload)
     )

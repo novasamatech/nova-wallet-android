@@ -20,7 +20,7 @@ class RealArbitraryAssetUseCase(
     private val accountRepository: AccountRepository,
     private val walletRepository: WalletRepository,
     private val chainRegistry: ChainRegistry
-): ArbitraryAssetUseCase {
+) : ArbitraryAssetUseCase {
 
     override fun assetFlow(chainId: ChainId, assetId: ChainAssetId): Flow<Asset> {
         return flowOfAll {

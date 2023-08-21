@@ -12,7 +12,7 @@ interface SingleStakingPropertiesFactory {
 
 class MultiSingleStakingPropertiesFactory(
     private val creators: Map<StakingTypeGroup, SingleStakingPropertiesFactory>
-): SingleStakingPropertiesFactory {
+) : SingleStakingPropertiesFactory {
 
     override fun createProperties(scope: CoroutineScope, stakingOption: StakingOption): SingleStakingProperties {
         val stakingGroup = stakingOption.additional.stakingType.group()

@@ -19,7 +19,7 @@ fun StartMultiStakingSelectionStoreProvider.currentSelectionFlow(scope: Coroutin
 
 class RealStartMultiStakingSelectionStoreProvider(
     private val computationalCache: ComputationalCache
-): StartMultiStakingSelectionStoreProvider {
+) : StartMultiStakingSelectionStoreProvider {
 
     private val key = "StartMultiStakingSelectionStore"
 

@@ -20,7 +20,6 @@ interface MultiStakingSelectionFormatter {
     suspend fun formatForStakingType(recommendableSelection: RecommendableMultiStakingSelection): StakingTargetModel
 }
 
-
 class RealMultiStakingSelectionFormatter(
     private val resourceManager: ResourceManager,
     private val poolDisplayFormatter: PoolDisplayFormatter,
@@ -100,7 +99,6 @@ class RealMultiStakingSelectionFormatter(
     private fun notYetImplemented(selection: StartMultiStakingSelection): Nothing {
         error("Not yet implemented: ${selection::class.simpleName}")
     }
-
 
     private fun Icon?.asStakeTargetIcon(): StakingTargetModel.TargetIcon? = this?.let(StakingTargetModel.TargetIcon::Icon)
 }

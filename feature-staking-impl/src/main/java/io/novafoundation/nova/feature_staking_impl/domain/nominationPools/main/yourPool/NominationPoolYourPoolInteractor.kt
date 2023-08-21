@@ -21,7 +21,7 @@ interface NominationPoolYourPoolInteractor {
         override val icon: Icon?,
         override val metadata: PoolMetadata?,
         override val stashAccountId: AccountId,
-    ): PoolDisplay
+    ) : PoolDisplay
 
     fun yourPoolFlow(poolId: PoolId, chainId: ChainId): Flow<YourPool>
 }

@@ -28,7 +28,6 @@ class RecommendableMultiStakingSelection(
     val selection: StartMultiStakingSelection,
 )
 
-
 val SelectionTypeSource.isRecommended: Boolean
     get() = when (this) {
         SelectionTypeSource.Automatic -> true

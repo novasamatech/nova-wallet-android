@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatAsSpannable
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.setEndSpan
 import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.toSpannable
@@ -40,7 +39,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.time.Duration
 

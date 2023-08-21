@@ -6,9 +6,9 @@ sealed class StakingPropertiesModel {
 
     object Hidden : StakingPropertiesModel()
 
-    object Loading: StakingPropertiesModel()
+    object Loading : StakingPropertiesModel()
 
-    class Loaded(val content: Content): StakingPropertiesModel()
+    class Loaded(val content: Content) : StakingPropertiesModel()
 
     class Content(
         val estimatedReward: String,

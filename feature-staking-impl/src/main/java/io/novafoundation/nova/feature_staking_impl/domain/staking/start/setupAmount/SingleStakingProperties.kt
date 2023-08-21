@@ -20,4 +20,3 @@ interface SingleStakingRecommendation {
 
     suspend fun recommendedSelection(): StartMultiStakingSelection
 }
-
