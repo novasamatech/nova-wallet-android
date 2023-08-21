@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.model
 
-import io.novafoundation.nova.common.presentation.ColoredText
+import io.novafoundation.nova.feature_staking_impl.presentation.view.stakingTarget.StakingTargetModel
 
 sealed class StakingPropertiesModel {
 
@@ -12,11 +12,6 @@ sealed class StakingPropertiesModel {
 
     class Content(
         val estimatedReward: String,
-        val selection: SelectionModel
-    )
-
-    class SelectionModel(
-        val title: String,
-        val subtitle: ColoredText
+        val selection: StakingTargetModel
     )
 }
