@@ -11,6 +11,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.s
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStore
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingPropertiesFactory
+import io.novafoundation.nova.runtime.ext.StakingTypeGroup
+import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
@@ -76,6 +78,7 @@ private class RealMultiStakingSelectionTypeProvider(
         selectionStore: StartMultiStakingSelectionStore,
     ): MultiStakingSelectionType {
         val candidateOptions = chainRegistry.constructStakingOptions(candidateOptionIds)
+            .sortedBy { it.stakingType.multiStakingPriority() }
 
         val candidates = candidateOptions.map { option ->
             singleStakingPropertiesFactory.createProperties(scope, option)
@@ -93,6 +96,14 @@ private class RealMultiStakingSelectionTypeProvider(
         val stakingProperties = singleStakingPropertiesFactory.createProperties(scope, option)
 
         return ManualMultiStakingSelectionType(stakingProperties)
+    }
+
+    private fun Chain.Asset.StakingType.multiStakingPriority(): Int {
+        return when(group()) {
+            StakingTypeGroup.RELAYCHAIN -> 0
+            StakingTypeGroup.NOMINATION_POOL -> 1
+            else -> 2
+        }
     }
 
     /**

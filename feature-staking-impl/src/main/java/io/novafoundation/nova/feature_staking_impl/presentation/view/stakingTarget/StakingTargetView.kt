@@ -46,6 +46,8 @@ class StakingTargetView @JvmOverloads constructor(
 
     fun setModel(stakingTargetModel: StakingTargetModel) {
         stakingTargetTitle.text = stakingTargetModel.title
+        stakingTargetTitle.makeVisible()
+
         stakingTargetSubtitle.setColoredTextOrHide(stakingTargetModel.subtitle)
 
         makeGoneViews(stakingTargetTitleShimmering, stakingTargetSubtitleShimmering, stakingTargetIconShimmer)

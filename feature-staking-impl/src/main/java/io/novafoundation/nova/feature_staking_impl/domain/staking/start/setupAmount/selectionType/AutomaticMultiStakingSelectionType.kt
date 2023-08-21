@@ -39,7 +39,7 @@ class AutomaticMultiStakingSelectionType(
     }
 
     private suspend fun List<SingleStakingProperties>.firstAllowingToStake(stake: Balance): SingleStakingProperties? {
-        return find { it.minStake() > stake }
+        return find { it.minStake() <= stake }
     }
 
     private suspend fun List<SingleStakingProperties>.findWithMinimumStake(): SingleStakingProperties {

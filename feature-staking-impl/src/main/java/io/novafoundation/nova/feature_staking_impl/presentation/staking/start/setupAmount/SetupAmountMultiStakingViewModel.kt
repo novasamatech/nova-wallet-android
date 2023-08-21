@@ -93,8 +93,9 @@ class SetupAmountMultiStakingViewModel(
     init {
         combine(
             multiStakingSelectionTypeFlow,
-            amountChooserMixin.backPressuredAmount
-        ) { multiStakingSelectionType, amount ->
+            amountChooserMixin.amountInput
+        ) { multiStakingSelectionType, amountInput ->
+            val amount = amountInput.toBigDecimalOrNull() ?: return@combine
             val asset = currentAssetFlow.first()
             val planks = asset.token.planksFromAmount(amount)
 

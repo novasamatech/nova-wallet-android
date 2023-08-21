@@ -6,6 +6,8 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.repository.ParasRepository
+import io.novafoundation.nova.feature_staking_impl.data.stakingType
+import io.novafoundation.nova.feature_staking_impl.data.unwrapNominationPools
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEra
 import io.novafoundation.nova.feature_staking_impl.domain.error.accountIdNotFound
@@ -60,7 +62,7 @@ class RewardCalculatorFactory(
     }
 
     private suspend fun StakingOption.createRewardCalculator(validators: List<RewardCalculationTarget>, totalIssuance: BigInteger): RewardCalculator {
-        return when (additional.stakingType) {
+        return when (unwrapNominationPools().stakingType) {
             RELAYCHAIN, RELAYCHAIN_AURA -> {
                 val activePublicParachains = parasRepository.activePublicParachains(assetWithChain.chain.id)
                 val inflationConfig = InflationConfig.Default(activePublicParachains)

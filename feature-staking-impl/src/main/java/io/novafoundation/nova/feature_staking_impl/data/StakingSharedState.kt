@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data
 
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.findStakingTypeBackingNominationPools
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
@@ -36,4 +37,13 @@ fun createStakingOption(chain: Chain, chainAsset: Chain.Asset, stakingType: Chai
         assetWithChain = ChainWithAsset(chain, chainAsset),
         additional = StakingSharedState.OptionAdditionalData(stakingType)
     )
+}
+
+fun StakingOption.unwrapNominationPools(): StakingOption {
+    return if (stakingType == Chain.Asset.StakingType.NOMINATION_POOLS) {
+        val backingType = assetWithChain.asset.findStakingTypeBackingNominationPools()
+        copy(additional = StakingSharedState.OptionAdditionalData(backingType))
+    } else {
+        this
+    }
 }
