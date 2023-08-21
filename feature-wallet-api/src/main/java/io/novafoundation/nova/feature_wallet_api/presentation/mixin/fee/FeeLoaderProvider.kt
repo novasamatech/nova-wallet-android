@@ -1,19 +1,19 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.model.InlineFee
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -41,7 +41,7 @@ class FeeLoaderProvider(
 
     override suspend fun loadFeeSuspending(
         retryScope: CoroutineScope,
-        feeConstructor: suspend (Token) -> BigInteger?,
+        feeConstructor: suspend (Token) -> Fee?,
         onRetryCancelled: () -> Unit,
     ): Unit = withContext(Dispatchers.IO) {
         feeLiveData.postValue(FeeStatus.Loading)
@@ -64,11 +64,29 @@ class FeeLoaderProvider(
         onRetryCancelled: () -> Unit,
     ) {
         coroutineScope.launch {
-            loadFeeSuspending(coroutineScope, feeConstructor, onRetryCancelled)
+            loadFeeSuspending(
+                retryScope = coroutineScope,
+                feeConstructor = { feeConstructor(it)?.let(::InlineFee) },
+                onRetryCancelled = onRetryCancelled
+            )
         }
     }
 
-    override suspend fun setFee(fee: BigDecimal?) {
+    override fun loadFeeV2(
+        coroutineScope: CoroutineScope,
+        feeConstructor: suspend (Token) -> Fee?,
+        onRetryCancelled: () -> Unit
+    ) {
+        coroutineScope.launch {
+            loadFeeSuspending(
+                retryScope = coroutineScope,
+                feeConstructor = feeConstructor,
+                onRetryCancelled = onRetryCancelled
+            )
+        }
+    }
+
+    override suspend fun setFee(fee: Fee?) {
         if (fee != null) {
             val token = tokenFlow.first()
             val feeModel = mapFeeToFeeModel(fee, token, includeZeroFiat = configuration.showZeroFiat)
@@ -79,6 +97,15 @@ class FeeLoaderProvider(
         }
     }
 
+    override suspend fun setFee(feeAmount: BigDecimal?) {
+        val fee = feeAmount?.let {
+            val token = tokenFlow.first()
+            InlineFee(token.planksFromAmount(feeAmount))
+        }
+
+        setFee(fee)
+    }
+
     override fun requireFee(
         block: (BigDecimal) -> Unit,
         onError: (title: String, message: String) -> Unit,
@@ -86,7 +113,7 @@ class FeeLoaderProvider(
         val feeStatus = feeLiveData.value
 
         if (feeStatus is FeeStatus.Loaded) {
-            block(feeStatus.feeModel.fee)
+            block(feeStatus.feeModel.decimalFee.decimalAmount)
         } else {
             onError(
                 resourceManager.getString(R.string.fee_not_yet_loaded_title),
@@ -95,18 +122,12 @@ class FeeLoaderProvider(
         }
     }
 
-    override suspend fun awaitFee(): BigDecimal {
-        return feeLiveData.asFlow()
-            .filterIsInstance<FeeStatus.Loaded>()
-            .first().feeModel.fee
-    }
-
     override fun requireOptionalFee(
         block: (BigDecimal?) -> Unit,
         onError: (title: String, message: String) -> Unit
     ) {
         when (val status = feeLiveData.value) {
-            is FeeStatus.Loaded -> block(status.feeModel.fee)
+            is FeeStatus.Loaded -> block(status.feeModel.decimalFee.decimalAmount)
             is FeeStatus.NoFee -> block(null)
             else -> onError(
                 resourceManager.getString(R.string.fee_not_yet_loaded_title),
@@ -117,9 +138,8 @@ class FeeLoaderProvider(
 
     private fun onFeeLoaded(
         token: Token,
-        feeInPlanks: BigInteger?
-    ): FeeStatus = if (feeInPlanks != null) {
-        val fee = token.amountFromPlanks(feeInPlanks)
+        fee: Fee?
+    ): FeeStatus = if (fee != null) {
         val feeModel = mapFeeToFeeModel(fee, token, includeZeroFiat = configuration.showZeroFiat)
 
         FeeStatus.Loaded(feeModel)
@@ -127,10 +147,10 @@ class FeeLoaderProvider(
         FeeStatus.NoFee
     }
 
-    fun onError(
+    private fun onError(
         exception: Throwable,
         retryScope: CoroutineScope,
-        feeConstructor: suspend (Token) -> BigInteger?,
+        feeConstructor: suspend (Token) -> Fee?,
         onRetryCancelled: () -> Unit,
     ) = if (exception !is CancellationException) {
         retryEvent.postValue(
@@ -138,7 +158,7 @@ class FeeLoaderProvider(
                 RetryPayload(
                     title = resourceManager.getString(R.string.choose_amount_network_error),
                     message = resourceManager.getString(R.string.choose_amount_error_fee),
-                    onRetry = { loadFee(retryScope, feeConstructor, onRetryCancelled) },
+                    onRetry = { loadFeeV2(retryScope, feeConstructor, onRetryCancelled) },
                     onCancel = onRetryCancelled
                 )
             )

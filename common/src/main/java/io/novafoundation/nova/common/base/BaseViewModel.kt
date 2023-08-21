@@ -75,7 +75,8 @@ open class BaseViewModel : ViewModel(), CoroutineScope, WithCoroutineScopeExtens
     suspend fun <P, S> ValidationExecutor.requireValid(
         validationSystem: ValidationSystem<P, S>,
         payload: P,
-        validationFailureTransformerCustom: (ValidationStatus.NotValid<S>, ValidationFlowActions) -> TransformedFailure,
+        validationFailureTransformerCustom: (ValidationStatus.NotValid<S>, ValidationFlowActions) -> TransformedFailure?,
+        autoFixPayload: (original: P, failureStatus: S) -> P = { original, _ -> original },
         progressConsumer: ProgressConsumer? = null,
         block: (P) -> Unit,
     ) = requireValid(
@@ -84,6 +85,7 @@ open class BaseViewModel : ViewModel(), CoroutineScope, WithCoroutineScopeExtens
         errorDisplayer = ::showError,
         validationFailureTransformerCustom = validationFailureTransformerCustom,
         progressConsumer = progressConsumer,
+        autoFixPayload = autoFixPayload,
         block = block
     )
 }
