@@ -4,6 +4,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import coil.ImageLoader
+import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeGoneViews
 import io.novafoundation.nova.common.utils.makeVisible
@@ -26,6 +29,10 @@ class StakingTargetView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
+    private val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
+        FeatureUtils.getCommonApi(context).imageLoader()
+    }
+
     init {
         View.inflate(context, R.layout.view_staking_target, this)
 
@@ -45,16 +52,16 @@ class StakingTargetView @JvmOverloads constructor(
 
         makeGoneViews(stakingTargetTitleShimmering, stakingTargetSubtitleShimmering, stakingTargetIconShimmer)
 
-        when (stakingTargetModel.icon) {
-            is StakingTargetModel.Icon.Drawable -> {
+        when (val icon = stakingTargetModel.icon) {
+            is StakingTargetModel.TargetIcon.Icon -> {
                 stakingTargetQuantity.makeGone()
                 stakingTargetIcon.makeVisible()
-                stakingTargetIcon.setImageDrawable(stakingTargetModel.icon.drawable)
+                stakingTargetIcon.setIcon(icon.icon, imageLoader)
             }
-            is StakingTargetModel.Icon.Quantity -> {
+            is StakingTargetModel.TargetIcon.Quantity -> {
                 stakingTargetIcon.makeGone()
                 stakingTargetQuantity.makeVisible()
-                stakingTargetQuantity.text = stakingTargetModel.icon.quantity
+                stakingTargetQuantity.text = icon.quantity
             }
             null -> {
                 makeGoneViews(stakingTargetIcon, stakingTargetQuantity)
