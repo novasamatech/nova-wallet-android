@@ -108,4 +108,8 @@ class SetupAmountMultiStakingViewModel(
     fun back() {
         router.back()
     }
+
+    fun selectionClicked() {
+        router.openSetupStakingType()
+    }
 }

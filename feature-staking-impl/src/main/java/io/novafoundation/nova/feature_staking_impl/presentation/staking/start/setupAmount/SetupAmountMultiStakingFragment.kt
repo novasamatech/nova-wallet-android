@@ -63,6 +63,8 @@ class SetupAmountMultiStakingFragment : BaseFragment<SetupAmountMultiStakingView
 
         viewModel.stakingPropertiesModel.observe(::showStakingProperties)
         viewModel.title.observe(startMultiStakingSetupAmountToolbar::setTitle)
+
+        startMultiStakingSetupAmountSelection.setOnClickListener { viewModel.selectionClicked() }
     }
 
     private fun showStakingProperties(properties: StakingPropertiesModel) {

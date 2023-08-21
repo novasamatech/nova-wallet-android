@@ -33,6 +33,10 @@
         android:label="SetupAmountMultiStakingFragment"
         tools:layout="@layout/fragment_start_multi_staking_amount">
         <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
             android:id="@+id/action_setupAmountMultiStakingFragment_to_setupStakingType"
             app:destination="@id/setupStakingType" />
     </fragment>
