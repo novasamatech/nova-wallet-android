@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.PayoutType
+import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.StartStakingEraInfo
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -102,13 +102,13 @@ class RealCompoundStartStakingInteractor(
     }
 
     private fun getPayouts(startStakingData: List<StartStakingData>): Payouts {
-        val automaticPayoutMinAmount = startStakingData.filter { it.payoutType is PayoutType.Automatic }
+        val automaticallyPayoutMinAmount = startStakingData.filter { it.payoutType is PayoutType.Automatically }
             .minOfOrNull { it.minStake }
 
         return Payouts(
             payoutTypes = startStakingData.map { it.payoutType }.distinct(),
-            automaticPayoutMinAmount = automaticPayoutMinAmount,
-            isAutomaticPayoutHasSmallestMinStake = isAutomaticPayoutHasSmallestMinStake(startStakingData, automaticPayoutMinAmount)
+            automaticPayoutMinAmount = automaticallyPayoutMinAmount,
+            isAutomaticPayoutHasSmallestMinStake = isAutomaticPayoutHasSmallestMinStake(startStakingData, automaticallyPayoutMinAmount)
         )
     }
 

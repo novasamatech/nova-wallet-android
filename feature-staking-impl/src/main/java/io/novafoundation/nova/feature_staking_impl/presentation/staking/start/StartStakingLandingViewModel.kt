@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.Particip
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.Payouts
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingCompoundData
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingInteractorFactory
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.PayoutType
+import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.model.StakingConditionRVItem
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.model.StartStakingLandingPayload
@@ -280,17 +280,17 @@ class StartStakingLandingViewModel(
     }
 
     private fun List<PayoutType>.containsManualAndAutomatic(): Boolean {
-        return contains(PayoutType.Manual) && any { it is PayoutType.Automatic } && size == 2
+        return contains(PayoutType.Manual) && any { it is PayoutType.Automatically } && size == 2
     }
 
     private fun isRestakeOnlyCase(payouts: Payouts): Boolean {
-        return payouts.payoutTypes.containsOnly(PayoutType.Automatic.Restake) ||
-            payouts.payoutTypes.contains(PayoutType.Automatic.Restake) && payouts.isAutomaticPayoutHasSmallestMinStake
+        return payouts.payoutTypes.containsOnly(PayoutType.Automatically.Restake) ||
+            payouts.payoutTypes.contains(PayoutType.Automatically.Restake) && payouts.isAutomaticPayoutHasSmallestMinStake
     }
 
     private fun isPayoutsOnlyCase(payouts: Payouts): Boolean {
-        return payouts.payoutTypes.containsOnly(PayoutType.Automatic.Payout) ||
-            payouts.payoutTypes.contains(PayoutType.Automatic.Payout) && payouts.isAutomaticPayoutHasSmallestMinStake
+        return payouts.payoutTypes.containsOnly(PayoutType.Automatically.Payout) ||
+            payouts.payoutTypes.contains(PayoutType.Automatically.Payout) && payouts.isAutomaticPayoutHasSmallestMinStake
     }
 
     private fun getThemeColor(chain: Chain): Int {

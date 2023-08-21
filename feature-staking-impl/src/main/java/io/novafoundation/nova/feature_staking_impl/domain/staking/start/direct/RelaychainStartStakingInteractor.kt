@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.rewards.DAYS_IN_YEAR
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.calculateMaxPeriodReturns
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingData
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.PayoutType
+import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +29,7 @@ class RelaychainStartStakingInteractor(
             StartStakingData(
                 maxEarningRate = calculateEarningRate(),
                 minStake = activeEraInfo.minStake,
-                payoutType = PayoutType.Automatic.Restake,
+                payoutType = PayoutType.Automatically.Restake,
                 participationInGovernance = chain.governance.isNotEmpty()
             )
         }

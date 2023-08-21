@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewar
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.DAYS_IN_YEAR
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingData
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.PayoutType
+import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -37,6 +37,6 @@ class ParachainStartStakingInteractor(
     }
 
     private fun getPayoutType(): PayoutType {
-        return PayoutType.Automatic.Payout
+        return PayoutType.Automatically.Payout
     }
 }

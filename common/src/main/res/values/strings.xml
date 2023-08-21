@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="setup_staking_type_min_amount_condition">Minimum stake: %s</string>
+    <string name="setup_staking_type_payout_type_manual_condition">Rewards: Claim manually</string>
+    <string name="setup_staking_type_payout_type_automatically_condition">Rewards: Paid automatically</string>
+    <string name="setup_staking_type_governance_condition">Pool staking</string>
+    <string name="setup_staking_type_advanced_options_condition">Pool staking</string>
+
     <string name="staking_type_title">Staking Type</string>
     <string name="setup_staking_type_pool_staking">Pool staking</string>
     <string name="setup_staking_type_direct_staking">Direct staking</string>

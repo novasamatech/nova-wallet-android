@@ -10,11 +10,14 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import kotlinx.android.synthetic.main.fragment_setup_staking_type.setupStakingTypeDirectStaking
-import kotlinx.android.synthetic.main.fragment_setup_staking_type.setupStakingTypePoolStaking
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.adapter.EditableStakingTypeRVItem
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.adapter.SetupStakingTypeAdapter
+import kotlinx.android.synthetic.main.fragment_setup_staking_type.setupStakingTypeList
 import kotlinx.android.synthetic.main.fragment_setup_staking_type.setupStakingTypeToolbar
 
-class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>() {
+class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), SetupStakingTypeAdapter.ItemAssetHandler {
+
+    private val adapter = SetupStakingTypeAdapter(this)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,11 +29,7 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>() {
 
     override fun initViews() {
         setupStakingTypeToolbar.applyStatusBarInsets()
-
-        setupStakingTypePoolStaking.setTitle(requireContext().getString(R.string.setup_staking_type_pool_staking))
-        setupStakingTypePoolStaking.setBackgroundRes(R.drawable.ic_pool_staking_banner_picture)
-        setupStakingTypeDirectStaking.setTitle(requireContext().getString(R.string.setup_staking_type_direct_staking))
-        setupStakingTypeDirectStaking.setBackgroundRes(R.drawable.ic_direct_staking_banner_picture)
+        setupStakingTypeList.adapter = adapter
     }
 
     override fun inject() {
@@ -44,5 +43,15 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>() {
     }
 
     override fun subscribe(viewModel: SetupStakingTypeViewModel) {
+
+        viewModel.availableToRewriteData.observe { setupStakingTypeToolbar.setRightActionEnabled(it) }
+
+        viewModel.stakingTypeModels.observe {
+            adapter.submitList(it)
+        }
+    }
+
+    override fun stakingTypeClicked(item: EditableStakingTypeRVItem) {
+        viewModel.selectStakingType(item)
     }
 }

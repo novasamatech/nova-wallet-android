@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.view.stakingTar
 
 import androidx.annotation.ColorRes
 
-class StakingTargetModel(
+data class StakingTargetModel(
     val title: String,
     val subtitle: String?,
     @ColorRes val subtitleColorRes: Int,
@@ -11,7 +11,7 @@ class StakingTargetModel(
 
     sealed interface Icon {
 
-        class Quantity(val quantity: String) : Icon
+        data class Quantity(val quantity: String) : Icon
 
         class Drawable(val drawable: android.graphics.drawable.Drawable) : Icon
     }

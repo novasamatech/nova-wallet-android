@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.reposito
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingData
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.StartStakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.PayoutType
+import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow

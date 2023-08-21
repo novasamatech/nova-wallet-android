@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start
 
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.model.PayoutType
+import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
