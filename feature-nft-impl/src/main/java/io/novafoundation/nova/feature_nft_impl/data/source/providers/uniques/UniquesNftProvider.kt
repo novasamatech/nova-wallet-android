@@ -75,10 +75,6 @@ class UniquesNftProvider(
                 instanceMetadataStorage.queryKeys(classesWithInstances)
             }
 
-            val classMetadatas = multiQueryResults.getValue(classMetadataStorage)
-                .mapKeys { (keyComponents, _) -> keyComponents.component1<BigInteger>() }
-                .mapValues { (_, parsedValue) -> bindMetadata(parsedValue) }
-
             val totalIssuances = multiQueryResults.getValue(classStorage)
                 .mapKeys { (keyComponents, _) -> keyComponents.component1<BigInteger>() }
                 .mapValues { (_, parsedValue) ->

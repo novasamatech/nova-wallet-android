@@ -67,13 +67,15 @@ class NftRepositoryImpl(
         val nftProvider = nftProvidersRegistry.get(nftTypeKey)
         val chain = chainsById[nftLocal.chainId]
         val collectionId = nftLocal.collectionId
-        return if (collectionNames.containsKey(collectionId)) {
-            collectionNames[collectionId]
-        } else {
-            nftProvider.getCollectionName(collectionId, chain?.id).apply {
-                collectionNames[collectionId] = this
+        return runCatching {
+            if (collectionNames.containsKey(collectionId)) {
+                collectionNames[collectionId]
+            } else {
+                nftProvider.getCollectionName(collectionId, chain?.id).apply {
+                    collectionNames[collectionId] = this
+                }
             }
-        }
+        }.getOrDefault(null)
     }
 
     override fun allNftFlow(metaAccount: MetaAccount): Flow<List<Nft>> {
