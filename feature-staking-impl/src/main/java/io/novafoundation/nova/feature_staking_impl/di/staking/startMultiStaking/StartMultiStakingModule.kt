@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.RealStartMultiStakingSelectionStoreProvider
@@ -73,10 +74,12 @@ class StartMultiStakingModule {
     @IntoMap
     @StakingTypeGroupKey(StakingTypeGroup.NOMINATION_POOL)
     fun providePoolsStakingPropertiesFactory(
-        nominationPoolSharedComputation: NominationPoolSharedComputation
+        nominationPoolSharedComputation: NominationPoolSharedComputation,
+        nominationPoolRecommendatorFactory: NominationPoolRecommendatorFactory
     ): SingleStakingPropertiesFactory {
         return NominationPoolStakingPropertiesFactory(
             nominationPoolSharedComputation = nominationPoolSharedComputation,
+            nominationPoolRecommendatorFactory = nominationPoolRecommendatorFactory
         )
     }
 

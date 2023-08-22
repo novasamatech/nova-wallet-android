@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingProperties
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingPropertiesFactory
@@ -14,11 +15,13 @@ import kotlinx.coroutines.CoroutineScope
 
 class NominationPoolStakingPropertiesFactory(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
+    private val nominationPoolRecommendatorFactory: NominationPoolRecommendatorFactory
 ) : SingleStakingPropertiesFactory {
 
     override fun createProperties(scope: CoroutineScope, stakingOption: StakingOption): SingleStakingProperties {
         return NominationPoolStakingProperties(
             nominationPoolSharedComputation = nominationPoolSharedComputation,
+            nominationPoolRecommendatorFactory = nominationPoolRecommendatorFactory,
             sharedComputationScope = scope,
             stakingOption = stakingOption
         )
@@ -27,6 +30,7 @@ class NominationPoolStakingPropertiesFactory(
 
 private class NominationPoolStakingProperties(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
+    private val nominationPoolRecommendatorFactory: NominationPoolRecommendatorFactory,
     private val sharedComputationScope: CoroutineScope,
     private val stakingOption: StakingOption,
 ) : SingleStakingProperties {
@@ -35,7 +39,11 @@ private class NominationPoolStakingProperties(
         return asset.transferableInPlanks
     }
 
-    override val recommendation: SingleStakingRecommendation = NominationPoolRecommendation(stakingOption)
+    override val recommendation: SingleStakingRecommendation = NominationPoolRecommendation(
+        scope = sharedComputationScope,
+        stakingOption = stakingOption,
+        nominationPoolRecommendatorFactory = nominationPoolRecommendatorFactory
+    )
 
     override val validationSystem: StartMultiStakingValidationSystem = ValidationSystem {
         // TODO
