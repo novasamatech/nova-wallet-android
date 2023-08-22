@@ -22,4 +22,3 @@ class FixedKnownNovaPools : KnownNovaPools {
 
     private fun key(chainId: ChainId, poolId: Int) = chainId to PoolId(poolId)
 }
-

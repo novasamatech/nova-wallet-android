@@ -11,10 +11,9 @@ interface PoolImageDataSource {
     suspend fun getPoolIcon(poolId: PoolId, chainId: ChainId): Icon?
 }
 
-
 class PredefinedPoolImageDataSource(
     knownNovaPools: KnownNovaPools,
-): PoolImageDataSource {
+) : PoolImageDataSource {
 
     private val presets: Map<Pair<ChainId, PoolId>, Icon?> = knownNovaPools.novaPoolIds
         .associateWith { R.drawable.ic_nova_logo.asIcon() }

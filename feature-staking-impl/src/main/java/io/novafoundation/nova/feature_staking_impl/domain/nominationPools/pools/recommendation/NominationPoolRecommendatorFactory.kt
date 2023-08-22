@@ -35,7 +35,6 @@ class NominationPoolRecommendatorFactory(
     }
 }
 
-
 private class RealNominationPoolRecommendator(
     private val chain: Chain,
     private val allNominationPools: List<NominationPool>,

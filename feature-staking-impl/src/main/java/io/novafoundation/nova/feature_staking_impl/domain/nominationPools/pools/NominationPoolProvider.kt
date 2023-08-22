@@ -21,7 +21,7 @@ class RealNominationPoolProvider(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val nominationPoolStateRepository: NominationPoolStateRepository,
     private val poolStateRepository: NominationPoolStateRepository
-): NominationPoolProvider {
+) : NominationPoolProvider {
 
     override suspend fun getNominationPools(
         stakingOption: StakingOption,
