@@ -50,7 +50,7 @@ private class RealNominationPoolRecommendator(
     private fun constructRecommendationList(): List<NominationPool> {
         return allNominationPools
             .filter { it.status.isActive && it.state.isOpen }
-            // weaken filter conditions if no matching pools found
+            // weaken filter conditions if no matching pools were found
             .ifEmpty { allNominationPools.filter { it.state.isOpen } }
             .sortedWith(poolComparator())
     }
