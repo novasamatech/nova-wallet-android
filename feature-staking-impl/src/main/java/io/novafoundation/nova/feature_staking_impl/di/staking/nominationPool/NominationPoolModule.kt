@@ -10,6 +10,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.datasource.KnownMaxUnlockingOverwrites
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.datasource.RealKnownMaxUnlockingOverwrites
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.FixedKnownNovaPools
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolImageDataSource
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PredefinedPoolImageDataSource
@@ -44,6 +46,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.u
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.userRewards.RealNominationPoolsUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.NominationPoolYourPoolInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.RealNominationPoolYourPoolInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.NominationPoolProvider
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.RealNominationPoolProvider
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.RealPoolDisplayFormatter
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
@@ -63,7 +68,13 @@ class NominationPoolModule {
 
     @Provides
     @FeatureScope
-    fun providePoolImageDataSource(): PoolImageDataSource = PredefinedPoolImageDataSource()
+    fun provideKnownNovaPools(): KnownNovaPools = FixedKnownNovaPools()
+
+    @Provides
+    @FeatureScope
+    fun providePoolImageDataSource(knownNovaPools: KnownNovaPools): PoolImageDataSource {
+        return PredefinedPoolImageDataSource(knownNovaPools)
+    }
 
     @Provides
     @FeatureScope
@@ -168,15 +179,11 @@ class NominationPoolModule {
     @FeatureScope
     fun provideNominationPoolRewardCalculatorFactory(
         stakingSharedComputation: StakingSharedComputation,
-        poolAccountDerivation: PoolAccountDerivation,
-        nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
-        nominationPoolStateRepository: NominationPoolStateRepository,
+        nominationPoolSharedComputation: NominationPoolSharedComputation,
     ): NominationPoolRewardCalculatorFactory {
         return NominationPoolRewardCalculatorFactory(
             sharedStakingSharedComputation = stakingSharedComputation,
-            poolAccountDerivation = poolAccountDerivation,
-            nominationPoolGlobalsRepository = nominationPoolGlobalsRepository,
-            nominationPoolStateRepository = nominationPoolStateRepository
+            nominationPoolSharedComputation = nominationPoolSharedComputation
         )
     }
 
@@ -188,7 +195,7 @@ class NominationPoolModule {
         nominationPoolStateRepository: NominationPoolStateRepository,
         nominationPoolUnbondRepository: NominationPoolUnbondRepository,
         poolAccountDerivation: PoolAccountDerivation,
-        nominationPoolRewardCalculatorFactory: NominationPoolRewardCalculatorFactory,
+        nominationPoolRewardCalculatorFactory: dagger.Lazy<NominationPoolRewardCalculatorFactory>,
         nominationPoolGlobalsRepository: NominationPoolGlobalsRepository
     ): NominationPoolSharedComputation {
         return NominationPoolSharedComputation(
@@ -240,5 +247,29 @@ class NominationPoolModule {
         poolMembersRepository = poolMembersRepository,
         accountRepository = accountRepository,
         resourceManager = resourceManager
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideNominationPoolRecommendatorFactory(
+        computationalCache: ComputationalCache,
+        nominationPoolProvider: NominationPoolProvider,
+        knownNovaPools: KnownNovaPools,
+    ) = NominationPoolRecommendatorFactory(
+        computationalCache = computationalCache,
+        nominationPoolProvider = nominationPoolProvider,
+        knownNovaPools = knownNovaPools
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideNominationPoolProvider(
+        nominationPoolSharedComputation: NominationPoolSharedComputation,
+        nominationPoolStateRepository: NominationPoolStateRepository,
+        poolStateRepository: NominationPoolStateRepository
+    ): NominationPoolProvider = RealNominationPoolProvider(
+        nominationPoolSharedComputation = nominationPoolSharedComputation,
+        nominationPoolStateRepository = nominationPoolStateRepository,
+        poolStateRepository = poolStateRepository
     )
 }

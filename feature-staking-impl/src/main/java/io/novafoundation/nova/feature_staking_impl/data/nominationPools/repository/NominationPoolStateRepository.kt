@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository
 
-import io.novafoundation.nova.common.utils.Perbill
+import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
@@ -40,11 +40,13 @@ interface NominationPoolStateRepository {
 
     suspend fun getParticipatingBondedPool(poolId: PoolId, chainId: ChainId): BondedPool
 
+    suspend fun getBondedPools(poolIds: Set<PoolId>, chainId: ChainId): Map<PoolId, BondedPool>
+
     fun observePoolMetadata(poolId: PoolId, chainId: ChainId): Flow<PoolMetadata?>
 
-    suspend fun getPoolIcon(poolId: PoolId, chainId: ChainId): Icon?
+    suspend fun getPoolMetadatas(poolIds: Set<PoolId>, chainId: ChainId): Map<PoolId, PoolMetadata>
 
-    suspend fun getPoolCommissions(poolIds: Set<PoolId>, chainId: ChainId): Map<PoolId, Perbill?>
+    suspend fun getPoolIcon(poolId: PoolId, chainId: ChainId): Icon?
 }
 
 class RealNominationPoolStateRepository(
@@ -87,23 +89,31 @@ class RealNominationPoolStateRepository(
         }
     }
 
+    override suspend fun getBondedPools(poolIds: Set<PoolId>, chainId: ChainId): Map<PoolId, BondedPool> {
+        return remoteStorage.query(chainId) {
+            metadata.nominationPools.bondedPools.multi(
+                keys = poolIds.map { it.value },
+                keyTransform = { PoolId(it) }
+            ).filterNotNull()
+        }
+    }
+
     override fun observePoolMetadata(poolId: PoolId, chainId: ChainId): Flow<PoolMetadata?> {
         return localStorage.subscribe(chainId) {
             metadata.nominationPools.metadata.observe(poolId.value)
         }
     }
 
-    override suspend fun getPoolIcon(poolId: PoolId, chainId: ChainId): Icon? {
-        return poolImageDataSource.getPoolIcon(poolId, chainId)
-    }
-
-    override suspend fun getPoolCommissions(poolIds: Set<PoolId>, chainId: ChainId): Map<PoolId, Perbill?> {
+    override suspend fun getPoolMetadatas(poolIds: Set<PoolId>, chainId: ChainId): Map<PoolId, PoolMetadata> {
         return remoteStorage.query(chainId) {
-            metadata.nominationPools.bondedPools.multi(
+            metadata.nominationPools.metadata.multi(
                 keys = poolIds.map { it.value },
                 keyTransform = { PoolId(it) }
-            )
-                .mapValues { (_, bondedPool) -> bondedPool?.commission?.current?.perbill }
+            ).filterNotNull()
         }
+    }
+
+    override suspend fun getPoolIcon(poolId: PoolId, chainId: ChainId): Icon? {
+        return poolImageDataSource.getPoolIcon(poolId, chainId)
     }
 }

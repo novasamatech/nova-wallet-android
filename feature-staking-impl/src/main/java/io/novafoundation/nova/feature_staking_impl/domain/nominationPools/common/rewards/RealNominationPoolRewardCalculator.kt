@@ -11,35 +11,29 @@ import io.novafoundation.nova.feature_account_api.data.model.AccountIdKeyMap
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
-import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.deriveAllBondedPools
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
+import io.novafoundation.nova.feature_staking_impl.data.unwrapNominationPools
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEra
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.findStakingTypeBackingNominationPools
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculator
 import kotlinx.coroutines.CoroutineScope
 
 class NominationPoolRewardCalculatorFactory(
     private val sharedStakingSharedComputation: StakingSharedComputation,
-    private val poolAccountDerivation: PoolAccountDerivation,
-    private val nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
-    private val nominationPoolStateRepository: NominationPoolStateRepository,
+    private val nominationPoolSharedComputation: NominationPoolSharedComputation,
 ) {
 
     suspend fun create(stakingOption: StakingOption, sharedComputationScope: CoroutineScope): NominationPoolRewardCalculator {
-        val chainId = stakingOption.assetWithChain.chain.id
+        val chainId = stakingOption.chain.id
 
-        val delegateOption = stakingOption.backingStakingOption()
+        val delegateOption = stakingOption.unwrapNominationPools()
+
         val delegate = sharedStakingSharedComputation.rewardCalculator(delegateOption, sharedComputationScope)
-
-        val lastPoolId = nominationPoolGlobalsRepository.lastPoolId(chainId)
-        val allPoolAccounts = poolAccountDerivation.deriveAllBondedPools(lastPoolId, chainId)
-
-        val poolCommissions = nominationPoolStateRepository.getPoolCommissions(allPoolAccounts.keys, chainId)
+        val allPoolAccounts = nominationPoolSharedComputation.allBondedPoolAccounts(chainId, sharedComputationScope)
+        val poolCommissions = nominationPoolSharedComputation.allBondedPools(chainId, sharedComputationScope)
+            .mapValues { (_, pool) -> pool.commission?.current?.perbill }
 
         return RealNominationPoolRewardCalculator(
             directStakingDelegate = delegate,
@@ -47,12 +41,6 @@ class NominationPoolRewardCalculatorFactory(
             commissions = poolCommissions,
             poolStashesById = allPoolAccounts
         )
-    }
-
-    private fun StakingOption.backingStakingOption(): StakingOption {
-        val backingStaking = assetWithChain.asset.findStakingTypeBackingNominationPools()
-
-        return copy(additional = StakingSharedState.OptionAdditionalData(backingStaking))
     }
 }
 
