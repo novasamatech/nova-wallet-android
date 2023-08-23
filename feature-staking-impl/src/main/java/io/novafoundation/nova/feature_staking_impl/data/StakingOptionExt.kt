@@ -15,6 +15,9 @@ val StakingOption.components: Triple<Chain, Chain.Asset, Chain.Asset.StakingType
 val StakingOption.chain: Chain
     get() = assetWithChain.chain
 
+val StakingOption.asset: Chain.Asset
+    get() = assetWithChain.asset
+
 val StakingOption.stakingType: Chain.Asset.StakingType
     get() = additional.stakingType
 

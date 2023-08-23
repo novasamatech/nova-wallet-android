@@ -127,7 +127,7 @@ class SetupStakingViewModel(
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
-                validationFailureTransformer = { stakingValidationFailure(payload, it, resourceManager) },
+                validationFailureTransformer = { stakingValidationFailure(it, resourceManager) },
                 progressConsumer = _showNextProgress.progressConsumer()
             ) {
                 _showNextProgress.value = false

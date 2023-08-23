@@ -17,5 +17,5 @@ interface StartStakingInteractor {
 
     fun observeData(): Flow<StartStakingData>
 
-    fun getAvailableBalance(asset: Asset): BigInteger
+    suspend fun getAvailableBalance(asset: Asset): BigInteger
 }

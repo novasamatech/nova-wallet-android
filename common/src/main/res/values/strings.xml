@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="start_staking_max_nominators_reached_title">%s is currently unavailable</string>
+    <string name="start_staking_max_nominators_reached_message">The maximum number of nominators has been reached. Try again later</string>
+
     <string name="start_staking_selection_validators_subtitle">Validators: %d (max %d)</string>
     <string name="common_recommended">Recommended</string>
 

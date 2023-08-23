@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGoneViews
 import io.novafoundation.nova.common.utils.makeVisibleViews
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
@@ -45,6 +46,9 @@ class SetupAmountMultiStakingFragment : BaseFragment<SetupAmountMultiStakingView
         startMultiStakingSetupAmountToolbar.setHomeButtonListener { viewModel.back() }
 
         startMultiStakingSetupAmountContinue.prepareForProgress(viewLifecycleOwner)
+        startMultiStakingSetupAmountContinue.setOnClickListener { viewModel.continueClicked() }
+
+        startMultiStakingSetupAmountSelection.setOnClickListener { viewModel.selectionClicked() }
     }
 
     override fun inject() {
@@ -63,7 +67,7 @@ class SetupAmountMultiStakingFragment : BaseFragment<SetupAmountMultiStakingView
         viewModel.stakingPropertiesModel.observe(::showStakingProperties)
         viewModel.title.observe(startMultiStakingSetupAmountToolbar::setTitle)
 
-        startMultiStakingSetupAmountSelection.setOnClickListener { viewModel.selectionClicked() }
+        viewModel.continueButtonState.observe(startMultiStakingSetupAmountContinue::setState)
     }
 
     private fun showStakingProperties(properties: StakingPropertiesModel) {

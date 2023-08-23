@@ -9,8 +9,8 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
 
-fun BigInteger.formatPlanks(chainAsset: Chain.Asset): String {
-    return chainAsset.amountFromPlanks(this).formatTokenAmount(chainAsset)
+fun BigInteger.formatPlanks(chainAsset: Chain.Asset, roundingMode: RoundingMode = RoundingMode.FLOOR): String {
+    return chainAsset.amountFromPlanks(this).formatTokenAmount(chainAsset, roundingMode)
 }
 
 fun SemiUnboundedRange<Balance>.formatPlanksRange(chainAsset: Chain.Asset): String {

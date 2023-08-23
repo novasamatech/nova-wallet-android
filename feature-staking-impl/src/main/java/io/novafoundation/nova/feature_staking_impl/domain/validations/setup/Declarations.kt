@@ -1,35 +1,45 @@
 package io.novafoundation.nova.feature_staking_impl.domain.validations.setup
 
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
-import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.stakeable
 import io.novafoundation.nova.feature_staking_impl.domain.validations.maximumNominatorsReached
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 
-typealias SetupStakingValidation = Validation<SetupStakingPayload, SetupStakingValidationFailure>
 typealias SetupStakingValidationSystem = ValidationSystem<SetupStakingPayload, SetupStakingValidationFailure>
 typealias SetupStakingValidationSystemBuilder = ValidationSystemBuilder<SetupStakingPayload, SetupStakingValidationFailure>
 
 fun ValidationSystem.Companion.setupStaking(
     stakingRepository: StakingRepository,
     stakingSharedComputation: StakingSharedComputation,
-    sharedState: StakingSharedState,
 ): SetupStakingValidationSystem = ValidationSystem {
     enoughToPayFee()
 
     enoughStakeable()
 
-    minimumBondValidation(stakingRepository, stakingSharedComputation)
+    minimumBondValidation(
+        stakingRepository = stakingRepository,
+        stakingSharedComputation = stakingSharedComputation,
+        chainAsset = { it.stashAsset.token.configuration },
+        balanceToCheckAgainstRequired = {
+            val decimals = it.bondAmount ?: it.stashAsset.bonded
+
+            it.stashAsset.token.planksFromAmount(decimals)
+        },
+        balanceToCheckAgainstRecommended = {
+            it.bondAmount?.let(it.stashAsset.token::planksFromAmount)
+        },
+        error = SetupStakingValidationFailure::AmountLessThanMinimum
+    )
 
     maximumNominatorsReached(
         stakingRepository = stakingRepository,
         isAlreadyNominating = SetupStakingPayload::isOnlyChangingValidators,
-        sharedState = sharedState,
+        chainId = { it.stashAsset.token.configuration.chainId },
         errorProducer = { SetupStakingValidationFailure.MaxNominatorsReached }
     )
 }

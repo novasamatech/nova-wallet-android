@@ -4,10 +4,13 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.s
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 interface SingleStakingProperties {
 
-    fun availableBalance(asset: Asset): Balance
+    val stakingType: Chain.Asset.StakingType
+
+    suspend fun availableBalance(asset: Asset): Balance
 
     val recommendation: SingleStakingRecommendation
 
@@ -18,5 +21,5 @@ interface SingleStakingProperties {
 
 interface SingleStakingRecommendation {
 
-    suspend fun recommendedSelection(): StartMultiStakingSelection
+    suspend fun recommendedSelection(stake: Balance): StartMultiStakingSelection
 }

@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.Valida
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.StartMultiStakingSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingRecommendation
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 
@@ -23,7 +24,7 @@ class DirectStakingRecommendation(
         recommendationSettingsProviderFactory.create(scope)
     }
 
-    override suspend fun recommendedSelection(): StartMultiStakingSelection {
+    override suspend fun recommendedSelection(stake: Balance): StartMultiStakingSelection {
         val provider = recommendationSettingsProvider.await()
         val recommendationSettings = provider.defaultSettings()
         val recommendator = recommendator.await()
@@ -33,7 +34,8 @@ class DirectStakingRecommendation(
         return DirectStakingSelection(
             validators = recommendedValidators,
             validatorsLimit = provider.maximumValidatorsPerNominator,
-            stakingOption = stakingOption
+            stakingOption = stakingOption,
+            stake = stake
         )
     }
 }
