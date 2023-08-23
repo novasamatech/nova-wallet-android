@@ -57,7 +57,7 @@ class MinimumStakeValidation<P, E>(
             }
 
             balanceToCheckAgainstRecommended != null && balanceToCheckAgainstRecommended < recommendedMinimum -> {
-                val context = StakingMinimumBondError.Context(hardMinimum, chainAsset, ThresholdType.RECOMMENDED)
+                val context = StakingMinimumBondError.Context(recommendedMinimum, chainAsset, ThresholdType.RECOMMENDED)
 
                 validationWarning(error(context))
             }

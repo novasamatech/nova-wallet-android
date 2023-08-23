@@ -82,8 +82,8 @@ private class DirectStakingProperties(
             stakingRepository = stakingRepository,
             stakingSharedComputation = stakingSharedComputation,
             chainAsset = { stakingOption.asset },
-            balanceToCheckAgainstRequired = { availableBalance(it.asset) },
-            balanceToCheckAgainstRecommended = { availableBalance(it.asset) },
+            balanceToCheckAgainstRequired = { it.selection.stake },
+            balanceToCheckAgainstRecommended = { it.selection.stake },
             error = StartMultiStakingValidationFailure::AmountLessThanMinimum
         )
     }

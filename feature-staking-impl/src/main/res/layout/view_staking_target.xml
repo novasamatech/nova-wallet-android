@@ -59,6 +59,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginVertical="9dp"
+        app:layout_constrainedWidth="true"
+        android:layout_marginEnd="16dp"
         android:layout_marginStart="12dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -80,6 +82,8 @@
             style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:textColor="@color/text_positive"
             tools:text="Recommended" />
 
