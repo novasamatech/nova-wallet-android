@@ -4,12 +4,12 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MultiStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.direct.ParachainStartStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.direct.RelaychainStartStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.nomination.NominationPoolStartStakingInteractor
@@ -28,8 +28,8 @@ class StartStakingInteractorFactory(
     private val stakingEraInteractorFactory: StakingEraInteractorFactory,
     private val parachainNetworkInfoInteractor: ParachainNetworkInfoInteractor,
     private val parachainStakingRewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
-    private val nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
+    private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
     private val chainRegistry: ChainRegistry,
 ) {
 
@@ -91,7 +91,8 @@ class StartStakingInteractorFactory(
         return NominationPoolStartStakingInteractor(
             stakingOption = stakingOption,
             scope = coroutineScope,
-            nominationPoolSharedComputation = nominationPoolSharedComputation
+            nominationPoolSharedComputation = nominationPoolSharedComputation,
+            poolsAvailableBalanceResolver = poolsAvailableBalanceResolver
         )
     }
 }

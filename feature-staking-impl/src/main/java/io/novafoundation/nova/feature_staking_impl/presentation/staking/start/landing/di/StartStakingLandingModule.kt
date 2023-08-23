@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteract
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.StartStakingLandingViewModel
@@ -53,6 +54,7 @@ class StartStakingLandingModule {
         parachainStakingRewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
         nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
         nominationPoolSharedComputation: NominationPoolSharedComputation,
+        poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
         chainRegistry: ChainRegistry
     ): StartStakingInteractorFactory {
         return StartStakingInteractorFactory(
@@ -62,7 +64,7 @@ class StartStakingLandingModule {
             stakingEraInteractorFactory = stakingEraInteractorFactory,
             parachainNetworkInfoInteractor = parachainNetworkInfoInteractor,
             parachainStakingRewardCalculatorFactory = parachainStakingRewardCalculatorFactory,
-            nominationPoolGlobalsRepository = nominationPoolGlobalsRepository,
+            poolsAvailableBalanceResolver = poolsAvailableBalanceResolver,
             nominationPoolSharedComputation = nominationPoolSharedComputation,
             chainRegistry = chainRegistry
         )

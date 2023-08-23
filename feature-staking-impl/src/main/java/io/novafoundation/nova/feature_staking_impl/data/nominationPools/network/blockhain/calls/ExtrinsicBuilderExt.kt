@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.calls
 
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolPoints
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -14,6 +15,17 @@ value class NominationPoolsCalls(val extrinsicBuilder: ExtrinsicBuilder)
 
 val ExtrinsicBuilder.nominationPools: NominationPoolsCalls
     get() = NominationPoolsCalls(this)
+
+fun NominationPoolsCalls.join(amount: Balance, poolId: PoolId) {
+    extrinsicBuilder.call(
+        moduleName = Modules.NOMINATION_POOLS,
+        callName = "join",
+        arguments = mapOf(
+            "amount" to amount,
+            "pool_id" to poolId.value
+        )
+    )
+}
 
 fun NominationPoolsCalls.bondExtra(source: NominationPoolBondExtraSource) {
     extrinsicBuilder.call(

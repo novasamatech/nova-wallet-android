@@ -4,9 +4,8 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.validation.ValidationSystem
-import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
-import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_account_api.domain.validation.hasChainAccount
+import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingMaxNominatorsValidation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationFailure.NoRelayChainAccount
@@ -18,13 +17,12 @@ class WelcomeStakingValidationModule {
     @Provides
     @FeatureScope
     fun provideMaxNominatorsReachedValidation(
-        stakingSharedState: StakingSharedState,
         stakingRepository: StakingRepository
     ) = WelcomeStakingMaxNominatorsValidation(
         stakingRepository = stakingRepository,
         errorProducer = { WelcomeStakingValidationFailure.MaxNominatorsReached },
         isAlreadyNominating = { false },
-        sharedState = stakingSharedState
+        chainId = { it.chain.id }
     )
 
     @Provides

@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingData
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.model.PayoutType
@@ -16,6 +17,7 @@ class NominationPoolStartStakingInteractor(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val stakingOption: StakingOption,
     private val scope: CoroutineScope,
+    private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
 ) : StartStakingInteractor {
 
     override fun observeData(): Flow<StartStakingData> {
@@ -32,7 +34,7 @@ class NominationPoolStartStakingInteractor(
         }
     }
 
-    override fun getAvailableBalance(asset: Asset): BigInteger {
-        return asset.transferableInPlanks
+    override suspend fun getAvailableBalance(asset: Asset): BigInteger {
+        return poolsAvailableBalanceResolver.availableBalanceToStartStaking(asset)
     }
 }

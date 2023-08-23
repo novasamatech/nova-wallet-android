@@ -120,7 +120,14 @@ class ValidationSystem<T, S>(
             }
         }
     }
+
+    fun copyTo(validationSystemBuilder: ValidationSystemBuilder<T, S>) {
+        validationSystemBuilder.validate(validation)
+    }
 }
+
+context (ValidationSystemBuilder<P, E>)
+fun <P, E> ValidationSystem<P, E>.copyIntoCurrent() = copyTo(this@ValidationSystemBuilder)
 
 fun <T, S> ValidationSystem.Companion.from(validations: Collection<Validation<T, S>>): ValidationSystem<T, S> {
     return ValidationSystem(CompositeValidation(validations))

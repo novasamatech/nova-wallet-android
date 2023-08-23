@@ -36,7 +36,7 @@ class RelaychainStartStakingInteractor(
         }
     }
 
-    override fun getAvailableBalance(asset: Asset): BigInteger {
+    override suspend fun getAvailableBalance(asset: Asset): BigInteger {
         return asset.freeInPlanks
     }
 
