@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
+import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 
 // TODO validations
@@ -19,5 +20,12 @@ fun StartMultiStakingValidationSystemBuilder.enoughToPayFee() {
                 fee = payload.fee.decimalAmount
             )
         }
+    )
+}
+
+fun StartMultiStakingValidationSystemBuilder.positiveBond() {
+    positiveAmount(
+        amount = { it.amountOf(it.selection.stake) },
+        error = { StartMultiStakingValidationFailure.NonPositiveAmount }
     )
 }

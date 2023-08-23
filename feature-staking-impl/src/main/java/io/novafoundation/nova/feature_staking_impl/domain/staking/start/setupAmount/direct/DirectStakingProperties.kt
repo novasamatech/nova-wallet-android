@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.v
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationSystemBuilder
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.enoughToPayFee
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.positiveBond
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingProperties
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingPropertiesFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingRecommendation
@@ -66,11 +67,13 @@ private class DirectStakingProperties(
     )
 
     override val validationSystem: StartMultiStakingValidationSystem = ValidationSystem {
+        maximumNominatorsReached()
+
         enoughToPayFee()
 
         enoughForMinimumStake()
 
-        maximumNominatorsReached()
+        positiveBond()
     }
 
     override suspend fun minStake(): Balance {

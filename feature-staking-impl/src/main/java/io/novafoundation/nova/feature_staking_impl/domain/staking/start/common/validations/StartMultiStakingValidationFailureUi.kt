@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.hand
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.formatStakingTypeLabel
 import io.novafoundation.nova.feature_wallet_api.domain.validation.amountIsTooBig
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
+import io.novafoundation.nova.feature_wallet_api.domain.validation.zeroAmount
 
 fun handleStartMultiStakingValidationFailure(error: StartMultiStakingValidationFailure, resourceManager: ResourceManager): TitleAndMessage {
     return when(error) {
@@ -26,5 +27,7 @@ fun handleStartMultiStakingValidationFailure(error: StartMultiStakingValidationF
         }
 
         NotEnoughAvailableToStake -> resourceManager.amountIsTooBig()
+
+        StartMultiStakingValidationFailure.NonPositiveAmount -> resourceManager.zeroAmount()
     }
 }

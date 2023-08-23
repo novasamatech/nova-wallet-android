@@ -22,7 +22,7 @@ fun NominationPoolsCalls.join(amount: Balance, poolId: PoolId) {
         callName = "join",
         arguments = mapOf(
             "amount" to amount,
-            "pool_id" to poolId
+            "pool_id" to poolId.value
         )
     )
 }
