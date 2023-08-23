@@ -6,7 +6,7 @@ sealed class SetupStakingValidationFailure {
 
     object NotEnoughStakeable : SetupStakingValidationFailure()
 
-    class AmountLessThanMinimum(override val context: StakingMinimumBondError.Context): SetupStakingValidationFailure(), StakingMinimumBondError
+    class AmountLessThanMinimum(override val context: StakingMinimumBondError.Context) : SetupStakingValidationFailure(), StakingMinimumBondError
 
     object MaxNominatorsReached : SetupStakingValidationFailure()
 }

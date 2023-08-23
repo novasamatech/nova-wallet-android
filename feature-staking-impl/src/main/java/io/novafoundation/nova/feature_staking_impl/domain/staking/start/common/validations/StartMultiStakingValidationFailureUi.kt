@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnou
 import io.novafoundation.nova.feature_wallet_api.domain.validation.zeroAmount
 
 fun handleStartMultiStakingValidationFailure(error: StartMultiStakingValidationFailure, resourceManager: ResourceManager): TitleAndMessage {
-    return when(error) {
+    return when (error) {
         is AmountLessThanMinimum -> handleStakingMinimumBondError(resourceManager, error)
 
         is NotEnoughToPayFees -> handleNotEnoughFeeError(error, resourceManager)

@@ -34,7 +34,7 @@ class MinimumStakeValidation<P, E>(
     private val stakingSharedComputation: StakingSharedComputation,
     private val chainAsset: (P) -> Chain.Asset,
     private val balanceToCheckAgainstRequired: suspend (P) -> Balance,
-    private val balanceToCheckAgainstRecommended:suspend (P) -> Balance?,
+    private val balanceToCheckAgainstRecommended: suspend (P) -> Balance?,
     private val error: (StakingMinimumBondError.Context) -> E
 ) : Validation<P, E> {
 

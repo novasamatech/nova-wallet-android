@@ -12,7 +12,7 @@ interface NominationPoolsAvailableBalanceResolver {
 
 class RealNominationPoolsAvailableBalanceResolver(
     private val walletConstants: WalletConstants
-): NominationPoolsAvailableBalanceResolver {
+) : NominationPoolsAvailableBalanceResolver {
 
     override suspend fun availableBalanceToStartStaking(asset: Asset): Balance {
         val existentialDeposit = walletConstants.existentialDeposit(asset.token.configuration.chainId)

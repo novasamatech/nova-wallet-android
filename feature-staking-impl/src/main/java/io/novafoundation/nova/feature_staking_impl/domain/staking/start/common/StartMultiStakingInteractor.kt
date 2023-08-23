@@ -17,7 +17,7 @@ interface StartMultiStakingInteractor {
 class RealStartMultiStakingInteractor(
     private val extrinsicService: ExtrinsicService,
     private val accountRepository: AccountRepository,
-): StartMultiStakingInteractor {
+) : StartMultiStakingInteractor {
 
     override suspend fun calculateFee(selection: StartMultiStakingSelection): Fee {
         return extrinsicService.estimateFeeV2(selection.stakingOption.chain) {

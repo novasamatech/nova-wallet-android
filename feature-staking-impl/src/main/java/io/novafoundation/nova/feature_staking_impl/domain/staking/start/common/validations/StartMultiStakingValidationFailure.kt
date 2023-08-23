@@ -13,11 +13,11 @@ sealed class StartMultiStakingValidationFailure {
         override val fee: BigDecimal
     ) : StartMultiStakingValidationFailure(), NotEnoughToPayFeesError
 
-    object NonPositiveAmount: StartMultiStakingValidationFailure()
+    object NonPositiveAmount : StartMultiStakingValidationFailure()
 
     object NotEnoughAvailableToStake : StartMultiStakingValidationFailure()
 
-    class AmountLessThanMinimum(override val context: StakingMinimumBondError.Context): StartMultiStakingValidationFailure(), StakingMinimumBondError
+    class AmountLessThanMinimum(override val context: StakingMinimumBondError.Context) : StartMultiStakingValidationFailure(), StakingMinimumBondError
 
     class MaxNominatorsReached(val stakingType: Chain.Asset.StakingType) : StartMultiStakingValidationFailure()
 }
