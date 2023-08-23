@@ -41,11 +41,14 @@ class Nft(
 
         @Parcelize
         enum class Key: Parcelable {
-            UNIQUES, RMRKV1, RMRKV2
+            UNIQUES, RMRKV1, RMRKV2, NFTS
         }
 
         @Parcelize
         class Uniques(val instanceId: BigInteger, val collectionId: BigInteger) : Type(Key.UNIQUES)
+
+        @Parcelize
+        class Nfts(val instanceId: BigInteger, val collectionId: BigInteger) : Type(Key.NFTS)
 
         @Parcelize
         class Rmrk1(val instanceId: String, val collectionId: String) : Type(Key.RMRKV1)

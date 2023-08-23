@@ -96,7 +96,8 @@ class NftRepositoryImpl(
             val nftProvider = nftProvidersRegistry.get(nftTypeKey)
 
             emitAll(nftProvider.nftDetailsFlow(nftId))
-        }.catch { throw exceptionHandler.transformException(it) }
+        }
+            .catch { throw exceptionHandler.transformException(it) }
     }
 
     override fun subscribeNftOwnerAddress(nftLocal: NftLocal): Flow<String> {
@@ -182,7 +183,7 @@ class NftRepositoryImpl(
     }
 
     companion object {
-        private val supportedSendNftTypes = setOf(Nft.Type.Uniques::class)
+        private val supportedSendNftTypes = setOf(Nft.Type.Uniques::class, Nft.Type.Nfts::class)
         private val pendingSendTransactionsNftLocals = MutableStateFlow(setOf<NftLocal>())
     }
 }

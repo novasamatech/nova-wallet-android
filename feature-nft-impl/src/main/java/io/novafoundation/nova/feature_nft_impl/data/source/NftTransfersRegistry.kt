@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_nft_impl.data.source
 
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_impl.data.network.blockchain.nfts.transfers.NftTransfersValidationSystem
+import io.novafoundation.nova.feature_nft_impl.data.source.transfers.NftsNftTransfer
 import io.novafoundation.nova.feature_nft_impl.data.source.transfers.Rmrk1NftTransfer
 import io.novafoundation.nova.feature_nft_impl.data.source.transfers.Rmrk2NftTransfer
 import io.novafoundation.nova.feature_nft_impl.data.source.transfers.UniquesNftTransfer
@@ -9,6 +10,7 @@ import javax.inject.Inject
 
 class NftTransfersRegistry @Inject constructor(
     private val uniquesNftTransfer: UniquesNftTransfer,
+    private val nftsNftTransfer: NftsNftTransfer,
     private val rmrk1NftTransfer: Rmrk1NftTransfer,
     private val rmrk2NftTransfer: Rmrk2NftTransfer,
 ) {
@@ -18,6 +20,7 @@ class NftTransfersRegistry @Inject constructor(
             Nft.Type.Key.RMRKV1 -> rmrk1NftTransfer
             Nft.Type.Key.RMRKV2 -> rmrk2NftTransfer
             Nft.Type.Key.UNIQUES -> uniquesNftTransfer
+            Nft.Type.Key.NFTS -> nftsNftTransfer
         }
     }
 

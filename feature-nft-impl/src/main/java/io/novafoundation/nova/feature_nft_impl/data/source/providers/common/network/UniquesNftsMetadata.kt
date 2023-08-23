@@ -1,8 +1,8 @@
-package io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.network
+package io.novafoundation.nova.feature_nft_impl.data.source.providers.common.network
 
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.common.models.MetadataAttribute
 
-data class UniquesMetadata(
+data class UniquesNftsMetadata(
     val name: String?,
     val image: String?,
     val description: String?,
@@ -10,7 +10,7 @@ data class UniquesMetadata(
     val attributes: List<MetadataAttribute>?
 ) {
     companion object {
-        val Default = UniquesMetadata(
+        val Default = UniquesNftsMetadata(
             name = null,
             image = null,
             description = "",
