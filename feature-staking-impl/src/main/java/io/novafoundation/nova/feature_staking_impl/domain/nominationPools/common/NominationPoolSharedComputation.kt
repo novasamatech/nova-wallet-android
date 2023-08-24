@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
@@ -12,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.UnbondingPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.bondedAccountOf
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.deriveAllBondedPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolUnbondRepository
@@ -36,7 +38,7 @@ class NominationPoolSharedComputation(
     private val nominationPoolUnbondRepository: NominationPoolUnbondRepository,
     private val nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
     private val poolAccountDerivation: PoolAccountDerivation,
-    private val nominationPoolRewardCalculatorFactory: NominationPoolRewardCalculatorFactory,
+    private val nominationPoolRewardCalculatorFactory: dagger.Lazy<NominationPoolRewardCalculatorFactory>,
 ) {
 
     fun currentPoolMemberFlow(chain: Chain, scope: CoroutineScope): Flow<PoolMember?> {
@@ -106,7 +108,7 @@ class NominationPoolSharedComputation(
         val key = "NOMINATION_POOLS_REWARD_CALCULATOR:${stakingOption.chain.id}"
 
         return computationalCache.useCache(key, scope) {
-            nominationPoolRewardCalculatorFactory.create(stakingOption, scope)
+            nominationPoolRewardCalculatorFactory.get().create(stakingOption, scope)
         }
     }
 
@@ -118,6 +120,32 @@ class NominationPoolSharedComputation(
 
         return computationalCache.useCache(key, scope) {
             nominationPoolGlobalsRepository.minJoinBond(chainId)
+        }
+    }
+
+    suspend fun allBondedPoolAccounts(
+        chainId: ChainId,
+        scope: CoroutineScope
+    ): Map<PoolId, AccountIdKey> {
+        val key = "NOMINATION_POOLS_STASH_IDS"
+
+        return computationalCache.useCache(key, scope) {
+            val lastPoolId = nominationPoolGlobalsRepository.lastPoolId(chainId)
+
+            poolAccountDerivation.deriveAllBondedPools(lastPoolId, chainId)
+        }
+    }
+
+    suspend fun allBondedPools(
+        chainId: ChainId,
+        scope: CoroutineScope
+    ): Map<PoolId, BondedPool> {
+        val key = "NOMINATION_POOLS_ALL_BONDED_POOLS"
+
+        return computationalCache.useCache(key, scope) {
+            val allBondedPoolAccounts = allBondedPoolAccounts(chainId, scope)
+
+            nominationPoolStateRepository.getBondedPools(allBondedPoolAccounts.keys, chainId)
         }
     }
 }

@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.model.MultiStakingType
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
 interface StartMultiStakingSelection {
@@ -14,7 +13,9 @@ interface StartMultiStakingSelection {
 
     val apy: Perbill
 
-    fun ExtrinsicBuilder.startStaking(amount: Balance, chain: Chain, metaAccount: MetaAccount)
+    val stake: Balance
+
+    fun ExtrinsicBuilder.startStaking(metaAccount: MetaAccount)
 }
 
 sealed class SelectionTypeSource {

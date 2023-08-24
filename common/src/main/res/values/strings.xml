@@ -11,6 +11,9 @@
     <string name="setup_staking_type_pool_staking">Pool staking</string>
     <string name="setup_staking_type_direct_staking">Direct staking</string>
 
+    <string name="start_staking_max_nominators_reached_title">%s is currently unavailable</string>
+    <string name="start_staking_max_nominators_reached_message">The maximum number of nominators has been reached. Try again later</string>
+
     <string name="start_staking_selection_validators_subtitle">Validators: %d (max %d)</string>
     <string name="start_staking_editing_selection_validators_subtitle">Selected: %d (max %d)</string>
     <string name="common_recommended">Recommended</string>

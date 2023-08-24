@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.selectionType
 
+import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.common.validation.copyIntoCurrent
+import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.RecommendableMultiStakingSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.SelectionTypeSource
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.StartMultiStakingSelection
@@ -14,8 +17,15 @@ class AutomaticMultiStakingSelectionType(
     private val selectionStore: StartMultiStakingSelectionStore,
 ) : MultiStakingSelectionType {
 
-    override suspend fun validationSystem(): StartMultiStakingValidationSystem {
-        TODO("use selected candidate validation system + apply balance gap validation")
+    override suspend fun validationSystem(selection: StartMultiStakingSelection): StartMultiStakingValidationSystem {
+        val candidateValidationSystem = candidates.first { it.stakingType == selection.stakingOption.stakingType }
+            .validationSystem
+
+        return ValidationSystem {
+            candidateValidationSystem.copyIntoCurrent()
+
+            // TODO apply balance gap validation
+        }
     }
 
     override suspend fun availableBalance(asset: Asset): Balance {
@@ -35,7 +45,7 @@ class AutomaticMultiStakingSelectionType(
     private suspend fun selectionFor(stake: Balance): StartMultiStakingSelection {
         val candidate = candidates.firstAllowingToStake(stake) ?: candidates.findWithMinimumStake()
 
-        return candidate.recommendation.recommendedSelection()
+        return candidate.recommendation.recommendedSelection(stake)
     }
 
     private suspend fun List<SingleStakingProperties>.firstAllowingToStake(stake: Balance): SingleStakingProperties? {

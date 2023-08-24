@@ -7,10 +7,14 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.RealNominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.RealStartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.MultiSingleStakingPropertiesFactory
@@ -21,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmo
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.RealMultiStakingSelectionFormatter
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -54,17 +59,27 @@ class StartMultiStakingModule {
 
     @Provides
     @FeatureScope
+    fun provideNominationPoolsAvailableBalanceResolver(
+        walletConstants: WalletConstants
+    ): NominationPoolsAvailableBalanceResolver {
+        return RealNominationPoolsAvailableBalanceResolver(walletConstants)
+    }
+
+    @Provides
+    @FeatureScope
     @IntoMap
     @StakingTypeGroupKey(StakingTypeGroup.RELAYCHAIN)
     fun provideDirectStakingPropertiesFactory(
         validatorRecommendatorFactory: ValidatorRecommendatorFactory,
         recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
         stakingSharedComputation: StakingSharedComputation,
+        stakingRepository: StakingRepository
     ): SingleStakingPropertiesFactory {
         return DirectStakingPropertiesFactory(
             validatorRecommendatorFactory = validatorRecommendatorFactory,
             recommendationSettingsProviderFactory = recommendationSettingsProviderFactory,
-            stakingSharedComputation = stakingSharedComputation
+            stakingSharedComputation = stakingSharedComputation,
+            stakingRepository = stakingRepository
         )
     }
 
@@ -73,10 +88,14 @@ class StartMultiStakingModule {
     @IntoMap
     @StakingTypeGroupKey(StakingTypeGroup.NOMINATION_POOL)
     fun providePoolsStakingPropertiesFactory(
-        nominationPoolSharedComputation: NominationPoolSharedComputation
+        nominationPoolSharedComputation: NominationPoolSharedComputation,
+        nominationPoolRecommendatorFactory: NominationPoolRecommendatorFactory,
+        availableBalanceResolver: NominationPoolsAvailableBalanceResolver
     ): SingleStakingPropertiesFactory {
         return NominationPoolStakingPropertiesFactory(
             nominationPoolSharedComputation = nominationPoolSharedComputation,
+            nominationPoolRecommendatorFactory = nominationPoolRecommendatorFactory,
+            poolsAvailableBalanceResolver = availableBalanceResolver
         )
     }
 
