@@ -1,0 +1,43 @@
+name: PR Workflow
+
+on:
+  pull_request:
+    branches:
+      - 'develop' # master
+
+jobs:
+  checkRef:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check if "rc" is present in github.ref
+        id: check_ref
+        run: |
+          echo ${{ github.head_ref || github.ref_name }}
+          if [[ "${{ github.head_ref || github.ref_name }}" == *"/rc/"* ]]; then
+            echo "ref_contains_rc=1" >> $GITHUB_OUTPUT
+          else
+            echo "ref_contains_rc=0" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Output check result
+        run: |
+          echo "Output: ${{ steps.check_ref.outputs.ref_contains_rc }}"
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if comment contains "Release notes"
+        if: github.ref == 'refs/heads/master'
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const comment = github.event.pull_request.comments.find(c => c.body.includes('Release notes'));
+            if (!comment) {
+              console.log('No comment found with "Release notes"');
+              throw new Error('Missing release notes');
+            } else {
+              console.log('Comment found with "Release notes"');
+            }
