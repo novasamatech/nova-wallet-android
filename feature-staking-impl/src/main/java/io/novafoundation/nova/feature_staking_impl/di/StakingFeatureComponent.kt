@@ -62,6 +62,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.d
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.di.ConfirmRewardDestinationComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.select.di.SelectRewardDestinationComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.di.SetupStakingTypeComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.di.ConfirmMultiStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.di.StartStakingLandingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.di.SetupAmountMultiStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.di.ConfirmUnbondComponent
@@ -107,6 +108,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun setupAmountMultiStakingComponentFactory(): SetupAmountMultiStakingComponent.Factory
 
     fun setupStakingType(): SetupStakingTypeComponent.Factory
+
+    fun confirmMultiStakingComponentFactory(): ConfirmMultiStakingComponent.Factory
 
     // relaychain staking
 

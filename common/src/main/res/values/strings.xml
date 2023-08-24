@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="staking_staking_type">Staking type</string>
+
     <string name="start_staking_inactive_pool_message">The pool you have selected is inactive due to no validators selected or its stake is less than the minimum.\nAre you sure you want to proceed with the selected Pool?</string>
 
     <string name="start_staking_cant_stake_amount">You can\'t stake the specified amount</string>

@@ -4,6 +4,8 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.ConfirmMultiStakingFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.ConfirmMultiStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.StartStakingLandingFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.SetupAmountMultiStakingFragment
@@ -25,5 +27,14 @@ class StartMultiStakingNavigator(
 
     override fun openSetupStakingType() {
         performNavigation(R.id.action_setupAmountMultiStakingFragment_to_setupStakingType)
+    }
+
+    override fun openConfirm(payload: ConfirmMultiStakingPayload) = performNavigation(
+        actionId = R.id.action_setupAmountMultiStakingFragment_to_confirmMultiStakingFragment,
+        args = ConfirmMultiStakingFragment.getBundle(payload)
+    )
+
+    override fun openSelectedValidators() {
+        performNavigation(R.id.action_confirmMultiStakingFragment_to_confirmNominationsFragment)
     }
 }
