@@ -39,6 +39,14 @@ val NominationPoolsApi.poolMembers: QueryableStorageEntry1<AccountId, PoolMember
     get() = storage1("PoolMembers", binding = { decoded, accountId -> bindPoolMember(decoded, accountId) })
 
 context(StorageQueryContext)
+val NominationPoolsApi.maxPoolMembers: QueryableStorageEntry0<BigInteger>
+    get() = storage0("MaxPoolMembers", binding = ::bindNumber)
+
+context(StorageQueryContext)
+val NominationPoolsApi.counterForPoolMembers: QueryableStorageEntry0<BigInteger>
+    get() = storage0("CounterForPoolMembers", binding = ::bindNumber)
+
+context(StorageQueryContext)
 val NominationPoolsApi.lastPoolId: QueryableStorageEntry0<BigInteger>
     get() = storage0("LastPoolId", binding = ::bindNumber)
 

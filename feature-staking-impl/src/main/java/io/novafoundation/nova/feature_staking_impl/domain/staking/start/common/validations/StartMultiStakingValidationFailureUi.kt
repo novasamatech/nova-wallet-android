@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure.AmountLessThanMinimum
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure.AvailableBalanceGap
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure.InactivePool
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure.MaxNominatorsReached
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure.NonPositiveAmount
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure.NotEnoughAvailableToStake
@@ -48,5 +49,8 @@ fun handleStartMultiStakingValidationFailure(error: StartMultiStakingValidationF
                     lockDisplay
                 )
         }
+
+        InactivePool -> resourceManager.getString(R.string.staking_parachain_wont_receive_rewards_title) to
+            resourceManager.getString(R.string.start_staking_inactive_pool_message)
     }
 }

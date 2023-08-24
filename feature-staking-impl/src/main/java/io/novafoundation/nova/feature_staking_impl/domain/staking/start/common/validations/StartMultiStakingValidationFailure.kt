@@ -28,4 +28,6 @@ sealed class StartMultiStakingValidationFailure {
         val biggestLockId: String,
         val chainAsset: Chain.Asset,
     ) : StartMultiStakingValidationFailure()
+
+    object InactivePool : StartMultiStakingValidationFailure()
 }

@@ -19,7 +19,11 @@ class AvailableBalanceGapValidation(
         val amount = value.selection.stake
         val stakingOption = value.selection.stakingOption
 
-        val availableBalancesWithMinStakes = candidates.map { it.availableBalance(value.asset) to it.minStake() }
+        val availableBalancesWithMinStakes = candidates.map {
+            val availableBalance = it.availableBalance(value.asset) - value.fee.fee.amount
+
+            availableBalance to it.minStake()
+        }
 
         // check against global maximum
         val maxAvailable = availableBalancesWithMinStakes.maxOf { (availableBalance) -> availableBalance }
