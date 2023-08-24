@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingProperties
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 
-
 class AvailableBalanceGapValidation(
     private val candidates: List<SingleStakingProperties>,
     private val locksRepository: BalanceLocksRepository,
@@ -42,12 +41,14 @@ class AvailableBalanceGapValidation(
             // we're sure such item exists due to global maximum check before
             val (_, matchingAlternativeMinStake) = availableBalancesWithMinStakes.first { (available, _) -> amount <= available }
 
-            return validationError(StartMultiStakingValidationFailure.AvailableBalanceGap(
-                currentMaxAvailable = selectedCandidateAvailableBalance,
-                alternativeMinStake = matchingAlternativeMinStake,
-                chainAsset = stakingOption.asset,
-                biggestLockId = biggestLock.id
-            ))
+            return validationError(
+                StartMultiStakingValidationFailure.AvailableBalanceGap(
+                    currentMaxAvailable = selectedCandidateAvailableBalance,
+                    alternativeMinStake = matchingAlternativeMinStake,
+                    chainAsset = stakingOption.asset,
+                    biggestLockId = biggestLock.id
+                )
+            )
         }
 
         return valid()

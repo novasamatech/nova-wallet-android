@@ -35,12 +35,14 @@ abstract class LockDao {
     @Query("SELECT * FROM locks WHERE metaId = :metaId AND chainId = :chainId AND assetId = :chainAssetId")
     abstract fun observeBalanceLocks(metaId: Long, chainId: String, chainAssetId: Int): Flow<List<BalanceLockLocal>>
 
-    @Query("""
+    @Query(
+        """
         SELECT * FROM locks
         WHERE metaId = :metaId AND chainId = :chainId AND assetId = :chainAssetId
         ORDER BY amount DESC
         LIMIT 1
-    """)
+    """
+    )
     abstract suspend fun getBiggestBalanceLock(metaId: Long, chainId: String, chainAssetId: Int): BalanceLockLocal?
 
     @Query("SELECT * FROM locks WHERE metaId = :metaId AND chainId = :chainId AND assetId = :chainAssetId AND type = :lockId")
