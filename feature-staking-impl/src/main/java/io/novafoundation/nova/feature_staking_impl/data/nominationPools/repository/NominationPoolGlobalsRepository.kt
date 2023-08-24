@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.datasour
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.counterForPoolMembers
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.lastPoolId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.maxPoolMembers
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.maxPoolMembersPerPool
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.minJoinBond
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.nominationPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
@@ -32,6 +33,8 @@ interface NominationPoolGlobalsRepository {
     suspend fun minJoinBond(chainId: ChainId): Balance
 
     suspend fun maxPoolMembers(chainId: ChainId): Int?
+
+    suspend fun maxPoolMembersPerPool(chainId: ChainId): Int?
 
     suspend fun counterForPoolMembers(chainId: ChainId): Int
 }
@@ -83,6 +86,13 @@ class RealNominationPoolGlobalsRepository(
     override suspend fun maxPoolMembers(chainId: ChainId): Int? {
         return localStorageDataSource.query(chainId) {
             metadata.nominationPools.maxPoolMembers.query()
+                ?.toInt()
+        }
+    }
+
+    override suspend fun maxPoolMembersPerPool(chainId: ChainId): Int? {
+        return localStorageDataSource.query(chainId) {
+            metadata.nominationPools.maxPoolMembersPerPool.query()
                 ?.toInt()
         }
     }

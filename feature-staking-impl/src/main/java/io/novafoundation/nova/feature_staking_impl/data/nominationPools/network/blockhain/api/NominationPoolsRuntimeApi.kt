@@ -43,6 +43,10 @@ val NominationPoolsApi.maxPoolMembers: QueryableStorageEntry0<BigInteger>
     get() = storage0("MaxPoolMembers", binding = ::bindNumber)
 
 context(StorageQueryContext)
+val NominationPoolsApi.maxPoolMembersPerPool: QueryableStorageEntry0<BigInteger>
+    get() = storage0("MaxPoolMembersPerPool", binding = ::bindNumber)
+
+context(StorageQueryContext)
 val NominationPoolsApi.counterForPoolMembers: QueryableStorageEntry0<BigInteger>
     get() = storage0("CounterForPoolMembers", binding = ::bindNumber)
 
