@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/setupStakingType"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.SetupStakingTypeFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypeFragment"
         android:label="SetupStakingTypeFragment"
         tools:layout="@layout/fragment_setup_staking_type">
 

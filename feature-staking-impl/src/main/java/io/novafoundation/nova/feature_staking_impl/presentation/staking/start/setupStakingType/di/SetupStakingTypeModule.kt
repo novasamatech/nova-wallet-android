@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.di
+package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -9,7 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.SetupStakingTypeViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypeViewModel
 
 @Module(includes = [ViewModelModule::class])
 class SetupStakingTypeModule {

@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store
 
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.RecommendableMultiStakingSelection
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.model.MultiStakingType
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.selectionType.MultiStakingSelectionType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 

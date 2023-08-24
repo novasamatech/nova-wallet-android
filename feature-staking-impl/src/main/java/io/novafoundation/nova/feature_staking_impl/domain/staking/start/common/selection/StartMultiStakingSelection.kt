@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.
 import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.model.MultiStakingType
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
@@ -23,7 +24,7 @@ sealed class SelectionTypeSource {
     data class Manual(val contentRecommended: Boolean) : SelectionTypeSource()
 }
 
-class RecommendableMultiStakingSelection(
+data class RecommendableMultiStakingSelection(
     val source: SelectionTypeSource,
     val selection: StartMultiStakingSelection,
 )

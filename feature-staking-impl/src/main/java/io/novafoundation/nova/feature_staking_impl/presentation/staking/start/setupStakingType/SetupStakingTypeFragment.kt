@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType
+package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,8 +10,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.adapter.EditableStakingTypeRVItem
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.adapter.SetupStakingTypeAdapter
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.SetupStakingTypeAdapter
 import kotlinx.android.synthetic.main.fragment_setup_staking_type.setupStakingTypeList
 import kotlinx.android.synthetic.main.fragment_setup_staking_type.setupStakingTypeToolbar
 
@@ -29,6 +28,8 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), Setu
 
     override fun initViews() {
         setupStakingTypeToolbar.applyStatusBarInsets()
+        setupStakingTypeToolbar.setRightActionClickListener { viewModel.donePressed() }
+        setupStakingTypeToolbar.setHomeButtonListener { viewModel.backPressed() }
         setupStakingTypeList.adapter = adapter
     }
 
@@ -43,7 +44,6 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), Setu
     }
 
     override fun subscribe(viewModel: SetupStakingTypeViewModel) {
-
         viewModel.availableToRewriteData.observe { setupStakingTypeToolbar.setRightActionEnabled(it) }
 
         viewModel.stakingTypeModels.observe {
@@ -51,7 +51,7 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), Setu
         }
     }
 
-    override fun stakingTypeClicked(item: EditableStakingTypeRVItem) {
-        viewModel.selectStakingType(item)
+    override fun stakingTypeClicked(position: Int) {
+        viewModel.selectStakingType(position)
     }
 }

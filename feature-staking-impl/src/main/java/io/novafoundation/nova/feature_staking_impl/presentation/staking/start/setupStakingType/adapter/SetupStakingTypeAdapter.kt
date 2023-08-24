@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.adapter
+package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter
 
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +18,7 @@ class SetupStakingTypeAdapter(
 
     interface ItemAssetHandler {
 
-        fun stakingTypeClicked(item: EditableStakingTypeRVItem)
+        fun stakingTypeClicked(position: Int)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditableStakingTypeViewHolder {
@@ -64,10 +64,6 @@ class EditableStakingTypeViewHolder(
     override val containerView: View
 ) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
-    init {
-
-    }
-
     fun bind(item: EditableStakingTypeRVItem) = with(containerView) {
         editableStakingType.setTitle(item.title)
         editableStakingType.setConditions(item.conditions)
@@ -77,7 +73,10 @@ class EditableStakingTypeViewHolder(
         editableStakingType.setBackgroundRes(item.imageRes)
         
         containerView.editableStakingType.setOnClickListener {
-            clickHandler.stakingTypeClicked(item)
+            val position = bindingAdapterPosition
+            if (position == RecyclerView.NO_POSITION) return@setOnClickListener
+
+            clickHandler.stakingTypeClicked(bindingAdapterPosition)
         }
     }
 

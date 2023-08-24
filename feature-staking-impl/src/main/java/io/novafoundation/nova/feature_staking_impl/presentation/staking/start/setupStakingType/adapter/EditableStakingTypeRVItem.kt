@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.adapter
+package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter
 
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.feature_staking_impl.presentation.view.stakingTarget.StakingTargetModel
@@ -9,12 +9,8 @@ class EditableStakingTypeRVItem(
     val title: String,
     @DrawableRes val imageRes: Int,
     val conditions: List<String>,
-    val stakingTarget: StakingTarget?,
-    val type: Type
+    val stakingTarget: StakingTarget?
 ) {
-    enum class Type {
-        DIRECT, POOL
-    }
 
     interface StakingTarget {
 

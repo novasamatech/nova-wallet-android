@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.bond
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.nominate
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.StartMultiStakingSelection
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.model.MultiStakingType
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.multiAddressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -34,5 +35,22 @@ class DirectStakingSelection(
 
         bond(controllerAddress, amount, RewardDestination.Restake)
         nominate(targets)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is DirectStakingSelection) return false
+
+        val otherAddresses = other.validators.map { it.address }.toSet()
+        val thisAddresses = validators.map { it.address }.toSet()
+        return thisAddresses == otherAddresses
+            && validatorsLimit == other.validatorsLimit
+    }
+
+    override fun hashCode(): Int {
+        var result = validators.map { it.address }
+            .hashCode()
+        result = 31 * result + validatorsLimit
+        return result
     }
 }

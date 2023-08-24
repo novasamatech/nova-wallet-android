@@ -12,6 +12,7 @@
     <string name="setup_staking_type_direct_staking">Direct staking</string>
 
     <string name="start_staking_selection_validators_subtitle">Validators: %d (max %d)</string>
+    <string name="start_staking_editing_selection_validators_subtitle">Selected: %d (max %d)</string>
     <string name="common_recommended">Recommended</string>
 
     <string name="staking_type_title">Staking Type</string>
@@ -23,7 +24,7 @@
     <string name="common_refresh_fee">Refresh fee</string>
 
     <string name="asset_add_evm_token_already_exist_title">This token already exists</string>
-<!--    <string name="asset_add_evm_token_already_exist_title">This token already exist</string>-->
+    <!--    <string name="asset_add_evm_token_already_exist_title">This token already exist</string>-->
     <string name="asset_add_evm_token_already_exist_modifiable_message">The entered contract address is present in Nova as a %s token. Are you sure you want to modify it?</string>
 
     <string name="nomination_pool_claim_rewards">Claim rewards</string>

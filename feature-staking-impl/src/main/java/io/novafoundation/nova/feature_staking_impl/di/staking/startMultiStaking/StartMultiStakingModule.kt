@@ -49,7 +49,7 @@ class StartMultiStakingModule {
     fun provideStartMultiStakingSelectionStoreProvider(
         computationalCache: ComputationalCache
     ): StartMultiStakingSelectionStoreProvider {
-        return RealStartMultiStakingSelectionStoreProvider(computationalCache)
+        return RealStartMultiStakingSelectionStoreProvider(computationalCache, "MultiStakingSelection")
     }
 
     @Provides

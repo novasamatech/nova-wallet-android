@@ -4,7 +4,8 @@ import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.model.PayoutType
+import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.model.StartStakingEraInfo
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -51,7 +52,7 @@ class RealCompoundStartStakingInteractor(
     private val chainAsset: Chain.Asset,
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
-    private val interactors: List<StartStakingInteractor>,
+    private val interactors: List<StakingTypeDetailsInteractor>,
     private val stakingEraInteractor: StakingEraInteractor,
 ) : CompoundStartStakingInteractor {
 
@@ -88,33 +89,33 @@ class RealCompoundStartStakingInteractor(
             .flatMapLatest { metaAccount -> walletRepository.assetFlow(metaAccount.id, chainAsset) }
     }
 
-    private fun getParticipationInGovernance(startStakingData: List<StartStakingData>): ParticipationInGovernance {
-        val participationInGovernanceData = startStakingData.filter { it.participationInGovernance }
+    private fun getParticipationInGovernance(stakingTypeDetails: List<StakingTypeDetails>): ParticipationInGovernance {
+        val participationInGovernanceData = stakingTypeDetails.filter { it.participationInGovernance }
 
         return when {
             participationInGovernanceData.isNotEmpty() -> {
                 val minAmount = participationInGovernanceData.minOf { it.minStake }
-                val isParticipationInGovernanceHasSmallestMinStake = startStakingData.all { it.minStake >= minAmount }
+                val isParticipationInGovernanceHasSmallestMinStake = stakingTypeDetails.all { it.minStake >= minAmount }
                 ParticipationInGovernance.Participate(minAmount, isParticipationInGovernanceHasSmallestMinStake)
             }
             else -> ParticipationInGovernance.NotParticipate
         }
     }
 
-    private fun getPayouts(startStakingData: List<StartStakingData>): Payouts {
-        val automaticPayoutMinAmount = startStakingData.filter { it.payoutType is PayoutType.Automatic }
+    private fun getPayouts(stakingTypeDetails: List<StakingTypeDetails>): Payouts {
+        val automaticPayoutMinAmount = stakingTypeDetails.filter { it.payoutType is PayoutType.Automatically }
             .minOfOrNull { it.minStake }
 
         return Payouts(
-            payoutTypes = startStakingData.map { it.payoutType }.distinct(),
+            payoutTypes = stakingTypeDetails.map { it.payoutType }.distinct(),
             automaticPayoutMinAmount = automaticPayoutMinAmount,
-            isAutomaticPayoutHasSmallestMinStake = isAutomaticPayoutHasSmallestMinStake(startStakingData, automaticPayoutMinAmount)
+            isAutomaticPayoutHasSmallestMinStake = isAutomaticPayoutHasSmallestMinStake(stakingTypeDetails, automaticPayoutMinAmount)
         )
     }
 
-    private fun isAutomaticPayoutHasSmallestMinStake(startStakingData: List<StartStakingData>, automaticPayoutMinAmount: BigInteger?): Boolean {
+    private fun isAutomaticPayoutHasSmallestMinStake(stakingTypeDetails: List<StakingTypeDetails>, automaticPayoutMinAmount: BigInteger?): Boolean {
         if (automaticPayoutMinAmount == null) return false
 
-        return startStakingData.all { it.minStake >= automaticPayoutMinAmount }
+        return stakingTypeDetails.all { it.minStake >= automaticPayoutMinAmount }
     }
 }

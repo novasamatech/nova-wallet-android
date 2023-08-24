@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.adapter.EditableStakingTypeRVItem
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem
 import kotlinx.android.synthetic.main.view_staking_type.view.stakingTypeBackground
 import kotlinx.android.synthetic.main.view_staking_type.view.stakingTypeConditions
 import kotlinx.android.synthetic.main.view_staking_type.view.stakingTypeRadioButton
