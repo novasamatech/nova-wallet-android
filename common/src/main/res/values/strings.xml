@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="start_staking_cant_stake_amount">You can\'t stake the specified amount</string>
+    <string name="start_staking_available_balance_gap_message">You have locked tokens on your balance due to %s. In order to continue you should enter less than %s or more than %s. To stake another amount you should remove your %s locks.</string>
+
     <string name="start_staking_max_nominators_reached_title">%s is currently unavailable</string>
     <string name="start_staking_max_nominators_reached_message">The maximum number of nominators has been reached. Try again later</string>
 

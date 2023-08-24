@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmo
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.RealMultiStakingSelectionFormatter
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -113,11 +114,13 @@ class StartMultiStakingModule {
         selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
         singleStakingPropertiesFactory: SingleStakingPropertiesFactory,
         chainRegistry: ChainRegistry,
+        locksRepository: BalanceLocksRepository
     ): MultiStakingSelectionTypeProviderFactory {
         return MultiStakingSelectionTypeProviderFactory(
             selectionStoreProvider = selectionStoreProvider,
             singleStakingPropertiesFactory = singleStakingPropertiesFactory,
-            chainRegistry = chainRegistry
+            chainRegistry = chainRegistry,
+            locksRepository = locksRepository
         )
     }
 }
