@@ -16,9 +16,9 @@ jobs:
         run: |
           echo ${{ github.head_ref || github.ref_name }}
           if [[ "${{ github.head_ref || github.ref_name }}" == *"/rc/"* ]]; then
-            echo "::set-output name=ref_contains_rc::1"
+            echo "ref_contains_rc=1" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=ref_contains_rc::0"
+            echo "ref_contains_rc=0" >> $GITHUB_OUTPUT
           fi
       
       - name: Output check result
