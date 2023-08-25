@@ -20,7 +20,7 @@ class DirectConfirmMultiStakingType(
     private val setupStakingSharedState: SetupStakingSharedState,
     private val resourceManager: ResourceManager,
     private val parentContext: ConfirmMultiStakingTypeFactory.Context,
-): ConfirmMultiStakingType, CoroutineScope by parentContext.scope {
+) : ConfirmMultiStakingType, CoroutineScope by parentContext.scope {
 
     init {
         clearStateOnCompletion()

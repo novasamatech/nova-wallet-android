@@ -89,7 +89,6 @@ class ConfirmMultiStakingViewModel(
     }
         .shareInBackground()
 
-
     val amountModelFlow = combine(currentSelectionFlow, assetFlow) { currentSelection, asset ->
         mapAmountToAmountModel(currentSelection.selection.stake, asset)
     }

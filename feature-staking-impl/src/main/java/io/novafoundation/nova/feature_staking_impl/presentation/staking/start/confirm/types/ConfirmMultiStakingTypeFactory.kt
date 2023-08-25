@@ -28,13 +28,13 @@ class RealConfirmMultiStakingTypeFactory(
     private val setupStakingSharedState: SetupStakingSharedState,
     private val resourceManager: ResourceManager,
     private val poolDisplayFormatter: PoolDisplayFormatter,
-): ConfirmMultiStakingTypeFactory {
+) : ConfirmMultiStakingTypeFactory {
 
     override suspend fun constructConfirmMultiStakingType(
         selection: StartMultiStakingSelection,
         parentContext: ConfirmMultiStakingTypeFactory.Context
     ): ConfirmMultiStakingType {
-        return when(selection) {
+        return when (selection) {
             is DirectStakingSelection -> createDirect(selection, parentContext)
             is NominationPoolSelection -> createPool(selection, parentContext)
             else -> error("Unknown staking type")

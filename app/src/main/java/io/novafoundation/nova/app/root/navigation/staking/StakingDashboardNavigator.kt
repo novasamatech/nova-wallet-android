@@ -1,16 +1,14 @@
 package io.novafoundation.nova.app.root.navigation.staking
 
-import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
-import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 
 class StakingDashboardNavigator(
     navigationHolder: NavigationHolder,
-): BaseNavigator(navigationHolder), StakingDashboardRouter {
+) : BaseNavigator(navigationHolder), StakingDashboardRouter {
 
     private var stakingTabNavController: NavController? = null
     private var pendingAction: Int? = null
