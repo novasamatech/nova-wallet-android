@@ -5,6 +5,10 @@
     app:startDestination="@+id/stakingDashboardFragment"
     android:id="@+id/staking_dashboard_graph">
 
+    <action
+        android:id="@+id/return_to_staking_dashboard"
+        app:popUpTo="@+id/stakingDashboardFragment" />
+
     <fragment
         android:id="@+id/stakingDashboardFragment"
         tools:layout="@layout/fragment_staking_dashboard"

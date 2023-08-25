@@ -6,16 +6,22 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.components
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StartMultiStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.currentSelectionFlow
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.handleStartMultiStakingValidationFailure
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.selectionType.MultiStakingSelectionTypeProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.toStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.types.ConfirmMultiStakingTypeFactory
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -37,9 +43,10 @@ class ConfirmMultiStakingViewModel(
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
     private val externalActions: ExternalActions.Presentation,
-    private val payload: ConfirmMultiStakingPayload,
-    private val selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
     private val confirmMultiStakingTypeFactory: ConfirmMultiStakingTypeFactory,
+    payload: ConfirmMultiStakingPayload,
+    selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
+    selectionTypeProviderFactory: MultiStakingSelectionTypeProviderFactory,
     assetUseCase: ArbitraryAssetUseCase,
     walletUiUseCase: WalletUiUseCase,
     selectedAccountUseCase: SelectedAccountUseCase,
@@ -67,6 +74,10 @@ class ConfirmMultiStakingViewModel(
             parentContext = stakingTypeContext
         )
     }.shareInBackground()
+
+    private val multiStakingSelectionTypeFlow = selectionTypeProviderFactory.create(viewModelScope, payload.availableStakingOptions.toStakingOptionIds())
+        .multiStakingSelectionTypeFlow()
+        .shareInBackground()
 
     val stakingTypeModel = confirmMultiStakingTypeFlow.flatMapLatest { it.stakingTypeModel }
         .shareInBackground()
@@ -117,38 +128,37 @@ class ConfirmMultiStakingViewModel(
     }
 
     private fun maybeGoToNext() = launch {
-//        val payload = NominationPoolsBondMoreValidationPayload(
-//            fee = payload.fee,
-//            amount = payload.amount,
-//            poolMember = poolMember.first(),
-//            asset = assetFlow.first()
-//        )
-//
-//        validationExecutor.requireValid(
-//            validationSystem = validationSystem,
-//            payload = payload,
-//            validationFailureTransformer = { nominationPoolsBondMoreValidationFailure(it, resourceManager) },
-//            progressConsumer = _showNextProgress.progressConsumer(),
-//            block = ::sendTransaction
-//        )
+        val selection = currentSelectionFlow.first().selection
+        val validationSystem = multiStakingSelectionTypeFlow.first().validationSystem(selection)
+
+        val payload = StartMultiStakingValidationPayload(
+            selection = selection,
+            asset = assetFlow.first(),
+            fee = decimalFee
+        )
+
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformer = { handleStartMultiStakingValidationFailure(it, resourceManager) },
+            progressConsumer = _showNextProgress.progressConsumer(),
+            block = ::sendTransaction
+        )
     }
 
-//    private fun sendTransaction(validationPayload: NominationPoolsBondMoreValidationPayload) = launch {
-//        val token = validationPayload.asset.token
-//        val amountInPlanks = token.planksFromAmount(payload.amount)
-//
-//        interactor.bondMore(amountInPlanks)
-//            .onSuccess {
-//                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
-//
-//                finishFlow()
-//            }
-//            .onFailure(::showError)
-//
-//        _showNextProgress.value = false
-//    }
+    private fun sendTransaction(validationPayload: StartMultiStakingValidationPayload) = launch {
+        interactor.startStaking(validationPayload.selection)
+            .onSuccess {
+                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-//    private fun finishFlow() {
-//        router.returnToStakingMain()
-//    }
+                finishFlow()
+            }
+            .onFailure(::showError)
+
+        _showNextProgress.value = false
+    }
+
+    private fun finishFlow() {
+        router.returnToStakingDashboard()
+    }
 }

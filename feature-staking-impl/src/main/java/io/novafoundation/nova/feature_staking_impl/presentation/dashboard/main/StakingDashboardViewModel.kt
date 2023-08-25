@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSynci
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingSecondary
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
@@ -41,12 +42,15 @@ class StakingDashboardViewModel(
     private val accountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,
     private val stakingDashboardUpdateSystem: StakingDashboardUpdateSystem,
+    private val dashboardRouter: StakingDashboardRouter,
     private val router: StakingRouter,
     private val startMultiStakingRouter: StartMultiStakingRouter,
     private val stakingSharedState: StakingSharedState,
     private val presentationMapper: StakingDashboardPresentationMapper,
     private val dashboardUpdatePeriod: Duration = 200.milliseconds
 ) : BaseViewModel() {
+
+    val scrollToTopEvent = startMultiStakingRouter.stakingFlowFinishedEvent
 
     val walletUi = accountUseCase.selectedWalletModelFlow()
         .shareInBackground()
@@ -95,7 +99,7 @@ class StakingDashboardViewModel(
     }
 
     fun onMoreOptionsClicked() {
-        router.openMoreStakingOptions()
+        dashboardRouter.openMoreStakingOptions()
     }
 
     fun avatarClicked() {

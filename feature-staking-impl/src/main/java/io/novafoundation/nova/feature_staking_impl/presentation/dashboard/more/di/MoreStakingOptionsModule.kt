@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
@@ -24,6 +25,7 @@ class MoreStakingOptionsModule {
     @ViewModelKey(MoreStakingOptionsViewModel::class)
     fun provideViewModel(
         interactor: StakingDashboardInteractor,
+        dashboardRouter: StakingDashboardRouter,
         router: StakingRouter,
         stakingSharedState: StakingSharedState,
         presentationMapper: StakingDashboardPresentationMapper,
@@ -31,8 +33,9 @@ class MoreStakingOptionsModule {
     ): ViewModel {
         return MoreStakingOptionsViewModel(
             interactor = interactor,
-            stakingRouter = router,
             startStakingRouter = startMultiStakingRouter,
+            dashboardRouter = dashboardRouter,
+            router = router,
             stakingSharedState = stakingSharedState,
             presentationMapper = presentationMapper
         )

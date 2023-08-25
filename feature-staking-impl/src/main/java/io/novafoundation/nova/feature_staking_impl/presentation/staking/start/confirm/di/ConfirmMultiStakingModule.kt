@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StartMultiStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.selectionType.MultiStakingSelectionTypeProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
@@ -60,6 +61,7 @@ class ConfirmMultiStakingModule {
         assetUseCase: ArbitraryAssetUseCase,
         walletUiUseCase: WalletUiUseCase,
         selectedAccountUseCase: SelectedAccountUseCase,
+        selectionTypeProviderFactory: MultiStakingSelectionTypeProviderFactory,
     ): ViewModel {
         return ConfirmMultiStakingViewModel(
             router = router,
@@ -72,7 +74,8 @@ class ConfirmMultiStakingModule {
             confirmMultiStakingTypeFactory = confirmMultiStakingTypeFactory,
             assetUseCase = assetUseCase,
             walletUiUseCase = walletUiUseCase,
-            selectedAccountUseCase = selectedAccountUseCase
+            selectedAccountUseCase = selectedAccountUseCase,
+            selectionTypeProviderFactory = selectionTypeProviderFactory
         )
     }
 

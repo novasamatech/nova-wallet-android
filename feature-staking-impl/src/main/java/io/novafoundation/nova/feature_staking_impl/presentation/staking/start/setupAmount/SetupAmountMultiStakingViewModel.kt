@@ -53,7 +53,7 @@ class SetupAmountMultiStakingViewModel(
     assetUseCase: ArbitraryAssetUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
     selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
-    payload: SetupAmountMultiStakingPayload,
+    private val payload: SetupAmountMultiStakingPayload,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory
 ) : BaseViewModel(),
     Validatable by validationExecutor {
@@ -171,7 +171,7 @@ class SetupAmountMultiStakingViewModel(
     }
 
     private fun openConfirm(validPayload: StartMultiStakingValidationPayload) {
-        val confirmPayload = ConfirmMultiStakingPayload(mapFeeToParcel(validPayload.fee))
+        val confirmPayload = ConfirmMultiStakingPayload(mapFeeToParcel(validPayload.fee), payload.availableStakingOptions)
 
         router.openConfirm(confirmPayload)
     }

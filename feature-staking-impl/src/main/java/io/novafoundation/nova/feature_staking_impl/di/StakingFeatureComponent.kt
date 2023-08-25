@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.di.staking.unbond.StakingUnbo
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.di.RebagComponent
@@ -224,6 +225,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
             @BindsInstance nominationPoolsRouter: NominationPoolsRouter,
 
             @BindsInstance startMultiStakingRouter: StartMultiStakingRouter,
+            @BindsInstance stakingDashboardRouter: StakingDashboardRouter,
 
             deps: StakingFeatureDependencies
         ): StakingFeatureComponent
