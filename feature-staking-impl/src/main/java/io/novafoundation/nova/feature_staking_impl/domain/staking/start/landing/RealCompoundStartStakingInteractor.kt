@@ -75,11 +75,11 @@ class RealCompoundStartStakingInteractor(
 
     override fun observeAvailableBalance(): Flow<LandingAvailableBalance> {
         return assetFlow().map {
-            val minAvailableBalance = interactors
+            val maxAvailableBalance = interactors
                 .maxOfOrNull { interactor -> interactor.getAvailableBalance(it) }
                 .orZero()
 
-            LandingAvailableBalance(it, minAvailableBalance)
+            LandingAvailableBalance(it, maxAvailableBalance)
         }
     }
 
