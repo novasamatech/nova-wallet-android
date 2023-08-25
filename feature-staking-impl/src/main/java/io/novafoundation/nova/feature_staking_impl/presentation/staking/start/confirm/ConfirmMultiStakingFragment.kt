@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm
 
 import android.os.Bundle
+import android.text.TextUtils.TruncateAt
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,6 +50,7 @@ class ConfirmMultiStakingFragment : BaseFragment<ConfirmMultiStakingViewModel>()
         startMultiStakingConfirmConfirm.setOnClickListener { viewModel.confirmClicked() }
 
         startMultiStakingConfirmStakingTypeDetails.setOnClickListener { viewModel.onStakingTypeDetailsClicked() }
+        startMultiStakingConfirmStakingTypeDetails.valuePrimary.ellipsize = TruncateAt.END
     }
 
     override fun inject() {
