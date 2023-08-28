@@ -193,8 +193,8 @@ class ConfirmStartParachainStakingViewModel(
 
     private fun finishFlow() {
         when(payload.flowMode) {
-            StartParachainStakingMode.START -> parachainStakingRouter.returnToStakingMain()
-            StartParachainStakingMode.BOND_MORE -> startStakingRouter.returnToStakingDashboard()
+            StartParachainStakingMode.START -> startStakingRouter.returnToStakingDashboard()
+            StartParachainStakingMode.BOND_MORE -> parachainStakingRouter.returnToStakingMain()
         }
     }
 
