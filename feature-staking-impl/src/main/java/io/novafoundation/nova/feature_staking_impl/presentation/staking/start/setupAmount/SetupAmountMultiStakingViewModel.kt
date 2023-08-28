@@ -20,6 +20,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakin
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.toStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.model.StakingPropertiesModel
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypeFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypePayload
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
@@ -50,7 +52,7 @@ class SetupAmountMultiStakingViewModel(
     assetUseCase: ArbitraryAssetUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
     selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
-    payload: SetupAmountMultiStakingPayload,
+    private val payload: SetupAmountMultiStakingPayload,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory
 ) : BaseViewModel(),
     Validatable by validationExecutor {
@@ -141,7 +143,7 @@ class SetupAmountMultiStakingViewModel(
     }
 
     fun selectionClicked() {
-        router.openSetupStakingType()
+        router.openSetupStakingType(SetupStakingTypePayload(payload.availableStakingOptions))
     }
 
     fun continueClicked() = launch {

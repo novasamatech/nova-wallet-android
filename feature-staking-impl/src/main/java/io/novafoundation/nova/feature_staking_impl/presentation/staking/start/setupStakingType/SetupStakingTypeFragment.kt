@@ -6,15 +6,28 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.SetupStakingTypeAdapter
 import kotlinx.android.synthetic.main.fragment_setup_staking_type.setupStakingTypeList
 import kotlinx.android.synthetic.main.fragment_setup_staking_type.setupStakingTypeToolbar
 
 class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), SetupStakingTypeAdapter.ItemAssetHandler {
+
+    companion object {
+
+        private val PAYLOAD_KEY = "payload_key"
+
+        fun getArguments(payload: SetupStakingTypePayload): Bundle {
+            return Bundle().apply {
+                putParcelable(PAYLOAD_KEY, payload)
+            }
+        }
+    }
 
     private val adapter = SetupStakingTypeAdapter(this)
 
@@ -31,6 +44,7 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), Setu
         setupStakingTypeToolbar.setRightActionClickListener { viewModel.donePressed() }
         setupStakingTypeToolbar.setHomeButtonListener { viewModel.backPressed() }
         setupStakingTypeList.adapter = adapter
+        setupStakingTypeList.itemAnimator = null
     }
 
     override fun inject() {
@@ -39,11 +53,13 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), Setu
             StakingFeatureApi::class.java
         )
             .setupStakingType()
-            .create(this)
+            .create(this, argument(PAYLOAD_KEY))
             .inject(this)
     }
 
     override fun subscribe(viewModel: SetupStakingTypeViewModel) {
+        observeValidations(viewModel)
+
         viewModel.availableToRewriteData.observe { setupStakingTypeToolbar.setRightActionEnabled(it) }
 
         viewModel.stakingTypeModels.observe {
@@ -51,7 +67,7 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), Setu
         }
     }
 
-    override fun stakingTypeClicked(position: Int) {
-        viewModel.selectStakingType(position)
+    override fun stakingTypeClicked(stakingTypeRVItem: EditableStakingTypeRVItem, position: Int) {
+        viewModel.selectStakingType(stakingTypeRVItem, position)
     }
 }

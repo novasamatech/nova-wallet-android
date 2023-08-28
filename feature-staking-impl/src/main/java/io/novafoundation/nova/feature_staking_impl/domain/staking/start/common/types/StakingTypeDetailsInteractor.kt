@@ -9,5 +9,5 @@ interface StakingTypeDetailsInteractor {
 
     fun observeData(): Flow<StakingTypeDetails>
 
-    fun getAvailableBalance(asset: Asset): BigInteger
+    suspend fun getAvailableBalance(asset: Asset): BigInteger
 }

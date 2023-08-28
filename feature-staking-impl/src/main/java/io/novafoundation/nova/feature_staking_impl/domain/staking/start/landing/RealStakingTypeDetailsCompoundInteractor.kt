@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetails
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.model.StartStakingEraInfo
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -40,21 +41,21 @@ class StartStakingCompoundData(
 
 class LandingAvailableBalance(val asset: Asset, val availableBalance: BigInteger)
 
-interface CompoundStartStakingInteractor {
+interface StakingTypeDetailsCompoundInteractor {
 
     fun observeStartStakingInfo(): Flow<StartStakingCompoundData>
 
     fun observeAvailableBalance(): Flow<LandingAvailableBalance>
 }
 
-class RealCompoundStartStakingInteractor(
+class RealStakingTypeDetailsCompoundInteractor(
     private val chain: Chain,
     private val chainAsset: Chain.Asset,
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val interactors: List<StakingTypeDetailsInteractor>,
     private val stakingEraInteractor: StakingEraInteractor,
-) : CompoundStartStakingInteractor {
+) : StakingTypeDetailsCompoundInteractor {
 
     override fun observeStartStakingInfo(): Flow<StartStakingCompoundData> {
         val startStakingDataFlow = interactors.map { it.observeData() }.combineList()

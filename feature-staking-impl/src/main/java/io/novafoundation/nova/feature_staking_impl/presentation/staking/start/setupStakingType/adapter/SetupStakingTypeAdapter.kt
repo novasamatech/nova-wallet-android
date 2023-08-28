@@ -18,7 +18,7 @@ class SetupStakingTypeAdapter(
 
     interface ItemAssetHandler {
 
-        fun stakingTypeClicked(position: Int)
+        fun stakingTypeClicked(stakingTypeRVItem: EditableStakingTypeRVItem, position: Int)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditableStakingTypeViewHolder {
@@ -71,12 +71,12 @@ class EditableStakingTypeViewHolder(
         editableStakingType.setSelectable(item.isSelectable)
         editableStakingType.setStakingTarget(item.stakingTarget)
         editableStakingType.setBackgroundRes(item.imageRes)
-        
+
         containerView.editableStakingType.setOnClickListener {
             val position = bindingAdapterPosition
             if (position == RecyclerView.NO_POSITION) return@setOnClickListener
 
-            clickHandler.stakingTypeClicked(bindingAdapterPosition)
+            clickHandler.stakingTypeClicked(item, bindingAdapterPosition)
         }
     }
 

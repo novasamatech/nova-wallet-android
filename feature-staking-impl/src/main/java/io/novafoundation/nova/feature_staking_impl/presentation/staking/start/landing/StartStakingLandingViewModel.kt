@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.ParticipationInGovernance
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.Payouts
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingCompoundData
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingInteractorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StakingTypeDetailsCompoundInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.toStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StakingConditionRVItem
@@ -53,7 +53,7 @@ class StartStakingLandingViewModel(
     private val router: StartMultiStakingRouter,
     private val resourceManager: ResourceManager,
     private val updateSystemFactory: StakingLandingInfoUpdateSystemFactory,
-    private val startStakingInteractorFactory: StartStakingInteractorFactory,
+    private val stakingTypeDetailsCompoundInteractorFactory: StakingTypeDetailsCompoundInteractorFactory,
     private val appLinksProvider: AppLinksProvider,
     private val startStakingLandingPayload: StartStakingLandingPayload
 ) : BaseViewModel(), Browserable {
@@ -61,7 +61,7 @@ class StartStakingLandingViewModel(
     private val availableStakingOptionsPayload = startStakingLandingPayload.availableStakingOptions
 
     private val startStakingInteractor = flowOf {
-        startStakingInteractorFactory.create(
+        stakingTypeDetailsCompoundInteractorFactory.create(
             multiStakingOptionIds = availableStakingOptionsPayload.toStakingOptionIds(),
             coroutineScope = this
         )

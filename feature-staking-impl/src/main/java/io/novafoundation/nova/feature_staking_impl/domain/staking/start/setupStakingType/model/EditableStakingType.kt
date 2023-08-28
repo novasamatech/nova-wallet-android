@@ -5,6 +5,5 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class EditableStakingType(
     val isAvailable: Boolean,
-    val stakingTypeDetails: StakingTypeDetails,
-    val stakingType: Chain.Asset.StakingType
+    val stakingTypeDetails: StakingTypeDetails
 )

@@ -17,17 +17,27 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.N
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.RealNominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.RealStartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.CompoundStakingTypeDetailsProvidersFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsProviderFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.direct.ParachainStakingTypeDetailsInteractorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.direct.RelaychainStakingTypeDetailsInteractorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.pools.PoolStakingTypeDetailsInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.MultiSingleStakingPropertiesFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingPropertiesFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.direct.DirectStakingPropertiesFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.pools.NominationPoolStakingPropertiesFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.selectionType.MultiStakingSelectionTypeProviderFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.EditingStakingTypeSelectionMixinFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.direct.DirectStakingTypeDetailsProviderFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.pool.PoolStakingTypeDetailsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.RealMultiStakingSelectionFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import javax.inject.Named
+import javax.inject.Qualifier
 
 @Target(
     AnnotationTarget.FUNCTION,
@@ -37,8 +47,96 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 @MapKey
 annotation class StakingTypeGroupKey(val group: StakingTypeGroup)
 
+@Target(
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER
+)
+@MapKey
+annotation class StakingTypeProviderKey(val group: StakingTypeGroup)
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.VALUE_PARAMETER)
+annotation class MultiStakingSelectionStoreProviderKey()
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.VALUE_PARAMETER)
+annotation class StakingTypeEditingStoreProviderKey()
+
 @Module
 class StartMultiStakingModule {
+
+    @Provides
+    @FeatureScope
+    @IntoMap
+    @StakingTypeProviderKey(StakingTypeGroup.NOMINATION_POOL)
+    fun providePoolStakingTypeDetailsProviderFactory(
+        poolStakingTypeDetailsInteractorFactory: PoolStakingTypeDetailsInteractorFactory,
+        singleStakingPropertiesFactory: SingleStakingPropertiesFactory,
+        @MultiStakingSelectionStoreProviderKey currentSelectionStoreProvider: StartMultiStakingSelectionStoreProvider
+    ): StakingTypeDetailsProviderFactory {
+        return PoolStakingTypeDetailsProviderFactory(
+            poolStakingTypeDetailsInteractorFactory,
+            singleStakingPropertiesFactory,
+            currentSelectionStoreProvider
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    @IntoMap
+    @StakingTypeProviderKey(StakingTypeGroup.RELAYCHAIN)
+    fun provideRelaychainDirectStakingTypeDetailsProviderFactory(
+        relaychainStakingTypeDetailsInteractorFactory: RelaychainStakingTypeDetailsInteractorFactory,
+        singleStakingPropertiesFactory: SingleStakingPropertiesFactory,
+        @MultiStakingSelectionStoreProviderKey currentSelectionStoreProvider: StartMultiStakingSelectionStoreProvider
+    ): StakingTypeDetailsProviderFactory {
+        return DirectStakingTypeDetailsProviderFactory(
+            relaychainStakingTypeDetailsInteractorFactory,
+            singleStakingPropertiesFactory,
+            currentSelectionStoreProvider
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    @IntoMap
+    @StakingTypeProviderKey(StakingTypeGroup.PARACHAIN)
+    fun provideParachainDirectStakingTypeDetailsProviderFactory(
+        parachainStakingTypeDetailsInteractorFactory: ParachainStakingTypeDetailsInteractorFactory,
+        singleStakingPropertiesFactory: SingleStakingPropertiesFactory,
+        @MultiStakingSelectionStoreProviderKey currentSelectionStoreProvider: StartMultiStakingSelectionStoreProvider
+    ): StakingTypeDetailsProviderFactory {
+        return DirectStakingTypeDetailsProviderFactory(
+            parachainStakingTypeDetailsInteractorFactory,
+            singleStakingPropertiesFactory,
+            currentSelectionStoreProvider
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideCompoundStakingTypeDetailsProvidersFactory(
+        factories: Map<StakingTypeGroup, @JvmSuppressWildcards StakingTypeDetailsProviderFactory>,
+    ): CompoundStakingTypeDetailsProvidersFactory {
+        return CompoundStakingTypeDetailsProvidersFactory(factories)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideEditingStakingTypeSelectionMixinFactory(
+        @MultiStakingSelectionStoreProviderKey currentSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
+        @StakingTypeEditingStoreProviderKey editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
+        compoundStakingTypeDetailsProvidersFactory: CompoundStakingTypeDetailsProvidersFactory
+    ): EditingStakingTypeSelectionMixinFactory {
+        return EditingStakingTypeSelectionMixinFactory(
+            currentSelectionStoreProvider,
+            editableSelectionStoreProvider,
+            compoundStakingTypeDetailsProvidersFactory
+        )
+    }
 
     @Provides
     @FeatureScope
@@ -51,10 +149,20 @@ class StartMultiStakingModule {
 
     @Provides
     @FeatureScope
+    @MultiStakingSelectionStoreProviderKey
     fun provideStartMultiStakingSelectionStoreProvider(
         computationalCache: ComputationalCache
     ): StartMultiStakingSelectionStoreProvider {
         return RealStartMultiStakingSelectionStoreProvider(computationalCache, "MultiStakingSelection")
+    }
+
+    @Provides
+    @FeatureScope
+    @StakingTypeEditingStoreProviderKey
+    fun provideStakingTypeEditingSelectionStoreProvider(
+        computationalCache: ComputationalCache
+    ): StartMultiStakingSelectionStoreProvider {
+        return RealStartMultiStakingSelectionStoreProvider(computationalCache, "StakingTypeEditing")
     }
 
     @Provides
@@ -110,7 +218,7 @@ class StartMultiStakingModule {
     @Provides
     @FeatureScope
     fun provideMultiStakingSelectionTypeProviderFactory(
-        selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
+        @MultiStakingSelectionStoreProviderKey selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
         singleStakingPropertiesFactory: SingleStakingPropertiesFactory,
         chainRegistry: ChainRegistry,
     ): MultiStakingSelectionTypeProviderFactory {

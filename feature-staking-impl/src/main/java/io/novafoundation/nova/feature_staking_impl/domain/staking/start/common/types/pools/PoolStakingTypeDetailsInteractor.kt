@@ -3,21 +3,41 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
+import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetails
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.direct.StakingTypeDetailsInteractorFactory
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
 
-class NominationPoolStakingTypeDetailsInteractor(
+class PoolStakingTypeDetailsInteractorFactory(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
+    private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver
+) : StakingTypeDetailsInteractorFactory {
+
+    override suspend fun create(
+        stakingOption: StakingOption,
+        coroutineScope: CoroutineScope
+    ): PoolStakingTypeDetailsInteractor {
+        return PoolStakingTypeDetailsInteractor(
+            nominationPoolSharedComputation,
+            poolsAvailableBalanceResolver,
+            stakingOption,
+            coroutineScope
+        )
+    }
+}
+
+class PoolStakingTypeDetailsInteractor(
+    private val nominationPoolSharedComputation: NominationPoolSharedComputation,
+    private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
     private val stakingOption: StakingOption,
     private val scope: CoroutineScope,
-    private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
 ) : StakingTypeDetailsInteractor {
 
     override fun observeData(): Flow<StakingTypeDetails> {
@@ -30,7 +50,8 @@ class NominationPoolStakingTypeDetailsInteractor(
                 minStake = minJoinBond,
                 payoutType = PayoutType.Manual,
                 participationInGovernance = false,
-                advancedOptionsAvailable = false
+                advancedOptionsAvailable = false,
+                stakingType = stakingOption.stakingType
             )
         }
     }
