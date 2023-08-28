@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.setup.SetupStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.setup.ChangeValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -45,7 +45,7 @@ class ConfirmChangeValidatorsModule {
         router: StakingRouter,
         addressIconGenerator: AddressIconGenerator,
         resourceManager: ResourceManager,
-        setupStakingInteractor: SetupStakingInteractor,
+        changeValidatorsInteractor: ChangeValidatorsInteractor,
         validationSystem: ValidationSystem<SetupStakingPayload, SetupStakingValidationFailure>,
         validationExecutor: ValidationExecutor,
         setupStakingSharedState: SetupStakingSharedState,
@@ -62,7 +62,7 @@ class ConfirmChangeValidatorsModule {
             resourceManager = resourceManager,
             validationSystem = validationSystem,
             setupStakingSharedState = setupStakingSharedState,
-            setupStakingInteractor = setupStakingInteractor,
+            changeValidatorsInteractor = changeValidatorsInteractor,
             feeLoaderMixin = feeLoaderMixin,
             externalActions = externalActions,
             selectedAssetState = singleAssetSharedState,

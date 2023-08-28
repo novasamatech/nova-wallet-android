@@ -22,7 +22,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.setup.SetupStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.setup.ChangeValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -47,7 +47,7 @@ class ConfirmChangeValidatorsViewModel(
     private val resourceManager: ResourceManager,
     private val validationSystem: ValidationSystem<SetupStakingPayload, SetupStakingValidationFailure>,
     private val setupStakingSharedState: SetupStakingSharedState,
-    private val setupStakingInteractor: SetupStakingInteractor,
+    private val changeValidatorsInteractor: ChangeValidatorsInteractor,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val externalActions: ExternalActions.Presentation,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
@@ -128,7 +128,7 @@ class ConfirmChangeValidatorsViewModel(
     private fun loadFee() {
         feeLoaderMixin.loadFee(
             coroutineScope = viewModelScope,
-            feeConstructor = { setupStakingInteractor.estimateFee(prepareNominations()) },
+            feeConstructor = { changeValidatorsInteractor.estimateFee(prepareNominations()) },
             onRetryCancelled = ::backClicked
         )
     }
@@ -155,7 +155,7 @@ class ConfirmChangeValidatorsViewModel(
     }
 
     private fun sendTransaction() = launch {
-        val setupResult = setupStakingInteractor.changeValidators(
+        val setupResult = changeValidatorsInteractor.changeValidators(
             controllerAddress = controllerAddressFlow.first(),
             validatorAccountIds = prepareNominations(),
         )

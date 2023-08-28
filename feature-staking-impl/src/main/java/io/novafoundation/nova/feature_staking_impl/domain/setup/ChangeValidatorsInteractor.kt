@@ -13,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
 
-class SetupStakingInteractor(
+class ChangeValidatorsInteractor(
     private val extrinsicService: ExtrinsicService,
     private val stakingSharedState: StakingSharedState,
 ) {

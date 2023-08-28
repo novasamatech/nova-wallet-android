@@ -62,7 +62,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPe
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
-import io.novafoundation.nova.feature_staking_impl.domain.setup.SetupStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.setup.ChangeValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.controller.ControllerInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.rebond.RebondInteractor
@@ -319,7 +319,7 @@ class StakingFeatureModule {
     fun provideSetupStakingInteractor(
         extrinsicService: ExtrinsicService,
         sharedState: StakingSharedState,
-    ) = SetupStakingInteractor(extrinsicService, sharedState)
+    ) = ChangeValidatorsInteractor(extrinsicService, sharedState)
 
     @Provides
     @FeatureScope
