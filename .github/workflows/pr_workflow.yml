@@ -15,6 +15,7 @@ jobs:
     outputs:
       need_run: ${{ steps.check_ref.outputs.ref_contains_rc }}
     
+      
     steps:
       - uses: actions/checkout@v2
       - name: Check if "rc" is present in github.ref
