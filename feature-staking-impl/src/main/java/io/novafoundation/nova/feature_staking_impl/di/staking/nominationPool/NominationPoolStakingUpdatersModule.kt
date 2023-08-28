@@ -15,7 +15,10 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentSlotUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.EraStartSessionIndexUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.GenesisSlotUpdater
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.CounterForPoolMembersUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.LastPoolIdUpdater
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.MaxPoolMembersPerPoolUpdater
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.MaxPoolMembersUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.MinJoinBondUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.PoolMetadataUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.SubPoolsUpdater
@@ -59,6 +62,42 @@ class NominationPoolStakingUpdatersModule {
 
     @Provides
     @FeatureScope
+    fun provideMaxPoolMembersUpdater(
+        storageCache: StorageCache,
+        stakingSharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+    ) = MaxPoolMembersUpdater(
+        storageCache = storageCache,
+        stakingSharedState = stakingSharedState,
+        chainRegistry = chainRegistry
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideMaxPoolMembersPerPoolUpdater(
+        storageCache: StorageCache,
+        stakingSharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+    ) = MaxPoolMembersPerPoolUpdater(
+        storageCache = storageCache,
+        stakingSharedState = stakingSharedState,
+        chainRegistry = chainRegistry
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideCounterForPoolMembersUpdater(
+        storageCache: StorageCache,
+        stakingSharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+    ) = CounterForPoolMembersUpdater(
+        storageCache = storageCache,
+        stakingSharedState = stakingSharedState,
+        chainRegistry = chainRegistry
+    )
+
+    @Provides
+    @FeatureScope
     fun provideSubPoolsUpdater(
         poolScope: PoolScope,
         storageCache: StorageCache,
@@ -94,6 +133,9 @@ class NominationPoolStakingUpdatersModule {
         poolMetadataUpdater: PoolMetadataUpdater,
         exposureUpdater: ValidatorExposureUpdater,
         subPoolsUpdater: SubPoolsUpdater,
+        maxPoolMembersUpdater: MaxPoolMembersUpdater,
+        maxPoolMembersPerPoolUpdater: MaxPoolMembersPerPoolUpdater,
+        counterForPoolMembersUpdater: CounterForPoolMembersUpdater,
         activeEraUpdater: ActiveEraUpdater,
         currentEraUpdater: CurrentEraUpdater,
         currentEpochIndexUpdater: CurrentEpochIndexUpdater,
@@ -110,6 +152,9 @@ class NominationPoolStakingUpdatersModule {
         activeEraUpdater,
         currentEraUpdater,
         subPoolsUpdater,
+        maxPoolMembersUpdater,
+        maxPoolMembersPerPoolUpdater,
+        counterForPoolMembersUpdater,
         currentEpochIndexUpdater,
         currentSlotUpdater,
         genesisSlotUpdater,

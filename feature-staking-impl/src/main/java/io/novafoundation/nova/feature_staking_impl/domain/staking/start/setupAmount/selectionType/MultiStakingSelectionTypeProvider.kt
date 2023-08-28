@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.s
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStore
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingPropertiesFactory
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -29,6 +30,7 @@ class MultiStakingSelectionTypeProviderFactory(
     private val selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
     private val singleStakingPropertiesFactory: SingleStakingPropertiesFactory,
     private val chainRegistry: ChainRegistry,
+    private val locksRepository: BalanceLocksRepository,
 ) {
 
     fun create(
@@ -40,6 +42,7 @@ class MultiStakingSelectionTypeProviderFactory(
             candidateOptionIds = candidateOptionsIds,
             scope = scope,
             singleStakingPropertiesFactory = singleStakingPropertiesFactory,
+            locksRepository = locksRepository,
             chainRegistry = chainRegistry
         )
     }
@@ -50,6 +53,7 @@ private class RealMultiStakingSelectionTypeProvider(
     private val candidateOptionIds: MultiStakingOptionIds,
     private val scope: CoroutineScope,
     private val singleStakingPropertiesFactory: SingleStakingPropertiesFactory,
+    private val locksRepository: BalanceLocksRepository,
     private val chainRegistry: ChainRegistry,
 ) : MultiStakingSelectionTypeProvider {
 
@@ -84,7 +88,7 @@ private class RealMultiStakingSelectionTypeProvider(
             singleStakingPropertiesFactory.createProperties(scope, option)
         }
 
-        return AutomaticMultiStakingSelectionType(candidates, selectionStore)
+        return AutomaticMultiStakingSelectionType(candidates, selectionStore, locksRepository)
     }
 
     private suspend fun createManualSelection(

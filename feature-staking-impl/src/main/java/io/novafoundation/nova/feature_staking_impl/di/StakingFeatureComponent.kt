@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.di.staking.unbond.StakingUnbo
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.di.RebagComponent
@@ -62,6 +63,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.d
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.di.ConfirmRewardDestinationComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.select.di.SelectRewardDestinationComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.di.SetupStakingTypeComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.di.ConfirmMultiStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.di.StartStakingLandingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.di.SetupAmountMultiStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.di.ConfirmUnbondComponent
@@ -107,6 +109,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun setupAmountMultiStakingComponentFactory(): SetupAmountMultiStakingComponent.Factory
 
     fun setupStakingType(): SetupStakingTypeComponent.Factory
+
+    fun confirmMultiStakingComponentFactory(): ConfirmMultiStakingComponent.Factory
 
     // relaychain staking
 
@@ -221,6 +225,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
             @BindsInstance nominationPoolsRouter: NominationPoolsRouter,
 
             @BindsInstance startMultiStakingRouter: StartMultiStakingRouter,
+            @BindsInstance stakingDashboardRouter: StakingDashboardRouter,
 
             deps: StakingFeatureDependencies
         ): StakingFeatureComponent

@@ -87,6 +87,10 @@ class StakingDashboardFragment :
         }
 
         viewModel.walletUi.observe(headerAdapter::setSelectedWallet)
+
+        viewModel.scrollToTopEvent.observeEvent {
+            stakingDashboardContent.scrollToPosition(0)
+        }
     }
 
     override fun onHasStakeItemClicked(index: Int) {

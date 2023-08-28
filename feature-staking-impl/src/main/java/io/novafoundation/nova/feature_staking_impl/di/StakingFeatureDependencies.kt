@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
@@ -148,4 +149,6 @@ interface StakingFeatureDependencies {
     val runtimeCallsApi: MultiChainRuntimeCallsApi
 
     val arbitraryAssetUseCase: ArbitraryAssetUseCase
+
+    val locksRepository: BalanceLocksRepository
 }

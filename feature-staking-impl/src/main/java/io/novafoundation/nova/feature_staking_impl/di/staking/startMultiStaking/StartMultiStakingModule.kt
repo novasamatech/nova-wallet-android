@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommendatorFactory
@@ -25,6 +26,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmo
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.RealMultiStakingSelectionFormatter
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -90,12 +92,14 @@ class StartMultiStakingModule {
     fun providePoolsStakingPropertiesFactory(
         nominationPoolSharedComputation: NominationPoolSharedComputation,
         nominationPoolRecommendatorFactory: NominationPoolRecommendatorFactory,
-        availableBalanceResolver: NominationPoolsAvailableBalanceResolver
+        availableBalanceResolver: NominationPoolsAvailableBalanceResolver,
+        nominationPoolGlobalsRepository: NominationPoolGlobalsRepository
     ): SingleStakingPropertiesFactory {
         return NominationPoolStakingPropertiesFactory(
             nominationPoolSharedComputation = nominationPoolSharedComputation,
             nominationPoolRecommendatorFactory = nominationPoolRecommendatorFactory,
-            poolsAvailableBalanceResolver = availableBalanceResolver
+            poolsAvailableBalanceResolver = availableBalanceResolver,
+            nominationPoolGlobalsRepository = nominationPoolGlobalsRepository
         )
     }
 
@@ -113,11 +117,13 @@ class StartMultiStakingModule {
         selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
         singleStakingPropertiesFactory: SingleStakingPropertiesFactory,
         chainRegistry: ChainRegistry,
+        locksRepository: BalanceLocksRepository
     ): MultiStakingSelectionTypeProviderFactory {
         return MultiStakingSelectionTypeProviderFactory(
             selectionStoreProvider = selectionStoreProvider,
             singleStakingPropertiesFactory = singleStakingPropertiesFactory,
-            chainRegistry = chainRegistry
+            chainRegistry = chainRegistry,
+            locksRepository = locksRepository
         )
     }
 }

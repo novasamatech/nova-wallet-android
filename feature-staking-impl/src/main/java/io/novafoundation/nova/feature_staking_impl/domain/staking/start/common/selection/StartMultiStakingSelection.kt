@@ -10,7 +10,7 @@ interface StartMultiStakingSelection {
 
     val stakingOption: StakingOption
 
-    val apy: Perbill
+    val apy: Perbill?
 
     val stake: Balance
 

@@ -1,7 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.pools
 
-import io.novafoundation.nova.common.utils.Perbill
-import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.calls.join
@@ -18,7 +16,7 @@ class NominationPoolSelection(
     override val stake: Balance,
 ) : StartMultiStakingSelection {
 
-    override val apy: Perbill = pool.apy.orZero()
+    override val apy = pool.apy
 
     override fun ExtrinsicBuilder.startStaking(metaAccount: MetaAccount) {
         nominationPools.join(stake, pool.id)

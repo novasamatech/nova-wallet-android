@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.isOpen
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.isNovaPool
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.NominationPool
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.apy
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.isActive
@@ -18,6 +19,7 @@ class NominationPoolRecommendatorFactory(
     private val computationalCache: ComputationalCache,
     private val nominationPoolProvider: NominationPoolProvider,
     private val knownNovaPools: KnownNovaPools,
+    private val nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
 ) {
 
     suspend fun create(stakingOption: StakingOption, computationScope: CoroutineScope): NominationPoolRecommendator {
@@ -25,11 +27,13 @@ class NominationPoolRecommendatorFactory(
 
         return computationalCache.useCache(key, computationScope) {
             val nominationPools = nominationPoolProvider.getNominationPools(stakingOption, computationScope)
+            val maxPoolMembersPerPool = nominationPoolGlobalsRepository.maxPoolMembersPerPool(stakingOption.chain.id)
 
             RealNominationPoolRecommendator(
                 chain = stakingOption.chain,
                 allNominationPools = nominationPools,
-                knownNovaPools = knownNovaPools
+                knownNovaPools = knownNovaPools,
+                maxPoolMembersPerPool = maxPoolMembersPerPool,
             )
         }
     }
@@ -39,6 +43,7 @@ private class RealNominationPoolRecommendator(
     private val chain: Chain,
     private val allNominationPools: List<NominationPool>,
     private val knownNovaPools: KnownNovaPools,
+    private val maxPoolMembersPerPool: Int?,
 ) : NominationPoolRecommendator {
 
     private val recommendations = constructRecommendationList()
@@ -49,9 +54,9 @@ private class RealNominationPoolRecommendator(
 
     private fun constructRecommendationList(): List<NominationPool> {
         return allNominationPools
-            .filter { it.status.isActive && it.state.isOpen }
+            .filter { it.status.isActive && it.canBeJoined() }
             // weaken filter conditions if no matching pools were found
-            .ifEmpty { allNominationPools.filter { it.state.isOpen } }
+            .ifEmpty { allNominationPools.filter { it.canBeJoined() } }
             .sortedWith(poolComparator())
     }
 
@@ -59,5 +64,13 @@ private class RealNominationPoolRecommendator(
         return compareByDescending<NominationPool> { pool -> knownNovaPools.isNovaPool(chain.id, pool.id) }
             .thenByDescending { it.apy.orZero() }
             .thenByDescending { it.membersCount }
+    }
+
+    private fun NominationPool.canBeJoined(): Boolean {
+        return state.isOpen && hasFreeSpots()
+    }
+
+    private fun NominationPool.hasFreeSpots(): Boolean {
+        return maxPoolMembersPerPool == null || membersCount < maxPoolMembersPerPool
     }
 }

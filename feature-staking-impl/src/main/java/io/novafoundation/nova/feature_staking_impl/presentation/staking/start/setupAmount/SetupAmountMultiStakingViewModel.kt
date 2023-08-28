@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_impl.R
@@ -19,6 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmo
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.toStakingOptionIds
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.ConfirmMultiStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.model.StakingPropertiesModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
@@ -27,6 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWithV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -50,7 +53,7 @@ class SetupAmountMultiStakingViewModel(
     assetUseCase: ArbitraryAssetUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
     selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
-    payload: SetupAmountMultiStakingPayload,
+    private val payload: SetupAmountMultiStakingPayload,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory
 ) : BaseViewModel(),
     Validatable by validationExecutor {
@@ -102,7 +105,7 @@ class SetupAmountMultiStakingViewModel(
             currentSelection == null -> StakingPropertiesModel.Loading
             else -> {
                 val content = StakingPropertiesModel.Content(
-                    estimatedReward = currentSelection.selection.apy.format(),
+                    estimatedReward = currentSelection.selection.apy.orZero().format(),
                     selection = multiStakingSelectionFormatter.formatForSetupAmount(currentSelection)
                 )
 
@@ -168,7 +171,9 @@ class SetupAmountMultiStakingViewModel(
     }
 
     private fun openConfirm(validPayload: StartMultiStakingValidationPayload) {
-        showMessage("Ready to open confirm")
+        val confirmPayload = ConfirmMultiStakingPayload(mapFeeToParcel(validPayload.fee), payload.availableStakingOptions)
+
+        router.openConfirm(confirmPayload)
     }
 
     private fun runFeeUpdates() {

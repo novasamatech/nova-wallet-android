@@ -255,10 +255,12 @@ class NominationPoolModule {
         computationalCache: ComputationalCache,
         nominationPoolProvider: NominationPoolProvider,
         knownNovaPools: KnownNovaPools,
+        nominationPoolGlobalsRepository: NominationPoolGlobalsRepository
     ) = NominationPoolRecommendatorFactory(
         computationalCache = computationalCache,
         nominationPoolProvider = nominationPoolProvider,
-        knownNovaPools = knownNovaPools
+        knownNovaPools = knownNovaPools,
+        nominationPoolGlobalsRepository = nominationPoolGlobalsRepository
     )
 
     @Provides
