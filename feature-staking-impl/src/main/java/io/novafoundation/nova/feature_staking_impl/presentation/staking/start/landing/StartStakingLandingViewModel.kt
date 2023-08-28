@@ -4,8 +4,10 @@ import android.graphics.Color
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.mixin.api.Browserable
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.Perbill
@@ -20,6 +22,9 @@ import io.novafoundation.nova.common.utils.setEndSpan
 import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.common.utils.withSafeLoading
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.ParticipationInGovernance
@@ -27,6 +32,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingCompoundData
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.model.PayoutType
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.validations.StartStakingLandingValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.validations.handleStartStakingLandingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.toStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StakingConditionRVItem
@@ -38,9 +45,13 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToA
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import java.math.BigInteger
 import kotlin.time.Duration
 
@@ -57,8 +68,12 @@ class StartStakingLandingViewModel(
     private val updateSystemFactory: StakingLandingInfoUpdateSystemFactory,
     private val startStakingInteractorFactory: StartStakingInteractorFactory,
     private val appLinksProvider: AppLinksProvider,
-    private val startStakingLandingPayload: StartStakingLandingPayload
-) : BaseViewModel(), Browserable {
+    private val startStakingLandingPayload: StartStakingLandingPayload,
+    private val validationExecutor: ValidationExecutor,
+    private val selectedMetaAccountUseCase: SelectedAccountUseCase,
+) : BaseViewModel(),
+    Browserable,
+    Validatable by validationExecutor {
 
     private val availableStakingOptionsPayload = startStakingLandingPayload.availableStakingOptions
 
@@ -95,6 +110,12 @@ class StartStakingLandingViewModel(
         resourceManager.getString(R.string.start_staking_fragment_available_balance, amountModel.token, amountModel.fiat!!)
     }.shareInBackground()
 
+    private val validationInProgressFlow = MutableStateFlow(false)
+
+    val isContinueButtonLoading = combine(validationInProgressFlow, modelFlow) { validationInProgress, model->
+        validationInProgress || model.isLoading()
+    }
+
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     init {
@@ -107,17 +128,38 @@ class StartStakingLandingViewModel(
         router.back()
     }
 
-    fun continueClicked() {
-        val firstStakingType = availableStakingOptionsPayload.stakingTypes.first()
+    fun continueClicked() = launch {
+        val interactor =  startStakingInteractor.first()
 
-        when(firstStakingType.group()) {
-            StakingTypeGroup.PARACHAIN -> router.openStartParachainStaking()
-            else ->  router.openStartMultiStaking(SetupAmountMultiStakingPayload(availableStakingOptionsPayload))
+        val validationSystem =interactor.validationSystem()
+        val payload = StartStakingLandingValidationPayload(
+            chain = interactor.chain,
+            metaAccount = selectedMetaAccountUseCase.getSelectedMetaAccount()
+        )
+
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformerCustom = { validationFailure, _ -> handleStartStakingLandingValidationFailure(resourceManager, validationFailure, router) },
+            progressConsumer = validationInProgressFlow.progressConsumer()
+        ) {
+            validationInProgressFlow.value = false
+
+            openStartStaking()
         }
     }
 
     fun termsOfUseClicked() {
         openBrowserEvent.value = Event(appLinksProvider.termsUrl)
+    }
+
+    private fun openStartStaking() {
+        val firstStakingType = availableStakingOptionsPayload.stakingTypes.first()
+
+        when (firstStakingType.group()) {
+            StakingTypeGroup.PARACHAIN -> router.openStartParachainStaking()
+            else -> router.openStartMultiStaking(SetupAmountMultiStakingPayload(availableStakingOptionsPayload))
+        }
     }
 
     private fun createTitle(chainAsset: Chain.Asset, earning: Perbill, themeColor: Int): CharSequence {

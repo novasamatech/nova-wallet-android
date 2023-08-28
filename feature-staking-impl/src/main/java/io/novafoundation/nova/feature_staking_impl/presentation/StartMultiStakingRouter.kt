@@ -24,4 +24,6 @@ interface StartMultiStakingRouter : ReturnableRouter {
     fun openSelectedValidators()
 
     fun returnToStakingDashboard()
+
+    fun goToWalletDetails(metaId: Long)
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
+import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
@@ -21,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.se
 class StartMultiStakingNavigator(
     navigationHolder: NavigationHolder,
     private val stakingDashboardRouter: StakingDashboardRouter,
+    private val commonNavigationHolder: Navigator,
 ) : BaseNavigator(navigationHolder), StartMultiStakingRouter {
 
     override val stakingFlowFinishedEvent = MutableLiveData<Event<Unit>>()
@@ -57,5 +59,9 @@ class StartMultiStakingNavigator(
         performNavigation(R.id.back_to_main)
         stakingDashboardRouter.returnToStakingTabRoot()
         stakingFlowFinishedEvent.value = Unit.event()
+    }
+
+    override fun goToWalletDetails(metaId: Long) {
+        commonNavigationHolder.openAccountDetails(metaId)
     }
 }
