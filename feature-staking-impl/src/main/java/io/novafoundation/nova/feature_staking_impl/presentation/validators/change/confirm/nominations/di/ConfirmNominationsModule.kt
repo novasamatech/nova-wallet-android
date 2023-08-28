@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.di
+package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
-import io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.ConfirmNominationsViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations.ConfirmNominationsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 
 @Module(includes = [ViewModelModule::class])

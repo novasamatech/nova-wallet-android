@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations
+package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations
 
 import android.os.Bundle
 import android.view.LayoutInflater

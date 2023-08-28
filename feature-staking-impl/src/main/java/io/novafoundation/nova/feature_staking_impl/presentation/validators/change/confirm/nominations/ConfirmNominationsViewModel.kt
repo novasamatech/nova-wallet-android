@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations
+package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations
 
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
@@ -36,7 +36,7 @@ class ConfirmNominationsViewModel(
 
     private val currentSetupStakingProcess = sharedStateSetup.get<SetupStakingProcess.ReadyToSubmit>()
 
-    private val validators = currentSetupStakingProcess.payload.validators
+    private val validators = currentSetupStakingProcess.validators
 
     val selectedValidatorsLiveData = liveData(Dispatchers.Default) {
         emit(convertToModels(validators, tokenUseCase.currentToken()))

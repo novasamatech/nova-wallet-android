@@ -94,7 +94,6 @@ private class DirectStakingProperties(
     private fun StartMultiStakingValidationSystemBuilder.maximumNominatorsReached() {
         maximumNominatorsReached(
             stakingRepository = stakingRepository,
-            isAlreadyNominating = { false },
             chainId = { stakingOption.chain.id },
             errorProducer = { StartMultiStakingValidationFailure.MaxNominatorsReached(stakingType) }
         )

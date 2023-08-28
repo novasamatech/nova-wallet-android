@@ -35,14 +35,6 @@
         android:label="StakingFragment">
 
         <action
-            android:id="@+id/action_stakingFragment_to_setupStakingFragment"
-            app:destination="@id/setupStakingFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
             android:id="@+id/action_stakingFragment_to_payoutsListFragment"
             app:destination="@id/payoutsListFragment"
             app:enterAnim="@anim/fragment_open_enter"
@@ -171,12 +163,6 @@
             app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
-    <fragment
-        android:id="@+id/setupStakingFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.setup.SetupStakingFragment"
-        android:label="setupStakingFragment"
-        tools:layout="@layout/fragment_setup_staking" />
-
     <action
         android:id="@+id/openStartChangeValidatorsFragment"
         app:destination="@id/startChangeValidatorsFragment"
@@ -273,9 +259,9 @@
 
     <fragment
         android:id="@+id/confirmStakingFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.confirm.ConfirmStakingFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.ConfirmChangeValidatorsFragment"
         android:label="confirmStakingFragment"
-        tools:layout="@layout/fragment_confirm_stake">
+        tools:layout="@layout/fragment_confirm_change_validators">
         <action
             android:id="@+id/action_confirmStakingFragment_to_confirmNominationsFragment"
             app:destination="@id/confirmNominationsFragment"
@@ -296,7 +282,7 @@
 
     <fragment
         android:id="@+id/confirmNominationsFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.ConfirmNominationsFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations.ConfirmNominationsFragment"
         android:label="ConfirmNominationsFragment"
         tools:layout="@layout/fragment_confirm_nominations" />
 

@@ -14,8 +14,6 @@ interface StakingRouter {
 
     fun openChainStakingMain()
 
-    fun openSetupStaking()
-
     fun openStartChangeValidators()
 
     fun openRecommendedValidators()

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.confirm.di
+package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
-import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -23,33 +22,29 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.Setu
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
-import io.novafoundation.nova.feature_staking_impl.presentation.common.hints.StakingHintsUseCase
-import io.novafoundation.nova.feature_staking_impl.presentation.confirm.ConfirmStakingViewModel
-import io.novafoundation.nova.feature_staking_impl.presentation.confirm.hints.ConfirmStakeHintsMixinFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.ConfirmChangeValidatorsViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.hints.ConfirmStakeHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
 @Module(includes = [ViewModelModule::class])
-class ConfirmStakingModule {
+class ConfirmChangeValidatorsModule {
 
     @Provides
     @ScreenScope
     fun provideConfirmStakeHintsMixinFactory(
-        interactor: StakingInteractor,
         resourceManager: ResourceManager,
-        stakingHintsUseCase: StakingHintsUseCase,
     ): ConfirmStakeHintsMixinFactory {
-        return ConfirmStakeHintsMixinFactory(interactor, resourceManager, stakingHintsUseCase)
+        return ConfirmStakeHintsMixinFactory(resourceManager)
     }
 
     @Provides
     @IntoMap
-    @ViewModelKey(ConfirmStakingViewModel::class)
+    @ViewModelKey(ConfirmChangeValidatorsViewModel::class)
     fun provideViewModel(
         interactor: StakingInteractor,
         router: StakingRouter,
         addressIconGenerator: AddressIconGenerator,
         resourceManager: ResourceManager,
-        addressDisplayUseCase: AddressDisplayUseCase,
         setupStakingInteractor: SetupStakingInteractor,
         validationSystem: ValidationSystem<SetupStakingPayload, SetupStakingValidationFailure>,
         validationExecutor: ValidationExecutor,
@@ -60,11 +55,10 @@ class ConfirmStakingModule {
         walletUiUseCase: WalletUiUseCase,
         hintsMixinFactory: ConfirmStakeHintsMixinFactory,
     ): ViewModel {
-        return ConfirmStakingViewModel(
+        return ConfirmChangeValidatorsViewModel(
             router = router,
             interactor = interactor,
             addressIconGenerator = addressIconGenerator,
-            addressDisplayUseCase = addressDisplayUseCase,
             resourceManager = resourceManager,
             validationSystem = validationSystem,
             setupStakingSharedState = setupStakingSharedState,
@@ -82,7 +76,7 @@ class ConfirmStakingModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory,
-    ): ConfirmStakingViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(ConfirmStakingViewModel::class.java)
+    ): ConfirmChangeValidatorsViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(ConfirmChangeValidatorsViewModel::class.java)
     }
 }
