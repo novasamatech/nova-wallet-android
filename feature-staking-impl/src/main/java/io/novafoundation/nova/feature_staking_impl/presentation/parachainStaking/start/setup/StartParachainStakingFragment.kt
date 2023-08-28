@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeRetries
@@ -29,6 +30,13 @@ import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startPara
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingToolbar
 
 class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewModel>() {
+
+    companion object {
+
+        private const val PAYLOAD = "StartParachainStakingFragment.Payload"
+
+        fun getBundle(payload: StartParachainStakingPayload) = bundleOf(PAYLOAD to payload)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,7 +64,7 @@ class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewMode
             StakingFeatureApi::class.java
         )
             .startParachainStakingFactory()
-            .create(this)
+            .create(this, argument(PAYLOAD))
             .inject(this)
     }
 

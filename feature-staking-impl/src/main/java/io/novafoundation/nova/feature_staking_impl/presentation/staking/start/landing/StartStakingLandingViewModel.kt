@@ -35,6 +35,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.se
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.ext.StakingTypeGroup
+import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -106,7 +108,12 @@ class StartStakingLandingViewModel(
     }
 
     fun continueClicked() {
-        router.openSetupAmount(SetupAmountMultiStakingPayload(availableStakingOptionsPayload))
+        val firstStakingType = availableStakingOptionsPayload.stakingTypes.first()
+
+        when(firstStakingType.group()) {
+            StakingTypeGroup.PARACHAIN -> router.openStartParachainStaking()
+            else ->  router.openStartMultiStaking(SetupAmountMultiStakingPayload(availableStakingOptionsPayload))
+        }
     }
 
     fun termsOfUseClicked() {

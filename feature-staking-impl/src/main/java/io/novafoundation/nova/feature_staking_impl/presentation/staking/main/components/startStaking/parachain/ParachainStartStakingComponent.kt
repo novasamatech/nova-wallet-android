@@ -20,6 +20,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.maximumAnnualApr
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.openStartStaking
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.StartParachainStakingMode
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.StakingRewardEstimationBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.BaseStartStakingComponent
@@ -116,7 +118,7 @@ private class ParachainStartStakingComponent(
             errorDisplayer = hostContext.errorDisplayer,
             validationFailureTransformerCustom = { status, _ -> validationFailure(status.reason) }
         ) {
-            router.openStartStaking()
+            router.openStartStaking(StartParachainStakingMode.START)
         }
     }
 
