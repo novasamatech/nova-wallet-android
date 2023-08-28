@@ -22,25 +22,24 @@ jobs:
           else
             echo "ref_contains_rc=0" >> $GITHUB_OUTPUT
           fi
-      
-      - name: Output check result
-        run: |
-          echo "Output: ${{ steps.check_ref.outputs.ref_contains_rc }}"
 
   build:
     runs-on: ubuntu-latest
     needs: checkRef
     if: ${{needs.checkRef.outputs.need_run}} == "0"
     steps:
-      - name: Check if comment contains "Release notes"
-        uses: actions/github-script@v4
+      - name: Find Comment
+        uses: peter-evans/find-comment@v2
+        id: fc
         with:
-          script: |
-            const comment = github.event.pull_request.comments.find(c => c.body.includes('Release notes'));
-            if (!comment) {
-              console.log('No comment found with "Release notes"');
-              throw new Error('Missing release notes');
-            } else {
-              console.log('Comment found with "Release notes"');
-            }
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: Release candidate
+
+      - name: Test comment
+        run: |
+          echo ${{ steps.fc.outputs.comment-body }}
+      
+      - name: Fail if no comment
+        if: ${{ steps.fc.outputs.comment-body }} == ""
+        run: exit 1
 
