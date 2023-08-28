@@ -8,6 +8,9 @@ on:
 
 jobs:
   checkRef:
+    # This job only runs for pull request comments
+    name: PR comment
+    if: ${{ github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     outputs:
       need_run: ${{ steps.check_ref.outputs.ref_contains_rc }}
