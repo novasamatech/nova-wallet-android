@@ -11,8 +11,8 @@ fun handleStartStakingLandingValidationFailure(
     resourceManager: ResourceManager,
     validationStatus: ValidationStatus.NotValid<StartStakingLandingValidationFailure>,
     router: StartMultiStakingRouter,
-) : TransformedFailure {
-    return when(val reason = validationStatus.reason) {
+): TransformedFailure {
+    return when (val reason = validationStatus.reason) {
         is StartStakingLandingValidationFailure.NoChainAccountFound -> handleChainAccountNotFound(
             failure = reason,
             addAccountDescriptionRes = R.string.staking_missing_account_message,

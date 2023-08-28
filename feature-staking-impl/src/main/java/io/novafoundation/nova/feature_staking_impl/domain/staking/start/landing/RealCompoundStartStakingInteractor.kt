@@ -62,7 +62,7 @@ class RealCompoundStartStakingInteractor(
     private val stakingEraInteractor: StakingEraInteractor,
 ) : CompoundStartStakingInteractor {
     override suspend fun validationSystem(): StartStakingLandingValidationSystem {
-       return ValidationSystem.startStalingLanding()
+        return ValidationSystem.startStalingLanding()
     }
 
     override fun observeStartStakingInfo(): Flow<StartStakingCompoundData> {

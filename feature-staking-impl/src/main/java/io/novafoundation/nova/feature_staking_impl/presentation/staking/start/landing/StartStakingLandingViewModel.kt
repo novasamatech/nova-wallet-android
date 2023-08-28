@@ -112,7 +112,7 @@ class StartStakingLandingViewModel(
 
     private val validationInProgressFlow = MutableStateFlow(false)
 
-    val isContinueButtonLoading = combine(validationInProgressFlow, modelFlow) { validationInProgress, model->
+    val isContinueButtonLoading = combine(validationInProgressFlow, modelFlow) { validationInProgress, model ->
         validationInProgress || model.isLoading()
     }
 
@@ -129,9 +129,9 @@ class StartStakingLandingViewModel(
     }
 
     fun continueClicked() = launch {
-        val interactor =  startStakingInteractor.first()
+        val interactor = startStakingInteractor.first()
 
-        val validationSystem =interactor.validationSystem()
+        val validationSystem = interactor.validationSystem()
         val payload = StartStakingLandingValidationPayload(
             chain = interactor.chain,
             metaAccount = selectedMetaAccountUseCase.getSelectedMetaAccount()
@@ -140,7 +140,13 @@ class StartStakingLandingViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformerCustom = { validationFailure, _ -> handleStartStakingLandingValidationFailure(resourceManager, validationFailure, router) },
+            validationFailureTransformerCustom = { validationFailure, _ ->
+                handleStartStakingLandingValidationFailure(
+                    resourceManager,
+                    validationFailure,
+                    router
+                )
+            },
             progressConsumer = validationInProgressFlow.progressConsumer()
         ) {
             validationInProgressFlow.value = false

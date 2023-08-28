@@ -7,4 +7,4 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class StartParachainStakingPayload(
     val flowMode: StartParachainStakingMode
-): Parcelable
+) : Parcelable
