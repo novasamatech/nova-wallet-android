@@ -72,7 +72,7 @@ class PoolStakingTypeDetailsProvider(
     private suspend fun validate(): ValidationStatus<EditingStakingTypeFailure>? {
         val selectionStore = currentSelectionStoreProvider.getSelectionStore(coroutineScope)
         val selectedStake = selectionStore.currentSelection?.selection?.stake ?: return null
-        val payload = EditingStakingTypePayload(selectedStake, stakingType)
+        val payload = EditingStakingTypePayload(selectedStake, stakingType, singleStakingProperties.minStake())
         return validationSystem.validate(payload).getOrNull()
     }
 

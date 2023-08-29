@@ -1,8 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store
 
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.RecommendableMultiStakingSelection
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.model.MultiStakingType
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.selectionType.MultiStakingSelectionType
+import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -13,6 +12,8 @@ interface StartMultiStakingSelectionStore {
     val currentSelection: RecommendableMultiStakingSelection?
 
     fun updateSelection(multiStakingSelection: RecommendableMultiStakingSelection)
+
+    fun updateStake(amount: BigInteger)
 }
 
 class RealStartMultiStakingSelectionStore : StartMultiStakingSelectionStore {
@@ -24,5 +25,13 @@ class RealStartMultiStakingSelectionStore : StartMultiStakingSelectionStore {
 
     override fun updateSelection(multiStakingSelection: RecommendableMultiStakingSelection) {
         currentSelectionFlow.value = multiStakingSelection
+    }
+
+    override fun updateStake(amount: BigInteger) {
+        currentSelection?.let { currentSelection ->
+            currentSelectionFlow.value = currentSelection.copy(
+                selection = currentSelection.selection.copyWith(amount)
+            )
+        }
     }
 }

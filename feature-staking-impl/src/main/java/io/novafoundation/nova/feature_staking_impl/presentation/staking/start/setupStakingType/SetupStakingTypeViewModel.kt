@@ -126,12 +126,10 @@ class SetupStakingTypeViewModel(
                 .stakingTypeDetails
             val stakingTypeMixin = editingStakingTypeSelectionMixin.first()
             val enteredAmount = stakingTypeMixin.enteredAmount() ?: return@launch
-            val validationSystem = stakingTypeMixin.getValidationSystem(stakingTypeDetails.stakingType) ?: return@launch
-            val payload = EditingStakingTypePayload(enteredAmount, stakingTypeDetails.stakingType)
 
             validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
+                validationSystem = stakingTypeMixin.getValidationSystem(stakingTypeDetails.stakingType) ?: return@launch,
+                payload = EditingStakingTypePayload(enteredAmount, stakingTypeDetails.stakingType, stakingTypeDetails.minStake),
                 validationFailureTransformer = { handleSetupStakingTypeValidationFailure(chainAsset, it, resourceManager) },
             ) {
                 setRecommendedSelection(stakingTypeDetails.stakingType)

@@ -13,6 +13,7 @@ typealias EditingStakingTypeValidationSystem = ValidationSystem<EditingStakingTy
 class EditingStakingTypePayload(
     val selectedAmount: BigInteger,
     val stakingType: Chain.Asset.StakingType,
+    val minStake: BigInteger,
 )
 
 sealed interface EditingStakingTypeFailure {
@@ -29,7 +30,7 @@ fun ValidationSystem.Companion.editingStakingType(
         stakingAmountValidation(
             singleStakingProperties,
             { it.selectedAmount }
-        ) { EditingStakingTypeFailure.AmountIsLessThanMinStake(it.selectedAmount, it.stakingType) }
+        ) { EditingStakingTypeFailure.AmountIsLessThanMinStake(it.minStake, it.stakingType) }
 
         stakingTypeAvailability(
             availableStakingTypes,

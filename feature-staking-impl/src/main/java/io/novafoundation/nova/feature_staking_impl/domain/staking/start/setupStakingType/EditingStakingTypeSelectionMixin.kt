@@ -59,7 +59,7 @@ class EditingStakingTypeSelectionMixin(
         currentSelectionFlow,
         editableSelectionFlow
     ) { current, editable ->
-        current != editable
+        !current.selection.isSettingsEquals(editable.selection)
     }
 
     fun getValidationSystem(stakingType: Chain.Asset.StakingType): EditingStakingTypeValidationSystem? {

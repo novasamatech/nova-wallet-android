@@ -55,7 +55,7 @@ class RealMultiStakingSelectionFormatter(
             is DirectStakingSelection -> StakingTargetModel(
                 title = resourceManager.getString(R.string.staking_recommended_title),
                 subtitle = formatValidatorsSubtitle(R.string.start_staking_editing_selection_validators_subtitle, recommendableSelection, selection),
-                icon = null
+                icon = StakingTargetModel.TargetIcon.Quantity(selection.validators.size.toString())
             )
 
             is NominationPoolSelection -> {

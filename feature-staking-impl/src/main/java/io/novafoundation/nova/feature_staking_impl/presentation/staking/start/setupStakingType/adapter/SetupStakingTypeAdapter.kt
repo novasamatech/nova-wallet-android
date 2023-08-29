@@ -65,12 +65,12 @@ class EditableStakingTypeViewHolder(
 ) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
     fun bind(item: EditableStakingTypeRVItem) = with(containerView) {
-        editableStakingType.setTitle(item.title)
-        editableStakingType.setConditions(item.conditions)
-        editableStakingType.select(item.isSelected)
-        editableStakingType.setSelectable(item.isSelectable)
-        editableStakingType.setStakingTarget(item.stakingTarget)
-        editableStakingType.setBackgroundRes(item.imageRes)
+        setTitle(item)
+        setConditions(item)
+        select(item)
+        setSelectable(item)
+        setStakingTarget(item)
+        setImage(item)
 
         containerView.editableStakingType.setOnClickListener {
             val position = bindingAdapterPosition

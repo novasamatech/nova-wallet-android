@@ -11,17 +11,16 @@ import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.bond
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.nominate
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.StartMultiStakingSelection
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.model.MultiStakingType
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.multiAddressOf
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
-class DirectStakingSelection(
+data class DirectStakingSelection(
     val validators: List<Validator>,
     val validatorsLimit: Int,
     override val stakingOption: StakingOption,
-    override val stake: Balance,
+    override var stake: Balance,
 ) : StartMultiStakingSelection {
 
     override val apy = validators.maxOf { it.electedInfo?.apy.orZero().asPerbill() }
@@ -36,7 +35,7 @@ class DirectStakingSelection(
         nominate(targets)
     }
 
-    override fun equals(other: Any?): Boolean {
+    override fun isSettingsEquals(other: StartMultiStakingSelection): Boolean {
         if (other === this) return true
         if (other !is DirectStakingSelection) return false
 
@@ -46,10 +45,7 @@ class DirectStakingSelection(
             && validatorsLimit == other.validatorsLimit
     }
 
-    override fun hashCode(): Int {
-        var result = validators.map { it.address }
-            .hashCode()
-        result = 31 * result + validatorsLimit
-        return result
+    override fun copyWith(stake: Balance): StartMultiStakingSelection {
+        return copy(stake = stake)
     }
 }

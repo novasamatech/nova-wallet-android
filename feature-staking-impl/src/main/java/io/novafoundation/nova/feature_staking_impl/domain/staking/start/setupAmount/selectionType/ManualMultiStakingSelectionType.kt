@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAm
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.copyIntoCurrent
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.StartMultiStakingSelection
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStore
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationSystemBuilder
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBal
 
 class ManualMultiStakingSelectionType(
     private val selectedType: SingleStakingProperties,
+    private val selectionStore: StartMultiStakingSelectionStore
 ) : MultiStakingSelectionType {
 
     override suspend fun validationSystem(selection: StartMultiStakingSelection): StartMultiStakingValidationSystem {
@@ -29,7 +31,7 @@ class ManualMultiStakingSelectionType(
     }
 
     override suspend fun updateSelectionFor(stake: Balance) {
-        // When selection is selected manually, we do not update it based on entered amount
+        selectionStore.updateStake(stake)
     }
 
     private fun StartMultiStakingValidationSystemBuilder.enoughAvailableToStake() {
