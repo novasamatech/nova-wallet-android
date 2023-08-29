@@ -79,10 +79,6 @@ interface StakingRouter {
 
     fun openDAppBrowser(url: String)
 
-    fun openMoreStakingOptions()
-
-    fun backInStakingTab()
-
     fun openStakingPeriods()
 
     fun openSetupStakingType()

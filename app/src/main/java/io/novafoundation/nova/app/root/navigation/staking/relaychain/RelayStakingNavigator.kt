@@ -1,6 +1,5 @@
 package io.novafoundation.nova.app.root.navigation.staking.relaychain
 
-import androidx.navigation.NavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
@@ -34,8 +33,6 @@ class RelayStakingNavigator(
     navigationHolder: NavigationHolder,
     private val commonNavigator: Navigator,
 ) : BaseNavigator(navigationHolder), StakingRouter {
-
-    var stakingTabNavController: NavController? = null
 
     override fun returnToStakingMain() = performNavigation(R.id.back_to_staking_main)
 
@@ -164,14 +161,6 @@ class RelayStakingNavigator(
         actionId = R.id.action_mainFragment_to_dappBrowserGraph,
         args = DAppBrowserFragment.getBundle(url)
     )
-
-    override fun openMoreStakingOptions() {
-        stakingTabNavController?.performNavigation(R.id.action_stakingDashboardFragment_to_moreStakingOptionsFragment)
-    }
-
-    override fun backInStakingTab() {
-        stakingTabNavController?.popBackStack()
-    }
 
     override fun openStakingPeriods() {
         performNavigation(R.id.action_stakingFragment_to_staking_periods)

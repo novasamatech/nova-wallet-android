@@ -8,13 +8,16 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.s
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.StartMultiStakingSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStore
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.availableBalanceGapValidation
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingProperties
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 
 class AutomaticMultiStakingSelectionType(
     private val candidates: List<SingleStakingProperties>,
     private val selectionStore: StartMultiStakingSelectionStore,
+    private val locksRepository: BalanceLocksRepository,
 ) : MultiStakingSelectionType {
 
     override suspend fun validationSystem(selection: StartMultiStakingSelection): StartMultiStakingValidationSystem {
@@ -24,7 +27,10 @@ class AutomaticMultiStakingSelectionType(
         return ValidationSystem {
             candidateValidationSystem.copyIntoCurrent()
 
-            // TODO apply balance gap validation
+            availableBalanceGapValidation(
+                candidates = candidates,
+                locksRepository = locksRepository
+            )
         }
     }
 

@@ -24,6 +24,9 @@ import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.getAccentColor
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
+import io.novafoundation.nova.common.utils.images.ExtraImageRequestBuilding
+import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.postToSelf
@@ -122,19 +125,26 @@ open class TableCellView @JvmOverloads constructor(
         @DrawableRes placeholderRes: Int? = null,
         roundedCornersDp: Int? = 10
     ) {
-        url?.let {
-            image.makeVisible()
-            image.load(url, imageLoader) {
-                roundedCornersDp?.let {
-                    transformations(RoundedCornersTransformation(roundedCornersDp.dpF(context)))
-                }
+        loadImage(icon = url?.let(Icon::FromLink)) {
+            roundedCornersDp?.let {
+                transformations(RoundedCornersTransformation(roundedCornersDp.dpF(context)))
+            }
 
-                placeholderRes?.let {
-                    placeholder(it)
-                    error(it)
-                }
+            placeholderRes?.let {
+                placeholder(it)
+                error(it)
             }
         }
+    }
+
+    fun loadImage(
+        icon: Icon?,
+        extraBuilder: ExtraImageRequestBuilding = { }
+    ) {
+        if (icon == null) return
+
+        image.makeVisible()
+        image.setIcon(icon, imageLoader, extraBuilder)
     }
 
     fun showProgress() {

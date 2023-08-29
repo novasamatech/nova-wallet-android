@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MoreSta
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDApp
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.allStakingTypes
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
@@ -23,7 +24,8 @@ import kotlinx.coroutines.launch
 class MoreStakingOptionsViewModel(
     private val interactor: StakingDashboardInteractor,
     private val startStakingRouter: StartMultiStakingRouter,
-    private val stakingRouter: StakingRouter,
+    private val dashboardRouter: StakingDashboardRouter,
+    private val router: StakingRouter,
     private val stakingSharedState: StakingSharedState,
     private val presentationMapper: StakingDashboardPresentationMapper,
 ) : BaseViewModel() {
@@ -51,7 +53,7 @@ class MoreStakingOptionsViewModel(
     }
 
     fun onBrowserStakingItemClicked(item: StakingDAppModel) = launch {
-        stakingRouter.openDAppBrowser(item.url)
+        router.openDAppBrowser(item.url)
     }
 
     private fun syncDApps() = launch {
@@ -80,6 +82,6 @@ class MoreStakingOptionsViewModel(
     }
 
     fun goBack() {
-        stakingRouter.backInStakingTab()
+        dashboardRouter.backInStakingTab()
     }
 }
