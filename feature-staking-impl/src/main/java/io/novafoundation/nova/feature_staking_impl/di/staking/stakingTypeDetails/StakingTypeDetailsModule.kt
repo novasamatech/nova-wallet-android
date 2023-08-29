@@ -46,7 +46,9 @@ class StakingTypeDetailsModule {
 
     @Provides
     @FeatureScope
-    fun provideRelaychainStakingTypeDetailsInteractorFactory(stakingSharedComputation: StakingSharedComputation): RelaychainStakingTypeDetailsInteractorFactory {
+    fun provideRelaychainStakingTypeDetailsInteractorFactory(
+        stakingSharedComputation: StakingSharedComputation
+    ): RelaychainStakingTypeDetailsInteractorFactory {
         return RelaychainStakingTypeDetailsInteractorFactory(stakingSharedComputation)
     }
 
