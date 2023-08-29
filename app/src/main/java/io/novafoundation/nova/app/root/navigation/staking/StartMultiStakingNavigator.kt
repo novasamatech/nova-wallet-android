@@ -7,7 +7,6 @@ import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
-import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.ConfirmMultiStakingFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.ConfirmMultiStakingPayload
@@ -17,7 +16,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.se
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.SetupAmountMultiStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypeFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypePayload
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypeViewModel
 
 class StartMultiStakingNavigator(
     navigationHolder: NavigationHolder,

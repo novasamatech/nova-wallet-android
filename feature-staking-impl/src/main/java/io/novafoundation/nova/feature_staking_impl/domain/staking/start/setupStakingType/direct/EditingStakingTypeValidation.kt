@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.stak
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
-
 typealias EditingStakingTypeValidationSystem = ValidationSystem<EditingStakingTypePayload, EditingStakingTypeFailure>
 
 class EditingStakingTypePayload(

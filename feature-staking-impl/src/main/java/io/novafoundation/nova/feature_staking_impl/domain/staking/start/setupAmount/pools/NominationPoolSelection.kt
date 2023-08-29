@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.NominationPool
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.apy
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.StartMultiStakingSelection
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.model.MultiStakingType
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 

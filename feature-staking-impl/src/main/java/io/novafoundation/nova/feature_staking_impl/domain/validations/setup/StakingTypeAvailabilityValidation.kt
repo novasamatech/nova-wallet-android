@@ -5,10 +5,7 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validationError
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingProperties
-import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigInteger
 
 class StakingTypeAvailabilityValidation<P, E>(
     private val availableStakingTypes: List<Chain.Asset.StakingType>,

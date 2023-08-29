@@ -10,7 +10,6 @@ import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.ext.isDirectStaking
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
-
 fun handleSetupStakingTypeValidationFailure(chainAsset: Chain.Asset, error: EditingStakingTypeFailure, resourceManager: ResourceManager): TitleAndMessage {
     return when (error) {
         is EditingStakingTypeFailure.AmountIsLessThanMinStake -> {

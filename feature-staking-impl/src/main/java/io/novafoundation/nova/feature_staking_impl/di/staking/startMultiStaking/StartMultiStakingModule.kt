@@ -38,7 +38,6 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRep
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import javax.inject.Named
 import javax.inject.Qualifier
 
 @Target(

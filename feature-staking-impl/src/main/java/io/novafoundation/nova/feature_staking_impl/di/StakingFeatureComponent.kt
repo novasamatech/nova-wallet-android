@@ -63,7 +63,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.c
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.di.RedeemComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.di.ConfirmRewardDestinationComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.select.di.SelectRewardDestinationComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.di.SetupStakingTypeComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.di.ConfirmMultiStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.di.SetupStakingTypeComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.di.StartStakingLandingComponent

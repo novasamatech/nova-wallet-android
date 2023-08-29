@@ -41,8 +41,8 @@ data class DirectStakingSelection(
 
         val otherAddresses = other.validators.map { it.address }.toSet()
         val thisAddresses = validators.map { it.address }.toSet()
-        return thisAddresses == otherAddresses
-            && validatorsLimit == other.validatorsLimit
+        return thisAddresses == otherAddresses &&
+            validatorsLimit == other.validatorsLimit
     }
 
     override fun copyWith(stake: Balance): StartMultiStakingSelection {

@@ -80,7 +80,6 @@ class SetupStakingTypeViewModel(
     private val editableSelection = editingStakingTypeSelectionMixin.flatMapLatest { it.editableSelectionFlow }
         .shareInBackground()
 
-
     val availableToRewriteData = editingStakingTypeSelectionMixin
         .flatMapLatest { it.availableToRewriteData }
         .shareInBackground()
@@ -104,7 +103,7 @@ class SetupStakingTypeViewModel(
     }
 
     fun backPressed() {
-        //TODO: request access to close
+        // TODO: request access to close
 
         router.back()
     }

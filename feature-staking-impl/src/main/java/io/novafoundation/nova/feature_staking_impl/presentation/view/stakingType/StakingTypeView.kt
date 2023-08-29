@@ -56,7 +56,7 @@ class StakingTypeView @JvmOverloads constructor(
             context.getColor(R.color.staking_type_card_border)
         }
     }
-    
+
     fun setConditions(conditions: List<String>) {
         stakingTypeConditions.text = conditions.joinToString(separator = "\n") { it }
     }
