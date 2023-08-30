@@ -55,4 +55,6 @@ jobs:
       repository: novasamatech/nova-wallet-android-releases
       event-type: create-pr
       payload: '{"pr-body": "${{ github.ref }}", "pr-name": "${{ github.sha }}", "changelog": "${{ github.sha }}", "entrypoint": "${{ github.sha }}"}'
-    secrets: inherit
+    secrets: 
+      PR_APP_ID: ${{ secrets.PR_APP_ID }}
+      PR_APP_TOKEN: ${{ secrets.PR_APP_TOKEN }}
