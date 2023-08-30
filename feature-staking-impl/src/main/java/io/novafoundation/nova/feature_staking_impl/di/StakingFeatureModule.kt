@@ -316,7 +316,7 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideSetupStakingInteractor(
+    fun provideChangeValidatorsInteractor(
         extrinsicService: ExtrinsicService,
         sharedState: StakingSharedState,
     ) = ChangeValidatorsInteractor(extrinsicService, sharedState)
