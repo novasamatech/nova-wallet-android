@@ -42,7 +42,7 @@ jobs:
           echo ${{ steps.fc.outputs.comment-body }}
 
       - name: Fail if no comment
-        if: ${{ steps.fc.outputs.comment-body }} == ""
+        if: ${{ steps.fc.outputs.comment-body }} == 0
         run: exit 1
 
       - name: Create PR in release repo
