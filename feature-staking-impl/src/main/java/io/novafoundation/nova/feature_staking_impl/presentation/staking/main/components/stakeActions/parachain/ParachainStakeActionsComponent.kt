@@ -19,6 +19,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTE
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_VALIDATORS
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.validation.unbondPreliminaryValidationFailure
+import io.novafoundation.nova.feature_staking_impl.presentation.openStartStaking
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.StartParachainStakingMode
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.parachainStaking.loadDelegatingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.ManageStakeAction
@@ -90,7 +92,7 @@ internal open class ParachainStakeActionsComponent(
     private fun navigateToAction(action: ManageStakeAction) {
         when (action.id) {
             SYSTEM_MANAGE_VALIDATORS -> router.openCurrentCollators()
-            SYSTEM_MANAGE_STAKING_BOND_MORE -> router.openStartStaking()
+            SYSTEM_MANAGE_STAKING_BOND_MORE -> router.openStartStaking(StartParachainStakingMode.BOND_MORE)
             SYSTEM_MANAGE_STAKING_UNBOND -> openUnbondIfValid()
         }
     }

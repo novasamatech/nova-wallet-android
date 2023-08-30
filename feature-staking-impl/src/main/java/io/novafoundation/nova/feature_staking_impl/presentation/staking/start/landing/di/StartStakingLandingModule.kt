@@ -10,7 +10,9 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
@@ -79,7 +81,9 @@ class StartStakingLandingModule {
         updateSystemFactory: StakingLandingInfoUpdateSystemFactory,
         startStakingInteractorFactory: StartStakingInteractorFactory,
         appLinksProvider: AppLinksProvider,
-        startStakingLandingPayload: StartStakingLandingPayload
+        startStakingLandingPayload: StartStakingLandingPayload,
+        validationExecutor: ValidationExecutor,
+        selectedMetaAccountUseCase: SelectedAccountUseCase
     ): ViewModel {
         return StartStakingLandingViewModel(
             router = router,
@@ -87,7 +91,9 @@ class StartStakingLandingModule {
             updateSystemFactory = updateSystemFactory,
             startStakingInteractorFactory = startStakingInteractorFactory,
             appLinksProvider = appLinksProvider,
-            startStakingLandingPayload = startStakingLandingPayload
+            startStakingLandingPayload = startStakingLandingPayload,
+            validationExecutor = validationExecutor,
+            selectedMetaAccountUseCase = selectedMetaAccountUseCase
         )
     }
 

@@ -13,7 +13,9 @@ interface StartMultiStakingRouter : ReturnableRouter {
 
     fun openStartStakingLanding(payload: StartStakingLandingPayload)
 
-    fun openSetupAmount(payload: SetupAmountMultiStakingPayload)
+    fun openStartParachainStaking()
+
+    fun openStartMultiStaking(payload: SetupAmountMultiStakingPayload)
 
     fun openSetupStakingType()
 
@@ -22,4 +24,6 @@ interface StartMultiStakingRouter : ReturnableRouter {
     fun openSelectedValidators()
 
     fun returnToStakingDashboard()
+
+    fun goToWalletDetails(metaId: Long)
 }

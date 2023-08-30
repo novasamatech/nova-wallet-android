@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.domain.isLoaded
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.common.view.setProgress
@@ -72,6 +73,9 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
 
     override fun subscribe(viewModel: StartStakingLandingViewModel) {
         observeBrowserEvents(viewModel)
+        observeValidations(viewModel)
+
+        viewModel.isContinueButtonLoading.observe(startStakingLandingButton::setProgress)
 
         viewModel.modelFlow.observe {
             val isLoaded = it.isLoaded()
@@ -79,7 +83,6 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
             headerAdapter.show(isLoaded)
             footerAdapter.show(isLoaded)
             shimmeringAdapter.show(it.isLoading())
-            startStakingLandingButton.setProgress(it.isLoading())
 
             when (it) {
                 is ExtendedLoadingState.Loaded<StartStakingInfoModel> -> {
