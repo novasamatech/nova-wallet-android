@@ -45,7 +45,7 @@ jobs:
           echo ${{ steps.fc.outputs.comment-body }}
 
       - name: Fail if no comment
-        if: ${{ steps.fc.outputs.comment-body }} == "0"
+        if: ${{ steps.fc.outputs.comment-body == '' }} 
         run: exit 1
 
 
