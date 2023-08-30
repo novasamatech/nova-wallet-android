@@ -20,10 +20,10 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_confirm_stake.stakingConfirmationContainer
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start_confirm.confirmStartParachainStakingAmount
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start_confirm.confirmStartParachainStakingCollator
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start_confirm.confirmStartParachainStakingConfirm
+import kotlinx.android.synthetic.main.fragment_parachain_staking_start_confirm.confirmStartParachainStakingContainer
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start_confirm.confirmStartParachainStakingExtrinsicInfo
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start_confirm.confirmStartParachainStakingHints
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start_confirm.confirmStartParachainStakingToolbar
@@ -46,7 +46,7 @@ class ConfirmStartParachainStakingFragment : BaseFragment<ConfirmStartParachainS
     }
 
     override fun initViews() {
-        stakingConfirmationContainer.applyStatusBarInsets()
+        confirmStartParachainStakingContainer.applyStatusBarInsets()
 
         confirmStartParachainStakingToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }

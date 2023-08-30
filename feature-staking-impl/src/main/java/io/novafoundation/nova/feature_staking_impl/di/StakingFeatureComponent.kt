@@ -23,8 +23,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboard
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.di.RebagComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.confirm.di.ConfirmStakingComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.di.ConfirmNominationsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.di.ConfirmChangeValidatorsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations.di.ConfirmNominationsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.di.StakingDashboardComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.di.NominationPoolsConfirmBondMoreComponent
@@ -51,7 +51,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.di.PayoutDetailsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.list.di.PayoutsListComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.period.di.StakingPeriodComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.setup.di.SetupStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.di.ConfirmBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.di.SelectBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.di.ConfirmSetControllerComponent
@@ -130,9 +129,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun stakingPeriodComponentFactory(): StakingPeriodComponent.Factory
 
-    fun setupStakingComponentFactory(): SetupStakingComponent.Factory
-
-    fun confirmStakingComponentFactory(): ConfirmStakingComponent.Factory
+    fun confirmStakingComponentFactory(): ConfirmChangeValidatorsComponent.Factory
 
     fun confirmNominationsComponentFactory(): ConfirmNominationsComponent.Factory
 

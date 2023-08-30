@@ -42,7 +42,7 @@ class ReviewCustomValidatorsViewModel(
         .share()
 
     private val selectedValidators = confirmSetupState
-        .map { it.payload.validators }
+        .map { it.validators }
         .share()
 
     private val currentTokenFlow = tokenUseCase.currentTokenFlow()

@@ -1,10 +1,10 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.di
+package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations.di
 
 import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.ConfirmNominationsFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations.ConfirmNominationsFragment
 
 @Subcomponent(
     modules = [

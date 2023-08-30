@@ -9,7 +9,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class MaxNominatorsReachedValidation<P, E>(
     private val stakingRepository: StakingRepository,
-    private val isAlreadyNominating: (P) -> Boolean,
     private val chainId: (P) -> ChainId,
     private val errorProducer: () -> E
 ) : Validation<P, E> {
@@ -20,10 +19,6 @@ class MaxNominatorsReachedValidation<P, E>(
         val nominatorCount = stakingRepository.nominatorsCount(chainId) ?: return ValidationStatus.Valid()
         val maxNominatorsAllowed = stakingRepository.maxNominators(chainId) ?: return ValidationStatus.Valid()
 
-        if (isAlreadyNominating(value)) {
-            return ValidationStatus.Valid()
-        }
-
         return validOrError(nominatorCount < maxNominatorsAllowed) {
             errorProducer()
         }
@@ -32,9 +27,8 @@ class MaxNominatorsReachedValidation<P, E>(
 
 fun <P, E> ValidationSystemBuilder<P, E>.maximumNominatorsReached(
     stakingRepository: StakingRepository,
-    isAlreadyNominating: (P) -> Boolean,
     chainId: (P) -> ChainId,
     errorProducer: () -> E
 ) {
-    validate(MaxNominatorsReachedValidation(stakingRepository, isAlreadyNominating, chainId, errorProducer))
+    validate(MaxNominatorsReachedValidation(stakingRepository, chainId, errorProducer))
 }

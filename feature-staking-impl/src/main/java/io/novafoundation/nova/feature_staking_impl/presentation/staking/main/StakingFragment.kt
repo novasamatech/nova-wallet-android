@@ -17,12 +17,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.setupNetworkInfoComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.setupStakeActionsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.setupStakeSummaryComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.setupStartStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.setupUnbondingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.setupUserRewardsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.setupYourPoolComponent
 import kotlinx.android.synthetic.main.fragment_staking.stakingAlertsInfo
-import kotlinx.android.synthetic.main.fragment_staking.stakingEstimate
 import kotlinx.android.synthetic.main.fragment_staking.stakingNetworkInfo
 import kotlinx.android.synthetic.main.fragment_staking.stakingStakeManage
 import kotlinx.android.synthetic.main.fragment_staking.stakingStakeSummary
@@ -69,7 +67,6 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
         setupUserRewardsComponent(viewModel.userRewardsComponent, stakingUserRewards, viewModel.router)
         setupUnbondingComponent(viewModel.unbondingComponent, stakingStakeUnbondings)
         setupStakeActionsComponent(viewModel.stakeActionsComponent, stakingStakeManage)
-        setupStartStakingComponent(viewModel.startStakingComponent, stakingEstimate)
         setupAlertsComponent(viewModel.alertsComponent, stakingAlertsInfo)
         setupYourPoolComponent(viewModel.yourPoolComponent, stakingYourPool)
 

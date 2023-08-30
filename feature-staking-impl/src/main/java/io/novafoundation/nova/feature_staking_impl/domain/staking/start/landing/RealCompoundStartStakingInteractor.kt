@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteract
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.model.PayoutType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.model.StartStakingEraInfo
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.validations.StartStakingLandingValidationSystem
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.validations.startStakingLanding
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.validations.startStalingLanding
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -62,7 +62,7 @@ class RealCompoundStartStakingInteractor(
     private val stakingEraInteractor: StakingEraInteractor,
 ) : CompoundStartStakingInteractor {
     override suspend fun validationSystem(): StartStakingLandingValidationSystem {
-        return ValidationSystem.startStakingLanding()
+        return ValidationSystem.startStalingLanding()
     }
 
     override fun observeStartStakingInfo(): Flow<StartStakingCompoundData> {

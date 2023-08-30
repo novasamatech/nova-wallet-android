@@ -4,12 +4,11 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess.ReadyToSubmit.SelectionMethod
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
-import java.lang.IllegalArgumentException
 
 fun SetupStakingSharedState.retractValidators() = mutate {
     when (it) {
         is SetupStakingProcess.ReadyToSubmit -> it.previous().previous()
-        is SetupStakingProcess.Validators -> it.previous()
+        is SetupStakingProcess.ChoosingValidators -> it.previous()
         else -> throw IllegalArgumentException("Cannot retract validators from $it state")
     }
 }
@@ -27,7 +26,7 @@ private fun SetupStakingSharedState.setValidators(
     selectionMethod: SelectionMethod
 ) = mutate {
     when (it) {
-        is SetupStakingProcess.Validators -> it.next(validators, selectionMethod)
+        is SetupStakingProcess.ChoosingValidators -> it.next(validators, selectionMethod)
         is SetupStakingProcess.ReadyToSubmit -> it.changeValidators(validators, selectionMethod)
         else -> throw IllegalArgumentException("Cannot set validators from $it state")
     }

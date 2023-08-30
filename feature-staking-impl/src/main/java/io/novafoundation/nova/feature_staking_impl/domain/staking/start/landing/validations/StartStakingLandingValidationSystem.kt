@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_account_api.domain.validation.hasChainAcco
 
 typealias StartStakingLandingValidationSystem = ValidationSystem<StartStakingLandingValidationPayload, StartStakingLandingValidationFailure>
 
-fun ValidationSystem.Companion.startStakingLanding(): StartStakingLandingValidationSystem = ValidationSystem {
+fun ValidationSystem.Companion.startStalingLanding(): StartStakingLandingValidationSystem = ValidationSystem {
     hasChainAccount(
         chain = { it.chain },
         metaAccount = { it.metaAccount },
