@@ -6,24 +6,15 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.data.stakingType
-import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
+import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.RecommendableMultiStakingSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetails
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.EditingStakingTypeSelectionMixinFactory
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.direct.EditingStakingTypePayload
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.EditableStakingType
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.ValidatedStakingTypeDetails
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem.StakingTarget
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.ext.isDirectStaking
-import io.novafoundation.nova.runtime.ext.isPoolStaking
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
@@ -42,7 +33,7 @@ class SetupStakingTypeViewModel(
     payload: SetupStakingTypePayload,
     private val editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
     private val editingStakingTypeSelectionMixinFactory: EditingStakingTypeSelectionMixinFactory,
-    private val multiStakingSelectionFormatter: MultiStakingSelectionFormatter,
+    private val editableStakingTypeItemFormatter: EditableStakingTypeItemFormatter,
     private val validationExecutor: ValidationExecutor,
     chainRegistry: ChainRegistry
 ) : BaseViewModel(), Validatable by validationExecutor {
@@ -121,17 +112,16 @@ class SetupStakingTypeViewModel(
 
         launch {
             val chainAsset = chainWithAsset.first().asset
-            val stakingTypeDetails = stakingTypesDataFlow.first()[position]
-                .stakingTypeDetails
-            val stakingTypeMixin = editingStakingTypeSelectionMixin.first()
-            val enteredAmount = stakingTypeMixin.enteredAmount() ?: return@launch
-
-            validationExecutor.requireValid(
-                validationSystem = stakingTypeMixin.getValidationSystem(stakingTypeDetails.stakingType) ?: return@launch,
-                payload = EditingStakingTypePayload(enteredAmount, stakingTypeDetails.stakingType, stakingTypeDetails.minStake),
-                validationFailureTransformer = { handleSetupStakingTypeValidationFailure(chainAsset, it, resourceManager) },
-            ) {
-                setRecommendedSelection(stakingTypeDetails.stakingType)
+            val validatedStakingType = stakingTypesDataFlow.first()[position]
+            val validationStatus = validatedStakingType.validationStatus ?: return@launch
+            when (validationStatus) {
+                is ValidationStatus.Valid -> {
+                    setRecommendedSelection(validatedStakingType.stakingTypeDetails.stakingType)
+                }
+                is ValidationStatus.NotValid -> {
+                    // provide error dialog
+                    // handleSetupStakingTypeValidationFailure(chainAsset, validationStatus.reason, resourceManager)
+                }
             }
         }
     }
@@ -144,53 +134,11 @@ class SetupStakingTypeViewModel(
 
     private suspend fun mapStakingTypes(
         asset: Asset,
-        stakingTypesDetails: List<EditableStakingType>,
+        stakingTypesDetails: List<ValidatedStakingTypeDetails>,
         selection: RecommendableMultiStakingSelection
     ): List<EditableStakingTypeRVItem> {
         return stakingTypesDetails.mapNotNull {
-            val stakingTarget = StakingTarget.Model(multiStakingSelectionFormatter.formatForStakingType(selection))
-            val selectedStakingType = selection.selection.stakingOption.stakingType
-            val stakingType = it.stakingTypeDetails.stakingType
-            when {
-                stakingType.isDirectStaking() -> EditableStakingTypeRVItem(
-                    isSelected = selectedStakingType.isDirectStaking(),
-                    isSelectable = it.isAvailable,
-                    title = resourceManager.getString(R.string.setup_staking_type_direct_staking),
-                    imageRes = R.drawable.ic_pool_staking_banner_picture,
-                    conditions = mapConditions(asset, it.stakingTypeDetails),
-                    stakingTarget = stakingTarget.takeIf { selectedStakingType.isDirectStaking() }
-                )
-                stakingType.isPoolStaking() -> EditableStakingTypeRVItem(
-                    isSelected = selectedStakingType.isPoolStaking(),
-                    isSelectable = it.isAvailable,
-                    title = resourceManager.getString(R.string.setup_staking_type_pool_staking),
-                    imageRes = R.drawable.ic_direct_staking_banner_picture,
-                    conditions = mapConditions(asset, it.stakingTypeDetails),
-                    stakingTarget = stakingTarget.takeIf { selectedStakingType.isPoolStaking() }
-                )
-                else -> null
-            }
-        }
-    }
-
-    private fun mapConditions(asset: Asset, stakingTypeDetails: StakingTypeDetails): List<String> {
-        return buildList {
-            val minAmount = mapAmountToAmountModel(stakingTypeDetails.minStake, asset.token)
-            add(resourceManager.getString(R.string.setup_staking_type_min_amount_condition, minAmount.token))
-
-            val payoutCondition = when (stakingTypeDetails.payoutType) {
-                is PayoutType.Automatically -> resourceManager.getString(R.string.setup_staking_type_payout_type_automatically_condition)
-                is PayoutType.Manual -> resourceManager.getString(R.string.setup_staking_type_payout_type_manual_condition)
-            }
-            add(payoutCondition)
-
-            if (stakingTypeDetails.participationInGovernance) {
-                add(resourceManager.getString(R.string.setup_staking_type_governance_condition))
-            }
-
-            if (stakingTypeDetails.advancedOptionsAvailable) {
-                add(resourceManager.getString(R.string.setup_staking_type_advanced_options_condition))
-            }
+            editableStakingTypeItemFormatter.format(asset, it, selection)
         }
     }
 }

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.c
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.chain
@@ -14,17 +15,17 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmo
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.view.stakingTarget.StakingTargetModel
 
-interface MultiStakingSelectionFormatter {
+interface MultiStakingTargetSelectionFormatter {
 
     suspend fun formatForSetupAmount(recommendableSelection: RecommendableMultiStakingSelection): StakingTargetModel
 
     suspend fun formatForStakingType(recommendableSelection: RecommendableMultiStakingSelection): StakingTargetModel
 }
 
-class RealMultiStakingSelectionFormatter(
+class RealMultiStakingTargetSelectionFormatter(
     private val resourceManager: ResourceManager,
     private val poolDisplayFormatter: PoolDisplayFormatter,
-) : MultiStakingSelectionFormatter {
+) : MultiStakingTargetSelectionFormatter {
 
     override suspend fun formatForSetupAmount(
         recommendableSelection: RecommendableMultiStakingSelection,
@@ -55,7 +56,7 @@ class RealMultiStakingSelectionFormatter(
             is DirectStakingSelection -> StakingTargetModel(
                 title = resourceManager.getString(R.string.staking_recommended_title),
                 subtitle = formatValidatorsSubtitle(R.string.start_staking_editing_selection_validators_subtitle, recommendableSelection, selection),
-                icon = StakingTargetModel.TargetIcon.Quantity(selection.validators.size.toString())
+                icon = StakingTargetModel.TargetIcon.Quantity(selection.validators.size.format())
             )
 
             is NominationPoolSelection -> {

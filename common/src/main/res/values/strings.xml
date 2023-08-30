@@ -2,11 +2,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
     <string name="setup_staking_type_staking_amount_is_less_than_min_amount_title">Your stake is less than the minimum to earn rewards</string>
-    <string name="setup_staking_type_direct_staking_amount_is_less_than_min_amount_message">You have specified less than the minimum stake of %s required to earn rewards with Direct staking. You should consider using Pool staking to earn rewards.</string>
-    <string name="setup_staking_type_staking_amount_is_less_than_min_amount_fallback_message">You have specified less than the minimum stake of %s required to earn rewards with this staking type.</string>
+    <string name="setup_staking_type_direct_staking_amount_is_less_than_min_amount_message">You have specified less than the minimum stake of %s required to earn rewards with %s. You should consider using Pool staking to earn rewards.</string>
     <string name="setup_staking_type_already_used_title">Staking type cannot be changed</string>
     <string name="setup_staking_type_pool_already_used_message">You are already staking in a pool</string>
-    <string name="setup_staking_type_direct_already_used_message">You are already have Direct staking</string>
+        <string name="setup_staking_type_direct_already_used_message">You are already have Direct staking</string>
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Unsupported staking type</string>
 
     <string name="setup_staking_type_min_amount_condition">Minimum stake: %s</string>

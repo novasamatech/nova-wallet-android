@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.S
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.selectionType.MultiStakingSelectionTypeProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingSelectionFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingTargetSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.di.CommonMultiStakingModule
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.SetupAmountMultiStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.SetupAmountMultiStakingViewModel
@@ -30,7 +30,7 @@ class SetupAmountMultiStakingModule {
     @IntoMap
     @ViewModelKey(SetupAmountMultiStakingViewModel::class)
     fun provideViewModel(
-        multiStakingSelectionFormatter: MultiStakingSelectionFormatter,
+        multiStakingTargetSelectionFormatter: MultiStakingTargetSelectionFormatter,
         resourceManager: ResourceManager,
         router: StartMultiStakingRouter,
         multiStakingSelectionTypeProviderFactory: MultiStakingSelectionTypeProviderFactory,
@@ -43,7 +43,7 @@ class SetupAmountMultiStakingModule {
         validationExecutor: ValidationExecutor
     ): ViewModel {
         return SetupAmountMultiStakingViewModel(
-            multiStakingSelectionFormatter = multiStakingSelectionFormatter,
+            multiStakingTargetSelectionFormatter = multiStakingTargetSelectionFormatter,
             resourceManager = resourceManager,
             router = router,
             multiStakingSelectionTypeProviderFactory = multiStakingSelectionTypeProviderFactory,

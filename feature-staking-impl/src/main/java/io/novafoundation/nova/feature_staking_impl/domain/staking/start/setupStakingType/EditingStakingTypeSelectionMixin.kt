@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.s
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.CompoundStakingTypeDetailsProvidersFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.direct.EditingStakingTypeValidationSystem
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.EditableStakingType
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.ValidatedStakingTypeDetails
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
@@ -65,7 +65,7 @@ class EditingStakingTypeSelectionMixin(
         return stakingTypeDetailsProvider.getValidationSystem()
     }
 
-    fun getEditableStakingTypes(): Flow<List<EditableStakingType>> {
+    fun getEditableStakingTypes(): Flow<List<ValidatedStakingTypeDetails>> {
         val comparator = getEditableStakingTypeComparator()
         return stakingTypeDetailsProviders.map { it.stakingTypeDetails }
             .combine()
@@ -93,16 +93,15 @@ class EditingStakingTypeSelectionMixin(
     }
 
     suspend fun apply() {
-        editableSelectionStoreProvider.getSelectionStore(scope).currentSelection?.let {
-            currentSelectionStoreProvider.getSelectionStore(scope).updateSelection(it)
-        }
+        val newSelection = editableSelectionStoreProvider.getSelectionStore(scope).currentSelection ?: return
+        currentSelectionStoreProvider.getSelectionStore(scope)
+            .updateSelection(newSelection)
     }
 
-    private fun getEditableStakingTypeComparator(): Comparator<EditableStakingType> {
+    private fun getEditableStakingTypeComparator(): Comparator<ValidatedStakingTypeDetails> {
         return compareBy {
             when (it.stakingTypeDetails.stakingType.group()) {
                 StakingTypeGroup.NOMINATION_POOL -> 0
-                StakingTypeGroup.PARACHAIN,
                 StakingTypeGroup.RELAYCHAIN -> 1
                 else -> 3
             }
