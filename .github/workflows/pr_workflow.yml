@@ -15,16 +15,16 @@ jobs:
       need_run: ${{ steps.check_ref.outputs.ref_contains_rc }}
 
     steps:
-        - uses: actions/checkout@v2
-        - name: Check if "rc" is present in github.ref
-          id: check_ref
-          run: |
-            echo ${{ github.head_ref || github.ref_name }}
-            if [[ "${{ github.head_ref || github.ref_name }}" == *"/rc/"* ]]; then
-                echo "ref_contains_rc=1" >> $GITHUB_OUTPUT
-            else
-                echo "ref_contains_rc=0" >> $GITHUB_OUTPUT
-            fi
+      - uses: actions/checkout@v2
+      - name: Check if "rc" is present in github.ref
+        id: check_ref
+        run: |
+          echo ${{ github.head_ref || github.ref_name }}
+          if [[ "${{ github.head_ref || github.ref_name }}" == *"/rc/"* ]]; then
+              echo "ref_contains_rc=1" >> $GITHUB_OUTPUT
+          else
+              echo "ref_contains_rc=0" >> $GITHUB_OUTPUT
+          fi
 
   build-payload:
     runs-on: ubuntu-latest
@@ -50,7 +50,7 @@ jobs:
         run: ${{ steps.fc.outputs.comment-body }}
 
   create-pr:
-    uses: stepanLav/nova-utils/.github/workflows/trigger-event/action.yml@feature/reusable_workflow
+    uses: stepanLav/nova-utils/.github/workflows/trigger_event.yml@feature/reusable_workflow
     needs: build-payload
     with:
       repository: novasamatech/nova-wallet-android-releases
