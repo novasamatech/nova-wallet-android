@@ -52,7 +52,7 @@ jobs:
     uses: stepanLav/nova-utils/.github/workflows/trigger_event.yml@feature/reusable_workflow
     needs: build-payload
     with:
-      repository: novasamatech/nova-wallet-android-releases
+      repository: stepanLav/nova-wallet-android-releases
       event-type: create-pr
       payload: '{"pr-body": "${{ github.ref }}", "pr-name": "${{ github.sha }}", "changelog": "${{ github.sha }}", "entrypoint": "${{ github.sha }}"}'
     secrets: 
