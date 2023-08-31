@@ -19,6 +19,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.runtime.ext.isDirectStaking
+import io.novafoundation.nova.runtime.ext.isPoolStaking
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
@@ -133,10 +135,21 @@ class SetupStakingTypeViewModel(
 
     fun stakingTargetClicked(position: Int) {
         launch {
-            val validators = editableSelectionStoreProvider.getSelectionStore(viewModelScope)
-                .getValidatorsOrEmpty()
-            setupStakingSharedState.set(SetupStakingProcess.ReadyToSubmit(validators, SelectionMethod.CUSTOM))
-            router.openSelectCustomValidators()
+            val stakingType = stakingTypesDataFlow.first()[position]
+                .stakingTypeDetails
+                .stakingType
+
+            val selectionStore = editableSelectionStoreProvider.getSelectionStore(viewModelScope)
+
+            when {
+                stakingType.isDirectStaking() -> {
+                    setupStakingSharedState.set(SetupStakingProcess.ReadyToSubmit(selectionStore.getValidatorsOrEmpty(), SelectionMethod.CUSTOM))
+                    router.openSelectCustomValidators()
+                }
+                stakingType.isPoolStaking() -> {
+                    // TODO
+                }
+            }
         }
     }
 
