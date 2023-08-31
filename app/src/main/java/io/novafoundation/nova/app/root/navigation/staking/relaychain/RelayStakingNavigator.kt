@@ -163,6 +163,6 @@ class RelayStakingNavigator(
     }
 
     override fun openSetupStakingType() {
-        performNavigation(R.id.action_stakingLandingFragment_to_setupStakingTypeFragment)
+        performNavigation(R.id.action_setupAmountMultiStakingFragment_to_setupStakingType)
     }
 }
