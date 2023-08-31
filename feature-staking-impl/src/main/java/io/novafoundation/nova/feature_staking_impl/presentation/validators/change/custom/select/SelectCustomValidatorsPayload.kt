@@ -5,4 +5,3 @@ class SelectCustomValidatorsPayload() {
         CHANGE_VALIDATORS,
     }
 }
-

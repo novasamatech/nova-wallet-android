@@ -23,7 +23,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem.StakingTarget
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setCustomValidators
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel

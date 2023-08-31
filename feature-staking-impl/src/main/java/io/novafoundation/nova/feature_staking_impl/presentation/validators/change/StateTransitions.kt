@@ -21,7 +21,6 @@ fun SetupStakingSharedState.setRecommendedValidators(
     validators: List<Validator>
 ) = setValidators(validators, SelectionMethod.RECOMMENDED)
 
-
 fun SetupStakingSharedState.getSelectedValidators(): List<Validator> {
     return when (val process = setupStakingProcess.value) {
         is SetupStakingProcess.ChoosingValidators -> emptyList()

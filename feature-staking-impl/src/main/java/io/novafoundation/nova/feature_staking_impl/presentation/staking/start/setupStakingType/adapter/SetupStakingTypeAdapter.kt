@@ -77,7 +77,6 @@ class EditableStakingTypeViewHolder(
 
         editableStakingType.setOnClickListener {
             doIfPositionValid { position -> clickHandler.stakingTypeClicked(item, position) }
-
         }
 
         editableStakingType.setStakingTargetClickListener {
