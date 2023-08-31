@@ -2,12 +2,15 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing
 
 import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetails
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.model.StartStakingEraInfo
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.validations.StartStakingLandingValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.validations.startStalingLanding
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -43,19 +46,27 @@ class LandingAvailableBalance(val asset: Asset, val availableBalance: BigInteger
 
 interface StakingTypeDetailsCompoundInteractor {
 
+    val chain: Chain
+
+    suspend fun validationSystem(): StartStakingLandingValidationSystem
+
     fun observeStartStakingInfo(): Flow<StartStakingCompoundData>
 
     fun observeAvailableBalance(): Flow<LandingAvailableBalance>
 }
 
 class RealStakingTypeDetailsCompoundInteractor(
-    private val chain: Chain,
+    override val chain: Chain,
     private val chainAsset: Chain.Asset,
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val interactors: List<StakingTypeDetailsInteractor>,
     private val stakingEraInteractor: StakingEraInteractor,
 ) : StakingTypeDetailsCompoundInteractor {
+
+    override suspend fun validationSystem(): StartStakingLandingValidationSystem {
+        return ValidationSystem.startStalingLanding()
+    }
 
     override fun observeStartStakingInfo(): Flow<StartStakingCompoundData> {
         val startStakingDataFlow = interactors.map { it.observeData() }.combineList()

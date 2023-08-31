@@ -4,10 +4,14 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
+import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.StartParachainStakingMode
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.ConfirmMultiStakingFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.ConfirmMultiStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.StartStakingLandingFragment
@@ -20,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.se
 class StartMultiStakingNavigator(
     navigationHolder: NavigationHolder,
     private val stakingDashboardRouter: StakingDashboardRouter,
+    private val commonNavigationHolder: Navigator,
 ) : BaseNavigator(navigationHolder), StartMultiStakingRouter {
 
     override val stakingFlowFinishedEvent = MutableLiveData<Event<Unit>>()
@@ -29,8 +34,13 @@ class StartMultiStakingNavigator(
         args = StartStakingLandingFragment.getBundle(payload)
     )
 
-    override fun openSetupAmount(payload: SetupAmountMultiStakingPayload) = performNavigation(
-        actionId = R.id.action_startStakingLandingFragment_to_setupAmountMultiStakingFragment,
+    override fun openStartParachainStaking() = performNavigation(
+        actionId = R.id.action_startStakingLandingFragment_to_staking_parachain_start_graph,
+        args = StartParachainStakingFragment.getBundle(StartParachainStakingPayload(StartParachainStakingMode.START))
+    )
+
+    override fun openStartMultiStaking(payload: SetupAmountMultiStakingPayload) = performNavigation(
+        actionId = R.id.action_startStakingLandingFragment_to_start_multi_staking_nav_graph,
         args = SetupAmountMultiStakingFragment.getBundle(payload)
     )
 
@@ -52,5 +62,9 @@ class StartMultiStakingNavigator(
         performNavigation(R.id.back_to_main)
         stakingDashboardRouter.returnToStakingTabRoot()
         stakingFlowFinishedEvent.value = Unit.event()
+    }
+
+    override fun goToWalletDetails(metaId: Long) {
+        commonNavigationHolder.openAccountDetails(metaId)
     }
 }

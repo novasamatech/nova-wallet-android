@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_staking_impl.di.validations.SetControllerV
 import io.novafoundation.nova.feature_staking_impl.di.validations.SetupStakingValidationsModule
 import io.novafoundation.nova.feature_staking_impl.di.validations.StakeActionsValidationModule
 import io.novafoundation.nova.feature_staking_impl.di.validations.UnbondValidationsModule
-import io.novafoundation.nova.feature_staking_impl.di.validations.WelcomeStakingValidationModule
 
 @Module(
     includes = [
@@ -22,7 +21,6 @@ import io.novafoundation.nova.feature_staking_impl.di.validations.WelcomeStaking
         RebondValidationsModule::class,
         SetControllerValidationsModule::class,
         RewardDestinationValidationsModule::class,
-        WelcomeStakingValidationModule::class,
         StakeActionsValidationModule::class
     ]
 )

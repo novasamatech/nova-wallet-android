@@ -71,6 +71,7 @@ class StartParachainStakingViewModel(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val collatorsUseCase: CollatorsUseCase,
+    private val payload: StartParachainStakingPayload,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
     Retriable,
@@ -293,7 +294,8 @@ class StartParachainStakingViewModel(
             ConfirmStartParachainStakingPayload(
                 collator = mapCollatorToCollatorParcelModel(collator),
                 amount = amount,
-                fee = fee
+                fee = fee,
+                flowMode = payload.flowMode
             )
         }
 
