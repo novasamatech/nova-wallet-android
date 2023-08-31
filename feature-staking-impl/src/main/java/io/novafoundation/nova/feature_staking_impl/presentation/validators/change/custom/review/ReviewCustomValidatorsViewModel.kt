@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -29,11 +30,13 @@ import kotlinx.coroutines.launch
 
 class ReviewCustomValidatorsViewModel(
     private val router: StakingRouter,
+    private val reviewValidatorsRouter: ReviewValidatorsRouter,
     private val addressIconGenerator: AddressIconGenerator,
     private val interactor: StakingInteractor,
     private val resourceManager: ResourceManager,
     private val sharedStateSetup: SetupStakingSharedState,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
+    private val reviewValidatorsFlowAction: ReviewValidatorsFlowAction,
     tokenUseCase: TokenUseCase
 ) : BaseViewModel() {
 
@@ -109,6 +112,10 @@ class ReviewCustomValidatorsViewModel(
     }
 
     fun nextClicked() {
-        router.openConfirmStaking()
+        launch {
+            reviewValidatorsFlowAction.execute(viewModelScope)
+
+            reviewValidatorsRouter.openNextScreen()
+        }
     }
 }

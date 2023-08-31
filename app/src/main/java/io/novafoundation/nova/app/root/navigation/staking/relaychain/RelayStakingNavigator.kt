@@ -1,5 +1,6 @@
 package io.novafoundation.nova.app.root.navigation.staking.relaychain
 
+import androidx.navigation.NavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
@@ -26,13 +27,20 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDe
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.story.StoryFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload.FlowType
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.ReviewCustomValidatorsFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.SelectCustomValidatorsFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
 
 class RelayStakingNavigator(
-    navigationHolder: NavigationHolder,
+    private val navigationHolder: NavigationHolder,
     private val commonNavigator: Navigator,
 ) : BaseNavigator(navigationHolder), StakingRouter {
+
+    private val navController: NavController?
+        get() = navigationHolder.navController
 
     override fun returnToStakingMain() = performNavigation(R.id.back_to_staking_main)
 
@@ -79,7 +87,19 @@ class RelayStakingNavigator(
     }
 
     override fun openSelectCustomValidators() {
-        performNavigation(R.id.action_startChangeValidatorsFragment_to_selectCustomValidatorsFragment)
+        val flowType = when (navigationHolder.navController?.currentDestination?.id) {
+            R.id.setupStakingType -> FlowType.SETUP_STAKING_VALIDATORS
+            else -> FlowType.CHANGE_STAKING_VALIDATORS
+        }
+        val payload = CustomValidatorsPayload(flowType)
+
+        performNavigation(
+            cases = arrayOf(
+                R.id.setupStakingType to R.id.action_setupStakingType_to_selectCustomValidatorsFragment,
+                R.id.startChangeValidatorsFragment to R.id.action_startChangeValidatorsFragment_to_selectCustomValidatorsFragment,
+            ),
+            args = SelectCustomValidatorsFragment.getBundle(payload)
+        )
     }
 
     override fun openCustomValidatorsSettings() {
@@ -90,8 +110,11 @@ class RelayStakingNavigator(
         performNavigation(R.id.action_selectCustomValidatorsFragment_to_searchCustomValidatorsFragment)
     }
 
-    override fun openReviewCustomValidators() {
-        performNavigation(R.id.action_selectCustomValidatorsFragment_to_reviewCustomValidatorsFragment)
+    override fun openReviewCustomValidators(payload: CustomValidatorsPayload) {
+        performNavigation(
+            R.id.action_selectCustomValidatorsFragment_to_reviewCustomValidatorsFragment,
+            args = ReviewCustomValidatorsFragment.getBundle(payload)
+        )
     }
 
     override fun openConfirmStaking() {
@@ -157,6 +180,7 @@ class RelayStakingNavigator(
     }
 
     override fun openRebag() = performNavigation(R.id.action_stakingFragment_to_rebag)
+
     override fun openDAppBrowser(url: String) = performNavigation(
         actionId = R.id.action_mainFragment_to_dappBrowserGraph,
         args = DAppBrowserFragment.getBundle(url)
@@ -168,5 +192,9 @@ class RelayStakingNavigator(
 
     override fun openSetupStakingType() {
         performNavigation(R.id.action_stakingLandingFragment_to_setupStakingTypeFragment)
+    }
+
+    override fun finishSetupValidatorsFlow() {
+
     }
 }

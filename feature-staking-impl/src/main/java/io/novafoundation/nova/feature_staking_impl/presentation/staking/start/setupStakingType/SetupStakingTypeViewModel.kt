@@ -11,14 +11,18 @@ import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.RecommendableMultiStakingSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.getValidatorsOrEmpty
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetails
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.EditingStakingTypeSelectionMixinFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.direct.EditingStakingTypePayload
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.EditableStakingType
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
+import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem.StakingTarget
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setCustomValidators
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -44,6 +48,7 @@ class SetupStakingTypeViewModel(
     private val editingStakingTypeSelectionMixinFactory: EditingStakingTypeSelectionMixinFactory,
     private val multiStakingSelectionFormatter: MultiStakingSelectionFormatter,
     private val validationExecutor: ValidationExecutor,
+    private val setupStakingSharedState: SetupStakingSharedState,
     chainRegistry: ChainRegistry
 ) : BaseViewModel(), Validatable by validationExecutor {
 
@@ -116,7 +121,7 @@ class SetupStakingTypeViewModel(
         }
     }
 
-    fun selectStakingType(stakingTypeRVItem: EditableStakingTypeRVItem, position: Int) {
+    fun stakingTypeClicked(stakingTypeRVItem: EditableStakingTypeRVItem, position: Int) {
         if (stakingTypeRVItem.isSelected) return
 
         launch {
@@ -133,6 +138,14 @@ class SetupStakingTypeViewModel(
             ) {
                 setRecommendedSelection(stakingTypeDetails.stakingType)
             }
+        }
+    }
+
+    fun stakingTargetClicked(position: Int) {
+        launch {
+            val validators = editableSelectionStoreProvider.getSelectionStore(viewModelScope)
+                .getValidatorsOrEmpty()
+            router.openSelectCustomValidators()
         }
     }
 

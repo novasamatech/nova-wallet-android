@@ -5,6 +5,8 @@ import androidx.lifecycle.asFlow
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import io.novafoundation.nova.app.R
+import io.novafoundation.nova.app.root.navigation.delayedNavigation.BackDelayedNavigation
+import io.novafoundation.nova.app.root.navigation.delayedNavigation.NavComponentDelayedNavigation
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.navigation.DelayedNavigation
 import io.novafoundation.nova.common.utils.getParcelableCompat
@@ -69,14 +71,7 @@ import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.Welco
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 import io.novafoundation.nova.splash.SplashRouter
-import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.Flow
-
-@Parcelize
-class NavComponentDelayedNavigation(val globalActionId: Int, val extras: Bundle? = null) : DelayedNavigation
-
-@Parcelize
-object BackDelayedNavigation : DelayedNavigation
 
 class Navigator(
     private val navigationHolder: NavigationHolder,

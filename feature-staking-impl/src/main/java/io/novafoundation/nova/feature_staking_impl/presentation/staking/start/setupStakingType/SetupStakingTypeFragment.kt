@@ -68,6 +68,10 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), Setu
     }
 
     override fun stakingTypeClicked(stakingTypeRVItem: EditableStakingTypeRVItem, position: Int) {
-        viewModel.selectStakingType(stakingTypeRVItem, position)
+        viewModel.stakingTypeClicked(stakingTypeRVItem, position)
+    }
+
+    override fun stakingTargetClicked(position: Int) {
+        viewModel.stakingTargetClicked(position)
     }
 }

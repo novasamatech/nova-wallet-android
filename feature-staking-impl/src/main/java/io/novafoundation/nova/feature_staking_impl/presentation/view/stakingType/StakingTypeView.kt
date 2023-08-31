@@ -84,4 +84,8 @@ class StakingTypeView @JvmOverloads constructor(
             }
         }
     }
+
+    fun setStakingTargetClickListener(listener: OnClickListener) {
+        stakingTypeTarget.setOnClickListener(listener)
+    }
 }
