@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalTime::class)
-
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.search
 
 import androidx.lifecycle.viewModelScope
@@ -33,7 +31,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
-import kotlin.time.ExperimentalTime
 
 class SearchCustomValidatorsViewModel(
     private val router: StakingRouter,
@@ -52,7 +49,7 @@ class SearchCustomValidatorsViewModel(
         .share()
 
     private val selectedValidators = confirmSetupState
-        .map { it.payload.validators.toSet() }
+        .map { it.validators.toSet() }
         .inBackground()
         .share()
 

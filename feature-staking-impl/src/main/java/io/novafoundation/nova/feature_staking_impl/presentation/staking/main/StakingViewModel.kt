@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.NetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryComponentFactory
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.StartStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.YourPoolComponentFactory
@@ -30,7 +29,6 @@ class StakingViewModel(
     assetUseCase: AssetUseCase,
     alertsComponentFactory: AlertsComponentFactory,
     unbondingComponentFactory: UnbondingComponentFactory,
-    startStakingComponentFactory: StartStakingComponentFactory,
     stakeSummaryComponentFactory: StakeSummaryComponentFactory,
     userRewardsComponentFactory: UserRewardsComponentFactory,
     stakeActionsComponentFactory: StakeActionsComponentFactory,
@@ -68,7 +66,6 @@ class StakingViewModel(
     )
 
     val unbondingComponent = unbondingComponentFactory.create(componentHostContext)
-    val startStakingComponent = startStakingComponentFactory.create(componentHostContext)
     val stakeSummaryComponent = stakeSummaryComponentFactory.create(componentHostContext)
     val userRewardsComponent = userRewardsComponentFactory.create(componentHostContext)
     val stakeActionsComponent = stakeActionsComponentFactory.create(componentHostContext)

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.confirm
+package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,28 +16,21 @@ import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.setup.BondPayload
-import io.novafoundation.nova.feature_staking_impl.domain.setup.SetupStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.setup.ChangeValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
-import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess.ReadyToSubmit.Payload
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
-import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationModel
 import io.novafoundation.nova.feature_staking_impl.presentation.common.validation.stakingValidationFailure
-import io.novafoundation.nova.feature_staking_impl.presentation.confirm.hints.ConfirmStakeHintsMixinFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.hints.ConfirmStakeHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
@@ -47,15 +40,14 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
-class ConfirmStakingViewModel(
+class ConfirmChangeValidatorsViewModel(
     private val router: StakingRouter,
     private val interactor: StakingInteractor,
     private val addressIconGenerator: AddressIconGenerator,
-    private val addressDisplayUseCase: AddressDisplayUseCase,
     private val resourceManager: ResourceManager,
     private val validationSystem: ValidationSystem<SetupStakingPayload, SetupStakingValidationFailure>,
     private val setupStakingSharedState: SetupStakingSharedState,
-    private val setupStakingInteractor: SetupStakingInteractor,
+    private val changeValidatorsInteractor: ChangeValidatorsInteractor,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val externalActions: ExternalActions.Presentation,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
@@ -69,28 +61,18 @@ class ConfirmStakingViewModel(
     ExternalActions by externalActions {
 
     private val currentProcessState = setupStakingSharedState.get<SetupStakingProcess.ReadyToSubmit>()
-    private val payload = currentProcessState.payload
 
-    val hintsMixin = hintsMixinFactory.create(coroutineScope = this, payload)
-
-    private val bondPayload = when (payload) {
-        is Payload.Full -> BondPayload(payload.amount, payload.rewardDestination)
-        else -> null
-    }
+    val hintsMixin = hintsMixinFactory.create(coroutineScope = this)
 
     private val stashFlow = interactor.selectedAccountStakingStateFlow(viewModelScope)
         .filterIsInstance<StakingState.Stash>()
         .inBackground()
         .share()
 
-    private val stashAddressFlow = flowOf {
-        currentAddressForFullFlowOr(StakingState.Stash::stashAddress)
-    }
+    private val stashAddressFlow = stashFlow.map { it.stashAddress }
         .shareInBackground()
 
-    private val controllerAddressFlow = flowOf {
-        currentAddressForFullFlowOr(StakingState.Stash::controllerAddress)
-    }
+    private val controllerAddressFlow = stashFlow.map { it.controllerAddress }
         .shareInBackground()
 
     private val controllerAssetFlow = controllerAddressFlow
@@ -100,23 +82,6 @@ class ConfirmStakingViewModel(
     private val stashAssetFlow = stashAddressFlow
         .flatMapLatest(interactor::assetFlow)
         .shareInBackground()
-
-    val title = flowOf {
-        when (payload) {
-            is Payload.Full -> resourceManager.getString(R.string.staking_start_title)
-            is Payload.Validators -> resourceManager.getString(R.string.staking_change_validators)
-        }
-    }
-        .inBackground()
-        .share()
-
-    val amountModel = controllerAssetFlow.map { asset ->
-        bondPayload?.let {
-            mapAmountToAmountModel(it.amount, asset)
-        }
-    }
-        .inBackground()
-        .share()
 
     val walletFlow = walletUiUseCase.selectedWalletUiFlow()
         .inBackground()
@@ -129,22 +94,11 @@ class ConfirmStakingViewModel(
         .share()
 
     val nominationsFlow = flowOf {
-        val selectedCount = payload.validators.size
+        val selectedCount = currentProcessState.validators.size
         val maxValidatorsPerNominator = interactor.maxValidatorsPerNominator()
 
         resourceManager.getString(R.string.staking_confirm_nominations, selectedCount, maxValidatorsPerNominator)
     }
-
-    val rewardDestinationFlow = flowOf {
-        val rewardDestination = when (payload) {
-            is Payload.Full -> payload.rewardDestination
-            else -> null
-        }
-
-        rewardDestination?.let { mapRewardDestinationToRewardDestinationModel(it) }
-    }
-        .inBackground()
-        .share()
 
     private val _showNextProgress = MutableLiveData(false)
     val showNextProgress: LiveData<Boolean> = _showNextProgress
@@ -167,57 +121,24 @@ class ConfirmStakingViewModel(
         externalActions.showExternalActions(ExternalActions.Type.Address(address), selectedAssetState.chain())
     }
 
-    fun payoutAccountClicked() = launch {
-        val payoutDestination = rewardDestinationFlow.first() as? RewardDestinationModel.Payout ?: return@launch
-
-        val type = ExternalActions.Type.Address(payoutDestination.destination.address)
-        externalActions.showExternalActions(type, selectedAssetState.chain())
-    }
-
     fun nominationsClicked() {
         router.openConfirmNominations()
     }
 
     private fun loadFee() {
         feeLoaderMixin.loadFee(
-            viewModelScope,
-            feeConstructor = {
-                val token = controllerAssetFlow.first().token
-
-                setupStakingInteractor.calculateSetupStakingFee(
-                    controllerAddress = controllerAddressFlow.first(),
-                    validatorAccountIds = prepareNominations(),
-                    bondPayload = bondPayload
-                )
-            },
+            coroutineScope = viewModelScope,
+            feeConstructor = { changeValidatorsInteractor.estimateFee(prepareNominations()) },
             onRetryCancelled = ::backClicked
         )
     }
 
-    private suspend fun mapRewardDestinationToRewardDestinationModel(
-        rewardDestination: RewardDestination,
-    ): RewardDestinationModel {
-        return when (rewardDestination) {
-            is RewardDestination.Restake -> RewardDestinationModel.Restake
-            is RewardDestination.Payout -> {
-                val chain = selectedAssetState.chain()
-                val address = chain.addressOf(rewardDestination.targetAccountId)
-                val name = addressDisplayUseCase(address)
-
-                val addressModel = generateDestinationModel(address, name)
-
-                RewardDestinationModel.Payout(addressModel)
-            }
-        }
-    }
-
-    private fun prepareNominations() = payload.validators.map(Validator::accountIdHex)
+    private fun prepareNominations() = currentProcessState.validators.map(Validator::accountIdHex)
 
     private fun sendTransactionIfValid() = requireFee { fee ->
         launch {
             val payload = SetupStakingPayload(
                 maxFee = fee,
-                bondAmount = bondPayload?.amount,
                 stashAsset = stashAssetFlow.first(),
                 controllerAsset = controllerAssetFlow.first()
             )
@@ -234,10 +155,9 @@ class ConfirmStakingViewModel(
     }
 
     private fun sendTransaction() = launch {
-        val setupResult = setupStakingInteractor.setupStaking(
+        val setupResult = changeValidatorsInteractor.changeValidators(
             controllerAddress = controllerAddressFlow.first(),
             validatorAccountIds = prepareNominations(),
-            bondPayload = bondPayload
         )
 
         _showNextProgress.value = false
@@ -247,11 +167,7 @@ class ConfirmStakingViewModel(
 
             setupStakingSharedState.set(currentProcessState.finish())
 
-            if (currentProcessState.payload is Payload.Validators) {
-                router.returnToCurrentValidators()
-            } else {
-                router.returnToStakingMain()
-            }
+            router.returnToCurrentValidators()
         } else {
             showError(setupResult.requireException())
         }
@@ -269,12 +185,5 @@ class ConfirmStakingViewModel(
             accountName = name,
             background = AddressIconGenerator.BACKGROUND_TRANSPARENT
         )
-    }
-
-    private suspend inline fun currentAddressForFullFlowOr(address: (StakingState.Stash) -> String): String {
-        return when (payload) {
-            is Payload.Full -> payload.currentAccountAddress
-            else -> address(stashFlow.first())
-        }
     }
 }

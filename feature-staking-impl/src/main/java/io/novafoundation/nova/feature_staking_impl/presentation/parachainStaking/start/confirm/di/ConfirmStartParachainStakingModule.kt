@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.ParachainStakingHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.ConfirmStartParachainStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.hints.ConfirmStartParachainStakingHintsMixinFactory
@@ -45,6 +46,7 @@ class ConfirmStartParachainStakingModule {
     @ViewModelKey(ConfirmStartParachainStakingViewModel::class)
     fun provideViewModel(
         router: ParachainStakingRouter,
+        startStakingRouter: StartMultiStakingRouter,
         addressIconGenerator: AddressIconGenerator,
         selectedAccountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
@@ -62,7 +64,7 @@ class ConfirmStartParachainStakingModule {
         delegatorStateUseCase: DelegatorStateUseCase
     ): ViewModel {
         return ConfirmStartParachainStakingViewModel(
-            router = router,
+            parachainStakingRouter = router,
             addressIconGenerator = addressIconGenerator,
             selectedAccountUseCase = selectedAccountUseCase,
             resourceManager = resourceManager,
@@ -77,7 +79,8 @@ class ConfirmStartParachainStakingModule {
             payload = payload,
             hintsMixinFactory = hintsMixinFactory,
             collatorsUseCase = collatorsUseCase,
-            delegatorStateUseCase = delegatorStateUseCase
+            delegatorStateUseCase = delegatorStateUseCase,
+            startStakingRouter = startStakingRouter
         )
     }
 

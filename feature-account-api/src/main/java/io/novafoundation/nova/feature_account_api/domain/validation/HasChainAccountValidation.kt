@@ -74,7 +74,7 @@ fun handleChainAccountNotFound(
     failure: NoChainAccountFoundError,
     @StringRes addAccountDescriptionRes: Int,
     resourceManager: ResourceManager,
-    goToWalletDetails: () -> Unit
+    goToWalletDetails: (metaAccountId: Long) -> Unit
 ): TransformedFailure {
     val chainName = failure.chain.name
 
@@ -85,7 +85,7 @@ fun handleChainAccountNotFound(
                 message = resourceManager.getString(addAccountDescriptionRes, chainName),
                 okAction = CustomDialogDisplayer.Payload.DialogAction(
                     title = resourceManager.getString(R.string.common_add),
-                    action = goToWalletDetails
+                    action = { goToWalletDetails(failure.account.id) }
                 ),
                 cancelAction = noOp(resourceManager.getString(R.string.common_cancel)),
                 customStyle = R.style.AccentNegativeAlertDialogTheme

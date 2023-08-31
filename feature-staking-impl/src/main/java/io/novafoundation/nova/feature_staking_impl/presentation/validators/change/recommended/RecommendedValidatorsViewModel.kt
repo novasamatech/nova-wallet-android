@@ -96,7 +96,7 @@ class RecommendedValidatorsViewModel(
     }
 
     private fun retractRecommended() = sharedStateSetup.mutate {
-        if (it is ReadyToSubmit && it.payload.selectionMethod == SelectionMethod.RECOMMENDED) {
+        if (it is ReadyToSubmit && it.selectionMethod == SelectionMethod.RECOMMENDED) {
             it.previous()
         } else {
             it

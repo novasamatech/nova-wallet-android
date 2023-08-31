@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -56,6 +57,7 @@ class StartParachainStakingModule {
         delegatorStateUseCase: DelegatorStateUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         collatorsUseCase: CollatorsUseCase,
+        payload: StartParachainStakingPayload,
     ): ViewModel {
         return StartParachainStakingViewModel(
             router = router,
@@ -71,7 +73,8 @@ class StartParachainStakingModule {
             validationSystem = validationSystem,
             delegatorStateUseCase = delegatorStateUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            collatorsUseCase = collatorsUseCase
+            collatorsUseCase = collatorsUseCase,
+            payload = payload
         )
     }
 

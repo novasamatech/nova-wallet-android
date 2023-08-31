@@ -217,7 +217,7 @@ class SelectCustomValidatorsViewModel(
     private fun observeExternalSelectionChanges() {
         setupStakingSharedState.setupStakingProcess
             .filterIsInstance<SetupStakingProcess.ReadyToSubmit>()
-            .onEach { selectedValidators.value = it.payload.validators.asSetItems() }
+            .onEach { selectedValidators.value = it.validators.asSetItems() }
             .launchIn(viewModelScope)
     }
 

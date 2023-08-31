@@ -12,81 +12,25 @@
         tools:layout="@layout/fragment_start_staking_landing">
 
         <action
-            android:id="@+id/action_startStakingLandingFragment_to_setupAmountMultiStakingFragment"
-            app:destination="@id/setupAmountMultiStakingFragment"
+            android:id="@+id/action_startStakingLandingFragment_to_start_multi_staking_nav_graph"
+            app:destination="@id/start_multi_staking_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_startStakingLandingFragment_to_staking_parachain_start_graph"
+            app:destination="@id/staking_parachain_start_graph" />
 
     </fragment>
 
-    <fragment
-        android:id="@+id/setupStakingType"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypeFragment"
-        android:label="SetupStakingTypeFragment"
-        tools:layout="@layout/fragment_setup_staking_type">
+    <include app:graph="@navigation/staking_parachain_start_graph" />
 
-        <action
-            android:id="@+id/action_setupStakingType_to_selectCustomValidatorsFragment"
-            app:destination="@id/setup_staking_validators_graph"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/setupAmountMultiStakingFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.SetupAmountMultiStakingFragment"
-        android:label="SetupAmountMultiStakingFragment"
-        tools:layout="@layout/fragment_start_multi_staking_amount">
-
-        <action
-            android:id="@+id/action_setupAmountMultiStakingFragment_to_setupStakingType"
-            app:destination="@id/setupStakingType"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_stakingLandingFragment_to_setupStakingTypeFragment"
-            app:destination="@id/setupStakingType"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_setupAmountMultiStakingFragment_to_confirmMultiStakingFragment"
-            app:destination="@id/confirmMultiStakingFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-    </fragment>
-
-
-    <fragment
-        android:id="@+id/confirmMultiStakingFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.ConfirmMultiStakingFragment"
-        android:label="ConfirmMultiStakingFragment">
-        <action
-            android:id="@+id/action_confirmMultiStakingFragment_to_confirmNominationsFragment"
-            app:destination="@id/confirmNominationsFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-    </fragment>
-
-
-    <fragment
-        android:id="@+id/confirmNominationsFragment"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.ConfirmNominationsFragment"
-        android:label="ConfirmNominationsFragment"
-        tools:layout="@layout/fragment_confirm_nominations" />
+    <include app:graph="@navigation/start_multi_staking_nav_graph" />
 
 </navigation>

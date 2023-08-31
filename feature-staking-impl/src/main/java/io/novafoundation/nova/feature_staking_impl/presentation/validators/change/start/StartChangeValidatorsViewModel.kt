@@ -46,13 +46,13 @@ class StartChangeValidatorsViewModel(
 
     val customValidatorsTexts = setupStakingSharedState.setupStakingProcess.transform {
         when {
-            it is SetupStakingProcess.ReadyToSubmit && it.payload.validators.isNotEmpty() -> emit(
+            it is SetupStakingProcess.ReadyToSubmit && it.validators.isNotEmpty() -> emit(
                 Texts(
                     toolbarTitle = resourceManager.getString(R.string.staking_change_validators),
                     selectManuallyTitle = resourceManager.getString(R.string.staking_select_custom),
                     selectManuallyBadge = resourceManager.getString(
                         R.string.staking_max_format,
-                        it.payload.validators.size,
+                        it.validators.size,
                         maxValidatorsPerNominator.first()
                     )
                 )
