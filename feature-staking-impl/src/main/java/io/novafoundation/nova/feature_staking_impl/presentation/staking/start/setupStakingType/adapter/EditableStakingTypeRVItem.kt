@@ -9,13 +9,5 @@ class EditableStakingTypeRVItem(
     val title: String,
     @DrawableRes val imageRes: Int,
     val conditions: List<String>,
-    val stakingTarget: StakingTarget?
-) {
-
-    interface StakingTarget {
-
-        object Loading : StakingTarget
-
-        data class Model(val model: StakingTargetModel) : StakingTarget
-    }
-}
+    val stakingTarget: StakingTargetModel?
+)

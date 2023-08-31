@@ -16,6 +16,7 @@ class EditingStakingTypePayload(
 )
 
 sealed interface EditingStakingTypeFailure {
+
     class AmountIsLessThanMinStake(val minStake: BigInteger, val stakingType: Chain.Asset.StakingType) : EditingStakingTypeFailure
 
     class StakingTypeIsAlreadyUsing(val stakingType: Chain.Asset.StakingType) : EditingStakingTypeFailure

@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingRecommendation
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.direct.EditingStakingTypeValidationSystem
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.EditableStakingType
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.ValidatedStakingTypeDetails
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
@@ -41,7 +41,7 @@ interface StakingTypeDetailsProvider {
 
     val stakingType: Chain.Asset.StakingType
 
-    val stakingTypeDetails: Flow<EditableStakingType>
+    val stakingTypeDetails: Flow<ValidatedStakingTypeDetails>
 
     val recommendationProvider: SingleStakingRecommendation
 

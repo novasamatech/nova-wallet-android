@@ -20,7 +20,7 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), Setu
 
     companion object {
 
-        private val PAYLOAD_KEY = "payload_key"
+        private val PAYLOAD_KEY = "SetupStakingTypeFragment.Payload"
 
         fun getArguments(payload: SetupStakingTypePayload): Bundle {
             return Bundle().apply {
