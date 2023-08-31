@@ -24,8 +24,8 @@ fun SetupStakingSharedState.setRecommendedValidators(
 
 fun SetupStakingSharedState.getSelectedValidators(): List<Validator> {
     return when (val process = setupStakingProcess.value) {
-        is SetupStakingProcess.Validators -> emptyList()
-        is SetupStakingProcess.ReadyToSubmit -> process.payload.validators
+        is SetupStakingProcess.ChoosingValidators -> emptyList()
+        is SetupStakingProcess.ReadyToSubmit -> process.validators
         else -> throw IllegalArgumentException("Cannot get validators from $process state")
     }
 }

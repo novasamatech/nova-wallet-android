@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupSta
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.EditableStakingType
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
+import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess.ReadyToSubmit.SelectionMethod
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem
@@ -145,6 +146,7 @@ class SetupStakingTypeViewModel(
         launch {
             val validators = editableSelectionStoreProvider.getSelectionStore(viewModelScope)
                 .getValidatorsOrEmpty()
+            setupStakingSharedState.set(SetupStakingProcess.ReadyToSubmit(validators, SelectionMethod.CUSTOM))
             router.openSelectCustomValidators()
         }
     }

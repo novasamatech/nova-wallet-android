@@ -55,7 +55,7 @@
         tools:layout="@layout/fragment_select_custom_validators">
 
         <action
-            android:id="@+id/back_to_staking_main"
+            android:id="@+id/action_back_to_setupAmountMultiStakingFragment"
             app:enterAnim="@anim/fragment_close_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
