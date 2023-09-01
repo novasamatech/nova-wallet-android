@@ -21,7 +21,7 @@ class ParallelContributionSource(
     override suspend fun getContributions(
         chain: Chain,
         accountId: AccountId,
-    ): List<ExternalContributionSource.ExternalContribution> = runCatching {
+    ) = runCatching {
         parallelApi.getContributions(
             chain = chain,
             accountId = accountId
@@ -32,9 +32,7 @@ class ParallelContributionSource(
                 paraId = it.paraId
             )
         }
-    }.getOrElse {
+    }.onFailure {
         Log.e(LOG_TAG, "Failed to fetch parallel contributions: ${it.message}")
-
-        emptyList()
     }
 }

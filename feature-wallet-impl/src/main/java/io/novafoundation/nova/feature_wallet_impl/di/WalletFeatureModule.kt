@@ -65,6 +65,9 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.RealCrossChain
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealTransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletConstants
 import io.novafoundation.nova.feature_wallet_impl.data.repository.TokenRepositoryImpl
+import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
+import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
+import io.novafoundation.nova.feature_wallet_impl.data.repository.RealExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.source.CoingeckoCoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
@@ -76,6 +79,14 @@ import javax.inject.Named
 
 @Module
 class WalletFeatureModule {
+
+    @Provides
+    @FeatureScope
+    fun provideExternalBalancesRepository(
+        externalBalanceDao: ExternalBalanceDao
+    ): ExternalBalanceRepository {
+        return RealExternalBalanceRepository(externalBalanceDao)
+    }
 
     @Provides
     @FeatureScope

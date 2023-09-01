@@ -22,6 +22,8 @@ import io.novafoundation.nova.feature_assets.di.modules.ManageTokensCommonModule
 import io.novafoundation.nova.feature_assets.di.modules.SendModule
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
+import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.RealExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.domain.tokens.add.CoinGeckoLinkParser
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
@@ -30,12 +32,20 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.filter.His
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [SendModule::class, ManageTokensCommonModule::class, AddTokenModule::class])
 class AssetsFeatureModule {
+
+    @Provides
+    @FeatureScope
+    fun provideExternalBalancesInteractor(
+        accountRepository: AccountRepository,
+        externalBalanceRepository: ExternalBalanceRepository
+    ): ExternalBalancesInteractor = RealExternalBalancesInteractor(accountRepository, externalBalanceRepository)
 
     @Provides
     @FeatureScope

@@ -14,7 +14,7 @@ interface ContributionsRepository {
         chain: Chain,
         accountId: ByteArray,
         fundInfos: Map<ParaId, FundInfo>
-    ): Flow<Pair<String, List<Contribution>>>
+    ): Flow<Pair<String, Result<List<Contribution>>>>
 
     fun observeContributions(metaAccount: MetaAccount): Flow<List<Contribution>>
 

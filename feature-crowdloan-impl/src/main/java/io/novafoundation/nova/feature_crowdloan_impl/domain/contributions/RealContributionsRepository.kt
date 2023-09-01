@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.domain.contributions
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mapList
+import io.novafoundation.nova.common.utils.mapResult
 import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
@@ -61,7 +62,7 @@ class RealContributionsRepository(
         chain: Chain,
         accountId: ByteArray,
         fundInfos: Map<ParaId, FundInfo>,
-    ): Flow<Pair<String, List<Contribution>>> = flow {
+    ): Flow<Pair<String, Result<List<Contribution>>>> = flow {
         if (!chain.hasCrowdloans) {
             return@flow
         }
@@ -83,9 +84,10 @@ class RealContributionsRepository(
         asset: Chain.Asset,
         accountId: ByteArray,
         fundInfos: Map<ParaId, FundInfo>,
-    ): Flow<List<Contribution>> = flow {
-        val result = getDirectContributions(chain, asset, accountId, fundInfos)
-        emit(result)
+    ): Flow<Result<List<Contribution>>> = flowOf {
+        runCatching {
+            getDirectContributions(chain, asset, accountId, fundInfos)
+        }
     }
 
     override suspend fun getDirectContributions(
@@ -108,17 +110,19 @@ class RealContributionsRepository(
         chain: Chain,
         asset: Chain.Asset,
         accountId: ByteArray,
-    ): Flow<List<Contribution>> {
+    ): Flow<Result<List<Contribution>>> {
         if (externalContributionSource.supports(chain)) {
             return flowOf { externalContributionSource.getContributions(chain, accountId) }
-                .mapList {
-                    Contribution(
-                        chain = chain,
-                        asset = asset,
-                        amountInPlanks = it.amount,
-                        sourceId = it.sourceId,
-                        paraId = it.paraId
-                    )
+                .mapResult { contributions ->
+                    contributions.map {
+                        Contribution(
+                            chain = chain,
+                            asset = asset,
+                            amountInPlanks = it.amount,
+                            sourceId = it.sourceId,
+                            paraId = it.paraId
+                        )
+                    }
                 }
         }
 

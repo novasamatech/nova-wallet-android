@@ -20,6 +20,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
+import io.novafoundation.nova.feature_wallet_api.domain.model.aggregatedBalanceByAsset
+import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -137,10 +139,10 @@ class WalletInteractorImpl(
 
     override suspend fun groupAssets(
         assets: List<Asset>,
-        offChainBalances: Map<FullChainAssetId, BigInteger>
+        externalBalances: List<ExternalBalance>
     ): Map<AssetGroup, List<AssetWithOffChainBalance>> {
         val chains = chainRegistry.chainsById.first()
 
-        return groupAndSortAssetsByNetwork(assets, offChainBalances, chains)
+        return groupAndSortAssetsByNetwork(assets, externalBalances.aggregatedBalanceByAsset(), chains)
     }
 }
