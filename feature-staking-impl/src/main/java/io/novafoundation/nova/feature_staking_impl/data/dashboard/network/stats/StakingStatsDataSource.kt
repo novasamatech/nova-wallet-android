@@ -28,7 +28,8 @@ interface StakingStatsDataSource {
 }
 
 class RealStakingStatsDataSource(
-    private val api: StakingStatsApi
+    private val api: StakingStatsApi,
+    private val dashboardApiUrl: String,
 ) : StakingStatsDataSource {
 
     override suspend fun fetchStakingStats(
@@ -37,7 +38,7 @@ class RealStakingStatsDataSource(
     ): MultiChainStakingStats = withContext(Dispatchers.IO) {
         retryUntilDone {
             val request = StakingStatsRequest(stakingAccounts, stakingChains)
-            val response = api.fetchStakingStats(request).data
+            val response = api.fetchStakingStats(request, dashboardApiUrl).data
 
             val earnings = response.stakingApies.associatedById()
             val rewards = response.rewards.associatedById()

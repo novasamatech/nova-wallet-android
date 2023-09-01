@@ -42,12 +42,17 @@ class StakingDashboardModule {
     @Provides
     @FeatureScope
     fun provideStakingStatsApi(apiCreator: NetworkApiCreator): StakingStatsApi {
-        return apiCreator.create(StakingStatsApi::class.java, customBaseUrl = BuildConfig.DASHBOARD_SUBQUERY_URL)
+        return apiCreator.create(StakingStatsApi::class.java)
     }
 
     @Provides
     @FeatureScope
-    fun provideStakingStatsDataSource(api: StakingStatsApi): StakingStatsDataSource = RealStakingStatsDataSource(api)
+    fun provideStakingStatsDataSource(api: StakingStatsApi): StakingStatsDataSource {
+        return RealStakingStatsDataSource(
+            api = api,
+            dashboardApiUrl =  BuildConfig.DASHBOARD_SUBQUERY_URL
+        )
+    }
 
     @Provides
     @FeatureScope
