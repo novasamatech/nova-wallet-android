@@ -32,7 +32,7 @@ class RealPaymentUpdaterFactory(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val scope: AccountUpdateScope,
     private val currencyRepository: CurrencyRepository
-): PaymentUpdaterFactory {
+) : PaymentUpdaterFactory {
 
     override fun create(chain: Chain): Updater<MetaAccount> {
         return PaymentUpdater(

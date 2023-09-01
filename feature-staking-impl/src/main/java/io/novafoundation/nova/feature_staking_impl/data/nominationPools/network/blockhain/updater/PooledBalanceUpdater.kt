@@ -126,15 +126,15 @@ class PooledBalanceUpdater(
     }
 
     private suspend fun insertExternalBalance(
-       poolMember: PoolMember?,
-       totalPoolBalances: TotalPoolBalances?,
-       metaAccount: MetaAccount,
+        poolMember: PoolMember?,
+        totalPoolBalances: TotalPoolBalances?,
+        metaAccount: MetaAccount,
     ) {
-       val totalStake = if (poolMember != null && totalPoolBalances != null) {
-           totalPoolBalances.totalStakeOf(poolMember)
-       } else {
-           Balance.ZERO
-       }
+        val totalStake = if (poolMember != null && totalPoolBalances != null) {
+            totalPoolBalances.totalStakeOf(poolMember)
+        } else {
+            Balance.ZERO
+        }
 
         val externalBalance = ExternalBalanceLocal(
             metaId = metaAccount.id,

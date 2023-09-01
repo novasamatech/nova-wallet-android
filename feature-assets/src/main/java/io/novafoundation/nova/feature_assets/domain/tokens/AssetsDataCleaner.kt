@@ -14,7 +14,7 @@ class RealAssetsDataCleaner(
     private val externalBalanceRepository: ExternalBalanceRepository,
     private val contributionsRepository: ContributionsRepository,
     private val walletRepository: WalletRepository,
-): AssetsDataCleaner {
+) : AssetsDataCleaner {
 
     override suspend fun clearAssetsData(assetIds: List<FullChainAssetId>) {
         contributionsRepository.deleteContributions(assetIds)

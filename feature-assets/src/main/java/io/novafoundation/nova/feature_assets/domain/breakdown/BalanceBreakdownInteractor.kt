@@ -124,8 +124,6 @@ class BalanceBreakdownInteractor(
         }
     }
 
-
-
     private fun calculateTotalBalance(
         assets: List<Asset>,
         externalBalancesItems: List<BalanceBreakdown.BreakdownItem>

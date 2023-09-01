@@ -30,13 +30,15 @@ val AddExternalBalances_45_46 = object : Migration(45, 46) {
         val converters = ExternalBalanceTypeConverters()
         val crowdloanId = converters.fromType(ExternalBalanceLocal.Type.CROWDLOAN)
 
-        database.execSQL("""
+        database.execSQL(
+            """
             INSERT INTO externalBalances
             SELECT metaId, chainId, assetId,
             "$crowdloanId" as type, sourceId as subtype, SUM(amountInPlanks) as amount 
             FROM contributions
             WHERE SELECT EXISTS
             GROUP BY metaId, chainId, assetId, sourceId
-        """.trimIndent())
+            """.trimIndent()
+        )
     }
 }

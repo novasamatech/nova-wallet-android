@@ -30,7 +30,7 @@ class ManageTokensCommonModule {
         externalBalanceRepository: ExternalBalanceRepository,
         contributionsRepository: ContributionsRepository,
         walletRepository: WalletRepository,
-        ): AssetsDataCleaner {
+    ): AssetsDataCleaner {
         return RealAssetsDataCleaner(externalBalanceRepository, contributionsRepository, walletRepository)
     }
 

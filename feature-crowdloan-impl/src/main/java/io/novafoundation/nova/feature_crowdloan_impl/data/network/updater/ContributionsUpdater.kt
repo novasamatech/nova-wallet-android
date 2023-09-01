@@ -79,7 +79,7 @@ class ContributionsUpdater(
             accountId = accountId,
             fundInfos = fundInfos,
         ).onEach { (sourceId, contributionsResult) ->
-            contributionsResult.onSuccess {  contributions ->
+            contributionsResult.onSuccess { contributions ->
                 val newContributions = contributions.map { mapContributionToLocal(metaAccount.id, it) }
                 val oldContributions = contributionDao.getContributions(metaAccount.id, chain.id, chainAsset.id, sourceId)
 

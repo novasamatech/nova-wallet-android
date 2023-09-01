@@ -15,6 +15,5 @@ class ExternalBalance(
     }
 }
 
-
 fun List<ExternalBalance>.aggregatedBalanceByAsset(): Map<FullChainAssetId, Balance> = groupBy { it.chainAssetId }
     .mapValues { (_, assetExternalBalances) -> assetExternalBalances.sumByBigInteger(ExternalBalance::amount) }
