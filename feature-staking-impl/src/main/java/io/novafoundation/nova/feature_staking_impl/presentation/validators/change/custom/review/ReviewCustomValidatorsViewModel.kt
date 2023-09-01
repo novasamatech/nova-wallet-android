@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.model.ValidatorsSelectionState
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setCustomValidators
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
@@ -87,7 +87,7 @@ class ReviewCustomValidatorsViewModel(
 
     val isInEditMode = MutableStateFlow(false)
 
-    fun deleteClicked(validatorModel: ValidatorModel) {
+    fun deleteClicked(validatorModel: ValidatorStakeTargetModel) {
         launch {
             val validators = selectedValidators.first()
 
@@ -105,7 +105,7 @@ class ReviewCustomValidatorsViewModel(
         router.back()
     }
 
-    fun validatorInfoClicked(validatorModel: ValidatorModel) = launch {
+    fun validatorInfoClicked(validatorModel: ValidatorStakeTargetModel) = launch {
         val stakeTarget = mapValidatorToValidatorDetailsParcelModel(validatorModel.stakeTarget)
 
         router.openValidatorDetails(StakeTargetDetailsPayload.relaychain(stakeTarget, interactor))

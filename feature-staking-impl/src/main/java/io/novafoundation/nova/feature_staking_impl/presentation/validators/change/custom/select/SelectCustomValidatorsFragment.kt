@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCustomValidatorsClearFilters
 import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCustomValidatorsContainer
@@ -124,11 +124,11 @@ class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewMo
         }
     }
 
-    override fun stakeTargetInfoClicked(validatorModel: ValidatorModel) {
-        viewModel.validatorInfoClicked(validatorModel)
+    override fun stakeTargetInfoClicked(stakeTargetModel: ValidatorStakeTargetModel) {
+        viewModel.validatorInfoClicked(stakeTargetModel)
     }
 
-    override fun stakeTargetClicked(validatorModel: ValidatorModel) {
-        viewModel.validatorClicked(validatorModel)
+    override fun stakeTargetClicked(stakeTargetModel: ValidatorStakeTargetModel) {
+        viewModel.validatorClicked(stakeTargetModel)
     }
 }

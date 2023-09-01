@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.model.ContinueButtonState
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setCustomValidators
@@ -160,14 +160,14 @@ class SelectCustomValidatorsViewModel(
         router.openReviewCustomValidators(payload)
     }
 
-    fun validatorInfoClicked(validatorModel: ValidatorModel) = launch {
+    fun validatorInfoClicked(validatorModel: ValidatorStakeTargetModel) = launch {
         val stakeTarget = mapValidatorToValidatorDetailsParcelModel(validatorModel.stakeTarget)
         val payload = StakeTargetDetailsPayload.relaychain(stakeTarget, interactor)
 
         router.openValidatorDetails(payload)
     }
 
-    fun validatorClicked(validatorModel: ValidatorModel) {
+    fun validatorClicked(validatorModel: ValidatorStakeTargetModel) {
         mutateSelected {
             it.toggle(validatorModel.stakeTarget.asSetItem())
         }
@@ -226,7 +226,7 @@ class SelectCustomValidatorsViewModel(
         validators: List<Validator>,
         selectedValidators: Set<SetItem<Validator>>,
         token: Token,
-    ): List<ValidatorModel> {
+    ): List<ValidatorStakeTargetModel> {
         return validators.map { validator ->
             mapValidatorToValidatorModel(
                 chain = chain,

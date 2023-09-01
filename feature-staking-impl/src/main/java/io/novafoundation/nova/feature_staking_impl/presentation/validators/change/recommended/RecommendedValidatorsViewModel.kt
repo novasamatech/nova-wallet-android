@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setRecommendedValidators
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
@@ -70,7 +70,7 @@ class RecommendedValidatorsViewModel(
         router.back()
     }
 
-    fun validatorInfoClicked(validatorModel: ValidatorModel) = launch {
+    fun validatorInfoClicked(validatorModel: ValidatorStakeTargetModel) = launch {
         val stakeTarget = mapValidatorToValidatorDetailsParcelModel(validatorModel.stakeTarget)
         val payload = StakeTargetDetailsPayload.relaychain(stakeTarget, interactor)
 
@@ -87,7 +87,7 @@ class RecommendedValidatorsViewModel(
     private suspend fun convertToModels(
         validators: List<Validator>,
         token: Token
-    ): List<ValidatorModel> {
+    ): List<ValidatorStakeTargetModel> {
         val chain = selectedAssetState.chain()
 
         return validators.map {

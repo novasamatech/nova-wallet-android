@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/selectCustomPoolContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@color/secondary_screen_background">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/selectCustomPoolToolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleText="@string/select_custom_pool_title" />
+
+    <FrameLayout
+        android:id="@+id/selectCustomPoolChips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/selectCustomPoolToolbar">
+
+        <TextView
+            android:id="@+id/selectCustomPoolRecommendedAction"
+            style="@style/Widget.Nova.Action.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:text="@string/select_custom_pool_select_recommedned_chip" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/selectCustomPoolListHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/selectCustomPoolChips">
+
+        <TextView
+            android:id="@+id/selectCustomPoolCount"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:textAllCaps="true"
+            android:textColor="@color/text_secondary"
+            tools:text="@string/select_custom_pool_active_pools_count" />
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginStart="16dp"
+            android:textAllCaps="true"
+            android:textColor="@color/text_secondary"
+            tools:text="@string/select_custom_pool_members" />
+    </FrameLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/selectCustomPoolList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/selectCustomPoolListHeader"
+        tools:listitem="@layout/item_validator" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
