@@ -34,7 +34,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceLocalDataSource
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteDataSource
-import io.novafoundation.nova.feature_wallet_api.di.Wallet
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.CoinPriceInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
@@ -49,8 +48,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderProviderFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.BalancesUpdateSystem
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.PaymentUpdaterFactory
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.RealPaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainConfigApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.PalletXcmRepository
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCrossChainTransactor
@@ -194,28 +193,11 @@ class WalletFeatureModule {
         assetSourceRegistry: AssetSourceRegistry,
         accountUpdateScope: AccountUpdateScope,
         currencyRepository: CurrencyRepository
-    ) = PaymentUpdaterFactory(
+    ): PaymentUpdaterFactory = RealPaymentUpdaterFactory(
         operationDao,
         assetSourceRegistry,
         accountUpdateScope,
         currencyRepository
-    )
-
-    @Provides
-    @Wallet
-    @FeatureScope
-    fun provideFeatureUpdaters(
-        chainRegistry: ChainRegistry,
-        paymentUpdaterFactory: PaymentUpdaterFactory,
-        balanceLocksUpdater: BalanceLocksUpdaterFactory,
-        accountUpdateScope: AccountUpdateScope,
-        storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
-    ): UpdateSystem = BalancesUpdateSystem(
-        chainRegistry,
-        paymentUpdaterFactory,
-        balanceLocksUpdater,
-        accountUpdateScope,
-        storageSharedRequestsBuilderFactory,
     )
 
     @Provides

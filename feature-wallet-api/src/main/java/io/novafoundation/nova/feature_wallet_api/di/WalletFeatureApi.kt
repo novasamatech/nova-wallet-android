@@ -1,8 +1,9 @@
 package io.novafoundation.nova.feature_wallet_api.di
 
-import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
@@ -31,9 +32,6 @@ interface WalletFeatureApi {
 
     fun provideWallConstants(): WalletConstants
 
-    @Wallet
-    fun provideWalletUpdateSystem(): UpdateSystem
-
     fun provideFeeLoaderMixinFactory(): FeeLoaderMixin.Factory
 
     fun provideCoinPriceRateInteractor(): CoinPriceInteractor
@@ -61,4 +59,8 @@ interface WalletFeatureApi {
     val arbitraryAssetUseCase: ArbitraryAssetUseCase
 
     val externalBalancesRepository: ExternalBalanceRepository
+
+    val paymentUpdaterFactory: PaymentUpdaterFactory
+
+    val balanceLocksUpdaterFactory: BalanceLocksUpdaterFactory
 }

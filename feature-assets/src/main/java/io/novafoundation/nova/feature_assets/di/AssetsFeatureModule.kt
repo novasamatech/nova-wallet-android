@@ -9,12 +9,14 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_assets.BuildConfig
 import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
 import io.novafoundation.nova.feature_assets.data.buyToken.providers.MercuryoProvider
 import io.novafoundation.nova.feature_assets.data.buyToken.providers.RampProvider
 import io.novafoundation.nova.feature_assets.data.buyToken.providers.TransakProvider
+import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.PreferencesAssetFiltersRepository
 import io.novafoundation.nova.feature_assets.di.modules.AddTokenModule
@@ -31,10 +33,14 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Control
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [SendModule::class, ManageTokensCommonModule::class, AddTokenModule::class])
@@ -167,6 +173,26 @@ class AssetsFeatureModule {
             missingKeysPresenter,
             actionAwaitableMixinFactory,
             resourceManager
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideBalancesUpdateSystem(
+        chainRegistry: ChainRegistry,
+        paymentUpdaterFactory: PaymentUpdaterFactory,
+        balanceLocksUpdater: BalanceLocksUpdaterFactory,
+        pooledBalanceUpdaterFactory: PooledBalanceUpdaterFactory,
+        accountUpdateScope: AccountUpdateScope,
+        storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
+    ): BalancesUpdateSystem {
+        return BalancesUpdateSystem(
+            chainRegistry = chainRegistry,
+            paymentUpdaterFactory = paymentUpdaterFactory,
+            balanceLocksUpdater = balanceLocksUpdater,
+            pooledBalanceUpdaterFactory = pooledBalanceUpdaterFactory,
+            accountUpdateScope = accountUpdateScope,
+            storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory
         )
     }
 }
