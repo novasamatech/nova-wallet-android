@@ -9,4 +9,6 @@ interface ExternalBalanceRepository {
     fun observeAccountExternalBalances(metaId: Long): Flow<List<ExternalBalance>>
 
     fun observeAccountChainExternalBalances(metaId: Long, assetId: FullChainAssetId): Flow<List<ExternalBalance>>
+
+    suspend fun deleteExternalBalances(assetIds: List<FullChainAssetId>)
 }

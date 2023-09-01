@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.data.network.updater
 
 import io.novafoundation.nova.common.utils.CollectionDiffer
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -63,7 +62,7 @@ class ContributionsUpdater(
             if (scopeValue.asset.token.configuration.enabled) {
                 sync(scopeValue)
             } else {
-                deleteContributions(scopeValue.asset.token.configuration)
+                emptyFlow()
             }
         }.noSideAffects()
     }
@@ -109,11 +108,5 @@ class ContributionsUpdater(
         )
 
         externalBalanceDao.updateExternalBalance(externalBalance)
-    }
-
-    private fun deleteContributions(asset: Chain.Asset): Flow<*> {
-        return flowOf {
-            contributionDao.deleteContributions(asset.chainId, asset.id)
-        }
     }
 }

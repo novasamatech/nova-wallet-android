@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.bindi
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.TrieIndex
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.flow.Flow
 
 interface ContributionsRepository {
@@ -23,4 +24,6 @@ interface ContributionsRepository {
     suspend fun getDirectContributions(chain: Chain, asset: Chain.Asset, accountId: ByteArray, fundInfos: Map<ParaId, FundInfo>): List<Contribution>
 
     suspend fun getDirectContribution(chain: Chain, asset: Chain.Asset, accountId: ByteArray, paraId: ParaId, trieIndex: TrieIndex): Contribution?
+
+    suspend fun deleteContributions(assetIds: List<FullChainAssetId>)
 }

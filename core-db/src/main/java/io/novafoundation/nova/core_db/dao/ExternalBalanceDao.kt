@@ -1,6 +1,7 @@
 package io.novafoundation.nova.core_db.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -23,6 +24,9 @@ interface ExternalBalanceDao {
         type: ExternalBalanceLocal.Type,
         subtype: String?,
     )
+
+    @Delete(entity = ExternalBalanceLocal::class)
+    suspend fun deleteAssetExternalBalances(params: List<ExternalBalanceAssetDeleteParams>)
 
     @Query(
         """
@@ -58,3 +62,5 @@ suspend fun ExternalBalanceDao.updateExternalBalance(externalBalance: ExternalBa
         )
     }
 }
+
+class ExternalBalanceAssetDeleteParams(val chainId: String, val assetId: Int)

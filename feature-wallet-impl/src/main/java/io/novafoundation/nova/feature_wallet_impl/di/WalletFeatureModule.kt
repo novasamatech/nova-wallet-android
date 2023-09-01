@@ -193,13 +193,11 @@ class WalletFeatureModule {
         operationDao: OperationDao,
         assetSourceRegistry: AssetSourceRegistry,
         accountUpdateScope: AccountUpdateScope,
-        walletRepository: WalletRepository,
         currencyRepository: CurrencyRepository
     ) = PaymentUpdaterFactory(
         operationDao,
         assetSourceRegistry,
         accountUpdateScope,
-        walletRepository,
         currencyRepository
     )
 

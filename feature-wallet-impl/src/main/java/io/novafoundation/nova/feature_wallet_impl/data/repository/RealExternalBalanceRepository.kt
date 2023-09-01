@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.repository
 
 import io.novafoundation.nova.common.utils.mapList
+import io.novafoundation.nova.core_db.dao.ExternalBalanceAssetDeleteParams
 import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.core_db.model.AggregatedExternalBalanceLocal
 import io.novafoundation.nova.core_db.model.ExternalBalanceLocal
@@ -11,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 
 internal class RealExternalBalanceRepository(
     private val externalBalanceDao: ExternalBalanceDao,
-): ExternalBalanceRepository {
+) : ExternalBalanceRepository {
 
     override fun observeAccountExternalBalances(metaId: Long): Flow<List<ExternalBalance>> {
         return externalBalanceDao.observeAggregatedExternalBalances(metaId).mapList(::mapExternalBalanceFromLocal)
@@ -20,6 +21,12 @@ internal class RealExternalBalanceRepository(
     override fun observeAccountChainExternalBalances(metaId: Long, assetId: FullChainAssetId): Flow<List<ExternalBalance>> {
         return externalBalanceDao.observeChainAggregatedExternalBalances(metaId, assetId.chainId, assetId.assetId)
             .mapList(::mapExternalBalanceFromLocal)
+    }
+
+    override suspend fun deleteExternalBalances(assetIds: List<FullChainAssetId>) {
+        val params = assetIds.map { ExternalBalanceAssetDeleteParams(it.chainId, it.assetId) }
+
+        return externalBalanceDao.deleteAssetExternalBalances(params)
     }
 
     private fun mapExternalBalanceFromLocal(externalBalance: AggregatedExternalBalanceLocal): ExternalBalance {
@@ -31,7 +38,7 @@ internal class RealExternalBalanceRepository(
     }
 
     private fun mapExternalBalanceTypeFromLocal(local: ExternalBalanceLocal.Type): ExternalBalance.Type {
-        return when(local) {
+        return when (local) {
             ExternalBalanceLocal.Type.CROWDLOAN -> ExternalBalance.Type.CROWDLOAN
             ExternalBalanceLocal.Type.NOMINATION_POOL -> ExternalBalance.Type.NOMINATION_POOL
         }
