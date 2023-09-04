@@ -9,7 +9,7 @@
     tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
-        android:id="@+id/rewardDetailToolbar"
+        android:id="@+id/poolRewardDetailToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
@@ -29,7 +29,7 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/rewardDetailTransferDirection"
+                android:id="@+id/poolRewardDetailTransferDirection"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginTop="16dp"
@@ -39,13 +39,13 @@
                 app:tint="@color/icon_secondary" />
 
             <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
-                android:id="@+id/rewardDetailAmount"
+                android:id="@+id/poolRewardDetailAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp" />
 
             <TextView
-                android:id="@+id/rewardDetailStatus"
+                android:id="@+id/poolRewardDetailStatus"
                 style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -65,28 +65,22 @@
                 android:layout_marginEnd="16dp">
 
                 <io.novafoundation.nova.common.view.TableCellView
-                    android:id="@+id/rewardDetailValidator"
+                    android:id="@+id/poolRewardDetailPool"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
                     app:primaryValueIconTint="@color/icon_secondary"
-                    app:title="@string/staking_reward_details_validator" />
+                    app:title="@string/nomination_pools_pool" />
 
                 <io.novafoundation.nova.common.view.TableCellView
-                    android:id="@+id/rewardDetailEra"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:title="@string/staking_reward_details_era" />
-
-                <io.novafoundation.nova.common.view.TableCellView
-                    android:id="@+id/rewardDetailNetwork"
+                    android:id="@+id/poolRewardDetailNetwork"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:title="@string/common_network" />
             </io.novafoundation.nova.common.view.TableView>
 
             <io.novafoundation.nova.common.view.TableView
-                android:id="@+id/rewardDetailTxSection"
+                android:id="@+id/poolRewardDetailTxSection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -95,15 +89,15 @@
                 android:layout_marginBottom="24dp">
 
                 <io.novafoundation.nova.common.view.TableCellView
-                    android:id="@+id/rewardDetailEvent"
+                    android:id="@+id/poolRewardDetailTransactionId"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
                     app:primaryValueIconTint="@color/icon_secondary"
-                    app:title="@string/common_event" />
+                    app:title="@string/common_transaction_id" />
 
                 <io.novafoundation.nova.common.view.TableCellView
-                    android:id="@+id/rewardDetailType"
+                    android:id="@+id/poolRewardDetailType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:title="@string/common_type" />

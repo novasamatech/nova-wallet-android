@@ -132,6 +132,10 @@ class TransactionHistoryProvider(
                     is OperationParcelizeModel.Reward -> {
                         router.openRewardDetail(payload)
                     }
+
+                    is OperationParcelizeModel.PoolReward -> {
+                        router.openPoolRewardDetail(payload)
+                    }
                 }
             }
         }

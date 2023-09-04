@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward
+package io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.direct
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel

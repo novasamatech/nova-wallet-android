@@ -2,10 +2,11 @@ package io.novafoundation.nova.feature_assets.presentation.model
 
 import android.os.Parcelable
 import androidx.annotation.DrawableRes
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import java.math.BigInteger
 import kotlinx.android.parcel.Parcelize
+import java.math.BigInteger
 
 sealed class OperationParcelizeModel : Parcelable {
 
@@ -15,12 +16,22 @@ sealed class OperationParcelizeModel : Parcelable {
         val eventId: String,
         val address: String,
         val time: Long,
-        val amount: String,
-        val fiatAmount: String?,
+        val amount: AmountParcelModel,
         val type: String,
         val era: String,
         val validator: String?,
         val statusAppearance: OperationStatusAppearance,
+    ) : OperationParcelizeModel()
+
+    @Parcelize
+    class PoolReward(
+        val chainId: ChainId,
+        val address: String,
+        val time: Long,
+        val amount: AmountParcelModel,
+        val type: String,
+        val poolId: Int,
+        val extrinsicHash: String?,
     ) : OperationParcelizeModel()
 
     @Parcelize
@@ -43,8 +54,7 @@ sealed class OperationParcelizeModel : Parcelable {
         val address: String,
         val hash: String?,
         val isIncome: Boolean,
-        val formattedAmount: String,
-        val formattedFiatAmount: String?,
+        val amount: AmountParcelModel,
         val receiver: String,
         val sender: String,
         val fee: BigInteger?,
@@ -52,4 +62,15 @@ sealed class OperationParcelizeModel : Parcelable {
         val statusAppearance: OperationStatusAppearance,
         @DrawableRes val transferDirectionIcon: Int
     ) : Parcelable, OperationParcelizeModel()
+}
+
+
+@Parcelize
+class AmountParcelModel(
+    val token: String,
+    val fiat: String?
+): Parcelable
+
+fun AmountParcelModel.toAmountModel(): AmountModel {
+    return AmountModel(token, fiat)
 }

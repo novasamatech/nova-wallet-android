@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.common.utils.splitSnakeOrCamelCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.presentation.model.AmountParcelModel
 import io.novafoundation.nova.feature_assets.presentation.model.ExtrinsicContentParcel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
@@ -283,8 +284,10 @@ suspend fun mapOperationToParcel(
                     time = time,
                     address = address,
                     hash =operation.extrinsicHash,
-                    formattedAmount = formatAmount(operation.chainAsset, isIncome, operationType),
-                    formattedFiatAmount = operationType.fiatAmount?.formatAsCurrency(currency),
+                    amount = AmountParcelModel(
+                        token = formatAmount(operation.chainAsset, isIncome, operationType),
+                        fiat = operationType.fiatAmount?.formatAsCurrency(currency)
+                    ),
                     receiver = operationType.receiver,
                     sender = operationType.sender,
                     fee = operationType.fee,
@@ -297,8 +300,11 @@ suspend fun mapOperationToParcel(
 
             is Operation.Type.Reward -> {
                 val typeRes = if (operationType.isReward) R.string.staking_reward else R.string.staking_slash
-                val amount = formatAmount(chainAsset, operationType)
-                val fiatAmount = operationType.fiatAmount?.formatAsCurrency(currency)
+
+                val amount = AmountParcelModel(
+                    token = formatAmount(chainAsset, operationType),
+                    fiat = operationType.fiatAmount?.formatAsCurrency(currency)
+                )
 
                 when(val rewardKind = operationType.kind) {
                     is RewardKind.Direct -> OperationParcelizeModel.Reward(
@@ -307,14 +313,21 @@ suspend fun mapOperationToParcel(
                         address = address,
                         time = time,
                         amount = amount,
-                        fiatAmount = fiatAmount,
                         type = resourceManager.getString(typeRes),
                         era = resourceManager.getString(R.string.staking_era_index_no_prefix, rewardKind.era),
                         validator = rewardKind.validator,
                         statusAppearance = OperationStatusAppearance.COMPLETED
                     )
 
-                    is RewardKind.Pool -> TODO()
+                    is RewardKind.Pool -> OperationParcelizeModel.PoolReward(
+                        chainId = chainAsset.chainId,
+                        address = address,
+                        time = time,
+                        amount = amount,
+                        type = resourceManager.getString(typeRes),
+                        poolId = rewardKind.poolId,
+                        extrinsicHash = extrinsicHash
+                    )
                 }
             }
 

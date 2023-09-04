@@ -38,6 +38,14 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/open_pool_reward_detail"
+        app:destination="@id/poolRewardDetailFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/open_extrinsic_detail"
         app:destination="@id/extrinsicDetailFragment"
         app:enterAnim="@anim/fragment_open_enter"
@@ -545,9 +553,15 @@
 
     <fragment
         android:id="@+id/rewardDetailFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.RewardDetailFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.direct.RewardDetailFragment"
         android:label="RewardDetailFragment"
         tools:layout="@layout/fragment_reward_slash_details" />
+
+    <fragment
+        android:id="@+id/poolRewardDetailFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.pool.PoolRewardDetailFragment"
+        android:label="PoolRewardDetailFragment"
+        tools:layout="@layout/fragment_pool_reward_details" />
 
     <fragment
         android:id="@+id/receiveFragment"

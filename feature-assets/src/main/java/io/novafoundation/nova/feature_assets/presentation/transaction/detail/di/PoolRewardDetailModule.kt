@@ -6,37 +6,34 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
-import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.direct.RewardDetailViewModel
+import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.pool.PoolRewardDetailViewModel
+import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
-class RewardDetailModule {
+class PoolRewardDetailModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(RewardDetailViewModel::class)
+    @ViewModelKey(PoolRewardDetailViewModel::class)
     fun provideViewModel(
-        operation: OperationParcelizeModel.Reward,
-        addressIconGenerator: AddressIconGenerator,
-        addressDisplayUseCase: AddressDisplayUseCase,
+        operation: OperationParcelizeModel.PoolReward,
+        poolDisplayUseCase: PoolDisplayUseCase,
+        router: AssetsRouter,
         chainRegistry: ChainRegistry,
-        externalActions: ExternalActions.Presentation,
-        router: AssetsRouter
+        externalActions: ExternalActions.Presentation
     ): ViewModel {
-        return RewardDetailViewModel(
-            operation,
-            addressIconGenerator,
-            addressDisplayUseCase,
-            router,
-            chainRegistry,
-            externalActions,
+        return PoolRewardDetailViewModel(
+            operation = operation,
+            poolDisplayUseCase = poolDisplayUseCase,
+            router = router,
+            chainRegistry = chainRegistry,
+            externalActions = externalActions
         )
     }
 
@@ -44,7 +41,7 @@ class RewardDetailModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): RewardDetailViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(RewardDetailViewModel::class.java)
+    ): PoolRewardDetailViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(PoolRewardDetailViewModel::class.java)
     }
 }

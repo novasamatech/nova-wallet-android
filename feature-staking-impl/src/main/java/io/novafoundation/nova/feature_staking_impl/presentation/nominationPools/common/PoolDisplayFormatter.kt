@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.nominationPools
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayModel
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.PoolDisplay
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -24,7 +25,8 @@ class RealPoolDisplayFormatter(
 
         return PoolDisplayModel(
             icon = poolDisplay.icon ?: poolAccount.image.asIcon(),
-            title = poolAccount.nameOrAddress
+            title = poolAccount.nameOrAddress,
+            poolAccountId = poolDisplay.stashAccountId
         )
     }
 
