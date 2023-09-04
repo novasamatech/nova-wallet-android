@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.network.subquery.request
 
-class DirectStakingPeriodRewardsRequest(accountAddress: String, val startTimestamp: Long?, val endTimestamp: Long?) :
+class DirectStakingPeriodRewardsRequest(accountAddress: String, startTimestamp: Long?, endTimestamp: Long?) :
     BaseStakingPeriodRewardsRequest(startTimestamp, endTimestamp) {
     val query = """
         query {

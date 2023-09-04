@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.network.subquery.request
 
-abstract class BaseStakingPeriodRewardsRequest(private val startTimestamp: Long?, private val endTimestamp: Long?) {
+abstract class BaseStakingPeriodRewardsRequest(@Transient private val startTimestamp: Long?, @Transient private val endTimestamp: Long?) {
 
     protected fun getTimestampFilter(): String {
         val start = startTimestamp?.let { "timestamp: { greaterThanOrEqualTo: \"$it\" }" }
