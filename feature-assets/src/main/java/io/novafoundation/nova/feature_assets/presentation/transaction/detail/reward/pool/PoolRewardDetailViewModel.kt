@@ -45,7 +45,6 @@ class PoolRewardDetailViewModel(
         operation.extrinsicHash?.let { hash ->
             shoExternalActions(ExternalActions.Type.Extrinsic(hash))
         }
-
     }
 
     fun poolClicked() = launch {

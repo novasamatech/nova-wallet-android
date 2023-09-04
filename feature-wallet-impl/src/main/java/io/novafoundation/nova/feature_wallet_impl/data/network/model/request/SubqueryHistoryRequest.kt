@@ -115,7 +115,6 @@ class SubqueryHistoryRequest(
         return listOf("balances")
     }
 
-
     private fun isIgnoredExtrinsic(assetType: Asset.Type): String {
         val exists = hasExtrinsic()
         val transferModules = assetType.transferModules()

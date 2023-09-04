@@ -283,7 +283,7 @@ suspend fun mapOperationToParcel(
                     assetId = operation.chainAsset.id,
                     time = time,
                     address = address,
-                    hash =operation.extrinsicHash,
+                    hash = operation.extrinsicHash,
                     amount = AmountParcelModel(
                         token = formatAmount(operation.chainAsset, isIncome, operationType),
                         fiat = operationType.fiatAmount?.formatAsCurrency(currency)
@@ -306,7 +306,7 @@ suspend fun mapOperationToParcel(
                     fiat = operationType.fiatAmount?.formatAsCurrency(currency)
                 )
 
-                when(val rewardKind = operationType.kind) {
+                when (val rewardKind = operationType.kind) {
                     is RewardKind.Direct -> OperationParcelizeModel.Reward(
                         chainId = chainAsset.chainId,
                         eventId = id,

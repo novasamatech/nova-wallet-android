@@ -92,7 +92,7 @@ fun mapOperationToOperationLocalDb(
 ): OperationLocal {
     val typeLocal = when (val operationType = operation.type) {
         is Type.Transfer -> OperationLocal.Type.TRANSFER
-        is Type.Reward -> when(operationType.kind) {
+        is Type.Reward -> when (operationType.kind) {
             is RewardKind.Direct -> OperationLocal.Type.REWARD
             is RewardKind.Pool -> OperationLocal.Type.POOL_REWARD
         }

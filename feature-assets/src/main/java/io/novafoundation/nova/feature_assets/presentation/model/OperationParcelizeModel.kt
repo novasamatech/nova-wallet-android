@@ -64,12 +64,11 @@ sealed class OperationParcelizeModel : Parcelable {
     ) : Parcelable, OperationParcelizeModel()
 }
 
-
 @Parcelize
 class AmountParcelModel(
     val token: String,
     val fiat: String?
-): Parcelable
+) : Parcelable
 
 fun AmountParcelModel.toAmountModel(): AmountModel {
     return AmountModel(token, fiat)
