@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.model.request
 
-import android.annotation.SuppressLint
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.and
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.anyOf
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.not
+import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.or
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset
 
@@ -58,6 +58,7 @@ class SubqueryHistoryRequest(
                     extrinsicHash
                     address
                     reward
+                    poolReward
                     extrinsic
                     ${transferResponseSection(assetType)}
                 }
@@ -82,7 +83,8 @@ class SubqueryHistoryRequest(
     private fun TransactionFilter.filterExpression(assetType: Asset.Type): String {
         return when (this) {
             TransactionFilter.TRANSFER -> transfersFilter(assetType)
-            else -> hasType(filterName)
+            TransactionFilter.REWARD -> rewardsFilter()
+            TransactionFilter.EXTRINSIC -> hasExtrinsic()
         }
     }
 
@@ -91,6 +93,10 @@ class SubqueryHistoryRequest(
             Asset.Type.Native -> "transfer"
             else -> "assetTransfer"
         }
+    }
+
+    private fun rewardsFilter(): String {
+        return hasType("reward") or hasType("poolReward")
     }
 
     private fun transfersFilter(assetType: Asset.Type): String {
@@ -103,12 +109,15 @@ class SubqueryHistoryRequest(
         }
     }
 
+    private fun hasExtrinsic() = hasType("extrinsic")
+
     private fun Asset.Type.transferModules(): List<String> {
         return listOf("balances")
     }
 
+
     private fun isIgnoredExtrinsic(assetType: Asset.Type): String {
-        val exists = hasType(TransactionFilter.EXTRINSIC.filterName)
+        val exists = hasExtrinsic()
         val transferModules = assetType.transferModules()
 
         val restrictedModulesList = ModuleRestriction.ignoreTransferExtrinsics(transferModules).map {
@@ -135,8 +144,4 @@ class SubqueryHistoryRequest(
     private fun transferAssetHasId(assetId: String): String {
         return "assetTransfer: { contains: { assetId: \"$assetId\" } }"
     }
-
-    private val TransactionFilter.filterName
-        @SuppressLint("DefaultLocale")
-        get() = name.toLowerCase()
 }

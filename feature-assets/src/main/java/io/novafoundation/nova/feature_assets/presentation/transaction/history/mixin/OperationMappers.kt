@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
+import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Reward.RewardKind
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
@@ -122,16 +123,20 @@ private fun formatContractFunctionName(extrinsicContent: Content.ContractCall): 
     }
 }
 
-private fun mapExtrinsicContentToParcel(extrinsic: Operation.Type.Extrinsic, resourceManager: ResourceManager): ExtrinsicContentParcel {
+private fun mapExtrinsicContentToParcel(
+    extrinsic: Operation.Type.Extrinsic,
+    extrinsicHash: String?,
+    resourceManager: ResourceManager
+): ExtrinsicContentParcel {
     return when (val content = extrinsic.content) {
-        is Content.ContractCall -> contractCallUi(content, extrinsic.hash, resourceManager)
-        is Content.SubstrateCall -> substrateCallUi(content, extrinsic.hash, resourceManager)
+        is Content.ContractCall -> contractCallUi(content, extrinsicHash, resourceManager)
+        is Content.SubstrateCall -> substrateCallUi(content, extrinsicHash, resourceManager)
     }
 }
 
 private fun contractCallUi(
     content: Content.ContractCall,
-    txHash: String,
+    txHash: String?,
     resourceManager: ResourceManager
 ) = ExtrinsicContentParcel {
     block {
@@ -142,18 +147,22 @@ private fun contractCallUi(
         }
     }
 
-    block {
-        transactionId(txHash)
+    txHash?.let {
+        block {
+            transactionId(txHash)
+        }
     }
 }
 
 private fun substrateCallUi(
     content: Content.SubstrateCall,
-    txHash: String,
+    txHash: String?,
     resourceManager: ResourceManager
 ) = ExtrinsicContentParcel {
     block {
-        transactionId(txHash)
+        txHash?.let {
+            transactionId(txHash)
+        }
 
         value(resourceManager.getString(R.string.common_module), content.module.itemToCapitalizedWords())
 
@@ -273,7 +282,7 @@ suspend fun mapOperationToParcel(
                     assetId = operation.chainAsset.id,
                     time = time,
                     address = address,
-                    hash = operationType.hash,
+                    hash =operation.extrinsicHash,
                     formattedAmount = formatAmount(operation.chainAsset, isIncome, operationType),
                     formattedFiatAmount = operationType.fiatAmount?.formatAsCurrency(currency),
                     receiver = operationType.receiver,
@@ -288,19 +297,25 @@ suspend fun mapOperationToParcel(
 
             is Operation.Type.Reward -> {
                 val typeRes = if (operationType.isReward) R.string.staking_reward else R.string.staking_slash
+                val amount = formatAmount(chainAsset, operationType)
+                val fiatAmount = operationType.fiatAmount?.formatAsCurrency(currency)
 
-                OperationParcelizeModel.Reward(
-                    chainId = chainAsset.chainId,
-                    eventId = id,
-                    address = address,
-                    time = time,
-                    amount = formatAmount(chainAsset, operationType),
-                    fiatAmount = operationType.fiatAmount?.formatAsCurrency(currency),
-                    type = resourceManager.getString(typeRes),
-                    era = resourceManager.getString(R.string.staking_era_index_no_prefix, operationType.era),
-                    validator = operationType.validator,
-                    statusAppearance = OperationStatusAppearance.COMPLETED
-                )
+                when(val rewardKind = operationType.kind) {
+                    is RewardKind.Direct -> OperationParcelizeModel.Reward(
+                        chainId = chainAsset.chainId,
+                        eventId = id,
+                        address = address,
+                        time = time,
+                        amount = amount,
+                        fiatAmount = fiatAmount,
+                        type = resourceManager.getString(typeRes),
+                        era = resourceManager.getString(R.string.staking_era_index_no_prefix, rewardKind.era),
+                        validator = rewardKind.validator,
+                        statusAppearance = OperationStatusAppearance.COMPLETED
+                    )
+
+                    is RewardKind.Pool -> TODO()
+                }
             }
 
             is Operation.Type.Extrinsic -> {
@@ -309,7 +324,7 @@ suspend fun mapOperationToParcel(
                     chainAssetId = chainAsset.id,
                     time = time,
                     originAddress = address,
-                    content = mapExtrinsicContentToParcel(operationType, resourceManager),
+                    content = mapExtrinsicContentToParcel(operationType, extrinsicHash, resourceManager),
                     fee = formatFee(chainAsset, operationType),
                     fiatFee = operationType.fiatFee?.formatAsCurrency(currency),
                     statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus)
