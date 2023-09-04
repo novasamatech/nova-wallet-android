@@ -115,7 +115,7 @@ class PooledBalanceUpdater(
 
         return remoteStorageSource.subscribeBatched(chain.id) {
             val bondedPoolFlow = metadata.nominationPools.bondedPools.observeNonNull(poolId.value)
-            val unbondingPoolsFlow = metadata.nominationPools.subPoolsStorage.observeNonNull(poolId.value)
+            val unbondingPoolsFlow = metadata.nominationPools.subPoolsStorage.observe(poolId.value)
 
             val bondedPoolStakeFlow = metadata.staking.ledger
                 .observeNonNull(bondedPoolAccountId)
@@ -150,7 +150,7 @@ class PooledBalanceUpdater(
 
     private class TotalPoolBalances(
         pool: BondedPool,
-        val unbondingPools: UnbondingPools,
+        val unbondingPools: UnbondingPools?,
         override val poolBalance: Balance,
     ) : PoolBalanceConvertable {
 
