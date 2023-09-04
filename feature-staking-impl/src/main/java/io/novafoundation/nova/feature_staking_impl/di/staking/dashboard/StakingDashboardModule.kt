@@ -50,7 +50,7 @@ class StakingDashboardModule {
     fun provideStakingStatsDataSource(api: StakingStatsApi): StakingStatsDataSource {
         return RealStakingStatsDataSource(
             api = api,
-            dashboardApiUrl =  BuildConfig.DASHBOARD_SUBQUERY_URL
+            dashboardApiUrl = BuildConfig.DASHBOARD_SUBQUERY_URL
         )
     }
 

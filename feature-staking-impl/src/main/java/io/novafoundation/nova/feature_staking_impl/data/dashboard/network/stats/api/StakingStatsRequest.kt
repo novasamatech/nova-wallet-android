@@ -16,7 +16,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.extensions.requireHexPrefix
 
-
 class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>) {
 
     @Transient
@@ -61,7 +60,6 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
         }
     }
     """.trimIndent()
-
 
     private fun constructStakingTypeOverrides(
         chains: List<Chain>,
@@ -171,4 +169,3 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
         val rewardsAddress: String?,
     )
 }
-
