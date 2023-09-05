@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.PoolStakeTargetModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
@@ -28,18 +27,14 @@ class SelectCustomPoolViewModel(
     }
 
     fun poolInfoClicked(poolStakeModel: PoolStakeTargetModel) = launch {
-
     }
 
     fun poolClicked(poolStakeModel: PoolStakeTargetModel) {
-
     }
 
     fun searchClicked() {
-
     }
 
     fun selectRecommended() {
-
     }
 }

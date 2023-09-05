@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
     <string name="select_custom_pool_title">Select pool</string>
-    <string name="select_custom_pool_select_recommedned_chip">Select recommended</string>
     <string name="select_custom_pool_active_pools_count">active pools: %d</string>
     <string name="select_custom_pool_members">members</string>
 
