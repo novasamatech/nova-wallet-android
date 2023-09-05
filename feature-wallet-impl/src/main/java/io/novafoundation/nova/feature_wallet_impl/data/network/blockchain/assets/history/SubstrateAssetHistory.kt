@@ -207,5 +207,4 @@ abstract class SubstrateAssetHistory(
             extrinsicHash = node.extrinsicHash
         )
     }
-
 }

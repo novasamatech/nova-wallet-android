@@ -71,9 +71,9 @@ class RealPoolAccountDerivation(
     }
 }
 
-private class IsPoolAccountFilter(private val prefix: ByteArray): Filter<AccountId> {
+private class IsPoolAccountFilter(private val prefix: ByteArray) : Filter<AccountId> {
 
     override fun shouldInclude(model: AccountId): Boolean {
-       return model.startsWith(prefix)
+        return model.startsWith(prefix)
     }
 }
