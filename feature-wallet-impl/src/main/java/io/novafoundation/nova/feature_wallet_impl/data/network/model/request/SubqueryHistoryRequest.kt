@@ -99,12 +99,12 @@ class SubqueryHistoryRequest(
         return rewardsSections(asset).joinToString(separator = "\n")
     }
 
-    private fun rewardsSections(asset: Asset) : List<String> {
+    private fun rewardsSections(asset: Asset): List<String> {
         return asset.staking.mapNotNull { it.rewardSection() }
     }
 
     private fun Asset.StakingType.rewardSection(): String? {
-        return when(group()) {
+        return when (group()) {
             StakingTypeGroup.RELAYCHAIN, StakingTypeGroup.PARACHAIN -> "reward"
             StakingTypeGroup.NOMINATION_POOL -> "poolReward"
             StakingTypeGroup.UNSUPPORTED -> null
