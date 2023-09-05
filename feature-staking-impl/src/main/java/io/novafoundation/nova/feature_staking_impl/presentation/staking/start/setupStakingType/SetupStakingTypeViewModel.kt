@@ -3,25 +3,17 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.s
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.RecommendableMultiStakingSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.getValidatorsOrEmpty
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.EditingStakingTypeSelectionMixinFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.ValidatedStakingTypeDetails
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
-import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess.ReadyToSubmit.SelectionMethod
-import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
-import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectCustomPoolPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.runtime.ext.isDirectStaking
-import io.novafoundation.nova.runtime.ext.isPoolStaking
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
@@ -36,13 +28,12 @@ import kotlinx.coroutines.launch
 class SetupStakingTypeViewModel(
     private val router: StakingRouter,
     private val assetUseCase: ArbitraryAssetUseCase,
-    private val resourceManager: ResourceManager,
     private val payload: SetupStakingTypePayload,
     private val editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
     private val editingStakingTypeSelectionMixinFactory: EditingStakingTypeSelectionMixinFactory,
     private val editableStakingTypeItemFormatter: EditableStakingTypeItemFormatter,
     private val validationExecutor: ValidationExecutor,
-    private val setupStakingSharedState: SetupStakingSharedState,
+    private val setupStakingTypeFlowExecutorFactory: SetupStakingTypeFlowExecutorFactory,
     chainRegistry: ChainRegistry
 ) : BaseViewModel(), Validatable by validationExecutor {
 
@@ -140,24 +131,12 @@ class SetupStakingTypeViewModel(
             val stakingType = stakingTypesDataFlow.first()[position]
                 .stakingTypeDetails
                 .stakingType
-
-            val selectionStore = editableSelectionStoreProvider.getSelectionStore(viewModelScope)
-
-            when {
-                stakingType.isDirectStaking() -> {
-                    setupStakingSharedState.set(SetupStakingProcess.ReadyToSubmit(selectionStore.getValidatorsOrEmpty(), SelectionMethod.CUSTOM))
-                    router.openSelectCustomValidators()
-                }
-
-                stakingType.isPoolStaking() -> {
-                    val selectCustomPoolPayload = SelectCustomPoolPayload(
-                        payload.availableStakingOptions.chainId,
-                        payload.availableStakingOptions.assetId,
-                        stakingType
-                    )
-                    router.openSelectCustomPool(selectCustomPoolPayload)
-                }
-            }
+            val setupStakingTypeFlowExecutor = setupStakingTypeFlowExecutorFactory.create(
+                payload.availableStakingOptions.chainId,
+                payload.availableStakingOptions.assetId,
+                stakingType
+            )
+            setupStakingTypeFlowExecutor.execute(viewModelScope)
         }
     }
 
