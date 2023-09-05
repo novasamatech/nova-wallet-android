@@ -1,11 +1,13 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations
 
+import io.novafoundation.nova.feature_account_api.domain.validation.notSystemAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.WillRemoveAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.recipientOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.sendingAmountInCommissionAsset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.AmountProducer
@@ -93,6 +95,11 @@ fun AssetTransfersValidationSystemBuilder.sufficientBalanceInUsedAsset() = suffi
     amount = { it.transfer.amount },
     fee = { BigDecimal.ZERO },
     error = { _, _ -> AssetTransferValidationFailure.NotEnoughFunds.InUsedAsset }
+)
+
+fun AssetTransfersValidationSystemBuilder.recipientIsNotSystemAccount() = notSystemAccount(
+    accountId = { it.transfer.recipientOrNull() },
+    error = { AssetTransferValidationFailure.RecipientIsSystemAccount }
 )
 
 private suspend fun AssetSourceRegistry.existentialDepositForUsedAsset(transfer: AssetTransfer): BigDecimal {

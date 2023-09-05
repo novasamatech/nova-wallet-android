@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.TransformedFailure.Default
 import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
+import io.novafoundation.nova.feature_account_api.domain.validation.handleSystemAccountValidationFailure
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
@@ -89,6 +90,10 @@ fun CoroutineScope.mapAssetTransferValidationFailureToUI(
             resourceManager = resourceManager,
             feeLoaderMixin = feeLoaderMixin,
             actions = actions,
+        )
+
+        AssetTransferValidationFailure.RecipientIsSystemAccount -> Default(
+            handleSystemAccountValidationFailure(resourceManager)
         )
     }
 }
