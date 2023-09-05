@@ -1,13 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.bondedAccountOf
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.calls.NominationPoolsCalls
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.calls.nominationPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.calls.unbond
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
-import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
-import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.bondedAccountOf
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.getParticipatingBondedPoolState
@@ -79,7 +79,7 @@ class RealNominationPoolsUnbondInteractor(
         val poolAccount = poolAccountDerivation.bondedAccountOf(poolMember.poolId, chainId)
 
         val bondedPoolState = nominationPoolSharedComputation.getParticipatingBondedPoolState(poolAccount, poolMember.poolId, chainId)
-        val unbondPoints = bondedPoolState.pointsOf(amount)
+        val unbondPoints = bondedPoolState.pointsOf(amount).coerceAtMost(poolMember.points)
 
         unbond(poolMember.accountId, unbondPoints)
     }
