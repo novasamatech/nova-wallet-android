@@ -33,3 +33,7 @@ data class NominationPoolSelection(
         return copy(stake = stake)
     }
 }
+
+fun StartMultiStakingSelection.asPoolSelection(): NominationPoolSelection? {
+    return this as? NominationPoolSelection
+}

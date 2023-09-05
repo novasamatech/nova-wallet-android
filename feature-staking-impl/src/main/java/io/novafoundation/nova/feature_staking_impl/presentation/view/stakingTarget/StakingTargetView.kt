@@ -7,6 +7,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.setColoredTextOrHide
+import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.getRippleMask
 import io.novafoundation.nova.common.utils.getRoundedCornerDrawable
 import io.novafoundation.nova.common.utils.images.setIcon
@@ -37,6 +38,8 @@ class StakingTargetView @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.view_staking_target, this)
+        
+        minHeight = 52.dp(context)
 
         background = getRoundedCornerDrawable(fillColorRes = R.color.block_background, cornerSizeDp = 8)
             .withRippleMask(getRippleMask(cornerSizeDp = 8))
@@ -63,11 +66,13 @@ class StakingTargetView @JvmOverloads constructor(
                 stakingTargetIcon.makeVisible()
                 stakingTargetIcon.setIcon(icon.icon, imageLoader)
             }
+
             is StakingTargetModel.TargetIcon.Quantity -> {
                 stakingTargetIcon.makeGone()
                 stakingTargetQuantity.makeVisible()
                 stakingTargetQuantity.text = icon.quantity
             }
+
             null -> {
                 makeGoneViews(stakingTargetIcon, stakingTargetQuantity)
                 stakingTargetIcon.makeGone()

@@ -1,12 +1,17 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType
 
 import io.novafoundation.nova.common.utils.combine
+import io.novafoundation.nova.feature_staking_api.domain.model.Validator
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.NominationPool
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.RecommendableMultiStakingSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.SelectionTypeSource
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.StartMultiStakingSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.currentSelectionFlow
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.CompoundStakingTypeDetailsProvidersFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsProvider
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.direct.DirectStakingSelection
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.pools.NominationPoolSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.direct.EditingStakingTypeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.ValidatedStakingTypeDetails
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
@@ -18,7 +23,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class EditingStakingTypeSelectionMixinFactory(
     private val currentSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
@@ -93,9 +100,32 @@ class EditingStakingTypeSelectionMixin(
     }
 
     suspend fun apply() {
-        val newSelection = editableSelectionStoreProvider.getSelectionStore(scope).currentSelection ?: return
+        val recommendableSelection = editableSelectionStoreProvider.getSelectionStore(scope).currentSelection ?: return
         currentSelectionStoreProvider.getSelectionStore(scope)
-            .updateSelection(newSelection)
+            .updateSelection(recommendableSelection)
+    }
+
+    suspend fun selectNominationPoolAndApply(pool: NominationPool) {
+        val editingSelection = editableSelectionFlow.first().selection as? NominationPoolSelection ?: return
+        val newSelection = editingSelection.copy(pool = pool)
+        setSelectionAndApply(newSelection)
+        apply()
+    }
+
+    suspend fun selectValidatorsAndApply(validators: List<Validator>) {
+        val editingSelection = editableSelectionFlow.first().selection as? DirectStakingSelection ?: return
+        val newSelection = editingSelection.copy(validators = validators)
+        setSelectionAndApply(newSelection)
+    }
+
+    private suspend fun setSelectionAndApply(selection: StartMultiStakingSelection) {
+        currentSelectionStoreProvider.getSelectionStore(scope)
+            .updateSelection(
+                RecommendableMultiStakingSelection(
+                    SelectionTypeSource.Manual(contentRecommended = false),
+                    selection
+                )
+            )
     }
 
     private fun getEditableStakingTypeComparator(): Comparator<ValidatedStakingTypeDetails> {

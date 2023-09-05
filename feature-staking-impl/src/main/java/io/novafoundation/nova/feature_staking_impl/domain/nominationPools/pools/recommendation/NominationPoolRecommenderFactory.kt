@@ -15,21 +15,21 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 
-class NominationPoolRecommendatorFactory(
+class NominationPoolRecommenderFactory(
     private val computationalCache: ComputationalCache,
     private val nominationPoolProvider: NominationPoolProvider,
     private val knownNovaPools: KnownNovaPools,
     private val nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
 ) {
 
-    suspend fun create(stakingOption: StakingOption, computationScope: CoroutineScope): NominationPoolRecommendator {
-        val key = "NominationPoolRecommendator"
+    suspend fun create(stakingOption: StakingOption, computationScope: CoroutineScope): NominationPoolRecommender {
+        val key = "NominationPoolRecommender"
 
         return computationalCache.useCache(key, computationScope) {
             val nominationPools = nominationPoolProvider.getNominationPools(stakingOption, computationScope)
             val maxPoolMembersPerPool = nominationPoolGlobalsRepository.maxPoolMembersPerPool(stakingOption.chain.id)
 
-            RealNominationPoolRecommendator(
+            RealNominationPoolRecommender(
                 chain = stakingOption.chain,
                 allNominationPools = nominationPools,
                 knownNovaPools = knownNovaPools,
@@ -39,12 +39,12 @@ class NominationPoolRecommendatorFactory(
     }
 }
 
-private class RealNominationPoolRecommendator(
+private class RealNominationPoolRecommender(
     private val chain: Chain,
     private val allNominationPools: List<NominationPool>,
     private val knownNovaPools: KnownNovaPools,
     private val maxPoolMembersPerPool: Int?,
-) : NominationPoolRecommendator {
+) : NominationPoolRecommender {
 
     private val recommendations = constructRecommendationList()
 

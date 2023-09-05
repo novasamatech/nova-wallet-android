@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess.ReadyToSubmit.SelectionMethod
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectCustomPoolPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -36,7 +37,7 @@ class SetupStakingTypeViewModel(
     private val router: StakingRouter,
     private val assetUseCase: ArbitraryAssetUseCase,
     private val resourceManager: ResourceManager,
-    payload: SetupStakingTypePayload,
+    private val payload: SetupStakingTypePayload,
     private val editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
     private val editingStakingTypeSelectionMixinFactory: EditingStakingTypeSelectionMixinFactory,
     private val editableStakingTypeItemFormatter: EditableStakingTypeItemFormatter,
@@ -125,6 +126,7 @@ class SetupStakingTypeViewModel(
                 is ValidationStatus.Valid -> {
                     setRecommendedSelection(validatedStakingType.stakingTypeDetails.stakingType)
                 }
+
                 is ValidationStatus.NotValid -> {
                     // provide error dialog
                     // handleSetupStakingTypeValidationFailure(chainAsset, validationStatus.reason, resourceManager)
@@ -146,8 +148,14 @@ class SetupStakingTypeViewModel(
                     setupStakingSharedState.set(SetupStakingProcess.ReadyToSubmit(selectionStore.getValidatorsOrEmpty(), SelectionMethod.CUSTOM))
                     router.openSelectCustomValidators()
                 }
+
                 stakingType.isPoolStaking() -> {
-                    // TODO
+                    val selectCustomPoolPayload = SelectCustomPoolPayload(
+                        payload.availableStakingOptions.chainId,
+                        payload.availableStakingOptions.assetId,
+                        stakingType
+                    )
+                    router.openSelectCustomPool(selectCustomPoolPayload)
                 }
             }
         }

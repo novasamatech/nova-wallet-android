@@ -7,8 +7,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.
 
 typealias ValidatorStakeTargetModel = StakeTargetModel<Validator>
 
-typealias PoolStakeTargetModel = StakeTargetModel<NominationPool>
-
 data class StakeTargetModel<V>(
     val accountIdHex: String,
     val slashed: Boolean,

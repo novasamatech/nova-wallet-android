@@ -1,7 +1,9 @@
 package io.novafoundation.nova.common.utils
 
+import android.content.Context
 import android.text.SpannableStringBuilder
 import android.text.SpannedString
+import androidx.annotation.StringRes
 import java.util.regex.Pattern
 
 /**
@@ -13,6 +15,16 @@ object SpannableFormatter {
     // Add other formatting types in next patterns such as 'd' in [] to extend functionality
     private val FORMAT_SEQUENCE: Pattern = Pattern.compile("%\\d*\\\$?[s]")
     private val INDEX_PATTERN: Pattern = Pattern.compile("(?<=^%)(\\d+)(?=\\\$[s]\$)") // search index in %1$s.
+
+    /**
+     * Not throw format exceptions if format is incorrect.
+     * In case when format is incorrect will return dirty string with format types.
+     */
+    fun format(context: Context, @StringRes resId: Int, vararg args: Any): SpannedString {
+        val rawString = context.getString(resId)
+
+        return format(rawString, *args)
+    }
 
     /**
      * Not throw format exceptions if format is incorrect.
