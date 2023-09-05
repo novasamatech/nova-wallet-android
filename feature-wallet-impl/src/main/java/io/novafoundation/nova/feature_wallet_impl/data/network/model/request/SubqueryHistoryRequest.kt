@@ -3,8 +3,9 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.model.request
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.and
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.anyOf
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.not
-import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.or
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
+import io.novafoundation.nova.runtime.ext.StakingTypeGroup
+import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset
 
 private class ModuleRestriction(
@@ -34,7 +35,7 @@ class SubqueryHistoryRequest(
     pageSize: Int = 1,
     cursor: String? = null,
     filters: Set<TransactionFilter>,
-    assetType: Asset.Type
+    asset: Asset
 ) {
     val query = """
     {
@@ -45,7 +46,7 @@ class SubqueryHistoryRequest(
                 orderBy: TIMESTAMP_DESC,
                 filter: { 
                     address:{ equalTo: "$accountAddress"},
-                    ${filters.toQueryFilter(assetType)}
+                    ${filters.toQueryFilter(asset)}
                 }
             ) {
                 pageInfo {
@@ -57,10 +58,9 @@ class SubqueryHistoryRequest(
                     timestamp
                     extrinsicHash
                     address
-                    reward
-                    poolReward
+                    ${rewardsResponseSections(asset)}
                     extrinsic
-                    ${transferResponseSection(assetType)}
+                    ${transferResponseSection(asset.type)}
                 }
             }
         }
@@ -71,19 +71,19 @@ class SubqueryHistoryRequest(
     /*
         or: [ {transfer: { notEqualTo: "null"} },  {extrinsic: { notEqualTo: "null"} } ]
      */
-    private fun Set<TransactionFilter>.toQueryFilter(assetType: Asset.Type): String {
-        val additionalFilters = not(isIgnoredExtrinsic(assetType))
+    private fun Set<TransactionFilter>.toQueryFilter(asset: Asset): String {
+        val additionalFilters = not(isIgnoredExtrinsic(asset.type))
 
-        val filtersExpressions = map { it.filterExpression(assetType) }
+        val filtersExpressions = map { it.filterExpression(asset) }
         val userFilters = anyOf(filtersExpressions)
 
         return userFilters and additionalFilters
     }
 
-    private fun TransactionFilter.filterExpression(assetType: Asset.Type): String {
+    private fun TransactionFilter.filterExpression(asset: Asset): String {
         return when (this) {
-            TransactionFilter.TRANSFER -> transfersFilter(assetType)
-            TransactionFilter.REWARD -> rewardsFilter()
+            TransactionFilter.TRANSFER -> transfersFilter(asset.type)
+            TransactionFilter.REWARD -> rewardsFilter(asset)
             TransactionFilter.EXTRINSIC -> hasExtrinsic()
         }
     }
@@ -95,8 +95,24 @@ class SubqueryHistoryRequest(
         }
     }
 
-    private fun rewardsFilter(): String {
-        return hasType("reward") or hasType("poolReward")
+    private fun rewardsResponseSections(asset: Asset): String {
+        return rewardsSections(asset).joinToString(separator = "\n")
+    }
+
+    private fun rewardsSections(asset: Asset) : List<String> {
+        return asset.staking.mapNotNull { it.rewardSection() }
+    }
+
+    private fun Asset.StakingType.rewardSection(): String? {
+        return when(group()) {
+            StakingTypeGroup.RELAYCHAIN, StakingTypeGroup.PARACHAIN -> "reward"
+            StakingTypeGroup.NOMINATION_POOL -> "poolReward"
+            StakingTypeGroup.UNSUPPORTED -> null
+        }
+    }
+
+    private fun rewardsFilter(asset: Asset): String {
+        return anyOf(rewardsSections(asset).map { hasType(it) })
     }
 
     private fun transfersFilter(assetType: Asset.Type): String {
