@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater
 
+import android.util.Log
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
@@ -87,6 +88,8 @@ class PooledBalanceUpdater(
     }
 
     private suspend fun sync(storageSubscriptionBuilder: SharedRequestsBuilder, metaAccount: MetaAccount): Flow<Updater.SideEffect> {
+        Log.d("RX", "Starting pooled balances updates for ${chain.name}")
+
         val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
 
         return remoteStorageSource.subscribe(chain.id, storageSubscriptionBuilder) {
@@ -112,7 +115,7 @@ class PooledBalanceUpdater(
 
         return remoteStorageSource.subscribeBatched(chain.id) {
             val bondedPoolFlow = metadata.nominationPools.bondedPools.observeNonNull(poolId.value)
-            val unbondingPoolsFlow = metadata.nominationPools.subPoolsStorage.observe(poolId.value)
+            val unbondingPoolsFlow = metadata.nominationPools.subPoolsStorage.observeNonNull(poolId.value)
 
             val bondedPoolStakeFlow = metadata.staking.ledger
                 .observeNonNull(bondedPoolAccountId)
@@ -147,7 +150,7 @@ class PooledBalanceUpdater(
 
     private class TotalPoolBalances(
         pool: BondedPool,
-        val unbondingPools: UnbondingPools?,
+        val unbondingPools: UnbondingPools,
         override val poolBalance: Balance,
     ) : PoolBalanceConvertable {
 
