@@ -89,7 +89,7 @@ class SelectCustomPoolFragment : BaseFragment<SelectCustomPoolViewModel>(), Pool
     }
 
     override fun poolInfoClicked(poolItem: PoolRvItem) {
-        viewModel.poolInfoClicked(poolItem)
+        viewModel.poolClicked(poolItem)
     }
 
     override fun poolClicked(poolItem: PoolRvItem) {
