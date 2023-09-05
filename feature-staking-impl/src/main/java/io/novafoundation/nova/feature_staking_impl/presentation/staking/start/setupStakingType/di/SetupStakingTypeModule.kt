@@ -47,6 +47,7 @@ class SetupStakingTypeModule {
         @StakingTypeEditingStoreProviderKey editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
         editableStakingTypeItemFormatter: EditableStakingTypeItemFormatter,
         compoundStakingTypeDetailsProvidersFactory: CompoundStakingTypeDetailsProvidersFactory,
+        resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
         chainRegistry: ChainRegistry
     ): ViewModel {
@@ -58,6 +59,7 @@ class SetupStakingTypeModule {
             editableSelectionStoreProvider,
             editableStakingTypeItemFormatter,
             compoundStakingTypeDetailsProvidersFactory,
+            resourceManager,
             validationExecutor,
             chainRegistry
         )

@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.
 import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingRecommendation
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.direct.EditingStakingTypePayload
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.direct.EditingStakingTypeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.ValidatedStakingTypeDetails
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
@@ -39,5 +41,15 @@ class CompoundStakingTypeDetailsProviders(private val providers: List<StakingTyp
     fun getRecommendationProvider(stakingType: Chain.Asset.StakingType): SingleStakingRecommendation {
         return providers.first { it.stakingType == stakingType }
             .recommendationProvider
+    }
+
+    fun getValidationSystem(stakingType: Chain.Asset.StakingType): EditingStakingTypeValidationSystem {
+        return providers.first { it.stakingType == stakingType }
+            .getValidationSystem()
+    }
+
+    suspend fun getValidationPayload(stakingType: Chain.Asset.StakingType): EditingStakingTypePayload? {
+        return providers.first { it.stakingType == stakingType }
+            .getValidationPayload()
     }
 }

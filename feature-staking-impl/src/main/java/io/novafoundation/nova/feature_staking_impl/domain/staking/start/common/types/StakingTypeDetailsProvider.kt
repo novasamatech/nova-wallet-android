@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.
 
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingRecommendation
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.direct.EditingStakingTypePayload
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.direct.EditingStakingTypeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.ValidatedStakingTypeDetails
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -26,4 +27,6 @@ interface StakingTypeDetailsProvider {
     val recommendationProvider: SingleStakingRecommendation
 
     fun getValidationSystem(): EditingStakingTypeValidationSystem
+
+    suspend fun getValidationPayload(): EditingStakingTypePayload?
 }

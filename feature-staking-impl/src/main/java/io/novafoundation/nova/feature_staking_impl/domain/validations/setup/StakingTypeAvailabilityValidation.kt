@@ -11,12 +11,11 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class StakingTypeAvailabilityValidation(
     private val availableStakingTypes: List<Chain.Asset.StakingType>,
-    private val stakingType: (EditingStakingTypePayload) -> Chain.Asset.StakingType,
     private val error: (EditingStakingTypePayload) -> EditingStakingTypeFailure,
 ) : Validation<EditingStakingTypePayload, EditingStakingTypeFailure> {
 
     override suspend fun validate(value: EditingStakingTypePayload): ValidationStatus<EditingStakingTypeFailure> {
-        return if (availableStakingTypes.contains(stakingType(value))) {
+        return if (availableStakingTypes.contains(value.stakingType)) {
             valid()
         } else {
             validationError(error(value))
@@ -26,13 +25,11 @@ class StakingTypeAvailabilityValidation(
 
 fun ValidationSystemBuilder<EditingStakingTypePayload, EditingStakingTypeFailure>.stakingTypeAvailability(
     availableStakingTypes: List<Chain.Asset.StakingType>,
-    stakingType: (EditingStakingTypePayload) -> Chain.Asset.StakingType,
     errorFormatter: (EditingStakingTypePayload) -> EditingStakingTypeFailure,
 ) {
     validate(
         StakingTypeAvailabilityValidation(
             availableStakingTypes,
-            stakingType,
             errorFormatter,
         )
     )

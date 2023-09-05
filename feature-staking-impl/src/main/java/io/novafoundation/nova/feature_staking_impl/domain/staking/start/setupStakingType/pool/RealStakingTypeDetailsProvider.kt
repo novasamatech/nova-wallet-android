@@ -34,10 +34,7 @@ class RealStakingTypeDetailsProviderFactory(
         availableStakingTypes: List<Chain.Asset.StakingType>
     ): StakingTypeDetailsProvider {
         val singleStakingProperties = singleStakingPropertiesFactory.createProperties(coroutineScope, stakingOption)
-        val validationSystem = ValidationSystem.editingStakingType(
-            singleStakingProperties,
-            availableStakingTypes
-        )
+        val validationSystem = ValidationSystem.editingStakingType(availableStakingTypes)
         return RealStakingTypeDetailsProvider(
             validationSystem,
             poolStakingTypeDetailsInteractorFactory.create(stakingOption, coroutineScope),
@@ -63,19 +60,23 @@ class RealStakingTypeDetailsProvider(
     override val stakingTypeDetails: Flow<ValidatedStakingTypeDetails> = stakingTypeDetailsInteractor.observeData()
         .map {
             ValidatedStakingTypeDetails(
-                validationStatus = validate(),
+                isAvailable = validate() is ValidationStatus.Valid,
                 stakingTypeDetails = it
             )
         }
 
     private suspend fun validate(): ValidationStatus<EditingStakingTypeFailure>? {
-        val selectionStore = currentSelectionStoreProvider.getSelectionStore(coroutineScope)
-        val selectedStake = selectionStore.currentSelection?.selection?.stake ?: return null
-        val payload = EditingStakingTypePayload(selectedStake, stakingType, singleStakingProperties.minStake())
+        val payload = getValidationPayload() ?: return null
         return validationSystem.validate(payload).getOrNull()
     }
 
     override fun getValidationSystem(): EditingStakingTypeValidationSystem {
         return validationSystem
+    }
+
+    override suspend fun getValidationPayload(): EditingStakingTypePayload? {
+        val selectionStore = currentSelectionStoreProvider.getSelectionStore(coroutineScope)
+        val selectedStake = selectionStore.currentSelection?.selection?.stake ?: return null
+        return EditingStakingTypePayload(selectedStake, stakingType, singleStakingProperties.minStake())
     }
 }
