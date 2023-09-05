@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settin
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class ValidatorRecommendator(val availableValidators: List<Validator>) {
+class ValidatorRecommender(val availableValidators: List<Validator>) {
 
     suspend fun recommendations(settings: RecommendationSettings) = withContext(Dispatchers.Default) {
         val all = availableValidators.applyFilters(settings.allFilters)

@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.validators.current.search.SearchCustomValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
@@ -39,7 +39,7 @@ class SearchCustomValidatorsViewModel(
     private val stakingInteractor: StakingInteractor,
     resourceManager: ResourceManager,
     private val sharedStateSetup: SetupStakingSharedState,
-    private val validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+    private val validatorRecommenderFactory: ValidatorRecommenderFactory,
     private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
     tokenUseCase: TokenUseCase,
 ) : SearchStakeTargetViewModel<Validator>(resourceManager) {
@@ -57,7 +57,7 @@ class SearchCustomValidatorsViewModel(
         .share()
 
     private val allElectedValidators by lazyAsync {
-        validatorRecommendatorFactory.create(scope = viewModelScope).availableValidators.toSet()
+        validatorRecommenderFactory.create(scope = viewModelScope).availableValidators.toSet()
     }
 
     private val foundValidatorsState = enteredQuery

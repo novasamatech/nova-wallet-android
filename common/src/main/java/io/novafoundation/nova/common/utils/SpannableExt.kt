@@ -5,19 +5,14 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.SpannedString
 import android.text.TextPaint
-import android.text.style.AbsoluteSizeSpan
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.view.View
 import androidx.core.text.toSpannable
 
-fun CharSequence.toSpannable(vararg spans: Any): Spannable {
-    return this.toSpannable().also { spannable ->
-        spans.forEach {
-            spannable.setFullSpan(it)
-        }
-    }
+fun CharSequence.toSpannable(span: Any): Spannable {
+    return this.toSpannable().setFullSpan(span)
 }
 
 fun Spannable.setFullSpan(span: Any): Spannable {
@@ -44,8 +39,6 @@ fun clickableSpan(onClick: () -> Unit) = object : ClickableSpan() {
 }
 
 fun colorSpan(color: Int) = ForegroundColorSpan(color)
-
-fun sizeSpan(sizeInPx: Int) = AbsoluteSizeSpan(sizeInPx)
 
 fun drawableSpan(drawable: Drawable) = ImageSpan(drawable)
 

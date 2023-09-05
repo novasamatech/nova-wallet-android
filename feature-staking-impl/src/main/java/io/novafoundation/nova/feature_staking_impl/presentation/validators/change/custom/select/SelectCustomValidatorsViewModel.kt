@@ -15,7 +15,7 @@ import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.APYSorting
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.TotalStakeSorting
@@ -49,7 +49,7 @@ import kotlinx.coroutines.launch
 
 class SelectCustomValidatorsViewModel(
     private val router: StakingRouter,
-    private val validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+    private val validatorRecommenderFactory: ValidatorRecommenderFactory,
     private val recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
     private val addressIconGenerator: AddressIconGenerator,
     private val interactor: StakingInteractor,
@@ -61,7 +61,7 @@ class SelectCustomValidatorsViewModel(
 ) : BaseViewModel() {
 
     private val validatorRecommendator by lazyAsync {
-        validatorRecommendatorFactory.create(scope = viewModelScope)
+        validatorRecommenderFactory.create(scope = viewModelScope)
     }
 
     private val recommendationSettingsProvider by lazyAsync {

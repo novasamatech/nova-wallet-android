@@ -12,7 +12,7 @@ import kotlinx.coroutines.withContext
 
 private const val ELECTED_VALIDATORS_CACHE = "ELECTED_VALIDATORS_CACHE"
 
-class ValidatorRecommendatorFactory(
+class ValidatorRecommenderFactory(
     private val validatorProvider: ValidatorProvider,
     private val sharedState: StakingSharedState,
     private val computationalCache: ComputationalCache
@@ -28,9 +28,9 @@ class ValidatorRecommendatorFactory(
         validatorProvider.getValidators(stakingOption, ValidatorSource.Elected, scope)
     }
 
-    suspend fun create(scope: CoroutineScope): ValidatorRecommendator = withContext(Dispatchers.IO) {
+    suspend fun create(scope: CoroutineScope): ValidatorRecommender = withContext(Dispatchers.IO) {
         val validators: List<Validator> = loadValidators(scope)
 
-        ValidatorRecommendator(validators)
+        ValidatorRecommender(validators)
     }
 }

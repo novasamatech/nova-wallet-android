@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.reposito
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommenderFactory
-import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.RealNominationPoolsAvailableBalanceResolver
@@ -172,13 +172,13 @@ class StartMultiStakingModule {
     @IntoMap
     @StakingTypeGroupKey(StakingTypeGroup.RELAYCHAIN)
     fun provideDirectStakingPropertiesFactory(
-        validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+        validatorRecommenderFactory: ValidatorRecommenderFactory,
         recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
         stakingSharedComputation: StakingSharedComputation,
         stakingRepository: StakingRepository
     ): SingleStakingPropertiesFactory {
         return DirectStakingPropertiesFactory(
-            validatorRecommendatorFactory = validatorRecommendatorFactory,
+            validatorRecommenderFactory = validatorRecommenderFactory,
             recommendationSettingsProviderFactory = recommendationSettingsProviderFactory,
             stakingSharedComputation = stakingSharedComputation,
             stakingRepository = stakingRepository

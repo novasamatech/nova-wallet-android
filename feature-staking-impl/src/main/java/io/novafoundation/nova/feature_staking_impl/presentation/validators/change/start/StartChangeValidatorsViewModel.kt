@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
@@ -29,7 +29,7 @@ class Texts(
 
 class StartChangeValidatorsViewModel(
     private val router: StakingRouter,
-    private val validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+    private val validatorRecommenderFactory: ValidatorRecommenderFactory,
     private val setupStakingSharedState: SetupStakingSharedState,
     private val appLinksProvider: AppLinksProvider,
     private val resourceManager: ResourceManager,
@@ -69,7 +69,7 @@ class StartChangeValidatorsViewModel(
 
     init {
         launch {
-            validatorRecommendatorFactory.awaitValidatorLoading(scope = viewModelScope)
+            validatorRecommenderFactory.awaitValidatorLoading(scope = viewModelScope)
 
             validatorsLoading.value = false
         }
