@@ -33,7 +33,7 @@ interface ExternalBalanceDao {
             SELECT chainId, assetId, type, SUM(amount) as aggregatedAmount 
             FROM externalBalances
             WHERE metaId = :metaId
-            GROUP BY type
+            GROUP BY chainId, assetId, type
         """
     )
     fun observeAggregatedExternalBalances(metaId: Long): Flow<List<AggregatedExternalBalanceLocal>>
