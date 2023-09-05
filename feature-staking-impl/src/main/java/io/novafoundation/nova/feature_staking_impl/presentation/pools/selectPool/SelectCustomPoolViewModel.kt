@@ -101,7 +101,6 @@ class SelectCustomPoolViewModel(
     }
 
     fun searchClicked() {
-
     }
 
     fun selectRecommended() {

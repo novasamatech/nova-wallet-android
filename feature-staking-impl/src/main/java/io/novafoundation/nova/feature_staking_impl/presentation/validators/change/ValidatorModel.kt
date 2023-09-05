@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.validators.chan
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.NominationPool
 
 typealias ValidatorStakeTargetModel = StakeTargetModel<Validator>
 

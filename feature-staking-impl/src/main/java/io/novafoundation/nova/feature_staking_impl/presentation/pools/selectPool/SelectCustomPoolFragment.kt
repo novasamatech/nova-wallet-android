@@ -20,7 +20,6 @@ import kotlinx.android.synthetic.main.fragment_select_custom_pool.selectCustomPo
 import kotlinx.android.synthetic.main.fragment_select_custom_pool.selectCustomPoolList
 import kotlinx.android.synthetic.main.fragment_select_custom_pool.selectCustomPoolRecommendedAction
 import kotlinx.android.synthetic.main.fragment_select_custom_pool.selectCustomPoolToolbar
-import kotlinx.coroutines.flow.first
 
 class SelectCustomPoolFragment : BaseFragment<SelectCustomPoolViewModel>(), PoolAdapter.ItemHandler {
 

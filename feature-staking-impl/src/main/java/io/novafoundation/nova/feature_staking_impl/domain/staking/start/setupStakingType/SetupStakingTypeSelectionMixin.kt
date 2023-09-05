@@ -38,9 +38,7 @@ class SetupStakingTypeSelectionMixin(
     val editableSelectionFlow = editableSelectionStoreProvider.currentSelectionFlow(scope)
         .filterNotNull()
 
-    val currentSelectionFlow = currentSelectionStoreProvider.currentSelectionFlow(scope)
-        .filterNotNull()
-
+    // TODO use it in SetupStakingTypeViewModel after refactoring
     suspend fun apply() {
         val recommendableSelection = editableSelectionStoreProvider.getSelectionStore(scope).currentSelection ?: return
         currentSelectionStoreProvider.getSelectionStore(scope)

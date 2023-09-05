@@ -8,30 +8,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
-import io.novafoundation.nova.common.list.PayloadGenerator
-import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.common.presentation.setColoredText
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
-import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_pool.view.itemPoolCheckBox
 import kotlinx.android.synthetic.main.item_pool.view.itemPoolIcon
 import kotlinx.android.synthetic.main.item_pool.view.itemPoolInfo
 import kotlinx.android.synthetic.main.item_pool.view.itemPoolMembersCount
 import kotlinx.android.synthetic.main.item_pool.view.itemPoolSubtitle
 import kotlinx.android.synthetic.main.item_pool.view.itemPoolTitle
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetCheck
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetActionIcon
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetScoringPrimary
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetScoringSecondary
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleLabel
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleValue
 
 class PoolAdapter(
     private val imageLoader: ImageLoader,

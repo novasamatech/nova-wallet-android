@@ -38,7 +38,7 @@ class StakingTargetView @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.view_staking_target, this)
-        
+
         minHeight = 52.dp(context)
 
         background = getRoundedCornerDrawable(fillColorRes = R.color.block_background, cornerSizeDp = 8)
