@@ -2,12 +2,14 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.notDeadRecipientInCommissionAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.notDeadRecipientInUsedAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeInUsedAsset
@@ -16,6 +18,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValid
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.doNotCrossExistentialDeposit
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notPhishingRecipient
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.positiveAmount
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.recipientIsNotSystemAccount
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientBalanceInUsedAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientCommissionBalanceToStayAboveED
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientTransferableBalanceToPayOriginFee
@@ -26,7 +29,6 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.callOrNull
 import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
-import java.math.BigInteger
 
 abstract class BaseAssetTransfers(
     private val chainRegistry: ChainRegistry,
@@ -43,7 +45,7 @@ abstract class BaseAssetTransfers(
      */
     protected abstract suspend fun transferFunctions(chainAsset: Chain.Asset): List<Pair<String, String>>
 
-    override suspend fun performTransfer(transfer: AssetTransfer): Result<String> {
+    override suspend fun performTransfer(transfer: WeightedAssetTransfer): Result<String> {
         val senderAccountId = transfer.sender.requireAccountIdIn(transfer.originChain)
 
         return extrinsicService.submitExtrinsicWithAnySuitableWallet(transfer.originChain, senderAccountId) {
@@ -51,8 +53,8 @@ abstract class BaseAssetTransfers(
         }
     }
 
-    override suspend fun calculateFee(transfer: AssetTransfer): BigInteger {
-        return extrinsicService.estimateFee(transfer.originChain) {
+    override suspend fun calculateFee(transfer: AssetTransfer): Fee {
+        return extrinsicService.estimateFeeV2(transfer.originChain) {
             transfer(transfer)
         }
     }
@@ -67,6 +69,7 @@ abstract class BaseAssetTransfers(
 
     protected fun defaultValidationSystem(): AssetTransfersValidationSystem = ValidationSystem {
         validAddress()
+        recipientIsNotSystemAccount()
 
         notPhishingRecipient(phishingValidationFactory)
 

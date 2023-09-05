@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedCo
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_BOND_MORE
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_REBAG
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_REBOND
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_REDEEM
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationSystem
@@ -37,6 +38,7 @@ class RelaychainModule {
         resourceManager: ResourceManager,
         @Named(SYSTEM_MANAGE_STAKING_REDEEM) redeemValidationSystem: StakeActionsValidationSystem,
         @Named(SYSTEM_MANAGE_STAKING_BOND_MORE) bondMoreValidationSystem: StakeActionsValidationSystem,
+        @Named(SYSTEM_MANAGE_STAKING_REBAG) rebagValidationSystem: StakeActionsValidationSystem,
         router: StakingRouter,
     ) = RelaychainAlertsComponentFactory(
         stakingSharedComputation = stakingSharedComputation,
@@ -44,6 +46,7 @@ class RelaychainModule {
         resourceManager = resourceManager,
         redeemValidationSystem = redeemValidationSystem,
         bondMoreValidationSystem = bondMoreValidationSystem,
+        rebagValidationSystem = rebagValidationSystem,
         router = router
     )
 

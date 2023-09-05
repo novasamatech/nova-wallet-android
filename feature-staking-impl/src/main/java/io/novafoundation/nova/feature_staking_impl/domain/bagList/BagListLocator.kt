@@ -1,15 +1,12 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bagList
 
+import io.novafoundation.nova.common.utils.rangeTo
 import io.novafoundation.nova.feature_staking_impl.domain.model.BagListNode.Score
 
 interface BagListLocator {
 
     fun bagBoundaries(userScore: Score): BagScoreBoundaries
-
-    fun nextBagBoundaries(previous: BagScoreBoundaries): BagScoreBoundaries
 }
-
-typealias BagScoreBoundaries = ClosedRange<Score>
 
 fun BagListLocator(thresholds: List<Score>): BagListLocator = RealBagListLocator(thresholds)
 
@@ -21,15 +18,8 @@ private class RealBagListLocator(private val thresholds: List<Score>) : BagListL
         return bagBoundariesAt(bagIndex)
     }
 
-    override fun nextBagBoundaries(previous: BagScoreBoundaries): BagScoreBoundaries {
-        val previousBagIndex = notionalBagIndexFor(previous.endInclusive)
-        val nextBagIndex = (previousBagIndex + 1).coerceAtMost(thresholds.size - 1)
-
-        return bagBoundariesAt(nextBagIndex)
-    }
-
     private fun bagBoundariesAt(index: Int): BagScoreBoundaries {
-        val bagUpper = thresholds[index]
+        val bagUpper = thresholds.getOrNull(index)
         val bagLower = if (index > 0) thresholds[index - 1] else Score.zero()
 
         return bagLower..bagUpper
