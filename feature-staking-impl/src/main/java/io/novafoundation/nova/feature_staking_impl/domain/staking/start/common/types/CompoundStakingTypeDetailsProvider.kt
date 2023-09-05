@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.
 
 import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
-import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingRecommendation
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.ValidatedStakingTypeDetails
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
@@ -41,5 +40,4 @@ class CompoundStakingTypeDetailsProviders(private val providers: List<StakingTyp
         return providers.first { it.stakingType == stakingType }
             .recommendationProvider
     }
-
 }

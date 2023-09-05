@@ -109,7 +109,7 @@ class SetupStakingTypeViewModel(
 
     fun donePressed() {
         launch {
-            //TODO use SetupStakingTypeSelectionMixin.apply() after merging
+            // TODO use SetupStakingTypeSelectionMixin.apply() after merging
 
             router.back()
         }
