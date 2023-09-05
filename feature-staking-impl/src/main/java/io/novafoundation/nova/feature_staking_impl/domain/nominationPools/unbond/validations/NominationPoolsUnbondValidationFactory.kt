@@ -23,7 +23,6 @@ class NominationPoolsUnbondValidationFactory(
         validate(
             PoolUnlockChunksLimitValidation(
                 stakingConstantsRepository = stakingConstantsRepository,
-                stakingRepository = stakingRepository,
                 stakingSharedComputation = stakingSharedComputation,
                 nominationPoolSharedComputation = nominationPoolSharedComputation,
                 stakingSharedState = stakingSharedState
