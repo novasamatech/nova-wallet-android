@@ -26,24 +26,6 @@ interface OptionsFilter<T, O> : Filter<T> {
     val options: List<O>
 }
 
-fun <T, R> Filter<T>.wrapWith(extractor: (R) -> T): Filter<R> = ExtractingFilter(this, extractor)
-
-class MatchAllFilter<T>(val filters: List<Filter<T>>) : Filter<T> {
-
-    override fun shouldInclude(model: T): Boolean {
-        return filters.all { filter -> filter.shouldInclude(model) }
-    }
-}
-
-private class ExtractingFilter<T, R>(
-    private val delegate: Filter<R>,
-    private val extractor: (T) -> R
-) : Filter<T> {
-    override fun shouldInclude(model: T): Boolean {
-        return delegate.shouldInclude(extractor(model))
-    }
-}
-
 fun <T> List<T>.applyFilters(filters: List<Filter<T>>): List<T> {
     return filter { item -> filters.all { filter -> filter.shouldInclude(item) } }
 }
