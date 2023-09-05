@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.s
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.SelectionTypeSource
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.direct.DirectStakingSelection
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.getSelectedValidators
 import kotlinx.coroutines.CoroutineScope
@@ -14,14 +15,17 @@ interface ReviewValidatorsFlowAction {
     suspend fun execute(coroutineScope: CoroutineScope)
 }
 
-class EmptyReviewValidatorsFlowAction : ReviewValidatorsFlowAction {
+class DefaultReviewValidatorsFlowAction(
+    private val stakingRouter: StakingRouter
+) : ReviewValidatorsFlowAction {
 
     override suspend fun execute(coroutineScope: CoroutineScope) {
-        // Do nothing
+        stakingRouter.finishSetupValidatorsFlow()
     }
 }
 
 class SetupStakingReviewValidatorsFlowAction(
+    private val stakingRouter: StakingRouter,
     private val sharedStateSetup: SetupStakingSharedState,
     private val currentSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
     private val recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
@@ -46,5 +50,7 @@ class SetupStakingReviewValidatorsFlowAction(
         )
 
         selectionStore.updateSelection(newSelection)
+
+        stakingRouter.openConfirmStaking()
     }
 }
