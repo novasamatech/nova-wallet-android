@@ -8,12 +8,12 @@ import io.novafoundation.nova.feature_staking_api.domain.model.activeBalance
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.BondedPool
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
+import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.UnbondingPools
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.bondedAccountOf
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.deriveAllBondedPools
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.bondedAccountOf
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.deriveAllBondedPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolUnbondRepository

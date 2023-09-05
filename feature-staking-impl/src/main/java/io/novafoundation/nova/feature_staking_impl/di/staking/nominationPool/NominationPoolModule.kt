@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.datasour
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.datasource.RealKnownMaxUnlockingOverwrites
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.FixedKnownNovaPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolImageDataSource
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PredefinedPoolImageDataSource
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.RealPoolAccountDerivation

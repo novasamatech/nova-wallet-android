@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.EraRedeemable
 import io.novafoundation.nova.feature_staking_api.domain.model.isUnbondingIn
 import io.novafoundation.nova.feature_staking_api.domain.model.of
+import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindEraIndex
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
