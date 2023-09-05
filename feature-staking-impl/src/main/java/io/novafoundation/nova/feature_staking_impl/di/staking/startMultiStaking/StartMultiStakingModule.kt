@@ -27,7 +27,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmo
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.direct.DirectStakingPropertiesFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.pools.NominationPoolStakingPropertiesFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.selectionType.MultiStakingSelectionTypeProviderFactory
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.EditingStakingTypeSelectionMixinFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.pool.RealStakingTypeDetailsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingTargetSelectionFormatter
@@ -103,20 +102,6 @@ class StartMultiStakingModule {
         factories: Map<StakingTypeGroup, @JvmSuppressWildcards StakingTypeDetailsProviderFactory>,
     ): CompoundStakingTypeDetailsProvidersFactory {
         return CompoundStakingTypeDetailsProvidersFactory(factories)
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideEditingStakingTypeSelectionMixinFactory(
-        @MultiStakingSelectionStoreProviderKey currentSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
-        @StakingTypeEditingStoreProviderKey editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
-        compoundStakingTypeDetailsProvidersFactory: CompoundStakingTypeDetailsProvidersFactory
-    ): EditingStakingTypeSelectionMixinFactory {
-        return EditingStakingTypeSelectionMixinFactory(
-            currentSelectionStoreProvider,
-            editableSelectionStoreProvider,
-            compoundStakingTypeDetailsProvidersFactory
-        )
     }
 
     @Provides

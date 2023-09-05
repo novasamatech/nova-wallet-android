@@ -10,9 +10,10 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_staking_impl.di.staking.startMultiStaking.MultiStakingSelectionStoreProviderKey
 import io.novafoundation.nova.feature_staking_impl.di.staking.startMultiStaking.StakingTypeEditingStoreProviderKey
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.EditingStakingTypeSelectionMixinFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.CompoundStakingTypeDetailsProvidersFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingTargetSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.EditableStakingTypeItemFormatter
@@ -41,22 +42,22 @@ class SetupStakingTypeModule {
     fun provideViewModel(
         stakingRouter: StakingRouter,
         assetUseCase: ArbitraryAssetUseCase,
-        resourceManager: ResourceManager,
         payload: SetupStakingTypePayload,
         @StakingTypeEditingStoreProviderKey editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
-        editingStakingTypeSelectionMixinFactory: EditingStakingTypeSelectionMixinFactory,
+        @MultiStakingSelectionStoreProviderKey currentSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
         editableStakingTypeItemFormatter: EditableStakingTypeItemFormatter,
+        compoundStakingTypeDetailsProvidersFactory: CompoundStakingTypeDetailsProvidersFactory,
         validationExecutor: ValidationExecutor,
         chainRegistry: ChainRegistry
     ): ViewModel {
         return SetupStakingTypeViewModel(
             stakingRouter,
             assetUseCase,
-            resourceManager,
             payload,
+            currentSelectionStoreProvider,
             editableSelectionStoreProvider,
-            editingStakingTypeSelectionMixinFactory,
             editableStakingTypeItemFormatter,
+            compoundStakingTypeDetailsProvidersFactory,
             validationExecutor,
             chainRegistry
         )

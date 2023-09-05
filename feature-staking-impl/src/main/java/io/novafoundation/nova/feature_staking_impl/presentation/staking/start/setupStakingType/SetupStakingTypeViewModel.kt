@@ -3,13 +3,13 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.s
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.RecommendableMultiStakingSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.EditingStakingTypeSelectionMixinFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.currentSelectionFlow
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.CompoundStakingTypeDetailsProvidersFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.ValidatedStakingTypeDetails
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem
@@ -19,21 +19,24 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.SelectionTypeSource
+import java.math.BigInteger
 import kotlinx.coroutines.launch
 
 class SetupStakingTypeViewModel(
     private val router: StakingRouter,
     private val assetUseCase: ArbitraryAssetUseCase,
-    private val resourceManager: ResourceManager,
     payload: SetupStakingTypePayload,
     private val editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
-    private val editingStakingTypeSelectionMixinFactory: EditingStakingTypeSelectionMixinFactory,
+    private val currentSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
     private val editableStakingTypeItemFormatter: EditableStakingTypeItemFormatter,
+    private val compoundStakingTypeDetailsProvidersFactory: CompoundStakingTypeDetailsProvidersFactory,
     private val validationExecutor: ValidationExecutor,
     chainRegistry: ChainRegistry
 ) : BaseViewModel(), Validatable by validationExecutor {
@@ -50,35 +53,40 @@ class SetupStakingTypeViewModel(
         payload.availableStakingOptions.assetId
     )
 
-    private val editingStakingTypeSelectionMixin = chainWithAsset
-        .map {
-            editingStakingTypeSelectionMixinFactory.create(
-                viewModelScope,
-                chainWithAsset = it,
-                availableStakingTypes = payload.availableStakingOptions.stakingTypes
-            )
-        }
+    private val stakingTypeDetailsProvidersFlow = chainWithAsset.map {
+        compoundStakingTypeDetailsProvidersFactory.create(
+            viewModelScope,
+            it,
+            payload.availableStakingOptions.stakingTypes
+        )
+    }
+
+    private val editableSelectionFlow = editableSelectionStoreProvider.currentSelectionFlow(viewModelScope)
+        .filterNotNull()
         .shareInBackground()
 
-    private val currentSelectionFlow = editingStakingTypeSelectionMixin
-        .flatMapLatest { it.currentSelectionFlow }
+    private val currentSelectionFlow = currentSelectionStoreProvider.currentSelectionFlow(viewModelScope)
+        .filterNotNull()
         .shareInBackground()
 
-    private val stakingTypesDataFlow = editingStakingTypeSelectionMixin
-        .flatMapLatest { it.getEditableStakingTypes() }
+    private val editableStakingTypeComparator = getEditableStakingTypeComparator()
+
+    private val stakingTypesDataFlow = stakingTypeDetailsProvidersFlow
+        .flatMapLatest { it.getStakingTypeDetails() }
+        .map { it.sortedWith(editableStakingTypeComparator) }
         .shareInBackground()
 
-    private val editableSelection = editingStakingTypeSelectionMixin.flatMapLatest { it.editableSelectionFlow }
-        .shareInBackground()
-
-    val availableToRewriteData = editingStakingTypeSelectionMixin
-        .flatMapLatest { it.availableToRewriteData }
-        .shareInBackground()
+    val availableToRewriteData = combine(
+        currentSelectionFlow,
+        editableSelectionFlow
+    ) { current, editable ->
+        !current.selection.isSettingsEquals(editable.selection)
+    }.shareInBackground()
 
     val stakingTypeModels = combine(
         assetFlow,
         stakingTypesDataFlow,
-        editableSelection
+        editableSelectionFlow
     ) { asset, stakingTypesData, selection ->
         mapStakingTypes(asset, stakingTypesData, selection)
     }
@@ -101,7 +109,7 @@ class SetupStakingTypeViewModel(
 
     fun donePressed() {
         launch {
-            editingStakingTypeSelectionMixin.first().apply()
+            //TODO use SetupStakingTypeSelectionMixin.apply() after merging
 
             router.back()
         }
@@ -118,6 +126,7 @@ class SetupStakingTypeViewModel(
                 is ValidationStatus.Valid -> {
                     setRecommendedSelection(validatedStakingType.stakingTypeDetails.stakingType)
                 }
+
                 is ValidationStatus.NotValid -> {
                     // provide error dialog
                     // handleSetupStakingTypeValidationFailure(chainAsset, validationStatus.reason, resourceManager)
@@ -128,7 +137,18 @@ class SetupStakingTypeViewModel(
 
     private fun setRecommendedSelection(stakingType: Chain.Asset.StakingType) {
         launch {
-            editingStakingTypeSelectionMixin.first().setRecommendedSelection(stakingType)
+            val currentStake = getEnteredAmount() ?: return@launch
+
+            val recommendedSelection = stakingTypeDetailsProvidersFlow.first().getRecommendationProvider(stakingType)
+                .recommendedSelection(currentStake)
+
+            val recommendableMultiStakingSelection = RecommendableMultiStakingSelection(
+                source = SelectionTypeSource.Manual(contentRecommended = true),
+                selection = recommendedSelection
+            )
+
+            editableSelectionStoreProvider.getSelectionStore(viewModelScope)
+                .updateSelection(recommendableMultiStakingSelection)
         }
     }
 
@@ -140,5 +160,12 @@ class SetupStakingTypeViewModel(
         return stakingTypesDetails.mapNotNull {
             editableStakingTypeItemFormatter.format(asset, it, selection)
         }
+    }
+
+    private suspend fun getEnteredAmount(): BigInteger? {
+        return currentSelectionStoreProvider.getSelectionStore(viewModelScope)
+            .currentSelection
+            ?.selection
+            ?.stake ?: return null
     }
 }
