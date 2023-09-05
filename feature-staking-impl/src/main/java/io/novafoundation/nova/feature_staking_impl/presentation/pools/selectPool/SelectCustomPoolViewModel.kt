@@ -31,6 +31,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.PoolStakeTargetModel
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
 class SelectCustomPoolViewModel(
@@ -84,6 +86,7 @@ class SelectCustomPoolViewModel(
         router.back()
     }
 
+    fun poolInfoClicked(poolStakeModel: PoolStakeTargetModel) = launch {
     fun poolInfoClicked(poolItem: PoolRvItem) {
         launch {
             val chain = stakingOption().chain
@@ -91,6 +94,8 @@ class SelectCustomPoolViewModel(
             externalActions.showAddressActions(pool.stashAccountId, chain)
         }
     }
+
+    fun poolClicked(poolStakeModel: PoolStakeTargetModel) {
 
     fun poolClicked(poolItem: PoolRvItem) {
         launch {
