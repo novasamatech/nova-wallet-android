@@ -11,7 +11,7 @@ private const val PREVIEW_COUNT = 3
 
 class AssetsListInteractor(
     private val accountRepository: AccountRepository,
-    private val nftRepository: NftRepository
+    private val nftRepository: NftRepository,
 ) {
 
     suspend fun fullSyncNft(nft: Nft) = nftRepository.fullNftSync(nft)

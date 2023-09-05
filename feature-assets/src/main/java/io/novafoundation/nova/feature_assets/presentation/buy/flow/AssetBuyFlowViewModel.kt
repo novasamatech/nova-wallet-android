@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.buy.flow
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
@@ -9,31 +10,30 @@ import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.b
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.flow.AssetFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import kotlinx.coroutines.flow.Flow
 
 class AssetBuyFlowViewModel(
-    router: AssetsRouter,
     interactor: AssetSearchInteractor,
+    router: AssetsRouter,
+    externalBalancesInteractor: ExternalBalancesInteractor,
     currencyInteractor: CurrencyInteractor,
-    contributionsInteractor: ContributionsInteractor,
     controllableAssetCheck: ControllableAssetCheckMixin,
     accountUseCase: SelectedAccountUseCase,
     buyMixinFactory: BuyMixinFactory
 ) : AssetFlowViewModel(
-    router,
     interactor,
+    router,
     currencyInteractor,
-    contributionsInteractor,
     controllableAssetCheck,
-    accountUseCase
+    accountUseCase,
+    externalBalancesInteractor,
 ) {
 
     val buyMixin = buyMixinFactory.create(scope = this)
 
     override fun searchAssetsFlow(): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
-        return interactor.buyAssetSearch(query, totalContributedByAssetsFlow)
+        return interactor.buyAssetSearch(query, externalBalancesFlow)
     }
 
     override fun assetClicked(assetModel: AssetModel) {

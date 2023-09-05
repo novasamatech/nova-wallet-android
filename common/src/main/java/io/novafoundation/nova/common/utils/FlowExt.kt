@@ -51,6 +51,10 @@ inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = 
     list.map { item -> mapper(item) }
 }
 
+inline fun <T, R> Flow<Result<T>>.mapResult(crossinline mapper: suspend (T) -> R) = map { result ->
+    result.map { item -> mapper(item) }
+}
+
 inline fun <T, R> Flow<List<T>>.mapListNotNull(crossinline mapper: suspend (T) -> R?) = map { list ->
     list.mapNotNull { item -> mapper(item) }
 }

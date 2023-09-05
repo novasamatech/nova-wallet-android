@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance
+package io.novafoundation.nova.feature_assets.data.network
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
@@ -7,7 +7,9 @@ import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
+import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.subscribe
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -27,6 +29,7 @@ class BalancesUpdateSystem(
     private val chainRegistry: ChainRegistry,
     private val paymentUpdaterFactory: PaymentUpdaterFactory,
     private val balanceLocksUpdater: BalanceLocksUpdaterFactory,
+    private val pooledBalanceUpdaterFactory: PooledBalanceUpdaterFactory,
     private val accountUpdateScope: AccountUpdateScope,
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : UpdateSystem {
@@ -44,7 +47,8 @@ class BalancesUpdateSystem(
         return flow {
             val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
 
-            val updaters = listOf(paymentUpdaterFactory.create(chain), balanceLocksUpdater.create(chain))
+            val updaters = createUpdates(chain)
+
             val sideEffectFlows = updaters.map { updater ->
                 try {
                     updater.listenForUpdates(subscriptionBuilder, metaAccount).catch { logError(chain, it) }
@@ -58,6 +62,14 @@ class BalancesUpdateSystem(
 
             emitAll(resultFlow)
         }.catch { logError(chain, it) }
+    }
+
+    private fun createUpdates(chain: Chain): List<Updater<MetaAccount>> {
+        return listOf(
+            paymentUpdaterFactory.create(chain),
+            balanceLocksUpdater.create(chain),
+            pooledBalanceUpdaterFactory.create(chain)
+        )
     }
 
     private fun logError(chain: Chain, error: Throwable) {

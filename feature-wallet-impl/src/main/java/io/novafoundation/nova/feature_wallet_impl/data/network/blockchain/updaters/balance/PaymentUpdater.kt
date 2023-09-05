@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updat
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
@@ -17,9 +16,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.runtime.ext.addressOf
-import io.novafoundation.nova.runtime.ext.disabledAssets
 import io.novafoundation.nova.runtime.ext.enabledAssets
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicStatus
@@ -29,21 +27,19 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 
-class PaymentUpdaterFactory(
+class RealPaymentUpdaterFactory(
     private val operationDao: OperationDao,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val scope: AccountUpdateScope,
-    private val walletRepository: WalletRepository,
     private val currencyRepository: CurrencyRepository
-) {
+) : PaymentUpdaterFactory {
 
-    fun create(chain: Chain): Updater<MetaAccount> {
+    override fun create(chain: Chain): Updater<MetaAccount> {
         return PaymentUpdater(
             operationDao = operationDao,
             assetSourceRegistry = assetSourceRegistry,
             scope = scope,
             chain = chain,
-            walletRepository = walletRepository,
             currencyRepository = currencyRepository
         )
     }
@@ -54,7 +50,6 @@ private class PaymentUpdater(
     private val assetSourceRegistry: AssetSourceRegistry,
     override val scope: AccountUpdateScope,
     private val chain: Chain,
-    private val walletRepository: WalletRepository,
     private val currencyRepository: CurrencyRepository
 ) : Updater<MetaAccount> {
 
@@ -68,22 +63,10 @@ private class PaymentUpdater(
 
         val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
 
-        val enabledAssetsSync = chain.enabledAssets().mapNotNull { chainAsset ->
+        return chain.enabledAssets().mapNotNull { chainAsset ->
             syncAsset(chainAsset, metaAccount, accountId, storageSubscriptionBuilder)
         }
-
-        val removeAssetsSync = flowOf {
-            deleteAssetIfExist(chain.disabledAssets())
-        }
-
-        val assetSyncs = buildList {
-            addAll(enabledAssetsSync)
-            add(removeAssetsSync)
-        }
-
-        val chainSyncingFlow = assetSyncs.mergeIfMultiple()
-
-        return chainSyncingFlow
+            .mergeIfMultiple()
             .noSideAffects()
     }
 
@@ -109,10 +92,6 @@ private class PaymentUpdater(
             balanceUpdate
         }
             .catch { logSyncError(chain, chainAsset, error = it) }
-    }
-
-    private suspend fun deleteAssetIfExist(chainAssets: List<Chain.Asset>) {
-        walletRepository.clearAssets(chainAssets)
     }
 
     private fun logSyncError(chain: Chain, chainAsset: Chain.Asset, error: Throwable) {

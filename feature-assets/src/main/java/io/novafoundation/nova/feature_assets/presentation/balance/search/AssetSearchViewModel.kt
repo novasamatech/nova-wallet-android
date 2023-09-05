@@ -2,12 +2,12 @@ package io.novafoundation.nova.feature_assets.presentation.balance.search
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGroupedAssetsToUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -17,7 +17,7 @@ class AssetSearchViewModel(
     private val router: AssetsRouter,
     interactor: AssetSearchInteractor,
     currencyInteractor: CurrencyInteractor,
-    contributionsInteractor: ContributionsInteractor,
+    externalBalancesInteractor: ExternalBalancesInteractor,
 ) : BaseViewModel() {
 
     val query = MutableStateFlow("")
@@ -26,10 +26,10 @@ class AssetSearchViewModel(
         .inBackground()
         .share()
 
-    private val totalContributedByAssetsFlow = contributionsInteractor.observeTotalContributedByAssets()
+    private val externalBalances = externalBalancesInteractor.observeExternalBalances()
 
     val searchResults = combine(
-        interactor.searchAssetsFlow(query, totalContributedByAssetsFlow),
+        interactor.searchAssetsFlow(query, externalBalances),
         selectedCurrency,
     ) { assets, currency ->
         assets.mapGroupedAssetsToUi(currency)

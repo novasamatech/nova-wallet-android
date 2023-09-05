@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_crowdloan_api.data.source.contribution
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import java.math.BigInteger
 
 interface ExternalContributionSource {
 
@@ -24,7 +24,7 @@ interface ExternalContributionSource {
     suspend fun getContributions(
         chain: Chain,
         accountId: AccountId,
-    ): List<ExternalContribution>
+    ): Result<List<ExternalContribution>>
 }
 
 fun ExternalContributionSource.supports(chain: Chain) = supportedChains == null || chain.id in supportedChains!!
