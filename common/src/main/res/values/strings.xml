@@ -1455,6 +1455,7 @@
     <string name="wallet_nickname_create_caption_v2_2_0">Name examples: Main account, My validator, Dotsama crowdloans, etc.</string>
     <string name="wallet_receive_description">Share this QR to sender</string>
     <string name="wallet_receive_description_v2_2_0">Let sender scan this QR code</string>
+    <!-- <string name="wallet_receive_share_message" formatted="false">My %s address to receive %s:</string> -->
     <string name="wallet_receive_share_message_token" formatted="false">My %s address to receive %s:</string>
     <string name="wallet_receive_share_message" formatted="false">My %s address:</string>
     <string name="wallet_receive_share_qr">Share QR code</string>

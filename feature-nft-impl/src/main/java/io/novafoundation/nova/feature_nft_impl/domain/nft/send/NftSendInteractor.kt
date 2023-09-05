@@ -1,10 +1,11 @@
 package io.novafoundation.nova.feature_nft_impl.domain.nft.send
 
+import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_nft_api.data.repository.PendingSendNftTransactionRepository
 import io.novafoundation.nova.feature_nft_impl.data.network.blockchain.nfts.transfers.NftTransferModel
 import io.novafoundation.nova.feature_nft_impl.data.network.blockchain.nfts.transfers.NftTransfersValidationSystem
-import io.novafoundation.nova.feature_nft_impl.data.source.NftTransfer
+import io.novafoundation.nova.feature_nft_impl.data.source.BaseNftTransfer
 import io.novafoundation.nova.feature_nft_impl.data.source.NftTransfersRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -18,12 +19,13 @@ import kotlinx.coroutines.withContext
 import java.math.BigInteger
 import javax.inject.Inject
 
+@FeatureScope
 class NftSendInteractor @Inject constructor(
     private val walletRepository: WalletRepository,
     private val nftTransfersRegistry: NftTransfersRegistry,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
-    private val nftRepository: NftRepository
+    private val pendingSendNftTransactionRepository: PendingSendNftTransactionRepository
 ) {
 
     fun commissionAssetFlow(chainId: ChainId): Flow<Asset> {
@@ -43,7 +45,7 @@ class NftSendInteractor @Inject constructor(
     suspend fun performTransfer(transfer: NftTransferModel): Result<String> {
         return getNftTransfers(transfer).performTransfer(transfer)
             .onSuccess {
-                nftRepository.onNftSendTransactionSubmitted(transfer.nftId)
+                pendingSendNftTransactionRepository.onNftSendTransactionSubmitted(transfer.nftId)
             }
     }
 
@@ -51,7 +53,7 @@ class NftSendInteractor @Inject constructor(
         return nftTransfersRegistry.defaultValidationSystem()
     }
 
-    private fun getNftTransfers(transfer: NftTransferModel): NftTransfer {
+    private fun getNftTransfers(transfer: NftTransferModel): BaseNftTransfer {
         return nftTransfersRegistry.get(transfer.nftType.key)
     }
 }

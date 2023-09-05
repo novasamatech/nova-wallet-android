@@ -34,54 +34,25 @@ import kotlinx.android.synthetic.main.item_nft_list_actions.view.nftActionsSend
 class NftGridAdapter(
     private val imageLoader: ImageLoader,
     private val handler: Handler
-) : ListAdapter<NftListItem, NftGridListHolder>(DiffCallback) {
-
-    companion object {
-        private const val TYPE_ACTIONS = 1
-        private const val TYPE_NFT = 2
-    }
+) : ListAdapter<NftListItem, NftHolder>(DiffCallback) {
 
     interface Handler {
 
         fun itemClicked(item: NftListItem)
 
         fun loadableItemShown(item: NftListItem)
-
-        fun sendClicked()
-
-        fun receiveClicked()
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return if (position == 0) {
-            TYPE_ACTIONS
-        } else {
-            TYPE_NFT
-        }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NftHolder {
+        return NftHolder(parent.inflateChild(R.layout.item_nft_grid), imageLoader, handler)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NftGridListHolder {
-        return when (viewType) {
-            TYPE_ACTIONS -> {
-                ActionsHolder(parent.inflateChild(R.layout.item_nft_list_actions), handler)
-            }
-            TYPE_NFT -> {
-                NftHolder(parent.inflateChild(R.layout.item_nft_grid), imageLoader, handler)
-            }
-            else -> error("No such viewType: $viewType")
-        }
+    override fun onBindViewHolder(holder: NftHolder, position: Int) {
+        holder.bind(getItem(position))
     }
 
-    override fun onBindViewHolder(holder: NftGridListHolder, position: Int) {
-        if (holder is NftHolder) {
-            holder.bind(getItem(position))
-        }
-    }
-
-    override fun onViewRecycled(holder: NftGridListHolder) {
-        if (holder is NftHolder) {
-            holder.unbind()
-        }
+    override fun onViewRecycled(holder: NftHolder) {
+        holder.unbind()
     }
 }
 
@@ -96,26 +67,11 @@ private object DiffCallback : DiffUtil.ItemCallback<NftListItem>() {
     }
 }
 
-sealed class NftGridListHolder(containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer
-
-class ActionsHolder(
-    override val containerView: View,
-    private val itemHandler: NftGridAdapter.Handler
-) : NftGridListHolder(containerView) {
-
-    init {
-        with(containerView) {
-            nftActionsSend.setOnClickListener { itemHandler.sendClicked() }
-            nftActionsReceive.setOnClickListener { itemHandler.receiveClicked() }
-        }
-    }
-}
-
 class NftHolder(
     override val containerView: View,
     private val imageLoader: ImageLoader,
     private val itemHandler: NftGridAdapter.Handler
-) : NftGridListHolder(containerView) {
+) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
     init {
         with(containerView) {

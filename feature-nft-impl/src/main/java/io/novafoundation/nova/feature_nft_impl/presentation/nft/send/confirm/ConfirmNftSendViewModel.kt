@@ -25,11 +25,13 @@ import io.novafoundation.nova.feature_nft_impl.data.network.blockchain.nfts.tran
 import io.novafoundation.nova.feature_nft_impl.domain.nft.send.NftSendInteractor
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.send.NftTransferDraft
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.send.mapNftTransferValidationFailureToUI
+import io.novafoundation.nova.feature_nft_impl.presentation.nft.send.mapToDomain
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -97,15 +99,8 @@ class ConfirmNftSendViewModel(
         .inBackground()
         .share()
 
-    private val _transferSubmittingLiveData = MutableStateFlow(false)
-
-    val sendButtonStateLiveData = _transferSubmittingLiveData.map { submitting ->
-        if (submitting) {
-            ButtonState.PROGRESS
-        } else {
-            ButtonState.NORMAL
-        }
-    }
+    private val _transferSubmittingFlow = MutableStateFlow(false)
+    val sendButtonStateFlow = _transferSubmittingFlow.asStateFlow()
 
     init {
         setInitialState()
@@ -135,7 +130,7 @@ class ConfirmNftSendViewModel(
         validationExecutor.requireValid(
             validationSystem = nftSendInteractor.defaultValidationSystem(),
             payload = payload,
-            progressConsumer = _transferSubmittingLiveData.progressConsumer(),
+            progressConsumer = _transferSubmittingFlow.progressConsumer(),
             validationFailureTransformer = { mapNftTransferValidationFailureToUI(resourceManager, it) }
         ) {
             performTransfer(it.transfer)
@@ -169,7 +164,7 @@ class ConfirmNftSendViewModel(
                 finishSendFlow()
             }.onFailure(::showError)
 
-        _transferSubmittingLiveData.value = false
+        _transferSubmittingFlow.value = false
     }
 
     private fun finishSendFlow() {
@@ -183,7 +178,7 @@ class ConfirmNftSendViewModel(
                 sender = currentAccount.first(),
                 recipient = transferDraft.recipientAddress,
                 nftId = transferDraft.nftId,
-                nftType = transferDraft.nftType,
+                nftType = transferDraft.nftType.mapToDomain(),
                 originChain = chain,
                 destinationChain = chain
             ),

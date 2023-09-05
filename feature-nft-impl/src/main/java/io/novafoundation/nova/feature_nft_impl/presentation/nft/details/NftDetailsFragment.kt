@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.dialog.errorDialog
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
@@ -119,14 +120,8 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
                 nftDetailsCreator.makeGone()
             }
 
-            assetActionsSend.makeVisible()
             nftDetailsChain.showChain(it.network)
-
-            if (it.isSupportedForSend) {
-                assetActionsSend.makeVisible()
-            } else {
-                assetActionsSend.makeGone()
-            }
+            assetActionsSend.setVisible(it.isSupportedForSend)
         }
 
         viewModel.exitingErrorLiveData.observeEvent {

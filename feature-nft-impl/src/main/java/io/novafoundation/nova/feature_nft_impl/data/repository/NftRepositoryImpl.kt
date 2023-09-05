@@ -2,7 +2,8 @@ package io.novafoundation.nova.feature_nft_impl.data.repository
 
 import android.util.Log
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
-import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
+import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -13,18 +14,24 @@ import io.novafoundation.nova.feature_nft_impl.data.mappers.mapNftLocalToNft
 import io.novafoundation.nova.feature_nft_impl.data.mappers.mapNftTypeLocalToTypeKey
 import io.novafoundation.nova.feature_nft_impl.data.source.JobOrchestrator
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvidersRegistry
+import io.novafoundation.nova.feature_nft_impl.data.source.NftTransfersRegistry
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.subscribe
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -32,6 +39,7 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.coroutineContext
+import kotlin.coroutines.suspendCoroutine
 
 private const val NFT_TAG = "NFT"
 
@@ -41,7 +49,8 @@ class NftRepositoryImpl(
     private val jobOrchestrator: JobOrchestrator,
     private val nftDao: NftDao,
     private val exceptionHandler: HttpExceptionHandler,
-    private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+    private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
+    private val nftTransfersRegistry: NftTransfersRegistry
 ) : NftRepository {
 
     override fun allNftFlow(metaAccount: MetaAccount): Flow<List<Nft>> {
@@ -64,45 +73,86 @@ class NftRepositoryImpl(
         }.catch { throw exceptionHandler.transformException(it) }
     }
 
-    override fun subscribeNftOwnerAddress(nftLocal: NftLocal): Flow<String> {
-        return flowOf {
-            val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(nftLocal.chainId)
-            nftLocal to subscriptionBuilder
-        }.flatMapConcat { (nftLocal, subscriptionBuilder) ->
-            val nftTypeKey = mapNftTypeLocalToTypeKey(nftDao.getNftType(nftLocal.identifier))
-            val nftProvider = nftProvidersRegistry.get(nftTypeKey)
-            nftProvider.subscribeNftOwnerAddress(
-                subscriptionBuilder,
-                nftLocal
-            ).onStart { subscriptionBuilder.subscribe(coroutineContext) }
+    override suspend fun subscribeNftOwnerAccountId(nftId: String): Flow<Pair<AccountId?, NftLocal>> {
+        val nftLocal = getLocalNft(nftId)
+        val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(nftLocal.chainId)
+        val nftTypeKey = mapNftTypeLocalToTypeKey(nftDao.getNftType(nftLocal.identifier))
+        val nftProvider = nftProvidersRegistry.get(nftTypeKey)
+        return nftProvider.subscribeNftOwnerAccountId(
+            subscriptionBuilder,
+            nftLocal
+        ).onStart {
+            subscriptionBuilder.subscribe(coroutineContext)
         }
+            .map { address -> address to nftLocal }
     }
 
     override suspend fun getLocalNft(nftIdentifier: String): NftLocal {
         return nftDao.getNft(nftIdentifier)
     }
 
+    override suspend fun getLocalNfts(nftIdentifiers: List<String>): List<NftLocal> {
+        return nftDao.getNfts(nftIdentifiers)
+    }
+
     override suspend fun initialNftSync(
         metaAccount: MetaAccount,
-        forceOverwrite: Boolean,
+        forceOverwrite: Boolean
     ): Unit = withContext(Dispatchers.IO) {
         val chains = chainRegistry.currentChains.first()
 
         val syncJobs = chains.flatMap { chain ->
+            initialNftSyncForChain(chain, metaAccount, forceOverwrite, skipFirstBlock = false)
+        }
+
+        syncJobs.joinAll()
+    }
+
+    override suspend fun initialNftSyncForChainId(
+        chainId: ChainId,
+        metaAccount: MetaAccount,
+        forceOverwrite: Boolean,
+        skipFirstBlock: Boolean
+    ): List<Job> {
+        val chain = chainRegistry.getChain(chainId)
+        return initialNftSyncForChain(chain, metaAccount, forceOverwrite, skipFirstBlock)
+    }
+
+    private suspend fun initialNftSyncForChain(
+        chain: Chain,
+        metaAccount: MetaAccount,
+        forceOverwrite: Boolean,
+        skipFirstBlock: Boolean
+    ): List<Job> {
+        return coroutineScope {
+            var blockHash: BlockHash? = null
+            if (skipFirstBlock) {
+                blockHash = getNextBlockHash(chainId = chain.id)
+            }
             nftProvidersRegistry.get(chain).map { nftProvider ->
                 // launch separate job per each nftProvider
                 launch {
                     // prevent whole sync from failing if some particular provider fails
                     runCatching {
-                        nftProvider.initialNftsSync(chain, metaAccount, forceOverwrite)
+                        nftProvider.initialNftsSync(chain, metaAccount, forceOverwrite, at = blockHash)
                     }.onFailure {
                         Log.e(NFT_TAG, "Failed to sync nfts in ${chain.name} using ${nftProvider::class.simpleName}", it)
                     }
                 }
             }
         }
+    }
 
-        syncJobs.joinAll()
+    private suspend fun getNextBlockHash(chainId: ChainId): String {
+        return coroutineScope {
+            val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chainId)
+            val runtime = chainRegistry.getRuntime(chainId)
+            val storage = runtime.metadata.system().storage("Number")
+            val blockNumberKey = storage.storageKey()
+            val blocksFlow = subscriptionBuilder.subscribe(blockNumberKey)
+            subscriptionBuilder.subscribe(this)
+            blocksFlow.drop(1).first().block
+        }
     }
 
     override suspend fun fullNftSync(nft: Nft) = withContext(Dispatchers.IO) {
@@ -118,32 +168,16 @@ class NftRepositoryImpl(
     override suspend fun getAvailableChains(): List<Chain> {
         val chains = chainRegistry.currentChains.first()
         return chains.mapNotNull { chain ->
-            chain.takeIf { nftProvidersRegistry.isAvailableChain(chain) }
+            chain.takeIf { nftProvidersRegistry.isNftTransferAvailableOnChain(chain) }
         }
-    }
-
-    override fun onNftSendTransactionSubmitted(nftId: String) {
-        pendingSendTransactionsNftIds.value = pendingSendTransactionsNftIds.value.toMutableSet().apply {
-            add(nftId)
-        }
-    }
-
-    override fun removeOldPendingTransactions(myNftIds: List<String>) {
-        pendingSendTransactionsNftIds.value = pendingSendTransactionsNftIds.value.toMutableSet().apply {
-            toList().forEach { _ -> removeIf { it in myNftIds } }
-        }
-    }
-
-    override fun getPendingSendTransactionsNftIds(): Flow<Set<String>> {
-        return pendingSendTransactionsNftIds.asStateFlow()
     }
 
     override fun isNftTypeSupportedForSend(nftType: Nft.Type): Boolean {
-        return nftType::class in supportedSendNftTypes
+        return nftTransfersRegistry.get(nftType.key).areTransfersSupported()
     }
 
-    companion object {
-        private val supportedSendNftTypes = setOf(Nft.Type.Uniques::class)
-        private val pendingSendTransactionsNftIds = MutableStateFlow(setOf<String>())
+    override suspend fun getChainForNftId(nftId: String): Chain {
+        val chainId = nftDao.getNft(nftId).chainId
+        return chainRegistry.getChain(chainId)
     }
 }

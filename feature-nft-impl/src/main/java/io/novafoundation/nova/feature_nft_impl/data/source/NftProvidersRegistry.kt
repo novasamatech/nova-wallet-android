@@ -24,7 +24,7 @@ class NftProvidersRegistry(
         }
     }
 
-    fun isAvailableChain(chain: Chain): Boolean {
+    fun isNftTransferAvailableOnChain(chain: Chain): Boolean {
         return chain.id in setOf(Chain.Geneses.STATEMINE)
     }
 

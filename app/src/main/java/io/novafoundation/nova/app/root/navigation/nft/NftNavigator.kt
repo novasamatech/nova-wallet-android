@@ -4,6 +4,7 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
+import io.novafoundation.nova.feature_assets.presentation.receive.ReceivePayload
 import io.novafoundation.nova.feature_assets.presentation.send.amount.InputAddressNftFragment
 import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_nft_impl.presentation.NftPayload
@@ -55,6 +56,6 @@ class NftNavigator(
     }
 
     override fun openReceive(chainId: ChainId) {
-        return performNavigation(R.id.action_open_receive, ReceiveFragment.getBundle(chainId))
+        return performNavigation(R.id.action_open_receive, ReceiveFragment.getBundle(ReceivePayload.Chain(chainId)))
     }
 }

@@ -52,12 +52,11 @@ class ReceiveViewModel(
         }
     }
     private val chainAsync by lazyAsync {
-        val chainId = assetPayload?.chainId ?: chainId.orEmpty()
-        chainRegistry.getChain(chainId)
+        chainRegistry.getChain(getChainId())
     }
 
     val qrBitmapFlow = flowOf {
-        val qrString = interactor.getQrCodeSharingString(assetPayload?.chainId ?: chainId.orEmpty())
+        val qrString = interactor.getQrCodeSharingString(getChainId())
 
         qrCodeGenerator.generateQrBitmap(qrString)
     }
@@ -132,5 +131,9 @@ class ReceiveViewModel(
                 tokenType.symbol
             )
         } + " " + address
+    }
+
+    private fun getChainId(): String {
+        return assetPayload?.chainId ?: chainId.orEmpty()
     }
 }

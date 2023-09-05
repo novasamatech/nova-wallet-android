@@ -1,12 +1,15 @@
 package io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques
 
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
+import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.common.utils.uniques
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.model.NftLocal
@@ -24,9 +27,9 @@ import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.singleValueOf
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
@@ -34,10 +37,15 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import java.math.BigInteger
 
 class UniquesNftProvider(
@@ -48,7 +56,12 @@ class UniquesNftProvider(
     private val ipfsApi: IpfsApi,
 ) : NftProvider {
 
-    override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
+    override suspend fun initialNftsSync(
+        chain: Chain,
+        metaAccount: MetaAccount,
+        forceOverwrite: Boolean,
+        at: BlockHash?
+    ) {
         val accountId = metaAccount.accountIdIn(chain) ?: return
 
         val newNfts = remoteStorage.query(chain.id) {
@@ -133,10 +146,10 @@ class UniquesNftProvider(
         }
     }
 
-    override suspend fun subscribeNftOwnerAddress(
+    override suspend fun subscribeNftOwnerAccountId(
         subscriptionBuilder: StorageSharedRequestsBuilder,
         nftLocal: NftLocal
-    ): Flow<String> {
+    ): Flow<AccountId?> {
         return remoteStorage.query(nftLocal.chainId) {
             val storage = runtime.metadata.uniques().storage("Asset")
             val key = storage.storageKey(
@@ -146,10 +159,9 @@ class UniquesNftProvider(
             )
             try {
                 subscriptionBuilder.subscribe(key)
-                    .map { bindNftOwnerAddress(it.value, runtime) }
+                    .map { bindNftOwnerAccountId(it.value, runtime) }
                     .flowOn(Dispatchers.IO)
             } catch (e: Exception) {
-                println("error: $e")
                 emptyFlow()
             }
         }
@@ -216,16 +228,16 @@ class UniquesNftProvider(
         return "$chainId-$collectionId-$instanceId"
     }
     
-    private fun bindNftOwnerAddress(scale: String?, runtime: RuntimeSnapshot): String {
-        return scale?.let { bindOrmlAccountData(it, runtime) } ?: ""
+    private fun bindNftOwnerAccountId(scale: String?, runtime: RuntimeSnapshot): AccountId? {
+        return scale?.let { bindOrmlAccountData(it, runtime) }
     }
 
     @UseCaseBinding
-    fun bindOrmlAccountData(scale: String, runtime: RuntimeSnapshot): String {
+    fun bindOrmlAccountData(scale: String, runtime: RuntimeSnapshot): AccountId {
         val type = runtime.metadata.uniques().storage("Asset").returnType()
 
         val dynamicInstance = type.fromHexOrNull(runtime, scale).cast<Struct.Instance>()
 
-        return bindAccountId(dynamicInstance["owner"]).toHexString()
+        return bindAccountId(dynamicInstance["owner"])
     }
 }

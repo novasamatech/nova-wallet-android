@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
@@ -20,12 +21,16 @@ import kotlinx.android.synthetic.main.fragment_nft_list.nftListRefresh
 import kotlinx.android.synthetic.main.fragment_nft_list.nftListToolbar
 import javax.inject.Inject
 
-class NftListFragment : BaseFragment<NftListViewModel>(), NftGridAdapter.Handler {
+class NftListFragment : BaseFragment<NftListViewModel>(), NftGridAdapter.Handler, ActionsAdapter.Handler {
 
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    private val adapter by lazy(LazyThreadSafetyMode.NONE) { NftGridAdapter(imageLoader, this) }
+    private val actionsAdapter by lazy(LazyThreadSafetyMode.NONE) { ActionsAdapter(this) }
+    private val nftGridAdapter by lazy(LazyThreadSafetyMode.NONE) { NftGridAdapter(imageLoader, this) }
+    private val adapter by lazy(LazyThreadSafetyMode.NONE) {
+        ConcatAdapter(actionsAdapter, nftGridAdapter)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,7 +66,7 @@ class NftListFragment : BaseFragment<NftListViewModel>(), NftGridAdapter.Handler
 
     override fun subscribe(viewModel: NftListViewModel) {
         viewModel.nftListItemsFlow.observe {
-            adapter.submitListPreservingViewPoint(it, nftListNfts)
+            nftGridAdapter.submitListPreservingViewPoint(it, nftListNfts)
         }
 
         viewModel.hideRefreshEvent.observeEvent {
