@@ -33,8 +33,8 @@ class SetupStakingTypeViewModel(
     private val router: StakingRouter,
     private val assetUseCase: ArbitraryAssetUseCase,
     payload: SetupStakingTypePayload,
-    private val editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
     private val currentSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
+    private val editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
     private val editableStakingTypeItemFormatter: EditableStakingTypeItemFormatter,
     private val compoundStakingTypeDetailsProvidersFactory: CompoundStakingTypeDetailsProvidersFactory,
     private val validationExecutor: ValidationExecutor,
@@ -135,21 +135,19 @@ class SetupStakingTypeViewModel(
         }
     }
 
-    private fun setRecommendedSelection(stakingType: Chain.Asset.StakingType) {
-        launch {
-            val currentStake = getEnteredAmount() ?: return@launch
+    private suspend fun setRecommendedSelection(stakingType: Chain.Asset.StakingType) {
+        val currentStake = getEnteredAmount() ?: return
 
-            val recommendedSelection = stakingTypeDetailsProvidersFlow.first().getRecommendationProvider(stakingType)
-                .recommendedSelection(currentStake)
+        val recommendedSelection = stakingTypeDetailsProvidersFlow.first().getRecommendationProvider(stakingType)
+            .recommendedSelection(currentStake)
 
-            val recommendableMultiStakingSelection = RecommendableMultiStakingSelection(
-                source = SelectionTypeSource.Manual(contentRecommended = true),
-                selection = recommendedSelection
-            )
+        val recommendableMultiStakingSelection = RecommendableMultiStakingSelection(
+            source = SelectionTypeSource.Manual(contentRecommended = true),
+            selection = recommendedSelection
+        )
 
-            editableSelectionStoreProvider.getSelectionStore(viewModelScope)
-                .updateSelection(recommendableMultiStakingSelection)
-        }
+        editableSelectionStoreProvider.getSelectionStore(viewModelScope)
+            .updateSelection(recommendableMultiStakingSelection)
     }
 
     private suspend fun mapStakingTypes(
@@ -166,6 +164,6 @@ class SetupStakingTypeViewModel(
         return currentSelectionStoreProvider.getSelectionStore(viewModelScope)
             .currentSelection
             ?.selection
-            ?.stake ?: return null
+            ?.stake
     }
 }
