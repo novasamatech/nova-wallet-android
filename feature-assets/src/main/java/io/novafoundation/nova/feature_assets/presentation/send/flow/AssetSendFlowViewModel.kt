@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.send.flow
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
@@ -9,28 +10,27 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.flow.AssetFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import kotlinx.coroutines.flow.Flow
 
 class AssetSendFlowViewModel(
-    router: AssetsRouter,
     interactor: AssetSearchInteractor,
+    router: AssetsRouter,
     currencyInteractor: CurrencyInteractor,
-    contributionsInteractor: ContributionsInteractor,
+    externalBalancesInteractor: ExternalBalancesInteractor,
     controllableAssetCheck: ControllableAssetCheckMixin,
     accountUseCase: SelectedAccountUseCase,
 ) : AssetFlowViewModel(
-    router,
     interactor,
+    router,
     currencyInteractor,
-    contributionsInteractor,
     controllableAssetCheck,
-    accountUseCase
+    accountUseCase,
+    externalBalancesInteractor,
 ) {
 
     override fun searchAssetsFlow(): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
-        return interactor.sendAssetSearch(query, totalContributedByAssetsFlow)
+        return interactor.sendAssetSearch(query, externalBalancesFlow)
     }
 
     override fun assetClicked(assetModel: AssetModel) {

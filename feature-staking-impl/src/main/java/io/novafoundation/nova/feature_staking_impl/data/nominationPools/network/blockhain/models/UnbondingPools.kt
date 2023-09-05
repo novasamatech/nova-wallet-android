@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.nominationPools.network
 import io.novafoundation.nova.common.data.network.runtime.binding.bindMap
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.UnlockChunk
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindEraIndex
@@ -32,6 +33,15 @@ fun UnbondingPools?.unlockChunksFor(poolMember: PoolMember): List<UnlockChunk> {
         val unbondBalance = unbondingPool.amountOf(unbondPoints)
 
         UnlockChunk(amount = unbondBalance, era = unbondEra)
+    }
+}
+
+fun UnbondingPools?.totalUnbondingFor(poolMember: PoolMember): Balance {
+    if (this == null) return Balance.ZERO
+
+    return poolMember.unbondingEras.entries.sumByBigInteger { (unbondEra, unbondPoints) ->
+        val unbondingPool = getPool(unbondEra)
+        unbondingPool.amountOf(unbondPoints)
     }
 }
 

@@ -9,11 +9,11 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.receive.flow.AssetReceiveFlowViewModel
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 
 @Module(includes = [ViewModelModule::class])
@@ -28,19 +28,19 @@ class AssetReceiveFlowModule {
     @IntoMap
     @ViewModelKey(AssetReceiveFlowViewModel::class)
     fun provideViewModel(
-        router: AssetsRouter,
         interactor: AssetSearchInteractor,
+        router: AssetsRouter,
         currencyInteractor: CurrencyInteractor,
-        contributionsInteractor: ContributionsInteractor,
-        controllableAssetCheckMixin: ControllableAssetCheckMixin,
-        accountUseCase: SelectedAccountUseCase
+        externalBalancesInteractor: ExternalBalancesInteractor,
+        controllableAssetCheck: ControllableAssetCheckMixin,
+        accountUseCase: SelectedAccountUseCase,
     ): ViewModel {
         return AssetReceiveFlowViewModel(
-            router = router,
             interactor = interactor,
+            router = router,
             currencyInteractor = currencyInteractor,
-            contributionsInteractor = contributionsInteractor,
-            controllableAssetCheck = controllableAssetCheckMixin,
+            externalBalancesInteractor = externalBalancesInteractor,
+            controllableAssetCheck = controllableAssetCheck,
             accountUseCase = accountUseCase
         )
     }

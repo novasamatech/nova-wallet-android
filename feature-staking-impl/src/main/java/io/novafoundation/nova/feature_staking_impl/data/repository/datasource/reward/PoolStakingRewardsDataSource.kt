@@ -2,9 +2,12 @@ package io.novafoundation.nova.feature_staking_impl.data.repository.datasource.r
 
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
+import io.novafoundation.nova.feature_staking_impl.data.model.stakingExternalApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
+import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request.PoolStakingPeriodRewardsRequest
+import io.novafoundation.nova.feature_staking_impl.data.network.subquery.response.totalReward
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.ext.addressOf
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class PoolStakingRewardsDataSource(
@@ -13,7 +16,21 @@ class PoolStakingRewardsDataSource(
 ) : BaseStakingRewardsDataSource(stakingTotalRewardDao) {
 
     override suspend fun sync(accountId: AccountId, stakingOption: StakingOption, rewardPeriod: RewardPeriod) {
-        // TODO sync pool rewards when subQuery is ready
-        saveTotalReward(Balance.ZERO, accountId, stakingOption)
+        val chain = stakingOption.assetWithChain.chain
+
+        val stakingExternalApi = chain.stakingExternalApi() ?: return
+        val address = chain.addressOf(accountId)
+
+        val response = stakingApi.getPoolRewardsByPeriod(
+            url = stakingExternalApi.url,
+            body = PoolStakingPeriodRewardsRequest(
+                accountAddress = address,
+                startTimestamp = rewardPeriod.startTimestamp,
+                endTimestamp = rewardPeriod.endTimestamp
+            )
+        )
+        val totalResult = response.data.totalReward
+
+        saveTotalReward(totalResult, accountId, stakingOption)
     }
 }
