@@ -161,4 +161,8 @@ class RelayStakingNavigator(
     override fun openStakingPeriods() {
         performNavigation(R.id.action_stakingFragment_to_staking_periods)
     }
+
+    override fun openSetupStakingType() {
+        performNavigation(R.id.action_setupAmountMultiStakingFragment_to_setupStakingType)
+    }
 }

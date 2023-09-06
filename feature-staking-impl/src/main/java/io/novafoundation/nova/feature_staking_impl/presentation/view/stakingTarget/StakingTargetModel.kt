@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.view.stakingTar
 import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.common.utils.images.Icon as CommonIcon
 
-class StakingTargetModel(
+data class StakingTargetModel(
     val title: String,
     val subtitle: ColoredText?,
     val icon: TargetIcon?
@@ -11,7 +11,7 @@ class StakingTargetModel(
 
     sealed interface TargetIcon {
 
-        class Quantity(val quantity: String) : TargetIcon
+        data class Quantity(val quantity: String) : TargetIcon
 
         class Icon(val icon: CommonIcon) : TargetIcon
     }

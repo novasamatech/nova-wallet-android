@@ -15,6 +15,10 @@ interface StartMultiStakingSelection {
     val stake: Balance
 
     fun ExtrinsicBuilder.startStaking(metaAccount: MetaAccount)
+
+    fun isSettingsEquals(other: StartMultiStakingSelection): Boolean
+
+    fun copyWith(stake: Balance): StartMultiStakingSelection
 }
 
 sealed class SelectionTypeSource {
@@ -24,7 +28,7 @@ sealed class SelectionTypeSource {
     data class Manual(val contentRecommended: Boolean) : SelectionTypeSource()
 }
 
-class RecommendableMultiStakingSelection(
+data class RecommendableMultiStakingSelection(
     val source: SelectionTypeSource,
     val selection: StartMultiStakingSelection,
 )

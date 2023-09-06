@@ -1,10 +1,11 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.di
+package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.di
 
 import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.SetupStakingTypeFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypeFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypePayload
 
 @Subcomponent(
     modules = [
@@ -18,7 +19,8 @@ interface SetupStakingTypeComponent {
     interface Factory {
 
         fun create(
-            @BindsInstance fragment: Fragment
+            @BindsInstance fragment: Fragment,
+            @BindsInstance argument: SetupStakingTypePayload
         ): SetupStakingTypeComponent
     }
 

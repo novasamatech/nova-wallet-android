@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.presentation.view.stakingTarget.StakingTargetModel
 import kotlinx.android.synthetic.main.view_staking_type.view.stakingTypeBackground
 import kotlinx.android.synthetic.main.view_staking_type.view.stakingTypeConditions
 import kotlinx.android.synthetic.main.view_staking_type.view.stakingTypeRadioButton
@@ -56,27 +57,27 @@ class StakingTypeView @JvmOverloads constructor(
         }
     }
 
-    fun setModel(stakingTypeModel: StakingTypeModel) {
-        stakingTypeConditions.text = stakingTypeModel.conditions.joinToString(separator = "\n") { it }
+    fun setConditions(conditions: List<String>) {
+        stakingTypeConditions.text = conditions.joinToString(separator = "\n") { it }
+    }
 
-        when (stakingTypeModel.stakingTarget) {
-            null -> stakingTypeTarget.makeGone()
-            StakingTypeModel.StakingTarget.Loading -> {
-                stakingTypeTarget.makeVisible()
-                stakingTypeTarget.setLoadingState()
-            }
-            is StakingTypeModel.StakingTarget.Model -> {
-                stakingTypeTarget.makeVisible()
-                stakingTypeTarget.setModel(stakingTypeModel.stakingTarget.model)
-            }
-        }
-
-        if (stakingTypeModel.isSelectable) {
+    fun setSelectable(isSelectable: Boolean) {
+        if (isSelectable) {
             stakingTypeTitle.setTextColorRes(R.color.text_primary)
             stakingTypeConditions.setTextColorRes(R.color.text_secondary)
         } else {
             stakingTypeTitle.setTextColorRes(R.color.button_text_inactive)
             stakingTypeConditions.setTextColorRes(R.color.button_text_inactive)
         }
+    }
+
+    fun setStakingTarget(stakingTarget: StakingTargetModel?) {
+        if (stakingTarget == null) {
+            stakingTypeTarget.makeGone()
+            return
+        }
+
+        stakingTypeTarget.makeVisible()
+        stakingTypeTarget.setModel(stakingTarget)
     }
 }

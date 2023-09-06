@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.s
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
-class NominationPoolSelection(
+data class NominationPoolSelection(
     val pool: NominationPool,
     override val stakingOption: StakingOption,
     override val stake: Balance,
@@ -20,5 +20,16 @@ class NominationPoolSelection(
 
     override fun ExtrinsicBuilder.startStaking(metaAccount: MetaAccount) {
         nominationPools.join(stake, pool.id)
+    }
+
+    override fun isSettingsEquals(other: StartMultiStakingSelection): Boolean {
+        if (this === other) return true
+        if (other !is NominationPoolSelection) return false
+
+        return pool.id.value == other.pool.id.value
+    }
+
+    override fun copyWith(stake: Balance): StartMultiStakingSelection {
+        return copy(stake = stake)
     }
 }

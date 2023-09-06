@@ -18,10 +18,9 @@ fun StartMultiStakingSelectionStoreProvider.currentSelectionFlow(scope: Coroutin
 }
 
 class RealStartMultiStakingSelectionStoreProvider(
-    private val computationalCache: ComputationalCache
+    private val computationalCache: ComputationalCache,
+    private val key: String
 ) : StartMultiStakingSelectionStoreProvider {
-
-    private val key = "StartMultiStakingSelectionStore"
 
     override suspend fun getSelectionStore(scope: CoroutineScope): StartMultiStakingSelectionStore {
         return computationalCache.useCache(key, scope) {

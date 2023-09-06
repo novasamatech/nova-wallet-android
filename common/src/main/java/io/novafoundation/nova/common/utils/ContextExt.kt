@@ -121,17 +121,17 @@ fun WithContextExtensions(context: Context) = object : WithContextExtensions {
     override val providedContext: Context = context
 }
 
-context (View)
+context(View)
 fun getRoundedCornerDrawable(
     @ColorRes fillColorRes: Int = R.color.secondary_screen_background,
     @ColorRes strokeColorRes: Int? = null,
     cornerSizeDp: Int = 12,
 ) = context.getRoundedCornerDrawable(fillColorRes, strokeColorRes, cornerSizeDp)
 
-context (View)
+context(View)
 fun getRippleMask(
     cornerSizeDp: Int = 12,
 ) = context.getRippleMask(cornerSizeDp)
 
-context (View)
+context(View)
 fun Drawable.withRippleMask(mask: Drawable = getRippleMask()) = context.addRipple(this, mask)

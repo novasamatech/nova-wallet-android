@@ -10,11 +10,12 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_staking_impl.di.staking.startMultiStaking.MultiStakingSelectionStoreProviderKey
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StartMultiStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.selectionType.MultiStakingSelectionTypeProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingSelectionFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingTargetSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.di.CommonMultiStakingModule
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.SetupAmountMultiStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.SetupAmountMultiStakingViewModel
@@ -29,20 +30,20 @@ class SetupAmountMultiStakingModule {
     @IntoMap
     @ViewModelKey(SetupAmountMultiStakingViewModel::class)
     fun provideViewModel(
-        multiStakingSelectionFormatter: MultiStakingSelectionFormatter,
+        multiStakingTargetSelectionFormatter: MultiStakingTargetSelectionFormatter,
         resourceManager: ResourceManager,
         router: StartMultiStakingRouter,
         multiStakingSelectionTypeProviderFactory: MultiStakingSelectionTypeProviderFactory,
         assetUseCase: ArbitraryAssetUseCase,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
-        selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
+        @MultiStakingSelectionStoreProviderKey selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
         startMultiStakingInteractor: StartMultiStakingInteractor,
         payload: SetupAmountMultiStakingPayload,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         validationExecutor: ValidationExecutor
     ): ViewModel {
         return SetupAmountMultiStakingViewModel(
-            multiStakingSelectionFormatter = multiStakingSelectionFormatter,
+            multiStakingTargetSelectionFormatter = multiStakingTargetSelectionFormatter,
             resourceManager = resourceManager,
             router = router,
             multiStakingSelectionTypeProviderFactory = multiStakingSelectionTypeProviderFactory,

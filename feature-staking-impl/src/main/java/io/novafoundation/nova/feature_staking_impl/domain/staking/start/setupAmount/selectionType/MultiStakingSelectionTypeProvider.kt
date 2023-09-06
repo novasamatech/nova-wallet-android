@@ -74,7 +74,7 @@ private class RealMultiStakingSelectionTypeProvider(
         return when (currentSelection?.source) {
             null, SelectionTypeSource.Automatic -> createAutomaticSelection(selectionStore)
 
-            is SelectionTypeSource.Manual -> createManualSelection(currentSelection.selection.stakingOption.stakingType)
+            is SelectionTypeSource.Manual -> createManualSelection(currentSelection.selection.stakingOption.stakingType, selectionStore)
         }
     }
 
@@ -93,13 +93,14 @@ private class RealMultiStakingSelectionTypeProvider(
 
     private suspend fun createManualSelection(
         selectedStakingType: Chain.Asset.StakingType,
+        selectionStore: StartMultiStakingSelectionStore
     ): MultiStakingSelectionType {
         val optionId = StakingOptionId(candidateOptionIds.chainId, candidateOptionIds.chainAssetId, selectedStakingType)
         val option = chainRegistry.constructStakingOption(optionId)
 
         val stakingProperties = singleStakingPropertiesFactory.createProperties(scope, option)
 
-        return ManualMultiStakingSelectionType(stakingProperties)
+        return ManualMultiStakingSelectionType(stakingProperties, selectionStore)
     }
 
     private fun Chain.Asset.StakingType.multiStakingPriority(): Int {

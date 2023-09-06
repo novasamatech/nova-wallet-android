@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common
 
+import androidx.annotation.StringRes
 import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.chain
@@ -13,17 +15,17 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmo
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.view.stakingTarget.StakingTargetModel
 
-interface MultiStakingSelectionFormatter {
+interface MultiStakingTargetSelectionFormatter {
 
     suspend fun formatForSetupAmount(recommendableSelection: RecommendableMultiStakingSelection): StakingTargetModel
 
     suspend fun formatForStakingType(recommendableSelection: RecommendableMultiStakingSelection): StakingTargetModel
 }
 
-class RealMultiStakingSelectionFormatter(
+class RealMultiStakingTargetSelectionFormatter(
     private val resourceManager: ResourceManager,
     private val poolDisplayFormatter: PoolDisplayFormatter,
-) : MultiStakingSelectionFormatter {
+) : MultiStakingTargetSelectionFormatter {
 
     override suspend fun formatForSetupAmount(
         recommendableSelection: RecommendableMultiStakingSelection,
@@ -31,7 +33,7 @@ class RealMultiStakingSelectionFormatter(
         return when (val selection = recommendableSelection.selection) {
             is DirectStakingSelection -> StakingTargetModel(
                 title = resourceManager.getString(R.string.setup_staking_type_direct_staking),
-                subtitle = formatValidatorsSubtitle(recommendableSelection, selection),
+                subtitle = formatValidatorsSubtitle(R.string.start_staking_selection_validators_subtitle, recommendableSelection, selection),
                 icon = null
             )
 
@@ -53,8 +55,8 @@ class RealMultiStakingSelectionFormatter(
         return when (val selection = recommendableSelection.selection) {
             is DirectStakingSelection -> StakingTargetModel(
                 title = resourceManager.getString(R.string.staking_recommended_title),
-                subtitle = formatValidatorsSubtitle(recommendableSelection, selection),
-                icon = null
+                subtitle = formatValidatorsSubtitle(R.string.start_staking_editing_selection_validators_subtitle, recommendableSelection, selection),
+                icon = StakingTargetModel.TargetIcon.Quantity(selection.validators.size.format())
             )
 
             is NominationPoolSelection -> {
@@ -72,10 +74,11 @@ class RealMultiStakingSelectionFormatter(
     }
 
     private fun formatValidatorsSubtitle(
+        @StringRes resId: Int,
         recommendableSelection: RecommendableMultiStakingSelection,
         selection: DirectStakingSelection
     ) = formatSubtitle(recommendableSelection) {
-        resourceManager.getString(R.string.start_staking_selection_validators_subtitle, selection.validators.size, selection.validatorsLimit)
+        resourceManager.getString(resId, selection.validators.size, selection.validatorsLimit)
     }
 
     private fun recommendedSubtitle(selection: RecommendableMultiStakingSelection) = formatSubtitle(selection, notRecommendedText = { null })

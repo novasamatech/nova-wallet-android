@@ -39,6 +39,17 @@ class PayoutAdapter(
     }
 }
 
+private class PayoutModelDiffCallback : DiffUtil.ItemCallback<PendingPayoutModel>() {
+
+    override fun areItemsTheSame(oldItem: PendingPayoutModel, newItem: PendingPayoutModel): Boolean {
+        return oldItem === newItem
+    }
+
+    override fun areContentsTheSame(oldItem: PendingPayoutModel, newItem: PendingPayoutModel): Boolean {
+        return true
+    }
+}
+
 class PayoutViewHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
     @ExperimentalTime
@@ -56,16 +67,5 @@ class PayoutViewHolder(override val containerView: View) : RecyclerView.ViewHold
         }
 
         setOnClickListener { itemHandler.payoutClicked(bindingAdapterPosition) }
-    }
-}
-
-private class PayoutModelDiffCallback : DiffUtil.ItemCallback<PendingPayoutModel>() {
-
-    override fun areItemsTheSame(oldItem: PendingPayoutModel, newItem: PendingPayoutModel): Boolean {
-        return oldItem === newItem
-    }
-
-    override fun areContentsTheSame(oldItem: PendingPayoutModel, newItem: PendingPayoutModel): Boolean {
-        return true
     }
 }
