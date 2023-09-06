@@ -22,7 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.Rea
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.RealTotalStakeChainComparatorProvider
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.TotalStakeChainComparatorProvider
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.domain.dashboard.RealStakingDashboardInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -42,12 +42,17 @@ class StakingDashboardModule {
     @Provides
     @FeatureScope
     fun provideStakingStatsApi(apiCreator: NetworkApiCreator): StakingStatsApi {
-        return apiCreator.create(StakingStatsApi::class.java, customBaseUrl = BuildConfig.DASHBOARD_SUBQUERY_URL)
+        return apiCreator.create(StakingStatsApi::class.java)
     }
 
     @Provides
     @FeatureScope
-    fun provideStakingStatsDataSource(api: StakingStatsApi): StakingStatsDataSource = RealStakingStatsDataSource(api)
+    fun provideStakingStatsDataSource(api: StakingStatsApi): StakingStatsDataSource {
+        return RealStakingStatsDataSource(
+            api = api,
+            dashboardApiUrl = BuildConfig.DASHBOARD_SUBQUERY_URL
+        )
+    }
 
     @Provides
     @FeatureScope

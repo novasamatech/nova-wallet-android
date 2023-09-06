@@ -31,7 +31,6 @@ import kotlinx.coroutines.launch
 
 class ReviewCustomValidatorsViewModel(
     private val router: StakingRouter,
-    private val reviewValidatorsRouter: ReviewValidatorsRouter,
     private val addressIconGenerator: AddressIconGenerator,
     private val interactor: StakingInteractor,
     private val resourceManager: ResourceManager,
@@ -115,8 +114,6 @@ class ReviewCustomValidatorsViewModel(
     fun nextClicked() {
         launch {
             reviewValidatorsFlowAction.execute(viewModelScope)
-
-            reviewValidatorsRouter.openNextScreen()
         }
     }
 }

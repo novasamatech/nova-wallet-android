@@ -42,18 +42,18 @@ class RealStartMultiStakingSelectionStore : StartMultiStakingSelectionStore {
 
 fun StartMultiStakingSelectionStore.getValidatorsOrEmpty(): List<Validator> {
     val selection = currentSelection?.selection
-    if (selection is DirectStakingSelection) {
-        return selection.validators
+    return if (selection is DirectStakingSelection) {
+        selection.validators
+    } else {
+        emptyList()
     }
-
-    return emptyList()
 }
 
 fun StartMultiStakingSelectionStore.getPoolOrNull(): NominationPool? {
     val selection = currentSelection?.selection
-    if (selection is NominationPoolSelection) {
-        return selection.pool
+    return if (selection is NominationPoolSelection) {
+        selection.pool
+    } else {
+        return null
     }
-
-    return null
 }

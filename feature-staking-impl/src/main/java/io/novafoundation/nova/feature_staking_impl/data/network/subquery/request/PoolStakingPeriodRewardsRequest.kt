@@ -1,9 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.data.network.subquery.request
 
-class StakingPeriodRewardsRequest(accountAddress: String, val startTimestamp: Long?, val endTimestamp: Long?) {
+class PoolStakingPeriodRewardsRequest(accountAddress: String, startTimestamp: Long?, endTimestamp: Long?) :
+    BaseStakingPeriodRewardsRequest(startTimestamp, endTimestamp) {
     val query = """
         query {
-            rewards: accountRewards(
+            rewards: accountPoolRewards(
                 filter: {
                     address: { equalTo : "$accountAddress" }
                     type: { equalTo: reward }
@@ -17,7 +18,7 @@ class StakingPeriodRewardsRequest(accountAddress: String, val startTimestamp: Lo
                 }
             }
             
-            slashes: accountRewards(
+            slashes: accountPoolRewards(
                 filter: {
                     address: { equalTo : "$accountAddress" }
                     type: { equalTo: slash }
@@ -32,14 +33,4 @@ class StakingPeriodRewardsRequest(accountAddress: String, val startTimestamp: Lo
             }
         }
     """.trimIndent()
-
-    private fun getTimestampFilter(): String {
-        val start = startTimestamp?.let { "timestamp: { greaterThanOrEqualTo: \"$it\" }" }
-        val end = endTimestamp?.let { "timestamp: { lessThanOrEqualTo: \"$it\" }" }
-        return if (startTimestamp != null && endTimestamp != null) {
-            "$start and: { $end }"
-        } else {
-            start ?: end ?: ""
-        }
-    }
 }

@@ -9,8 +9,8 @@ import io.novafoundation.nova.feature_crowdloan_impl.data.network.api.acala.getC
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
-import java.math.BigInteger
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import java.math.BigInteger
 
 class LiquidAcalaContributionSource(
     private val acalaApi: AcalaApi,
@@ -24,7 +24,7 @@ class LiquidAcalaContributionSource(
     override suspend fun getContributions(
         chain: Chain,
         accountId: AccountId,
-    ): List<ExternalContributionSource.ExternalContribution> = runCatching {
+    ) = runCatching {
         val amount = acalaApi.getContributions(
             chain = chain,
             accountId = accountId
@@ -37,9 +37,7 @@ class LiquidAcalaContributionSource(
                 paraId = parachainInfoRepository.paraId(Chain.Geneses.ACALA)!!
             ).takeIf { amount > BigInteger.ZERO }
         )
-    }.getOrElse {
+    }.onFailure {
         Log.e(LOG_TAG, "Failed to fetch acala contributions: ${it.message}")
-
-        emptyList()
     }
 }

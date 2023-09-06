@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindPerbillTyp
 import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.Perbill
+import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
 
 class BondedPool(
     val poolId: PoolId,

@@ -70,6 +70,7 @@ dependencies {
     implementation project(':feature-currency-api')
     implementation project(':feature-crowdloan-api')
     implementation project(':feature-wallet-connect-api')
+    implementation project(':feature-staking-api')
     implementation project(':web3names')
     implementation project(':runtime')
 

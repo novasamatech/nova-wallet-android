@@ -120,20 +120,6 @@ class StartMultiStakingModule {
 
     @Provides
     @FeatureScope
-    fun provideEditingStakingTypeSelectionMixinFactory(
-        @MultiStakingSelectionStoreProviderKey currentSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
-        @StakingTypeEditingStoreProviderKey editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
-        compoundStakingTypeDetailsProvidersFactory: CompoundStakingTypeDetailsProvidersFactory
-    ): EditingStakingTypeSelectionMixinFactory {
-        return EditingStakingTypeSelectionMixinFactory(
-            currentSelectionStoreProvider,
-            editableSelectionStoreProvider,
-            compoundStakingTypeDetailsProvidersFactory
-        )
-    }
-
-    @Provides
-    @FeatureScope
     fun provideMultiStakingSelectionFormatter(
         resourceManager: ResourceManager,
         poolDisplayFormatter: PoolDisplayFormatter,

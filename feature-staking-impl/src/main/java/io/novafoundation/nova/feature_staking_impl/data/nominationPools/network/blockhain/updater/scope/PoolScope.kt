@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.nominationPools.network
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.core.updater.UpdateScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
+import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.CoroutineScope

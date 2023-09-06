@@ -72,7 +72,6 @@
         android:id="@+id/confirmMultiStakingFragment"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.ConfirmMultiStakingFragment"
         android:label="ConfirmMultiStakingFragment">
-
         <action
             android:id="@+id/action_confirmMultiStakingFragment_to_confirmNominationsFragment"
             app:destination="@id/confirmNominationsFragment"

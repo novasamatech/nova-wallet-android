@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:background="@color/secondary_screen_background">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/poolRewardDetailToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:homeButtonIcon="@drawable/ic_close"
+        app:titleText="Apr 10, 2022, 22:36"
+        app:titleTextAppearance="@style/TextAppearance.NovaFoundation.TransactionDetailToolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/poolRewardDetailTransferDirection"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_icon_container_on_color"
+                android:padding="11dp"
+                android:src="@drawable/ic_staking_filled"
+                app:tint="@color/icon_secondary" />
+
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
+                android:id="@+id/poolRewardDetailAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:id="@+id/poolRewardDetailStatus"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
+                tools:drawablePadding="4dp"
+                tools:drawableStart="@drawable/ic_checkmark_circle_16"
+                tools:drawableTint="@color/icon_positive"
+                tools:text="completed"
+                tools:textColor="@color/text_positive" />
+
+            <io.novafoundation.nova.common.view.TableView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="16dp">
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/poolRewardDetailPool"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                    app:primaryValueIconTint="@color/icon_secondary"
+                    app:title="@string/nomination_pools_pool" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/poolRewardDetailNetwork"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/common_network" />
+            </io.novafoundation.nova.common.view.TableView>
+
+            <io.novafoundation.nova.common.view.TableView
+                android:id="@+id/poolRewardDetailTxSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="24dp">
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/poolRewardDetailTransactionId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                    app:primaryValueIconTint="@color/icon_secondary"
+                    app:title="@string/common_transaction_id" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/poolRewardDetailType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/common_type" />
+            </io.novafoundation.nova.common.view.TableView>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

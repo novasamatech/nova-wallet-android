@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.ContributionDao
+import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdateSystemFactory
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdaterFactory
@@ -90,11 +91,13 @@ class ContributionsModule {
     fun provideContributionsUpdaterFactory(
         contributionsRepository: ContributionsRepository,
         crowdloanRepository: CrowdloanRepository,
-        contributionDao: ContributionDao
+        contributionDao: ContributionDao,
+        externalBalanceDao: ExternalBalanceDao
     ): ContributionsUpdaterFactory = RealContributionsUpdaterFactory(
         contributionsRepository,
         crowdloanRepository,
-        contributionDao
+        contributionDao,
+        externalBalanceDao
     )
 
     @Provides

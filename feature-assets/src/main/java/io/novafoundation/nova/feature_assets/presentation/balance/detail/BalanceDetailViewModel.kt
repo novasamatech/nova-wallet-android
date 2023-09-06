@@ -6,9 +6,11 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetPayload
@@ -20,16 +22,14 @@ import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksMode
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsWithTotalAmount
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
+import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.balanceId
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import jp.co.soramitsu.fearless_utils.hash.isPositive
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
@@ -53,7 +53,7 @@ class BalanceDetailViewModel(
     private val resourceManager: ResourceManager,
     private val currencyInteractor: CurrencyInteractor,
     private val controllableAssetCheck: ControllableAssetCheckMixin,
-    private val contributionsInteractor: ContributionsInteractor,
+    private val externalBalancesInteractor: ExternalBalancesInteractor,
 ) : BaseViewModel(),
     TransactionHistoryUi by transactionHistoryMixin {
 
@@ -76,20 +76,18 @@ class BalanceDetailViewModel(
     private val selectedAccountFlow = accountUseCase.selectedMetaAccountFlow()
         .share()
 
-    private val contributionsFlow = selectedAccountFlow.flatMapLatest {
-        contributionsInteractor.observeChainContributions(it, assetPayload.chainId, assetPayload.chainAssetId)
-    }
-        .onStart { emit(ContributionsWithTotalAmount.empty()) }
+    private val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
+        .onStart { emit(emptyList()) }
         .shareInBackground()
 
-    val assetDetailsModel = combine(assetFlow, contributionsFlow) { asset, contributions ->
-        mapAssetToUi(asset, contributions)
+    val assetDetailsModel = combine(assetFlow, externalBalancesFlow) { asset, externalBalances ->
+        mapAssetToUi(asset, externalBalances)
     }
         .inBackground()
         .share()
 
-    private val lockedBalanceModel = combine(balanceLocksFlow, contributionsFlow, assetFlow) { locks, contributions, asset ->
-        mapBalanceLocksToUi(locks, contributions, asset)
+    private val lockedBalanceModel = combine(balanceLocksFlow, externalBalancesFlow, assetFlow) { locks, externalBalances, asset ->
+        mapBalanceLocksToUi(locks, externalBalances, asset)
     }
         .inBackground()
         .share()
@@ -170,8 +168,9 @@ class BalanceDetailViewModel(
         }
     }
 
-    private fun mapAssetToUi(asset: Asset, contributions: ContributionsWithTotalAmount<Contribution>): AssetDetailsModel {
-        val totalContributed = asset.token.amountFromPlanks(contributions.totalContributed)
+    private fun mapAssetToUi(asset: Asset, externalBalances: List<ExternalBalance>): AssetDetailsModel {
+        val totalContributedPlanks = externalBalances.sumByBigInteger { it.amount }
+        val totalContributed = asset.token.amountFromPlanks(totalContributedPlanks)
 
         return AssetDetailsModel(
             token = mapTokenToTokenModel(asset.token),
@@ -183,7 +182,7 @@ class BalanceDetailViewModel(
 
     private fun mapBalanceLocksToUi(
         balanceLocks: List<BalanceLock>,
-        contributions: ContributionsWithTotalAmount<Contribution>,
+        externalBalances: List<ExternalBalance>,
         asset: Asset
     ): BalanceLocksModel {
         val mappedLocks = balanceLocks.map {
@@ -198,20 +197,19 @@ class BalanceDetailViewModel(
             mapAmountToAmountModel(asset.reserved, asset)
         )
 
-        return BalanceLocksModel(
-            buildList {
-                addAll(mappedLocks)
-                add(reservedBalance)
+        val external = externalBalances.map { externalBalance ->
+            BalanceLocksModel.Lock(
+                name = mapBalanceIdToUi(resourceManager, externalBalance.type.balanceId),
+                amount = mapAmountToAmountModel(externalBalance.amount, asset)
+            )
+        }
 
-                if (contributions.totalContributed.isPositive()) {
-                    val totalContributedBalance = BalanceLocksModel.Lock(
-                        resourceManager.getString(R.string.assets_balance_details_locks_crowdloans),
-                        mapAmountToAmountModel(contributions.totalContributed, asset)
-                    )
+        val locks = buildList {
+            addAll(mappedLocks)
+            add(reservedBalance)
+            addAll(external)
+        }
 
-                    add(totalContributedBalance)
-                }
-            }
-        )
+        return BalanceLocksModel(locks)
     }
 }

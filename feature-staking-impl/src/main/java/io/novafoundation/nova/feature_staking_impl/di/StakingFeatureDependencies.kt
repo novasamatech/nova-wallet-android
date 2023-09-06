@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
+import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.core_db.dao.StakingDashboardDao
 import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
@@ -151,4 +152,6 @@ interface StakingFeatureDependencies {
     val arbitraryAssetUseCase: ArbitraryAssetUseCase
 
     val locksRepository: BalanceLocksRepository
+
+    val externalBalanceDao: ExternalBalanceDao
 }

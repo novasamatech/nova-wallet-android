@@ -28,22 +28,16 @@ class EditableStakingTypeItemFormatter(
         val selectedStakingType = selection.selection.stakingOption.stakingType
         val stakingType = validatedStakingType.stakingTypeDetails.stakingType
 
-        val title = when {
-            stakingType.isDirectStaking() -> resourceManager.getString(R.string.setup_staking_type_direct_staking)
-            stakingType.isPoolStaking() -> resourceManager.getString(R.string.setup_staking_type_pool_staking)
-            else -> return null
-        }
-
-        val imageRes = when {
-            stakingType.isDirectStaking() -> R.drawable.ic_pool_staking_banner_picture
-            stakingType.isPoolStaking() -> R.drawable.ic_direct_staking_banner_picture
+        val (titleRes, imageRes) = when {
+            stakingType.isDirectStaking() -> R.string.setup_staking_type_direct_staking to R.drawable.ic_direct_staking_banner_picture
+            stakingType.isPoolStaking() -> R.string.setup_staking_type_pool_staking to R.drawable.ic_pool_staking_banner_picture
             else -> return null
         }
 
         return EditableStakingTypeRVItem(
             isSelected = selectedStakingType == stakingType,
             isSelectable = validatedStakingType.isAvailable,
-            title = title,
+            title = resourceManager.getString(titleRes),
             imageRes = imageRes,
             conditions = mapConditions(asset, validatedStakingType.stakingTypeDetails),
             stakingTarget = stakingTarget.takeIf { selectedStakingType == stakingType }

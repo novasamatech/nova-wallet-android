@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools
 
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
+import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculator

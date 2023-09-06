@@ -6,8 +6,8 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.calls.nominationPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.calls.unbond
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.bondedAccountOf
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.bondedAccountOf
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.getParticipatingBondedPoolState

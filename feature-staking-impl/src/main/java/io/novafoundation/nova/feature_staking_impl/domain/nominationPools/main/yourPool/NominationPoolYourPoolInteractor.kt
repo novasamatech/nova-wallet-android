@@ -2,10 +2,10 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.
 
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.images.Icon
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
+import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMetadata
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolAccountDerivation
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.bondedAccountOf
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.bondedAccountOf
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.NominationPoolYourPoolInteractor.YourPool
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.PoolDisplay
