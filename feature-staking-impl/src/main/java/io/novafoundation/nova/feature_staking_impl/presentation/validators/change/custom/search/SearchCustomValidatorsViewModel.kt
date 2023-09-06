@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.search.SearchStakeTargetViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setCustomValidators
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
@@ -89,7 +89,7 @@ class SearchCustomValidatorsViewModel(
         }
     }
 
-    override fun itemClicked(item: ValidatorModel) {
+    override fun itemClicked(item: ValidatorStakeTargetModel) {
         if (item.stakeTarget.prefs!!.blocked) {
             showError(resourceManager.getString(R.string.staking_custom_blocked_warning))
             return
@@ -102,7 +102,7 @@ class SearchCustomValidatorsViewModel(
         }
     }
 
-    override fun itemInfoClicked(item: ValidatorModel) {
+    override fun itemInfoClicked(item: ValidatorStakeTargetModel) {
         launch {
             val stakeTarget = mapValidatorToValidatorDetailsParcelModel(item.stakeTarget)
             val payload = StakeTargetDetailsPayload.relaychain(stakeTarget, stakingInteractor)

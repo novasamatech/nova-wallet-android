@@ -3,8 +3,11 @@ package io.novafoundation.nova.feature_staking_impl.presentation.validators.chan
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.NominationPool
 
-typealias ValidatorModel = StakeTargetModel<Validator>
+typealias ValidatorStakeTargetModel = StakeTargetModel<Validator>
+
+typealias PoolStakeTargetModel = StakeTargetModel<NominationPool>
 
 data class StakeTargetModel<V>(
     val accountIdHex: String,
