@@ -6,6 +6,8 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.domain.mapLoading
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -62,6 +64,8 @@ class StartStakingInfoModel(
     val buttonColor: Int
 )
 
+typealias AcknowledgeStakingStartedTitle = String
+
 class StartStakingLandingViewModel(
     private val router: StartMultiStakingRouter,
     private val resourceManager: ResourceManager,
@@ -71,6 +75,7 @@ class StartStakingLandingViewModel(
     private val startStakingLandingPayload: StartStakingLandingPayload,
     private val validationExecutor: ValidationExecutor,
     private val selectedMetaAccountUseCase: SelectedAccountUseCase,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 ) : BaseViewModel(),
     Browserable,
     Validatable by validationExecutor {
@@ -83,6 +88,8 @@ class StartStakingLandingViewModel(
             coroutineScope = this
         )
     }.shareInBackground()
+
+    val acknowledgeStakingStarted = actionAwaitableMixinFactory.confirmingAction<AcknowledgeStakingStartedTitle>()
 
     private val startStakingInfo = startStakingInteractor.flatMapLatest { interactor ->
         interactor.observeStartStakingInfo()
@@ -122,7 +129,10 @@ class StartStakingLandingViewModel(
         updateSystemFactory.create(availableStakingOptionsPayload.chainId, availableStakingOptionsPayload.stakingTypes)
             .start()
             .launchIn(this)
+
+        closeOnStakingStarted()
     }
+
 
     fun back() {
         router.back()
@@ -157,6 +167,17 @@ class StartStakingLandingViewModel(
 
     fun termsOfUseClicked() {
         openBrowserEvent.value = Event(appLinksProvider.termsUrl)
+    }
+
+    private fun closeOnStakingStarted()  = launch {
+        val interactor = startStakingInteractor.first()
+        val stakingStartedChain = interactor.observeStatingStarted().first()
+
+        val title = resourceManager.getString(R.string.staking_already_staking_title, stakingStartedChain.name)
+
+        acknowledgeStakingStarted.awaitAction(title)
+
+        router.returnToStakingDashboard()
     }
 
     private fun openStartStaking() {

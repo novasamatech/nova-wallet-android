@@ -30,6 +30,12 @@ interface StakingDashboardDao {
     @Query("SELECT * FROM staking_dashboard_items WHERE metaId = :metaId")
     fun dashboardItemsFlow(metaId: Long): Flow<List<StakingDashboardItemLocal>>
 
+    @Query("""
+        SELECT * FROM staking_dashboard_items
+        WHERE metaId = :metaId AND chainId = :chainId AND chainAssetId = :assetId AND stakingType IN (:assetTypes)
+        """)
+    fun dashboardItemsFlow(metaId: Long, chainId: String, assetId: Int, assetTypes: List<String>): Flow<List<StakingDashboardItemLocal>>
+
     @Query("SELECT chainId, chainAssetId, stakingType, stakeStatusAccount, rewardsAccount FROM staking_dashboard_items WHERE metaId = :metaId")
     fun stakingAccountsViewFlow(metaId: Long): Flow<List<StakingDashboardAccountsView>>
 

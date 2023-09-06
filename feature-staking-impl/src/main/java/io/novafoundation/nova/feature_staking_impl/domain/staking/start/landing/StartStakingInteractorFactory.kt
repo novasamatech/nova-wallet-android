@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MultiStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
@@ -31,6 +32,7 @@ class StartStakingInteractorFactory(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
     private val chainRegistry: ChainRegistry,
+    private val stakingDashboardRepository: StakingDashboardRepository
 ) {
 
     suspend fun create(
@@ -48,6 +50,8 @@ class StartStakingInteractorFactory(
             accountRepository = accountRepository,
             interactors = interactors,
             stakingEraInteractor = stakingEraInteractor,
+            stakingOptionIds = multiStakingOptionIds,
+            stakingDashboardRepository = stakingDashboardRepository,
         )
     }
 
