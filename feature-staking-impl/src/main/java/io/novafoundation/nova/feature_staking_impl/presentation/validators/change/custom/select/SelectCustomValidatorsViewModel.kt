@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.model.ContinueButtonState
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setCustomValidators
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
@@ -56,6 +57,7 @@ class SelectCustomValidatorsViewModel(
     private val setupStakingSharedState: SetupStakingSharedState,
     private val tokenUseCase: TokenUseCase,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
+    private val payload: CustomValidatorsPayload,
 ) : BaseViewModel() {
 
     private val validatorRecommendator by lazyAsync {
@@ -155,7 +157,7 @@ class SelectCustomValidatorsViewModel(
     fun nextClicked() {
         updateSetupStakingState()
 
-        router.openReviewCustomValidators()
+        router.openReviewCustomValidators(payload)
     }
 
     fun validatorInfoClicked(validatorModel: ValidatorModel) = launch {

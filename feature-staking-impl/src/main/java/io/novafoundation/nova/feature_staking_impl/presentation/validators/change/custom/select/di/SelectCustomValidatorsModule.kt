@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.Valida
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.SelectCustomValidatorsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 
@@ -35,7 +36,8 @@ class SelectCustomValidatorsModule {
         setupStakingSharedState: SetupStakingSharedState,
         router: StakingRouter,
         tokenUseCase: TokenUseCase,
-        selectedAssetState: StakingSharedState
+        selectedAssetState: StakingSharedState,
+        payload: CustomValidatorsPayload
     ): ViewModel {
         return SelectCustomValidatorsViewModel(
             router,
@@ -46,7 +48,8 @@ class SelectCustomValidatorsModule {
             resourceManager,
             setupStakingSharedState,
             tokenUseCase,
-            selectedAssetState
+            selectedAssetState,
+            payload
         )
     }
 

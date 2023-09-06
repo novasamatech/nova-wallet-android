@@ -80,4 +80,8 @@ class StakingTypeView @JvmOverloads constructor(
         stakingTypeTarget.makeVisible()
         stakingTypeTarget.setModel(stakingTarget)
     }
+
+    fun setStakingTargetClickListener(listener: OnClickListener) {
+        stakingTypeTarget.setOnClickListener(listener)
+    }
 }

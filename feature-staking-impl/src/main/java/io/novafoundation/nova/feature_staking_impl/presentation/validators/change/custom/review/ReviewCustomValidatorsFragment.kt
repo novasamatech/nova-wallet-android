@@ -17,12 +17,24 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.Stake
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter.Mode.EDIT
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter.Mode.VIEW
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsAccounts
 import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsList
 import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsNext
 import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsToolbar
 
 class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewModel>(), StakeTargetAdapter.ItemHandler<Validator> {
+
+    companion object {
+
+        private const val KEY_PAYLOAD = "SelectCustomValidatorsFragment.Payload"
+
+        fun getBundle(
+            payload: CustomValidatorsPayload
+        ) = Bundle().apply {
+            putParcelable(KEY_PAYLOAD, payload)
+        }
+    }
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
         StakeTargetAdapter(this)
@@ -59,7 +71,7 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
             StakingFeatureApi::class.java
         )
             .reviewCustomValidatorsComponentFactory()
-            .create(this)
+            .create(this, argument(KEY_PAYLOAD))
             .inject(this)
     }
 

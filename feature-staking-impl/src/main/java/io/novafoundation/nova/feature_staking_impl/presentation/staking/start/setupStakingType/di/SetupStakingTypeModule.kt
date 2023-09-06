@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.di.staking.startMultiStaking.
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.CompoundStakingTypeDetailsProvidersFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingTargetSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.EditableStakingTypeItemFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypePayload
@@ -49,6 +50,7 @@ class SetupStakingTypeModule {
         compoundStakingTypeDetailsProvidersFactory: CompoundStakingTypeDetailsProvidersFactory,
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
+        setupStakingSharedState: SetupStakingSharedState,
         chainRegistry: ChainRegistry
     ): ViewModel {
         return SetupStakingTypeViewModel(
@@ -61,6 +63,7 @@ class SetupStakingTypeModule {
             compoundStakingTypeDetailsProvidersFactory,
             resourceManager,
             validationExecutor,
+            setupStakingSharedState,
             chainRegistry
         )
     }

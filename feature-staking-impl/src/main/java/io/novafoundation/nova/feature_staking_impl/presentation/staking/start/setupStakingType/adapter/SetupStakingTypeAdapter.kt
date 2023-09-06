@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
+import io.novafoundation.nova.common.utils.doIfPositionValid
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.android.extensions.LayoutContainer
@@ -19,6 +20,8 @@ class SetupStakingTypeAdapter(
     interface ItemAssetHandler {
 
         fun stakingTypeClicked(stakingTypeRVItem: EditableStakingTypeRVItem, position: Int)
+
+        fun stakingTargetClicked(position: Int)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditableStakingTypeViewHolder {
@@ -72,11 +75,12 @@ class EditableStakingTypeViewHolder(
         setStakingTarget(item)
         setImage(item)
 
-        containerView.editableStakingType.setOnClickListener {
-            val position = bindingAdapterPosition
-            if (position == RecyclerView.NO_POSITION) return@setOnClickListener
+        editableStakingType.setOnClickListener {
+            doIfPositionValid { position -> clickHandler.stakingTypeClicked(item, position) }
+        }
 
-            clickHandler.stakingTypeClicked(item, bindingAdapterPosition)
+        editableStakingType.setStakingTargetClickListener {
+            doIfPositionValid { position -> clickHandler.stakingTargetClicked(position) }
         }
     }
 

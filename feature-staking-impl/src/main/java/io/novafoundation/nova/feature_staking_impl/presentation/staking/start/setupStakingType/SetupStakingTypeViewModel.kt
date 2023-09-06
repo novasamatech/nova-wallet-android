@@ -8,13 +8,19 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.RecommendableMultiStakingSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.getValidatorsOrEmpty
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.currentSelectionFlow
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.CompoundStakingTypeDetailsProvidersFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.ValidatedStakingTypeDetails
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
+import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess.ReadyToSubmit.SelectionMethod
+import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.runtime.ext.isDirectStaking
+import io.novafoundation.nova.runtime.ext.isPoolStaking
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
@@ -39,6 +45,7 @@ class SetupStakingTypeViewModel(
     private val compoundStakingTypeDetailsProvidersFactory: CompoundStakingTypeDetailsProvidersFactory,
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
+    private val setupStakingSharedState: SetupStakingSharedState,
     chainRegistry: ChainRegistry
 ) : BaseViewModel(), Validatable by validationExecutor {
 
@@ -116,7 +123,7 @@ class SetupStakingTypeViewModel(
         }
     }
 
-    fun selectStakingType(stakingTypeRVItem: EditableStakingTypeRVItem, position: Int) {
+    fun stakingTypeClicked(stakingTypeRVItem: EditableStakingTypeRVItem, position: Int) {
         if (stakingTypeRVItem.isSelected) return
 
         launch {
@@ -136,6 +143,26 @@ class SetupStakingTypeViewModel(
                 validationFailureTransformer = { handleSetupStakingTypeValidationFailure(chainAsset, it, resourceManager) },
             ) {
                 setRecommendedSelection(enteredAmount, stakingType)
+            }
+        }
+    }
+
+    fun stakingTargetClicked(position: Int) {
+        launch {
+            val stakingType = stakingTypesDataFlow.first()[position]
+                .stakingTypeDetails
+                .stakingType
+
+            val selectionStore = editableSelectionStoreProvider.getSelectionStore(viewModelScope)
+
+            when {
+                stakingType.isDirectStaking() -> {
+                    setupStakingSharedState.set(SetupStakingProcess.ReadyToSubmit(selectionStore.getValidatorsOrEmpty(), SelectionMethod.CUSTOM))
+                    router.openSelectCustomValidators()
+                }
+                stakingType.isPoolStaking() -> {
+                    // TODO
+                }
             }
         }
     }
