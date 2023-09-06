@@ -11,9 +11,10 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.NominationPoolProvider
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommenderFactory
-import io.novafoundation.nova.feature_staking_impl.domain.staking.pool.SelectingNominationPoolInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.selecting.SelectingNominationPoolInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.SetupStakingTypeSelectionMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectCustomPoolPayload
@@ -25,9 +26,10 @@ class SelectCustomPoolModule {
 
     @Provides
     fun provideSelectNominationPoolInteractor(
-        nominationPoolProvider: NominationPoolProvider
+        nominationPoolProvider: NominationPoolProvider,
+        knownNovaPools: KnownNovaPools
     ): SelectingNominationPoolInteractor {
-        return SelectingNominationPoolInteractor(nominationPoolProvider)
+        return SelectingNominationPoolInteractor(nominationPoolProvider, knownNovaPools)
     }
 
     @Provides

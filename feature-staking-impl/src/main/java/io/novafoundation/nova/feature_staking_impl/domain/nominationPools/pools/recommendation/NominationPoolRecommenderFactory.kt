@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.isNovaPool
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.getPoolComparator
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.NominationPool
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.apy
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.isActive
@@ -32,8 +33,8 @@ class NominationPoolRecommenderFactory(
             RealNominationPoolRecommender(
                 chain = stakingOption.chain,
                 allNominationPools = nominationPools,
-                knownNovaPools = knownNovaPools,
                 maxPoolMembersPerPool = maxPoolMembersPerPool,
+                poolComparator = getPoolComparator(knownNovaPools, stakingOption.chain)
             )
         }
     }
@@ -42,8 +43,8 @@ class NominationPoolRecommenderFactory(
 private class RealNominationPoolRecommender(
     private val chain: Chain,
     private val allNominationPools: List<NominationPool>,
-    private val knownNovaPools: KnownNovaPools,
     private val maxPoolMembersPerPool: Int?,
+    private val poolComparator: Comparator<NominationPool>
 ) : NominationPoolRecommender {
 
     private val recommendations = constructRecommendationList()
@@ -57,13 +58,7 @@ private class RealNominationPoolRecommender(
             .filter { it.status.isActive && it.canBeJoined() }
             // weaken filter conditions if no matching pools were found
             .ifEmpty { allNominationPools.filter { it.canBeJoined() } }
-            .sortedWith(poolComparator())
-    }
-
-    private fun poolComparator(): Comparator<NominationPool> {
-        return compareByDescending<NominationPool> { pool -> knownNovaPools.isNovaPool(chain.id, pool.id) }
-            .thenByDescending { it.apy.orZero() }
-            .thenByDescending { it.membersCount }
+            .sortedWith(poolComparator)
     }
 
     private fun NominationPool.canBeJoined(): Boolean {

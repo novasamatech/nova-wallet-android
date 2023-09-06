@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.NominationPool
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommenderFactory
-import io.novafoundation.nova.feature_staking_impl.domain.staking.pool.SelectingNominationPoolInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.selecting.SelectingNominationPoolInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.pools.asPoolSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.SetupStakingTypeSelectionMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
