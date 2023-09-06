@@ -50,10 +50,10 @@ class PoolViewHolder(
 ) : RecyclerView.ViewHolder(containerView) {
 
     fun bind(poolItem: PoolRvItem) = with(itemView) {
-        itemPoolTitle.text = poolItem.title
+        itemPoolTitle.text = poolItem.model.title
         itemPoolSubtitle.text = poolItem.subtitle
         itemPoolMembersCount.text = poolItem.members
-        itemPoolIcon.setIcon(poolItem.icon, imageLoader)
+        itemPoolIcon.setIcon(poolItem.model.icon, imageLoader)
 
         itemPoolIcon.isInvisible = poolItem.isChecked
         itemPoolCheckBox.isVisible = poolItem.isChecked

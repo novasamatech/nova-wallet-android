@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.getPoolComparator
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.NominationPool
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.apy
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.NominationPoolProvider
 import kotlinx.coroutines.CoroutineScope
 

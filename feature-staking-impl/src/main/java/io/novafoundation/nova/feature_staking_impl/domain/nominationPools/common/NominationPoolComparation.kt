@@ -12,4 +12,3 @@ fun getPoolComparator(knownNovaPools: KnownNovaPools, chain: Chain): Comparator<
         .thenByDescending { it.apy.orZero() }
         .thenByDescending { it.membersCount }
 }
-

@@ -16,9 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupSta
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.ChangeStakingReviewValidatorsRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.flowAction.EmptyReviewValidatorsFlowAction
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.DefaultReviewValidatorsFlowAction
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.flowAction.DefaultReviewValidatorsFlowAction
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.ReviewCustomValidatorsViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.flowAction.ReviewValidatorsFlowAction
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.flowAction.SetupStakingReviewValidatorsFlowAction

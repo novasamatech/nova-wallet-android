@@ -27,7 +27,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmo
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.direct.DirectStakingPropertiesFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.pools.NominationPoolStakingPropertiesFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.selectionType.MultiStakingSelectionTypeProviderFactory
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.EditingStakingTypeSelectionMixinFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.SetupStakingTypeSelectionMixinFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.pool.RealStakingTypeDetailsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
@@ -111,10 +110,12 @@ class StartMultiStakingModule {
     fun provideSetupStakingTypeSelectionMixinFactory(
         @MultiStakingSelectionStoreProviderKey currentSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
         @StakingTypeEditingStoreProviderKey editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
+        singleStakingPropertiesFactory: SingleStakingPropertiesFactory
     ): SetupStakingTypeSelectionMixinFactory {
         return SetupStakingTypeSelectionMixinFactory(
             currentSelectionStoreProvider,
-            editableSelectionStoreProvider
+            editableSelectionStoreProvider,
+            singleStakingPropertiesFactory
         )
     }
 

@@ -1,13 +1,12 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.pools.common
 
-import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayModel
 import java.math.BigInteger
 
 class PoolRvItem(
     val id: BigInteger,
-    val title: CharSequence,
+    val model: PoolDisplayModel,
     val subtitle: CharSequence,
     val members: CharSequence,
-    val isChecked: Boolean,
-    val icon: Icon
+    val isChecked: Boolean
 )

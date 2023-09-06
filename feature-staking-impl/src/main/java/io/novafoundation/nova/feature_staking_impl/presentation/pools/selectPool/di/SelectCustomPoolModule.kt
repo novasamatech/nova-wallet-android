@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -17,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.selecting.SelectingNominationPoolInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.SetupStakingTypeSelectionMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectCustomPoolPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectCustomPoolViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -40,22 +40,22 @@ class SelectCustomPoolModule {
         selectNominationPoolInteractor: SelectingNominationPoolInteractor,
         nominationPoolRecommenderFactory: NominationPoolRecommenderFactory,
         setupStakingTypeSelectionMixinFactory: SetupStakingTypeSelectionMixinFactory,
-        addressIconGenerator: AddressIconGenerator,
         payload: SelectCustomPoolPayload,
         resourceManager: ResourceManager,
         chainRegistry: ChainRegistry,
+        poolDisplayFormatter: PoolDisplayFormatter,
         externalActions: ExternalActions.Presentation
     ): ViewModel {
         return SelectCustomPoolViewModel(
             stakingRouter,
             nominationPoolRecommenderFactory,
             setupStakingTypeSelectionMixinFactory,
-            addressIconGenerator,
             payload,
             resourceManager,
             selectNominationPoolInteractor,
             chainRegistry,
-            externalActions
+            externalActions,
+            poolDisplayFormatter
         )
     }
 

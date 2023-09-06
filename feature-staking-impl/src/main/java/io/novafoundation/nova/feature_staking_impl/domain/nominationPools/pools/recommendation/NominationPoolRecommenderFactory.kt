@@ -1,16 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
-import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.isOpen
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.isNovaPool
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.getPoolComparator
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.NominationPool
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.apy
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.isActive
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.NominationPoolProvider
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain

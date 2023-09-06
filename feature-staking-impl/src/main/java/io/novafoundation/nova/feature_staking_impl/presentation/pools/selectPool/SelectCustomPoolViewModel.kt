@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool
 
 import androidx.lifecycle.viewModelScope
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
@@ -18,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmo
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.SetupStakingTypeSelectionMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapNominationPoolToPoolRvItem
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.PoolRvItem
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
@@ -36,12 +36,12 @@ class SelectCustomPoolViewModel(
     private val router: StakingRouter,
     private val nominationPoolRecommenderFactory: NominationPoolRecommenderFactory,
     private val setupStakingTypeSelectionMixinFactory: SetupStakingTypeSelectionMixinFactory,
-    private val addressIconGenerator: AddressIconGenerator,
     private val payload: SelectCustomPoolPayload,
     private val resourceManager: ResourceManager,
     private val selectNominationPoolInteractor: SelectingNominationPoolInteractor,
     private val chainRegistry: ChainRegistry,
     private val externalActions: ExternalActions.Presentation,
+    private val poolDisplayFormatter: PoolDisplayFormatter,
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val stakingOption = async(Dispatchers.Default) {
@@ -67,8 +67,8 @@ class SelectCustomPoolViewModel(
         .map { resourceManager.getString(R.string.select_custom_pool_active_pools_count, it.size) }
         .shareInBackground()
 
-    val fillWithRecommendedEnabled = combine(nominationPoolRecommenderFlow, selectedPoolFlow) { allPools, selectedPool ->
-        allPools.recommendedPool().id != selectedPool?.id
+    val fillWithRecommendedEnabled = combine(nominationPoolRecommenderFlow, selectedPoolFlow) { recommender, selectedPool ->
+        recommender.recommendedPool().id != selectedPool?.id
     }
         .share()
 
@@ -76,7 +76,7 @@ class SelectCustomPoolViewModel(
         setupStakingTypeSelectionMixin.editableSelectionFlow
             .onEach {
                 selectedPoolFlow.value = it.selection.asPoolSelection()?.pool
-            }.launchIn(this)
+            }.launchIn(viewModelScope)
     }
 
     fun backClicked() {
@@ -86,7 +86,7 @@ class SelectCustomPoolViewModel(
     fun poolClicked(poolItem: PoolRvItem) {
         launch {
             val pool = getPoolById(poolItem.id) ?: return@launch
-            setupStakingTypeSelectionMixin.selectNominationPoolAndApply(pool)
+            setupStakingTypeSelectionMixin.selectNominationPoolAndApply(pool, stakingOption())
             router.finishSetupPoolFlow()
         }
     }
@@ -97,7 +97,7 @@ class SelectCustomPoolViewModel(
     fun selectRecommended() {
         launch {
             val recommendedPool = nominationPoolRecommenderFlow.first().recommendedPool()
-            setupStakingTypeSelectionMixin.selectNominationPoolAndApply(recommendedPool)
+            setupStakingTypeSelectionMixin.selectNominationPoolAndApply(recommendedPool, stakingOption())
             router.finishSetupPoolFlow()
         }
     }
@@ -110,8 +110,8 @@ class SelectCustomPoolViewModel(
             mapNominationPoolToPoolRvItem(
                 chain = stakingOption().chain,
                 pool = pool,
-                iconGenerator = addressIconGenerator,
                 resourceManager = resourceManager,
+                poolDisplayFormatter = poolDisplayFormatter,
                 isChecked = pool.id == selectedPool?.id,
             )
         }

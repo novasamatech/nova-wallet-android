@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
@@ -20,7 +21,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.chang
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
-import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -35,7 +35,7 @@ class ReviewCustomValidatorsViewModel(
     private val interactor: StakingInteractor,
     private val resourceManager: ResourceManager,
     private val sharedStateSetup: SetupStakingSharedState,
-    private val selectedAssetState: AnySelectedAssetOptionSharedState,
+    private val selectedAssetState: StakingSharedState,
     private val reviewValidatorsFlowAction: ReviewValidatorsFlowAction,
     tokenUseCase: TokenUseCase
 ) : BaseViewModel() {
@@ -113,7 +113,8 @@ class ReviewCustomValidatorsViewModel(
 
     fun nextClicked() {
         launch {
-            reviewValidatorsFlowAction.execute(viewModelScope)
+            val stakingOption = selectedAssetState.selectedOption.first()
+            reviewValidatorsFlowAction.execute(viewModelScope, stakingOption)
         }
     }
 }
