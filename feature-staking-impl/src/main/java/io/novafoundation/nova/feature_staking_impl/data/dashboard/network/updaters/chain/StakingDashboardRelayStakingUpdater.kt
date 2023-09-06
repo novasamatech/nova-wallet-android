@@ -3,6 +3,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain
 
 import io.novafoundation.nova.common.utils.combineToPair
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
@@ -12,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
+import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.ChainStakingStats
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.MultiChainStakingStats
@@ -21,6 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.bo
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.ledger
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.nominators
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.staking
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.validators
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -84,8 +87,8 @@ class StakingDashboardRelayStakingUpdater(
         return remoteStorageSource.subscribe(chain.id) {
             metadata.staking.ledger.observe(controllerId).flatMapLatest { ledger ->
                 if (ledger != null) {
-                    subscribeToNominations(ledger.stashId).map { nominations ->
-                        RelaychainStakingBaseInfo(ledger, nominations)
+                    subscribeToStakerIntentions(ledger.stashId).map { (nominations, validatorPrefs) ->
+                        RelaychainStakingBaseInfo(ledger, nominations, validatorPrefs)
                     }
                 } else {
                     flowOf(null)
@@ -94,9 +97,12 @@ class StakingDashboardRelayStakingUpdater(
         }
     }
 
-    private suspend fun subscribeToNominations(stashId: AccountId): Flow<Nominations?> {
-        return remoteStorageSource.subscribe(chain.id) {
-            metadata.staking.nominators.observe(stashId)
+    private suspend fun subscribeToStakerIntentions(stashId: AccountId): Flow<Pair<Nominations?, ValidatorPrefs?>> {
+        return remoteStorageSource.subscribeBatched(chain.id) {
+            combineToPair(
+                metadata.staking.nominators.observe(stashId),
+                metadata.staking.validators.observe(stashId)
+            )
         }
     }
 
@@ -149,9 +155,10 @@ class StakingDashboardRelayStakingUpdater(
     ): Status? {
         return when {
             baseInfo == null -> null
-            baseInfo.nominations == null -> Status.INACTIVE
+            baseInfo.stakingLedger.active.isZero -> Status.INACTIVE
+            baseInfo.nominations == null && baseInfo.validatorPrefs == null -> Status.INACTIVE
             chainStakingStats.accountPresentInActiveStakers -> Status.ACTIVE
-            baseInfo.nominations.isWaiting(activeEra) -> Status.WAITING
+            baseInfo.nominations != null && baseInfo.nominations.isWaiting(activeEra) -> Status.WAITING
             else -> Status.INACTIVE
         }
     }
@@ -160,6 +167,7 @@ class StakingDashboardRelayStakingUpdater(
 private class RelaychainStakingBaseInfo(
     val stakingLedger: StakingLedger,
     val nominations: Nominations?,
+    val validatorPrefs: ValidatorPrefs?,
 )
 
 private class RelaychainStakingSecondaryInfo(

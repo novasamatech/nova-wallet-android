@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 
 class StakeSummary<S>(
     val status: S,
-    val totalStaked: Balance,
+    val activeStake: Balance,
 )
 
 sealed class NominatorStatus {
