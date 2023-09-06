@@ -13,6 +13,15 @@ fun Any?.asGsonParsedNumberOrNull(): BigInteger? = when (this) {
     else -> null
 }
 
+fun Any?.asGsonParsedLongOrNull(): Long? = when (this) {
+    // gson parses integers as double when type is not specified
+    is Double -> toLong()
+    is Long -> this
+    is Int -> toLong()
+    is String -> toLongOrNull()
+    else -> null
+}
+
 fun Any?.asGsonParsedNumber(): BigInteger = asGsonParsedNumberOrNull()
     ?: throw IllegalArgumentException("Failed to convert gson-parsed object to number")
 
