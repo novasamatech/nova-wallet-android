@@ -15,7 +15,7 @@
         <!--text sizes-->
         <item name="textSizeH1">@dimen/text_size_h1</item>
         <item name="textSizeH2">@dimen/text_size_h2</item>
-        <item name="textSizeH3">@dimen/text_size_h3</item>
+        <item name="textSizeH3">@dimen/text_size_h3</item>#
         <item name="textSizeH4">@dimen/text_size_h4</item>
         <item name="textSizeH5">@dimen/text_size_h5</item>
         <item name="textSizeCapsTitle1">@dimen/text_size_caps_title_1</item>
@@ -53,5 +53,9 @@
 
     <style name="WhiteOverlay" parent="ThemeOverlay.AppCompat">
         <item name="colorPrimary">@color/text_primary</item>
+    </style>
+
+    <style name="BlueDarkOverlay" parent="ThemeOverlay.AppCompat">
+        <item name="colorPrimary">@color/default_system_blue_dark</item>
     </style>
 </resources>

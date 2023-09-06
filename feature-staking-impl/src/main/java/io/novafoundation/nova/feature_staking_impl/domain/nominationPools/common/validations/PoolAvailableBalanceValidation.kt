@@ -1,0 +1,130 @@
+package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations
+
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.DialogAction
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.atLeastZero
+import io.novafoundation.nova.common.validation.TransformedFailure
+import io.novafoundation.nova.common.validation.Validation
+import io.novafoundation.nova.common.validation.ValidationFlowActions
+import io.novafoundation.nova.common.validation.ValidationStatus
+import io.novafoundation.nova.common.validation.ValidationSystemBuilder
+import io.novafoundation.nova.common.validation.isTrueOrWarning
+import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.hash.isPositive
+import java.math.BigDecimal
+
+class PoolAvailableBalanceValidationFactory(
+    private val walletConstants: WalletConstants,
+    private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
+) {
+
+    context(ValidationSystemBuilder<P, E>)
+    fun <P, E> enoughAvailableBalanceToStake(
+        asset: (P) -> Asset,
+        fee: (P) -> Balance,
+        amount: (P) -> BigDecimal,
+        error: (PoolAvailableBalanceValidation.ValidationError.Context) -> E
+    ) {
+        validate(PoolAvailableBalanceValidation(
+            walletConstants = walletConstants,
+            poolsAvailableBalanceResolver = poolsAvailableBalanceResolver,
+            asset = asset,
+            fee = fee,
+            error = error,
+            amount = amount
+        ))
+    }
+}
+
+class PoolAvailableBalanceValidation<P, E>(
+    private val walletConstants: WalletConstants,
+    private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
+    private val asset: (P) -> Asset,
+    private val fee: (P) -> Balance,
+    private val amount: (P) -> BigDecimal,
+    private val error: (ValidationError.Context) -> E
+) : Validation<P, E> {
+
+    interface ValidationError {
+
+        val context: Context
+
+        class Context(
+            val availableBalance: Balance,
+            val minimumBalance: Balance,
+            val fee: Balance,
+            val maximumToStake: Balance,
+            val chainAsset: Chain.Asset,
+        )
+    }
+
+    override suspend fun validate(value: P): ValidationStatus<E> {
+        val asset = asset(value)
+        val chainAsset = asset.token.configuration
+
+        val existentialDeposit = walletConstants.existentialDeposit(chainAsset.chainId)
+        val fee = fee(value)
+        val availableBalance = poolsAvailableBalanceResolver.availableBalanceToStartStaking(asset)
+        val enteredAmount = chainAsset.planksFromAmount(amount(value))
+
+        val maximumToStake = availableBalance - existentialDeposit - fee
+        val hasEnoughToStake = enteredAmount <= maximumToStake
+
+        return hasEnoughToStake isTrueOrWarning {
+            val errorContext = ValidationError.Context(
+                availableBalance = availableBalance,
+                minimumBalance = existentialDeposit,
+                fee = fee,
+                maximumToStake = maximumToStake.atLeastZero(),
+                chainAsset = chainAsset
+            )
+            error(errorContext)
+        }
+    }
+}
+
+fun <P> handlePoolAvailableBalanceError(
+    error: PoolAvailableBalanceValidation.ValidationError,
+    resourceManager: ResourceManager,
+    flowActions: ValidationFlowActions<P>,
+    modifyPayload: (oldPayload: P, maxAmountToStake: BigDecimal) -> P,
+): TransformedFailure.Custom  = with(error.context){
+    val maximumToStakeAmount = chainAsset.amountFromPlanks(maximumToStake)
+
+    val dialogPayload = CustomDialogDisplayer.Payload(
+        title = resourceManager.getString(R.string.common_not_enough_funds_title),
+        customStyle = R.style.BlueDarkOverlay,
+        message = resourceManager.getString(
+            R.string.staking_pool_available_validation_message,
+            availableBalance.formatPlanks(chainAsset),
+            minimumBalance.formatPlanks(chainAsset),
+            fee.formatPlanks(chainAsset),
+            maximumToStakeAmount.formatTokenAmount(chainAsset)
+        ),
+        okAction = if (maximumToStake.isPositive()) {
+            DialogAction(
+                title = resourceManager.getString(R.string.staking_stake_max),
+                action = {
+                    flowActions.resumeFlow { oldPayload ->
+                        modifyPayload(oldPayload, maximumToStakeAmount)
+                    }
+                }
+            )
+        } else {
+            null
+        },
+        cancelAction = DialogAction.noOp(resourceManager.getString(R.string.common_close))
+    )
+
+    TransformedFailure.Custom(dialogPayload)
+}

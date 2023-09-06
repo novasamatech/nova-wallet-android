@@ -143,7 +143,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
     }
 
     private fun showBiometricNotReadyDialog() {
-        dialog(requireContext(), style = R.style.AccentAlertDialogTheme) {
+        dialog(requireContext(), customStyle = R.style.AccentAlertDialogTheme) {
             setTitle(R.string.settings_biometric_not_ready_title)
             setMessage(R.string.settings_biometric_not_ready_message)
             setNegativeButton(R.string.common_cancel, null)
