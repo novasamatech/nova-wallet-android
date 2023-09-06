@@ -1,6 +1,5 @@
-package io.novafoundation.nova.feature_wallet_impl.data.mappers
+package io.novafoundation.nova.feature_assets.data.mappers
 
-import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.OperationLocal.ExtrinsicContentType
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
@@ -9,9 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Reward.RewardKind
 import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
-import io.novafoundation.nova.feature_wallet_impl.data.network.model.response.SubqueryHistoryElementResponse
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlin.time.Duration.Companion.seconds
 
 fun mapOperationStatusToOperationLocalStatus(status: Operation.Status) = when (status) {
     Operation.Status.PENDING -> OperationLocal.Status.PENDING
@@ -175,79 +172,4 @@ fun mapOperationLocalToOperation(
             extrinsicHash = hash,
         )
     }
-}
-
-fun mapNodeToOperation(
-    node: SubqueryHistoryElementResponse.Query.HistoryElements.Node,
-    coinRate: CoinRate?,
-    chainAsset: Chain.Asset,
-): Operation {
-    val type: Type = when {
-        node.reward != null -> with(node.reward) {
-            Type.Reward(
-                amount = amount,
-                fiatAmount = coinRate?.convertPlanks(chainAsset, amount),
-                isReward = isReward,
-                kind = RewardKind.Direct(
-                    era = era,
-                    validator = validator.nullIfEmpty(),
-                )
-            )
-        }
-
-        node.poolReward != null -> with(node.poolReward) {
-            Type.Reward(
-                amount = amount,
-                fiatAmount = coinRate?.convertPlanks(chainAsset, amount),
-                isReward = isReward,
-                kind = RewardKind.Pool(
-                    poolId = poolId
-                )
-            )
-        }
-
-        node.extrinsic != null -> with(node.extrinsic) {
-            Type.Extrinsic(
-                content = Content.SubstrateCall(module, call),
-                fee = fee,
-                fiatFee = coinRate?.convertPlanks(chainAsset, fee),
-                status = Operation.Status.fromSuccess(success)
-            )
-        }
-
-        node.transfer != null -> with(node.transfer) {
-            Type.Transfer(
-                myAddress = node.address,
-                amount = amount,
-                fiatAmount = coinRate?.convertPlanks(chainAsset, amount),
-                receiver = to,
-                sender = from,
-                fee = fee,
-                status = Operation.Status.fromSuccess(success),
-            )
-        }
-
-        node.assetTransfer != null -> with(node.assetTransfer) {
-            Type.Transfer(
-                myAddress = node.address,
-                amount = amount,
-                fiatAmount = coinRate?.convertPlanks(chainAsset, amount),
-                receiver = to,
-                sender = from,
-                status = Operation.Status.fromSuccess(success),
-                fee = fee,
-            )
-        }
-
-        else -> throw IllegalStateException("All of the known operation type fields were null")
-    }
-
-    return Operation(
-        id = node.id,
-        address = node.address,
-        type = type,
-        time = node.timestamp.seconds.inWholeMilliseconds,
-        chainAsset = chainAsset,
-        extrinsicHash = node.extrinsicHash
-    )
 }

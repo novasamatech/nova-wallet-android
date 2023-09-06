@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.nominationPools.network
 import io.novafoundation.nova.common.utils.nominationPools
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
+import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.base.NominationPoolUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.scope.PoolScope
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry

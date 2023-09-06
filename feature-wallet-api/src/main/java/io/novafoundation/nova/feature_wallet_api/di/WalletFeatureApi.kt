@@ -13,8 +13,8 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.CoinPriceInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
@@ -50,8 +50,6 @@ interface WalletFeatureApi {
 
     val balanceLocksRepository: BalanceLocksRepository
 
-    val transactionHistoryRepository: TransactionHistoryRepository
-
     val chainAssetRepository: ChainAssetRepository
 
     val erc20Standard: Erc20Standard
@@ -63,4 +61,6 @@ interface WalletFeatureApi {
     val paymentUpdaterFactory: PaymentUpdaterFactory
 
     val balanceLocksUpdaterFactory: BalanceLocksUpdaterFactory
+
+    val coinPriceRepository: CoinPriceRepository
 }

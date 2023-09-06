@@ -36,7 +36,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.implementations.CoinPric
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
@@ -59,7 +58,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.CoinPriceRepos
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealBalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealChainAssetRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealCrossChainTransfersRepository
-import io.novafoundation.nova.feature_wallet_impl.data.repository.RealTransactionHistoryRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletConstants
 import io.novafoundation.nova.feature_wallet_impl.data.repository.TokenRepositoryImpl
 import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
@@ -169,18 +167,6 @@ class WalletFeatureModule {
         phishingAddressDao,
         coinPriceRemoteDataSource,
         chainRegistry,
-    )
-
-    @Provides
-    @FeatureScope
-    fun provideTransactionHistoryRepository(
-        assetSourceRegistry: AssetSourceRegistry,
-        operationsDao: OperationDao,
-        coinPriceRepository: CoinPriceRepository
-    ): TransactionHistoryRepository = RealTransactionHistoryRepository(
-        assetSourceRegistry = assetSourceRegistry,
-        operationDao = operationsDao,
-        coinPriceRepository = coinPriceRepository
     )
 
     @Provides

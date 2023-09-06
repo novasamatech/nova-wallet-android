@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards
 
 import io.novafoundation.nova.common.utils.Perbill
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
+import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
 
 interface NominationPoolRewardCalculator {
 
