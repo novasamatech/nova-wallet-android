@@ -68,7 +68,7 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
         return chains.flatMap { chain ->
             val utilityAsset = chain.utilityAsset
 
-            utilityAsset.supportedStakingOptions().map { stakingType ->
+            utilityAsset.supportedStakingOptions().mapNotNull { stakingType ->
                 val stakingOption = createStakingOption(chain, utilityAsset, stakingType)
                 val stakingOptionId = stakingOption.fullId
                 val stakingOptionAccounts = stakingAccounts[stakingOptionId]

@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChain
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.di.ManageChainTokensComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.di.ManageTokensComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.ExtrinsicDetailComponent
+import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.PoolRewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.RewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.TransactionDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.di.TransactionHistoryFilterComponent
@@ -60,6 +61,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun transactionHistoryComponentFactory(): TransactionHistoryFilterComponent.Factory
 
     fun rewardDetailComponentFactory(): RewardDetailComponent.Factory
+
+    fun poolRewardDetailComponentFactory(): PoolRewardDetailComponent.Factory
 
     fun extrinsicDetailComponentFactory(): ExtrinsicDetailComponent.Factory
 

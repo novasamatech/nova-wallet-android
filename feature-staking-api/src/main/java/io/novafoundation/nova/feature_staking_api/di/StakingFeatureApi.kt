@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updater
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.TuringAutomationTasksRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
+import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayUseCase
 
 interface StakingFeatureApi {
 
@@ -17,4 +18,6 @@ interface StakingFeatureApi {
     val dashboardUpdateSystem: StakingDashboardUpdateSystem
 
     val pooledBalanceUpdaterFactory: PooledBalanceUpdaterFactory
+
+    val poolDisplayUseCase: PoolDisplayUseCase
 }

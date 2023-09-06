@@ -83,8 +83,8 @@ class EvmErc20AssetHistory(
         return Operation(
             id = remote.hash,
             address = accountAddress,
+            extrinsicHash = remote.hash,
             type = Operation.Type.Transfer(
-                hash = remote.hash,
                 myAddress = accountAddress,
                 amount = remote.value,
                 fiatAmount = coinRate?.convertPlanks(chainAsset, remote.value),

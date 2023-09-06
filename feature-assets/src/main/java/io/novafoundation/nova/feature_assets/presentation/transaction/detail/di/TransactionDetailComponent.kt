@@ -6,7 +6,8 @@ import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment
-import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.RewardDetailFragment
+import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.direct.RewardDetailFragment
+import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.pool.PoolRewardDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer.TransferDetailFragment
 
 @Subcomponent(
@@ -47,6 +48,26 @@ interface RewardDetailComponent {
     }
 
     fun inject(fragment: RewardDetailFragment)
+}
+
+@Subcomponent(
+    modules = [
+        PoolRewardDetailModule::class
+    ]
+)
+@ScreenScope
+interface PoolRewardDetailComponent {
+
+    @Subcomponent.Factory
+    interface Factory {
+
+        fun create(
+            @BindsInstance fragment: Fragment,
+            @BindsInstance operation: OperationParcelizeModel.PoolReward
+        ): PoolRewardDetailComponent
+    }
+
+    fun inject(fragment: PoolRewardDetailFragment)
 }
 
 @Subcomponent(

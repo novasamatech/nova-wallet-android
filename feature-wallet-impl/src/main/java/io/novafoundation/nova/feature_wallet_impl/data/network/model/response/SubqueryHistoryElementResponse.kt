@@ -14,18 +14,26 @@ class SubqueryHistoryElementResponse(val query: Query) {
             class Node(
                 val id: String,
                 val timestamp: Long,
-                val extrinsicHash: String,
+                val extrinsicHash: String?,
                 val address: String,
-                val reward: Rewards?,
+                val reward: Reward?,
+                val poolReward: PoolReward?,
                 val transfer: Transfer?,
                 val extrinsic: Extrinsic?,
                 val assetTransfer: AssetTransfer?,
             ) {
-                class Rewards(
+                class Reward(
                     val era: Int,
                     val amount: BigInteger,
                     val isReward: Boolean,
                     val validator: String,
+                )
+
+                class PoolReward(
+                    val era: Int,
+                    val amount: BigInteger,
+                    val poolId: Int,
+                    val isReward: Boolean,
                 )
 
                 class Transfer(

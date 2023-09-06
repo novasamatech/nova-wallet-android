@@ -51,6 +51,7 @@ import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
 import io.novafoundation.nova.core_db.migrations.AddEnabledColumnToChainAssets_30_31
 import io.novafoundation.nova.core_db.migrations.AddExternalBalances_45_46
+import io.novafoundation.nova.core_db.migrations.AddExternalBalances_46_47
 import io.novafoundation.nova.core_db.migrations.AddExtrinsicContentField_37_38
 import io.novafoundation.nova.core_db.migrations.AddFavouriteDApps_9_10
 import io.novafoundation.nova.core_db.migrations.AddGovernanceDapps_25_26
@@ -120,7 +121,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 46,
+    version = 47,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -201,6 +202,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddWalletConnectSessions_39_40, TransferFiatAmount_40_41)
                     .addMigrations(AddStakingDashboardItems_41_42, StakingRewardPeriods_42_43)
                     .addMigrations(AddRewardAccountToStakingDashboard_43_44, AddStakingTypeToTotalRewards_44_45, AddExternalBalances_45_46)
+                    .addMigrations(AddExternalBalances_46_47)
                     .build()
             }
             return instance!!

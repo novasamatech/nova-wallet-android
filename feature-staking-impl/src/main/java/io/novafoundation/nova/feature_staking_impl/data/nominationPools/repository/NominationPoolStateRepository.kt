@@ -46,6 +46,8 @@ interface NominationPoolStateRepository {
 
     suspend fun getPoolMetadatas(poolIds: Set<PoolId>, chainId: ChainId): Map<PoolId, PoolMetadata>
 
+    suspend fun getAnyPoolMetadata(poolId: PoolId, chainId: ChainId): PoolMetadata?
+
     suspend fun getPoolIcon(poolId: PoolId, chainId: ChainId): Icon?
 }
 
@@ -110,6 +112,12 @@ class RealNominationPoolStateRepository(
                 keys = poolIds.map { it.value },
                 keyTransform = { PoolId(it) }
             ).filterNotNull()
+        }
+    }
+
+    override suspend fun getAnyPoolMetadata(poolId: PoolId, chainId: ChainId): PoolMetadata? {
+        return remoteStorage.query(chainId) {
+            metadata.nominationPools.metadata.query(poolId.value)
         }
     }
 
