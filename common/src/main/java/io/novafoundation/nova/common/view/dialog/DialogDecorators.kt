@@ -17,7 +17,7 @@ inline fun dialog(
     @StyleRes customStyle: Int? = null,
     decorator: DialogDecorator
 ) {
-    val styleOrDefault = customStyle ?: R.style.WhiteOverlay
+    val styleOrDefault = customStyle ?: R.style.BlueDarkOverlay
     val builder = BaseAlertDialogBuilder(ContextThemeWrapper(context, styleOrDefault))
         .setCancelable(false)
 

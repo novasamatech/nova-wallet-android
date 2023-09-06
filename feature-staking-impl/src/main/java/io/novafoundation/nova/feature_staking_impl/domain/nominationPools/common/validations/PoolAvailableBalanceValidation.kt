@@ -105,7 +105,6 @@ fun <P> handlePoolAvailableBalanceError(
 
     val dialogPayload = CustomDialogDisplayer.Payload(
         title = resourceManager.getString(R.string.common_not_enough_funds_title),
-        customStyle = R.style.BlueDarkOverlay,
         message = resourceManager.getString(
             R.string.staking_pool_available_validation_message,
             availableBalance.formatPlanks(chainAsset),
