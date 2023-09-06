@@ -111,7 +111,7 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
             dialog(requireContext()) {
                 setTitle(action.payload)
 
-                setPositiveButton(R.string.common_close) { _, _  ->
+                setPositiveButton(R.string.common_close) { _, _ ->
                     action.onSuccess(Unit)
                 }
             }

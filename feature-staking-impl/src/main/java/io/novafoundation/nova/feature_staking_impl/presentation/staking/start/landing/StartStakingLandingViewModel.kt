@@ -133,7 +133,6 @@ class StartStakingLandingViewModel(
         closeOnStakingStarted()
     }
 
-
     fun back() {
         router.back()
     }
@@ -169,7 +168,7 @@ class StartStakingLandingViewModel(
         openBrowserEvent.value = Event(appLinksProvider.termsUrl)
     }
 
-    private fun closeOnStakingStarted()  = launch {
+    private fun closeOnStakingStarted() = launch {
         val interactor = startStakingInteractor.first()
         val stakingStartedChain = interactor.observeStatingStarted().first()
 
