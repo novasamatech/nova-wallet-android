@@ -17,7 +17,6 @@ fun nominationPoolsBondMoreValidationFailure(
     flowActions: ValidationFlowActions<NominationPoolsBondMoreValidationPayload>,
 ): TransformedFailure {
     return when (val reason = validationStatus.reason) {
-
         is NotEnoughToBond -> handlePoolAvailableBalanceError(
             error = reason,
             resourceManager = resourceManager,

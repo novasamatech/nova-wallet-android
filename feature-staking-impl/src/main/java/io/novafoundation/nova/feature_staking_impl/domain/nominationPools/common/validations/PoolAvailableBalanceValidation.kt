@@ -35,14 +35,16 @@ class PoolAvailableBalanceValidationFactory(
         amount: (P) -> BigDecimal,
         error: (PoolAvailableBalanceValidation.ValidationError.Context) -> E
     ) {
-        validate(PoolAvailableBalanceValidation(
-            walletConstants = walletConstants,
-            poolsAvailableBalanceResolver = poolsAvailableBalanceResolver,
-            asset = asset,
-            fee = fee,
-            error = error,
-            amount = amount
-        ))
+        validate(
+            PoolAvailableBalanceValidation(
+                walletConstants = walletConstants,
+                poolsAvailableBalanceResolver = poolsAvailableBalanceResolver,
+                asset = asset,
+                fee = fee,
+                error = error,
+                amount = amount
+            )
+        )
     }
 }
 
@@ -98,7 +100,7 @@ fun <P> handlePoolAvailableBalanceError(
     resourceManager: ResourceManager,
     flowActions: ValidationFlowActions<P>,
     modifyPayload: (oldPayload: P, maxAmountToStake: BigDecimal) -> P,
-): TransformedFailure.Custom  = with(error.context){
+): TransformedFailure.Custom = with(error.context) {
     val maximumToStakeAmount = chainAsset.amountFromPlanks(maximumToStake)
 
     val dialogPayload = CustomDialogDisplayer.Payload(

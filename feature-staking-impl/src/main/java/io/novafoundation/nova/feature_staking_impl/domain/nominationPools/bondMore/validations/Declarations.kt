@@ -34,7 +34,6 @@ private fun NominationPoolsBondMoreValidationSystemBuilder.poolIsNotDestroying(f
     )
 }
 
-
 private fun NominationPoolsBondMoreValidationSystemBuilder.enoughAvailableToStakeInPool(factory: PoolAvailableBalanceValidationFactory) {
     factory.enoughAvailableBalanceToStake(
         asset = { it.asset },
