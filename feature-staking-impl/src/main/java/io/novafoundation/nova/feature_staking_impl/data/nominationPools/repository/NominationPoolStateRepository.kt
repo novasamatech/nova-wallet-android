@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
+import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.ledger
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.nominators
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.staking
@@ -11,7 +12,6 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.metadata
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.nominationPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.BondedPool
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMetadata
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.PoolImageDataSource
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -45,6 +45,8 @@ interface NominationPoolStateRepository {
     fun observePoolMetadata(poolId: PoolId, chainId: ChainId): Flow<PoolMetadata?>
 
     suspend fun getPoolMetadatas(poolIds: Set<PoolId>, chainId: ChainId): Map<PoolId, PoolMetadata>
+
+    suspend fun getAnyPoolMetadata(poolId: PoolId, chainId: ChainId): PoolMetadata?
 
     suspend fun getPoolIcon(poolId: PoolId, chainId: ChainId): Icon?
 }
@@ -110,6 +112,12 @@ class RealNominationPoolStateRepository(
                 keys = poolIds.map { it.value },
                 keyTransform = { PoolId(it) }
             ).filterNotNull()
+        }
+    }
+
+    override suspend fun getAnyPoolMetadata(poolId: PoolId, chainId: ChainId): PoolMetadata? {
+        return remoteStorage.query(chainId) {
+            metadata.nominationPools.metadata.query(poolId.value)
         }
     }
 

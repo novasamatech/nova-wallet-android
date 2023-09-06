@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.userRewards
 
+import android.util.Log
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.fullId
@@ -23,6 +25,8 @@ class ParachainStakingUserRewardsInteractor(
     ): Result<*> = withContext(Dispatchers.Default) {
         runCatching {
             stakingRewardsRepository.sync(delegator.accountId, stakingOption, rewardPeriod)
+        }.onFailure {
+            Log.e(this@ParachainStakingUserRewardsInteractor.LOG_TAG, "Failed to sync rewards: $it")
         }
     }
 

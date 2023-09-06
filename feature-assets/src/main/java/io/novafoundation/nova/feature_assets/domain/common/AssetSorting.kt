@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.domain.common
 
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.sumByBigDecimal
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
@@ -10,7 +11,6 @@ import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigDecimal
-import java.math.BigInteger
 
 class AssetGroup(
     val chain: Chain,
@@ -31,7 +31,7 @@ class AssetWithOffChainBalance(
 
 fun groupAndSortAssetsByNetwork(
     assets: List<Asset>,
-    offChainBalancesByFullAssetId: Map<FullChainAssetId, BigInteger>,
+    externalBalances: Map<FullChainAssetId, Balance>,
     chainsById: Map<String, Chain>
 ): Map<AssetGroup, List<AssetWithOffChainBalance>> {
     val assetGroupComparator = compareByDescending(AssetGroup::groupBalanceFiat)
@@ -39,7 +39,7 @@ fun groupAndSortAssetsByNetwork(
         .then(Chain.defaultComparatorFrom(AssetGroup::chain))
 
     return assets
-        .map { asset -> AssetWithOffChainBalance(asset, asset.totalWithOffChain(offChainBalancesByFullAssetId)) }
+        .map { asset -> AssetWithOffChainBalance(asset, asset.totalWithOffChain(externalBalances)) }
         .groupBy { chainsById.getValue(it.asset.token.configuration.chainId) }
         .mapValues { (_, assets) ->
             assets.sortedWith(
@@ -57,9 +57,9 @@ fun groupAndSortAssetsByNetwork(
         }.toSortedMap(assetGroupComparator)
 }
 
-private fun Asset.totalWithOffChain(offChainSource: Map<FullChainAssetId, BigInteger>): AssetWithOffChainBalance.TotalBalance {
+private fun Asset.totalWithOffChain(externalBalances: Map<FullChainAssetId, Balance>): AssetWithOffChainBalance.TotalBalance {
     val onChainTotal = total
-    val offChainTotal = offChainSource[token.configuration.fullId]
+    val offChainTotal = externalBalances[token.configuration.fullId]
         ?.let(token::amountFromPlanks)
         .orZero()
 

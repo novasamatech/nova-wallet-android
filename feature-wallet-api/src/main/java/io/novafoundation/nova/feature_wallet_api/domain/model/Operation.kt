@@ -12,12 +12,12 @@ data class Operation(
     val type: Type,
     val time: Long,
     val chainAsset: Chain.Asset,
+    val extrinsicHash: String?,
 ) {
 
     sealed class Type {
 
         data class Extrinsic(
-            val hash: String,
             val content: Content,
             val fee: BigInteger,
             val fiatFee: BigDecimal?,
@@ -36,12 +36,18 @@ data class Operation(
             val amount: BigInteger,
             val fiatAmount: BigDecimal?,
             val isReward: Boolean,
-            val era: Int,
-            val validator: String?,
-        ) : Type()
+            val kind: RewardKind
+        ) : Type() {
+
+            sealed class RewardKind {
+
+                class Direct(val era: Int, val validator: String?) : RewardKind()
+
+                class Pool(val poolId: Int) : RewardKind()
+            }
+        }
 
         data class Transfer(
-            val hash: String?,
             val myAddress: String,
             val amount: BigInteger,
             val fiatAmount: BigDecimal?,

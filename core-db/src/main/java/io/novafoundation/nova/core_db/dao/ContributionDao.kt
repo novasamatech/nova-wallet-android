@@ -41,4 +41,9 @@ abstract class ContributionDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     protected abstract suspend fun insertContributions(contributions: List<ContributionLocal>)
+
+    @Delete(entity = ContributionLocal::class)
+    abstract suspend fun deleteAssetContributions(params: List<DeleteAssetContributionsParams>)
 }
+
+class DeleteAssetContributionsParams(val chainId: String, val assetId: Int)

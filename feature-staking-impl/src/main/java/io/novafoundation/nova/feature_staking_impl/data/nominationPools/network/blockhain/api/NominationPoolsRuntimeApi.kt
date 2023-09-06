@@ -2,9 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.data.nominationPools.network
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.nominationPools
+import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
+import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolIdRaw
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.BondedPool
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolIdRaw
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMetadata
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.UnbondingPools

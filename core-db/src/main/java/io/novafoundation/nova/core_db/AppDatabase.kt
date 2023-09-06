@@ -10,6 +10,7 @@ import io.novafoundation.nova.core_db.converters.ChainConverters
 import io.novafoundation.nova.core_db.converters.CryptoTypeConverters
 import io.novafoundation.nova.core_db.converters.CurrencyConverters
 import io.novafoundation.nova.core_db.converters.ExternalApiConverters
+import io.novafoundation.nova.core_db.converters.ExternalBalanceTypeConverters
 import io.novafoundation.nova.core_db.converters.LongMathConverters
 import io.novafoundation.nova.core_db.converters.MetaAccountTypeConverters
 import io.novafoundation.nova.core_db.converters.NetworkTypeConverters
@@ -25,6 +26,7 @@ import io.novafoundation.nova.core_db.dao.CoinPriceDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.core_db.dao.CurrencyDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
+import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
 import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.core_db.dao.LockDao
@@ -48,6 +50,8 @@ import io.novafoundation.nova.core_db.migrations.AddContributions_23_24
 import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
 import io.novafoundation.nova.core_db.migrations.AddEnabledColumnToChainAssets_30_31
+import io.novafoundation.nova.core_db.migrations.AddExternalBalances_45_46
+import io.novafoundation.nova.core_db.migrations.AddExternalBalances_46_47
 import io.novafoundation.nova.core_db.migrations.AddExtrinsicContentField_37_38
 import io.novafoundation.nova.core_db.migrations.AddFavouriteDApps_9_10
 import io.novafoundation.nova.core_db.migrations.AddGovernanceDapps_25_26
@@ -93,6 +97,7 @@ import io.novafoundation.nova.core_db.model.CoinPriceLocal
 import io.novafoundation.nova.core_db.model.ContributionLocal
 import io.novafoundation.nova.core_db.model.CurrencyLocal
 import io.novafoundation.nova.core_db.model.DappAuthorizationLocal
+import io.novafoundation.nova.core_db.model.ExternalBalanceLocal
 import io.novafoundation.nova.core_db.model.FavouriteDAppLocal
 import io.novafoundation.nova.core_db.model.GovernanceDAppLocal
 import io.novafoundation.nova.core_db.model.NftLocal
@@ -116,7 +121,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 45,
+    version = 47,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -147,7 +152,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         WalletConnectSessionAccountLocal::class,
         CoinPriceLocal::class,
         StakingDashboardItemLocal::class,
-        StakingRewardPeriodLocal::class
+        StakingRewardPeriodLocal::class,
+        ExternalBalanceLocal::class,
     ],
 )
 @TypeConverters(
@@ -160,7 +166,8 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
     CurrencyConverters::class,
     AssetSourceConverter::class,
     ExternalApiConverters::class,
-    ChainConverters::class
+    ChainConverters::class,
+    ExternalBalanceTypeConverters::class,
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -194,7 +201,8 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddExtrinsicContentField_37_38, AddNodeSelectionStrategyField_38_39)
                     .addMigrations(AddWalletConnectSessions_39_40, TransferFiatAmount_40_41)
                     .addMigrations(AddStakingDashboardItems_41_42, StakingRewardPeriods_42_43)
-                    .addMigrations(AddRewardAccountToStakingDashboard_43_44, AddStakingTypeToTotalRewards_44_45)
+                    .addMigrations(AddRewardAccountToStakingDashboard_43_44, AddStakingTypeToTotalRewards_44_45, AddExternalBalances_45_46)
+                    .addMigrations(AddExternalBalances_46_47)
                     .build()
             }
             return instance!!
@@ -250,4 +258,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun coinPriceDao(): CoinPriceDao
 
     abstract fun stakingRewardPeriodDao(): StakingRewardPeriodDao
+
+    abstract fun externalBalanceDao(): ExternalBalanceDao
 }

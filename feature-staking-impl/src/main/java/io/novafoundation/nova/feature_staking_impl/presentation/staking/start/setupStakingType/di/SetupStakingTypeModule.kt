@@ -10,9 +10,10 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_staking_impl.di.staking.startMultiStaking.MultiStakingSelectionStoreProviderKey
 import io.novafoundation.nova.feature_staking_impl.di.staking.startMultiStaking.StakingTypeEditingStoreProviderKey
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.EditingStakingTypeSelectionMixinFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.CompoundStakingTypeDetailsProvidersFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingTargetSelectionFormatter
@@ -42,11 +43,12 @@ class SetupStakingTypeModule {
     fun provideViewModel(
         stakingRouter: StakingRouter,
         assetUseCase: ArbitraryAssetUseCase,
-        resourceManager: ResourceManager,
         payload: SetupStakingTypePayload,
+        @MultiStakingSelectionStoreProviderKey currentSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
         @StakingTypeEditingStoreProviderKey editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
-        editingStakingTypeSelectionMixinFactory: EditingStakingTypeSelectionMixinFactory,
         editableStakingTypeItemFormatter: EditableStakingTypeItemFormatter,
+        compoundStakingTypeDetailsProvidersFactory: CompoundStakingTypeDetailsProvidersFactory,
+        resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
         setupStakingSharedState: SetupStakingSharedState,
         chainRegistry: ChainRegistry
@@ -54,11 +56,12 @@ class SetupStakingTypeModule {
         return SetupStakingTypeViewModel(
             stakingRouter,
             assetUseCase,
-            resourceManager,
             payload,
+            currentSelectionStoreProvider,
             editableSelectionStoreProvider,
-            editingStakingTypeSelectionMixinFactory,
             editableStakingTypeItemFormatter,
+            compoundStakingTypeDetailsProvidersFactory,
+            resourceManager,
             validationExecutor,
             setupStakingSharedState,
             chainRegistry

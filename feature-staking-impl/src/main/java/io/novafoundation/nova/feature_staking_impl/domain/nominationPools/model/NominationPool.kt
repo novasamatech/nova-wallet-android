@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model
 
 import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.common.utils.images.Icon
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolId
+import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMetadata
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolState
 import jp.co.soramitsu.fearless_utils.runtime.AccountId

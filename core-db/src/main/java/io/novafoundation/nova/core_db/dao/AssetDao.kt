@@ -1,10 +1,10 @@
 package io.novafoundation.nova.core_db.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import io.novafoundation.nova.core_db.model.AssetLocal
 import io.novafoundation.nova.core_db.model.AssetWithToken
 import kotlinx.coroutines.flow.Flow
@@ -84,13 +84,8 @@ abstract class AssetDao : AssetReadOnlyCache {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertAssets(assets: List<AssetLocal>)
 
-    @Query("DELETE FROM assets WHERE chainId = :chainId AND assetId = :assetId")
-    protected abstract suspend fun clearAssets(chainId: String, assetId: Int)
-
-    @Transaction
-    open suspend fun clearAssets(fullAssetIds: List<FullAssetIdLocal>) {
-        fullAssetIds.forEach { (chainId, assetId) ->
-            clearAssets(chainId, assetId)
-        }
-    }
+    @Delete(entity = AssetLocal::class)
+    abstract suspend fun clearAssets(assetIds: List<ClearAssetsParams>)
 }
+
+class ClearAssetsParams(val chainId: String, val assetId: Int)
