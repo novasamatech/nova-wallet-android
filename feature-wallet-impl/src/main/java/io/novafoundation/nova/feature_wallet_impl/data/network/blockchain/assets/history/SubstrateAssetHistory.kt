@@ -102,7 +102,7 @@ abstract class SubstrateAssetHistory(
             pageSize = pageSize,
             cursor = cursor,
             filters = filters,
-            assetType = chainAsset.type
+            asset = chainAsset
         )
 
         val subqueryResponse = subqueryApi.getOperationsHistory(apiUrl, request).data.query
