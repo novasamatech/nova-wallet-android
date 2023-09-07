@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -25,7 +24,6 @@ import kotlinx.android.synthetic.main.fragment_parachain_staking_start_confirm.c
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start_confirm.confirmStartParachainStakingConfirm
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start_confirm.confirmStartParachainStakingContainer
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start_confirm.confirmStartParachainStakingExtrinsicInfo
-import kotlinx.android.synthetic.main.fragment_parachain_staking_start_confirm.confirmStartParachainStakingHints
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start_confirm.confirmStartParachainStakingToolbar
 
 class ConfirmStartParachainStakingFragment : BaseFragment<ConfirmStartParachainStakingViewModel>() {
@@ -74,7 +72,6 @@ class ConfirmStartParachainStakingFragment : BaseFragment<ConfirmStartParachainS
         observeValidations(viewModel)
         setupExternalActions(viewModel)
         setupFeeLoading(viewModel, confirmStartParachainStakingExtrinsicInfo.fee)
-        observeHints(viewModel.hintsMixin, confirmStartParachainStakingHints)
 
         viewModel.title.observe(confirmStartParachainStakingToolbar::setTitle)
         viewModel.showNextProgress.observe(confirmStartParachainStakingConfirm::setProgress)

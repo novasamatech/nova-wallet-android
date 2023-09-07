@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.base.BaseFragmentMixin
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.themed
 import io.novafoundation.nova.common.view.dialog.dialog
 
 class CustomDialogProvider : CustomDialogDisplayer.Presentation {
@@ -26,14 +25,14 @@ fun <V> BaseFragmentMixin<V>.setupCustomDialogDisplayer(
 }
 
 fun BaseFragmentMixin<*>.displayDialogFor(payload: CustomDialogDisplayer.Payload) {
-    val themedContext = payload.customStyle?.let(providedContext::themed) ?: providedContext
-
-    dialog(themedContext) {
+    dialog(providedContext, customStyle = payload.customStyle) {
         setTitle(payload.title)
         setMessage(payload.message)
 
-        setPositiveButton(payload.okAction.title) { _, _ ->
-            payload.okAction.action()
+        payload.okAction?.let { okAction ->
+            setPositiveButton(okAction.title) { _, _ ->
+                okAction.action()
+            }
         }
 
         payload.cancelAction?.let { negativeAction ->

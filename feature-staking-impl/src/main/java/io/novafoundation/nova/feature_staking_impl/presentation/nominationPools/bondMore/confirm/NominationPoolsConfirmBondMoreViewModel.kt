@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.Flow
@@ -49,6 +50,8 @@ class NominationPoolsConfirmBondMoreViewModel(
     ExternalActions by externalActions,
     Validatable by validationExecutor {
 
+    private val decimalFee = mapFeeFromParcel(payload.fee)
+
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: Flow<Boolean> = _showNextProgress
 
@@ -66,7 +69,7 @@ class NominationPoolsConfirmBondMoreViewModel(
         .shareInBackground()
 
     val feeStatusFlow = assetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(payload.fee, asset.token)
+        val feeModel = mapFeeToFeeModel(decimalFee.fee, asset.token)
 
         FeeStatus.Loaded(feeModel)
     }
@@ -96,7 +99,7 @@ class NominationPoolsConfirmBondMoreViewModel(
 
     private fun maybeGoToNext() = launch {
         val payload = NominationPoolsBondMoreValidationPayload(
-            fee = payload.fee,
+            fee = decimalFee,
             amount = payload.amount,
             poolMember = poolMember.first(),
             asset = assetFlow.first()
@@ -105,7 +108,7 @@ class NominationPoolsConfirmBondMoreViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformer = { nominationPoolsBondMoreValidationFailure(it, resourceManager) },
+            validationFailureTransformerCustom = { status, flowActions -> nominationPoolsBondMoreValidationFailure(status, resourceManager, flowActions) },
             progressConsumer = _showNextProgress.progressConsumer(),
             block = ::sendTransaction
         )

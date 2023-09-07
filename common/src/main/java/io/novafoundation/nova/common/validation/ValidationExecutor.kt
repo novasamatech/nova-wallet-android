@@ -21,9 +21,9 @@ sealed class TransformedFailure {
     class Custom(val dialogPayload: CustomDialogDisplayer.Payload) : TransformedFailure()
 }
 
-interface ValidationFlowActions {
+interface ValidationFlowActions<P> {
 
-    fun resumeFlow()
+    fun resumeFlow(modifyPayload: ((P) -> P)? = null)
 }
 
 class ValidationExecutor : Validatable {
@@ -32,7 +32,7 @@ class ValidationExecutor : Validatable {
         validationSystem: ValidationSystem<P, S>,
         payload: P,
         errorDisplayer: (Throwable) -> Unit,
-        validationFailureTransformerCustom: (ValidationStatus.NotValid<S>, ValidationFlowActions) -> TransformedFailure?,
+        validationFailureTransformerCustom: (ValidationStatus.NotValid<S>, ValidationFlowActions<P>) -> TransformedFailure?,
         progressConsumer: ProgressConsumer? = null,
         autoFixPayload: (original: P, failureStatus: S) -> P = { original, _ -> original },
         block: (P) -> Unit,
@@ -82,12 +82,14 @@ class ValidationExecutor : Validatable {
         autoFixPayload: (original: P, failureStatus: S) -> P = { original, _ -> original },
         block: (P) -> Unit,
         notValidStatus: ValidationStatus.NotValid<S>,
-    ) = object : ValidationFlowActions {
+    ) = object : ValidationFlowActions<P> {
 
-        override fun resumeFlow() {
+        override fun resumeFlow(modifyPayload: ((P) -> P)?) {
             progressConsumer?.invoke(true)
 
-            val transformedPayload = autoFixPayload(payload, notValidStatus.reason)
+            val payloadToAutoFix = modifyPayload?.invoke(payload) ?: payload
+            // we do not remove autoFixPayload functionality for backward compatibility, with passing `modifiedPayload` becoming the preferred way
+            val transformedPayload = autoFixPayload(payloadToAutoFix, notValidStatus.reason)
 
             block(transformedPayload)
         }

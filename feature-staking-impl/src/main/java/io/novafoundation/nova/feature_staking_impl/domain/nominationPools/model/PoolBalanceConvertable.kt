@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolPoints
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 interface PoolBalanceConvertable {
 
@@ -32,7 +33,9 @@ fun PoolBalanceConvertable.amountOf(memberPoints: PoolPoints): Balance {
 }
 
 fun PoolBalanceConvertable.pointsOf(amount: Balance): PoolPoints {
-    val pointsRaw = (pointsToBalanceRatio * amount.toBigDecimal()).toBigInteger()
+    val pointsRaw = (pointsToBalanceRatio * amount.toBigDecimal())
+        .setScale(0, RoundingMode.UP)
+        .toBigInteger()
 
     return PoolPoints(pointsRaw)
 }

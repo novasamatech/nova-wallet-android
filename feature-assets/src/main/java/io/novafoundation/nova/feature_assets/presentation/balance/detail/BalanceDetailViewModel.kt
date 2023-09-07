@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mapTokenToTokenModel
+import io.novafoundation.nova.feature_assets.presentation.fullChainAssetId
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
@@ -76,7 +77,7 @@ class BalanceDetailViewModel(
     private val selectedAccountFlow = accountUseCase.selectedMetaAccountFlow()
         .share()
 
-    private val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
+    private val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances(assetPayload.fullChainAssetId)
         .onStart { emit(emptyList()) }
         .shareInBackground()
 

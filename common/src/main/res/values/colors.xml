@@ -9,6 +9,7 @@
 
     <!-- System -->
     <color name="android_system_accent">#1F78FF</color>
+    <color name="default_system_blue_dark">#0A84FF</color>
 
     <!-- Text Colors -->
     <color name="text_primary">#E0FFFFFF</color>
