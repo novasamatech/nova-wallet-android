@@ -43,6 +43,7 @@ data class Chain(
         val defaultTip: BigInteger?,
         val themeColor: String?,
         val stakingWiki: String?,
+        val defaultBlockTimeMillis: Long?,
     )
 
     data class Types(
