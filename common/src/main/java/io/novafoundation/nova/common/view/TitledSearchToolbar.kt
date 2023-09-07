@@ -1,7 +1,6 @@
 package io.novafoundation.nova.common.view
 
 import android.content.Context
-import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.StringRes

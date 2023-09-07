@@ -44,8 +44,6 @@ fun NominationPool.name(): String? {
     return metadata?.title
 }
 
-
 fun NominationPool.nameOrAddress(chain: Chain): String {
     return name() ?: address(chain)
 }
-

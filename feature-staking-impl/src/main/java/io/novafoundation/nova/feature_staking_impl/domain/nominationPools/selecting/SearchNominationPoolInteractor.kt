@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.name
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.nameOrAddress
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.NominationPoolProvider
-import io.novafoundation.nova.runtime.ext.addressOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -44,8 +43,8 @@ class SearchNominationPoolInteractor(
 
             nominationPools
                 .filter {
-                    (it.name()?.lowercase()?.contains(query) ?: false)
-                        || it.address(stakingOption.chain).startsWith(query)
+                    (it.name()?.lowercase()?.contains(query) ?: false) ||
+                        it.address(stakingOption.chain).startsWith(query)
                 }
                 .sortedWith(comparator)
         }
