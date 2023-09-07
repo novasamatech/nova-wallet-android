@@ -40,7 +40,7 @@ fun handleStartMultiStakingValidationFailure(
 
             TransformedFailure.Default(
                 resourceManager.getString(R.string.start_staking_max_nominators_reached_title, stakingTypeLabel) to
-                resourceManager.getString(R.string.start_staking_max_nominators_reached_message)
+                    resourceManager.getString(R.string.start_staking_max_nominators_reached_message)
             )
         }
 
@@ -55,19 +55,19 @@ fun handleStartMultiStakingValidationFailure(
 
             TransformedFailure.Default(
                 resourceManager.getString(R.string.start_staking_cant_stake_amount) to
-                resourceManager.getString(
-                    R.string.start_staking_available_balance_gap_message,
-                    lockDisplay,
-                    currentMaxAvailable,
-                    alternativeMinStake,
-                    lockDisplay
-                )
+                    resourceManager.getString(
+                        R.string.start_staking_available_balance_gap_message,
+                        lockDisplay,
+                        currentMaxAvailable,
+                        alternativeMinStake,
+                        lockDisplay
+                    )
             )
         }
 
         InactivePool -> TransformedFailure.Default(
             resourceManager.getString(R.string.staking_parachain_wont_receive_rewards_title) to
-            resourceManager.getString(R.string.start_staking_inactive_pool_message)
+                resourceManager.getString(R.string.start_staking_inactive_pool_message)
         )
 
         is StartMultiStakingValidationFailure.PoolAvailableBalance -> handlePoolAvailableBalanceError(

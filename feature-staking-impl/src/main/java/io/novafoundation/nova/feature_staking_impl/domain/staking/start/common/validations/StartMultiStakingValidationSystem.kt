@@ -4,12 +4,10 @@ import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
-import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 
 typealias StartMultiStakingValidation = Validation<StartMultiStakingValidationPayload, StartMultiStakingValidationFailure>
 typealias StartMultiStakingValidationSystem = ValidationSystem<StartMultiStakingValidationPayload, StartMultiStakingValidationFailure>
 typealias StartMultiStakingValidationSystemBuilder = ValidationSystemBuilder<StartMultiStakingValidationPayload, StartMultiStakingValidationFailure>
-
 
 fun StartMultiStakingValidationSystemBuilder.positiveBond() {
     positiveAmount(

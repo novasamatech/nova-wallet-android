@@ -16,7 +16,7 @@ fun nominationPoolsBondMoreValidationFailure(
     validationStatus: ValidationStatus.NotValid<NominationPoolsBondMoreValidationFailure>,
     resourceManager: ResourceManager,
     flowActions: ValidationFlowActions<NominationPoolsBondMoreValidationPayload>,
-    updateAmountInUi: (maxAmountToStake: BigDecimal)-> Unit = {}
+    updateAmountInUi: (maxAmountToStake: BigDecimal) -> Unit = {}
 ): TransformedFailure {
     return when (val reason = validationStatus.reason) {
         is NotEnoughToBond -> handlePoolAvailableBalanceError(

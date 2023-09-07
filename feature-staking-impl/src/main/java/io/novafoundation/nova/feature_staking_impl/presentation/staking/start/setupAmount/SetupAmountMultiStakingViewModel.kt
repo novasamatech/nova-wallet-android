@@ -162,7 +162,14 @@ class SetupAmountMultiStakingViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformerCustom = { status, flowActions -> handleStartMultiStakingValidationFailure(status, resourceManager, flowActions, amountChooserMixin::setAmount) },
+            validationFailureTransformerCustom = { status, flowActions ->
+                handleStartMultiStakingValidationFailure(
+                    status,
+                    resourceManager,
+                    flowActions,
+                    amountChooserMixin::setAmount
+                )
+            },
             progressConsumer = loadingInProgressFlow.progressConsumer(),
         ) { newPayload ->
             loadingInProgressFlow.value = false

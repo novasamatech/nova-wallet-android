@@ -94,7 +94,7 @@ fun <P> handlePoolAvailableBalanceError(
     resourceManager: ResourceManager,
     flowActions: ValidationFlowActions<P>,
     modifyPayload: (oldPayload: P, maxAmountToStake: BigDecimal) -> P,
-    updateAmountInUi: (maxAmountToStake: BigDecimal)-> Unit = {}
+    updateAmountInUi: (maxAmountToStake: BigDecimal) -> Unit = {}
 ): TransformedFailure.Custom = with(error.context) {
     val maximumToStakeAmount = chainAsset.amountFromPlanks(maximumToStake)
 

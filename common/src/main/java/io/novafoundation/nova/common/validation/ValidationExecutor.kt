@@ -148,7 +148,7 @@ class ValidationExecutor : Validatable {
     )
 
     context (CoroutineScope)
-        suspend fun <P, S> requireValid(
+    suspend fun <P, S> requireValid(
         validationSystem: ValidationSystem<P, S>,
         payload: P,
         errorDisplayer: (Throwable) -> Unit,
@@ -169,6 +169,5 @@ class ValidationExecutor : Validatable {
 
     override val validationFailureEvent = MutableLiveData<Event<ValidationFailureUi>>()
 }
-
 
 fun TitleAndMessage.asDefault() = TransformedFailure.Default(this)
