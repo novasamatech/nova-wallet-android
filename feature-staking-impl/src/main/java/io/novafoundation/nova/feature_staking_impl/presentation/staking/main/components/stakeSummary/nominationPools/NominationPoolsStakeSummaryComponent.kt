@@ -55,7 +55,7 @@ private class NominationPoolsStakeSummaryComponent(
 
             hostContext.assetFlow.mapLatest { asset ->
                 StakeSummaryModel(
-                    totalStaked = mapAmountToAmountModel(stakeSummary.totalStaked, asset),
+                    totalStaked = mapAmountToAmountModel(stakeSummary.activeStake, asset),
                     status = status
                 )
             }

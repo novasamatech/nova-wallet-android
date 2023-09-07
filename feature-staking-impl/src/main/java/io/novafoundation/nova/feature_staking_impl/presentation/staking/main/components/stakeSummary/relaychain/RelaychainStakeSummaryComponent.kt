@@ -131,7 +131,7 @@ private class RelaychainStakeSummaryComponent(
         domainFlow
     ) { asset, summary ->
         StakeSummaryModel(
-            totalStaked = mapAmountToAmountModel(summary.totalStaked, asset),
+            totalStaked = mapAmountToAmountModel(summary.activeStake, asset),
             status = statusMapper(summary.status),
         )
     }.withLoading()

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
@@ -35,6 +36,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.StashNoneStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -141,6 +143,7 @@ class StakingInteractor(
         scope: CoroutineScope
     ): Flow<StakeSummary<ValidatorStatus>> = observeStakeSummary(validatorState, scope) {
         val status = when {
+            it.activeStake.isZero -> ValidatorStatus.INACTIVE
             isValidatorActive(validatorState.stashId, it.activeEraInfo.exposures) -> ValidatorStatus.ACTIVE
             else -> ValidatorStatus.INACTIVE
         }
@@ -155,6 +158,8 @@ class StakingInteractor(
         val eraStakers = it.activeEraInfo.exposures.values
 
         when {
+            it.activeStake.isZero -> emit(NominatorStatus.Inactive(NominatorStatus.Inactive.Reason.MIN_STAKE))
+
             nominationStatus(nominatorState.stashId, eraStakers, it.rewardedNominatorsPerValidator).isActive -> emit(NominatorStatus.Active)
 
             nominatorState.nominations.isWaiting(it.activeEraInfo.eraIndex) -> {
@@ -294,7 +299,7 @@ class StakingInteractor(
             stakingSharedComputation.activeEraInfo(chainId, scope),
             walletRepository.assetFlow(state.accountId, chainAsset)
         ) { activeEraInfo, asset ->
-            val totalStaked = asset.bondedInPlanks
+            val activeStake = asset.bondedInPlanks
 
             val rewardedNominatorsPerValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
@@ -302,12 +307,13 @@ class StakingInteractor(
                 activeEraInfo,
                 asset,
                 rewardedNominatorsPerValidator,
+                activeStake = activeStake
             )
 
             val summary = flow { statusResolver(statusResolutionContext) }.map { status ->
                 StakeSummary(
                     status = status,
-                    totalStaked = totalStaked
+                    activeStake = activeStake
                 )
             }
 
@@ -348,5 +354,6 @@ class StakingInteractor(
         val activeEraInfo: ActiveEraInfo,
         val asset: Asset,
         val rewardedNominatorsPerValidator: Int,
+        val activeStake: Balance,
     )
 }
