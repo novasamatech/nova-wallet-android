@@ -14,10 +14,7 @@ fun Any?.asGsonParsedNumberOrNull(): BigInteger? = when (this) {
 }
 
 fun Any?.asGsonParsedLongOrNull(): Long? = when (this) {
-    // gson parses integers as double when type is not specified
-    is Double -> toLong()
-    is Long -> this
-    is Int -> toLong()
+    is Number -> toLong()
     is String -> toLongOrNull()
     else -> null
 }

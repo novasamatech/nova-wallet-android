@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.RealMultiStakingSelectionFormatter
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -61,8 +62,8 @@ class StartMultiStakingModule {
 
     @Provides
     @FeatureScope
-    fun provideNominationPoolsAvailableBalanceResolver(): NominationPoolsAvailableBalanceResolver {
-        return RealNominationPoolsAvailableBalanceResolver()
+    fun provideNominationPoolsAvailableBalanceResolver(walletConstants: WalletConstants): NominationPoolsAvailableBalanceResolver {
+        return RealNominationPoolsAvailableBalanceResolver(walletConstants)
     }
 
     @Provides

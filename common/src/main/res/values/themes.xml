@@ -52,6 +52,6 @@
     </style>
 
     <style name="BlueDarkOverlay" parent="ThemeOverlay.AppCompat">
-        <item name="colorPrimary">@color/default_system_blue_dark</item>
+        <item name="colorPrimary">@color/button_text_accent</item>
     </style>
 </resources>
