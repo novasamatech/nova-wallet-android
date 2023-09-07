@@ -26,10 +26,9 @@ class SelectCustomPoolModule {
 
     @Provides
     fun provideSelectNominationPoolInteractor(
-        nominationPoolProvider: NominationPoolProvider,
-        knownNovaPools: KnownNovaPools
+        nominationPoolRecommenderFactory: NominationPoolRecommenderFactory
     ): SelectingNominationPoolInteractor {
-        return SelectingNominationPoolInteractor(nominationPoolProvider, knownNovaPools)
+        return SelectingNominationPoolInteractor(nominationPoolRecommenderFactory)
     }
 
     @Provides
