@@ -5,6 +5,8 @@ import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMetadata
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolState
+import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
 class NominationPool(
@@ -33,3 +35,17 @@ val NominationPool.apy: Perbill?
 
 val NominationPool.Status.isActive: Boolean
     get() = this is NominationPool.Status.Active
+
+fun NominationPool.address(chain: Chain): String {
+    return chain.addressOf(stashAccountId)
+}
+
+fun NominationPool.name(): String? {
+    return metadata?.title
+}
+
+
+fun NominationPool.nameOrAddress(chain: Chain): String {
+    return name() ?: address(chain)
+}
+

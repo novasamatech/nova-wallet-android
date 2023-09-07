@@ -252,4 +252,10 @@
         <attr name="layout_cardBorderColor" format="color" />
         <attr name="layout_cardRadius" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="TitledSearchToolbar">
+        <attr name="titleText" />
+        <attr name="android:hint" />
+    </declare-styleable>
+
 </resources>

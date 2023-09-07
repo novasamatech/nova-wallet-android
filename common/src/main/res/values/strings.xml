@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <!--<string name="delegate_search_placeholder_default">Search result will be displayed here</string>-->
+    <string name="common_search_placeholder_default">Search result will be displayed here</string>
+
+    <string name="search_pool_no_pools_found_placeholder">No pool with entered name or pool ID were found. Make sure you entered correct data</string>
+
     <string name="pool_item_subtitle_apy">%s / year</string>
 
     <string name="select_custom_pool_title">Select pool</string>
@@ -298,7 +304,6 @@
     <string name="staking_alert_rebag_title">Staking improvements</string>
     <string name="staking_alert_rebag_message">Having outdated position in the queue of stake assignment to a validator may suspend your rewards</string>
 
-    <string name="delegate_search_placeholder_default">Search result will be displayed here</string>
     <string name="delegate_search_placeholder_empty">Address format is invalid. Make sure that address belongs to the right network</string>
     <string name="delegate_search_result_count">search results: %d</string>
     <string name="delegate_search_hint">Search by address or name</string>

@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.s
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
-import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectCustomPoolPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.SelectingPoolPayload
 import io.novafoundation.nova.runtime.ext.isDirectStaking
 import io.novafoundation.nova.runtime.ext.isPoolStaking
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -69,11 +69,11 @@ class SetupPoolStakingFlowExecutor(
 ) : SetupStakingTypeFlowExecutor {
 
     override suspend fun execute(coroutineScope: CoroutineScope) {
-        val selectCustomPoolPayload = SelectCustomPoolPayload(
+        val selectingPoolPayload = SelectingPoolPayload(
             chainId,
             assetId,
             stakingType
         )
-        router.openSelectCustomPool(selectCustomPoolPayload)
+        router.openSelectPool(selectingPoolPayload)
     }
 }

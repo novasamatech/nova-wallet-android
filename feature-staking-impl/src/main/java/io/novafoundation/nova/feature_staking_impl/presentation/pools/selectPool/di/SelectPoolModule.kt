@@ -13,40 +13,32 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.NominationPoolProvider
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommenderFactory
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.selecting.SelectingNominationPoolInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.selecting.SearchNominationPoolInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.SetupStakingTypeSelectionMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
-import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectCustomPoolPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectCustomPoolViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.SelectingPoolPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectPoolViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
-class SelectCustomPoolModule {
-
-    @Provides
-    fun provideSelectNominationPoolInteractor(
-        nominationPoolProvider: NominationPoolProvider,
-        knownNovaPools: KnownNovaPools
-    ): SelectingNominationPoolInteractor {
-        return SelectingNominationPoolInteractor(nominationPoolProvider, knownNovaPools)
-    }
+class SelectPoolModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(SelectCustomPoolViewModel::class)
+    @ViewModelKey(SelectPoolViewModel::class)
     fun provideViewModel(
         stakingRouter: StakingRouter,
-        selectNominationPoolInteractor: SelectingNominationPoolInteractor,
+        selectNominationPoolInteractor: SearchNominationPoolInteractor,
         nominationPoolRecommenderFactory: NominationPoolRecommenderFactory,
         setupStakingTypeSelectionMixinFactory: SetupStakingTypeSelectionMixinFactory,
-        payload: SelectCustomPoolPayload,
+        payload: SelectingPoolPayload,
         resourceManager: ResourceManager,
         chainRegistry: ChainRegistry,
         poolDisplayFormatter: PoolDisplayFormatter,
         externalActions: ExternalActions.Presentation
     ): ViewModel {
-        return SelectCustomPoolViewModel(
+        return SelectPoolViewModel(
             stakingRouter,
             nominationPoolRecommenderFactory,
             setupStakingTypeSelectionMixinFactory,
@@ -63,7 +55,7 @@ class SelectCustomPoolModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): SelectCustomPoolViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(SelectCustomPoolViewModel::class.java)
+    ): SelectPoolViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(SelectPoolViewModel::class.java)
     }
 }

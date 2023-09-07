@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation
 
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
-import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectCustomPoolPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.SelectingPoolPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMorePayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.ConfirmSetControllerPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingStoryModel
@@ -83,7 +83,9 @@ interface StakingRouter {
 
     fun openSetupStakingType()
 
-    fun openSelectCustomPool(payload: SelectCustomPoolPayload)
+    fun openSelectPool(payload: SelectingPoolPayload)
+
+    fun openSearchPool(payload: SelectingPoolPayload)
 
     fun finishSetupValidatorsFlow()
 
