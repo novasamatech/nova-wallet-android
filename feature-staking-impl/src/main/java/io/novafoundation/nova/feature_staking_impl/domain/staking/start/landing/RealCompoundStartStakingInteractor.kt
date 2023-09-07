@@ -24,7 +24,7 @@ import java.math.BigInteger
 import io.novafoundation.nova.common.utils.combine as combineList
 
 sealed interface ParticipationInGovernance {
-    class Participate(val minAmount: BigInteger?, val isParticipationInGovernanceHasSmallestMinStake: Boolean) : ParticipationInGovernance
+    class Participate(val minAmount: BigInteger?) : ParticipationInGovernance
     object NotParticipate : ParticipationInGovernance
 }
 
@@ -126,7 +126,7 @@ class RealCompoundStartStakingInteractor(
             participationInGovernanceData.isNotEmpty() -> {
                 val minAmount = participationInGovernanceData.minOf { it.minStake }
                 val isParticipationInGovernanceHasSmallestMinStake = startStakingData.all { it.minStake >= minAmount }
-                ParticipationInGovernance.Participate(minAmount, isParticipationInGovernanceHasSmallestMinStake)
+                ParticipationInGovernance.Participate(minAmount.takeUnless { isParticipationInGovernanceHasSmallestMinStake })
             }
             else -> ParticipationInGovernance.NotParticipate
         }
