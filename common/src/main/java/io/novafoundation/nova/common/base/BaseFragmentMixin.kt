@@ -39,6 +39,12 @@ interface BaseFragmentMixin<T : BaseViewModel> : BaseScreenMixin<T> {
         }
     }
 
+    fun <V> Flow<V>.observeWhenCreated(collector: suspend (V) -> Unit) {
+        fragment.lifecycleScope.launchWhenCreated {
+            collect(collector)
+        }
+    }
+
     fun <V> Flow<V>.observeWhenVisible(collector: suspend (V) -> Unit) {
         fragment.viewLifecycleOwner.lifecycleScope.launchWhenResumed {
             collect(collector)

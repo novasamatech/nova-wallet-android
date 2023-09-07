@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="staking_already_staking_title">You are already have staking in %s</string>
+
     <string name="staking_unable_to_stake_more_title">Unable to stake more</string>
     <string name="staking_unable_to_stake_more_message">You are unstaking all of your tokens and can\'t stake more.</string>
 

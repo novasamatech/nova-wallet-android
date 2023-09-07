@@ -1,16 +1,20 @@
 package io.novafoundation.nova.common.mixin.actionAwaitable
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asFlow
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin.Action
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.mapNotNull
 
 typealias ChooseOneOfManyAwaitable<E> = ActionAwaitableMixin<DynamicListBottomSheet.Payload<E>, E>
 typealias ConfirmationAwaitable<P> = ActionAwaitableMixin.Presentation<P, Unit>
 
 typealias ConfirmOrDenyAwaitable<P> = ActionAwaitableMixin.Presentation<P, Boolean>
 
-typealias ChooseOneOfAwaitableAction<E> = ActionAwaitableMixin.Action<List<E>, E>
-typealias ChooseOneOfManyAwaitableAction<E> = ActionAwaitableMixin.Action<DynamicListBottomSheet.Payload<E>, E>
+typealias ChooseOneOfAwaitableAction<E> = Action<List<E>, E>
+typealias ChooseOneOfManyAwaitableAction<E> = Action<DynamicListBottomSheet.Payload<E>, E>
 
 interface ActionAwaitableMixin<P, R> {
 
@@ -32,6 +36,10 @@ interface ActionAwaitableMixin<P, R> {
         fun <P, R> create(): Presentation<P, R>
     }
 }
+
+val <P, R> ActionAwaitableMixin<P, R>.awaitableActionFlow: Flow<Action<P, R>>
+    get() = awaitableActionLiveData.asFlow()
+        .mapNotNull { it.getContentIfNotHandled() }
 
 fun <T> ActionAwaitableMixin.Factory.selectingOneOf() = create<DynamicListBottomSheet.Payload<T>, T>()
 fun <P> ActionAwaitableMixin.Factory.confirmingAction(): ConfirmationAwaitable<P> = create()
