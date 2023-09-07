@@ -15,7 +15,7 @@ import io.novafoundation.nova.runtime.ext.multiAddressOf
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
-class DirectStakingSelection(
+data class DirectStakingSelection(
     val validators: List<Validator>,
     val validatorsLimit: Int,
     override val stakingOption: StakingOption,
@@ -33,5 +33,9 @@ class DirectStakingSelection(
 
         bond(controllerAddress, stake, RewardDestination.Restake)
         nominate(targets)
+    }
+
+    override fun copyWith(stake: Balance): StartMultiStakingSelection {
+        return copy(stake = stake)
     }
 }

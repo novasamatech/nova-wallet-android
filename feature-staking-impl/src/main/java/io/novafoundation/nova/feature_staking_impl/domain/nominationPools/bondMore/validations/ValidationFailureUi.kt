@@ -10,18 +10,21 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMo
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.validations.NominationPoolsBondMoreValidationFailure.PoolIsDestroying
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.handlePoolAvailableBalanceError
 import io.novafoundation.nova.feature_wallet_api.domain.validation.zeroAmount
+import java.math.BigDecimal
 
 fun nominationPoolsBondMoreValidationFailure(
     validationStatus: ValidationStatus.NotValid<NominationPoolsBondMoreValidationFailure>,
     resourceManager: ResourceManager,
     flowActions: ValidationFlowActions<NominationPoolsBondMoreValidationPayload>,
+    updateAmountInUi: (maxAmountToStake: BigDecimal)-> Unit = {}
 ): TransformedFailure {
     return when (val reason = validationStatus.reason) {
         is NotEnoughToBond -> handlePoolAvailableBalanceError(
             error = reason,
             resourceManager = resourceManager,
             flowActions = flowActions,
-            modifyPayload = { oldPayload, maxAmountToStake -> oldPayload.copy(amount = maxAmountToStake) }
+            modifyPayload = { oldPayload, maxAmountToStake -> oldPayload.copy(amount = maxAmountToStake) },
+            updateAmountInUi = updateAmountInUi
         )
 
         NotPositiveAmount -> TransformedFailure.Default(resourceManager.zeroAmount())

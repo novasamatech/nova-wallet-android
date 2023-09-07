@@ -10,19 +10,6 @@ typealias StartMultiStakingValidation = Validation<StartMultiStakingValidationPa
 typealias StartMultiStakingValidationSystem = ValidationSystem<StartMultiStakingValidationPayload, StartMultiStakingValidationFailure>
 typealias StartMultiStakingValidationSystemBuilder = ValidationSystemBuilder<StartMultiStakingValidationPayload, StartMultiStakingValidationFailure>
 
-fun StartMultiStakingValidationSystemBuilder.enoughToPayFee() {
-    sufficientBalance(
-        fee = { it.fee.decimalAmount },
-        available = { it.asset.transferable },
-        error = { payload, availableToPayFees ->
-            StartMultiStakingValidationFailure.NotEnoughToPayFees(
-                chainAsset = payload.asset.token.configuration,
-                availableToPayFees = availableToPayFees,
-                fee = payload.fee.decimalAmount
-            )
-        }
-    )
-}
 
 fun StartMultiStakingValidationSystemBuilder.positiveBond() {
     positiveAmount(

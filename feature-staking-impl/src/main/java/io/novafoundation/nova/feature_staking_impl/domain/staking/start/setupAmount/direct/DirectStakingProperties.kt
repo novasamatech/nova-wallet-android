@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settin
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationSystemBuilder
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.enoughToPayFee
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.amountOf
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.positiveBond
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingProperties
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingPropertiesFactory
@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.maximumNom
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.minimumBondValidation
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 
@@ -59,6 +60,10 @@ private class DirectStakingProperties(
         return asset.freeInPlanks
     }
 
+    override suspend fun maximumToStake(asset: Asset, fee: Balance): Balance {
+        return availableBalance(asset) - fee
+    }
+
     override val recommendation: SingleStakingRecommendation = DirectStakingRecommendation(
         validatorRecommendatorFactory = validatorRecommendatorFactory,
         recommendationSettingsProviderFactory = recommendationSettingsProviderFactory,
@@ -69,11 +74,11 @@ private class DirectStakingProperties(
     override val validationSystem: StartMultiStakingValidationSystem = ValidationSystem {
         maximumNominatorsReached()
 
-        enoughToPayFee()
+        positiveBond()
 
         enoughForMinimumStake()
 
-        positiveBond()
+        enoughAvailableToStake()
     }
 
     override suspend fun minStake(): Balance {
@@ -96,6 +101,21 @@ private class DirectStakingProperties(
             stakingRepository = stakingRepository,
             chainId = { stakingOption.chain.id },
             errorProducer = { StartMultiStakingValidationFailure.MaxNominatorsReached(stakingType) }
+        )
+    }
+
+    private fun StartMultiStakingValidationSystemBuilder.enoughAvailableToStake() {
+        sufficientBalance(
+            fee = { it.fee.decimalAmount },
+            available = { it.amountOf(availableBalance(it.asset)) },
+            amount = { it.amountOf(it.selection.stake) },
+            error = { payload, availableToPayFees ->
+                StartMultiStakingValidationFailure.NotEnoughToPayFees(
+                    chainAsset = payload.asset.token.configuration,
+                    availableToPayFees = availableToPayFees,
+                    fee = payload.fee.decimalAmount
+                )
+            }
         )
     }
 }

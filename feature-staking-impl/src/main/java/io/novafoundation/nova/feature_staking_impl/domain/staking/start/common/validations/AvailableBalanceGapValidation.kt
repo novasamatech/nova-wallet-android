@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingProperties
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import java.math.BigDecimal
 
 class AvailableBalanceGapValidation(
     private val candidates: List<SingleStakingProperties>,
@@ -17,33 +18,35 @@ class AvailableBalanceGapValidation(
     override suspend fun validate(value: StartMultiStakingValidationPayload): ValidationStatus<StartMultiStakingValidationFailure> {
         val amount = value.selection.stake
         val stakingOption = value.selection.stakingOption
+        val fee = value.fee.fee.amount
 
-        val availableBalancesWithMinStakes = candidates.map {
-            val availableBalance = it.availableBalance(value.asset) - value.fee.fee.amount
+        val maxToStakeWithMinStakes = candidates.map {
+            val maximumToStake = it.maximumToStake(value.asset, fee)
 
-            availableBalance to it.minStake()
+            maximumToStake to it.minStake()
         }
 
         // check against global maximum
-        val maxAvailable = availableBalancesWithMinStakes.maxOf { (availableBalance) -> availableBalance }
-        if (amount > maxAvailable) {
-            return validationError(StartMultiStakingValidationFailure.NotEnoughAvailableToStake)
+        val globalMaxToStake = maxToStakeWithMinStakes.maxOf { (maxToStake) -> maxToStake }
+        if (globalMaxToStake == BigDecimal.ZERO || amount > globalMaxToStake) {
+            return leaveForFurtherValidations()
         }
 
         // check against currently selected maximum
         val selectedCandidate = candidates.first { it.stakingType == stakingOption.stakingType }
-        val selectedCandidateAvailableBalance = selectedCandidate.availableBalance(value.asset)
-        if (amount > selectedCandidateAvailableBalance) {
+        val selectedCandidateMaxToStakeBalance = selectedCandidate.maximumToStake(value.asset, fee)
+
+        if (amount > selectedCandidateMaxToStakeBalance) {
             val biggestLock = locksRepository.getBiggestLock(stakingOption.chain, stakingOption.asset)
-                // we fallback to simpler error in case we haven't found any locks
-                ?: return validationError(StartMultiStakingValidationFailure.NotEnoughAvailableToStake)
+                // in case no locks we found we let type-specific validations handle it
+                ?: return leaveForFurtherValidations()
 
             // we're sure such item exists due to global maximum check before
-            val (_, matchingAlternativeMinStake) = availableBalancesWithMinStakes.first { (available, _) -> amount <= available }
+            val (_, matchingAlternativeMinStake) = maxToStakeWithMinStakes.first { (maxToSTake, _) -> amount <= maxToSTake }
 
             return validationError(
                 StartMultiStakingValidationFailure.AvailableBalanceGap(
-                    currentMaxAvailable = selectedCandidateAvailableBalance,
+                    currentMaxAvailable = selectedCandidateMaxToStakeBalance,
                     alternativeMinStake = matchingAlternativeMinStake,
                     chainAsset = stakingOption.asset,
                     biggestLockId = biggestLock.id
@@ -51,6 +54,10 @@ class AvailableBalanceGapValidation(
             )
         }
 
+        return valid()
+    }
+
+    private fun leaveForFurtherValidations(): ValidationStatus<StartMultiStakingValidationFailure> {
         return valid()
     }
 }

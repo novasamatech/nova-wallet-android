@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.reposito
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolAvailableBalanceValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolStateValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 
 @Module
 class NominationPoolsValidationsModule {
@@ -21,7 +20,6 @@ class NominationPoolsValidationsModule {
     @Provides
     @FeatureScope
     fun providePoolAvailableBalanceValidationFactory(
-        walletConstants: WalletConstants,
         poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
-    ) = PoolAvailableBalanceValidationFactory(walletConstants, poolsAvailableBalanceResolver)
+    ) = PoolAvailableBalanceValidationFactory(poolsAvailableBalanceResolver)
 }

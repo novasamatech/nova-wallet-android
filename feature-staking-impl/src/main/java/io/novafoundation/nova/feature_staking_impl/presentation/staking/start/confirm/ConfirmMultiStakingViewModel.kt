@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.components
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StartMultiStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.copyWith
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.currentSelectionFlow
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationPayload
@@ -36,6 +37,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 
 class ConfirmMultiStakingViewModel(
     private val router: StartMultiStakingRouter,
@@ -44,8 +46,8 @@ class ConfirmMultiStakingViewModel(
     private val validationExecutor: ValidationExecutor,
     private val externalActions: ExternalActions.Presentation,
     private val confirmMultiStakingTypeFactory: ConfirmMultiStakingTypeFactory,
+    private val selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
     payload: ConfirmMultiStakingPayload,
-    selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
     selectionTypeProviderFactory: MultiStakingSelectionTypeProviderFactory,
     assetUseCase: ArbitraryAssetUseCase,
     walletUiUseCase: WalletUiUseCase,
@@ -127,11 +129,11 @@ class ConfirmMultiStakingViewModel(
     }
 
     private fun maybeGoToNext() = launch {
-        val selection = currentSelectionFlow.first().selection
-        val validationSystem = multiStakingSelectionTypeFlow.first().validationSystem(selection)
+        val recommendableSelection = currentSelectionFlow.first()
+        val validationSystem = multiStakingSelectionTypeFlow.first().validationSystem(recommendableSelection.selection)
 
         val payload = StartMultiStakingValidationPayload(
-            selection = selection,
+            recommendableSelection = recommendableSelection,
             asset = assetFlow.first(),
             fee = decimalFee
         )
@@ -139,7 +141,9 @@ class ConfirmMultiStakingViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformer = { handleStartMultiStakingValidationFailure(it, resourceManager) },
+            validationFailureTransformerCustom = { status, flowActions ->
+                handleStartMultiStakingValidationFailure(status, resourceManager, flowActions, ::updateAmount)
+            },
             progressConsumer = _showNextProgress.progressConsumer(),
             block = ::sendTransaction
         )
@@ -159,5 +163,12 @@ class ConfirmMultiStakingViewModel(
 
     private fun finishFlow() {
         router.returnToStakingDashboard()
+    }
+
+    private fun updateAmount(newAmount: BigDecimal) = launch {
+        val currentSelection = currentSelectionFlow.first()
+        val newSelection = currentSelection.copyWith(newAmount)
+
+        selectionStoreProvider.getSelectionStore(viewModelScope).updateSelection(newSelection)
     }
 }
