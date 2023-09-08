@@ -9,6 +9,7 @@ import io.novafoundation.nova.core_db.model.AssetLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.runtime.ext.enabledAssets
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -68,7 +69,7 @@ class AssetCache(
         builder: (Chain.Asset) -> AssetLocal
     ): CollectionDiffer.Diff<AssetLocal> = withContext(Dispatchers.IO) {
         val oldAssetsLocal = getAssetsInChain(metaAccount.id, chain.id)
-        val newAssetsLocal = chain.assets.map { builder(it) }
+        val newAssetsLocal = chain.enabledAssets().map { builder(it) }
         val diff = CollectionDiffer.findDiff(newAssetsLocal, oldAssetsLocal, forceUseNewItems = false)
         assetDao.insertAssets(diff.newOrUpdated)
         diff
