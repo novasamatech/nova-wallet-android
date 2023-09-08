@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.unbondings
 
+import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
@@ -13,8 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.constru
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.from
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combineTransform
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
@@ -38,15 +38,14 @@ class RealNominationPoolUnbondingsInteractor(
         sharedComputationScope: CoroutineScope,
     ): Flow<Unbondings> {
         val chainId = stakingOption.assetWithChain.chain.id
-        return combineTransform(
+        return combineToPair(
             stakingSharedComputation.activeEraFlow(chainId, sharedComputationScope),
             nominationPoolSharedComputation.unbondingPoolsFlow(poolMember.poolId, chainId, sharedComputationScope),
-        ) { activeEraIndex, unbondingPools ->
-            val unbondingsFlow = unbondingPools.unbondingsFor(poolMember, activeEraIndex, stakingOption, sharedComputationScope)
-                .map { Unbondings.from(it, rebondPossible = false) }
-
-            emitAll(unbondingsFlow)
-        }
+        )
+            .flatMapLatest { (activeEraIndex, unbondingPools) ->
+                unbondingPools.unbondingsFor(poolMember, activeEraIndex, stakingOption, sharedComputationScope)
+            }
+            .map { Unbondings.from(it, rebondPossible = false) }
     }
 
     private fun UnbondingPools?.unbondingsFor(
