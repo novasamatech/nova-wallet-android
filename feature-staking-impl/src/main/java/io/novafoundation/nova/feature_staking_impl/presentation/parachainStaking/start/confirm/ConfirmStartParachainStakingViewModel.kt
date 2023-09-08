@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.collators.collatorAddressModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.mapCollatorToDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.StartParachainStakingMode
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.hints.ConfirmStartParachainStakingHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.startParachainStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
@@ -64,6 +65,7 @@ class ConfirmStartParachainStakingViewModel(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     walletUiUseCase: WalletUiUseCase,
     private val payload: ConfirmStartParachainStakingPayload,
+    hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor,
@@ -73,6 +75,11 @@ class ConfirmStartParachainStakingViewModel(
     // Take state only once since subscribing to it might cause switch to Delegator state while waiting for tx confirmation
     private val delegatorStateFlow = flowOf { delegatorStateUseCase.currentDelegatorState() }
         .shareInBackground()
+
+    val hintsMixin = hintsMixinFactory.create(
+        coroutineScope = this,
+        delegatorStateFlow = delegatorStateFlow
+    )
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
