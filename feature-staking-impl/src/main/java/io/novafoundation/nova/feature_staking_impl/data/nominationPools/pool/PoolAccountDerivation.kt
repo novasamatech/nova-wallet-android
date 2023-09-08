@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.Filter
-import io.novafoundation.nova.common.utils.constant
-import io.novafoundation.nova.common.utils.nominationPools
+import io.novafoundation.nova.common.utils.constantOrNull
+import io.novafoundation.nova.common.utils.nominationPoolsOrNull
 import io.novafoundation.nova.common.utils.startsWith
 import io.novafoundation.nova.common.utils.toByteArray
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
@@ -23,14 +23,14 @@ class RealPoolAccountDerivation(
 ) : PoolAccountDerivation {
 
     override suspend fun derivePoolAccount(poolId: PoolId, derivationType: PoolAccountType, chainId: ChainId): AccountId {
-        val commonPrefix = poolAccountPrefix(derivationType, chainId)
+        val commonPrefix = requirePoolAccountPrefix(derivationType, chainId)
         val poolIdBytes = uint32.toByteArray(poolId.value.toInt().toUInt())
 
         return (commonPrefix + poolIdBytes).truncateToAccountId()
     }
 
     override suspend fun derivePoolAccountsRange(numberOfPools: Int, derivationType: PoolAccountType, chainId: ChainId): Map<PoolId, AccountIdKey> {
-        val commonPrefix = poolAccountPrefix(derivationType, chainId)
+        val commonPrefix = requirePoolAccountPrefix(derivationType, chainId)
 
         return (1..numberOfPools).associateBy(
             keySelector = { PoolId(it.toBigInteger()) },
@@ -42,17 +42,17 @@ class RealPoolAccountDerivation(
         )
     }
 
-    override suspend fun poolAccountFilter(derivationType: PoolAccountType, chainId: ChainId): Filter<AccountId> {
-        val poolAccountPrefix = poolAccountPrefix(derivationType, chainId)
+    override suspend fun poolAccountFilter(derivationType: PoolAccountType, chainId: ChainId): Filter<AccountId>? {
+        val poolAccountPrefix = poolAccountPrefix(derivationType, chainId) ?: return null
 
         return IsPoolAccountFilter(poolAccountPrefix)
     }
 
     private fun ByteArray.truncateToAccountId(): AccountId = copyOf(newSize = 32)
 
-    private suspend fun palletId(chainId: ChainId): ByteArray {
+    private suspend fun palletId(chainId: ChainId): ByteArray? {
         return localDataSource.query(chainId) {
-            metadata.nominationPools().constant("PalletId").value
+            metadata.nominationPoolsOrNull()?.constantOrNull("PalletId")?.value
         }
     }
 
@@ -62,9 +62,13 @@ class RealPoolAccountDerivation(
             PoolAccountType.REWARD -> 1
         }
 
-    private suspend fun poolAccountPrefix(derivationType: PoolAccountType, chainId: ChainId): ByteArray {
+    private suspend fun requirePoolAccountPrefix(derivationType: PoolAccountType, chainId: ChainId): ByteArray {
+        return requireNotNull(poolAccountPrefix(derivationType, chainId))
+    }
+
+    private suspend fun poolAccountPrefix(derivationType: PoolAccountType, chainId: ChainId): ByteArray? {
         val prefixBytes = PREFIX.encodeToByteArray()
-        val palletId = palletId(chainId)
+        val palletId = palletId(chainId) ?: return null
         val derivationTypeIndex = derivationType.derivationIndex
 
         return prefixBytes + palletId + derivationTypeIndex
