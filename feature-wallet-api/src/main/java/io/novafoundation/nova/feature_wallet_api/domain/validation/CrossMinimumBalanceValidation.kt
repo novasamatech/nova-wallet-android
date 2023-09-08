@@ -1,10 +1,13 @@
 package io.novafoundation.nova.feature_wallet_api.domain.validation
 
-import io.novafoundation.nova.common.base.TitleAndMessage
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
+import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.DialogAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.isZero
+import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.Validation
+import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.validOrWarning
 import io.novafoundation.nova.feature_wallet_api.R
@@ -58,10 +61,25 @@ interface CrossMinimumBalanceValidationFailure {
     val errorContext: ErrorContext
 }
 
-fun CrossMinimumBalanceValidationFailure.formatWith(resourceManager: ResourceManager): TitleAndMessage = with(errorContext) {
+fun <P> CrossMinimumBalanceValidationFailure.handleWith(
+    resourceManager: ResourceManager,
+    flowActions: ValidationFlowActions<P>,
+    modifyPayload: (old: P, newAmount: BigDecimal) -> P,
+): TransformedFailure.Custom = with(errorContext) {
     val balanceAfterDeductionFormatted = balanceAfterDeduction.formatTokenAmount(chainAsset)
     val minimumBalanceFormatted = minimumBalance.formatTokenAmount(chainAsset)
 
-    return resourceManager.getString(R.string.staking_unbond_crossed_existential_title) to
-        resourceManager.getString(R.string.staking_unbond_crossed_existential, minimumBalanceFormatted, balanceAfterDeductionFormatted)
+    val dialogPayload = CustomDialogDisplayer.Payload(
+        title = resourceManager.getString(R.string.staking_unbond_crossed_existential_title),
+        message = resourceManager.getString(R.string.staking_unbond_crossed_existential, minimumBalanceFormatted, balanceAfterDeductionFormatted),
+        okAction = DialogAction(
+            title = resourceManager.getString(R.string.staking_unstake_all),
+            action = {
+                flowActions.resumeFlow { modifyPayload(it, wholeAmount) }
+            }
+        ),
+        cancelAction = DialogAction.noOp(resourceManager.getString(R.string.common_cancel))
+    )
+
+    return TransformedFailure.Custom(dialogPayload)
 }

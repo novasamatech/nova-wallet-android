@@ -214,6 +214,8 @@ fun RuntimeMetadata.preImage() = module(Modules.PREIMAGE)
 
 fun RuntimeMetadata.nominationPools() = module(Modules.NOMINATION_POOLS)
 
+fun RuntimeMetadata.nominationPoolsOrNull() = moduleOrNull(Modules.NOMINATION_POOLS)
+
 fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
 }

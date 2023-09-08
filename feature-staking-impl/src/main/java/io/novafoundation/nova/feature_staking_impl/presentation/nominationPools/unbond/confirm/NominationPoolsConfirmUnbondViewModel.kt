@@ -113,7 +113,7 @@ class NominationPoolsConfirmUnbondViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformer = { nominationPoolsUnbondValidationFailure(it, resourceManager) },
+            validationFailureTransformerCustom = { status, flowActions -> nominationPoolsUnbondValidationFailure(status, flowActions, resourceManager) },
             progressConsumer = _showNextProgress.progressConsumer(),
             block = ::sendTransaction
         )

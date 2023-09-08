@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.nominationPoolsUnbondValidationFailure
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.nominationPoolsUnbondValidationPayloadAutoFix
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.confirm.NominationPoolsConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.hints.NominationPoolsUnbondHintsFactory
@@ -119,8 +118,7 @@ class NominationPoolsSetupUnbondViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformer = { nominationPoolsUnbondValidationFailure(it, resourceManager) },
-            autoFixPayload = ::nominationPoolsUnbondValidationPayloadAutoFix,
+            validationFailureTransformerCustom = { status, flowActions -> nominationPoolsUnbondValidationFailure(status, flowActions, resourceManager) },
             progressConsumer = showNextProgress.progressConsumer()
         ) { updatedPayload ->
             showNextProgress.value = false

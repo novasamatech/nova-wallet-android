@@ -20,10 +20,10 @@ interface PoolAccountDerivation {
      */
     suspend fun derivePoolAccountsRange(numberOfPools: Int, derivationType: PoolAccountType, chainId: ChainId): Map<PoolId, AccountIdKey>
 
-    suspend fun poolAccountFilter(derivationType: PoolAccountType, chainId: ChainId): Filter<AccountId>
+    suspend fun poolAccountFilter(derivationType: PoolAccountType, chainId: ChainId): Filter<AccountId>?
 }
 
-suspend fun PoolAccountDerivation.poolRewardAccountFilter(chainId: ChainId): Filter<AccountId> {
+suspend fun PoolAccountDerivation.poolRewardAccountFilter(chainId: ChainId): Filter<AccountId>? {
     return poolAccountFilter(PoolAccountDerivation.PoolAccountType.REWARD, chainId)
 }
 

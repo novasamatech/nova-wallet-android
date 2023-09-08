@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbon
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationFailure.TooLowRemainingBond
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationPayload
 import io.novafoundation.nova.feature_wallet_api.domain.validation.notSufficientBalanceToPayFeeErrorMessage
-import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmountErrorMessage
+import io.novafoundation.nova.feature_wallet_api.domain.validation.zeroAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 
 fun parachainStakingUnbondValidationFailure(
@@ -36,7 +36,7 @@ fun parachainStakingUnbondValidationFailure(
             }
         }
 
-        NotPositiveAmount -> resourceManager.positiveAmountErrorMessage()
+        NotPositiveAmount -> resourceManager.zeroAmount()
 
         AlreadyHasDelegationRequestToCollator -> {
             resourceManager.getString(R.string.staking_parachain_unbond_already_exists_title) to

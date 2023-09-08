@@ -21,12 +21,14 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.di.StartParachainStakingModule
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.ConfirmStartParachainStakingViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.hints.ConfirmStartParachainStakingHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
-@Module(includes = [ViewModelModule::class])
+@Module(includes = [ViewModelModule::class, StartParachainStakingModule::class])
 class ConfirmStartParachainStakingModule {
 
     @Provides
@@ -48,6 +50,7 @@ class ConfirmStartParachainStakingModule {
         selectedAssetState: StakingSharedState,
         walletUiUseCase: WalletUiUseCase,
         payload: ConfirmStartParachainStakingPayload,
+        hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
         delegatorStateUseCase: DelegatorStateUseCase
     ): ViewModel {
         return ConfirmStartParachainStakingViewModel(
@@ -64,6 +67,7 @@ class ConfirmStartParachainStakingModule {
             assetUseCase = assetUseCase,
             walletUiUseCase = walletUiUseCase,
             payload = payload,
+            hintsMixinFactory = hintsMixinFactory,
             collatorsUseCase = collatorsUseCase,
             delegatorStateUseCase = delegatorStateUseCase,
             startStakingRouter = startStakingRouter

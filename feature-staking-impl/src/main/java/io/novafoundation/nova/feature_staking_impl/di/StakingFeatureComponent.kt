@@ -42,7 +42,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.di.ParachainStakingRebondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.redeem.di.ParachainStakingRedeemComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.di.ConfirmStartParachainStakingComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.di.StartParachainStakingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.di.SetupStartParachainStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.di.ParachainStakingUnbondConfirmComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.setup.di.ParachainStakingUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.confirm.di.YieldBoostConfirmComponent
@@ -171,7 +171,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     // parachain staking
 
-    fun startParachainStakingFactory(): StartParachainStakingComponent.Factory
+    fun startParachainStakingFactory(): SetupStartParachainStakingComponent.Factory
 
     fun confirmStartParachainStakingFactory(): ConfirmStartParachainStakingComponent.Factory
 
