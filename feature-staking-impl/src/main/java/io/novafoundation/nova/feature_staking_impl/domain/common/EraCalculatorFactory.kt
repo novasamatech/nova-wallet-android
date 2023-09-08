@@ -148,7 +148,7 @@ class EraTimeCalculatorFactory(
         val difference = (newTimestamp - previousTimestamp).absoluteValue
         val canIgnore = difference < ERA_DURATION_DIFFERENCE_THRESHOLD
 
-        Log.d("EraTimeCalculatorFactory", "New update for RewardCalculator, difference with lastly used is ${difference}, can ignore: $canIgnore")
+        Log.d("EraTimeCalculatorFactory", "New update for RewardCalculator, difference with lastly used is $difference, can ignore: $canIgnore")
 
         return canIgnore
     }
