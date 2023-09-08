@@ -3,12 +3,10 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.selec
 import io.novafoundation.nova.common.utils.orFalse
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.isOpen
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.getPoolComparator
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.NominationPool
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.address
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.isActive
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.name
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.nameOrAddress
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.NominationPoolProvider
