@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.model.request
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.and
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.anyOf
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.not
+import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
@@ -74,18 +75,18 @@ class SubqueryHistoryRequest(
     private fun Set<TransactionFilter>.toQueryFilter(asset: Asset): String {
         val additionalFilters = not(isIgnoredExtrinsic(asset.type))
 
-        val filtersExpressions = map { it.filterExpression(asset) }
+        val filtersExpressions = mapNotNull { it.filterExpression(asset) }
         val userFilters = anyOf(filtersExpressions)
 
         return userFilters and additionalFilters
     }
 
-    private fun TransactionFilter.filterExpression(asset: Asset): String {
+    private fun TransactionFilter.filterExpression(asset: Asset): String? {
         return when (this) {
             TransactionFilter.TRANSFER -> transfersFilter(asset.type)
             TransactionFilter.REWARD -> rewardsFilter(asset)
             TransactionFilter.EXTRINSIC -> hasExtrinsic()
-        }
+        }.nullIfEmpty()
     }
 
     private fun transferResponseSection(assetType: Asset.Type): String {
