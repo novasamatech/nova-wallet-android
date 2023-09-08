@@ -32,6 +32,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorToCollatorParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators.mapCollatorToSelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators.mapSelectedCollatorToSelectCollatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.hints.ConfirmStartParachainStakingHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.ChooseCollatorResponse
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
@@ -72,6 +73,7 @@ class StartParachainStakingViewModel(
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val collatorsUseCase: CollatorsUseCase,
     private val payload: StartParachainStakingPayload,
+    hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
     Retriable,
@@ -85,6 +87,8 @@ class StartParachainStakingViewModel(
 
     private val currentDelegatorStateFlow = delegatorStateUseCase.currentDelegatorStateFlow()
         .shareInBackground()
+
+    val hintsMixin = hintsMixinFactory.create(coroutineScope = this, payload.flowMode)
 
     private val stakeableAmount = combine(assetFlow, currentDelegatorStateFlow) { asset, currentDelegator ->
         currentDelegator.stakeablePlanks(asset.freeInPlanks)

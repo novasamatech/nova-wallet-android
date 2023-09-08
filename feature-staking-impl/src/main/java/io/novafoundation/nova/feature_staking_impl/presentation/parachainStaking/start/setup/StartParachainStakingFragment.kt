@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -24,6 +25,7 @@ import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startPara
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingCollator
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingContainer
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingFee
+import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingHints
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingMinStake
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingNext
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingRewards
@@ -74,6 +76,7 @@ class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewMode
         setupAmountChooser(viewModel.amountChooserMixin, startParachainStakingAmountField)
         setupParachainStakingRewardsComponent(viewModel.rewardsComponent, startParachainStakingRewards)
         setupFeeLoading(viewModel, startParachainStakingFee)
+        observeHints(viewModel.hintsMixin, startParachainStakingHints)
 
         viewModel.title.observe(startParachainStakingToolbar::setTitle)
 

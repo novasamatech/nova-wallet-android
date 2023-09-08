@@ -76,10 +76,7 @@ class ConfirmStartParachainStakingViewModel(
     private val delegatorStateFlow = flowOf { delegatorStateUseCase.currentDelegatorState() }
         .shareInBackground()
 
-    val hintsMixin = hintsMixinFactory.create(
-        coroutineScope = this,
-        delegatorStateFlow = delegatorStateFlow
-    )
+    val hintsMixin = hintsMixinFactory.create(coroutineScope = this, payload.flowMode)
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
