@@ -303,7 +303,7 @@ class StartStakingLandingViewModel(
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_manual).formatAsSpannable(time)
             }
             payoutTypes.containsManualAndAutomatic() -> {
-                val automaticPayoutFormattedAmount = payouts.automaticPayoutMinAmount?.formatPlanks(asset.token.configuration) ?: ""
+                val automaticPayoutFormattedAmount = payouts.automaticPayoutMinAmount?.formatPlanks(asset.token.configuration).orEmpty()
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_automatic_and_manual)
                     .formatAsSpannable(time, automaticPayoutFormattedAmount)
             }

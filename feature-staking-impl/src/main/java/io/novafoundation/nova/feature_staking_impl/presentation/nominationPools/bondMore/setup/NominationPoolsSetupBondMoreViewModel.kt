@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
@@ -108,7 +109,9 @@ class NominationPoolsSetupBondMoreViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformerCustom = { status, flowActions -> nominationPoolsBondMoreValidationFailure(status, resourceManager, flowActions) },
+            validationFailureTransformerCustom = { status, flowActions ->
+                nominationPoolsBondMoreValidationFailure(status, resourceManager, flowActions, amountChooserMixin::setAmount)
+            },
             progressConsumer = showNextProgress.progressConsumer()
         ) { updatedPayload ->
             showNextProgress.value = false

@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.commo
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.DialogAction
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationFlowActions
@@ -13,7 +12,6 @@ import io.novafoundation.nova.common.validation.isTrueOrWarning
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
@@ -24,7 +22,6 @@ import jp.co.soramitsu.fearless_utils.hash.isPositive
 import java.math.BigDecimal
 
 class PoolAvailableBalanceValidationFactory(
-    private val walletConstants: WalletConstants,
     private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
 ) {
 
@@ -37,7 +34,6 @@ class PoolAvailableBalanceValidationFactory(
     ) {
         validate(
             PoolAvailableBalanceValidation(
-                walletConstants = walletConstants,
                 poolsAvailableBalanceResolver = poolsAvailableBalanceResolver,
                 asset = asset,
                 fee = fee,
@@ -49,7 +45,6 @@ class PoolAvailableBalanceValidationFactory(
 }
 
 class PoolAvailableBalanceValidation<P, E>(
-    private val walletConstants: WalletConstants,
     private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
     private val asset: (P) -> Asset,
     private val fee: (P) -> Balance,
@@ -74,20 +69,19 @@ class PoolAvailableBalanceValidation<P, E>(
         val asset = asset(value)
         val chainAsset = asset.token.configuration
 
-        val existentialDeposit = walletConstants.existentialDeposit(chainAsset.chainId)
         val fee = fee(value)
         val availableBalance = poolsAvailableBalanceResolver.availableBalanceToStartStaking(asset)
+        val maxToStake = poolsAvailableBalanceResolver.maximumBalanceToStake(asset, fee)
         val enteredAmount = chainAsset.planksFromAmount(amount(value))
 
-        val maximumToStake = availableBalance - existentialDeposit - fee
-        val hasEnoughToStake = enteredAmount <= maximumToStake
+        val hasEnoughToStake = enteredAmount <= maxToStake.maxToStake
 
         return hasEnoughToStake isTrueOrWarning {
             val errorContext = ValidationError.Context(
                 availableBalance = availableBalance,
-                minimumBalance = existentialDeposit,
+                minimumBalance = maxToStake.existentialDeposit,
                 fee = fee,
-                maximumToStake = maximumToStake.atLeastZero(),
+                maximumToStake = maxToStake.maxToStake,
                 chainAsset = chainAsset
             )
             error(errorContext)
@@ -100,6 +94,7 @@ fun <P> handlePoolAvailableBalanceError(
     resourceManager: ResourceManager,
     flowActions: ValidationFlowActions<P>,
     modifyPayload: (oldPayload: P, maxAmountToStake: BigDecimal) -> P,
+    updateAmountInUi: (maxAmountToStake: BigDecimal) -> Unit = {}
 ): TransformedFailure.Custom = with(error.context) {
     val maximumToStakeAmount = chainAsset.amountFromPlanks(maximumToStake)
 
@@ -116,9 +111,9 @@ fun <P> handlePoolAvailableBalanceError(
             DialogAction(
                 title = resourceManager.getString(R.string.staking_stake_max),
                 action = {
-                    flowActions.resumeFlow { oldPayload ->
-                        modifyPayload(oldPayload, maximumToStakeAmount)
-                    }
+                    updateAmountInUi(maximumToStakeAmount)
+
+                    flowActions.revalidate { oldPayload -> modifyPayload(oldPayload, maximumToStakeAmount) }
                 }
             )
         } else {

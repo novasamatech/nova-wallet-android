@@ -86,6 +86,7 @@ open class BaseViewModel : ViewModel(), CoroutineScope, WithCoroutineScopeExtens
         validationFailureTransformerCustom = validationFailureTransformerCustom,
         progressConsumer = progressConsumer,
         autoFixPayload = autoFixPayload,
-        block = block
+        block = block,
+        scope = viewModelScope
     )
 }

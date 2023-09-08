@@ -68,6 +68,10 @@ fun <T> Flow<T>.withLoading(): Flow<LoadingState<T>> {
         .onStart { emit(LoadingState.Loading()) }
 }
 
+fun <T> MutableStateFlow<T>.setter(): (T) -> Unit {
+    return { value = it }
+}
+
 fun <T> Flow<T>.withItemScope(parentScope: CoroutineScope): Flow<Pair<T, CoroutineScope>> {
     var currentScope: CoroutineScope? = null
 

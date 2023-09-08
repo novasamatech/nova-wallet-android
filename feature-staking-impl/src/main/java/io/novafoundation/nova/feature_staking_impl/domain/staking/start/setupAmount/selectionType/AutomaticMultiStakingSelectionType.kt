@@ -25,12 +25,13 @@ class AutomaticMultiStakingSelectionType(
             .validationSystem
 
         return ValidationSystem {
-            candidateValidationSystem.copyIntoCurrent()
-
+            // should always go before `candidateValidationSystem` since it delegates some cases to type-specific validations
             availableBalanceGapValidation(
                 candidates = candidates,
                 locksRepository = locksRepository
             )
+
+            candidateValidationSystem.copyIntoCurrent()
         }
     }
 

@@ -6,7 +6,9 @@ import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.mixin.api.ValidationFailureUi
 import io.novafoundation.nova.common.utils.Event
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
 typealias ProgressConsumer = (Boolean) -> Unit
 
@@ -24,6 +26,8 @@ sealed class TransformedFailure {
 interface ValidationFlowActions<P> {
 
     fun resumeFlow(modifyPayload: ((P) -> P)? = null)
+
+    fun revalidate(modifyPayload: ((P) -> P)? = null)
 }
 
 class ValidationExecutor : Validatable {
@@ -35,6 +39,7 @@ class ValidationExecutor : Validatable {
         validationFailureTransformerCustom: (ValidationStatus.NotValid<S>, ValidationFlowActions<P>) -> TransformedFailure?,
         progressConsumer: ProgressConsumer? = null,
         autoFixPayload: (original: P, failureStatus: S) -> P = { original, _ -> original },
+        scope: CoroutineScope,
         block: (P) -> Unit,
     ) {
         progressConsumer?.invoke(true)
@@ -50,7 +55,26 @@ class ValidationExecutor : Validatable {
                 onInvalid = {
                     progressConsumer?.invoke(false)
 
-                    val validationFlowActions = createFlowActions(payload, progressConsumer, autoFixPayload, block, it)
+                    val validationFlowActions = createFlowActions(
+                        payload = payload,
+                        autoFixPayload = autoFixPayload,
+                        notValidStatus = it,
+                        revalidate = { newPayload ->
+                            scope.launch {
+                                requireValid(
+                                    validationSystem = validationSystem,
+                                    payload = newPayload,
+                                    errorDisplayer = errorDisplayer,
+                                    validationFailureTransformerCustom = validationFailureTransformerCustom,
+                                    progressConsumer = progressConsumer,
+                                    autoFixPayload = autoFixPayload,
+                                    block = block,
+                                    scope = scope
+                                )
+                            }
+                        },
+                        successBlock = block
+                    )
 
                     val eventPayload = when (val transformedFailure = validationFailureTransformerCustom(it, validationFlowActions)) {
                         is TransformedFailure.Custom -> ValidationFailureUi.Custom(transformedFailure.dialogPayload)
@@ -80,21 +104,50 @@ class ValidationExecutor : Validatable {
         payload: P,
         progressConsumer: ProgressConsumer? = null,
         autoFixPayload: (original: P, failureStatus: S) -> P = { original, _ -> original },
-        block: (P) -> Unit,
         notValidStatus: ValidationStatus.NotValid<S>,
+        revalidate: (newPayload: P) -> Unit,
+        successBlock: (newPayload: P) -> Unit,
     ) = object : ValidationFlowActions<P> {
 
         override fun resumeFlow(modifyPayload: ((P) -> P)?) {
             progressConsumer?.invoke(true)
+            successBlock(transformPayload(modifyPayload))
+        }
 
+        override fun revalidate(modifyPayload: ((P) -> P)?) {
+            progressConsumer?.invoke(true)
+            revalidate(transformPayload(modifyPayload))
+        }
+
+        private fun transformPayload(modifyPayload: ((P) -> P)?): P {
             val payloadToAutoFix = modifyPayload?.invoke(payload) ?: payload
-            // we do not remove autoFixPayload functionality for backward compatibility, with passing `modifiedPayload` becoming the preferred way
-            val transformedPayload = autoFixPayload(payloadToAutoFix, notValidStatus.reason)
 
-            block(transformedPayload)
+            // we do not remove autoFixPayload functionality for backward compatibility, with passing `modifiedPayload` becoming the preferred way
+            return autoFixPayload(payloadToAutoFix, notValidStatus.reason)
         }
     }
 
+    suspend fun <P, S> requireValid(
+        validationSystem: ValidationSystem<P, S>,
+        payload: P,
+        errorDisplayer: (Throwable) -> Unit,
+        validationFailureTransformerDefault: (S) -> TitleAndMessage,
+        autoFixPayload: (original: P, failureStatus: S) -> P = { original, _ -> original },
+        progressConsumer: ProgressConsumer? = null,
+        scope: CoroutineScope,
+        block: (P) -> Unit,
+    ) = requireValid(
+        validationSystem = validationSystem,
+        payload = payload,
+        errorDisplayer = errorDisplayer,
+        validationFailureTransformerCustom = { it, _ -> TransformedFailure.Default(validationFailureTransformerDefault(it.reason)) },
+        progressConsumer = progressConsumer,
+        autoFixPayload = autoFixPayload,
+        block = block,
+        scope = scope
+    )
+
+    context (CoroutineScope)
     suspend fun <P, S> requireValid(
         validationSystem: ValidationSystem<P, S>,
         payload: P,
@@ -110,8 +163,11 @@ class ValidationExecutor : Validatable {
         validationFailureTransformerCustom = { it, _ -> TransformedFailure.Default(validationFailureTransformerDefault(it.reason)) },
         progressConsumer = progressConsumer,
         autoFixPayload = autoFixPayload,
-        block = block
+        block = block,
+        scope = this@CoroutineScope
     )
 
     override val validationFailureEvent = MutableLiveData<Event<ValidationFailureUi>>()
 }
+
+fun TitleAndMessage.asDefault() = TransformedFailure.Default(this)

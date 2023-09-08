@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.se
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWithV2
@@ -52,7 +53,7 @@ class SetupAmountMultiStakingViewModel(
     multiStakingSelectionTypeProviderFactory: MultiStakingSelectionTypeProviderFactory,
     assetUseCase: ArbitraryAssetUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
-    selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
+    private val selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
     private val payload: SetupAmountMultiStakingPayload,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory
 ) : BaseViewModel(),
@@ -148,12 +149,12 @@ class SetupAmountMultiStakingViewModel(
     }
 
     fun continueClicked() = launch {
-        val currentSelection = currentSelectionFlow.first()?.selection ?: return@launch
+        val recommendableSelection = currentSelectionFlow.first() ?: return@launch
         loadingInProgressFlow.value = true
 
-        val validationSystem = multiStakingSelectionTypeFlow.first().validationSystem(currentSelection)
+        val validationSystem = multiStakingSelectionTypeFlow.first().validationSystem(recommendableSelection.selection)
         val payload = StartMultiStakingValidationPayload(
-            selection = currentSelection,
+            recommendableSelection = recommendableSelection,
             asset = currentAssetFlow.first(),
             fee = feeLoaderMixin.awaitDecimalFee()
         )
@@ -161,16 +162,26 @@ class SetupAmountMultiStakingViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformer = { handleStartMultiStakingValidationFailure(it, resourceManager) },
+            validationFailureTransformerCustom = { status, flowActions ->
+                handleStartMultiStakingValidationFailure(
+                    status,
+                    resourceManager,
+                    flowActions,
+                    amountChooserMixin::setAmount
+                )
+            },
             progressConsumer = loadingInProgressFlow.progressConsumer(),
-        ) {
+        ) { newPayload ->
             loadingInProgressFlow.value = false
 
-            openConfirm(it)
+            openConfirm(newPayload)
         }
     }
 
-    private fun openConfirm(validPayload: StartMultiStakingValidationPayload) {
+    private fun openConfirm(validPayload: StartMultiStakingValidationPayload) = launch {
+        // payload might've been updated during validations so we should store it again
+        selectionStoreProvider.getSelectionStore(viewModelScope).updateSelection(validPayload.recommendableSelection)
+
         val confirmPayload = ConfirmMultiStakingPayload(mapFeeToParcel(validPayload.fee), payload.availableStakingOptions)
 
         router.openConfirm(confirmPayload)
