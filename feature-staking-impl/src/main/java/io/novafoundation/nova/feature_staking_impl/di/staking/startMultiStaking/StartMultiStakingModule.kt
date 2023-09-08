@@ -221,8 +221,13 @@ class StartMultiStakingModule {
     @FeatureScope
     fun provideSelectNominationPoolInteractor(
         nominationPoolProvider: NominationPoolProvider,
-        knownNovaPools: KnownNovaPools
+        knownNovaPools: KnownNovaPools,
+        nominationPoolRecommenderFactory: NominationPoolRecommenderFactory
     ): SearchNominationPoolInteractor {
-        return SearchNominationPoolInteractor(nominationPoolProvider, knownNovaPools)
+        return SearchNominationPoolInteractor(
+            nominationPoolProvider,
+            knownNovaPools,
+            nominationPoolRecommenderFactory
+        )
     }
 }

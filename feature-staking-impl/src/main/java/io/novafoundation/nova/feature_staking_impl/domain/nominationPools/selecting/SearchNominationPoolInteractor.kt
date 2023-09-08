@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.selecting
 
+import io.novafoundation.nova.common.utils.orFalse
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.isOpen
@@ -11,21 +12,20 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.name
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.nameOrAddress
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.NominationPoolProvider
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommenderFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class SearchNominationPoolInteractor(
     private val nominationPoolProvider: NominationPoolProvider,
-    private val knownNovaPools: KnownNovaPools
+    private val knownNovaPools: KnownNovaPools,
+    private val nominationPoolRecommenderFactory: NominationPoolRecommenderFactory
 ) {
 
     suspend fun getSortedNominationPools(stakingOption: StakingOption, coroutineScope: CoroutineScope): List<NominationPool> {
-        val nominationPools = nominationPoolProvider.getNominationPools(stakingOption, coroutineScope)
-        val comparator = getPoolComparator(knownNovaPools, stakingOption.chain)
-        return nominationPools
-            .filter { it.state.isOpen && it.status.isActive }
-            .sortedWith(comparator)
+        return nominationPoolRecommenderFactory.create(stakingOption, coroutineScope)
+            .recommendations
     }
 
     suspend fun searchNominationPools(
@@ -43,8 +43,9 @@ class SearchNominationPoolInteractor(
 
             nominationPools
                 .filter {
-                    (it.name()?.lowercase()?.contains(query) ?: false) ||
-                        it.address(stakingOption.chain).startsWith(query)
+                    val name = it.name()?.lowercase()
+                    val address = it.address(stakingOption.chain)
+                    name?.contains(query).orFalse() || address.startsWith(query)
                 }
                 .sortedWith(comparator)
         }
