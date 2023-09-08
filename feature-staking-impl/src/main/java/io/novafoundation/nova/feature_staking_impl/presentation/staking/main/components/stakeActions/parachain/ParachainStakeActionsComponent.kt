@@ -119,6 +119,7 @@ internal open class ParachainStakeActionsComponent(
             payload = ParachainStakingUnbondPreliminaryValidationPayload,
             errorDisplayer = hostContext.errorDisplayer,
             validationFailureTransformerDefault = { unbondPreliminaryValidationFailure(it, resourceManager) },
+            scope = hostContext.scope
         ) {
             router.openUnbond()
         }
