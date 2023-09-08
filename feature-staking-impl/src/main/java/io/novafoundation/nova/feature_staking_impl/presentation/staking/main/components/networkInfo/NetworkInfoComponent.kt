@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 typealias NetworkInfoComponent = StatefullComponent<NetworkInfoState, NetworkInfoEvent, NetworkInfoAction>
 
 data class NetworkInfoState(
+    val title: String,
     val actions: List<NetworkInfoItem>,
     val expanded: Boolean,
 )

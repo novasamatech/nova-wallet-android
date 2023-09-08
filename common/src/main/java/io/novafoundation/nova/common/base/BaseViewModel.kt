@@ -69,7 +69,8 @@ open class BaseViewModel : ViewModel(), CoroutineScope, WithCoroutineScopeExtens
         validationFailureTransformerDefault = validationFailureTransformer,
         progressConsumer = progressConsumer,
         autoFixPayload = autoFixPayload,
-        block = block
+        block = block,
+        scope = viewModelScope
     )
 
     suspend fun <P, S> ValidationExecutor.requireValid(

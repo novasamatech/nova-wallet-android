@@ -4,6 +4,7 @@ import android.util.Log
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.networkInfo.NominationPoolsNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
@@ -37,7 +38,7 @@ private class NominationPoolsNetworkInfoComponent(
 
     private val hostContext: ComponentHostContext,
     private val stakingOption: StakingOption,
-) : BaseNetworkInfoComponent(resourceManager, hostContext.scope) {
+) : BaseNetworkInfoComponent(resourceManager, hostContext.scope, titleRes = R.string.nomination_pools_info) {
 
     init {
         updateContentState()

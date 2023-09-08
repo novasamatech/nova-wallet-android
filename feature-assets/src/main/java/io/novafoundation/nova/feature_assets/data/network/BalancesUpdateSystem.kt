@@ -37,7 +37,6 @@ class BalancesUpdateSystem(
     override fun start(): Flow<Updater.SideEffect> {
         return accountUpdateScope.invalidationFlow().flatMapLatest { metaAccount ->
             chainRegistry.currentChains.transformLatestDiffed { chain ->
-                Log.d("RX", "Starting balances updates for ${chain.name}")
                 val updater = balanceChainUpdaters(chain, metaAccount)
                 emitAll(updater)
             }

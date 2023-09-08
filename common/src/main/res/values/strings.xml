@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="staking_info">Staking info</string>
+    <string name="nomination_pools_info">Pool staking info</string>
+<!--    <string name="staking_about">About staking</string>-->
+
     <string name="staking_already_staking_title">You are already have staking in %s</string>
 
     <string name="staking_unable_to_stake_more_title">Unable to stake more</string>
@@ -1326,7 +1330,6 @@
     <string name="settings_youtube">Youtube</string>
     <string name="sr25519_selection_subtitle">sr25519 (recommended)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
-    <string name="staking_about">About staking</string>
     <string name="staking_account_is_used_as_controller">Selected account is already in use as controller</string>
     <string name="staking_add_controller">Add controller account %s to the application to perform this action.</string>
     <string name="staking_alert_change_validators">Change your validators.</string>

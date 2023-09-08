@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.common
 
+import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
@@ -9,9 +10,11 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.Ele
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import java.math.BigInteger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
 class EraTimeCalculator(
     private val startTimeStamp: BigInteger,
@@ -29,8 +32,9 @@ class EraTimeCalculator(
     fun calculate(destinationEra: EraIndex? = null): BigInteger {
         val eraRemained = remainingEraBlocks()
 
+        // EraTimeCalculator was initialized based on values known at startTimeStamp.
+        // We need to adjust timers in case this instance is used for a long period of time
         val finishTimeStamp = System.currentTimeMillis().toBigInteger()
-        // Doing math takes very long time. By finishing all requests and calculations the time will be outdated for ~5 seconds
         val deltaTime = finishTimeStamp - startTimeStamp
 
         return if (destinationEra != null) {
@@ -60,16 +64,29 @@ class EraTimeCalculator(
         return tillEraStart - sessionDuration
     }
 
-    private fun BigInteger.toDuration() = toLong().milliseconds
+    /**
+     * Returns a number that can be used to compare different instances of [EraTimeCalculator]
+     * to determine how much their calculations would deffer between each other
+     * This wont correspond to real timestamp and shouldn't be used as such
+     */
+    fun derivedTimestamp(): Duration {
+        val derivedProgressInBlocks = activeEra * eraLength * sessionLength + eraProgress()
 
-    private fun remainingEraBlocks(): BlockNumber {
+        return (derivedProgressInBlocks * blockCreationTime).toDuration()
+    }
+
+    private fun eraProgress(): BlockNumber {
         val epochStartSlot = currentEpochIndex * sessionLength + genesisSlot
         val sessionProgress = currentSlot - epochStartSlot
 
-        val eraProgress = (currentSessionIndex - eraStartSessionIndex) * sessionLength + sessionProgress
-
-        return eraLength * sessionLength - eraProgress
+        return (currentSessionIndex - eraStartSessionIndex) * sessionLength + sessionProgress
     }
+
+    private fun remainingEraBlocks(): BlockNumber {
+        return eraLength * sessionLength - eraProgress()
+    }
+
+    private fun BigInteger.toDuration() = toLong().milliseconds
 }
 
 fun EraTimeCalculator.erasDuration(numberOfEras: BigInteger): Duration {
@@ -79,6 +96,8 @@ fun EraTimeCalculator.erasDuration(numberOfEras: BigInteger): Duration {
 fun EraTimeCalculator.calculateDurationTill(era: EraIndex): Duration {
     return calculate(era).toLong().milliseconds
 }
+
+private val ERA_DURATION_DIFFERENCE_THRESHOLD = 10.minutes
 
 class EraTimeCalculatorFactory(
     private val stakingRepository: StakingRepository,
@@ -119,5 +138,18 @@ class EraTimeCalculatorFactory(
                 activeEra = activeEra
             )
         }
+            .distinctUntilChanged { old, new -> new.canBeIgnoredAfter(old) }
+    }
+
+    private fun EraTimeCalculator.canBeIgnoredAfter(previous: EraTimeCalculator): Boolean {
+        val previousTimestamp = previous.derivedTimestamp()
+        val newTimestamp = derivedTimestamp()
+
+        val difference = (newTimestamp - previousTimestamp).absoluteValue
+        val canIgnore = difference < ERA_DURATION_DIFFERENCE_THRESHOLD
+
+        Log.d("EraTimeCalculatorFactory", "New update for RewardCalculator, difference with lastly used is $difference, can ignore: $canIgnore")
+
+        return canIgnore
     }
 }

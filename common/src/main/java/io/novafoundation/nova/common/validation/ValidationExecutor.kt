@@ -147,26 +147,6 @@ class ValidationExecutor : Validatable {
         scope = scope
     )
 
-    context (CoroutineScope)
-    suspend fun <P, S> requireValid(
-        validationSystem: ValidationSystem<P, S>,
-        payload: P,
-        errorDisplayer: (Throwable) -> Unit,
-        validationFailureTransformerDefault: (S) -> TitleAndMessage,
-        autoFixPayload: (original: P, failureStatus: S) -> P = { original, _ -> original },
-        progressConsumer: ProgressConsumer? = null,
-        block: (P) -> Unit,
-    ) = requireValid(
-        validationSystem = validationSystem,
-        payload = payload,
-        errorDisplayer = errorDisplayer,
-        validationFailureTransformerCustom = { it, _ -> TransformedFailure.Default(validationFailureTransformerDefault(it.reason)) },
-        progressConsumer = progressConsumer,
-        autoFixPayload = autoFixPayload,
-        block = block,
-        scope = this@CoroutineScope
-    )
-
     override val validationFailureEvent = MutableLiveData<Event<ValidationFailureUi>>()
 }
 
