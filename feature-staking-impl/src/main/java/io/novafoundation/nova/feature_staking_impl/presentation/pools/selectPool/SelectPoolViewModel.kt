@@ -76,6 +76,15 @@ class SelectPoolViewModel(
         router.back()
     }
 
+    fun poolInfoClicked(poolItem: PoolRvItem) {
+        launch {
+            externalActions.showExternalActions(
+                ExternalActions.Type.Address(poolItem.address),
+                stakingOption().chain
+            )
+        }
+    }
+
     fun poolClicked(poolItem: PoolRvItem) {
         launch {
             val pool = getPoolById(poolItem.id) ?: return@launch

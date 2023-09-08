@@ -208,6 +208,11 @@ class RelayStakingNavigator(
     }
 
     override fun finishSetupPoolFlow() {
-        performNavigation(R.id.action_searchPool_to_setupAmountMultiStakingFragment)
+        performNavigation(
+            cases = arrayOf(
+                R.id.searchPoolFragment to R.id.action_searchPool_to_setupAmountMultiStakingFragment,
+                R.id.selectPoolFragment to R.id.action_selectPool_to_setupAmountMultiStakingFragment,
+            )
+        )
     }
 }

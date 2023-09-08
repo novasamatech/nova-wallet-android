@@ -98,7 +98,7 @@ class SearchPoolFragment : BaseFragment<SearchPoolViewModel>(), PoolAdapter.Item
     }
 
     override fun poolInfoClicked(poolItem: PoolRvItem) {
-        viewModel.poolClicked(poolItem)
+        viewModel.poolInfoClicked(poolItem)
     }
 
     override fun poolClicked(poolItem: PoolRvItem) {
