@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.common
 
+import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
-import io.novafoundation.nova.common.utils.divideToDecimal
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import java.math.BigInteger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
 class EraTimeCalculator(
     private val startTimeStamp: BigInteger,
@@ -68,10 +69,10 @@ class EraTimeCalculator(
      * to determine how much their calculations would deffer between each other
      * This wont correspond to real timestamp and shouldn't be used as such
      */
-    fun derivedTimestamp(): BigInteger {
+    fun derivedTimestamp(): Duration {
         val derivedProgressInBlocks = activeEra * eraLength * sessionLength + eraProgress()
 
-        return derivedProgressInBlocks * blockCreationTime
+        return (derivedProgressInBlocks * blockCreationTime).toDuration()
     }
 
     private fun eraProgress(): BlockNumber {
@@ -96,7 +97,7 @@ fun EraTimeCalculator.calculateDurationTill(era: EraIndex): Duration {
     return calculate(era).toLong().milliseconds
 }
 
-private const val ERA_DURATION_DIFFERENCE_THRESHOLD = 0.01
+private val ERA_DURATION_DIFFERENCE_THRESHOLD = 10.minutes
 
 class EraTimeCalculatorFactory(
     private val stakingRepository: StakingRepository,
@@ -104,8 +105,6 @@ class EraTimeCalculatorFactory(
     private val chainStateRepository: ChainStateRepository,
     private val electionsSessionRegistry: ElectionsSessionRegistry,
 ) {
-
-    private val durationCoercionRange = (1.0 - ERA_DURATION_DIFFERENCE_THRESHOLD)..(1.0 + ERA_DURATION_DIFFERENCE_THRESHOLD)
 
     suspend fun create(
         stakingOption: StakingOption,
@@ -143,8 +142,14 @@ class EraTimeCalculatorFactory(
     }
 
     private fun EraTimeCalculator.canBeIgnoredAfter(previous: EraTimeCalculator): Boolean {
-        val ratio = derivedTimestamp().divideToDecimal(previous.derivedTimestamp())
+        val previousTimestamp = previous.derivedTimestamp()
+        val newTimestamp = derivedTimestamp()
 
-        return ratio.toDouble() in durationCoercionRange
+        val difference = (newTimestamp - previousTimestamp).absoluteValue
+        val canIgnore = difference < ERA_DURATION_DIFFERENCE_THRESHOLD
+
+        Log.d("EraTimeCalculatorFactory", "New update for RewardCalculator, difference with lastly used is ${difference}, can ignore: $canIgnore")
+
+        return canIgnore
     }
 }
