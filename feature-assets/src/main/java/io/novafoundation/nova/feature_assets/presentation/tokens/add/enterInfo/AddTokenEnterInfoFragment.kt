@@ -20,12 +20,14 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoAddressInput
+import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoAddressLabel
 import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoContainer
 import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoDecimalsInput
 import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoPriceConfirm
 import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoPriceInput
 import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoScrollArea
 import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoSymbolInput
+import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoTitle
 import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoToolbar
 
 class AddTokenEnterInfoFragment : BaseFragment<AddTokenEnterInfoViewModel>() {
@@ -83,6 +85,10 @@ class AddTokenEnterInfoFragment : BaseFragment<AddTokenEnterInfoViewModel>() {
         observeValidations(viewModel)
         val scope = viewLifecycleOwner.lifecycleScope
 
+        viewModel.titleResId.observe(addTokenEnterInfoTitle::setText)
+        viewModel.tokenIdTitleResId.observe(addTokenEnterInfoAddressLabel::setText)
+        viewModel.tokenIdHintResId.observe(addTokenEnterInfoAddressInput::setHint)
+        viewModel.tokenIdInputType.observe(addTokenEnterInfoAddressInput::setInputType)
         addTokenEnterInfoAddressInput.bindTo(viewModel.contractAddressInput, scope)
         addTokenEnterInfoSymbolInput.bindTo(viewModel.symbolInput, scope)
         addTokenEnterInfoDecimalsInput.bindTo(viewModel.decimalsInput, scope)

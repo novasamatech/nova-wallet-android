@@ -12,8 +12,11 @@ import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRep
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import javax.inject.Named
 
 @Module
 class AddTokenModule {
@@ -36,7 +39,8 @@ class AddTokenModule {
         ethereumAddressFormat: EthereumAddressFormat,
         currencyRepository: CurrencyRepository,
         walletRepository: WalletRepository,
-        coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory
+        coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory,
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorage: StorageDataSource
     ): AddTokensInteractor {
         return RealAddTokensInteractor(
             chainRegistry,
@@ -46,7 +50,8 @@ class AddTokenModule {
             ethereumAddressFormat,
             currencyRepository,
             walletRepository,
-            coinGeckoLinkValidationFactory
+            coinGeckoLinkValidationFactory,
+            remoteStorage
         )
     }
 }

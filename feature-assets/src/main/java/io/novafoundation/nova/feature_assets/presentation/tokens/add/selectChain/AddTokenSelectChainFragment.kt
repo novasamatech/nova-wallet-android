@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -22,8 +23,23 @@ class AddTokenSelectChainFragment :
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    private val chainsAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        SelectChainAdapter(imageLoader, this)
+    private val erc20TokensTitleAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        SelectChainGroupAdapter(R.string.assets_add_token_select_erc20_chain_title)
+    }
+    private val erc20TokensAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        SelectChainAdapter(imageLoader, this, isEthereumBased = true)
+    }
+    private val substrateTokensTitleAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        SelectChainGroupAdapter(R.string.assets_add_token_select_substrate_chain_title)
+    }
+    private val substrateTokensAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        SelectChainAdapter(imageLoader, this, isEthereumBased = false)
+    }
+    private val selectChainAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        ConcatAdapter(
+            erc20TokensTitleAdapter, erc20TokensAdapter,
+            substrateTokensTitleAdapter, substrateTokensAdapter
+        )
     }
 
     override fun onCreateView(
@@ -36,9 +52,10 @@ class AddTokenSelectChainFragment :
 
     override fun initViews() {
         addTokenSelectChainToolbar.applyStatusBarInsets()
+        addTokenSelectChainToolbar.setTitle(R.string.assets_add_token_select_chain_title)
 
         addTokenSelectChainChains.setHasFixedSize(true)
-        addTokenSelectChainChains.adapter = chainsAdapter
+        addTokenSelectChainChains.adapter = selectChainAdapter
 
         addTokenSelectChainToolbar.setHomeButtonListener { viewModel.backClicked() }
     }
@@ -51,10 +68,11 @@ class AddTokenSelectChainFragment :
     }
 
     override fun subscribe(viewModel: AddTokenSelectChainViewModel) {
-        viewModel.availableChainModels.observe(chainsAdapter::submitList)
+        viewModel.availableEthereumChainModels.observe(erc20TokensAdapter::submitList)
+        viewModel.availableSubstrateChainModels.observe(substrateTokensAdapter::submitList)
     }
 
-    override fun itemClicked(position: Int) {
-        viewModel.chainClicked(position)
+    override fun itemClicked(position: Int, isEthereumBased: Boolean) {
+        viewModel.chainClicked(position, isEthereumBased)
     }
 }

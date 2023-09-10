@@ -24,6 +24,9 @@ abstract class ChainAssetDao {
     @Query("SELECT * FROM chain_assets WHERE id = :id AND chainId = :chainId")
     abstract suspend fun getAsset(id: Int, chainId: String): ChainAssetLocal?
 
+    @Query("SELECT * FROM chain_assets WHERE chainId = :chainId")
+    abstract suspend fun getAssets(chainId: String): List<ChainAssetLocal>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertAsset(asset: ChainAssetLocal)
 

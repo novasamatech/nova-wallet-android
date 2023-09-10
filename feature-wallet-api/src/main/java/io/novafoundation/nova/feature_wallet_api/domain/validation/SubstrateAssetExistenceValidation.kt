@@ -6,23 +6,22 @@ import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
-import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.chainAssetIdOfErc20Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 
-class EvmAssetExistenceValidation<P, E>(
+class SubstrateAssetExistenceValidation<P, E>(
     private val assetRepository: ChainAssetRepository,
     private val chain: (P) -> Chain,
-    private val contractAddress: (P) -> String,
+    private val tokenId: (P) -> String,
     private val assetNotExistError: AssetNotExistError<E>,
     private val addressMappingError: (P) -> E,
 ) : Validation<P, E> {
 
     override suspend fun validate(value: P): ValidationStatus<E> {
         return try {
-            val assetId = chainAssetIdOfErc20Token(contractAddress(value))
-            val fullAssetId = FullChainAssetId(chain(value).id, assetId)
-            val alreadyExistingSymbol = assetRepository.getAssetSymbol(fullAssetId)
+            val alreadyExistingSymbol = assetRepository.getAssetSymbolByTypeExtras(
+                chainId = chain(value).id,
+                assetId = tokenId(value)
+            )
 
             if (alreadyExistingSymbol != null) {
                 validationError(assetNotExistError(alreadyExistingSymbol))
@@ -35,17 +34,17 @@ class EvmAssetExistenceValidation<P, E>(
     }
 }
 
-fun <P, E> ValidationSystemBuilder<P, E>.evmAssetNotExist(
+fun <P, E> ValidationSystemBuilder<P, E>.substrateAssetNotExist(
     assetRepository: ChainAssetRepository,
     chain: (P) -> Chain,
-    address: (P) -> String,
+    tokenId: (P) -> String,
     assetNotExistError: AssetNotExistError<E>,
     addressMappingError: (P) -> E
 ) = validate(
-    EvmAssetExistenceValidation(
+    SubstrateAssetExistenceValidation(
         assetRepository = assetRepository,
         chain = chain,
-        contractAddress = address,
+        tokenId = tokenId,
         assetNotExistError = assetNotExistError,
         addressMappingError = addressMappingError
     )

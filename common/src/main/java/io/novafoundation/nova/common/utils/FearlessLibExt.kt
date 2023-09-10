@@ -160,6 +160,8 @@ fun RuntimeMetadata.voterListName(): String = requireNotNull(voterListOrNull()).
 
 fun RuntimeMetadata.system() = module(Modules.SYSTEM)
 
+fun RuntimeMetadata.assets() = module(Modules.ASSETS)
+
 fun RuntimeMetadata.balances() = module(Modules.BALANCES)
 
 fun RuntimeMetadata.eqBalances() = module(Modules.EQ_BALANCES)

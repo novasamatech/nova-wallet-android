@@ -15,10 +15,17 @@ class AddTokenSelectChainViewModel(
     private val interactor: AddTokensInteractor,
 ) : BaseViewModel() {
 
-    private val availableChains = interactor.availableChainsToAddTokenFlow()
+    private val availableEthereumChains = interactor.availableChainsToAddErc20TokenFlow()
         .shareInBackground()
 
-    val availableChainModels = availableChains
+    private val availableSubstrateChains = interactor.availableChainsToAddSubstrateTokenFlow()
+        .shareInBackground()
+
+    val availableEthereumChainModels = availableEthereumChains
+        .mapList(::mapChainToUi)
+        .shareInBackground()
+
+    val availableSubstrateChainModels = availableSubstrateChains
         .mapList(::mapChainToUi)
         .shareInBackground()
 
@@ -26,14 +33,25 @@ class AddTokenSelectChainViewModel(
         router.back()
     }
 
-    fun chainClicked(position: Int) = launch {
-        val chain = getChainAt(position) ?: return@launch
+    fun chainClicked(
+        position: Int,
+        isEthereumBased: Boolean
+    ) = launch {
+        val chain = if (isEthereumBased) {
+            getEthereumChainAt(position)
+        } else {
+            getSubstrateChainAt(position)
+        }  ?: return@launch
 
         val payload = AddTokenEnterInfoPayload(chain.id)
         router.openAddTokenEnterInfo(payload)
     }
 
-    private suspend fun getChainAt(position: Int): Chain? {
-        return availableChains.first().getOrNull(position)
+    private suspend fun getEthereumChainAt(position: Int): Chain? {
+        return availableEthereumChains.first().getOrNull(position)
+    }
+
+    private suspend fun getSubstrateChainAt(position: Int): Chain? {
+        return availableSubstrateChains.first().getOrNull(position)
     }
 }

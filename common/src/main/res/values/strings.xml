@@ -347,6 +347,7 @@
 
 
     <string name="asset_add_evm_token_invalid_contract_address_message">The entered contract address is not a %s ERC-20 contract.</string>
+    <string name="asset_add_substrate_token_invalid_token_id_message">The entered token id is not an integer.</string>
 
     <string name="assets_filter_title">Filter tokens</string>
 
@@ -356,10 +357,13 @@
 
     <string name="manage_assets_add_token">Add token</string>
 
-    <string name="asset_add_evm_token_already_exist_title">This token already exist</string>
+    <!-- <string name="asset_add_evm_token_already_exist_title">This token already exist</string> -->
+    <string name="asset_add_token_already_exist_title">This token already exist</string>
     <string name="asset_add_evm_token_already_exist_message">The entered contract address is present in Nova as a %s token.</string>
+    <string name="asset_add_substrate_token_already_exist_message">The entered token id is present in Nova as a %s token.</string>
 
     <string name="asset_add_evm_token_invalid_contract_address_title">Invalid contract address</string>
+    <string name="asset_add_substrate_token_invalid_token_id_title">Invalid token id</string>
 
     <string name="asset_add_evm_token_invalid_decimals_title">Invalid decimals value</string>
     <string name="asset_add_evm_token_invalid_decimals_message">Decimals must be at least 0, and not over 36.</string>
@@ -372,10 +376,16 @@
     <string name="asset_add_token_enter_decimals">Enter decimals</string>
     <string name="assets_add_token">Add token</string>
 
-    <string name="assets_add_token_enter_info_title">Enter ERC-20 token details</string>
+    <!-- <string name="assets_add_token_enter_info_title">Enter ERC-20 token details</string> -->
+    <string name="assets_add_erc20_token_enter_info_title">Enter ERC-20 token details</string>
+    <string name="assets_add_substrate_token_enter_info_title">Enter Substrate token details</string>
 
-    <string name="assets_add_token_enter_info_address_label">Contract address</string>
-    <string name="assets_add_token_enter_info_address_hint" translatable="false">0x...</string>
+    <!-- <string name="assets_add_token_enter_info_address_label">Contract address</string> -->
+    <string name="assets_add_erc20_token_enter_info_address_label">Contract address</string>
+    <string name="assets_add_substrate_token_enter_info_address_label">Asset ID</string>
+    <!-- <string name="assets_add_token_enter_info_address_hint" translatable="false">0x...</string> -->
+    <string name="assets_add_erc20_token_enter_info_address_hint" translatable="false">0x...</string>
+    <string name="assets_add_substrate_token_enter_info_address_hint" translatable="false">123...</string>
 
     <string name="assets_add_token_enter_info_symbol_label">Symbol</string>
     <string name="assets_add_token_enter_info_symbol_hint" translatable="false">USDT</string>
@@ -386,7 +396,10 @@
     <string name="assets_add_token_enter_info_price_label">Coingecko link for price info (Optional) </string>
     <string name="assets_add_token_enter_info_price_hint" translatable="false">www.coingecko.com/en/coins/tether</string>
 
-    <string name="assets_add_token_select_chain_title">Select network to add ERC-20 token</string>
+    <!-- <string name="assets_add_token_select_chain_title">Select network to add ERC-20 token</string> -->
+    <string name="assets_add_token_select_chain_title">Select network</string>
+    <string name="assets_add_token_select_erc20_chain_title">ERC-20 networks</string>
+    <string name="assets_add_token_select_substrate_chain_title">Substrate networks</string>
 
     <string name="common_disabled">Disabled</string>
 

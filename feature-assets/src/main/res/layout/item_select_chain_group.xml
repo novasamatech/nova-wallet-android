@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    android:id="@+id/itemSelectChainGroupTextView"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="16dp"
+    android:layout_marginEnd="16dp"
+    android:textColor="@color/text_primary"
+    android:text="@string/assets_add_token_select_chain_title" />

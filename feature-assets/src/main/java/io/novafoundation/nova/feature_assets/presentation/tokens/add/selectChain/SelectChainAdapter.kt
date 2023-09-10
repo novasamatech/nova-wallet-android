@@ -16,19 +16,21 @@ import kotlinx.android.synthetic.main.item_select_chain.view.itemSelectChainName
 
 class SelectChainAdapter(
     private val imageLoader: ImageLoader,
-    private val handler: ItemHandler
+    private val handler: ItemHandler,
+    private val isEthereumBased: Boolean
 ) : BaseListAdapter<ChainUi, SelectChainHolder>(DiffCallback()) {
 
     interface ItemHandler {
 
-        fun itemClicked(position: Int)
+        fun itemClicked(position: Int, isEthereumBased: Boolean)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectChainHolder {
         return SelectChainHolder(
             containerView = parent.inflateChild(R.layout.item_select_chain),
             itemHandler = handler,
-            imageLoader = imageLoader
+            imageLoader = imageLoader,
+            isEthereumBased = isEthereumBased
         )
     }
 
@@ -41,11 +43,12 @@ class SelectChainHolder(
     containerView: View,
     private val itemHandler: SelectChainAdapter.ItemHandler,
     private val imageLoader: ImageLoader,
+    private val isEthereumBased: Boolean
 ) : BaseViewHolder(containerView) {
 
     init {
         containerView.setOnClickListener {
-            itemHandler.itemClicked(bindingAdapterPosition)
+            itemHandler.itemClicked(bindingAdapterPosition, isEthereumBased)
         }
     }
 

@@ -7,6 +7,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
+import androidx.annotation.StringRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
@@ -64,6 +65,14 @@ class InsertableInputField @JvmOverloads constructor(
 
         actionInputFieldClear.isGone = textIsEmpty
         actionInputFieldAction.isVisible = textIsEmpty && clipboardIsNotEmpty
+    }
+
+    fun setHint(@StringRes hintResId: Int) {
+        content.setHint(hintResId)
+    }
+
+    fun setInputType(inputType: Int) {
+        content.inputType = inputType
     }
 
     private fun setBackgrounds() = with(context) {

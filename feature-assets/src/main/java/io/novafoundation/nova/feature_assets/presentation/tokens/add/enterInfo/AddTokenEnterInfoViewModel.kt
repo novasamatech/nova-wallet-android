@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo
 
+import android.text.InputType
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -12,10 +13,11 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.tokens.add.AddTokensInteractor
-import io.novafoundation.nova.feature_assets.domain.tokens.add.CustomErc20Token
-import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.AddEvmTokenPayload
+import io.novafoundation.nova.feature_assets.domain.tokens.add.CustomToken
+import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.AddTokenPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -35,6 +37,34 @@ class AddTokenEnterInfoViewModel(
 ) : BaseViewModel(), Validatable by validationExecutor {
 
     val chain = flowOf { chainRegistry.getChain(payload.chainId) }
+    val titleResId = chain.map { chain ->
+        if (chain.isEthereumBased) {
+            R.string.assets_add_erc20_token_enter_info_title
+        } else {
+            R.string.assets_add_substrate_token_enter_info_title
+        }
+    }
+    val tokenIdTitleResId = chain.map { chain ->
+        if (chain.isEthereumBased) {
+            R.string.assets_add_erc20_token_enter_info_address_label
+        } else {
+            R.string.assets_add_substrate_token_enter_info_address_label
+        }
+    }
+    val tokenIdHintResId = chain.map { chain ->
+        if (chain.isEthereumBased) {
+            R.string.assets_add_erc20_token_enter_info_address_hint
+        } else {
+            R.string.assets_add_substrate_token_enter_info_address_hint
+        }
+    }
+    val tokenIdInputType = chain.map { chain ->
+        if (chain.isEthereumBased) {
+            InputType.TYPE_CLASS_TEXT
+        } else {
+            InputType.TYPE_CLASS_NUMBER
+        }
+    }
 
     val contractAddressInput = MutableStateFlow("")
     val symbolInput = MutableStateFlow("")
@@ -65,6 +95,7 @@ class AddTokenEnterInfoViewModel(
         autocompleteFieldsBasedOnContractAddress()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun autocompleteFieldsBasedOnContractAddress() {
         contractAddressInput
             .mapLatest { contractAddress ->
@@ -83,7 +114,7 @@ class AddTokenEnterInfoViewModel(
 
     fun confirmClicked() {
         launch {
-            val customToken = CustomErc20Token(
+            val customToken = CustomToken(
                 contractAddressInput.first(),
                 intDecimals.first()!!,
                 symbolInput.first(),
@@ -91,26 +122,27 @@ class AddTokenEnterInfoViewModel(
                 payload.chainId
             )
 
-            val payload = AddEvmTokenPayload(
+
+            val payload = AddTokenPayload(
                 customToken,
                 chain = chain.first(),
             )
 
             validationExecutor.requireValid(
-                validationSystem = interactor.getValidationSystem(),
+                validationSystem = interactor.getValidationSystem(payload.chain.isEthereumBased),
                 payload = payload,
                 progressConsumer = addingInProgressFlow.progressConsumer(),
                 validationFailureTransformer = { mapAddEvmTokensValidationFailureToUI(resourceManager, it) }
             ) {
-                performAddToken(it.customErc20Token)
+                performAddToken(it.customToken)
             }
         }
     }
 
-    private fun performAddToken(customErc20Token: CustomErc20Token) {
+    private fun performAddToken(customToken: CustomToken) {
         launch {
             runCatching {
-                interactor.addCustomTokenAndSync(customErc20Token)
+                interactor.addCustomTokenAndSync(customToken)
             }.onSuccess {
                 addingInProgressFlow.value = false
                 router.finishAddTokenFlow()
