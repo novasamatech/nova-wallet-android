@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 
-typealias ValidatorModel = StakeTargetModel<Validator>
+typealias ValidatorStakeTargetModel = StakeTargetModel<Validator>
 
 data class StakeTargetModel<V>(
     val accountIdHex: String,

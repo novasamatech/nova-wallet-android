@@ -27,6 +27,7 @@ fun BaseFragment<*>.setupUserRewardsComponent(component: UserRewardsComponent, v
         }
 
         view.setClaimableRewardsState(userRewardsState?.claimableRewards)
+        userRewardsState?.iconRes?.let { view.setBannerImage(it) }
     }
 
     component.events.observeEvent {

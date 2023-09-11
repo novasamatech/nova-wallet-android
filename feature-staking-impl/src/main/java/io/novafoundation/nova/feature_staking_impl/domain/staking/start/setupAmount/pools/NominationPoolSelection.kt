@@ -22,7 +22,18 @@ data class NominationPoolSelection(
         nominationPools.join(stake, pool.id)
     }
 
+    override fun isSettingsEquals(other: StartMultiStakingSelection): Boolean {
+        if (this === other) return true
+        if (other !is NominationPoolSelection) return false
+
+        return pool.id.value == other.pool.id.value
+    }
+
     override fun copyWith(stake: Balance): StartMultiStakingSelection {
         return copy(stake = stake)
     }
+}
+
+fun StartMultiStakingSelection.asPoolSelection(): NominationPoolSelection? {
+    return this as? NominationPoolSelection
 }

@@ -48,7 +48,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.y
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.yourPool.RealNominationPoolYourPoolInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.NominationPoolProvider
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.RealNominationPoolProvider
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.RealPoolDisplayFormatter
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
@@ -256,7 +256,7 @@ class NominationPoolModule {
         nominationPoolProvider: NominationPoolProvider,
         knownNovaPools: KnownNovaPools,
         nominationPoolGlobalsRepository: NominationPoolGlobalsRepository
-    ) = NominationPoolRecommendatorFactory(
+    ) = NominationPoolRecommenderFactory(
         computationalCache = computationalCache,
         nominationPoolProvider = nominationPoolProvider,
         knownNovaPools = knownNovaPools,

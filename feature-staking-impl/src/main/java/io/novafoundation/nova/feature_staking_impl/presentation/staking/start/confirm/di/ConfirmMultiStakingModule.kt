@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_staking_impl.di.staking.startMultiStaking.MultiStakingSelectionStoreProviderKey
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StartMultiStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
@@ -57,7 +58,7 @@ class ConfirmMultiStakingModule {
         validationExecutor: ValidationExecutor,
         externalActions: ExternalActions.Presentation,
         payload: ConfirmMultiStakingPayload,
-        selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
+        @MultiStakingSelectionStoreProviderKey selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
         confirmMultiStakingTypeFactory: ConfirmMultiStakingTypeFactory,
         assetUseCase: ArbitraryAssetUseCase,
         walletUiUseCase: WalletUiUseCase,

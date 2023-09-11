@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
@@ -79,6 +80,7 @@ private class RelaychainUserRewardsComponent(
             UserRewardsState(
                 amount = rewardAmount,
                 claimableRewards = null,
+                iconRes = R.drawable.ic_direct_staking_banner_picture,
                 selectedRewardPeriod = mapRewardPeriodToString(resourceManager, rewardPeriod)
             )
         }

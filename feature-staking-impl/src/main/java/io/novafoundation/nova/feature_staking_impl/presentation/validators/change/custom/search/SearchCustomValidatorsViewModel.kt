@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.validators.current.search.SearchCustomValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.search.SearchStakeTargetViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setCustomValidators
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
@@ -39,7 +39,7 @@ class SearchCustomValidatorsViewModel(
     private val stakingInteractor: StakingInteractor,
     resourceManager: ResourceManager,
     private val sharedStateSetup: SetupStakingSharedState,
-    private val validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+    private val validatorRecommenderFactory: ValidatorRecommenderFactory,
     private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
     tokenUseCase: TokenUseCase,
 ) : SearchStakeTargetViewModel<Validator>(resourceManager) {
@@ -57,7 +57,7 @@ class SearchCustomValidatorsViewModel(
         .share()
 
     private val allRecommendedValidators by lazyAsync {
-        validatorRecommendatorFactory.create(scope = viewModelScope).availableValidators.toSet()
+        validatorRecommenderFactory.create(scope = viewModelScope).availableValidators.toSet()
     }
 
     private val foundValidatorsState = enteredQuery
@@ -89,7 +89,7 @@ class SearchCustomValidatorsViewModel(
         }
     }
 
-    override fun itemClicked(item: ValidatorModel) {
+    override fun itemClicked(item: ValidatorStakeTargetModel) {
         if (item.stakeTarget.prefs!!.blocked) {
             showError(resourceManager.getString(R.string.staking_custom_blocked_warning))
             return
@@ -102,7 +102,7 @@ class SearchCustomValidatorsViewModel(
         }
     }
 
-    override fun itemInfoClicked(item: ValidatorModel) {
+    override fun itemInfoClicked(item: ValidatorStakeTargetModel) {
         launch {
             val stakeTarget = mapValidatorToValidatorDetailsParcelModel(item.stakeTarget)
             val payload = StakeTargetDetailsPayload.relaychain(stakeTarget, stakingInteractor)

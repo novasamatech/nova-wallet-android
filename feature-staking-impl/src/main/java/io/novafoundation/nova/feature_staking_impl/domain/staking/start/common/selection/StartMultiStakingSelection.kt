@@ -20,6 +20,8 @@ interface StartMultiStakingSelection {
 
     fun ExtrinsicBuilder.startStaking(metaAccount: MetaAccount)
 
+    fun isSettingsEquals(other: StartMultiStakingSelection): Boolean
+
     fun copyWith(stake: Balance): StartMultiStakingSelection
 }
 

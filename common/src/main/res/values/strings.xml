@@ -1,5 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <!--<string name="dapp_browser_close_warning_message">Are you sure you want to close this screen?\nYour changes will not be applied.</string>-->
+    <string name="common_close_confirmation_message">Are you sure you want to close this screen?\nYour changes will not be applied.</string>
+
+    <!--<string name="delegate_search_placeholder_default">Search result will be displayed here</string>-->
+    <string name="common_search_placeholder_default">Search result will be displayed here</string>
+
+    <string name="search_pool_no_pools_found_placeholder">No pool with entered name or pool ID were found. Make sure you entered correct data</string>
+
+    <string name="pool_item_subtitle_apy">%s / year</string>
+
+    <string name="select_custom_pool_title">Select pool</string>
+    <string name="select_custom_pool_active_pools_count">active pools: %d</string>
+    <string name="select_custom_pool_members">members</string>
+
+    <string name="setup_staking_type_staking_amount_is_less_than_min_amount_title">Your stake is less than the minimum to earn rewards</string>
+    <string name="setup_staking_type_direct_staking_amount_is_less_than_min_amount_message">You have specified less than the minimum stake of %s required to earn rewards with %s. You should consider using Pool staking to earn rewards.</string>
+    <string name="setup_staking_type_already_used_title">Staking type cannot be changed</string>
+    <string name="setup_staking_type_pool_already_used_message">You are already staking in a pool</string>
+    <string name="setup_staking_type_direct_already_used_message">You are already have Direct staking</string>
+    <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Unsupported staking type</string>
+
+    <string name="setup_staking_type_min_amount_condition">Minimum stake: %s</string>
+    <string name="setup_staking_type_payout_type_manual_condition">Rewards: Claim manually</string>
+    <string name="setup_staking_type_payout_type_automatically_condition">Rewards: Paid automatically</string>
+    <string name="setup_staking_type_governance_condition">Reuse tokens in Governance</string>
+    <string name="setup_staking_type_advanced_options_condition">Advanced staking management </string>
+
+    <string name="staking_type_title">Staking Type</string>
+    <string name="setup_staking_type_pool_staking">Pool staking</string>
+    <string name="setup_staking_type_direct_staking">Direct staking</string>
+
     <string name="staking_unstake_all">Unstake all</string>
 
     <!--    <string name="choose_amount_error_too_big">Sorry, you don\'t have enough funds to spend specified amount</string>-->
@@ -40,11 +72,8 @@
     <string name="start_staking_max_nominators_reached_message">The maximum number of nominators has been reached. Try again later</string>
 
     <string name="start_staking_selection_validators_subtitle">Validators: %d (max %d)</string>
+    <string name="start_staking_editing_selection_validators_subtitle">Selected: %d (max %d)</string>
     <string name="common_recommended">Recommended</string>
-
-    <string name="staking_type_title">Staking Type</string>
-    <string name="setup_staking_type_pool_staking">Pool staking</string>
-    <string name="setup_staking_type_direct_staking">Direct staking</string>
 
     <string name="common_fee_changed_title">Network fee is too high</string>
     <string name="common_fee_changed_message">The estimated network fee %s is much higher than the default network fee (%s). This might be due to temporary network congestion. You can refresh to wait for a lower network fee.</string>
@@ -305,7 +334,6 @@
     <string name="staking_alert_rebag_title">Staking improvements</string>
     <string name="staking_alert_rebag_message">Having outdated position in the queue of stake assignment to a validator may suspend your rewards</string>
 
-    <string name="delegate_search_placeholder_default">Search result will be displayed here</string>
     <string name="delegate_search_placeholder_empty">Address format is invalid. Make sure that address belongs to the right network</string>
     <string name="delegate_search_result_count">search results: %d</string>
     <string name="delegate_search_hint">Search by address or name</string>
@@ -1028,7 +1056,6 @@
 
     <string name="wallet_send_insufficient_balance_commission">You don\'t have enough %s to pay fees</string>
 
-    <string name="dapp_browser_close_warning_message">Are you sure you want to close this screen?\nYour changes will not be applied.</string>
     <string name="common_close">Close</string>
 
     <string name="dapp_search_hint">Search by name or enter URL</string>

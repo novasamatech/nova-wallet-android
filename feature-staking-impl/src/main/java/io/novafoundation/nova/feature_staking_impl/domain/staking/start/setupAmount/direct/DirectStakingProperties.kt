@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.minStake
-import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationSystem
@@ -27,7 +27,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 
 class DirectStakingPropertiesFactory(
-    private val validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+    private val validatorRecommenderFactory: ValidatorRecommenderFactory,
     private val recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
     private val stakingSharedComputation: StakingSharedComputation,
     private val stakingRepository: StakingRepository,
@@ -35,7 +35,7 @@ class DirectStakingPropertiesFactory(
 
     override fun createProperties(scope: CoroutineScope, stakingOption: StakingOption): SingleStakingProperties {
         return DirectStakingProperties(
-            validatorRecommendatorFactory = validatorRecommendatorFactory,
+            validatorRecommenderFactory = validatorRecommenderFactory,
             recommendationSettingsProviderFactory = recommendationSettingsProviderFactory,
             stakingOption = stakingOption,
             scope = scope,
@@ -46,7 +46,7 @@ class DirectStakingPropertiesFactory(
 }
 
 private class DirectStakingProperties(
-    validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+    validatorRecommenderFactory: ValidatorRecommenderFactory,
     recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
     private val stakingOption: StakingOption,
     private val scope: CoroutineScope,
@@ -65,7 +65,7 @@ private class DirectStakingProperties(
     }
 
     override val recommendation: SingleStakingRecommendation = DirectStakingRecommendation(
-        validatorRecommendatorFactory = validatorRecommendatorFactory,
+        validatorRecommenderFactory = validatorRecommenderFactory,
         recommendationSettingsProviderFactory = recommendationSettingsProviderFactory,
         stakingOption = stakingOption,
         scope = scope

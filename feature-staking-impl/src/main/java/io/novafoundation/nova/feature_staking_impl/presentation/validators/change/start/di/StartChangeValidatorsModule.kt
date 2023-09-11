@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.start.StartChangeValidatorsViewModel
@@ -23,7 +23,7 @@ class StartChangeValidatorsModule {
     @IntoMap
     @ViewModelKey(StartChangeValidatorsViewModel::class)
     fun provideViewModel(
-        validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+        validatorRecommenderFactory: ValidatorRecommenderFactory,
         router: StakingRouter,
         sharedState: SetupStakingSharedState,
         resourceManager: ResourceManager,
@@ -32,7 +32,7 @@ class StartChangeValidatorsModule {
     ): ViewModel {
         return StartChangeValidatorsViewModel(
             router = router,
-            validatorRecommendatorFactory = validatorRecommendatorFactory,
+            validatorRecommenderFactory = validatorRecommenderFactory,
             setupStakingSharedState = sharedState,
             appLinksProvider = appLinksProvider,
             resourceManager = resourceManager,

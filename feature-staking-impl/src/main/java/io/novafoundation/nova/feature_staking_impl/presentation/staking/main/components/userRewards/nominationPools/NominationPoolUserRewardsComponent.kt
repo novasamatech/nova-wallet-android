@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.presentation.flatMap
 import io.novafoundation.nova.common.presentation.map
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.fullId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
@@ -108,6 +109,7 @@ private class NominationPoolUserRewardsComponent(
         UserRewardsState(
             amount = total,
             claimableRewards = claimable,
+            iconRes = R.drawable.ic_pool_staking_banner_picture,
             selectedRewardPeriod = mapRewardPeriodToString(resourceManager, rewardPeriod)
         )
     }

@@ -11,13 +11,13 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.SelectStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
-import kotlinx.android.synthetic.main.item_validator.view.itemValidationCheck
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorActionIcon
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorIcon
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorInfo
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorName
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleLabel
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleValue
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetCheck
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetActionIcon
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetIcon
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetInfo
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetName
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleLabel
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleValue
 
 class SelectCollatorView @JvmOverloads constructor(
     context: Context,
@@ -31,20 +31,20 @@ class SelectCollatorView @JvmOverloads constructor(
         background = getRoundedCornerDrawable(R.color.block_background).withRippleMask()
         clipToOutline = true
 
-        itemValidationCheck.makeGone()
-        itemValidatorActionIcon.makeGone()
-        itemValidatorSubtitleLabel.makeGone()
+        itemStakingTargetCheck.makeGone()
+        itemStakingTargetActionIcon.makeGone()
+        itemStakingTargetSubtitleLabel.makeGone()
 
-        itemValidatorInfo.setImageResource(R.drawable.ic_chevron_right)
-        itemValidatorInfo.setImageTintRes(R.color.icon_secondary)
+        itemStakingTargetInfo.setImageResource(R.drawable.ic_chevron_right)
+        itemStakingTargetInfo.setImageTintRes(R.color.icon_secondary)
 
         setSelectedCollator(null)
     }
 
     fun setSelectedCollator(selectedCollator: SelectCollatorModel?) {
         if (selectedCollator == null) {
-            itemValidatorName.setText(R.string.staking_parachain_select_collator)
-            itemValidatorIcon.setImageResource(R.drawable.ic_identicon_placeholder)
+            itemStakingTargetName.setText(R.string.staking_parachain_select_collator)
+            itemStakingTargetIcon.setImageResource(R.drawable.ic_identicon_placeholder)
         } else {
             bindSelectedCollator(selectedCollator)
         }
@@ -52,16 +52,16 @@ class SelectCollatorView @JvmOverloads constructor(
 }
 
 fun View.bindSelectedCollator(selectedCollator: SelectStakeTargetModel<*>) {
-    itemValidatorName.text = selectedCollator.addressModel.nameOrAddress
-    itemValidatorIcon.setImageDrawable(selectedCollator.addressModel.image)
+    itemStakingTargetName.text = selectedCollator.addressModel.nameOrAddress
+    itemStakingTargetIcon.setImageDrawable(selectedCollator.addressModel.image)
 
     bindSubtitle(selectedCollator.subtitle)
 }
 
 private fun View.bindSubtitle(subtitle: CharSequence?) {
-    itemValidatorSubtitleValue.setVisible(subtitle != null)
+    itemStakingTargetSubtitleValue.setVisible(subtitle != null)
 
     if (subtitle != null) {
-        itemValidatorSubtitleValue.text = subtitle
+        itemStakingTargetSubtitleValue.text = subtitle
     }
 }

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards
 
+import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
@@ -14,6 +15,7 @@ typealias UserRewardsComponent = StatefullComponent<UserRewardsState, UserReward
 class UserRewardsState(
     val amount: LoadingState<AmountModel>,
     val claimableRewards: LoadingState<ClaimableRewards>?,
+    @DrawableRes val iconRes: Int,
     val selectedRewardPeriod: String
 ) {
 

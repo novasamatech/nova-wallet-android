@@ -69,7 +69,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteract
 import io.novafoundation.nova.feature_staking_impl.domain.payout.PayoutInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.RealStakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.setup.ChangeValidatorsInteractor
@@ -295,7 +295,7 @@ class StakingFeatureModule {
         computationalCache: ComputationalCache,
         sharedState: StakingSharedState,
         knownNovaValidators: KnownNovaValidators
-    ) = ValidatorRecommendatorFactory(validatorProvider, sharedState, computationalCache, knownNovaValidators)
+    ) = ValidatorRecommenderFactory(validatorProvider, sharedState, computationalCache, knownNovaValidators)
 
     @Provides
     @FeatureScope
