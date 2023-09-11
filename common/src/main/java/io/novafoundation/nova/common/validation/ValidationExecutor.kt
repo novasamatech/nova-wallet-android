@@ -59,6 +59,7 @@ class ValidationExecutor : Validatable {
                         payload = payload,
                         autoFixPayload = autoFixPayload,
                         notValidStatus = it,
+                        progressConsumer = progressConsumer,
                         revalidate = { newPayload ->
                             scope.launch {
                                 requireValid(
@@ -102,8 +103,8 @@ class ValidationExecutor : Validatable {
 
     private fun <P, S> createFlowActions(
         payload: P,
-        progressConsumer: ProgressConsumer? = null,
-        autoFixPayload: (original: P, failureStatus: S) -> P = { original, _ -> original },
+        progressConsumer: ProgressConsumer?,
+        autoFixPayload: (original: P, failureStatus: S) -> P,
         notValidStatus: ValidationStatus.NotValid<S>,
         revalidate: (newPayload: P) -> Unit,
         successBlock: (newPayload: P) -> Unit,
