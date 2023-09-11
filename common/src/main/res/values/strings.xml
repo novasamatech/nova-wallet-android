@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="transactions_pool_staking_subtitle">Pool staking</string>
+
     <!--<string name="dapp_browser_close_warning_message">Are you sure you want to close this screen?\nYour changes will not be applied.</string>-->
     <string name="common_close_confirmation_message">Are you sure you want to close this screen?\nYour changes will not be applied.</string>
 

@@ -185,13 +185,14 @@ fun mapOperationToOperationModel(
         when (val operationType = type) {
             is Operation.Type.Reward -> {
                 val headerResId = if (operationType.isReward) R.string.staking_reward else R.string.staking_slash
+                val subtitleRes = if (operationType.kind is RewardKind.Direct) R.string.tabbar_staking_title else R.string.transactions_pool_staking_subtitle
                 OperationModel(
                     id = id,
                     amount = formatAmount(chainAsset, operationType),
                     amountDetails = mapToFiatWithTime(token, operationType.fiatAmount, formattedTime, resourceManager),
                     amountColorRes = if (operationType.isReward) R.color.text_positive else R.color.text_primary,
                     header = resourceManager.getString(headerResId),
-                    subHeader = resourceManager.getString(R.string.tabbar_staking_title),
+                    subHeader = resourceManager.getString(subtitleRes),
                     subHeaderEllipsize = TextUtils.TruncateAt.END,
                     statusAppearance = statusAppearance,
                     operationIcon = resourceManager.getDrawable(R.drawable.ic_staking_filled).asIcon(),
