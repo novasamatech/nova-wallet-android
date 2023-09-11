@@ -56,7 +56,7 @@ class RewardCalculatorFactory(
         val chainId = stakingOption.assetWithChain.chain.id
 
         val exposures = shareStakingSharedComputation.get().electedExposuresInActiveEra(chainId, scope)
-        val validatorsPrefs = stakingRepository.getValidatorPrefs(chainId, exposures.keys.toList())
+        val validatorsPrefs = stakingRepository.getValidatorPrefs(chainId, exposures.keys)
 
         create(stakingOption, exposures, validatorsPrefs)
     }
