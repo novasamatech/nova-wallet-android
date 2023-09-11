@@ -51,8 +51,6 @@ interface CompoundStartStakingInteractor {
     fun observeStartStakingInfo(): Flow<StartStakingCompoundData>
 
     fun observeAvailableBalance(): Flow<LandingAvailableBalance>
-
-
 }
 
 class RealCompoundStartStakingInteractor(

@@ -47,7 +47,6 @@ class RealStakingStartedDetectionService(
     private val chainRegistry: ChainRegistry,
 ) : StakingStartedDetectionService {
 
-
     override fun observeStatingStarted(
         stakingOptionIds: MultiStakingOptionIds,
         screenScope: CoroutineScope

@@ -56,7 +56,7 @@ class ConfirmMultiStakingViewModel(
     walletUiUseCase: WalletUiUseCase,
     selectedAccountUseCase: SelectedAccountUseCase,
     private val stakingStartedDetectionService: StakingStartedDetectionService,
-    ) : BaseViewModel(),
+) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor {
 
