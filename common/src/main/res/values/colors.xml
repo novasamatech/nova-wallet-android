@@ -79,7 +79,8 @@
     <color name="button_background_approve">#2FC864</color>
     <color name="button_background_reject">#E53450</color>
     <color name="button_background_inactive_on_gradient">#1A999EC7</color>
-    <color name="button_background_inactive">#1A999EC7</color>
+    <color name="button_background_inactive">#181920</color>
+
     <color name="button_wallet_connect_background">#353D67</color>
     <color name="wallet_connections_background">#101636</color>
 
