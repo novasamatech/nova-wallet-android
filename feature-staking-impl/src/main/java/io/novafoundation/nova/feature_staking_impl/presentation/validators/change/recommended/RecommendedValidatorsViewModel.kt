@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess.ReadyToSubmit
@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 
 class RecommendedValidatorsViewModel(
     private val router: StakingRouter,
-    private val validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+    private val validatorRecommenderFactory: ValidatorRecommenderFactory,
     private val recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
     private val addressIconGenerator: AddressIconGenerator,
     private val interactor: StakingInteractor,
@@ -48,7 +48,7 @@ class RecommendedValidatorsViewModel(
     }
 
     private val recommendedValidators = flow {
-        val validatorRecommendator = validatorRecommendatorFactory.create(scope = viewModelScope)
+        val validatorRecommendator = validatorRecommenderFactory.create(scope = viewModelScope)
         val validators = validatorRecommendator.recommendations(recommendedSettings())
 
         emit(validators)

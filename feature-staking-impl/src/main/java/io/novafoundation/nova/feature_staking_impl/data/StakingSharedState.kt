@@ -14,8 +14,8 @@ class StakingSharedState : SelectedAssetOptionSharedState<StakingSharedState.Opt
 
     class OptionAdditionalData(val stakingType: Chain.Asset.StakingType)
 
-    private val _selectedOption = singleReplaySharedFlow<SupportedAssetOption<OptionAdditionalData>>()
-    override val selectedOption: Flow<SupportedAssetOption<OptionAdditionalData>> = _selectedOption
+    private val _selectedOption = singleReplaySharedFlow<StakingOption>()
+    override val selectedOption: Flow<StakingOption> = _selectedOption
 
     suspend fun setSelectedOption(
         chain: Chain,

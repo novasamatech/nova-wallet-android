@@ -2,7 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools
 
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.NominationPool
 
-interface NominationPoolRecommendator {
+interface NominationPoolRecommender {
+
+    val recommendations: List<NominationPool>
 
     fun recommendedPool(): NominationPool
 }

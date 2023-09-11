@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.enoughToPayFee
@@ -24,7 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 
 class NominationPoolStakingPropertiesFactory(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
-    private val nominationPoolRecommendatorFactory: NominationPoolRecommendatorFactory,
+    private val nominationPoolRecommenderFactory: NominationPoolRecommenderFactory,
     private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
     private val nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
 ) : SingleStakingPropertiesFactory {
@@ -32,7 +32,7 @@ class NominationPoolStakingPropertiesFactory(
     override fun createProperties(scope: CoroutineScope, stakingOption: StakingOption): SingleStakingProperties {
         return NominationPoolStakingProperties(
             nominationPoolSharedComputation = nominationPoolSharedComputation,
-            nominationPoolRecommendatorFactory = nominationPoolRecommendatorFactory,
+            nominationPoolRecommenderFactory = nominationPoolRecommenderFactory,
             sharedComputationScope = scope,
             stakingOption = stakingOption,
             poolsAvailableBalanceResolver = poolsAvailableBalanceResolver,
@@ -43,7 +43,7 @@ class NominationPoolStakingPropertiesFactory(
 
 private class NominationPoolStakingProperties(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
-    private val nominationPoolRecommendatorFactory: NominationPoolRecommendatorFactory,
+    private val nominationPoolRecommenderFactory: NominationPoolRecommenderFactory,
     private val sharedComputationScope: CoroutineScope,
     private val stakingOption: StakingOption,
     private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
@@ -59,7 +59,7 @@ private class NominationPoolStakingProperties(
     override val recommendation: SingleStakingRecommendation = NominationPoolRecommendation(
         scope = sharedComputationScope,
         stakingOption = stakingOption,
-        nominationPoolRecommendatorFactory = nominationPoolRecommendatorFactory
+        nominationPoolRecommenderFactory = nominationPoolRecommenderFactory
     )
 
     override val validationSystem: StartMultiStakingValidationSystem = ValidationSystem {

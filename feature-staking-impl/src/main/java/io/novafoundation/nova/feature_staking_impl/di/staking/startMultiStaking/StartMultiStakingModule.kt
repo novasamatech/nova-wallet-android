@@ -11,8 +11,8 @@ import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommendatorFactory
-import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommenderFactory
+import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.RealNominationPoolsAvailableBalanceResolver
@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmo
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.direct.DirectStakingPropertiesFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.pools.NominationPoolStakingPropertiesFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.selectionType.MultiStakingSelectionTypeProviderFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.SetupStakingTypeSelectionMixinFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.pool.RealStakingTypeDetailsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingTargetSelectionFormatter
@@ -106,6 +107,20 @@ class StartMultiStakingModule {
 
     @Provides
     @FeatureScope
+    fun provideSetupStakingTypeSelectionMixinFactory(
+        @MultiStakingSelectionStoreProviderKey currentSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
+        @StakingTypeEditingStoreProviderKey editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
+        singleStakingPropertiesFactory: SingleStakingPropertiesFactory
+    ): SetupStakingTypeSelectionMixinFactory {
+        return SetupStakingTypeSelectionMixinFactory(
+            currentSelectionStoreProvider,
+            editableSelectionStoreProvider,
+            singleStakingPropertiesFactory
+        )
+    }
+
+    @Provides
+    @FeatureScope
     fun provideMultiStakingSelectionFormatter(
         resourceManager: ResourceManager,
         poolDisplayFormatter: PoolDisplayFormatter,
@@ -144,13 +159,13 @@ class StartMultiStakingModule {
     @IntoMap
     @StakingTypeGroupKey(StakingTypeGroup.RELAYCHAIN)
     fun provideDirectStakingPropertiesFactory(
-        validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+        validatorRecommenderFactory: ValidatorRecommenderFactory,
         recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
         stakingSharedComputation: StakingSharedComputation,
         stakingRepository: StakingRepository
     ): SingleStakingPropertiesFactory {
         return DirectStakingPropertiesFactory(
-            validatorRecommendatorFactory = validatorRecommendatorFactory,
+            validatorRecommenderFactory = validatorRecommenderFactory,
             recommendationSettingsProviderFactory = recommendationSettingsProviderFactory,
             stakingSharedComputation = stakingSharedComputation,
             stakingRepository = stakingRepository
@@ -163,13 +178,13 @@ class StartMultiStakingModule {
     @StakingTypeGroupKey(StakingTypeGroup.NOMINATION_POOL)
     fun providePoolsStakingPropertiesFactory(
         nominationPoolSharedComputation: NominationPoolSharedComputation,
-        nominationPoolRecommendatorFactory: NominationPoolRecommendatorFactory,
+        nominationPoolRecommenderFactory: NominationPoolRecommenderFactory,
         availableBalanceResolver: NominationPoolsAvailableBalanceResolver,
         nominationPoolGlobalsRepository: NominationPoolGlobalsRepository
     ): SingleStakingPropertiesFactory {
         return NominationPoolStakingPropertiesFactory(
             nominationPoolSharedComputation = nominationPoolSharedComputation,
-            nominationPoolRecommendatorFactory = nominationPoolRecommendatorFactory,
+            nominationPoolRecommenderFactory = nominationPoolRecommenderFactory,
             poolsAvailableBalanceResolver = availableBalanceResolver,
             nominationPoolGlobalsRepository = nominationPoolGlobalsRepository
         )

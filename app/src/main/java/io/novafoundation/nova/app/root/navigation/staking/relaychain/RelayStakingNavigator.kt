@@ -11,6 +11,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.PayoutDetailsFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectCustomPoolFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectCustomPoolPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMoreFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMorePayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.SelectBondMoreFragment
@@ -190,7 +192,16 @@ class RelayStakingNavigator(
         performNavigation(R.id.action_setupAmountMultiStakingFragment_to_setupStakingType)
     }
 
+    override fun openSelectCustomPool(payload: SelectCustomPoolPayload) {
+        val arguments = SelectCustomPoolFragment.getBundle(payload)
+        performNavigation(R.id.action_setupStakingType_to_selectCustomPoolFragment, args = arguments)
+    }
+
     override fun finishSetupValidatorsFlow() {
         performNavigation(R.id.action_back_to_setupAmountMultiStakingFragment)
+    }
+
+    override fun finishSetupPoolFlow() {
+        performNavigation(R.id.action_selectCustomPool_to_setupAmountMultiStakingFragment)
     }
 }

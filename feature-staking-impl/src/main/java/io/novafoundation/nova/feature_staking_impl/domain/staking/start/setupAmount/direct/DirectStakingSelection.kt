@@ -49,3 +49,7 @@ data class DirectStakingSelection(
         return copy(stake = stake)
     }
 }
+
+fun StartMultiStakingSelection.asDirectSelection(): DirectStakingSelection? {
+    return this as? DirectStakingSelection
+}
