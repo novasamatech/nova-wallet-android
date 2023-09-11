@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.subquery.Staking
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.RealPooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
@@ -77,6 +78,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.controller.Con
 import io.novafoundation.nova.feature_staking_impl.domain.staking.rebond.RebondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.rewardDestination.ChangeRewardDestinationInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.RealStakingStartedDetectionService
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.validators.current.CurrentValidatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validators.current.search.SearchCustomValidatorsInteractor
@@ -582,5 +585,19 @@ class StakingFeatureModule {
         poolDisplayFormatter = poolDisplayFormatter,
         poolAccountDerivation = poolAccountDerivation,
         poolStateRepository = poolStateRepository
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideStakingStartedDetectionService(
+        stakingDashboardRepository: StakingDashboardRepository,
+        computationalCache: ComputationalCache,
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+    ): StakingStartedDetectionService = RealStakingStartedDetectionService(
+        stakingDashboardRepository = stakingDashboardRepository,
+        computationalCache = computationalCache,
+        accountRepository = accountRepository,
+        chainRegistry = chainRegistry
     )
 }

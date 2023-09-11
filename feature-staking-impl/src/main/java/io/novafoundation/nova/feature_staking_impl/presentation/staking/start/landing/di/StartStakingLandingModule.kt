@@ -14,7 +14,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
@@ -23,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.StartStakingLandingViewModel
@@ -57,7 +57,6 @@ class StartStakingLandingModule {
         parachainStakingRewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
         nominationPoolSharedComputation: NominationPoolSharedComputation,
         poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
-        stakingDashboardRepository: StakingDashboardRepository,
         chainRegistry: ChainRegistry
     ): StartStakingInteractorFactory {
         return StartStakingInteractorFactory(
@@ -70,7 +69,6 @@ class StartStakingLandingModule {
             poolsAvailableBalanceResolver = poolsAvailableBalanceResolver,
             nominationPoolSharedComputation = nominationPoolSharedComputation,
             chainRegistry = chainRegistry,
-            stakingDashboardRepository = stakingDashboardRepository
         )
     }
 
@@ -86,7 +84,8 @@ class StartStakingLandingModule {
         startStakingLandingPayload: StartStakingLandingPayload,
         validationExecutor: ValidationExecutor,
         selectedMetaAccountUseCase: SelectedAccountUseCase,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        stakingStartedDetectionService: StakingStartedDetectionService
     ): ViewModel {
         return StartStakingLandingViewModel(
             router = router,
@@ -97,7 +96,8 @@ class StartStakingLandingModule {
             startStakingLandingPayload = startStakingLandingPayload,
             validationExecutor = validationExecutor,
             selectedMetaAccountUseCase = selectedMetaAccountUseCase,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            stakingStartedDetectionService = stakingStartedDetectionService
         )
     }
 
