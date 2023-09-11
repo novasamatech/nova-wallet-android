@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.mixin.actionAwaitable
 
+import androidx.annotation.StyleRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.view.dialog.dialog
@@ -9,9 +10,9 @@ class ConfirmationDialogInfo(val title: Int, val message: Int, val positiveButto
     constructor(title: Int, message: Int) : this(title, message, R.string.common_enable, R.string.common_cancel)
 }
 
-fun BaseFragment<*>.setupConfirmationDialog(awaitableMixin: ConfirmationAwaitable<ConfirmationDialogInfo>) {
+fun BaseFragment<*>.setupConfirmationDialog(@StyleRes style: Int, awaitableMixin: ConfirmationAwaitable<ConfirmationDialogInfo>) {
     awaitableMixin.awaitableActionLiveData.observeEvent { action ->
-        dialog(requireContext(), R.style.AccentAlertDialogTheme) {
+        dialog(requireContext(), style) {
             setTitle(action.payload.title)
             setMessage(action.payload.message)
             setPositiveButton(action.payload.positiveButton) { _, _ -> action.onSuccess(Unit) }
@@ -21,9 +22,9 @@ fun BaseFragment<*>.setupConfirmationDialog(awaitableMixin: ConfirmationAwaitabl
     }
 }
 
-fun BaseFragment<*>.setupConfirmationOrDenyDialog(awaitableMixin: ConfirmOrDenyAwaitable<ConfirmationDialogInfo>) {
+fun BaseFragment<*>.setupConfirmationOrDenyDialog(@StyleRes style: Int, awaitableMixin: ConfirmOrDenyAwaitable<ConfirmationDialogInfo>) {
     awaitableMixin.awaitableActionLiveData.observeEvent { action ->
-        dialog(requireContext(), R.style.AccentAlertDialogTheme) {
+        dialog(requireContext(), style) {
             setTitle(action.payload.title)
             setMessage(action.payload.message)
             setPositiveButton(action.payload.positiveButton) { _, _ -> action.onSuccess(true) }

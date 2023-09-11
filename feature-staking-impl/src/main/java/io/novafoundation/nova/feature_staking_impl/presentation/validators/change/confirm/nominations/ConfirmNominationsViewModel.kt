@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
@@ -50,7 +50,7 @@ class ConfirmNominationsViewModel(
         router.back()
     }
 
-    fun validatorInfoClicked(validatorModel: ValidatorModel) {
+    fun validatorInfoClicked(validatorModel: ValidatorStakeTargetModel) {
         viewModelScope.launch {
             val stakeTarget = mapValidatorToValidatorDetailsParcelModel(validatorModel.stakeTarget)
             val payload = StakeTargetDetailsPayload.relaychain(stakeTarget, interactor)
@@ -62,7 +62,7 @@ class ConfirmNominationsViewModel(
     private suspend fun convertToModels(
         validators: List<Validator>,
         token: Token,
-    ): List<ValidatorModel> {
+    ): List<ValidatorStakeTargetModel> {
         val chain = selectedAssetState.chain()
 
         return validators.map {

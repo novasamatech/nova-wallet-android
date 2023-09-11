@@ -70,6 +70,17 @@ fun Chain.Asset.StakingType.group(): StakingTypeGroup {
     }
 }
 
+fun Chain.Asset.StakingType.isDirectStaking(): Boolean {
+    return when (group()) {
+        StakingTypeGroup.RELAYCHAIN, StakingTypeGroup.PARACHAIN -> true
+        else -> false
+    }
+}
+
+fun Chain.Asset.StakingType.isPoolStaking(): Boolean {
+    return group() == StakingTypeGroup.NOMINATION_POOL
+}
+
 inline fun <reified T : Chain.ExternalApi> Chain.externalApi(): T? {
     return externalApis.findIsInstanceOrNull<T>()
 }

@@ -16,18 +16,10 @@
         app:textRight="@string/common_done"
         app:titleText="@string/staking_type_title" />
 
-    <io.novafoundation.nova.feature_staking_impl.presentation.view.stakingType.StakingTypeView
-        android:id="@+id/setupStakingTypePoolStaking"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/setupStakingTypeList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp" />
-
-    <io.novafoundation.nova.feature_staking_impl.presentation.view.stakingType.StakingTypeView
-        android:id="@+id/setupStakingTypeDirectStaking"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp" />
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
 </LinearLayout>

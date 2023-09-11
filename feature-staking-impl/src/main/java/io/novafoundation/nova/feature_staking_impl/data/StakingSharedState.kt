@@ -14,8 +14,8 @@ class StakingSharedState : SelectedAssetOptionSharedState<StakingSharedState.Opt
 
     class OptionAdditionalData(val stakingType: Chain.Asset.StakingType)
 
-    private val _selectedOption = singleReplaySharedFlow<SupportedAssetOption<OptionAdditionalData>>()
-    override val selectedOption: Flow<SupportedAssetOption<OptionAdditionalData>> = _selectedOption
+    private val _selectedOption = singleReplaySharedFlow<StakingOption>()
+    override val selectedOption: Flow<StakingOption> = _selectedOption
 
     suspend fun setSelectedOption(
         chain: Chain,
@@ -32,10 +32,17 @@ class StakingSharedState : SelectedAssetOptionSharedState<StakingSharedState.Opt
     }
 }
 
-fun createStakingOption(chain: Chain, chainAsset: Chain.Asset, stakingType: Chain.Asset.StakingType): StakingOption {
+fun createStakingOption(chainWithAsset: ChainWithAsset, stakingType: Chain.Asset.StakingType): StakingOption {
     return StakingOption(
-        assetWithChain = ChainWithAsset(chain, chainAsset),
+        assetWithChain = chainWithAsset,
         additional = StakingSharedState.OptionAdditionalData(stakingType)
+    )
+}
+
+fun createStakingOption(chain: Chain, chainAsset: Chain.Asset, stakingType: Chain.Asset.StakingType): StakingOption {
+    return createStakingOption(
+        chainWithAsset = ChainWithAsset(chain, chainAsset),
+        stakingType = stakingType
     )
 }
 

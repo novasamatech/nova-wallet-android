@@ -38,4 +38,18 @@ data class DirectStakingSelection(
     override fun copyWith(stake: Balance): StartMultiStakingSelection {
         return copy(stake = stake)
     }
+
+    override fun isSettingsEquals(other: StartMultiStakingSelection): Boolean {
+        if (other === this) return true
+        if (other !is DirectStakingSelection) return false
+
+        val otherAddresses = other.validators.map { it.address }.toSet()
+        val thisAddresses = validators.map { it.address }.toSet()
+        return thisAddresses == otherAddresses &&
+            validatorsLimit == other.validatorsLimit
+    }
+}
+
+fun StartMultiStakingSelection.asDirectSelection(): DirectStakingSelection? {
+    return this as? DirectStakingSelection
 }

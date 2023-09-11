@@ -1,5 +1,6 @@
 package io.novafoundation.nova.app.root.navigation.staking.relaychain
 
+import androidx.navigation.NavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
@@ -10,6 +11,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.PayoutDetailsFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectPoolFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.SelectingPoolPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.searchPool.SearchPoolFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMoreFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMorePayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.SelectBondMoreFragment
@@ -26,13 +30,20 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDe
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.story.StoryFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload.FlowType
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.ReviewCustomValidatorsFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.SelectCustomValidatorsFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
 
 class RelayStakingNavigator(
-    navigationHolder: NavigationHolder,
+    private val navigationHolder: NavigationHolder,
     private val commonNavigator: Navigator,
 ) : BaseNavigator(navigationHolder), StakingRouter {
+
+    private val navController: NavController?
+        get() = navigationHolder.navController
 
     override fun returnToStakingMain() = performNavigation(R.id.back_to_staking_main)
 
@@ -79,7 +90,19 @@ class RelayStakingNavigator(
     }
 
     override fun openSelectCustomValidators() {
-        performNavigation(R.id.action_startChangeValidatorsFragment_to_selectCustomValidatorsFragment)
+        val flowType = when (navigationHolder.navController?.currentDestination?.id) {
+            R.id.setupStakingType -> FlowType.SETUP_STAKING_VALIDATORS
+            else -> FlowType.CHANGE_STAKING_VALIDATORS
+        }
+        val payload = CustomValidatorsPayload(flowType)
+
+        performNavigation(
+            cases = arrayOf(
+                R.id.setupStakingType to R.id.action_setupStakingType_to_selectCustomValidatorsFragment,
+                R.id.startChangeValidatorsFragment to R.id.action_startChangeValidatorsFragment_to_selectCustomValidatorsFragment,
+            ),
+            args = SelectCustomValidatorsFragment.getBundle(payload)
+        )
     }
 
     override fun openCustomValidatorsSettings() {
@@ -90,8 +113,11 @@ class RelayStakingNavigator(
         performNavigation(R.id.action_selectCustomValidatorsFragment_to_searchCustomValidatorsFragment)
     }
 
-    override fun openReviewCustomValidators() {
-        performNavigation(R.id.action_selectCustomValidatorsFragment_to_reviewCustomValidatorsFragment)
+    override fun openReviewCustomValidators(payload: CustomValidatorsPayload) {
+        performNavigation(
+            R.id.action_selectCustomValidatorsFragment_to_reviewCustomValidatorsFragment,
+            args = ReviewCustomValidatorsFragment.getBundle(payload)
+        )
     }
 
     override fun openConfirmStaking() {
@@ -153,6 +179,7 @@ class RelayStakingNavigator(
     }
 
     override fun openRebag() = performNavigation(R.id.action_stakingFragment_to_rebag)
+
     override fun openDAppBrowser(url: String) = performNavigation(
         actionId = R.id.action_mainFragment_to_dappBrowserGraph,
         args = DAppBrowserFragment.getBundle(url)
@@ -160,5 +187,32 @@ class RelayStakingNavigator(
 
     override fun openStakingPeriods() {
         performNavigation(R.id.action_stakingFragment_to_staking_periods)
+    }
+
+    override fun openSetupStakingType() {
+        performNavigation(R.id.action_setupAmountMultiStakingFragment_to_setupStakingType)
+    }
+
+    override fun openSelectPool(payload: SelectingPoolPayload) {
+        val arguments = SelectPoolFragment.getBundle(payload)
+        performNavigation(R.id.action_setupStakingType_to_selectCustomPoolFragment, args = arguments)
+    }
+
+    override fun openSearchPool(payload: SelectingPoolPayload) {
+        val arguments = SearchPoolFragment.getBundle(payload)
+        performNavigation(R.id.action_selectPool_to_searchPoolFragment, args = arguments)
+    }
+
+    override fun finishSetupValidatorsFlow() {
+        performNavigation(R.id.action_back_to_setupAmountMultiStakingFragment)
+    }
+
+    override fun finishSetupPoolFlow() {
+        performNavigation(
+            cases = arrayOf(
+                R.id.searchPoolFragment to R.id.action_searchPool_to_setupAmountMultiStakingFragment,
+                R.id.selectPoolFragment to R.id.action_selectPool_to_setupAmountMultiStakingFragment,
+            )
+        )
     }
 }

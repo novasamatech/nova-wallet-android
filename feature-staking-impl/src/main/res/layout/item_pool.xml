@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemPoolContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:background="@drawable/bg_primary_list_item"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    tools:background="@color/secondary_screen_background">
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/itemPoolCheckBox"
+        style="@style/Widget.Nova.Checkbox"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="16dp"
+        android:checked="true"
+        android:clickable="false"
+        android:focusableInTouchMode="false"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/itemPoolIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@color/icon_accent" />
+
+    <TextView
+        android:id="@+id/itemPoolTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:textColor="@color/text_primary"
+        app:layout_constraintBottom_toTopOf="@+id/itemPoolSubtitle"
+        app:layout_constraintEnd_toStartOf="@+id/amountBarrier"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/itemPoolIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="SUPERSYMMETRY" />
+
+    <TextView
+        android:id="@+id/itemPoolSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:textColor="@color/text_tertiary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/itemPoolIcon"
+        app:layout_constraintTop_toBottomOf="@+id/itemPoolTitle"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="1M% / per year" />
+
+    <TextView
+        android:id="@+id/itemPoolMembersCount"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:textColor="@color/text_primary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/itemPoolInfo"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="84" />
+
+    <ImageView
+        android:id="@+id/itemPoolInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="8dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_info_cicrle_filled_16"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/icon_secondary" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/amountBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="left"
+        app:constraint_referenced_ids="itemPoolMembersCount" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

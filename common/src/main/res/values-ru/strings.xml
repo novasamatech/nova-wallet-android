@@ -457,7 +457,7 @@
     <string name="dapp_sign_extrinsic_details_subtitle">Убедитесь, что операция правильная</string>
     <string name="dapp_sign_extrinsic_failed">Не удалось подписать запрошенную операцию</string>
     <string name="delegate_search_hint">Поиск по адресу или имени</string>
-    <string name="delegate_search_placeholder_default">Результаты поиска будут отображаться здесь</string>
+    <string name="common_search_placeholder_default">Результаты поиска будут отображаться здесь</string>
     <string name="delegate_search_placeholder_empty">Недопустимый формат адреса. Убедитесь, что адрес принадлежит правильной сети</string>
     <string name="delegate_search_result_count">результаты поиска: %d</string>
     <string name="delegation_add_delegation">Добавить делегацию</string>

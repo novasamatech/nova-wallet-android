@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.di.staking.UpdatersModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.dashboard.StakingDashboardModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool.NominationPoolModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.ParachainStakingModule
+import io.novafoundation.nova.feature_staking_impl.di.staking.stakingTypeDetails.StakingTypeDetailsModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.startMultiStaking.StartMultiStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.unbond.StakingUnbondModule
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculatorFactory
@@ -51,6 +52,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.di.PayoutDetailsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.list.di.PayoutsListComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.period.di.StakingPeriodComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.searchPool.di.SearchPoolComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.di.SelectPoolComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.di.ConfirmBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.di.SelectBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.di.ConfirmSetControllerComponent
@@ -61,8 +64,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.c
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.di.RedeemComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.di.ConfirmRewardDestinationComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.select.di.SelectRewardDestinationComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.setupStakingType.di.SetupStakingTypeComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.di.ConfirmMultiStakingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.di.SetupStakingTypeComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.di.StartStakingLandingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.di.SetupAmountMultiStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.di.ConfirmUnbondComponent
@@ -92,6 +95,7 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
         NominationPoolModule::class,
         StakingDashboardModule::class,
         StartMultiStakingModule::class,
+        StakingTypeDetailsModule::class
     ]
 )
 @FeatureScope
@@ -122,6 +126,10 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun selectCustomValidatorsComponentFactory(): SelectCustomValidatorsComponent.Factory
 
     fun startChangeValidatorsComponentFactory(): StartChangeValidatorsComponent.Factory
+
+    fun selectPoolComponentFactory(): SelectPoolComponent.Factory
+
+    fun searchPoolComponentFactory(): SearchPoolComponent.Factory
 
     fun recommendedValidatorsComponentFactory(): RecommendedValidatorsComponent.Factory
 

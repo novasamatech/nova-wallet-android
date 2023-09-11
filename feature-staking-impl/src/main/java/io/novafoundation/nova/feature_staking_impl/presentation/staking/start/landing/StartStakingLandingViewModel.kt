@@ -35,15 +35,15 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.a
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.ParticipationInGovernance
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.Payouts
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingCompoundData
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingInteractorFactory
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.model.PayoutType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.validations.StartStakingLandingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.validations.handleStartStakingLandingValidationFailure
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StakingTypeDetailsCompoundInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.toStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StakingConditionRVItem
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.SetupAmountMultiStakingPayload
+import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -73,7 +73,7 @@ class StartStakingLandingViewModel(
     private val router: StartMultiStakingRouter,
     private val resourceManager: ResourceManager,
     private val updateSystemFactory: StakingLandingInfoUpdateSystemFactory,
-    private val startStakingInteractorFactory: StartStakingInteractorFactory,
+    private val stakingTypeDetailsCompoundInteractorFactory: StakingTypeDetailsCompoundInteractorFactory,
     private val appLinksProvider: AppLinksProvider,
     private val startStakingLandingPayload: StartStakingLandingPayload,
     private val validationExecutor: ValidationExecutor,
@@ -88,7 +88,7 @@ class StartStakingLandingViewModel(
     private val stakingOptionIds = availableStakingOptionsPayload.toStakingOptionIds()
 
     private val startStakingInteractor = flowOf {
-        startStakingInteractorFactory.create(
+        stakingTypeDetailsCompoundInteractorFactory.create(
             multiStakingOptionIds = stakingOptionIds,
             coroutineScope = this
         )
@@ -368,17 +368,17 @@ class StartStakingLandingViewModel(
     }
 
     private fun List<PayoutType>.containsManualAndAutomatic(): Boolean {
-        return contains(PayoutType.Manual) && any { it is PayoutType.Automatic } && size == 2
+        return contains(PayoutType.Manual) && any { it is PayoutType.Automatically } && size == 2
     }
 
     private fun isRestakeOnlyCase(payouts: Payouts): Boolean {
-        return payouts.payoutTypes.containsOnly(PayoutType.Automatic.Restake) ||
-            payouts.payoutTypes.contains(PayoutType.Automatic.Restake) && payouts.isAutomaticPayoutHasSmallestMinStake
+        return payouts.payoutTypes.containsOnly(PayoutType.Automatically.Restake) ||
+            payouts.payoutTypes.contains(PayoutType.Automatically.Restake) && payouts.isAutomaticPayoutHasSmallestMinStake
     }
 
     private fun isPayoutsOnlyCase(payouts: Payouts): Boolean {
-        return payouts.payoutTypes.containsOnly(PayoutType.Automatic.Payout) ||
-            payouts.payoutTypes.contains(PayoutType.Automatic.Payout) && payouts.isAutomaticPayoutHasSmallestMinStake
+        return payouts.payoutTypes.containsOnly(PayoutType.Automatically.Payout) ||
+            payouts.payoutTypes.contains(PayoutType.Automatically.Payout) && payouts.isAutomaticPayoutHasSmallestMinStake
     }
 
     private fun getThemeColor(chain: Chain): Int {

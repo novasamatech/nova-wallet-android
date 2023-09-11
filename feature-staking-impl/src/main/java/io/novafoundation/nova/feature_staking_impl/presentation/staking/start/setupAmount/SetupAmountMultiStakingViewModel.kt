@@ -18,10 +18,11 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.v
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.handleStartMultiStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.selectionType.MultiStakingSelectionTypeProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingSelectionFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingTargetSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.toStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.ConfirmMultiStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.model.StakingPropertiesModel
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypePayload
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
@@ -45,7 +46,7 @@ import kotlin.time.Duration.Companion.milliseconds
 private const val DEBOUNCE_RATE_MILLIS = 500
 
 class SetupAmountMultiStakingViewModel(
-    private val multiStakingSelectionFormatter: MultiStakingSelectionFormatter,
+    private val multiStakingTargetSelectionFormatter: MultiStakingTargetSelectionFormatter,
     private val resourceManager: ResourceManager,
     private val router: StartMultiStakingRouter,
     private val interactor: StartMultiStakingInteractor,
@@ -107,7 +108,7 @@ class SetupAmountMultiStakingViewModel(
             else -> {
                 val content = StakingPropertiesModel.Content(
                     estimatedReward = currentSelection.selection.apy.orZero().format(),
-                    selection = multiStakingSelectionFormatter.formatForSetupAmount(currentSelection)
+                    selection = multiStakingTargetSelectionFormatter.formatForSetupAmount(currentSelection)
                 )
 
                 StakingPropertiesModel.Loaded(content)
@@ -145,7 +146,7 @@ class SetupAmountMultiStakingViewModel(
     }
 
     fun selectionClicked() {
-        router.openSetupStakingType()
+        router.openSetupStakingType(SetupStakingTypePayload(payload.availableStakingOptions))
     }
 
     fun continueClicked() = launch {
