@@ -1,11 +1,15 @@
 package io.novafoundation.nova.feature_staking_impl.domain.validators
 
+import io.novafoundation.nova.common.utils.foldToSet
 import io.novafoundation.nova.common.utils.toHexAccountId
+import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
+import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.data.validators.KnownNovaValidators
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEra
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
@@ -18,7 +22,9 @@ sealed class ValidatorSource {
 
     object Elected : ValidatorSource()
 
-    class Custom(val validatorIds: List<String>) : ValidatorSource()
+    class Custom(val validatorIds: Set<String>) : ValidatorSource()
+
+    object NovaValidators : ValidatorSource()
 }
 
 class ValidatorProvider(
@@ -27,11 +33,12 @@ class ValidatorProvider(
     private val rewardCalculatorFactory: RewardCalculatorFactory,
     private val stakingConstantsRepository: StakingConstantsRepository,
     private val stakingSharedComputation: StakingSharedComputation,
+    private val knownNovaValidators: KnownNovaValidators,
 ) {
 
     suspend fun getValidators(
         stakingOption: StakingOption,
-        source: ValidatorSource,
+        sources: List<ValidatorSource>,
         scope: CoroutineScope,
     ): List<Validator> {
         val chain = stakingOption.assetWithChain.chain
@@ -39,15 +46,11 @@ class ValidatorProvider(
 
         val electedValidatorExposures = stakingSharedComputation.electedExposuresInActiveEra(chainId, scope)
 
-        val requestedValidatorIds = when (source) {
-            ValidatorSource.Elected -> electedValidatorExposures.keys.toList()
-            is ValidatorSource.Custom -> source.validatorIds
-        }
-
+        val requestedValidatorIds = sources.allValidatorIds(chainId, electedValidatorExposures)
+        // we always need validator prefs for elected validators to construct reward calculator
         val validatorIdsToQueryPrefs = electedValidatorExposures.keys + requestedValidatorIds
 
-        val validatorPrefs = stakingRepository.getValidatorPrefs(chainId, validatorIdsToQueryPrefs.toList())
-
+        val validatorPrefs = stakingRepository.getValidatorPrefs(chainId, validatorIdsToQueryPrefs)
         val identities = identityRepository.getIdentitiesFromIdsHex(chainId, requestedValidatorIds)
         val slashes = stakingRepository.getSlashes(chainId, requestedValidatorIds)
 
@@ -55,8 +58,6 @@ class ValidatorProvider(
         val maxNominators = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
         return requestedValidatorIds.map { accountIdHex ->
-            val prefs = validatorPrefs[accountIdHex]
-
             val electedInfo = electedValidatorExposures[accountIdHex]?.let {
                 Validator.ElectedInfo(
                     totalStake = it.total,
@@ -71,7 +72,7 @@ class ValidatorProvider(
                 slashed = slashes.getOrDefault(accountIdHex, false),
                 accountIdHex = accountIdHex,
                 electedInfo = electedInfo,
-                prefs = prefs,
+                prefs = validatorPrefs[accountIdHex],
                 identity = identities[accountIdHex],
                 address = chain.addressOf(accountIdHex.fromHex())
             )
@@ -97,4 +98,32 @@ class ValidatorProvider(
             electedInfo = null
         )
     }
+
+    private fun List<ValidatorSource>.allValidatorIds(
+        chainId: ChainId,
+        electedExposures: AccountIdMap<Exposure>
+    ): Set<String> {
+        return foldToSet { it.validatorIds(chainId, electedExposures) }
+    }
+
+    private fun ValidatorSource.validatorIds(
+        chainId: ChainId,
+        electedExposures: AccountIdMap<Exposure>
+    ): Set<String> {
+        return when(this) {
+            is ValidatorSource.Custom -> validatorIds
+            ValidatorSource.Elected -> electedExposures.keys
+            ValidatorSource.NovaValidators -> knownNovaValidators.getValidatorIds(chainId)
+        }
+    }
 }
+
+suspend fun ValidatorProvider.getValidators(
+    stakingOption: StakingOption,
+    source: ValidatorSource,
+    scope: CoroutineScope,
+): List<Validator> = getValidators(
+    stakingOption = stakingOption,
+    sources = listOf(source),
+    scope = scope
+)

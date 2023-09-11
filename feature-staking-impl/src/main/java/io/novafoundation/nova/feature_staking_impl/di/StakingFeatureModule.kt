@@ -56,6 +56,8 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.re
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.PoolStakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.RealStakingRewardsDataSourceRegistry
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.StakingRewardsDataSourceRegistry
+import io.novafoundation.nova.feature_staking_impl.data.validators.FixedKnownNovaValidators
+import io.novafoundation.nova.feature_staking_impl.data.validators.KnownNovaValidators
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.di.staking.PayoutsBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -281,11 +283,16 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideKnownNovaValidators(): KnownNovaValidators = FixedKnownNovaValidators()
+
+    @Provides
+    @FeatureScope
     fun provideValidatorRecommendatorFactory(
         validatorProvider: ValidatorProvider,
         computationalCache: ComputationalCache,
         sharedState: StakingSharedState,
-    ) = ValidatorRecommendatorFactory(validatorProvider, sharedState, computationalCache)
+        knownNovaValidators: KnownNovaValidators
+    ) = ValidatorRecommendatorFactory(validatorProvider, sharedState, computationalCache, knownNovaValidators)
 
     @Provides
     @FeatureScope
@@ -294,13 +301,15 @@ class StakingFeatureModule {
         identityRepository: OnChainIdentityRepository,
         rewardCalculatorFactory: RewardCalculatorFactory,
         stakingConstantsRepository: StakingConstantsRepository,
-        stakingSharedComputation: StakingSharedComputation
+        stakingSharedComputation: StakingSharedComputation,
+        knownNovaValidators: KnownNovaValidators
     ) = ValidatorProvider(
-        stakingRepository,
-        identityRepository,
-        rewardCalculatorFactory,
-        stakingConstantsRepository,
-        stakingSharedComputation
+        stakingRepository = stakingRepository,
+        identityRepository = identityRepository,
+        rewardCalculatorFactory = rewardCalculatorFactory,
+        stakingConstantsRepository = stakingConstantsRepository,
+        stakingSharedComputation = stakingSharedComputation,
+        knownNovaValidators = knownNovaValidators
     )
 
     @Provides

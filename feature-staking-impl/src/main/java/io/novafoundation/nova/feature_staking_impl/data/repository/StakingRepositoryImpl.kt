@@ -43,7 +43,6 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
 import io.novafoundation.nova.runtime.storage.source.query.metadata
-import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
@@ -120,18 +119,18 @@ class StakingRepositoryImpl(
 
     override suspend fun getValidatorPrefs(
         chainId: ChainId,
-        accountIdsHex: List<String>,
+        accountIdsHex: Collection<String>,
     ): AccountIdMap<ValidatorPrefs?> {
         return remoteStorage.query(chainId) {
             runtime.metadata.staking().storage("Validators").entries(
-                keysArguments = accountIdsHex.map(String::fromHex).wrapSingleArgumentKeys(),
+                keysArguments = accountIdsHex.map { listOf(it.fromHex()) },
                 keyExtractor = { (accountId: AccountId) -> accountId.toHexString() },
                 binding = { decoded, _ -> decoded?.let { bindValidatorPrefs(decoded) } }
             )
         }
     }
 
-    override suspend fun getSlashes(chainId: ChainId, accountIdsHex: List<String>): AccountIdMap<Boolean> = withContext(Dispatchers.Default) {
+    override suspend fun getSlashes(chainId: ChainId, accountIdsHex: Collection<String>): AccountIdMap<Boolean> = withContext(Dispatchers.Default) {
         remoteStorage.query(chainId) {
             val activeEraIndex = getActiveEraIndex(chainId)
 
@@ -139,7 +138,7 @@ class StakingRepositoryImpl(
             val slashDeferDuration = bindSlashDeferDuration(slashDeferDurationConstant, runtime)
 
             runtime.metadata.staking().storage("SlashingSpans").entries(
-                keysArguments = accountIdsHex.map(String::fromHex).wrapSingleArgumentKeys(),
+                keysArguments = accountIdsHex.map { listOf(it.fromHex()) },
                 keyExtractor = { (accountId: AccountId) -> accountId.toHexString() },
                 binding = { decoded, _ ->
                     val span = decoded?.let { bindSlashingSpans(it) }

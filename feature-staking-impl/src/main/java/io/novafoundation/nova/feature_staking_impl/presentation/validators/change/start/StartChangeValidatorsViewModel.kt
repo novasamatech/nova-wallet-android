@@ -69,7 +69,7 @@ class StartChangeValidatorsViewModel(
 
     init {
         launch {
-            validatorRecommendatorFactory.awaitValidatorLoading(scope = viewModelScope)
+            validatorRecommendatorFactory.awaitRecommendatorLoading(scope = viewModelScope)
 
             validatorsLoading.value = false
         }
