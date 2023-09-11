@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="23dp"
+    android:orientation="vertical"
+    android:paddingBottom="16dp">
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:layout_width="145dp"
+        android:layout_height="16dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="18dp"
+        android:background="@drawable/bg_shimmering" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:layout_width="185dp"
+        android:layout_height="16dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="18dp"
+        android:background="@drawable/bg_shimmering" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:layout_width="109dp"
+        android:layout_height="16dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/bg_shimmering" />
+
+    <androidx.legacy.widget.Space
+        android:layout_width="match_parent"
+        android:layout_height="39dp" />
+
+    <include layout="@layout/item_start_staking_landing_shimmering_item" />
+
+    <androidx.legacy.widget.Space
+        android:layout_width="match_parent"
+        android:layout_height="41dp" />
+
+    <include layout="@layout/item_start_staking_landing_shimmering_item" />
+
+    <androidx.legacy.widget.Space
+        android:layout_width="match_parent"
+        android:layout_height="41dp" />
+
+    <include layout="@layout/item_start_staking_landing_shimmering_item" />
+
+    <androidx.legacy.widget.Space
+        android:layout_width="match_parent"
+        android:layout_height="41dp" />
+
+    <include layout="@layout/item_start_staking_landing_shimmering_item" />
+
+    <androidx.legacy.widget.Space
+        android:layout_width="match_parent"
+        android:layout_height="41dp" />
+
+    <include layout="@layout/item_start_staking_landing_shimmering_item" />
+
+</LinearLayout>

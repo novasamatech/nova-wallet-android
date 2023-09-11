@@ -170,7 +170,7 @@ class ExternaSignViewModel(
 
     private fun validationFailureToUi(
         failure: ValidationStatus.NotValid<ConfirmDAppOperationValidationFailure>,
-        actions: ValidationFlowActions
+        actions: ValidationFlowActions<*>
     ): TransformedFailure? {
         return when (val reason = failure.reason) {
             is ConfirmDAppOperationValidationFailure.FeeSpikeDetected -> originFeeMixin?.let {

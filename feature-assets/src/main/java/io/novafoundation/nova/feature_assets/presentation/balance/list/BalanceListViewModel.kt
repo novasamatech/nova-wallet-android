@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdown
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdownInteractor
@@ -32,7 +33,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGrou
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
@@ -66,7 +66,7 @@ class BalanceListViewModel(
     private val router: AssetsRouter,
     private val currencyInteractor: CurrencyInteractor,
     private val balanceBreakdownInteractor: BalanceBreakdownInteractor,
-    private val contributionsInteractor: ContributionsInteractor,
+    private val externalBalancesInteractor: ExternalBalancesInteractor,
     private val resourceManager: ResourceManager,
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
 ) : BaseViewModel() {
@@ -100,10 +100,10 @@ class BalanceListViewModel(
     val selectedWalletModelFlow = selectedAccountUseCase.selectedWalletModelFlow()
         .shareInBackground()
 
-    private val offChainBalances = contributionsInteractor.observeTotalContributedByAssets()
+    private val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
         .shareInBackground()
 
-    private val balanceBreakdown = balanceBreakdownInteractor.balanceBreakdownFlow(assetsFlow, offChainBalances)
+    private val balanceBreakdown = balanceBreakdownInteractor.balanceBreakdownFlow(assetsFlow, externalBalancesFlow)
         .shareInBackground()
 
     private val nftsPreviews = assetsListInteractor.observeNftPreviews()
@@ -120,8 +120,8 @@ class BalanceListViewModel(
         .inBackground()
         .share()
 
-    val assetModelsFlow = combine(filteredAssetsFlow, selectedCurrency, offChainBalances) { assets, currency, offChainBalances ->
-        walletInteractor.groupAssets(assets, offChainBalances).mapGroupedAssetsToUi(currency)
+    val assetModelsFlow = combine(filteredAssetsFlow, selectedCurrency, externalBalancesFlow) { assets, currency, externalBalances ->
+        walletInteractor.groupAssets(assets, externalBalances).mapGroupedAssetsToUi(currency)
     }
         .distinctUntilChanged()
         .shareInBackground()
@@ -270,8 +270,8 @@ class BalanceListViewModel(
 
             val breakdown = balanceBreakdown.breakdown.map {
                 BalanceBreakdownAmount(
-                    name = it.asset.token.configuration.symbol + " " + mapBalanceIdToUi(resourceManager, it.id),
-                    amount = mapAmountToAmountModel(it.tokenAmount, it.asset)
+                    name = it.token.configuration.symbol + " " + mapBalanceIdToUi(resourceManager, it.id),
+                    amount = mapAmountToAmountModel(it.tokenAmount, it.token)
                 )
             }
 

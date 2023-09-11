@@ -50,7 +50,7 @@
         android:layout_height="5dp"
         android:layout_marginTop="12dp"
         android:background="@drawable/bg_shimmering"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/itemCrowdloanParaRaisedShimmering" />
 

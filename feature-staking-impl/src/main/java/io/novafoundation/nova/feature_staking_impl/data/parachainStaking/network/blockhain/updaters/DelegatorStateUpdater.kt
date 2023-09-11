@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.networ
 
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.core.storage.StorageCache
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -17,10 +18,10 @@ class DelegatorStateUpdater(
     storageCache: StorageCache,
     val stakingSharedState: StakingSharedState,
     chainRegistry: ChainRegistry,
-) : SingleStorageKeyUpdater<AccountUpdateScope>(scope, stakingSharedState, chainRegistry, storageCache), ParachainStakingUpdater {
+) : SingleStorageKeyUpdater<MetaAccount>(scope, stakingSharedState, chainRegistry, storageCache), ParachainStakingUpdater<MetaAccount> {
 
-    override suspend fun storageKey(runtime: RuntimeSnapshot): String? {
-        val account = scope.getAccount()
+    override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: MetaAccount): String? {
+        val account = scopeValue
         val chain = stakingSharedState.chain()
 
         val accountId = account.accountIdIn(chain) ?: return null

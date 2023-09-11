@@ -6,17 +6,17 @@
     android:layout_height="wrap_content">
 
     <io.novafoundation.nova.common.view.BannerView
+        android:id="@+id/userRewardsBanner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_planet"
-        app:bannerBackground="@drawable/ic_main_banner_background">
+        android:scaleType="matrix"
+        android:src="@drawable/ic_direct_staking_banner_picture"
+        app:bannerBackground="@color/your_rewards_card_background">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="100dp"
-            android:layout_marginBottom="24dp">
+            android:layout_marginStart="16dp">
 
             <TextView
                 android:id="@+id/userRewardsTitle"
@@ -25,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="@string/staking_your_rewards"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/text_tertiary"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -68,15 +68,17 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
+                android:layout_marginBottom="16dp"
                 android:ellipsize="end"
                 android:includeFontPadding="false"
                 android:singleLine="true"
-                android:textColor="@color/text_secondary"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:textColor="@color/text_tertiary"
+                app:layout_constraintBottom_toTopOf="@+id/userRewardsPendingContainer"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/userRewardsTokenAmount"
                 app:layout_constraintTop_toBottomOf="@id/userRewardsTokenAmount"
                 app:layout_constraintVertical_bias="0"
+                app:layout_goneMarginBottom="24dp"
                 tools:text="0.03133 KSM" />
 
             <com.facebook.shimmer.ShimmerFrameLayout
@@ -124,6 +126,57 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:constraint_referenced_ids="userRewardsFiatAmountShimmer, userRewardsTokenAmountShimmer" />
+
+            <View
+                android:id="@+id/userRewardsPendingContainer"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="12dp"
+                android:background="@color/block_background"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/userRewardsPendingAmount"
+                style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline.Primary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="@+id/userRewardsPendingContainer"
+                app:layout_constraintTop_toTopOf="@+id/userRewardsPendingContainer"
+                tools:text="0.00014 DOT" />
+
+            <TextView
+                android:id="@+id/userRewardsPendingFiat"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@+id/userRewardsPendingAmount"
+                app:layout_constraintTop_toBottomOf="@+id/userRewardsPendingAmount"
+                tools:text="$0.004" />
+
+            <io.novafoundation.nova.common.view.PrimaryButton
+                android:id="@+id/userRewardsPendingClaim"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="Claim rewards"
+                app:appearance="primaryTransparent"
+                app:layout_constraintBottom_toBottomOf="@+id/userRewardsPendingContainer"
+                app:layout_constraintEnd_toEndOf="@+id/userRewardsPendingContainer"
+                app:layout_constraintTop_toTopOf="@+id/userRewardsPendingContainer"
+                app:size="extra_small" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/userRewardsPendingGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="userRewardsPendingAmount,userRewardsPendingClaim, userRewardsPendingFiat, userRewardsPendingContainer" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

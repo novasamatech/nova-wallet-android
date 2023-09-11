@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
@@ -21,11 +22,16 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.activateDetection
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.pauseDetection
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.details.parachain
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorParcelModelToCollator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.collators.collatorAddressModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.mapCollatorToDetailsParcelModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.StartParachainStakingMode
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.hints.ConfirmStartParachainStakingHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.startParachainStakingValidationFailure
@@ -47,7 +53,8 @@ import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
 class ConfirmStartParachainStakingViewModel(
-    private val router: ParachainStakingRouter,
+    private val parachainStakingRouter: ParachainStakingRouter,
+    private val startStakingRouter: StartMultiStakingRouter,
     private val addressIconGenerator: AddressIconGenerator,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,
@@ -62,6 +69,7 @@ class ConfirmStartParachainStakingViewModel(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     walletUiUseCase: WalletUiUseCase,
     private val payload: ConfirmStartParachainStakingPayload,
+    private val stakingStartedDetectionService: StakingStartedDetectionService,
     hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
 ) : BaseViewModel(),
     Retriable,
@@ -73,10 +81,7 @@ class ConfirmStartParachainStakingViewModel(
     private val delegatorStateFlow = flowOf { delegatorStateUseCase.currentDelegatorState() }
         .shareInBackground()
 
-    val hintsMixin = hintsMixinFactory.create(
-        coroutineScope = this,
-        delegatorStateFlow = delegatorStateFlow
-    )
+    val hintsMixin = hintsMixinFactory.create(coroutineScope = this, payload.flowMode)
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -126,7 +131,7 @@ class ConfirmStartParachainStakingViewModel(
     }
 
     fun backClicked() {
-        router.back()
+        parachainStakingRouter.back()
     }
 
     fun originAccountClicked() = launch {
@@ -140,7 +145,7 @@ class ConfirmStartParachainStakingViewModel(
             mapCollatorToDetailsParcelModel(collator())
         }
 
-        router.openCollatorDetails(StakeTargetDetailsPayload.parachain(parcel, collatorsUseCase))
+        parachainStakingRouter.openCollatorDetails(StakeTargetDetailsPayload.parachain(parcel, collatorsUseCase))
     }
 
     private fun setInitialFee() = launch {
@@ -172,22 +177,31 @@ class ConfirmStartParachainStakingViewModel(
         val token = assetFlow.first().token
         val amountInPlanks = token.planksFromAmount(payload.amount)
 
+        stakingStartedDetectionService.pauseDetection(viewModelScope)
+
         interactor.delegate(
             amount = amountInPlanks,
             collator = payload.collator.accountIdHex.fromHex()
         )
             .onFailure {
-                it.printStackTrace()
-
                 showError(it)
+
+                stakingStartedDetectionService.activateDetection(viewModelScope)
             }
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.returnToStakingMain()
+                finishFlow()
             }
 
         _showNextProgress.value = false
+    }
+
+    private fun finishFlow() {
+        when (payload.flowMode) {
+            StartParachainStakingMode.START -> startStakingRouter.returnToStakingDashboard()
+            StartParachainStakingMode.BOND_MORE -> parachainStakingRouter.returnToStakingMain()
+        }
     }
 
     private fun requireFee(block: (BigDecimal) -> Unit) = feeLoaderMixin.requireFee(

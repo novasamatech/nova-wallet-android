@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nomination_pools_bond_more_graph"
+    app:startDestination="@id/nominationPoolsSetupBondMoreFragment">
+
+    <fragment
+        android:id="@+id/nominationPoolsSetupBondMoreFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.setup.NominationPoolsSetupBondMoreFragment"
+        android:label="NominationPoolsSetupBondMoreFragment"
+        tools:layout="@layout/fragment_nomination_pools_bond_more">
+
+        <action
+            android:id="@+id/action_nominationPoolsSetupBondMoreFragment_to_nominationPoolsConfirmBondMoreFragment"
+            app:destination="@id/nominationPoolsConfirmBondMoreFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nominationPoolsConfirmBondMoreFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.NominationPoolsConfirmBondMoreFragment"
+        android:label="NominationPoolsConfirmBondMoreFragment"
+        tools:layout="@layout/fragment_nomination_pools_confirm_bond_more" />
+</navigation>

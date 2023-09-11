@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.map
 
 typealias AnySelectedAssetOptionSharedState = SelectedAssetOptionSharedState<*>
 
-interface SelectedAssetOptionSharedState<A> : ChainIdHolder {
+interface SelectedAssetOptionSharedState<out A> : ChainIdHolder {
 
     val selectedOption: Flow<SupportedAssetOption<A>>
 

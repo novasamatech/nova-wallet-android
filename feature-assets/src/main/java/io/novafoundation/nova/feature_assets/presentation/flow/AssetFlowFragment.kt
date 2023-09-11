@@ -24,7 +24,6 @@ import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNot
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowList
 import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowPlaceholder
-import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowSearch
 import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowSearchContainer
 import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowToolbar
 
@@ -68,12 +67,12 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
             itemAnimator = null
         }
 
-        assetFlowSearch.requestFocus()
-        assetFlowSearch.content.showSoftKeyboard()
+        assetFlowToolbar.searchField.requestFocus()
+        assetFlowToolbar.searchField.content.showSoftKeyboard()
     }
 
     override fun subscribe(viewModel: T) {
-        assetFlowSearch.content.bindTo(viewModel.query, lifecycleScope)
+        assetFlowToolbar.searchField.content.bindTo(viewModel.query, lifecycleScope)
 
         viewModel.searchResults.observe { searchResult ->
             assetFlowPlaceholder.setVisible(searchResult.isEmpty())
@@ -98,7 +97,7 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
     override fun onDestroyView() {
         super.onDestroyView()
 
-        assetFlowSearch.hideSoftKeyboard()
+        assetFlowToolbar.searchField.hideSoftKeyboard()
     }
 
     override fun assetClicked(asset: AssetModel) {

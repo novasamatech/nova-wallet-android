@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
+import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -35,6 +36,7 @@ class AssetsFeatureHolder @Inject constructor(
             .crowdloanFeatureApi(getFeature(CrowdloanFeatureApi::class.java))
             .web3NamesApi(getFeature(Web3NamesApi::class.java))
             .walletConnectFeatureApi(getFeature(WalletConnectFeatureApi::class.java))
+            .stakingFeatureApi(getFeature(StakingFeatureApi::class.java))
             .build()
         return DaggerAssetsFeatureComponent.factory()
             .create(router, selectAddressCommunicator, dependencies)

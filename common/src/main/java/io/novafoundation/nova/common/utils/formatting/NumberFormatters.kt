@@ -4,10 +4,12 @@ import android.content.Context
 import android.text.format.DateUtils
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.daysFromMillis
 import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.isNonNegative
+import io.novafoundation.nova.common.utils.toPercent
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
@@ -96,6 +98,10 @@ fun BigDecimal.formatAsPercentage(): String {
 
 fun Percent.format(): String {
     return value.toBigDecimal().formatAsPercentage()
+}
+
+fun Perbill.format(): String {
+    return toPercent().format()
 }
 
 fun BigDecimal.formatFractionAsPercentage(): String {

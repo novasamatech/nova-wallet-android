@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
@@ -43,17 +44,12 @@ class NetworkInfoView @JvmOverloads constructor(
         stakingNetworkCollapsibleView.itemAnimator = null
     }
 
-    fun setState(state: NetworkInfoState?) {
-        if (state == null) {
-            makeGone()
-            return
-        }
+    fun setState(state: NetworkInfoState?) = letOrHide(state) { networkInfoState ->
+        setExpanded(networkInfoState.expanded)
 
-        makeVisible()
+        stakingNetworkInfoTitle.text = networkInfoState.title
 
-        setExpanded(state.expanded)
-
-        adapter.submitList(state.actions)
+        adapter.submitList(networkInfoState.actions)
     }
 
     fun onExpandClicked(listener: OnClickListener) {

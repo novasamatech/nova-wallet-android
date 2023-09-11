@@ -15,7 +15,7 @@ import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.APYSorting
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.TotalStakeSorting
@@ -25,7 +25,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.model.ContinueButtonState
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setCustomValidators
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
@@ -48,7 +49,7 @@ import kotlinx.coroutines.launch
 
 class SelectCustomValidatorsViewModel(
     private val router: StakingRouter,
-    private val validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+    private val validatorRecommenderFactory: ValidatorRecommenderFactory,
     private val recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
     private val addressIconGenerator: AddressIconGenerator,
     private val interactor: StakingInteractor,
@@ -56,10 +57,11 @@ class SelectCustomValidatorsViewModel(
     private val setupStakingSharedState: SetupStakingSharedState,
     private val tokenUseCase: TokenUseCase,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
+    private val payload: CustomValidatorsPayload,
 ) : BaseViewModel() {
 
     private val validatorRecommendator by lazyAsync {
-        validatorRecommendatorFactory.create(scope = viewModelScope)
+        validatorRecommenderFactory.create(scope = viewModelScope)
     }
 
     private val recommendationSettingsProvider by lazyAsync {
@@ -155,17 +157,17 @@ class SelectCustomValidatorsViewModel(
     fun nextClicked() {
         updateSetupStakingState()
 
-        router.openReviewCustomValidators()
+        router.openReviewCustomValidators(payload)
     }
 
-    fun validatorInfoClicked(validatorModel: ValidatorModel) = launch {
+    fun validatorInfoClicked(validatorModel: ValidatorStakeTargetModel) = launch {
         val stakeTarget = mapValidatorToValidatorDetailsParcelModel(validatorModel.stakeTarget)
         val payload = StakeTargetDetailsPayload.relaychain(stakeTarget, interactor)
 
         router.openValidatorDetails(payload)
     }
 
-    fun validatorClicked(validatorModel: ValidatorModel) {
+    fun validatorClicked(validatorModel: ValidatorStakeTargetModel) {
         mutateSelected {
             it.toggle(validatorModel.stakeTarget.asSetItem())
         }
@@ -215,7 +217,7 @@ class SelectCustomValidatorsViewModel(
     private fun observeExternalSelectionChanges() {
         setupStakingSharedState.setupStakingProcess
             .filterIsInstance<SetupStakingProcess.ReadyToSubmit>()
-            .onEach { selectedValidators.value = it.payload.validators.asSetItems() }
+            .onEach { selectedValidators.value = it.validators.asSetItems() }
             .launchIn(viewModelScope)
     }
 
@@ -224,7 +226,7 @@ class SelectCustomValidatorsViewModel(
         validators: List<Validator>,
         selectedValidators: Set<SetItem<Validator>>,
         token: Token,
-    ): List<ValidatorModel> {
+    ): List<ValidatorStakeTargetModel> {
         return validators.map { validator ->
             mapValidatorToValidatorModel(
                 chain = chain,

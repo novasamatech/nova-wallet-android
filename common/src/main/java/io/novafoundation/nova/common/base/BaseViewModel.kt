@@ -69,13 +69,14 @@ open class BaseViewModel : ViewModel(), CoroutineScope, WithCoroutineScopeExtens
         validationFailureTransformerDefault = validationFailureTransformer,
         progressConsumer = progressConsumer,
         autoFixPayload = autoFixPayload,
-        block = block
+        block = block,
+        scope = viewModelScope
     )
 
     suspend fun <P, S> ValidationExecutor.requireValid(
         validationSystem: ValidationSystem<P, S>,
         payload: P,
-        validationFailureTransformerCustom: (ValidationStatus.NotValid<S>, ValidationFlowActions) -> TransformedFailure?,
+        validationFailureTransformerCustom: (ValidationStatus.NotValid<S>, ValidationFlowActions<P>) -> TransformedFailure?,
         autoFixPayload: (original: P, failureStatus: S) -> P = { original, _ -> original },
         progressConsumer: ProgressConsumer? = null,
         block: (P) -> Unit,
@@ -86,6 +87,7 @@ open class BaseViewModel : ViewModel(), CoroutineScope, WithCoroutineScopeExtens
         validationFailureTransformerCustom = validationFailureTransformerCustom,
         progressConsumer = progressConsumer,
         autoFixPayload = autoFixPayload,
-        block = block
+        block = block,
+        scope = viewModelScope
     )
 }

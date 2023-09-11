@@ -8,6 +8,10 @@ object SubqueryExpressions {
 
     fun or(innerExpressions: Collection<String>) = or(*innerExpressions.toTypedArray())
 
+    infix fun String.or(another: String): String {
+        return or(this, another)
+    }
+
     fun anyOf(innerExpressions: Collection<String>) = or(innerExpressions)
     fun anyOf(vararg innerExpressions: String) = or(*innerExpressions)
 

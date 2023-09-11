@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_CONTROLLER
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_PAYOUTS
@@ -28,7 +29,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.unbond
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.validators
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.mainStakingValidationFailure
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -43,14 +43,14 @@ class RelaychainStakeActionsComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: ChainWithAsset,
+        stakingOption: StakingOption,
         hostContext: ComponentHostContext
     ): StakeActionsComponent = RelaychainStakeActionsComponent(
         stakingSharedComputation = stakingSharedComputation,
         resourceManager = resourceManager,
         router = router,
         stakeActionsValidations = stakeActionsValidations,
-        assetWithChain = assetWithChain,
+        stakingOption = stakingOption,
         hostContext = hostContext
     )
 }
@@ -62,7 +62,7 @@ private class RelaychainStakeActionsComponent(
     private val stakeActionsValidations: Map<String, StakeActionsValidationSystem>,
 
     private val hostContext: ComponentHostContext,
-    private val assetWithChain: ChainWithAsset,
+    private val stakingOption: StakingOption,
 ) : StakeActionsComponent,
     CoroutineScope by hostContext.scope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
@@ -70,7 +70,7 @@ private class RelaychainStakeActionsComponent(
     override val events = MutableLiveData<Event<StakeActionsEvent>>()
 
     private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
-        assetWithChain = assetWithChain,
+        assetWithChain = stakingOption.assetWithChain,
         scope = hostContext.scope
     )
 
@@ -102,6 +102,7 @@ private class RelaychainStakeActionsComponent(
                     payload = payload,
                     errorDisplayer = hostContext.errorDisplayer,
                     validationFailureTransformerDefault = { mainStakingValidationFailure(it, resourceManager) },
+                    scope = hostContext.scope
                 ) {
                     navigateToAction(manageStakeAction)
                 }

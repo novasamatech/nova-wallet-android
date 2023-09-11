@@ -9,6 +9,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.model.ParachainStakingRebondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.ConfirmStartParachainStakingFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.ParachainStakingUnbondConfirmFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.model.ParachainStakingUnbondConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.confirm.YieldBoostConfirmFragment
@@ -21,7 +23,10 @@ class ParachainStakingNavigator(
     private val commonNavigator: Navigator,
 ) : BaseNavigator(navigationHolder), ParachainStakingRouter {
 
-    override fun openStartStaking() = performNavigation(R.id.action_open_startParachainStakingGraph)
+    override fun openStartStaking(payload: StartParachainStakingPayload) = performNavigation(
+        actionId = R.id.action_open_startParachainStakingGraph,
+        args = StartParachainStakingFragment.getBundle(payload)
+    )
 
     override fun openConfirmStartStaking(payload: ConfirmStartParachainStakingPayload) = performNavigation(
         actionId = R.id.action_startParachainStakingFragment_to_confirmStartParachainStakingFragment,

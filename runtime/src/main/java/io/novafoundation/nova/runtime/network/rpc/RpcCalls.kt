@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindWeight
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
-import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.calls.FeeCalculationRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockHashRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockRequest
@@ -15,15 +14,13 @@ import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock.Block.Header
 import io.novafoundation.nova.common.utils.extrinsicHash
-import io.novafoundation.nova.common.utils.removeHexPrefix
+import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.asExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.u32
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.toHex
 import jp.co.soramitsu.fearless_utils.wsrpc.executeAsync
 import jp.co.soramitsu.fearless_utils.wsrpc.mappers.nonNull
 import jp.co.soramitsu.fearless_utils.wsrpc.mappers.pojo
@@ -44,21 +41,25 @@ private const val FEE_DECODE_TYPE = "RuntimeDispatchInfo"
 @Suppress("EXPERIMENTAL_API_USAGE")
 class RpcCalls(
     private val chainRegistry: ChainRegistry,
+    private val runtimeCallsApi: MultiChainRuntimeCallsApi
 ) {
 
     suspend fun getExtrinsicFee(chainId: ChainId, extrinsic: String): FeeResponse {
         val runtime = chainRegistry.getRuntime(chainId)
-        val type = runtime.typeRegistry[FEE_DECODE_TYPE]
 
-        return if (type != null) {
+        return if (runtime.typeRegistry[FEE_DECODE_TYPE] != null) {
             val lengthInBytes = extrinsic.fromHex().size
-            val encodedLength = u32.toHex(runtime, lengthInBytes.toBigInteger()).removeHexPrefix()
-            val param = extrinsic + encodedLength
-            val request = StateCallRequest("TransactionPaymentApi_query_info", param)
-            val response = socketFor(chainId).executeAsync(request, mapper = pojo<String>().nonNull())
-            val decoded = type.fromHexOrIncompatible(response, runtime)
 
-            bindPartialFee(decoded)
+            runtimeCallsApi.forChain(chainId).call(
+                section = "TransactionPaymentApi",
+                method = "query_info",
+                arguments = listOf(
+                    extrinsic to null,
+                    lengthInBytes.toBigInteger() to "u32"
+                ),
+                returnType = FEE_DECODE_TYPE,
+                returnBinding = ::bindPartialFee
+            )
         } else {
             val request = FeeCalculationRequest(extrinsic)
             socketFor(chainId).executeAsync(request, mapper = pojo<FeeResponse>().nonNull())

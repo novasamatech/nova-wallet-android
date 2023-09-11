@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.redeem
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
+import io.novafoundation.nova.feature_staking_api.domain.model.numberOfSlashingSpans
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.withdrawUnbonded
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -35,12 +36,6 @@ class RedeemInteractor(
     }
 
     private suspend fun getSlashingSpansNumber(stakingState: StakingState.Stash): BigInteger {
-        val slashingSpans = stakingRepository.getSlashingSpan(stakingState.chain.id, stakingState.stashId)
-
-        return slashingSpans?.let {
-            val totalSpans = it.prior.size + 1 //  all from prior + one for lastNonZeroSlash
-
-            totalSpans.toBigInteger()
-        } ?: BigInteger.ZERO
+        return stakingRepository.getSlashingSpan(stakingState.chain.id, stakingState.stashId).numberOfSlashingSpans()
     }
 }

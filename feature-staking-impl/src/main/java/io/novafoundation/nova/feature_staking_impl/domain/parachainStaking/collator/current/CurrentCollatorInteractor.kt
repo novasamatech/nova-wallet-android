@@ -3,11 +3,13 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.coll
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegatedCollatorIdsHex
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorProvider.CollatorSource
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegationState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.delegationStatesFor
+import io.novafoundation.nova.runtime.state.selectedOption
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -22,16 +24,18 @@ interface CurrentCollatorInteractor {
 class RealCurrentCollatorInteractor(
     private val currentRoundRepository: CurrentRoundRepository,
     private val collatorProvider: CollatorProvider,
+    private val stakingSharedState: StakingSharedState,
 ) : CurrentCollatorInteractor {
 
     override fun currentCollatorsFlow(delegatorState: DelegatorState.Delegator): Flow<GroupedList<DelegatedCollatorGroup, DelegatedCollator>> = flow {
         val chainId = delegatorState.chain.id
+        val stakingOption = stakingSharedState.selectedOption()
 
         val innerFlow = currentRoundRepository.currentRoundInfoFlow(chainId).mapLatest { currentRoundInfo ->
             val snapshots = currentRoundRepository.collatorsSnapshot(chainId, currentRoundInfo.current)
 
             val delegationAccountIds = delegatorState.delegatedCollatorIdsHex()
-            val collatorsById = collatorProvider.getCollators(delegatorState.chainAsset, CollatorSource.Custom(delegationAccountIds), snapshots)
+            val collatorsById = collatorProvider.getCollators(stakingOption, CollatorSource.Custom(delegationAccountIds), snapshots)
                 .associateBy { it.accountIdHex }
 
             val delegationStates = delegatorState.delegationStatesFor(collatorsById)

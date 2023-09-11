@@ -16,13 +16,13 @@ class HistoryDepthUpdater(
     stakingSharedState: StakingSharedState,
     chainRegistry: ChainRegistry,
     storageCache: StorageCache,
-) : SingleStorageKeyUpdater<GlobalScope>(GlobalScope, stakingSharedState, chainRegistry, storageCache), StakingUpdater {
+) : SingleStorageKeyUpdater<Unit>(GlobalScope, stakingSharedState, chainRegistry, storageCache), StakingUpdater<Unit> {
 
     override fun fallbackValue(runtime: RuntimeSnapshot): String? {
         return storageEntry(runtime)?.defaultInHex()
     }
 
-    override suspend fun storageKey(runtime: RuntimeSnapshot): String? {
+    override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: Unit): String? {
         return storageEntry(runtime)?.storageKey()
     }
 

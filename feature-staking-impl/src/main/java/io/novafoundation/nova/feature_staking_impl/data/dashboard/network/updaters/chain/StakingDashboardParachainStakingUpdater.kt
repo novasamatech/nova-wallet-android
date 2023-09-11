@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updat
 
 import io.novafoundation.nova.common.address.get
 import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.activeB
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.ChainStakingStats
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.MultiChainStakingStats
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.MultiChainOffChainSyncResult
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindCandidateMetadata
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindDelegatorState
@@ -36,7 +38,7 @@ class StakingDashboardParachainStakingUpdater(
     chainAsset: Chain.Asset,
     stakingType: Chain.Asset.StakingType,
     metaAccount: MetaAccount,
-    private val stakingStatsFlow: Flow<IndexedValue<MultiChainStakingStats>>,
+    private val stakingStatsFlow: Flow<MultiChainOffChainSyncResult>,
     private val stakingDashboardCache: StakingDashboardCache,
     private val remoteStorageSource: StorageDataSource
 ) : BaseStakingDashboardUpdater(chain, chainAsset, stakingType, metaAccount) {
@@ -99,7 +101,8 @@ class StakingDashboardParachainStakingUpdater(
                 status = secondaryInfo?.status ?: fromCache?.status,
                 rewards = secondaryInfo?.rewards ?: fromCache?.rewards,
                 estimatedEarnings = secondaryInfo?.estimatedEarnings ?: fromCache?.estimatedEarnings,
-                primaryStakingAccountId = parachainStakingBaseInfo.delegatorState.accountId
+                stakeStatusAccount = parachainStakingBaseInfo.delegatorState.accountId,
+                rewardsAccount = parachainStakingBaseInfo.delegatorState.accountId
             )
         } else {
             StakingDashboardItemLocal.notStaking(
@@ -131,6 +134,7 @@ class StakingDashboardParachainStakingUpdater(
     ): StakingDashboardItemLocal.Status? {
         return when {
             baseInfo == null -> null
+            baseInfo.delegatorState.activeBonded.isZero -> StakingDashboardItemLocal.Status.INACTIVE
             chainStakingStats.accountPresentInActiveStakers -> StakingDashboardItemLocal.Status.ACTIVE
             baseInfo.hasWaitingCollators() -> StakingDashboardItemLocal.Status.WAITING
             else -> StakingDashboardItemLocal.Status.INACTIVE

@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.withFlagSet
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.unbondings.DelegationRequestWithCollatorInfo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.unbondings.ParachainStakingUnbondingsInteractor
@@ -27,8 +28,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.from
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
-
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -47,10 +46,10 @@ class ParachainUnbondingComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: ChainWithAsset,
+        stakingOption: StakingOption,
         hostContext: ComponentHostContext,
     ): UnbondingComponent = ParachainUnbondingComponent(
-        assetWithChain = assetWithChain,
+        stakingOption = stakingOption,
         hostContext = hostContext,
         delegatorStateUseCase = delegatorStateUseCase,
         interactor = interactor,
@@ -66,7 +65,7 @@ private class ParachainUnbondingComponent(
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
 
-    private val assetWithChain: ChainWithAsset,
+    private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
     private val router: ParachainStakingRouter
 ) : UnbondingComponent,
@@ -77,7 +76,7 @@ private class ParachainUnbondingComponent(
 
     override val state = delegatorStateUseCase.loadDelegatingState(
         hostContext = hostContext,
-        assetWithChain = assetWithChain,
+        assetWithChain = stakingOption.assetWithChain,
         stateProducer = ::delegatorSummaryStateFlow
     )
         .shareInBackground()

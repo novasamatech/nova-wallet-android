@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.storage.source
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.SubstrateSubscriptionBuilder
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.query.LocalStorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
@@ -12,8 +13,9 @@ import kotlinx.coroutines.flow.map
 
 class LocalStorageSource(
     chainRegistry: ChainRegistry,
+    sharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     private val storageCache: StorageCache,
-) : BaseStorageSource(chainRegistry) {
+) : BaseStorageSource(chainRegistry, sharedRequestsBuilderFactory) {
 
     override suspend fun query(key: String, chainId: String, at: BlockHash?): String? {
         requireWithoutAt(at)

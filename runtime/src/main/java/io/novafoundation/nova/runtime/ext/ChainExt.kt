@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.NOMINATION_POOLS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
@@ -57,7 +58,7 @@ fun Chain.Asset.supportedStakingOptions(): List<Chain.Asset.StakingType> {
 
 enum class StakingTypeGroup {
 
-    RELAYCHAIN, PARACHAIN, UNSUPPORTED
+    RELAYCHAIN, PARACHAIN, NOMINATION_POOL, UNSUPPORTED
 }
 
 fun Chain.Asset.StakingType.group(): StakingTypeGroup {
@@ -65,7 +66,19 @@ fun Chain.Asset.StakingType.group(): StakingTypeGroup {
         UNSUPPORTED -> StakingTypeGroup.UNSUPPORTED
         RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> StakingTypeGroup.RELAYCHAIN
         PARACHAIN, TURING -> StakingTypeGroup.PARACHAIN
+        NOMINATION_POOLS -> StakingTypeGroup.NOMINATION_POOL
     }
+}
+
+fun Chain.Asset.StakingType.isDirectStaking(): Boolean {
+    return when (group()) {
+        StakingTypeGroup.RELAYCHAIN, StakingTypeGroup.PARACHAIN -> true
+        else -> false
+    }
+}
+
+fun Chain.Asset.StakingType.isPoolStaking(): Boolean {
+    return group() == StakingTypeGroup.NOMINATION_POOL
 }
 
 inline fun <reified T : Chain.ExternalApi> Chain.externalApi(): T? {

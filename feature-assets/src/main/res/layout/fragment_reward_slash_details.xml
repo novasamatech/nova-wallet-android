@@ -38,31 +38,18 @@
                 android:src="@drawable/ic_staking_filled"
                 app:tint="@color/icon_secondary" />
 
-            <TextView
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
                 android:id="@+id/rewardDetailAmount"
-                style="@style/TextAppearance.NovaFoundation.Bold.LargeTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:textColor="@color/text_primary"
-                tools:text="-4 KSM" />
-
-            <TextView
-                android:id="@+id/rewardDetailAmountFiat"
-                style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="4dp"
-                android:textColor="@color/text_secondary"
-                tools:text="$149.36" />
+                android:layout_marginTop="16dp" />
 
             <TextView
                 android:id="@+id/rewardDetailStatus"
                 style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:gravity="center_vertical"
                 tools:drawablePadding="4dp"
                 tools:drawableStart="@drawable/ic_checkmark_circle_16"

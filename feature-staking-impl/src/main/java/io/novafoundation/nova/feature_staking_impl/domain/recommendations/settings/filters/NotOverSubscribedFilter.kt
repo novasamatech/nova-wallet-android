@@ -13,7 +13,8 @@ class NotOverSubscribedFilter(
         return if (electedInfo != null) {
             electedInfo.nominatorStakes.size < maxSubscribers
         } else {
-            throw IllegalStateException("Filtering validator ${model.accountIdHex} with no prefs")
+            // inactive validators are considered as non-oversubscribed
+            true
         }
     }
 }

@@ -92,7 +92,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
     }
 
     override fun subscribe(viewModel: SettingsViewModel) {
-        setupConfirmationDialog(viewModel.confirmationAwaitableAction)
+        setupConfirmationDialog(R.style.AccentAlertDialogTheme, viewModel.confirmationAwaitableAction)
         observeBrowserEvents(viewModel)
 
         viewModel.selectedWalletModel.observe {
@@ -143,7 +143,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
     }
 
     private fun showBiometricNotReadyDialog() {
-        dialog(requireContext(), style = R.style.AccentAlertDialogTheme) {
+        dialog(requireContext(), customStyle = R.style.AccentAlertDialogTheme) {
             setTitle(R.string.settings_biometric_not_ready_title)
             setMessage(R.string.settings_biometric_not_ready_message)
             setNegativeButton(R.string.common_cancel, null)

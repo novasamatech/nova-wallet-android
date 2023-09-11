@@ -6,6 +6,7 @@ apply from: '../scripts/secrets.gradle'
 android {
     compileSdkVersion rootProject.compileSdkVersion
 
+
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
@@ -36,6 +37,7 @@ android {
 
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
     }
 }
 

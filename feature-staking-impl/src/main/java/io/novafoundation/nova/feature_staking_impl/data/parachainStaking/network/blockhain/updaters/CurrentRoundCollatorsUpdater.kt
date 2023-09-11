@@ -28,9 +28,12 @@ class CurrentRoundCollatorsUpdater(
     private val chainRegistry: ChainRegistry,
     private val storageCache: StorageCache,
     private val currentRoundRepository: CurrentRoundRepository,
-) : GlobalScopeUpdater, ParachainStakingUpdater {
+) : GlobalScopeUpdater, ParachainStakingUpdater<Unit> {
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(
+        storageSubscriptionBuilder: SharedRequestsBuilder,
+        scopeValue: Unit,
+    ): Flow<Updater.SideEffect> {
         val socketService = storageSubscriptionBuilder.socketService ?: return emptyFlow()
 
         val chainId = stakingSharedState.chainId()
