@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.userRewards.ParachainStakingUserRewardsInteractor
@@ -66,6 +67,7 @@ private class ParachainUserRewardsComponent(
             UserRewardsState(
                 amount = rewardAmount,
                 claimableRewards = null,
+                iconRes = R.drawable.ic_direct_staking_banner_picture,
                 selectedRewardPeriod = mapRewardPeriodToString(resourceManager, rewardPeriod)
             )
         }
