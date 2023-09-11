@@ -10,7 +10,6 @@ interface KnownNovaValidators {
     fun getValidatorIds(chainId: ChainId): Set<String>
 }
 
-
 class FixedKnownNovaValidators : KnownNovaValidators {
 
     private val novaValidators by lazy {
@@ -27,7 +26,7 @@ class FixedKnownNovaValidators : KnownNovaValidators {
         return novaValidators[chainId].orEmpty()
     }
 
-    private fun sharedValidatorsAccountIdsHex() : Set<String> {
+    private fun sharedValidatorsAccountIdsHex(): Set<String> {
         return setOf(
             "127zarPDhVzmCXVQ7Kfr1yyaa9wsMuJ74GJW9Q7ezHfQEgh6".toHexAccountId()
         )

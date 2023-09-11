@@ -110,7 +110,7 @@ class ValidatorProvider(
         chainId: ChainId,
         electedExposures: AccountIdMap<Exposure>
     ): Set<String> {
-        return when(this) {
+        return when (this) {
             is ValidatorSource.Custom -> validatorIds
             ValidatorSource.Elected -> electedExposures.keys
             ValidatorSource.NovaValidators -> knownNovaValidators.getValidatorIds(chainId)
