@@ -9,9 +9,9 @@
         android:id="@+id/userRewardsBanner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:scaleType="matrix"
         android:src="@drawable/ic_direct_staking_banner_picture"
-        app:bannerBackground="@color/your_rewards_card_background"
-        app:imageScaleType="matrix">
+        app:bannerBackground="@color/your_rewards_card_background">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

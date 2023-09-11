@@ -33,11 +33,6 @@ class BannerView @JvmOverloads constructor(
         applyAttributes(attrs)
     }
 
-    enum class ScaleType(val imageScaleType: ImageView.ScaleType) {
-        CENTER(ImageView.ScaleType.CENTER),
-        MATRIX(ImageView.ScaleType.MATRIX)
-    }
-
     fun setOnCloseClickListener(listener: OnClickListener?) {
         bannerClose.setOnClickListener(listener)
     }
@@ -55,7 +50,7 @@ class BannerView @JvmOverloads constructor(
             val showClose = typedArray.getBoolean(R.styleable.BannerView_showClose, false)
             bannerClose.isVisible = showClose
 
-            val style = typedArray.getEnum(R.styleable.BannerView_imageScaleType, ScaleType.CENTER)
+            val style = typedArray.getEnum(R.styleable.BannerView_android_scaleType, ImageView.ScaleType.CENTER)
             setImageScaleType(style)
 
             typedArray.recycle()
@@ -78,7 +73,7 @@ class BannerView @JvmOverloads constructor(
         bannerImage.setImageResource(imageRes)
     }
 
-    fun setImageScaleType(scaleType: ScaleType) {
-        bannerImage.scaleType = scaleType.imageScaleType
+    fun setImageScaleType(scaleType: ImageView.ScaleType) {
+        bannerImage.scaleType = scaleType
     }
 }
