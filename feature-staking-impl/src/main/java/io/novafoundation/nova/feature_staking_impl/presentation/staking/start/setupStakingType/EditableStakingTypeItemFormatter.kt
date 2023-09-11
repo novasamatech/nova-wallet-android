@@ -29,8 +29,8 @@ class EditableStakingTypeItemFormatter(
         val stakingType = validatedStakingType.stakingTypeDetails.stakingType
 
         val (titleRes, imageRes) = when {
-            stakingType.isDirectStaking() -> R.string.setup_staking_type_direct_staking to R.drawable.direct_staking_banner_picture
-            stakingType.isPoolStaking() -> R.string.setup_staking_type_pool_staking to R.drawable.pool_staking_banner_picture
+            stakingType.isDirectStaking() -> R.string.setup_staking_type_direct_staking to R.drawable.ic_direct_staking_banner_picture
+            stakingType.isPoolStaking() -> R.string.setup_staking_type_pool_staking to R.drawable.ic_pool_staking_banner_picture
             else -> return null
         }
 

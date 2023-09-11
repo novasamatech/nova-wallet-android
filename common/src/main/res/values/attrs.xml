@@ -222,6 +222,10 @@
     <declare-styleable name="BannerView">
         <attr name="android:src" format="reference" />
         <attr name="bannerBackground" format="reference|color" />
+        <attr name="imageScaleType" format="enum">
+            <enum name="center" value="0" />
+            <enum name="matrix" value="1" />
+        </attr>
         <attr name="showClose" />
     </declare-styleable>
 

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.vi
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.WithContextExtensions
@@ -12,6 +13,7 @@ import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsState.ClaimableRewards
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
+import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsBanner
 import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsContentGroup
 import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsFiatAmount
 import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsFiatAmountShimmer
@@ -34,8 +36,8 @@ class UserRewardsView @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_user_rewards, this)
 
-        // TODO apply blur
         userRewardsPendingContainer.background = getRoundedCornerDrawable(fillColorRes = R.color.block_background, cornerSizeDp = 10)
+        userRewardsPendingGroup.makeGone()
     }
 
     fun showPendingRewardsLoading() {
@@ -59,6 +61,10 @@ class UserRewardsView @JvmOverloads constructor(
 
         userRewardsTokenAmount.text = amountModel.token
         userRewardsFiatAmount.text = amountModel.fiat
+    }
+
+    fun setBannerImage(@DrawableRes imageRes: Int) {
+        userRewardsBanner.setImage(imageRes)
     }
 
     fun setClaimClickListener(listener: (View) -> Unit) {

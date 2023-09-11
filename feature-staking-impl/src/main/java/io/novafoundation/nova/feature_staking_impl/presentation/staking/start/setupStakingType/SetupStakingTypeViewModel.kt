@@ -127,7 +127,6 @@ class SetupStakingTypeViewModel(
 
             router.back()
         }
-
     }
 
     fun donePressed() {

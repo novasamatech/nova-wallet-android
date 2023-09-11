@@ -71,6 +71,7 @@
     <color name="solid_navigation_background">#0F111A</color>
     <color name="dim_background">#7A08090E</color>
     <color name="waiting_status_background">#3D999EC7</color>
+    <color name="your_rewards_card_background">#060A33</color>
 
     <!-- Button Colors -->
     <color name="button_background_primary">#1F78FF</color>
