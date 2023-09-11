@@ -39,7 +39,7 @@ class RuntimeParachainStakingConstantsRepository(
 
     override suspend fun minimumDelegatorStake(chainId: ChainId): BigInteger {
         return numberConstantOrNull(chainId, "MinDelegatorStk")
-            // Starting from runtime 1500, MinDelegatorStk was removed and only MinDelegation remained
+            // Starting from runtime 2500, MinDelegatorStk was removed and only MinDelegation remained
             ?: minimumDelegation(chainId)
     }
 
