@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="pool_full_failure_title">Pool is full</string>
+    <string name="pool_full_failure_message">You cannot join pool since it reached maximum number of members</string>
+
+    <string name="pool_inactive_failure_title">Pool is not open</string>
+    <string name="pool_inactive_failure_message">You cannot join pool that is not open. Please, contact the pool owner.</string>
 
     <!--<string name="dapp_browser_close_warning_message">Are you sure you want to close this screen?\nYour changes will not be applied.</string>-->
     <string name="common_close_confirmation_message">Are you sure you want to close this screen?\nYour changes will not be applied.</string>
