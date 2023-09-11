@@ -61,9 +61,7 @@ class RealStakingTypeDetailsCompoundInteractor(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val interactors: List<StakingTypeDetailsInteractor>,
-    private val stakingOptionIds: MultiStakingOptionIds,
-    private val stakingEraInteractor: StakingEraInteractor,
-    private val stakingDashboardRepository: StakingDashboardRepository
+    private val stakingEraInteractor: StakingEraInteractor
 ) : StakingTypeDetailsCompoundInteractor {
 
     override suspend fun validationSystem(): StartStakingLandingValidationSystem {
