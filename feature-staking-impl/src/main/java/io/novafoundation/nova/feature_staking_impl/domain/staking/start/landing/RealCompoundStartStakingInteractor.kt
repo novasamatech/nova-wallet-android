@@ -4,9 +4,6 @@ import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MultiStakingOptionIds
-import io.novafoundation.nova.feature_staking_impl.data.dashboard.model.StakingDashboardItem
-import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.model.PayoutType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.model.StartStakingEraInfo
@@ -19,7 +16,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.transform
 import java.math.BigInteger
 import io.novafoundation.nova.common.utils.combine as combineList
 
@@ -56,7 +52,7 @@ interface CompoundStartStakingInteractor {
 
     fun observeAvailableBalance(): Flow<LandingAvailableBalance>
 
-    fun observeStatingStarted(): Flow<Chain>
+
 }
 
 class RealCompoundStartStakingInteractor(
@@ -65,9 +61,7 @@ class RealCompoundStartStakingInteractor(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val interactors: List<StartStakingInteractor>,
-    private val stakingOptionIds: MultiStakingOptionIds,
     private val stakingEraInteractor: StakingEraInteractor,
-    private val stakingDashboardRepository: StakingDashboardRepository
 ) : CompoundStartStakingInteractor {
     override suspend fun validationSystem(): StartStakingLandingValidationSystem {
         return ValidationSystem.startStalingLanding()
@@ -98,19 +92,6 @@ class RealCompoundStartStakingInteractor(
                 .orZero()
 
             LandingAvailableBalance(it, maxAvailableBalance)
-        }
-    }
-
-    override fun observeStatingStarted(): Flow<Chain> {
-        return accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
-            stakingDashboardRepository.dashboardItemsFlow(account.id, stakingOptionIds)
-                .transform { dashboardItems ->
-                    val hasAnyStake = dashboardItems.any { item -> item.stakeState is StakingDashboardItem.StakeState.HasStake }
-
-                    if (hasAnyStake) {
-                        emit(chain)
-                    }
-                }
         }
     }
 

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.l
 
 import android.graphics.Color
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.domain.isLoading
@@ -29,6 +30,8 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.awaitStakingStarted
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.ParticipationInGovernance
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.Payouts
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingCompoundData
@@ -75,16 +78,18 @@ class StartStakingLandingViewModel(
     private val startStakingLandingPayload: StartStakingLandingPayload,
     private val validationExecutor: ValidationExecutor,
     private val selectedMetaAccountUseCase: SelectedAccountUseCase,
-    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val stakingStartedDetectionService: StakingStartedDetectionService,
 ) : BaseViewModel(),
     Browserable,
     Validatable by validationExecutor {
 
     private val availableStakingOptionsPayload = startStakingLandingPayload.availableStakingOptions
+    private val stakingOptionIds = availableStakingOptionsPayload.toStakingOptionIds()
 
     private val startStakingInteractor = flowOf {
         startStakingInteractorFactory.create(
-            multiStakingOptionIds = availableStakingOptionsPayload.toStakingOptionIds(),
+            multiStakingOptionIds = stakingOptionIds,
             coroutineScope = this
         )
     }.shareInBackground()
@@ -169,8 +174,10 @@ class StartStakingLandingViewModel(
     }
 
     private fun closeOnStakingStarted() = launch {
-        val interactor = startStakingInteractor.first()
-        val stakingStartedChain = interactor.observeStatingStarted().first()
+        val stakingStartedChain = stakingStartedDetectionService.awaitStakingStarted(
+            stakingOptionIds = stakingOptionIds,
+            screenScope = viewModelScope
+        )
 
         val title = resourceManager.getString(R.string.staking_already_staking_title, stakingStartedChain.name)
 

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
@@ -21,6 +22,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.activateDetection
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.pauseDetection
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.details.parachain
@@ -65,6 +69,7 @@ class ConfirmStartParachainStakingViewModel(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     walletUiUseCase: WalletUiUseCase,
     private val payload: ConfirmStartParachainStakingPayload,
+    private val stakingStartedDetectionService: StakingStartedDetectionService,
     hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
 ) : BaseViewModel(),
     Retriable,
@@ -172,12 +177,16 @@ class ConfirmStartParachainStakingViewModel(
         val token = assetFlow.first().token
         val amountInPlanks = token.planksFromAmount(payload.amount)
 
+        stakingStartedDetectionService.pauseDetection(viewModelScope)
+
         interactor.delegate(
             amount = amountInPlanks,
             collator = payload.collator.accountIdHex.fromHex()
         )
             .onFailure {
                 showError(it)
+
+                stakingStartedDetectionService.activateDetection(viewModelScope)
             }
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
