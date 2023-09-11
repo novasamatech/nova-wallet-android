@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MultiStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.direct.StakingTypeDetailsInteractorFactory
@@ -20,6 +21,7 @@ class StakingTypeDetailsCompoundInteractorFactory(
     private val stakingEraInteractorFactory: StakingEraInteractorFactory,
     private val stakingTypeDetailsInteractorFactories: Map<StakingTypeGroup, StakingTypeDetailsInteractorFactory>,
     private val chainRegistry: ChainRegistry,
+    private val stakingDashboardRepository: StakingDashboardRepository
 ) {
 
     suspend fun create(
@@ -37,6 +39,8 @@ class StakingTypeDetailsCompoundInteractorFactory(
             accountRepository = accountRepository,
             interactors = interactors,
             stakingEraInteractor = stakingEraInteractor,
+            stakingOptionIds = multiStakingOptionIds,
+            stakingDashboardRepository = stakingDashboardRepository,
         )
     }
 

@@ -6,6 +6,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
@@ -101,13 +102,15 @@ class StakingTypeDetailsModule {
         stakingEraInteractorFactory: StakingEraInteractorFactory,
         chainRegistry: ChainRegistry,
         factories: Map<StakingTypeGroup, @JvmSuppressWildcards StakingTypeDetailsInteractorFactory>,
+        stakingDashboardRepository: StakingDashboardRepository
     ): StakingTypeDetailsCompoundInteractorFactory {
         return StakingTypeDetailsCompoundInteractorFactory(
             walletRepository = walletRepository,
             accountRepository = accountRepository,
             stakingEraInteractorFactory = stakingEraInteractorFactory,
             stakingTypeDetailsInteractorFactories = factories,
-            chainRegistry = chainRegistry
+            chainRegistry = chainRegistry,
+            stakingDashboardRepository = stakingDashboardRepository
         )
     }
 }
