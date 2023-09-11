@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository
 
 import io.novafoundation.nova.common.utils.numberConstant
+import io.novafoundation.nova.common.utils.numberConstantOrNull
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -37,7 +38,9 @@ class RuntimeParachainStakingConstantsRepository(
     }
 
     override suspend fun minimumDelegatorStake(chainId: ChainId): BigInteger {
-        return numberConstant(chainId, "MinDelegatorStk")
+        return numberConstantOrNull(chainId, "MinDelegatorStk")
+            // Starting from runtime 1500, MinDelegatorStk was removed and only MinDelegation remained
+            ?: minimumDelegation(chainId)
     }
 
     override suspend fun delegationBondLessDelay(chainId: ChainId): BigInteger {
@@ -52,5 +55,11 @@ class RuntimeParachainStakingConstantsRepository(
         val runtime = chainRegistry.getRuntime(chainId)
 
         return runtime.metadata.parachainStaking().numberConstant(name, runtime)
+    }
+
+    private suspend fun numberConstantOrNull(chainId: ChainId, name: String): BigInteger? {
+        val runtime = chainRegistry.getRuntime(chainId)
+
+        return runtime.metadata.parachainStaking().numberConstantOrNull(name, runtime)
     }
 }
