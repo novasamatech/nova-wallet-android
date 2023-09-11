@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -58,6 +59,7 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), Setu
     }
 
     override fun subscribe(viewModel: SetupStakingTypeViewModel) {
+        setupConfirmationDialog(R.style.AccentNegativeAlertDialogTheme_Reversed, viewModel.closeConfirmationAction)
         observeValidations(viewModel)
 
         viewModel.availableToRewriteData.observe { setupStakingTypeToolbar.setRightActionEnabled(it) }

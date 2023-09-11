@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <!--<string name="dapp_browser_close_warning_message">Are you sure you want to close this screen?\nYour changes will not be applied.</string>-->
+    <string name="common_close_confirmation_message">Are you sure you want to close this screen?\nYour changes will not be applied.</string>
+
     <!--<string name="delegate_search_placeholder_default">Search result will be displayed here</string>-->
     <string name="common_search_placeholder_default">Search result will be displayed here</string>
 
@@ -1053,7 +1056,6 @@
 
     <string name="wallet_send_insufficient_balance_commission">You don\'t have enough %s to pay fees</string>
 
-    <string name="dapp_browser_close_warning_message">Are you sure you want to close this screen?\nYour changes will not be applied.</string>
     <string name="common_close">Close</string>
 
     <string name="dapp_search_hint">Search by name or enter URL</string>

@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.di.staking.startMultiStaking.MultiStakingSelectionStoreProviderKey
@@ -67,7 +68,8 @@ class SetupStakingTypeModule {
         validationExecutor: ValidationExecutor,
         setupStakingTypeFlowExecutorFactory: SetupStakingTypeFlowExecutorFactory,
         setupStakingTypeSelectionMixinFactory: SetupStakingTypeSelectionMixinFactory,
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     ): ViewModel {
         return SetupStakingTypeViewModel(
             stakingRouter,
@@ -81,6 +83,7 @@ class SetupStakingTypeModule {
             validationExecutor,
             setupStakingTypeFlowExecutorFactory,
             setupStakingTypeSelectionMixinFactory,
+            actionAwaitableMixinFactory,
             chainRegistry
         )
     }

@@ -92,7 +92,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
     }
 
     override fun subscribe(viewModel: SettingsViewModel) {
-        setupConfirmationDialog(viewModel.confirmationAwaitableAction)
+        setupConfirmationDialog(R.style.AccentAlertDialogTheme, viewModel.confirmationAwaitableAction)
         observeBrowserEvents(viewModel)
 
         viewModel.selectedWalletModel.observe {

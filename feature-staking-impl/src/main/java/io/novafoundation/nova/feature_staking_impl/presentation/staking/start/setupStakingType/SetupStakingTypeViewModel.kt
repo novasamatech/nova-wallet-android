@@ -2,10 +2,14 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.s
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.RecommendableMultiStakingSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
@@ -42,8 +46,11 @@ class SetupStakingTypeViewModel(
     private val validationExecutor: ValidationExecutor,
     private val setupStakingTypeFlowExecutorFactory: SetupStakingTypeFlowExecutorFactory,
     private val setupStakingTypeSelectionMixinFactory: SetupStakingTypeSelectionMixinFactory,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     chainRegistry: ChainRegistry
 ) : BaseViewModel(), Validatable by validationExecutor {
+
+    val closeConfirmationAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
 
     private val setupStakingTypeSelectionMixin = setupStakingTypeSelectionMixinFactory.create(viewModelScope)
 
@@ -108,9 +115,18 @@ class SetupStakingTypeViewModel(
     }
 
     fun backPressed() {
-        // TODO: request access to close
+        launch {
+            closeConfirmationAction.awaitAction(
+                ConfirmationDialogInfo(
+                    R.string.common_confirmation_title,
+                    R.string.common_close_confirmation_message,
+                    R.string.common_close,
+                    R.string.common_cancel,
+                )
+            )
 
-        router.back()
+            router.back()
+        }
     }
 
     fun donePressed() {

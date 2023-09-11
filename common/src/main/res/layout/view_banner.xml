@@ -33,7 +33,7 @@
             android:id="@+id/bannerImage"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:scaleType="center"
+            android:scaleType="matrix"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
