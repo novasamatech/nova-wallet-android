@@ -51,7 +51,7 @@
         <item name="android:textColorPrimary">@color/text_primary</item>
     </style>
 
-    <style name="WhiteOverlay" parent="ThemeOverlay.AppCompat">
-        <item name="colorPrimary">@color/text_primary</item>
+    <style name="BlueDarkOverlay" parent="ThemeOverlay.AppCompat">
+        <item name="colorPrimary">@color/button_text_accent</item>
     </style>
 </resources>

@@ -21,6 +21,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.di.StartParachainStakingModule
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.hints.ConfirmStartParachainStakingHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
@@ -28,8 +30,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
-@Module(includes = [ViewModelModule::class])
-class StartParachainStakingModule {
+@Module(includes = [ViewModelModule::class, StartParachainStakingModule::class])
+class SetupStartParachainStakingModule {
 
     @Provides
     @ScreenScope
@@ -56,6 +58,7 @@ class StartParachainStakingModule {
         addressIconGenerator: AddressIconGenerator,
         delegatorStateUseCase: DelegatorStateUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
         collatorsUseCase: CollatorsUseCase,
         payload: StartParachainStakingPayload,
     ): ViewModel {
@@ -74,6 +77,7 @@ class StartParachainStakingModule {
             delegatorStateUseCase = delegatorStateUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             collatorsUseCase = collatorsUseCase,
+            hintsMixinFactory = hintsMixinFactory,
             payload = payload
         )
     }

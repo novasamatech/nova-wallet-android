@@ -18,7 +18,7 @@ import kotlinx.coroutines.CoroutineScope
 fun CoroutineScope.mapAssetTransferValidationFailureToUI(
     resourceManager: ResourceManager,
     status: ValidationStatus.NotValid<AssetTransferValidationFailure>,
-    actions: ValidationFlowActions,
+    actions: ValidationFlowActions<*>,
     feeLoaderMixin: FeeLoaderMixin.Presentation,
 ): TransformedFailure? {
     return when (val reason = status.reason) {

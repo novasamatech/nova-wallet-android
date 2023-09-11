@@ -16,6 +16,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.selecting.SearchNominationPoolInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolAvailableBalanceValidationFactory
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.RealNominationPoolsAvailableBalanceResolver
@@ -151,9 +154,7 @@ class StartMultiStakingModule {
 
     @Provides
     @FeatureScope
-    fun provideNominationPoolsAvailableBalanceResolver(
-        walletConstants: WalletConstants
-    ): NominationPoolsAvailableBalanceResolver {
+    fun provideNominationPoolsAvailableBalanceResolver(walletConstants: WalletConstants): NominationPoolsAvailableBalanceResolver {
         return RealNominationPoolsAvailableBalanceResolver(walletConstants)
     }
 
@@ -183,13 +184,15 @@ class StartMultiStakingModule {
         nominationPoolSharedComputation: NominationPoolSharedComputation,
         nominationPoolRecommenderFactory: NominationPoolRecommenderFactory,
         availableBalanceResolver: NominationPoolsAvailableBalanceResolver,
-        nominationPoolGlobalsRepository: NominationPoolGlobalsRepository
+        nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
+        poolAvailableBalanceValidationFactory: PoolAvailableBalanceValidationFactory,
     ): SingleStakingPropertiesFactory {
         return NominationPoolStakingPropertiesFactory(
             nominationPoolSharedComputation = nominationPoolSharedComputation,
             nominationPoolRecommenderFactory = nominationPoolRecommenderFactory,
             poolsAvailableBalanceResolver = availableBalanceResolver,
-            nominationPoolGlobalsRepository = nominationPoolGlobalsRepository
+            nominationPoolGlobalsRepository = nominationPoolGlobalsRepository,
+            poolAvailableBalanceValidationFactory = poolAvailableBalanceValidationFactory,
         )
     }
 

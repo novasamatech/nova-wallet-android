@@ -29,6 +29,35 @@
     <string name="setup_staking_type_pool_staking">Pool staking</string>
     <string name="setup_staking_type_direct_staking">Direct staking</string>
 
+    <string name="staking_unstake_all">Unstake all</string>
+
+    <!--    <string name="choose_amount_error_too_big">Sorry, you don\'t have enough funds to spend specified amount</string>-->
+    <string name="choose_amount_error_too_big">Sorry, you don\'t have enough funds to spend the specified amount</string>
+
+    <!--    <string name="staking_setup_amount_too_low">You cannot stake less than the network minimum value (%s)</string>-->
+    <string name="staking_setup_amount_too_low">You can\'t stake less than the minimal value (%s)</string>
+
+    <!--    <string name="add_delegation_missing_account_message">You should add %s account to the wallet in order to delegate</string>-->
+<!--    <string name="staking_missing_account_message">You should add a %s account to your wallet in order to start staking</string>-->
+<!--    <string name="referendum_missing_account_message">You should add %s account to the wallet in order to vote</string>-->
+<!--    <string name="crowdloan_missing_account_message">You should add %s account to the wallet in order to contribute</string>-->
+    <string name="staking_missing_account_message">You need to add a %s account to your wallet in order to start staking</string>
+    <string name="add_delegation_missing_account_message">You need to add a %s account to the wallet in order to delegate</string>
+    <string name="referendum_missing_account_message">You need to add a %s account to the wallet in order to vote</string>
+    <string name="crowdloan_missing_account_message">You need to add a %s account to the wallet in order to contribute</string>
+
+
+    <string name="staking_info">Staking info</string>
+    <string name="nomination_pools_info">Pool staking info</string>
+<!--    <string name="staking_about">About staking</string>-->
+
+    <string name="staking_already_staking_title">You are already have staking in %s</string>
+
+    <string name="staking_unable_to_stake_more_title">Unable to stake more</string>
+    <string name="staking_unable_to_stake_more_message">You are unstaking all of your tokens and can\'t stake more.</string>
+
+    <string name="staking_stake_max">Stake max</string>
+    <string name="staking_pool_available_validation_message">Your available balance is %s, you need to leave %s as minimal balance and pay network fee of %s. You can stake not more than %s.</string>
     <string name="staking_staking_type">Staking type</string>
 
     <string name="start_staking_inactive_pool_message">The pool you have selected is inactive due to no validators selected or its stake is less than the minimum.\nAre you sure you want to proceed with the selected Pool?</string>
@@ -290,8 +319,6 @@
     <string name="common_some_tx_failed_title">Failed to submit some transactions</string>
     <string name="common_some_tx_failed_message">There was an error while submitting some transactions. Do you want to retry?</string>
 
-    <string name="staking_setup_amount_too_low">You cannot stake less than the network minimum value (%s)</string>
-
     <string name="staking_setup_amount_less_than_recommended">The recommended minimum stake to consistently receive rewards is %s.</string>
 
     <string name="staking_alert_bond_more_title">Stake more tokens</string>
@@ -314,7 +341,6 @@
     <string name="staking_reward_payouts_payout_all">Pay out all (%s)</string>
     <string name="staking_pending_rewards_subtitle">You can pay them out yourself, when they are close to expire, but you will pay the fee</string>
 
-    <string name="add_delegation_missing_account_message">You should add %s account to the wallet in order to delegate</string>
 
     <string name="referendum_vote_abstain">Abstain</string>
 
@@ -510,8 +536,6 @@
 
     <string name="referenda_list_placeholder">Referenda information will appear here when they start</string>
 
-    <string name="referendum_missing_account_message">You should add %s account to the wallet in order to vote</string>
-
     <string name="dapp_sign_error_unsupported_chain">Unsupported chain with genesis hash %s</string>
 
     <string name="referendum_unlock_remains_locked_format">remains locked in %s</string>
@@ -641,8 +665,6 @@
     <string name="crowdloan_contributions_parallel_source">Parallel</string>
 
     <string name="assets_balance_details_locks_crowdloans">Crowdloans</string>
-
-    <string name="crowdloan_missing_account_message">You should add %s account to the wallet in order to contribute</string>
 
     <string name="common_accept_terms">Accept terms...</string>
     <string name="yield_boost_terms">Yield Boost will automatically stake %s all my transferable tokens above %s</string>
@@ -913,7 +935,6 @@
     <string name="staking_setup_amount_too_low_strict">Minimum stake should be greater than %s</string>
 
     <string name="common_missing_account_title">%s account is missing</string>
-    <string name="staking_missing_account_message">You should add %s account to the wallet in order to start staking</string>
 
     <string name="common_enter_amount">Enter amount…</string>
     <string name="staking_parachain_select_collator_hint">Select collator…</string>
@@ -1122,7 +1143,6 @@
     <string name="choose_amount_available_balance">Available balance</string>
     <string name="choose_amount_error_balance">Sorry, balance checking request failed. Please, try again later.</string>
     <string name="choose_amount_error_fee">Sorry, we couldn\'t contact transfer provider. Please, try again later.</string>
-    <string name="choose_amount_error_too_big">Sorry, you don\'t have enough funds to spend specified amount</string>
     <string name="choose_amount_fee">Transfer fee</string>
     <string name="choose_amount_initial" translatable="false">0</string>
     <string name="choose_amount_network_error">Network not responding</string>
@@ -1344,7 +1364,6 @@
     <string name="settings_youtube">Youtube</string>
     <string name="sr25519_selection_subtitle">sr25519 (recommended)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
-    <string name="staking_about">About staking</string>
     <string name="staking_account_is_used_as_controller">Selected account is already in use as controller</string>
     <string name="staking_add_controller">Add controller account %s to the application to perform this action.</string>
     <string name="staking_alert_change_validators">Change your validators.</string>

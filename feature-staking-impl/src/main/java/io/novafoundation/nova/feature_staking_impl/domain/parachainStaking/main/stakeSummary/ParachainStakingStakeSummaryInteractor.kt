@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.stakeSummary
 
 import io.novafoundation.nova.common.utils.anyIs
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.activeBonded
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegatedCollatorIds
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
@@ -31,6 +33,7 @@ class ParachainStakingStakeSummaryInteractor(
             val delegationStates = delegatorState.delegationStatesIn(snapshots, candidateMetadatas).values
 
             when {
+                delegatorState.activeBonded.isZero -> emit(DelegatorStatus.Inactive)
                 delegationStates.anyIs(DelegationState.ACTIVE) -> emit(DelegatorStatus.Active)
                 delegationStates.anyIs(DelegationState.WAITING) -> {
                     val targetRound = currentRoundInfo.current + BigInteger.ONE

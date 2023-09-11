@@ -18,9 +18,12 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
@@ -94,7 +97,7 @@ class NominationPoolsSetupBondMoreViewModel(
     private fun maybeGoToNext() = launch {
         showNextProgress.value = true
 
-        val fee = originFeeMixin.awaitFee()
+        val fee = originFeeMixin.awaitDecimalFee()
 
         val payload = NominationPoolsBondMoreValidationPayload(
             fee = fee,
@@ -106,19 +109,21 @@ class NominationPoolsSetupBondMoreViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformer = { nominationPoolsBondMoreValidationFailure(it, resourceManager) },
+            validationFailureTransformerCustom = { status, flowActions ->
+                nominationPoolsBondMoreValidationFailure(status, resourceManager, flowActions, amountChooserMixin::setAmount)
+            },
             progressConsumer = showNextProgress.progressConsumer()
-        ) {
+        ) { updatedPayload ->
             showNextProgress.value = false
 
-            openConfirm(payload)
+            openConfirm(updatedPayload)
         }
     }
 
     private fun openConfirm(validationPayload: NominationPoolsBondMoreValidationPayload) {
         val confirmPayload = NominationPoolsConfirmBondMorePayload(
             amount = validationPayload.amount,
-            fee = validationPayload.fee
+            fee = mapFeeToParcel(validationPayload.fee)
         )
 
         router.openConfirmBondMore(confirmPayload)

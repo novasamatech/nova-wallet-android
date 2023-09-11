@@ -135,8 +135,7 @@ class EquilibriumAssetBalance(
 
         var oldBlockHash: String? = null
 
-        return combine(assetBalancesFlow, reservedBalanceFlow) { assetBalancesWithBlock, reservedBalancesWithBlocks ->
-            val assetBalances = assetBalancesWithBlock.second
+        return combine(assetBalancesFlow, reservedBalanceFlow) { (blockHash, assetBalances), reservedBalancesWithBlocks ->
             val freeByAssetId = assetBalances.assets.associateBy { it.assetId }
             val reservedByAssetId = reservedBalancesWithBlocks.associateBy { it.assetId }
 
@@ -145,9 +144,9 @@ class EquilibriumAssetBalance(
                 val reserved = reservedByAssetId[asset.id]?.reservedBalance
                 val locks = if (asset.isUtilityAsset) assetBalances.lock else BigInteger.ZERO
                 AssetLocal(
-                    asset.id,
-                    asset.chainId,
-                    metaAccount.id,
+                    assetId = asset.id,
+                    chainId = asset.chainId,
+                    metaId = metaAccount.id,
                     freeInPlanks = free.orZero(),
                     reservedInPlanks = reserved.orZero(),
                     frozenInPlanks = locks.orZero(),
@@ -157,7 +156,6 @@ class EquilibriumAssetBalance(
                 )
             }
 
-            val blockHash = assetBalancesWithBlock.first
             if (diff.hasUpdated() && oldBlockHash != blockHash) {
                 oldBlockHash = blockHash
                 BalanceSyncUpdate.CauseFetchable(blockHash)

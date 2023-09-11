@@ -180,6 +180,7 @@ private class RelaychainAlertsComponent(
             payload = StakeActionsValidationPayload(stashState),
             errorDisplayer = hostContext.errorDisplayer,
             validationFailureTransformerDefault = { mainStakingValidationFailure(it, resourceManager) },
+            scope = hostContext.scope
         ) {
             action()
         }

@@ -2,15 +2,18 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updat
 
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.activeBalance
+import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.ChainStakingStats
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.MultiChainStakingStats
@@ -21,10 +24,8 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.nominationPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.api.poolMembers
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.BondedPool
-import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolPoints
-import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.PoolBalanceConvertable
@@ -192,6 +193,7 @@ class StakingDashboardNominationPoolsUpdater(
     ): StakingDashboardItemLocal.Status? {
         return when {
             baseInfo == null -> null
+            baseInfo.poolMember.points.value.isZero -> StakingDashboardItemLocal.Status.INACTIVE
             chainStakingStats.accountPresentInActiveStakers -> StakingDashboardItemLocal.Status.ACTIVE
             baseInfo.poolAggregatedState.poolNominations != null && baseInfo.poolAggregatedState.poolNominations.isWaiting(activeEra) -> {
                 StakingDashboardItemLocal.Status.WAITING

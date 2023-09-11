@@ -102,6 +102,7 @@ private class RelaychainStakeActionsComponent(
                     payload = payload,
                     errorDisplayer = hostContext.errorDisplayer,
                     validationFailureTransformerDefault = { mainStakingValidationFailure(it, resourceManager) },
+                    scope = hostContext.scope
                 ) {
                     navigateToAction(manageStakeAction)
                 }

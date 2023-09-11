@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.nominationPools
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.setter
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -22,10 +23,12 @@ import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -49,6 +52,8 @@ class NominationPoolsConfirmBondMoreViewModel(
     ExternalActions by externalActions,
     Validatable by validationExecutor {
 
+    private val decimalFee = mapFeeFromParcel(payload.fee)
+
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: Flow<Boolean> = _showNextProgress
 
@@ -57,16 +62,16 @@ class NominationPoolsConfirmBondMoreViewModel(
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
 
-    val amountModelFlow = assetFlow.map { asset ->
-        mapAmountToAmountModel(payload.amount, asset)
-    }
+    private val amountFlow = MutableStateFlow(payload.amount)
+
+    val amountModelFlow = combine(amountFlow, assetFlow, ::mapAmountToAmountModel)
         .shareInBackground()
 
     val walletUiFlow = walletUiUseCase.selectedWalletUiFlow()
         .shareInBackground()
 
     val feeStatusFlow = assetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(payload.fee, asset.token)
+        val feeModel = mapFeeToFeeModel(decimalFee.fee, asset.token)
 
         FeeStatus.Loaded(feeModel)
     }
@@ -96,8 +101,8 @@ class NominationPoolsConfirmBondMoreViewModel(
 
     private fun maybeGoToNext() = launch {
         val payload = NominationPoolsBondMoreValidationPayload(
-            fee = payload.fee,
-            amount = payload.amount,
+            fee = decimalFee,
+            amount = amountFlow.first(),
             poolMember = poolMember.first(),
             asset = assetFlow.first()
         )
@@ -105,7 +110,9 @@ class NominationPoolsConfirmBondMoreViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformer = { nominationPoolsBondMoreValidationFailure(it, resourceManager) },
+            validationFailureTransformerCustom = { status, flowActions ->
+                nominationPoolsBondMoreValidationFailure(status, resourceManager, flowActions, amountFlow.setter())
+            },
             progressConsumer = _showNextProgress.progressConsumer(),
             block = ::sendTransaction
         )

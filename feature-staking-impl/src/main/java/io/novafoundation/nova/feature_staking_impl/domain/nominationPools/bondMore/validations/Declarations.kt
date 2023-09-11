@@ -1,26 +1,29 @@
 package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.validations
 
+import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolAvailableBalanceValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolStateValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.validateNotDestroying
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
-import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 
+typealias NominationPoolsBondMoreValidation = Validation<NominationPoolsBondMoreValidationPayload, NominationPoolsBondMoreValidationFailure>
 typealias NominationPoolsBondMoreValidationSystem = ValidationSystem<NominationPoolsBondMoreValidationPayload, NominationPoolsBondMoreValidationFailure>
 typealias NominationPoolsBondMoreValidationSystemBuilder =
     ValidationSystemBuilder<NominationPoolsBondMoreValidationPayload, NominationPoolsBondMoreValidationFailure>
 
 fun ValidationSystem.Companion.nominationPoolsBondMore(
     poolStateValidationFactory: PoolStateValidationFactory,
+    poolAvailableBalanceValidationFactory: PoolAvailableBalanceValidationFactory,
 ): NominationPoolsBondMoreValidationSystem = ValidationSystem {
-    enoughToBond()
+    poolIsNotDestroying(poolStateValidationFactory)
 
-    enoughToPayFees()
+    notUnstakingAll()
+
+    enoughAvailableToStakeInPool(poolAvailableBalanceValidationFactory)
 
     positiveBond()
-
-    poolIsNotDestroying(poolStateValidationFactory)
 }
 
 private fun NominationPoolsBondMoreValidationSystemBuilder.poolIsNotDestroying(factory: PoolStateValidationFactory) {
@@ -31,26 +34,12 @@ private fun NominationPoolsBondMoreValidationSystemBuilder.poolIsNotDestroying(f
     )
 }
 
-private fun NominationPoolsBondMoreValidationSystemBuilder.enoughToPayFees() {
-    sufficientBalance(
-        fee = { it.fee },
-        available = { it.asset.transferable },
+private fun NominationPoolsBondMoreValidationSystemBuilder.enoughAvailableToStakeInPool(factory: PoolAvailableBalanceValidationFactory) {
+    factory.enoughAvailableBalanceToStake(
+        asset = { it.asset },
+        fee = { it.fee.fee.amount },
         amount = { it.amount },
-        error = { payload, leftForFees ->
-            NominationPoolsBondMoreValidationFailure.NotEnoughBalanceToPayFees(
-                chainAsset = payload.asset.token.configuration,
-                availableToPayFees = leftForFees,
-                fee = payload.fee
-            )
-        }
-    )
-}
-
-private fun NominationPoolsBondMoreValidationSystemBuilder.enoughToBond() {
-    sufficientBalance(
-        available = { it.asset.transferable },
-        amount = { it.amount },
-        error = { _, _ -> NominationPoolsBondMoreValidationFailure.NotEnoughToBond }
+        error = NominationPoolsBondMoreValidationFailure::NotEnoughToBond
     )
 }
 

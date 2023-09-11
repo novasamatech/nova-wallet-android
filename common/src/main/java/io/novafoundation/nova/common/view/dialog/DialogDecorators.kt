@@ -14,10 +14,11 @@ typealias DialogDecorator = AlertDialog.Builder.() -> Unit
 
 inline fun dialog(
     context: Context,
-    @StyleRes style: Int = R.style.WhiteOverlay,
+    @StyleRes customStyle: Int? = null,
     decorator: DialogDecorator
 ) {
-    val builder = BaseAlertDialogBuilder(ContextThemeWrapper(context, style))
+    val styleOrDefault = customStyle ?: R.style.BlueDarkOverlay
+    val builder = BaseAlertDialogBuilder(ContextThemeWrapper(context, styleOrDefault))
         .setCancelable(false)
 
     builder.decorator()

@@ -162,9 +162,9 @@ class RealTransactionHistoryRepository(
     private suspend fun AssetHistory.createTransactionFilters(chain: Chain): List<Filter<Operation>> {
         val isPoolAccountFilter = poolAccountDerivation.poolRewardAccountFilter(chain.id)
 
-        return listOf(
+        return listOfNotNull(
             IgnoreUnsafeOperations(this),
-            IgnorePoolRewardTransfers(isPoolAccountFilter, chain)
+            isPoolAccountFilter?.let { IgnorePoolRewardTransfers(it, chain) }
         )
     }
 

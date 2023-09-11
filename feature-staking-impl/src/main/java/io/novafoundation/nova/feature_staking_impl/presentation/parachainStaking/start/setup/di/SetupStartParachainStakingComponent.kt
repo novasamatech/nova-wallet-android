@@ -9,11 +9,11 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 
 @Subcomponent(
     modules = [
-        StartParachainStakingModule::class
+        SetupStartParachainStakingModule::class
     ]
 )
 @ScreenScope
-interface StartParachainStakingComponent {
+interface SetupStartParachainStakingComponent {
 
     @Subcomponent.Factory
     interface Factory {
@@ -21,7 +21,7 @@ interface StartParachainStakingComponent {
         fun create(
             @BindsInstance fragment: Fragment,
             @BindsInstance payload: StartParachainStakingPayload,
-        ): StartParachainStakingComponent
+        ): SetupStartParachainStakingComponent
     }
 
     fun inject(fragment: StartParachainStakingFragment)

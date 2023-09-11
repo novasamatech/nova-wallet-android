@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updat
 
 import io.novafoundation.nova.common.address.get
 import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
@@ -133,6 +134,7 @@ class StakingDashboardParachainStakingUpdater(
     ): StakingDashboardItemLocal.Status? {
         return when {
             baseInfo == null -> null
+            baseInfo.delegatorState.activeBonded.isZero -> StakingDashboardItemLocal.Status.INACTIVE
             chainStakingStats.accountPresentInActiveStakers -> StakingDashboardItemLocal.Status.ACTIVE
             baseInfo.hasWaitingCollators() -> StakingDashboardItemLocal.Status.WAITING
             else -> StakingDashboardItemLocal.Status.INACTIVE

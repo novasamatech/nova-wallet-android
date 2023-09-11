@@ -20,7 +20,6 @@
         android:paddingEnd="16dp"
         android:paddingBottom="14dp"
         android:textColor="@color/text_primary"
-        android:text="@string/staking_about"
         app:drawableEndCompat="@drawable/ic_chevron_down"
         app:drawableTint="@color/icon_secondary"
         tools:textColor="@color/text_primary" />

@@ -18,7 +18,6 @@ import io.novafoundation.nova.runtime.state.selectedOption
 
 class PoolUnlockChunksLimitValidation(
     private val stakingConstantsRepository: StakingConstantsRepository,
-    private val stakingRepository: StakingRepository,
     private val stakingSharedComputation: StakingSharedComputation,
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val stakingSharedState: StakingSharedState,
@@ -30,11 +29,7 @@ class PoolUnlockChunksLimitValidation(
         val poolId = value.poolMember.poolId
         val sharedComputationScope = value.sharedComputationScope
 
-        val bondingDuration = stakingConstantsRepository.lockupPeriodInEras(chainId)
-        val currentEra = stakingRepository.getCurrentEraIndex(chainId)
         val activeEra = stakingSharedComputation.getActiveEra(chainId, sharedComputationScope)
-
-        val unbondEra = currentEra + bondingDuration
 
         val maxUnlockingChunks = stakingConstantsRepository.maxUnlockingChunks(chainId).toInt()
 
@@ -44,9 +39,8 @@ class PoolUnlockChunksLimitValidation(
 
         val unlockListHasFreePlaces = poolUnlockChunks.size < maxUnlockingChunks
         val canRedeem = poolUnlockChunks.any { it.isRedeemableIn(activeEra) }
-        val targetUnbondEraPresentInUnlockingList = poolUnlockChunks.any { it.era == unbondEra }
 
-        val canAddNewUnlockChunk = unlockListHasFreePlaces || targetUnbondEraPresentInUnlockingList || canRedeem
+        val canAddNewUnlockChunk = unlockListHasFreePlaces || canRedeem
 
         return canAddNewUnlockChunk isTrueOrError {
             val eraTimeCalculator = stakingSharedComputation.eraTimeCalculator(stakingOption, sharedComputationScope)

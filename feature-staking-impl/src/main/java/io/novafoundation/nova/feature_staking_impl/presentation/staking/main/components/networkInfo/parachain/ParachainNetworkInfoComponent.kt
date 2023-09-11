@@ -47,7 +47,7 @@ private class ParachainNetworkInfoComponent(
 
     private val hostContext: ComponentHostContext,
     private val stakingOption: StakingOption,
-) : BaseNetworkInfoComponent(resourceManager, hostContext.scope) {
+) : BaseNetworkInfoComponent(resourceManager, hostContext.scope, titleRes = R.string.staking_info) {
 
     private val delegatorStateFlow = hostContext.selectedAccount.flatMapLatest {
         delegatorStateUseCase.delegatorStateFlow(it, stakingOption.assetWithChain.chain, stakingOption.assetWithChain.asset)

@@ -12,6 +12,8 @@ interface SingleStakingProperties {
 
     suspend fun availableBalance(asset: Asset): Balance
 
+    suspend fun maximumToStake(asset: Asset, fee: Balance): Balance
+
     val recommendation: SingleStakingRecommendation
 
     val validationSystem: StartMultiStakingValidationSystem

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations
 
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolAvailableBalanceValidation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.StakingMinimumBondError
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.NotEnoughToPayFeesError
@@ -28,6 +29,10 @@ sealed class StartMultiStakingValidationFailure {
         val biggestLockId: String,
         val chainAsset: Chain.Asset,
     ) : StartMultiStakingValidationFailure()
+
+    class PoolAvailableBalance(
+        override val context: PoolAvailableBalanceValidation.ValidationError.Context
+    ) : PoolAvailableBalanceValidation.ValidationError, StartMultiStakingValidationFailure()
 
     object InactivePool : StartMultiStakingValidationFailure()
 }

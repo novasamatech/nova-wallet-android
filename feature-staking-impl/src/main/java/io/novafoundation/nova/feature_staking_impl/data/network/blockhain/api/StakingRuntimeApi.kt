@@ -5,10 +5,12 @@ import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
+import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindActiveEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindNominations
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSessionIndex
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedger
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindValidatorPrefs
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry0
@@ -34,6 +36,10 @@ val StakingRuntimeApi.ledger: QueryableStorageEntry1<AccountId, StakingLedger>
 context(StorageQueryContext)
 val StakingRuntimeApi.nominators: QueryableStorageEntry1<AccountId, Nominations>
     get() = storage1("Nominators", binding = { decoded, _ -> bindNominations(decoded) })
+
+context(StorageQueryContext)
+val StakingRuntimeApi.validators: QueryableStorageEntry1<AccountId, ValidatorPrefs>
+    get() = storage1("Validators", binding = { decoded, _ -> bindValidatorPrefs(decoded) })
 
 context(StorageQueryContext)
 val StakingRuntimeApi.bonded: QueryableStorageEntry1<AccountId, AccountId>

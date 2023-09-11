@@ -162,7 +162,8 @@ private class RelaychainUnbondingComponent(
                 payload = StakeActionsValidationPayload(stashState),
                 errorDisplayer = hostContext.errorDisplayer,
                 validationFailureTransformerDefault = { mainStakingValidationFailure(it, resourceManager) },
-                block = { launch { block(it) } }
+                block = { launch { block(it) } },
+                scope = hostContext.scope
             )
         }
     }

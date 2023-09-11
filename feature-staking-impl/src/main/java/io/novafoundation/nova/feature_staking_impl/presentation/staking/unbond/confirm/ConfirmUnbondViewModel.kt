@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.Unb
 import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.UnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.hints.UnbondHintsMixinFactory
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.unbondPayloadAutoFix
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.unbondValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
@@ -119,8 +118,7 @@ class ConfirmUnbondViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformer = { unbondValidationFailure(it, resourceManager) },
-            autoFixPayload = ::unbondPayloadAutoFix,
+            validationFailureTransformerCustom = { status, flowActions -> unbondValidationFailure(status, flowActions, resourceManager) },
             progressConsumer = _showNextProgress.progressConsumer()
         ) { validPayload ->
             sendTransaction(validPayload)

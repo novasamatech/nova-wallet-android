@@ -222,7 +222,7 @@ inline fun CoroutineScope.invokeOnCompletion(crossinline action: () -> Unit) {
 
 inline fun <T> Iterable<T>.filterToSet(predicate: (T) -> Boolean): Set<T> = filterTo(mutableSetOf(), predicate)
 
-fun String.nullIfEmpty(): String? = if (isEmpty()) null else this
+fun String?.nullIfEmpty(): String? = if (isNullOrEmpty()) null else this
 
 fun String.ensureSuffix(suffix: String) = if (endsWith(suffix)) this else this + suffix
 

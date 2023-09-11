@@ -46,7 +46,7 @@ private class RelaychainNetworkInfoComponent(
 
     private val hostContext: ComponentHostContext,
     private val stakingOption: StakingOption,
-) : BaseNetworkInfoComponent(resourceManager, hostContext.scope) {
+) : BaseNetworkInfoComponent(resourceManager, hostContext.scope, titleRes = R.string.staking_info) {
 
     private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
         assetWithChain = stakingOption.assetWithChain,

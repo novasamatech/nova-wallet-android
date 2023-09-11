@@ -6,10 +6,12 @@ import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolAvailableBalanceValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.stakeAmount
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationSystem
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.enoughToPayFee
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.nominationPools.activePool
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.nominationPools.enoughForMinJoinBond
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.nominationPools.maxPoolMembersNotReached
@@ -27,6 +29,7 @@ class NominationPoolStakingPropertiesFactory(
     private val nominationPoolRecommenderFactory: NominationPoolRecommenderFactory,
     private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
     private val nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
+    private val poolAvailableBalanceValidationFactory: PoolAvailableBalanceValidationFactory,
 ) : SingleStakingPropertiesFactory {
 
     override fun createProperties(scope: CoroutineScope, stakingOption: StakingOption): SingleStakingProperties {
@@ -36,7 +39,8 @@ class NominationPoolStakingPropertiesFactory(
             sharedComputationScope = scope,
             stakingOption = stakingOption,
             poolsAvailableBalanceResolver = poolsAvailableBalanceResolver,
-            nominationPoolGlobalsRepository = nominationPoolGlobalsRepository
+            nominationPoolGlobalsRepository = nominationPoolGlobalsRepository,
+            poolAvailableBalanceValidationFactory = poolAvailableBalanceValidationFactory,
         )
     }
 }
@@ -48,12 +52,17 @@ private class NominationPoolStakingProperties(
     private val stakingOption: StakingOption,
     private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
     private val nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
+    private val poolAvailableBalanceValidationFactory: PoolAvailableBalanceValidationFactory,
 ) : SingleStakingProperties {
 
     override val stakingType: Chain.Asset.StakingType = stakingOption.stakingType
 
     override suspend fun availableBalance(asset: Asset): Balance {
         return poolsAvailableBalanceResolver.availableBalanceToStartStaking(asset)
+    }
+
+    override suspend fun maximumToStake(asset: Asset, fee: Balance): Balance {
+        return poolsAvailableBalanceResolver.maximumBalanceToStake(asset, fee).maxToStake
     }
 
     override val recommendation: SingleStakingRecommendation = NominationPoolRecommendation(
@@ -65,13 +74,18 @@ private class NominationPoolStakingProperties(
     override val validationSystem: StartMultiStakingValidationSystem = ValidationSystem {
         maxPoolMembersNotReached(nominationPoolGlobalsRepository)
 
-        enoughToPayFee()
-
-        enoughForMinJoinBond()
+        activePool()
 
         positiveBond()
 
-        activePool()
+        enoughForMinJoinBond()
+
+        poolAvailableBalanceValidationFactory.enoughAvailableBalanceToStake(
+            asset = { it.asset },
+            fee = { it.fee.fee.amount },
+            amount = { it.selection.stakeAmount() },
+            error = StartMultiStakingValidationFailure::PoolAvailableBalance
+        )
     }
 
     override suspend fun minStake(): Balance {

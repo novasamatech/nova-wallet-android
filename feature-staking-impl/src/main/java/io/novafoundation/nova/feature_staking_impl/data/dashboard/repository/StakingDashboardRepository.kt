@@ -8,18 +8,22 @@ import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.StakingDashboardDao
 import io.novafoundation.nova.core_db.model.StakingDashboardAccountsView
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MultiStakingOptionIds
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.model.StakingDashboardItem
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.model.StakingDashboardItem.StakeState.HasStake
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.model.StakingDashboardItem.StakeState.NoStake
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.model.StakingDashboardOptionAccounts
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapStakingStringToStakingType
+import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapStakingTypeToStakingString
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.flow.Flow
 
 interface StakingDashboardRepository {
 
     fun dashboardItemsFlow(metaAccountId: Long): Flow<List<StakingDashboardItem>>
+
+    fun dashboardItemsFlow(metaAccountId: Long, multiStakingOptionIds: MultiStakingOptionIds): Flow<List<StakingDashboardItem>>
 
     fun stakingAccountsFlow(metaAccountId: Long): Flow<List<StakingDashboardOptionAccounts>>
 }
@@ -30,6 +34,13 @@ class RealStakingDashboardRepository(
 
     override fun dashboardItemsFlow(metaAccountId: Long): Flow<List<StakingDashboardItem>> {
         return dao.dashboardItemsFlow(metaAccountId).mapList(::mapDashboardItemFromLocal)
+    }
+
+    override fun dashboardItemsFlow(metaAccountId: Long, multiStakingOptionIds: MultiStakingOptionIds): Flow<List<StakingDashboardItem>> {
+        val stakingTypes = multiStakingOptionIds.stakingTypes.mapNotNull(::mapStakingTypeToStakingString)
+
+        return dao.dashboardItemsFlow(metaAccountId, multiStakingOptionIds.chainId, multiStakingOptionIds.chainAssetId, stakingTypes)
+            .mapList(::mapDashboardItemFromLocal)
     }
 
     override fun stakingAccountsFlow(metaAccountId: Long): Flow<List<StakingDashboardOptionAccounts>> {

@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMo
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.validations.NominationPoolsBondMoreValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.validations.nominationPoolsBondMore
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.hints.NominationPoolHintsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolAvailableBalanceValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolStateValidationFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.hints.NominationPoolsBondMoreHintsFactory
 
@@ -30,8 +31,12 @@ class NominationPoolsCommonBondMoreModule {
     @Provides
     @ScreenScope
     fun provideValidationSystem(
-        poolStateValidationFactory: PoolStateValidationFactory
-    ): NominationPoolsBondMoreValidationSystem = ValidationSystem.nominationPoolsBondMore(poolStateValidationFactory)
+        poolStateValidationFactory: PoolStateValidationFactory,
+        poolAvailableBalanceValidationFactory: PoolAvailableBalanceValidationFactory,
+    ): NominationPoolsBondMoreValidationSystem = ValidationSystem.nominationPoolsBondMore(
+        poolStateValidationFactory = poolStateValidationFactory,
+        poolAvailableBalanceValidationFactory = poolAvailableBalanceValidationFactory
+    )
 
     @Provides
     @ScreenScope

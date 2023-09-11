@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.isLoaded
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
+import io.novafoundation.nova.common.mixin.actionAwaitable.awaitableActionFlow
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -104,6 +105,16 @@ class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel>()
 
         viewModel.availableBalanceTextFlow.observe {
             startStakingLandingAvailableBalance.text = it
+        }
+
+        viewModel.acknowledgeStakingStarted.awaitableActionFlow.observeWhenCreated { action ->
+            dialog(requireContext()) {
+                setTitle(action.payload)
+
+                setPositiveButton(R.string.common_close) { _, _ ->
+                    action.onSuccess(Unit)
+                }
+            }
         }
     }
 

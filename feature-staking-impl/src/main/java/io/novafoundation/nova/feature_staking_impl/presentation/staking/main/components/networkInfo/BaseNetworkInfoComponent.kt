@@ -30,13 +30,14 @@ import java.math.RoundingMode
 abstract class BaseNetworkInfoComponent(
     private val resourceManager: ResourceManager,
     coroutineScope: CoroutineScope,
+    @StringRes titleRes: Int,
 ) : NetworkInfoComponent,
     CoroutineScope by coroutineScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
     override val events = MutableLiveData<Event<StakeActionsEvent>>()
 
-    override val state = MutableStateFlow(initialState())
+    override val state = MutableStateFlow(initialState(titleRes))
 
     abstract fun initialItems(): List<NetworkInfoItem>
 
@@ -71,8 +72,9 @@ abstract class BaseNetworkInfoComponent(
         state.value = update(state.value)
     }
 
-    private fun initialState(): NetworkInfoState {
+    private fun initialState(@StringRes titleRes: Int): NetworkInfoState {
         return NetworkInfoState(
+            title = resourceManager.getString(titleRes),
             actions = initialItems(),
             expanded = false
         )

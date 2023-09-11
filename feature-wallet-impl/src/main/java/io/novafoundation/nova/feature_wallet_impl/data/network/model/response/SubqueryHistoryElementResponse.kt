@@ -26,11 +26,10 @@ class SubqueryHistoryElementResponse(val query: Query) {
                     val era: Int,
                     val amount: BigInteger,
                     val isReward: Boolean,
-                    val validator: String,
+                    val validator: String?,
                 )
 
                 class PoolReward(
-                    val era: Int,
                     val amount: BigInteger,
                     val poolId: Int,
                     val isReward: Boolean,
