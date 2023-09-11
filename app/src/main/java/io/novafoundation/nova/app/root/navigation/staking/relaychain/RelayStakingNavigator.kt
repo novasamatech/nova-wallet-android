@@ -11,8 +11,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.PayoutDetailsFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
-import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectCustomPoolFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectCustomPoolPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectPoolFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.SelectingPoolPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.searchPool.SearchPoolFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMoreFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMorePayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.SelectBondMoreFragment
@@ -192,9 +193,14 @@ class RelayStakingNavigator(
         performNavigation(R.id.action_setupAmountMultiStakingFragment_to_setupStakingType)
     }
 
-    override fun openSelectCustomPool(payload: SelectCustomPoolPayload) {
-        val arguments = SelectCustomPoolFragment.getBundle(payload)
+    override fun openSelectPool(payload: SelectingPoolPayload) {
+        val arguments = SelectPoolFragment.getBundle(payload)
         performNavigation(R.id.action_setupStakingType_to_selectCustomPoolFragment, args = arguments)
+    }
+
+    override fun openSearchPool(payload: SelectingPoolPayload) {
+        val arguments = SearchPoolFragment.getBundle(payload)
+        performNavigation(R.id.action_selectPool_to_searchPoolFragment, args = arguments)
     }
 
     override fun finishSetupValidatorsFlow() {
@@ -202,6 +208,11 @@ class RelayStakingNavigator(
     }
 
     override fun finishSetupPoolFlow() {
-        performNavigation(R.id.action_selectCustomPool_to_setupAmountMultiStakingFragment)
+        performNavigation(
+            cases = arrayOf(
+                R.id.searchPoolFragment to R.id.action_searchPool_to_setupAmountMultiStakingFragment,
+                R.id.selectPoolFragment to R.id.action_selectPool_to_setupAmountMultiStakingFragment,
+            )
+        )
     }
 }

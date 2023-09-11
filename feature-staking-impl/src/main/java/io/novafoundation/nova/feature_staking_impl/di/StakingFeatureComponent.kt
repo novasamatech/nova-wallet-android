@@ -52,7 +52,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.di.PayoutDetailsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.list.di.PayoutsListComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.period.di.StakingPeriodComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.di.SelectCustomPoolComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.searchPool.di.SearchPoolComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.di.SelectPoolComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.di.ConfirmBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.di.SelectBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.di.ConfirmSetControllerComponent
@@ -126,7 +127,9 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun startChangeValidatorsComponentFactory(): StartChangeValidatorsComponent.Factory
 
-    fun selectCustomPoolComponentFactory(): SelectCustomPoolComponent.Factory
+    fun selectPoolComponentFactory(): SelectPoolComponent.Factory
+
+    fun searchPoolComponentFactory(): SearchPoolComponent.Factory
 
     fun recommendedValidatorsComponentFactory(): RecommendedValidatorsComponent.Factory
 

@@ -11,9 +11,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.apy
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.PoolRvItem
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-
-private const val ICON_SIZE_DP = 24
 
 suspend fun mapNominationPoolToPoolRvItem(
     chain: Chain,
@@ -22,11 +21,13 @@ suspend fun mapNominationPoolToPoolRvItem(
     poolDisplayFormatter: PoolDisplayFormatter,
     isChecked: Boolean
 ): PoolRvItem {
+    val model = poolDisplayFormatter.format(pool, chain)
     return PoolRvItem(
         id = pool.id.value,
-        model = poolDisplayFormatter.format(pool, chain),
+        model = model,
         subtitle = getSubtitle(pool, resourceManager),
         members = pool.membersCount.format(),
+        address = chain.addressOf(model.poolAccountId),
         isChecked = isChecked
     )
 }
