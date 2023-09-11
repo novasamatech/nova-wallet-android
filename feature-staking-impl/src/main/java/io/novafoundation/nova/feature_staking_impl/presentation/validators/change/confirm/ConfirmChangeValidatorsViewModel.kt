@@ -69,17 +69,10 @@ class ConfirmChangeValidatorsViewModel(
         .inBackground()
         .share()
 
-    private val stashAddressFlow = stashFlow.map { it.stashAddress }
-        .shareInBackground()
-
     private val controllerAddressFlow = stashFlow.map { it.controllerAddress }
         .shareInBackground()
 
     private val controllerAssetFlow = controllerAddressFlow
-        .flatMapLatest(interactor::assetFlow)
-        .shareInBackground()
-
-    private val stashAssetFlow = stashAddressFlow
         .flatMapLatest(interactor::assetFlow)
         .shareInBackground()
 
@@ -139,7 +132,6 @@ class ConfirmChangeValidatorsViewModel(
         launch {
             val payload = SetupStakingPayload(
                 maxFee = fee,
-                stashAsset = stashAssetFlow.first(),
                 controllerAsset = controllerAssetFlow.first()
             )
 

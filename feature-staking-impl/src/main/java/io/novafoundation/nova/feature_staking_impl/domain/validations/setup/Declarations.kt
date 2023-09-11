@@ -18,8 +18,8 @@ fun ValidationSystem.Companion.changeValidators(
     minimumBondValidation(
         stakingRepository = stakingRepository,
         stakingSharedComputation = stakingSharedComputation,
-        chainAsset = { it.stashAsset.token.configuration },
-        balanceToCheckAgainstRequired = { it.stashAsset.bondedInPlanks },
+        chainAsset = { it.controllerAsset.token.configuration },
+        balanceToCheckAgainstRequired = { it.controllerAsset.bondedInPlanks },
         balanceToCheckAgainstRecommended = { null }, // while changing validators we don't check against recommended minimum
         error = SetupStakingValidationFailure::AmountLessThanMinimum
     )
