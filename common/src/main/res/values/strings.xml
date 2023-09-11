@@ -139,9 +139,9 @@
     <string name="start_staking_fragment_governance_participation_with_min_amount_accent">participate in governance</string>
 
     <string name="start_staking_fragment_stake_monitoring_monitor_stake">Monitor your stake</string>
-    <string name="start_staking_fragment_stake_monitoring">Rewards &amp; staking status vary over time. %s from time to time</string>
+    <string name="start_staking_fragment_stake_monitoring">Rewards and staking status vary over time. %s from time to time</string>
 
-    <string name="start_staking_fragment_more_info">Find out more information about\nMoonbeam staking over at the %s</string>
+    <string name="start_staking_fragment_more_info">Find out more information about\n%1$s staking over at the %2$s</string>
     <string name="start_staking_fragment_more_info_clicable_part">Nova Wiki</string>
 
     <string name="start_staking_fragment_terms_of_use">See %s</string>

@@ -223,6 +223,7 @@ class StartStakingLandingViewModel(
 
         return SpannableFormatter.format(
             resourceManager.getString(R.string.start_staking_fragment_more_info),
+            chain.name,
             clickablePart
         )
     }
