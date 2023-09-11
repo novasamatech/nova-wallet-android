@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StakingTypeDetailsCompoundInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.StartStakingLandingViewModel
@@ -50,7 +51,8 @@ class StartStakingLandingModule {
         startStakingLandingPayload: StartStakingLandingPayload,
         validationExecutor: ValidationExecutor,
         selectedMetaAccountUseCase: SelectedAccountUseCase,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        stakingStartedDetectionService: StakingStartedDetectionService
     ): ViewModel {
         return StartStakingLandingViewModel(
             router = router,
@@ -61,7 +63,8 @@ class StartStakingLandingModule {
             startStakingLandingPayload = startStakingLandingPayload,
             validationExecutor = validationExecutor,
             selectedMetaAccountUseCase = selectedMetaAccountUseCase,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            stakingStartedDetectionService = stakingStartedDetectionService
         )
     }
 

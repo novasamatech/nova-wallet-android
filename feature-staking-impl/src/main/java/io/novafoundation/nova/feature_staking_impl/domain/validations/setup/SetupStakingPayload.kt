@@ -5,6 +5,5 @@ import java.math.BigDecimal
 
 class SetupStakingPayload(
     val maxFee: BigDecimal,
-    val stashAsset: Asset,
     val controllerAsset: Asset,
 )

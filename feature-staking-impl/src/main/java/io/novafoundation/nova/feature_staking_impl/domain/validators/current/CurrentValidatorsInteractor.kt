@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.controller
 import io.novafoundation.nova.feature_staking_impl.domain.validations.controller.controllerAccountAccess
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.validators.ValidatorSource
+import io.novafoundation.nova.feature_staking_impl.domain.validators.getValidators
 import io.novafoundation.nova.runtime.state.selectedOption
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.CoroutineScope
@@ -64,7 +65,7 @@ class CurrentValidatorsInteractor(
 
             val groupedByStatusClass = validatorProvider.getValidators(
                 stakingOption = stakingOption,
-                source = ValidatorSource.Custom(nominatedValidatorIds.toList()),
+                source = ValidatorSource.Custom(nominatedValidatorIds),
                 scope = scope
             )
                 .map { validator ->

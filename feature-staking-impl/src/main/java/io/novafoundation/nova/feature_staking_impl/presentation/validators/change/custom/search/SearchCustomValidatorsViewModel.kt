@@ -56,14 +56,14 @@ class SearchCustomValidatorsViewModel(
     private val currentTokenFlow = tokenUseCase.currentTokenFlow()
         .share()
 
-    private val allElectedValidators by lazyAsync {
+    private val allRecommendedValidators by lazyAsync {
         validatorRecommenderFactory.create(scope = viewModelScope).availableValidators.toSet()
     }
 
     private val foundValidatorsState = enteredQuery
         .mapLatest {
             if (it.isNotEmpty()) {
-                interactor.searchValidator(it, allElectedValidators() + selectedValidators.first())
+                interactor.searchValidator(it, allRecommendedValidators() + selectedValidators.first())
             } else {
                 null
             }

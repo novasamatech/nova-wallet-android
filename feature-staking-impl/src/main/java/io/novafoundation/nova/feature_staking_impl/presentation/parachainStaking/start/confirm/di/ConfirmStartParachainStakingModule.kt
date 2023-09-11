@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.StartParachainStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.di.StartParachainStakingModule
@@ -51,7 +52,8 @@ class ConfirmStartParachainStakingModule {
         walletUiUseCase: WalletUiUseCase,
         payload: ConfirmStartParachainStakingPayload,
         hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
-        delegatorStateUseCase: DelegatorStateUseCase
+        delegatorStateUseCase: DelegatorStateUseCase,
+        stakingStartedDetectionService: StakingStartedDetectionService,
     ): ViewModel {
         return ConfirmStartParachainStakingViewModel(
             parachainStakingRouter = router,
@@ -70,7 +72,8 @@ class ConfirmStartParachainStakingModule {
             hintsMixinFactory = hintsMixinFactory,
             collatorsUseCase = collatorsUseCase,
             delegatorStateUseCase = delegatorStateUseCase,
-            startStakingRouter = startStakingRouter
+            startStakingRouter = startStakingRouter,
+            stakingStartedDetectionService = stakingStartedDetectionService
         )
     }
 

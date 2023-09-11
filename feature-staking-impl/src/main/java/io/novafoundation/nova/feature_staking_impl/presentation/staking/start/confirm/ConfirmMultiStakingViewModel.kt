@@ -14,7 +14,10 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddr
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.components
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StartMultiStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.activateDetection
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.pauseDetection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.copyWith
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.currentSelectionFlow
@@ -52,6 +55,7 @@ class ConfirmMultiStakingViewModel(
     assetUseCase: ArbitraryAssetUseCase,
     walletUiUseCase: WalletUiUseCase,
     selectedAccountUseCase: SelectedAccountUseCase,
+    private val stakingStartedDetectionService: StakingStartedDetectionService,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor {
@@ -150,13 +154,19 @@ class ConfirmMultiStakingViewModel(
     }
 
     private fun sendTransaction(validationPayload: StartMultiStakingValidationPayload) = launch {
+        stakingStartedDetectionService.pauseDetection(viewModelScope)
+
         interactor.startStaking(validationPayload.selection)
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
                 finishFlow()
             }
-            .onFailure(::showError)
+            .onFailure {
+                showError(it)
+
+                stakingStartedDetectionService.activateDetection(viewModelScope)
+            }
 
         _showNextProgress.value = false
     }
