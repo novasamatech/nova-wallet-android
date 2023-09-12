@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
@@ -222,13 +221,11 @@ class StartMultiStakingModule {
     @FeatureScope
     fun provideSelectNominationPoolInteractor(
         nominationPoolProvider: NominationPoolProvider,
-        knownNovaPools: KnownNovaPools,
         nominationPoolRecommenderFactory: NominationPoolRecommenderFactory,
         nominationPoolGlobalsRepository: NominationPoolGlobalsRepository
     ): SearchNominationPoolInteractor {
         return SearchNominationPoolInteractor(
             nominationPoolProvider,
-            knownNovaPools,
             nominationPoolRecommenderFactory,
             nominationPoolGlobalsRepository
         )
