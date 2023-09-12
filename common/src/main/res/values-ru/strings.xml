@@ -207,6 +207,7 @@
     <string name="common_change">Изменить</string>
     <string name="common_choose_network">Выберите сеть</string>
     <string name="common_close">Закрыть</string>
+    <string name="common_close_confirmation_message">Вы уверены, что хотите закрыть этот экран?\nИзменения не будут применены.</string>
     <string name="common_completed">Завершённые</string>
     <string name="common_completed_with_count">Завершённые (%s)</string>
     <string name="common_confirm">Подтвердить</string>
@@ -308,6 +309,7 @@
     <string name="common_price">Цена</string>
     <string name="common_proceed">Продолжить</string>
     <string name="common_read_more">Подробнее</string>
+    <string name="common_recommended">Рекомендовано</string>
     <string name="common_refresh_fee">Обновить</string>
     <string name="common_reject">Отклонить</string>
     <string name="common_remove">Удалить</string>
@@ -318,6 +320,7 @@
     <string name="common_save">Сохранить</string>
     <string name="common_scan_qr_code">Отсканируйте QR-код</string>
     <string name="common_search">Поиск</string>
+    <string name="common_search_placeholder_default">Результаты поиска будут отображаться здесь</string>
     <string name="common_search_results_number">Результаты поиска: %d</string>
     <string name="common_secret_derivation_path">Последовательность для вывода</string>
     <string name="common_settings">Настройки</string>
@@ -431,7 +434,6 @@
     <string name="dapp_authorized_remove_description">”%s” DApp будет удален из Авторизованных</string>
     <string name="dapp_authorized_remove_title">Удалить из Авторизованных?</string>
     <string name="dapp_authorized_title">Авторизованные DApps</string>
-    <string name="dapp_browser_close_warning_message">Вы уверены, что хотите закрыть этот экран?\nВсе изменения не будут применены.</string>
     <string name="dapp_catalog">Каталог</string>
     <string name="dapp_confirm_authorize_subtitle">Одобрите этот запрос, если вы доверяете приложению</string>
     <string name="dapp_confirm_authorize_title_format">Разрешить “%s” доступ к адресам вашего кошелька?</string>
@@ -457,7 +459,6 @@
     <string name="dapp_sign_extrinsic_details_subtitle">Убедитесь, что операция правильная</string>
     <string name="dapp_sign_extrinsic_failed">Не удалось подписать запрошенную операцию</string>
     <string name="delegate_search_hint">Поиск по адресу или имени</string>
-    <string name="common_search_placeholder_default">Результаты поиска будут отображаться здесь</string>
     <string name="delegate_search_placeholder_empty">Недопустимый формат адреса. Убедитесь, что адрес принадлежит правильной сети</string>
     <string name="delegate_search_result_count">результаты поиска: %d</string>
     <string name="delegation_add_delegation">Добавить делегацию</string>
@@ -574,6 +575,18 @@
     <string name="nft_owned_by">Владелец</string>
     <string name="nft_price_not_listed">Без цены</string>
     <string name="nft_your_nfts">Ваши NFT</string>
+    <string name="nomination_pool_claim_rewards">Забрать награды</string>
+    <string name="nomination_pools_claim_rewards_restake_subtitle">Ваши токены будут добавлены обратно в стейкинг</string>
+    <string name="nomination_pools_direct">Напрямую</string>
+    <string name="nomination_pools_info">Информация о стейкинге в пулах</string>
+    <string name="nomination_pools_pending_claim_hint_format">Ваши награды (%s) также будут забраны и добавлены к вашему доступному балансу.</string>
+    <string name="nomination_pools_pool">Пул</string>
+    <string name="nomination_pools_pool_destroying_error_message">Невозможно выполнить указанную операцию, так как пул находится в состоянии закрытия. В ближайшее время он будет закрыт.</string>
+    <string name="nomination_pools_pool_destroying_error_title">Пул закрывается</string>
+    <string name="nomination_pools_pool_reached_unbondings_limit_message">В настоящее время в очереди на вывод средств для вашего пула нет свободных мест. Пожалуйста, повторите попытку через %s</string>
+    <string name="nomination_pools_pool_reached_unbondings_limit_title">Слишком много участников выводят средства из вашего пула</string>
+    <string name="nomination_pools_your_pool">Ваш пул</string>
+    <string name="nomination_pools_your_pool_format">Ваш пул (#%s)</string>
     <string name="onboarding_create_account">Создать аккаунт</string>
     <string name="onboarding_create_wallet">Создать новый кошелёк</string>
     <string name="onboarding_privacy_policy">Политикой конфиденциальности</string>
@@ -601,6 +614,10 @@
     <string name="pincode_create_top_title">Новый PIN-код</string>
     <string name="pincode_enter_pin_code_v2_2_0">Введите PIN-код</string>
     <string name="pincode_title_create">Установите свой PIN-код</string>
+    <string name="pool_full_failure_message">Вы не можете присоединиться к пулу, поскольку в нем достигнуто максимальное количество участников.</string>
+    <string name="pool_full_failure_title">Пул заполнен</string>
+    <string name="pool_inactive_failure_message">Вы не можете присоединиться к не открытому пулу. Пожалуйста, свяжитесь с владельцем пула.</string>
+    <string name="pool_inactive_failure_title">Пул не открыт</string>
     <string name="profile_accounts_title">Аккаунты</string>
     <string name="profile_accounts_title_2_0">Кошельки</string>
     <string name="profile_language_title">Язык</string>
@@ -731,9 +748,13 @@
     <string name="runtime_update_failure_title">Ошибка обновления среды выполнения</string>
     <string name="search_contacts">Контакты</string>
     <string name="search_header_my_accounts">мои аккаунты</string>
+    <string name="search_pool_no_pools_found_placeholder">Пул с введенным именем или номером не найден. Убедитесь, что вы ввели правильные данные</string>
     <string name="search_recipient_hint">Адрес аккаунта или имя аккаунта</string>
     <string name="search_recipient_welcome_v2_2_0">Здесь появятся результаты поиска</string>
     <string name="search_result_header">Результат поиска</string>
+    <string name="select_custom_pool_active_pools_count">активные пулы: %d</string>
+    <string name="select_custom_pool_members">участники</string>
+    <string name="select_custom_pool_title">Выбрать пул</string>
     <string name="select_delegation_tracks_add_title">Выберите треки для делегирования</string>
     <string name="select_delegation_tracks_available_tracks">Доступные треки</string>
     <string name="select_delegation_tracks_description">Пожалуйста, выберите треки, в которых вы бы хотели делегировать ваши голоса.</string>
@@ -759,11 +780,23 @@
     <string name="settings_support">Поддержка и обратная связь</string>
     <string name="settings_twitter">Twitter</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_staking_type_advanced_options_condition">Расширенное управление стейкингом</string>
+    <string name="setup_staking_type_already_used_title">Тип стейкинга не может быть изменен</string>
+    <string name="setup_staking_type_direct_already_used_message">У вас уже есть стейкинг напрямую</string>
+    <string name="setup_staking_type_direct_staking">Стейкинг напрямую</string>
+    <string name="setup_staking_type_direct_staking_amount_is_less_than_min_amount_message" formatted="false">Вы указали сумму меньше минимальной в %s, необходимую для получения вознаграждений используя %s. Вам следует подумать об использовании стейкинга в пуле для получения вознаграждений.</string>
+    <string name="setup_staking_type_governance_condition">Переиспользуйте токены в Голосованиях</string>
+    <string name="setup_staking_type_min_amount_condition">Минимальный стейк: %s</string>
+    <string name="setup_staking_type_payout_type_automatically_condition">Вознаграждения: выплачиваются автоматически</string>
+    <string name="setup_staking_type_payout_type_manual_condition">Вознаграждения: нужно забирать вручную</string>
+    <string name="setup_staking_type_pool_already_used_message">Вы уже стейкаете в пуле</string>
+    <string name="setup_staking_type_pool_staking">Стейкинг в пуле</string>
+    <string name="setup_staking_type_staking_amount_is_less_than_min_amount_title">Ваш стейк меньше минимального для получения вознаграждений</string>
+    <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Неподдерживаемый тип стейкинга</string>
     <string name="sr25519_selection_subtitle">sr25519 (рекомендованный)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
     <string name="stacking_no_access_to_controller_account_message">Добавьте учетную запись контроллера в устройство.</string>
     <string name="stacking_no_access_to_controller_account_title">Нет доступа к учетной записи контроллера</string>
-    <string name="staking_about">О стейкинге</string>
     <string name="staking_account_is_used_as_controller">Выбранный аккаунт уже используется в качестве контроллера.</string>
     <string name="staking_active_delegators">Активные делегаторы</string>
     <string name="staking_add_controller">Чтобы выполнить это действие, добавьте контроллер аккаунт %s в приложение</string>
@@ -777,6 +810,7 @@
     <string name="staking_alert_start_next_era_message">Пожалуйста, дождитесь начала следующей эры.</string>
     <string name="staking_alert_title">Предупреждения</string>
     <string name="staking_already_controller_title">Уже контроллер</string>
+    <string name="staking_already_staking_title">У вас уже есть стейкинг используя %s</string>
     <string name="staking_balance_title">Баланс стейкинга</string>
     <string name="staking_balance_title_v2_2_0">Баланс</string>
     <string name="staking_bond_more_v1_9_0">Застейкать ещё</string>
@@ -822,6 +856,7 @@
     <string name="staking_hint_unbond_kills_stash">Nova wallet изменит назначение вознаграждений\nна ваш аккаунт, чтобы избежать остатка в стейкинге.</string>
     <string name="staking_hint_unstake_format">Для вывода токенов из стейкинга потребуется %s.</string>
     <string name="staking_hint_unstake_format_v2_2_0">Период вывода токенов из стейкинга занимает %s</string>
+    <string name="staking_info">Информация о стейкинге</string>
     <string name="staking_main_active_nominators_title">Активные номинаторы</string>
     <plurals name="staking_main_lockup_period_value">
         <item quantity="one">%d день</item>
@@ -911,6 +946,7 @@
     <string name="staking_period_week_short">7Д</string>
     <string name="staking_period_year">Последний год (1Г)</string>
     <string name="staking_period_year_short">1Г</string>
+    <string name="staking_pool_available_validation_message" formatted="false">Ваш доступный баланс составляет %s, вам необходимо оставить %s в качестве минимального баланса и оплатить комиссию сети в размере %s. Таким образом, вы можете застейкать не более %s.</string>
     <string name="staking_rebag_current_bag">Текущий слот очереди</string>
     <string name="staking_rebag_new_bag">Новый слот очереди</string>
     <string name="staking_rebond">Вернуть в стейк</string>
@@ -970,7 +1006,9 @@
     <string name="staking_setup_reward_payout_account">Аккаунт для выплат</string>
     <string name="staking_slash">Слэш</string>
     <string name="staking_stake_format">Застейкать %s</string>
+    <string name="staking_stake_max">Застейкать всё</string>
     <string name="staking_staking_period">Время стейкинга</string>
+    <string name="staking_staking_type">Тип стейкинга</string>
     <string name="staking_start_change_validators_custom_subtitle">Вы должны доверять своим валидаторам, чтобы они действовали грамотно и честно. Принятие решения исключительно на основе их текущей прибыльности может привести к снижению прибыли или даже потере средств.</string>
     <string name="staking_start_change_validators_custom_subtitle_v2_2_0">Тщательно выбирайте своих валидаторов, чтобы они действовали профессионально и честно. Принятие решения исключительно на основе прибыльности может привести к уменьшению наград или даже потере стейка</string>
     <string name="staking_start_change_validators_custom_title">Стейкинг с выбранными валидаторами</string>
@@ -1006,7 +1044,11 @@
     <string name="staking_turing_frequency_update_title" formatted="false">чтобы автоматически, %s (раньше:  %s), отправлять все мои переводимые токены выше</string>
     <string name="staking_turing_restake_title">Я хочу стейкать</string>
     <string name="staking_turing_yield_boost">Yield Boost</string>
-    <string name="staking_unbond_crossed_existential">В результате этой операции все токены будут выведены из стейкинга.</string>
+    <string name="staking_type_title">Тип стейкинга</string>
+    <string name="staking_unable_to_stake_more_message">Вы выводите из стейкинга все свои токены и не можете добавить токены в стейкинг.</string>
+    <string name="staking_unable_to_stake_more_title">Невозможно добавить токены в стейкинг</string>
+    <string name="staking_unbond_crossed_existential" formatted="false">При частичном выводе средств вы должны оставить в стейке не менее %s. Хотите ли вы полностью вывести средства, также разблокировав оставшиеся %s?</string>
+    <string name="staking_unbond_crossed_existential_title">В стейкинге остается слишком маленькая сумма</string>
     <string name="staking_unbond_too_big">Сумма, которую вы хотите вывести из стейкинга, превышает сумму застейканных токенов.</string>
     <string name="staking_unbond_v1_9_0">Вывод из стейка</string>
     <string name="staking_unbonding_empty_list_v1_9_0">Операции по выводу из стейка появятся здесь</string>
@@ -1016,6 +1058,7 @@
     <string name="staking_unbonding_limit_reached_message">Вы достигли лимита запросов на вывод из стейка ( %d активных запросов).</string>
     <string name="staking_unbonding_limit_reached_title">Достигнут лимит запросов на вывод из стейка</string>
     <string name="staking_unbonding_period_v1_9_0">Время вывода</string>
+    <string name="staking_unstake_all">Вывести всё</string>
     <string name="staking_unstake_all_question">Вывести из стейка всё?</string>
     <string name="staking_validator_apy_percent">Примерное вознаграждение (% APY)</string>
     <string name="staking_validator_estimated_reward">Примерное вознаграждение</string>
@@ -1043,6 +1086,40 @@
     <string name="staking_your_stake">Ваш стейк</string>
     <string name="staking_your_validators">Ваши валидаторы</string>
     <string name="staking_your_validators_changing_title">Ваши валидаторы поменяются в следующую эру</string>
+    <string name="start_staking_available_balance_gap_message" formatted="false">Вы заблокировали токены на своем балансе используя %s. Чтобы продолжить, вам следует ввести меньше %s или больше %s. Чтобы поставить еще одну сумму, вам следует разблокировать токены из %s.</string>
+    <string name="start_staking_cant_stake_amount">Вы не можете застейкать указанную сумму</string>
+    <string name="start_staking_editing_selection_validators_subtitle" formatted="false">Выбрано: %d (макс. %d)</string>
+    <string name="start_staking_fragment_available_balance">Доступный баланс: %1$s (%2$s)</string>
+    <string name="start_staking_fragment_governance_participation_no_conditions">%s с вашими токенами в стейкинге</string>
+    <string name="start_staking_fragment_governance_participation_no_conditions_accent">Участвуйте в голосованиях</string>
+    <string name="start_staking_fragment_governance_participation_with_min_amount">Застейкайте больше %1$s и %2$s с вашими токенами в стейкинге</string>
+    <string name="start_staking_fragment_governance_participation_with_min_amount_accent">участвуйте в голосованиях</string>
+    <string name="start_staking_fragment_min_stake_condition">Стейкайте в любое время всего с %1$s. Ваш стейк активно будет зарабатывать вознаграждения %2$s</string>
+    <string name="start_staking_fragment_min_stake_condition_duration">через %s</string>
+    <string name="start_staking_fragment_more_info">Узнайте больше о стейкинге\n%1$s на %2$s</string>
+    <string name="start_staking_fragment_more_info_clicable_part">Nova Wiki</string>
+    <string name="start_staking_fragment_reward_frequency_condition_automatic_and_manual">Вознаграждения начисляются %1$s. Для автоматической выплаты вознаграждений застейкайте более %2$s, в противном случае вам необходимо будет получать вознаграждения вручную</string>
+    <string name="start_staking_fragment_reward_frequency_condition_duration">раз в %s</string>
+    <string name="start_staking_fragment_reward_frequency_condition_fallback">Вознаграждения начисляются %s</string>
+    <string name="start_staking_fragment_reward_frequency_condition_manual">Вознаграждения начисляются %s. Вам нужно забрать награды вручную</string>
+    <string name="start_staking_fragment_reward_frequency_condition_payout_only">Вознаграждения начисляются %s и добавляются к переводимому балансу</string>
+    <string name="start_staking_fragment_reward_frequency_condition_restake_only">Вознаграждения начисляются %s и добавляются обратно в стейк</string>
+    <string name="start_staking_fragment_stake_monitoring">Вознаграждения и статус стейкинга меняются со временем. %s время от времени</string>
+    <string name="start_staking_fragment_stake_monitoring_monitor_stake">Следите за своим стейкингом</string>
+    <string name="start_staking_fragment_start_staking">Начать стейкинг</string>
+    <string name="start_staking_fragment_terms_of_use">См. %s</string>
+    <string name="start_staking_fragment_terms_of_use_clicable_part">Условия использования</string>
+    <string name="start_staking_fragment_test_network_condition">%1$s — это %2$s с %3$s</string>
+    <string name="start_staking_fragment_test_network_condition_no_token">токеном без цены</string>
+    <string name="start_staking_fragment_test_network_condition_test_network">тестовая сеть</string>
+    <string name="start_staking_fragment_title">%1$s\nна ваших токенах %2$s\nв год</string>
+    <string name="start_staking_fragment_title_APY">Зарабатывайте до %s</string>
+    <string name="start_staking_fragment_unstake_condition">Отмените стейк в любое время, и верните свои средства %s. Вознаграждения не начисляются пока производится отмена</string>
+    <string name="start_staking_fragment_unstake_condition_duration">через %s</string>
+    <string name="start_staking_inactive_pool_message">Выбранный вами пул неактивен, поскольку у него не выбраны валидаторы или его стейк меньше минимальной.\nВы уверены, что хотите продолжить с выбранным пулом?</string>
+    <string name="start_staking_max_nominators_reached_message">Достигнуто максимальное количество номинаторов. Повторите попытку позже</string>
+    <string name="start_staking_max_nominators_reached_title">%s в настоящее время недоступен</string>
+    <string name="start_staking_selection_validators_subtitle" formatted="false">Валидаторы: %d (макс. %d)</string>
     <string name="tabbar_staking_title">Стейкинг</string>
     <string name="tabbar_wallet_title">Кошелёк</string>
     <string name="today">Сегодня</string>

@@ -39,6 +39,6 @@ private fun getSubtitle(
     val apyColor = resourceManager.getColor(R.color.text_positive)
     val apy = pool.apy ?: 0.0.asPerbill()
     val apyString = apy.format().toSpannable(colorSpan(apyColor))
-    return resourceManager.getString(R.string.pool_item_subtitle_apy)
+    return resourceManager.getString(R.string.common_per_year_format)
         .formatAsSpannable(apyString)
 }
