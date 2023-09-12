@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.isOpen
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.isActive
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.selecting.PoolAvailabilityFailure
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.selecting.PoolAvailabilityPayload
 
@@ -18,7 +17,7 @@ class PoolAvailabilityValidation(
     override suspend fun validate(value: PoolAvailabilityPayload): ValidationStatus<PoolAvailabilityFailure> {
         val pool = value.nominationPool
         return when {
-            !pool.status.isActive || !pool.state.isOpen -> validationError(PoolAvailabilityFailure.PoolIsClosed)
+            !pool.state.isOpen -> validationError(PoolAvailabilityFailure.PoolIsClosed)
             isPoolFull(value) -> validationError(PoolAvailabilityFailure.PoolIsFull)
             else -> valid()
         }
