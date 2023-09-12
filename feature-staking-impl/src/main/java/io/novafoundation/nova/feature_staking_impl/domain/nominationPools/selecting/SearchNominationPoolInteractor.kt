@@ -43,14 +43,17 @@ class SearchNominationPoolInteractor(
                 return@map emptyList()
             }
 
-            nominationPools
-                .filter {
+            nominationPools.filter {
                     val name = it.name()?.lowercase()
                     val address = it.address(stakingOption.chain)
-                    name?.contains(query).orFalse() || address.startsWith(query)
+                    name?.contains(query).orFalse() || address.startsWith(query)  || it.hasId(query)
                 }
                 .sortedWith(comparator)
         }
+    }
+
+    private fun NominationPool.hasId(query: String): Boolean {
+        return id.value.toString() == query
     }
 
     fun getValidationSystem(): PoolAvailabilityValidationSystem {
