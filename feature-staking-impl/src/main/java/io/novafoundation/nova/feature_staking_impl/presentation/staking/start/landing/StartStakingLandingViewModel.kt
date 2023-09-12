@@ -21,6 +21,7 @@ import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatAsSpannable
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.setEndSpan
 import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.toSpannable
@@ -58,6 +59,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.math.BigInteger
+import jp.co.soramitsu.fearless_utils.hash.isPositive
 import kotlin.time.Duration
 
 class StartStakingInfoModel(
@@ -261,17 +263,25 @@ class StartStakingLandingViewModel(
         eraDuration: Duration,
         themeColor: Int
     ): StakingConditionRVItem {
-        val minStake = minStakeAmount.formatPlanks(asset.token.configuration)
-            .toSpannable(colorSpan(themeColor))
         val time = resourceManager.getString(
             R.string.start_staking_fragment_min_stake_condition_duration,
             resourceManager.formatDuration(eraDuration, false)
         ).toSpannable(colorSpan(themeColor))
 
-        return StakingConditionRVItem(
-            iconId = R.drawable.ic_stake_anytime,
-            text = resourceManager.getString(R.string.start_staking_fragment_min_stake_condition).formatAsSpannable(minStake, time),
-        )
+        return if (minStakeAmount.isPositive()) {
+            val minStake = minStakeAmount.formatPlanks(asset.token.configuration)
+                .toSpannable(colorSpan(themeColor))
+
+            StakingConditionRVItem(
+                iconId = R.drawable.ic_stake_anytime,
+                text = resourceManager.getString(R.string.start_staking_fragment_min_stake_condition).formatAsSpannable(minStake, time),
+            )
+        } else {
+            StakingConditionRVItem(
+                iconId = R.drawable.ic_stake_anytime,
+                text = resourceManager.getString(R.string.start_staking_fragment_min_stake_condition_no_min_stake).formatAsSpannable(time),
+            )
+        }
     }
 
     private fun createUnstakeCondition(
@@ -304,17 +314,21 @@ class StartStakingLandingViewModel(
             isRestakeOnlyCase(payouts) -> {
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_restake_only).formatAsSpannable(time)
             }
+
             isPayoutsOnlyCase(payouts) -> {
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_payout_only).formatAsSpannable(time)
             }
+
             payoutTypes.containsOnly(PayoutType.Manual) -> {
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_manual).formatAsSpannable(time)
             }
+
             payoutTypes.containsManualAndAutomatic() -> {
                 val automaticPayoutFormattedAmount = payouts.automaticPayoutMinAmount?.formatPlanks(asset.token.configuration).orEmpty()
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_automatic_and_manual)
                     .formatAsSpannable(time, automaticPayoutFormattedAmount)
             }
+
             else -> {
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_fallback)
                     .formatAsSpannable(time)
