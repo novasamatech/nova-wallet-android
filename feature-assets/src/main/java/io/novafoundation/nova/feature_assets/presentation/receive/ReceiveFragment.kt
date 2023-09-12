@@ -25,6 +25,7 @@ import javax.inject.Inject
 
 private const val KEY_PAYLOAD = "KEY_PAYLOAD"
 private const val KEY_CHAIN_ID = "KEY_CHAIN"
+private const val KEY_TITLE_RES = "KEY_TITLE_RES"
 
 class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
 
@@ -37,8 +38,9 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
             putParcelable(KEY_PAYLOAD, assetPayload)
         }
 
-        fun getBundle(chainId: ChainId) = Bundle().apply {
+        fun getBundle(chainId: ChainId, titleRes: Int? = null) = Bundle().apply {
             putString(KEY_CHAIN_ID, chainId)
+            titleRes?.let { putInt(KEY_TITLE_RES, it) }
         }
     }
 
@@ -83,7 +85,9 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
             receiveFrom.setLabel(it.chain.name)
         }
 
-        viewModel.toolbarTitle.observe(receiveToolbar::setTitle)
+        argument<Int?>(KEY_TITLE_RES)?.let {
+            receiveToolbar.setTitle(it)
+        } ?: viewModel.toolbarTitle.observe(receiveToolbar::setTitle)
 
         viewModel.shareEvent.observeEvent(::startQrSharingIntent)
     }
