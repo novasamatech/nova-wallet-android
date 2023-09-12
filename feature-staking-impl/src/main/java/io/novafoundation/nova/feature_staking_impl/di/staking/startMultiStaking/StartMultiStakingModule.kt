@@ -223,12 +223,14 @@ class StartMultiStakingModule {
     fun provideSelectNominationPoolInteractor(
         nominationPoolProvider: NominationPoolProvider,
         knownNovaPools: KnownNovaPools,
-        nominationPoolRecommenderFactory: NominationPoolRecommenderFactory
+        nominationPoolRecommenderFactory: NominationPoolRecommenderFactory,
+        nominationPoolGlobalsRepository: NominationPoolGlobalsRepository
     ): SearchNominationPoolInteractor {
         return SearchNominationPoolInteractor(
             nominationPoolProvider,
             knownNovaPools,
-            nominationPoolRecommenderFactory
+            nominationPoolRecommenderFactory,
+            nominationPoolGlobalsRepository
         )
     }
 }
