@@ -20,6 +20,8 @@ import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatAsSpannable
+import io.novafoundation.nova.common.utils.formatting.DayDurationShortcut
+import io.novafoundation.nova.common.utils.formatting.DurationShortcutFormatter
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.setEndSpan
 import io.novafoundation.nova.common.utils.setFullSpan
@@ -79,10 +81,12 @@ class StartStakingLandingViewModel(
     private val validationExecutor: ValidationExecutor,
     private val selectedMetaAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val stakingStartedDetectionService: StakingStartedDetectionService,
+    private val stakingStartedDetectionService: StakingStartedDetectionService
 ) : BaseViewModel(),
     Browserable,
     Validatable by validationExecutor {
+
+    private val durationShortcutFormatter: DurationShortcutFormatter = createDurationShortcutFormatter()
 
     private val availableStakingOptionsPayload = startStakingLandingPayload.availableStakingOptions
     private val stakingOptionIds = availableStakingOptionsPayload.toStakingOptionIds()
@@ -294,27 +298,28 @@ class StartStakingLandingViewModel(
         asset: Asset,
         themeColor: Int
     ): StakingConditionRVItem {
-        val time = resourceManager.getString(
-            R.string.start_staking_fragment_reward_frequency_condition_duration,
-            resourceManager.formatDuration(eraDuration, false)
-        ).toSpannable(colorSpan(themeColor))
+        val time = formatTime(eraDuration, themeColor)
 
         val payoutTypes = payouts.payoutTypes
         val text = when {
             isRestakeOnlyCase(payouts) -> {
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_restake_only).formatAsSpannable(time)
             }
+
             isPayoutsOnlyCase(payouts) -> {
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_payout_only).formatAsSpannable(time)
             }
+
             payoutTypes.containsOnly(PayoutType.Manual) -> {
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_manual).formatAsSpannable(time)
             }
+
             payoutTypes.containsManualAndAutomatic() -> {
                 val automaticPayoutFormattedAmount = payouts.automaticPayoutMinAmount?.formatPlanks(asset.token.configuration).orEmpty()
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_automatic_and_manual)
                     .formatAsSpannable(time, automaticPayoutFormattedAmount)
             }
+
             else -> {
                 resourceManager.getString(R.string.start_staking_fragment_reward_frequency_condition_fallback)
                     .formatAsSpannable(time)
@@ -325,6 +330,15 @@ class StartStakingLandingViewModel(
             iconId = R.drawable.ic_rewards,
             text = text,
         )
+    }
+
+    private fun formatTime(eraDuration: Duration, themeColor: Int): CharSequence {
+        return durationShortcutFormatter.format(eraDuration) {
+            resourceManager.getString(
+                R.string.start_staking_fragment_reward_frequency_condition_duration,
+                resourceManager.formatDuration(eraDuration, false)
+            )
+        }.toSpannable(colorSpan(themeColor))
     }
 
     private fun createGovernanceParticipatingCondition(
@@ -385,5 +399,11 @@ class StartStakingLandingViewModel(
     private fun getThemeColor(chain: Chain): Int {
         return chain.additional?.themeColor?.let { Color.parseColor(it) }
             ?: resourceManager.getColor(R.color.text_positive)
+    }
+
+    private fun createDurationShortcutFormatter(): DurationShortcutFormatter {
+        return DurationShortcutFormatter(
+            DayDurationShortcut(resourceManager.getString(R.string.common_frequency_days_daily))
+        )
     }
 }
