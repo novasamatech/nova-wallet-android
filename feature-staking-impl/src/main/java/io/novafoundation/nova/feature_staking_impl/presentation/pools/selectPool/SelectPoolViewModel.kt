@@ -79,7 +79,7 @@ class SelectPoolViewModel(
     fun poolInfoClicked(poolItem: PoolRvItem) {
         launch {
             externalActions.showExternalActions(
-                ExternalActions.Type.Address(poolItem.address),
+                ExternalActions.Type.Address(poolItem.model.address),
                 stakingOption().chain
             )
         }
