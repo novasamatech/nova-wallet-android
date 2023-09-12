@@ -12,12 +12,13 @@ interface KnownNovaPools {
 
 fun KnownNovaPools.isNovaPool(chainId: ChainId, poolId: PoolId) = chainId to poolId in novaPoolIds
 
-private const val NOVA_POLKADOT_POOL_ID = 54
 
 class FixedKnownNovaPools : KnownNovaPools {
 
     override val novaPoolIds: Set<Pair<ChainId, PoolId>> = setOf(
-        key(Chain.Geneses.POLKADOT, NOVA_POLKADOT_POOL_ID)
+        key(Chain.Geneses.POLKADOT, 54),
+        key(Chain.Geneses.KUSAMA, 160),
+        key(Chain.Geneses.ALEPH_ZERO, 74)
     )
 
     private fun key(chainId: ChainId, poolId: Int) = chainId to PoolId(poolId)

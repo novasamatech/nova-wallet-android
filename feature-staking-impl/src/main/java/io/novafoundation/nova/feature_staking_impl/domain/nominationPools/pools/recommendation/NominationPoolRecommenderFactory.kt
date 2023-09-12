@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.NominationPool
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.isActive
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.NominationPoolProvider
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 
 class NominationPoolRecommenderFactory(
@@ -28,7 +27,6 @@ class NominationPoolRecommenderFactory(
             val maxPoolMembersPerPool = nominationPoolGlobalsRepository.maxPoolMembersPerPool(stakingOption.chain.id)
 
             RealNominationPoolRecommender(
-                chain = stakingOption.chain,
                 allNominationPools = nominationPools,
                 maxPoolMembersPerPool = maxPoolMembersPerPool,
                 poolComparator = getPoolComparator(knownNovaPools, stakingOption.chain)
@@ -38,7 +36,6 @@ class NominationPoolRecommenderFactory(
 }
 
 private class RealNominationPoolRecommender(
-    private val chain: Chain,
     private val allNominationPools: List<NominationPool>,
     private val maxPoolMembersPerPool: Int?,
     private val poolComparator: Comparator<NominationPool>
