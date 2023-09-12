@@ -21,22 +21,24 @@ object SpannableFormatter {
     fun format(format: CharSequence, vararg args: Any): SpannedString {
         val out = SpannableStringBuilder(format)
         val matcher = FORMAT_SEQUENCE.matcher(format)
-        var i = 0
+        var index = 0
+        var offset = 0
         while (matcher.find()) {
             matcher.group()
-            val argNumber = parseArgNumber(matcher.group()) ?: i
+            val argNumber = parseArgNumber(matcher.group()) ?: index
             if (argNumber >= args.size) {
                 continue
             }
             val arg = args[argNumber]
-            val start = matcher.start()
-            val end = matcher.end()
+            val start = matcher.start() - offset
+            val end = matcher.end() - offset
             if (arg is CharSequence) {
-                out.replace(start - i, end - i, arg)
+                out.replace(start, end, arg)
             } else {
-                out.replace(start - i, end - i, arg.toString())
+                out.replace(start, end, arg.toString())
             }
-            i += end - start - arg.toString().length
+            index++
+            offset += end - start - arg.toString().length
         }
         return SpannedString(out)
     }
