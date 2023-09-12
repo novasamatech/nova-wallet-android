@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.utils.makeGoneViews
 import io.novafoundation.nova.common.utils.makeVisibleViews
@@ -53,6 +54,12 @@ class SetupAmountMultiStakingFragment : BaseFragment<SetupAmountMultiStakingView
         startMultiStakingSetupAmountSelection.setOnClickListener { viewModel.selectionClicked() }
 
         startMultiStakingSetupAmountAmount.amountInput.showSoftKeyboard()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        startMultiStakingSetupAmountAmount.amountInput.hideSoftKeyboard()
     }
 
     override fun inject() {
