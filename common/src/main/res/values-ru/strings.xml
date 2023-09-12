@@ -207,7 +207,7 @@
     <string name="common_change">Изменить</string>
     <string name="common_choose_network">Выберите сеть</string>
     <string name="common_close">Закрыть</string>
-    <string name="common_close_confirmation_message">Вы уверены, что хотите закрыть этот экран?\nВсе изменения не будут применены.</string>
+    <string name="common_close_confirmation_message">Вы уверены, что хотите закрыть этот экран?\nИзменения не будут применены.</string>
     <string name="common_completed">Завершённые</string>
     <string name="common_completed_with_count">Завершённые (%s)</string>
     <string name="common_confirm">Подтвердить</string>
@@ -614,6 +614,10 @@
     <string name="pincode_create_top_title">Новый PIN-код</string>
     <string name="pincode_enter_pin_code_v2_2_0">Введите PIN-код</string>
     <string name="pincode_title_create">Установите свой PIN-код</string>
+    <string name="pool_full_failure_message">Вы не можете присоединиться к пулу, поскольку в нем достигнуто максимальное количество участников.</string>
+    <string name="pool_full_failure_title">Пул заполнен</string>
+    <string name="pool_inactive_failure_message">Вы не можете присоединиться к не открытому пулу. Пожалуйста, свяжитесь с владельцем пула.</string>
+    <string name="pool_inactive_failure_title">Пул не открыт</string>
     <string name="profile_accounts_title">Аккаунты</string>
     <string name="profile_accounts_title_2_0">Кошельки</string>
     <string name="profile_language_title">Язык</string>
@@ -785,7 +789,7 @@
     <string name="setup_staking_type_min_amount_condition">Минимальный стейк: %s</string>
     <string name="setup_staking_type_payout_type_automatically_condition">Вознаграждения: выплачиваются автоматически</string>
     <string name="setup_staking_type_payout_type_manual_condition">Вознаграждения: нужно забирать вручную</string>
-    <string name="setup_staking_type_pool_already_used_message">Вы уже делаете стейкаете в пуле</string>
+    <string name="setup_staking_type_pool_already_used_message">Вы уже стейкаете в пуле</string>
     <string name="setup_staking_type_pool_staking">Стейкинг в пуле</string>
     <string name="setup_staking_type_staking_amount_is_less_than_min_amount_title">Ваш стейк меньше минимального для получения вознаграждений</string>
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Неподдерживаемый тип стейкинга</string>
@@ -1097,9 +1101,9 @@
     <string name="start_staking_fragment_reward_frequency_condition_automatic_and_manual">Вознаграждения начисляются %1$s. Для автоматической выплаты вознаграждений застейкайте более %2$s, в противном случае вам необходимо будет получать вознаграждения вручную</string>
     <string name="start_staking_fragment_reward_frequency_condition_duration">раз в %s</string>
     <string name="start_staking_fragment_reward_frequency_condition_fallback">Вознаграждения начисляются %s</string>
-    <string name="start_staking_fragment_reward_frequency_condition_manual">Награды начисляются %s. Вам нужно забрать награды вручную</string>
-    <string name="start_staking_fragment_reward_frequency_condition_payout_only">Награды начисляются %s и добавляются к переводимому балансу</string>
-    <string name="start_staking_fragment_reward_frequency_condition_restake_only">Награды начисляются %s и добавляются обратно в стейк</string>
+    <string name="start_staking_fragment_reward_frequency_condition_manual">Вознаграждения начисляются %s. Вам нужно забрать награды вручную</string>
+    <string name="start_staking_fragment_reward_frequency_condition_payout_only">Вознаграждения начисляются %s и добавляются к переводимому балансу</string>
+    <string name="start_staking_fragment_reward_frequency_condition_restake_only">Вознаграждения начисляются %s и добавляются обратно в стейк</string>
     <string name="start_staking_fragment_stake_monitoring">Вознаграждения и статус стейкинга меняются со временем. %s время от времени</string>
     <string name="start_staking_fragment_stake_monitoring_monitor_stake">Следите за своим стейкингом</string>
     <string name="start_staking_fragment_start_staking">Начать стейкинг</string>
