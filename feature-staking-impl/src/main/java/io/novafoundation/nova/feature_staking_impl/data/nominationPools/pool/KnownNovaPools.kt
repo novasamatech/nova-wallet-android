@@ -12,7 +12,6 @@ interface KnownNovaPools {
 
 fun KnownNovaPools.isNovaPool(chainId: ChainId, poolId: PoolId) = chainId to poolId in novaPoolIds
 
-
 class FixedKnownNovaPools : KnownNovaPools {
 
     override val novaPoolIds: Set<Pair<ChainId, PoolId>> = setOf(
