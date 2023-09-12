@@ -4,9 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.domain.onLoaded
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.scrollToTopWhenItemsShuffled
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -19,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.Sel
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_select_pool.selectPoolCount
 import kotlinx.android.synthetic.main.fragment_select_pool.selectPoolList
+import kotlinx.android.synthetic.main.fragment_select_pool.selectPoolProgressBar
 import kotlinx.android.synthetic.main.fragment_select_pool.selectPoolRecommendedAction
 import kotlinx.android.synthetic.main.fragment_select_pool.selectPoolToolbar
 
@@ -78,7 +82,12 @@ class SelectPoolFragment : BaseFragment<SelectPoolViewModel>(), PoolAdapter.Item
     override fun subscribe(viewModel: SelectPoolViewModel) {
         setupExternalActions(viewModel)
 
-        viewModel.poolModelsFlow.observe(adapter::submitList)
+        viewModel.poolModelsFlow.observe { loadingState ->
+            loadingState.onLoaded {
+                adapter.submitList(it)
+            }
+            selectPoolProgressBar.isVisible = loadingState.isLoading()
+        }
 
         viewModel.selectedTitle.observe(selectPoolCount::setText)
 

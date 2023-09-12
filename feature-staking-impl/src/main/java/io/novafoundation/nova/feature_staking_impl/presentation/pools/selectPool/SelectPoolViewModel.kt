@@ -6,6 +6,8 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
+import io.novafoundation.nova.common.utils.withLoading
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.chain
@@ -59,8 +61,8 @@ class SelectPoolViewModel(
         val selectedPool = selection.selection.asPoolSelection()?.pool
         convertToModels(allPools, selectedPool)
     }
-        .inBackground()
-        .share()
+        .withSafeLoading()
+        .shareInBackground()
 
     val selectedTitle = poolsFlow
         .map { resourceManager.getString(R.string.select_custom_pool_active_pools_count, it.size) }
