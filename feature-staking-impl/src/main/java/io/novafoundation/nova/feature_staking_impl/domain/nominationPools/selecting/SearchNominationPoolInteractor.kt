@@ -44,10 +44,10 @@ class SearchNominationPoolInteractor(
             }
 
             nominationPools.filter {
-                    val name = it.name()?.lowercase()
-                    val address = it.address(stakingOption.chain)
-                    name?.contains(query).orFalse() || address.startsWith(query)  || it.hasId(query)
-                }
+                val name = it.name()?.lowercase()
+                val address = it.address(stakingOption.chain)
+                name?.contains(query).orFalse() || address.startsWith(query) || it.hasId(query)
+            }
                 .sortedWith(comparator)
         }
     }
