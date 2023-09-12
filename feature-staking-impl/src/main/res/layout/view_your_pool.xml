@@ -47,8 +47,8 @@
 
     <ImageView
         android:id="@+id/yourPoolInfo"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
         android:scaleType="centerInside"
         android:src="@drawable/ic_info_cicrle_filled_16"
