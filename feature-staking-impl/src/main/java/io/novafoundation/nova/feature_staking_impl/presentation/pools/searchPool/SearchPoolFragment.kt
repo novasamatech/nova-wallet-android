@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
@@ -82,6 +83,8 @@ class SearchPoolFragment : BaseFragment<SearchPoolViewModel>(), PoolAdapter.Item
 
     override fun subscribe(viewModel: SearchPoolViewModel) {
         setupExternalActions(viewModel)
+        observeValidations(viewModel)
+
         searchPoolToolbar.searchField.content.bindTo(viewModel.query, lifecycleScope)
 
         viewModel.poolModelsFlow.observe {

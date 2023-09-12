@@ -15,14 +15,14 @@ fun handleSetupStakingTypeValidationFailure(chainAsset: Chain.Asset, error: Edit
         is EditingStakingTypeFailure.AmountIsLessThanMinStake -> {
             val amount = error.minStake.formatPlanks(chainAsset)
             val stakingTypeFormat = resourceManager.formatStakingTypeLabel(error.stakingType)
-            return TitleAndMessage(
+            TitleAndMessage(
                 resourceManager.getString(R.string.setup_staking_type_staking_amount_is_less_than_min_amount_title),
                 resourceManager.getString(R.string.setup_staking_type_direct_staking_amount_is_less_than_min_amount_message, amount, stakingTypeFormat)
             )
         }
 
         is EditingStakingTypeFailure.StakingTypeIsAlreadyUsing -> {
-            return when (error.stakingType.group()) {
+            when (error.stakingType.group()) {
                 StakingTypeGroup.PARACHAIN,
                 StakingTypeGroup.RELAYCHAIN -> TitleAndMessage(
                     resourceManager.getString(R.string.setup_staking_type_already_used_title),
