@@ -1476,6 +1476,6 @@
     <string name="wallet_your_balance">Your balance</string>
     <string name="yesterday">Yesterday</string>
     <string name="nft_receive">Receive NFT</string>
-    <string name="nft_send">Send</string>
+    <string name="nft_send">Send NFT</string>
     <string name="nft_search_hint">Search by NFT name or Collection name</string>
 </resources>
