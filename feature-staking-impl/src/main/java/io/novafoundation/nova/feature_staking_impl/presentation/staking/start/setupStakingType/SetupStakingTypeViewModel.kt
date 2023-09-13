@@ -116,7 +116,6 @@ class SetupStakingTypeViewModel(
 
     fun backPressed() {
         launch {
-
             val dataHasBeenChanged = dataHasBeenChanged.first()
 
             if (dataHasBeenChanged) {
