@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeInvisible
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.TableCellView
@@ -26,6 +27,7 @@ import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.R
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureComponent
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.setPriceOrHide
 import kotlinx.android.synthetic.main.fragment_nft_details.assetActionsSend
 import kotlinx.android.synthetic.main.fragment_nft_details.nftAttributesTable
@@ -36,12 +38,14 @@ import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsDescription
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsIssuance
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsMedia
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsOnwer
-import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsPrice
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsProgress
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsTable
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsTitle
-import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsTokenPrice
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsToolbar
+import kotlinx.android.synthetic.main.fragment_nft_details.nftTokenPrice
+import kotlinx.android.synthetic.main.fragment_nft_details.nftTokenPriceDetails
+import kotlinx.android.synthetic.main.fragment_nft_details.nftTokenPriceFiat
+import kotlinx.android.synthetic.main.fragment_nft_details.nftTokenPriceNotListed
 import kotlinx.android.synthetic.main.fragment_nft_details.tagsRecyclerView
 import javax.inject.Inject
 
@@ -64,7 +68,7 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
     private val contentViews by lazy(LazyThreadSafetyMode.NONE) {
         listOf(
             nftDetailsMedia, nftDetailsTitle, nftDetailsDescription, nftDetailsIssuance,
-            nftDetailsPrice, nftDetailsTable, assetActionsSend
+            nftTokenPriceDetails, nftDetailsTable, assetActionsSend
         )
     }
 
@@ -138,11 +142,17 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
             nftDetailsTitle.text = it.name
             nftDetailsDescription.setTextOrHide(it.description)
 
-            nftDetailsPrice.setPriceOrHide(it.price)
-            if (it.price == null) {
-                nftDetailsTokenPrice.showValue(getString(R.string.nft_price_not_listed))
+            nftTokenPriceDetails.makeVisible()
+            if (it.price != null) {
+                nftTokenPrice.makeVisible()
+                nftTokenPrice.text = it.price.token
+                nftTokenPriceFiat.makeVisible()
+                nftTokenPriceFiat.text = it.price.fiat
+                nftTokenPriceNotListed.makeGone()
             } else {
-                nftDetailsTokenPrice.showValue(it.price.token, it.price.fiat)
+                nftTokenPrice.makeInvisible()
+                nftTokenPriceFiat.makeGone()
+                nftTokenPriceNotListed.makeVisible()
             }
 
             if (it.collection != null) {
