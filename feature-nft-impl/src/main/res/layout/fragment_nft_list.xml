@@ -7,7 +7,7 @@
     android:background="@drawable/drawable_background_image"
     android:orientation="vertical">
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/nftListToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,18 +18,18 @@
             android:id="@+id/nftListBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
             android:layout_marginStart="16dp"
+            android:paddingEnd="16dp"
             android:src="@drawable/ic_arrow_back"
             app:tint="@color/actions_color" />
 
         <TextView
             style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="?attr/actionBarSize"
             android:gravity="center"
+            android:layout_gravity="center"
             android:text="@string/nft_your_nfts"
             android:textColor="@color/text_primary" />
 
@@ -37,9 +37,10 @@
             android:id="@+id/nftListCounter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
             android:layout_marginEnd="16dp"
             tools:text="6" />
-    </LinearLayout>
+    </FrameLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/nftListRefresh"
