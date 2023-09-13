@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="start_staking_fragment_min_stake_condition_no_min_stake">Stake anytime. Your stake will actively earn rewards %s</string>
+
     <string name="pool_full_failure_title">Pool is full</string>
     <string name="pool_full_failure_message">You cannot join pool since it reached maximum number of members</string>
 
