@@ -36,6 +36,7 @@ data class Operation(
             val amount: BigInteger,
             val fiatAmount: BigDecimal?,
             val isReward: Boolean,
+            val eventId: String,
             val kind: RewardKind
         ) : Type() {
 

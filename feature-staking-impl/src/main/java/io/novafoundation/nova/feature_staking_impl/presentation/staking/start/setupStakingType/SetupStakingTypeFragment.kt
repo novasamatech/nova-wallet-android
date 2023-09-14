@@ -46,6 +46,8 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), Setu
         setupStakingTypeToolbar.setHomeButtonListener { viewModel.backPressed() }
         setupStakingTypeList.adapter = adapter
         setupStakingTypeList.itemAnimator = null
+
+        onBackPressed { viewModel.backPressed() }
     }
 
     override fun inject() {
@@ -62,7 +64,7 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), Setu
         setupConfirmationDialog(R.style.AccentNegativeAlertDialogTheme_Reversed, viewModel.closeConfirmationAction)
         observeValidations(viewModel)
 
-        viewModel.availableToRewriteData.observe { setupStakingTypeToolbar.setRightActionEnabled(it) }
+        viewModel.dataHasBeenChanged.observe { setupStakingTypeToolbar.setRightActionEnabled(it) }
 
         viewModel.stakingTypeModels.observe {
             adapter.submitList(it)

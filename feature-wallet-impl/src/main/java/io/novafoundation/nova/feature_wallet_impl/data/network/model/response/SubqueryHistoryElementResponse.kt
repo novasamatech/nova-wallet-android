@@ -17,6 +17,7 @@ class SubqueryHistoryElementResponse(val query: Query) {
                 val extrinsicHash: String?,
                 val address: String,
                 val reward: Reward?,
+                val blockNumber: Long,
                 val poolReward: PoolReward?,
                 val transfer: Transfer?,
                 val extrinsic: Extrinsic?,
@@ -25,12 +26,14 @@ class SubqueryHistoryElementResponse(val query: Query) {
                 class Reward(
                     val era: Int,
                     val amount: BigInteger,
+                    val eventIdx: Int,
                     val isReward: Boolean,
                     val validator: String?,
                 )
 
                 class PoolReward(
                     val amount: BigInteger,
+                    val eventIdx: Int,
                     val poolId: Int,
                     val isReward: Boolean,
                 )

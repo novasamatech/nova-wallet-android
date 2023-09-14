@@ -115,7 +115,8 @@ fun mapOperationToOperationLocalDb(
             isReward = rewardOrNull()?.isReward,
             era = rewardOrNull()?.directKindOrNull()?.era,
             validator = rewardOrNull()?.directKindOrNull()?.validator,
-            poolId = rewardOrNull()?.poolKindOrNull()?.poolId
+            poolId = rewardOrNull()?.poolKindOrNull()?.poolId,
+            eventId = rewardOrNull()?.eventId
         )
     }
 }
@@ -151,7 +152,8 @@ fun mapOperationLocalToOperation(
                 kind = RewardKind.Direct(
                     era = era!!,
                     validator = validator
-                )
+                ),
+                eventId = eventId!!
             )
             OperationLocal.Type.POOL_REWARD -> Type.Reward(
                 amount = amount!!,
@@ -159,7 +161,8 @@ fun mapOperationLocalToOperation(
                 isReward = isReward!!,
                 kind = RewardKind.Pool(
                     poolId = poolId!!
-                )
+                ),
+                eventId = eventId!!
             )
         }
 

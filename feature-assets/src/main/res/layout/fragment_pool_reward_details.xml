@@ -89,12 +89,12 @@
                 android:layout_marginBottom="24dp">
 
                 <io.novafoundation.nova.common.view.TableCellView
-                    android:id="@+id/poolRewardDetailTransactionId"
+                    android:id="@+id/poolRewardDetailEventId"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
                     app:primaryValueIconTint="@color/icon_secondary"
-                    app:title="@string/common_transaction_id" />
+                    app:title="@string/common_event" />
 
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/poolRewardDetailType"

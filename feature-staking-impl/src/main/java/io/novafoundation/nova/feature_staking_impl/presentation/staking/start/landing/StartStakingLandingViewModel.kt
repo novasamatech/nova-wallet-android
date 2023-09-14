@@ -67,6 +67,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.math.BigInteger
+import jp.co.soramitsu.fearless_utils.hash.isPositive
 import kotlin.time.Duration
 
 class StartStakingInfoModel(
@@ -275,17 +276,25 @@ class StartStakingLandingViewModel(
         eraDuration: Duration,
         themeColor: Int
     ): StakingConditionRVItem {
-        val minStake = minStakeAmount.formatPlanks(asset.token.configuration)
-            .toSpannable(colorSpan(themeColor))
         val time = resourceManager.getString(
             R.string.start_staking_fragment_min_stake_condition_duration,
             durationFormatter.format(eraDuration)
         ).toSpannable(colorSpan(themeColor))
 
-        return StakingConditionRVItem(
-            iconId = R.drawable.ic_stake_anytime,
-            text = resourceManager.getString(R.string.start_staking_fragment_min_stake_condition).formatAsSpannable(minStake, time),
-        )
+        return if (minStakeAmount.isPositive()) {
+            val minStake = minStakeAmount.formatPlanks(asset.token.configuration)
+                .toSpannable(colorSpan(themeColor))
+
+            StakingConditionRVItem(
+                iconId = R.drawable.ic_stake_anytime,
+                text = resourceManager.getString(R.string.start_staking_fragment_min_stake_condition).formatAsSpannable(minStake, time),
+            )
+        } else {
+            StakingConditionRVItem(
+                iconId = R.drawable.ic_stake_anytime,
+                text = resourceManager.getString(R.string.start_staking_fragment_min_stake_condition_no_min_stake).formatAsSpannable(time),
+            )
+        }
     }
 
     private fun createUnstakeCondition(

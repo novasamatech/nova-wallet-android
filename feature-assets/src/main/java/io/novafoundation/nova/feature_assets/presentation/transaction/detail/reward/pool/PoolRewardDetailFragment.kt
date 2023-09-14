@@ -18,11 +18,11 @@ import io.novafoundation.nova.feature_assets.presentation.model.showOperationSta
 import io.novafoundation.nova.feature_assets.presentation.model.toAmountModel
 import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.showPool
 import kotlinx.android.synthetic.main.fragment_pool_reward_details.poolRewardDetailAmount
+import kotlinx.android.synthetic.main.fragment_pool_reward_details.poolRewardDetailEventId
 import kotlinx.android.synthetic.main.fragment_pool_reward_details.poolRewardDetailNetwork
 import kotlinx.android.synthetic.main.fragment_pool_reward_details.poolRewardDetailPool
 import kotlinx.android.synthetic.main.fragment_pool_reward_details.poolRewardDetailStatus
 import kotlinx.android.synthetic.main.fragment_pool_reward_details.poolRewardDetailToolbar
-import kotlinx.android.synthetic.main.fragment_pool_reward_details.poolRewardDetailTransactionId
 import kotlinx.android.synthetic.main.fragment_pool_reward_details.poolRewardDetailType
 
 class PoolRewardDetailFragment : BaseFragment<PoolRewardDetailViewModel>() {
@@ -44,8 +44,8 @@ class PoolRewardDetailFragment : BaseFragment<PoolRewardDetailViewModel>() {
     override fun initViews() {
         poolRewardDetailToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        poolRewardDetailTransactionId.setOnClickListener {
-            viewModel.transactionIdClicked()
+        poolRewardDetailEventId.setOnClickListener {
+            viewModel.eventIdClicked()
         }
 
         poolRewardDetailPool.setOnClickListener {
@@ -71,7 +71,7 @@ class PoolRewardDetailFragment : BaseFragment<PoolRewardDetailViewModel>() {
         setupExternalActions(viewModel)
 
         with(viewModel.operation) {
-            poolRewardDetailTransactionId.showValueOrHide(extrinsicHash)
+            poolRewardDetailEventId.showValueOrHide(eventId)
             poolRewardDetailToolbar.setTitle(time.formatDateTime())
             poolRewardDetailAmount.setAmount(amount.toAmountModel())
 
