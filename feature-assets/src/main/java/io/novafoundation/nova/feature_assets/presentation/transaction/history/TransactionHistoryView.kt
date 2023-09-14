@@ -22,7 +22,6 @@ import io.novafoundation.nova.common.utils.updateTopMargin
 import io.novafoundation.nova.common.view.bottomSheet.LockBottomSheetBehavior
 import io.novafoundation.nova.common.view.shape.getTopRoundedCornerDrawable
 import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import kotlinx.android.synthetic.main.view_transfer_history.view.placeholder
 import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryFilter
 import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryList
@@ -32,7 +31,7 @@ import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHist
 
 typealias ScrollingListener = (position: Int) -> Unit
 typealias SlidingStateListener = (Int) -> Unit
-typealias TransactionClickListener = (OperationModel) -> Unit
+typealias TransactionClickListener = (transactionId: String) -> Unit
 
 private const val MIN_MARGIN = 20 // dp
 private const val MAX_MARGIN = 32 // dp
@@ -202,8 +201,8 @@ class TransferHistorySheet @JvmOverloads constructor(
         super.onDetachedFromWindow()
     }
 
-    override fun transactionClicked(transactionModel: OperationModel) {
-        transactionClickListener?.invoke(transactionModel)
+    override fun transactionClicked(transactionId: String) {
+        transactionClickListener?.invoke(transactionId)
     }
 
     private fun addScrollListener() {

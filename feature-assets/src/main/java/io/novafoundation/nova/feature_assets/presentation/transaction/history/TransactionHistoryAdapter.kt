@@ -31,7 +31,7 @@ class TransactionHistoryAdapter(
 
     interface Handler {
 
-        fun transactionClicked(transactionModel: OperationModel)
+        fun transactionClicked(transactionId: String)
     }
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
@@ -51,9 +51,15 @@ class TransactionHistoryAdapter(
     }
 
     override fun bindChild(holder: GroupedListHolder, position: Int, child: OperationModel, payloads: List<Any>) {
+        require(holder is TransactionHolder)
+
         resolvePayload(holder, position, payloads) {
             when (it) {
-                OperationModel::amountDetails -> (holder as TransactionHolder).bindFiatWithTime(child)
+                OperationModel::statusAppearance -> holder.bindStatus(child)
+                OperationModel::header -> holder.bindHeader(child)
+                OperationModel::subHeader -> holder.bindSubHeader(child)
+                OperationModel::amount -> holder.bindAmount(child)
+                OperationModel::amountDetails -> holder.bindAmountDetails(child)
             }
         }
     }
@@ -70,30 +76,47 @@ class TransactionHolder(
 
     fun bind(item: OperationModel, handler: TransactionHistoryAdapter.Handler) {
         with(containerView) {
-            header.text = item.header
+            bindHeader(item)
 
-            valuePrimary.setTextColorRes(item.amountColorRes)
-            valuePrimary.text = item.amount
+            bindAmount(item)
 
-            bindFiatWithTime(item)
-            subHeader.text = item.subHeader
-            subHeader.ellipsize = item.subHeaderEllipsize
+            bindAmountDetails(item)
+            bindSubHeader(item)
+
             icon.setIcon(item.operationIcon, imageLoader)
 
-            if (item.statusAppearance != OperationStatusAppearance.COMPLETED) {
-                status.makeVisible()
-                status.setImageResource(item.statusAppearance.icon)
-                status.setImageTintRes(item.statusAppearance.statusIconTint)
-            } else {
-                status.makeGone()
-            }
+            bindStatus(item)
 
-            setOnClickListener { handler.transactionClicked(item) }
+            setOnClickListener { handler.transactionClicked(item.id) }
         }
     }
 
-    fun bindFiatWithTime(item: OperationModel) {
+    fun bindAmount(item: OperationModel) = with(containerView) {
+        valuePrimary.setTextColorRes(item.amountColorRes)
+        valuePrimary.text = item.amount
+    }
+
+    fun bindHeader(item: OperationModel) {
+        containerView. header.text = item.header
+    }
+
+    fun bindAmountDetails(item: OperationModel) {
         containerView.valueSecondary.setTextOrHide(item.amountDetails)
+    }
+
+    fun bindSubHeader(item: OperationModel) = with(containerView) {
+        subHeader.text = item.subHeader
+        subHeader.ellipsize = item.subHeaderEllipsize
+    }
+
+    fun bindStatus(item: OperationModel) = with(containerView) {
+        if (item.statusAppearance != OperationStatusAppearance.COMPLETED) {
+            status.makeVisible()
+            status.setImageResource(item.statusAppearance.icon)
+            status.setImageTintRes(item.statusAppearance.statusIconTint)
+        } else {
+            status.makeGone()
+        }
     }
 
     override fun unbind() {
@@ -109,7 +132,13 @@ class DayHolder(view: View) : GroupedListHolder(view) {
     }
 }
 
-private object TransactionPayloadGenerator : PayloadGenerator<OperationModel>(OperationModel::amountDetails)
+private object TransactionPayloadGenerator : PayloadGenerator<OperationModel>(
+    OperationModel::statusAppearance,
+    OperationModel::header,
+    OperationModel::subHeader,
+    OperationModel::amount,
+    OperationModel::amountDetails,
+)
 
 object TransactionHistoryDiffCallback : BaseGroupedDiffCallback<DayHeader, OperationModel>(DayHeader::class.java) {
     override fun areGroupItemsTheSame(oldItem: DayHeader, newItem: DayHeader): Boolean {
