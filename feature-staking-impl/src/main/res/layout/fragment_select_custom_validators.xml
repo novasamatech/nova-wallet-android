@@ -5,7 +5,6 @@
     android:id="@+id/selectCustomValidatorsContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
@@ -81,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:textAllCaps="true"
-            android:textColor="@color/text_primary"
+            android:textColor="@color/text_secondary"
             tools:text="validators: 200 of 940" />
 
         <TextView
@@ -92,7 +91,7 @@
             android:layout_gravity="end"
             android:layout_marginStart="16dp"
             android:textAllCaps="true"
-            android:textColor="@color/text_primary"
+            android:textColor="@color/text_secondary"
             tools:text="@string/staking_rewards_apy" />
     </FrameLayout>
 

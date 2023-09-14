@@ -88,8 +88,9 @@ class ParachainStakingModule {
     fun provideRoundDurationEstimator(
         parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
         chainStateRepository: ChainStateRepository,
-        currentRoundRepository: CurrentRoundRepository
-    ): RoundDurationEstimator = RealRoundDurationEstimator(parachainStakingConstantsRepository, chainStateRepository, currentRoundRepository)
+        currentRoundRepository: CurrentRoundRepository,
+        @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+    ): RoundDurationEstimator = RealRoundDurationEstimator(parachainStakingConstantsRepository, chainStateRepository, currentRoundRepository, storageDataSource)
 
     @Provides
     @FeatureScope

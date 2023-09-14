@@ -2,11 +2,10 @@ package io.novafoundation.nova.feature_crowdloan_impl.data.network.updater
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.transformLatestDiffed
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.core.updater.Updater
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdateSystemFactory
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdaterFactory
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -17,14 +16,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.transformLatest
 
 class RealContributionsUpdateSystemFactory(
     private val chainRegistry: ChainRegistry,
-    private val accountUpdateScope: AccountUpdateScope,
     private val contributionsUpdaterFactory: ContributionsUpdaterFactory,
     private val assetBalanceScopeFactory: AssetBalanceScopeFactory,
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
@@ -33,7 +30,6 @@ class RealContributionsUpdateSystemFactory(
     override fun create(): UpdateSystem {
         return ContributionsUpdateSystem(
             chainRegistry,
-            accountUpdateScope,
             contributionsUpdaterFactory,
             assetBalanceScopeFactory,
             storageSharedRequestsBuilderFactory
@@ -43,33 +39,35 @@ class RealContributionsUpdateSystemFactory(
 
 class ContributionsUpdateSystem(
     private val chainRegistry: ChainRegistry,
-    private val accountUpdateScope: AccountUpdateScope,
     private val contributionsUpdaterFactory: ContributionsUpdaterFactory,
     private val assetBalanceScopeFactory: AssetBalanceScopeFactory,
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : UpdateSystem {
 
     override fun start(): Flow<Updater.SideEffect> {
-        return accountUpdateScope.invalidationFlow().flatMapLatest { metaAccount ->
+        return flowOfAll {
             chainRegistry.currentChains.mapLatest { chains ->
                 chains.filter { it.hasCrowdloans }
             }.transformLatestDiffed {
-                emitAll(run(it, metaAccount))
+                emitAll(run(it))
             }
         }.flowOn(Dispatchers.Default)
     }
 
-    private fun run(chain: Chain, metaAccount: MetaAccount): Flow<Updater.SideEffect> {
-        return flow {
+    private fun run(chain: Chain): Flow<Updater.SideEffect> {
+        return flowOfAll {
+            // we do not start subscription builder since it is not needed for contributions
             val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
-            val invalidationScope = assetBalanceScopeFactory.create(chain.utilityAsset, metaAccount)
+            val invalidationScope = assetBalanceScopeFactory.create(chain, chain.utilityAsset)
             val updater = contributionsUpdaterFactory.create(chain, invalidationScope)
 
-            kotlin.runCatching {
-                updater.listenForUpdates(subscriptionBuilder)
-                    .catch { logError(chain, it) }
-            }.onSuccess { updaterFlow ->
-                emitAll(updaterFlow)
+            invalidationScope.invalidationFlow().transformLatest {
+                kotlin.runCatching {
+                    updater.listenForUpdates(subscriptionBuilder, it)
+                        .catch { logError(chain, it) }
+                }.onSuccess { updaterFlow ->
+                    emitAll(updaterFlow)
+                }
             }
         }.catch { logError(chain, it) }
     }

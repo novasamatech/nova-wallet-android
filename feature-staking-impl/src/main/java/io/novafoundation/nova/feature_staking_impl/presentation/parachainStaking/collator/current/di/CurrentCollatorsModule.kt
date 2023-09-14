@@ -31,9 +31,11 @@ class CurrentCollatorsModule {
     fun provideInteractor(
         currentRoundRepository: CurrentRoundRepository,
         collatorProvider: CollatorProvider,
+        stakingSharedState: StakingSharedState,
     ): CurrentCollatorInteractor = RealCurrentCollatorInteractor(
         currentRoundRepository = currentRoundRepository,
-        collatorProvider = collatorProvider
+        collatorProvider = collatorProvider,
+        stakingSharedState = stakingSharedState
     )
 
     @Provides

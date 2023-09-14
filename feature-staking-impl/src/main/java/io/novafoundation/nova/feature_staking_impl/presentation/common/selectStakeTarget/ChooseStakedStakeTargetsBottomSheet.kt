@@ -24,10 +24,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.selectSta
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.view.bindSelectedCollator
 import kotlinx.android.synthetic.main.item_select_staked_collator.view.itemSelectStakedCollatorCheck
 import kotlinx.android.synthetic.main.item_select_staked_collator.view.itemSelectStakedCollatorCollator
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorInfo
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorName
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleLabel
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleValue
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetInfo
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetName
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleLabel
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleValue
 
 class ChooseStakedStakeTargetsBottomSheet<T : Identifiable>(
     context: Context,
@@ -104,27 +104,27 @@ private class ViewHolder<T : Identifiable>(
         itemSelectStakedCollatorCollator.bindSelectedCollator(item)
         itemSelectStakedCollatorCheck.isChecked = isSelected
 
-        val primaryTextColor = if (item.active) R.color.text_primary else R.color.text_secondary
+        val primaryTextColor = if (item.active) R.color.text_primary else R.color.text_tertiary
 
         with(itemSelectStakedCollatorCollator) {
-            itemValidatorName.setTextColorRes(primaryTextColor)
-            itemValidatorSubtitleValue.setTextColorRes(primaryTextColor)
+            itemStakingTargetName.setTextColorRes(primaryTextColor)
+            itemStakingTargetSubtitleValue.setTextColorRes(primaryTextColor)
         }
     }
 
     private fun setInitialState() = with(containerView) {
         itemSelectStakedCollatorCollator.background = null
-        itemSelectStakedCollatorCollator.itemValidatorSubtitleLabel.makeGone()
+        itemSelectStakedCollatorCollator.itemStakingTargetSubtitleLabel.makeGone()
 
         when (selectionStyle) {
             SelectionStyle.RadioGroup -> {
-                itemSelectStakedCollatorCollator.itemValidatorInfo.makeGone()
+                itemSelectStakedCollatorCollator.itemStakingTargetInfo.makeGone()
                 itemSelectStakedCollatorCheck.makeVisible()
             }
             SelectionStyle.Arrow -> {
                 itemSelectStakedCollatorCheck.makeGone()
-                itemSelectStakedCollatorCollator.itemValidatorInfo.makeVisible()
-                itemSelectStakedCollatorCollator.itemValidatorInfo.setImageResource(R.drawable.ic_chevron_right)
+                itemSelectStakedCollatorCollator.itemStakingTargetInfo.makeVisible()
+                itemSelectStakedCollatorCollator.itemStakingTargetInfo.setImageResource(R.drawable.ic_chevron_right)
             }
         }
     }

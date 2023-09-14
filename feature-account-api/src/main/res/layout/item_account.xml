@@ -64,7 +64,7 @@
         android:includeFontPadding="false"
         android:lines="1"
         android:minHeight="18dp"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/itemAccountEndBarrier"
         app:layout_constraintHorizontal_bias="0.5"

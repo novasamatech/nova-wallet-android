@@ -5,9 +5,9 @@ import dagger.Provides
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
-import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.CollatorCommissionUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.CurrentRoundCollatorsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.CurrentRoundUpdater
@@ -144,7 +144,7 @@ class ParachainStakingUpdatersModule {
         parachainBondInfoUpdater: ParachainBondInfoUpdater,
         collatorCommissionUpdater: CollatorCommissionUpdater,
         scheduledDelegationRequestsUpdater: ScheduledDelegationRequestsUpdater,
-    ): List<Updater> = listOf(
+    ) = StakingUpdaters.Group(
         delegatorStateUpdater,
         currentRoundUpdater,
         currentRoundCollatorsUpdater,

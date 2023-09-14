@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel.StakingTypeModel
 import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeChainAvailableBalance
 import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeChainIcon
 import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeChainName
@@ -28,6 +29,7 @@ import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboard
 import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarningsSuffix
 import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarningsSuffixContainer
 import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeEarningsSuffixShimmerShape
+import kotlinx.android.synthetic.main.item_dashboard_no_stake.view.itemDashboardNoStakeStakingType
 
 class StakingDashboardNoStakeView @JvmOverloads constructor(
     context: Context,
@@ -82,6 +84,10 @@ class StakingDashboardNoStakeView @JvmOverloads constructor(
 
     fun setAvailableBalance(maybeBalance: String?) {
         itemDashboardNoStakeChainAvailableBalance.setTextOrHide(maybeBalance)
+    }
+
+    fun setStakingTypeBadge(model: StakingTypeModel?) {
+        itemDashboardNoStakeStakingType.setModelOrHide(model)
     }
 
     fun unbind() {

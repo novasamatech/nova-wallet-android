@@ -8,9 +8,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
-import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_account_api.view.showOptionalAddress
@@ -19,8 +17,8 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.showOperationStatus
+import io.novafoundation.nova.feature_assets.presentation.model.toAmountModel
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailAmount
-import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailAmountFiat
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailFee
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailFrom
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailHash
@@ -30,7 +28,6 @@ import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetai
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailTo
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailToolbar
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailTransferDirection
-import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailTxSection
 
 private const val KEY_TRANSACTION = "KEY_DRAFT"
 
@@ -97,16 +94,10 @@ class TransferDetailFragment : BaseFragment<TransactionDetailViewModel>() {
                 }
             }
 
-            transactionDetailAmount.text = formattedAmount
-            transactionDetailAmount.setTextColorRes(statusAppearance.amountTint)
+            transactionDetailAmount.setAmount(amount.toAmountModel())
+            transactionDetailAmount.setTokenAmountTextColor(statusAppearance.amountTint)
 
-            transactionDetailAmountFiat.setTextOrHide(this.formattedFiatAmount)
-
-            if (hash != null) {
-                transactionDetailHash.showValue(hash)
-            } else {
-                transactionDetailTxSection.makeGone()
-            }
+            transactionDetailHash.showValueOrHide(hash)
         }
 
         viewModel.senderAddressModelLiveData.observe(transactionDetailFrom::showOptionalAddress)

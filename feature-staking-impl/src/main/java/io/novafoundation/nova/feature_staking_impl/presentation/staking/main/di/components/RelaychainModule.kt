@@ -15,14 +15,11 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTE
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_REBOND
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_REDEEM
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.StakeActionsValidationSystem
-import io.novafoundation.nova.feature_staking_impl.domain.validations.welcome.WelcomeStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.relaychain.RelaychainAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.relaychain.RelaychainNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.relaychain.RelaychainStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.relaychain.RelaychainStakeSummaryComponentFactory
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.relaychain.RelaychainStartStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.relaychain.RelaychainUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.relaychain.RelaychainUserRewardsComponentFactory
 import javax.inject.Named
@@ -86,24 +83,6 @@ class RelaychainModule {
         stakingInteractor = stakingInteractor,
         resourceManager = resourceManager,
         stakingSharedComputation = stakingSharedComputation,
-    )
-
-    @Provides
-    @ScreenScope
-    fun provideRelaychainStartStakingComponentFactory(
-        stakingSharedComputation: StakingSharedComputation,
-        setupStakingSharedState: SetupStakingSharedState,
-        resourceManager: ResourceManager,
-        router: StakingRouter,
-        validationSystem: WelcomeStakingValidationSystem,
-        validationExecutor: ValidationExecutor,
-    ) = RelaychainStartStakingComponentFactory(
-        setupStakingSharedState = setupStakingSharedState,
-        resourceManager = resourceManager,
-        router = router,
-        validationSystem = validationSystem,
-        validationExecutor = validationExecutor,
-        stakingSharedComputation = stakingSharedComputation
     )
 
     @Provides

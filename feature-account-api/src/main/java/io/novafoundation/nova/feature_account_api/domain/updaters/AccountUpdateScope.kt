@@ -7,11 +7,9 @@ import kotlinx.coroutines.flow.Flow
 
 class AccountUpdateScope(
     private val accountRepository: AccountRepository
-) : UpdateScope {
+) : UpdateScope<MetaAccount> {
 
     override fun invalidationFlow(): Flow<MetaAccount> {
         return accountRepository.selectedMetaAccountFlow()
     }
-
-    suspend fun getAccount() = accountRepository.getSelectedMetaAccount()
 }

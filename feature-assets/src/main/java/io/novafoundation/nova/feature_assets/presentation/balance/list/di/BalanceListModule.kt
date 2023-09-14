@@ -13,16 +13,16 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdownInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractorImpl
-import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -64,26 +64,26 @@ class BalanceListModule {
     @IntoMap
     @ViewModelKey(BalanceListViewModel::class)
     fun provideViewModel(
-        interactor: WalletInteractor,
+        walletInteractor: WalletInteractor,
         assetsListInteractor: AssetsListInteractor,
-        router: AssetsRouter,
         selectedAccountUseCase: SelectedAccountUseCase,
+        router: AssetsRouter,
         currencyInteractor: CurrencyInteractor,
         balanceBreakdownInteractor: BalanceBreakdownInteractor,
-        contributionsInteractor: ContributionsInteractor,
+        externalBalancesInteractor: ExternalBalancesInteractor,
         resourceManager: ResourceManager,
         walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     ): ViewModel {
         return BalanceListViewModel(
-            interactor,
-            assetsListInteractor,
-            selectedAccountUseCase,
-            router,
-            currencyInteractor,
-            balanceBreakdownInteractor,
-            contributionsInteractor,
-            resourceManager,
-            walletConnectSessionsUseCase
+            walletInteractor = walletInteractor,
+            assetsListInteractor = assetsListInteractor,
+            selectedAccountUseCase = selectedAccountUseCase,
+            router = router,
+            currencyInteractor = currencyInteractor,
+            balanceBreakdownInteractor = balanceBreakdownInteractor,
+            externalBalancesInteractor = externalBalancesInteractor,
+            resourceManager = resourceManager,
+            walletConnectSessionsUseCase = walletConnectSessionsUseCase
         )
     }
 

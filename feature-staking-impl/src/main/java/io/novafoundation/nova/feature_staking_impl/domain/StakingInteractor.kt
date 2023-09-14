@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
@@ -13,7 +14,9 @@ import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposur
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingAccount
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.fullId
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapAccountToStakingAccount
 import io.novafoundation.nova.feature_staking_impl.data.model.Payout
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
@@ -21,7 +24,6 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConsta
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.ActiveEraInfo
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculator
-import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.isWaiting
 import io.novafoundation.nova.feature_staking_impl.domain.model.NetworkInfo
@@ -34,21 +36,23 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.StashNoneStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.assetWithChain
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novafoundation.nova.runtime.state.chainAsset
+import io.novafoundation.nova.runtime.state.selectedOption
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -69,14 +73,13 @@ class StakingInteractor(
     private val stakingSharedState: StakingSharedState,
     private val payoutRepository: PayoutRepository,
     private val assetUseCase: AssetUseCase,
-    private val factory: EraTimeCalculatorFactory,
     private val stakingSharedComputation: StakingSharedComputation,
 ) {
     suspend fun calculatePendingPayouts(scope: CoroutineScope): Result<PendingPayoutsStatistics> = withContext(Dispatchers.Default) {
         runCatching {
             val currentStakingState = selectedAccountStakingStateFlow(scope).first()
             val chainId = currentStakingState.chain.id
-            val calculator = getEraTimeCalculator()
+            val calculator = getEraTimeCalculator(scope)
 
             require(currentStakingState is StakingState.Stash)
 
@@ -120,12 +123,11 @@ class StakingInteractor(
 
     suspend fun syncStakingRewards(
         stakingState: StakingState.Stash,
-        chain: Chain,
-        chainAsset: Chain.Asset,
+        stakingOption: StakingOption,
         period: RewardPeriod
     ) = withContext(Dispatchers.IO) {
         runCatching {
-            stakingRewardsRepository.sync(stakingState.stashAddress, chain, chainAsset, period)
+            stakingRewardsRepository.sync(stakingState.stashId, stakingOption, period)
         }
     }
 
@@ -133,17 +135,20 @@ class StakingInteractor(
         stashState: StakingState.Stash.None,
         scope: CoroutineScope
     ): Flow<StakeSummary<StashNoneStatus>> = observeStakeSummary(stashState, scope) {
-        StashNoneStatus.INACTIVE
+        emit(StashNoneStatus.INACTIVE)
     }
 
     suspend fun observeValidatorSummary(
         validatorState: StakingState.Stash.Validator,
         scope: CoroutineScope
     ): Flow<StakeSummary<ValidatorStatus>> = observeStakeSummary(validatorState, scope) {
-        when {
+        val status = when {
+            it.activeStake.isZero -> ValidatorStatus.INACTIVE
             isValidatorActive(validatorState.stashId, it.activeEraInfo.exposures) -> ValidatorStatus.ACTIVE
             else -> ValidatorStatus.INACTIVE
         }
+
+        emit(status)
     }
 
     suspend fun observeNominatorSummary(
@@ -153,11 +158,21 @@ class StakingInteractor(
         val eraStakers = it.activeEraInfo.exposures.values
 
         when {
-            nominationStatus(nominatorState.stashId, eraStakers, it.rewardedNominatorsPerValidator).isActive -> NominatorStatus.Active
+            it.activeStake.isZero -> emit(NominatorStatus.Inactive(NominatorStatus.Inactive.Reason.MIN_STAKE))
 
-            nominatorState.nominations.isWaiting(it.activeEraInfo.eraIndex) -> NominatorStatus.Waiting(
-                timeLeft = getEraTimeCalculator().calculate(nominatorState.nominations.submittedInEra + ERA_OFFSET).toLong()
-            )
+            nominationStatus(nominatorState.stashId, eraStakers, it.rewardedNominatorsPerValidator).isActive -> emit(NominatorStatus.Active)
+
+            nominatorState.nominations.isWaiting(it.activeEraInfo.eraIndex) -> {
+                val nextEra = nominatorState.nominations.submittedInEra + ERA_OFFSET
+
+                val timerFlow = eraTimeCalculatorFlow(scope).map { eraTimeCalculator ->
+                    val timeLift = eraTimeCalculator.calculate(nextEra).toLong()
+
+                    NominatorStatus.Waiting(timeLift)
+                }
+
+                emitAll(timerFlow)
+            }
 
             else -> {
                 val inactiveReason = when {
@@ -165,21 +180,20 @@ class StakingInteractor(
                     else -> NominatorStatus.Inactive.Reason.NO_ACTIVE_VALIDATOR
                 }
 
-                NominatorStatus.Inactive(inactiveReason)
+                emit(NominatorStatus.Inactive(inactiveReason))
             }
         }
     }
 
     fun observeUserRewards(
         state: StakingState.Stash,
-        chain: Chain,
-        chainAsset: Chain.Asset,
+        stakingOption: StakingOption,
     ): Flow<TotalReward> {
-        return stakingRewardsRepository.totalRewardFlow(state.stashAddress, chain.id, chainAsset.id)
+        return stakingRewardsRepository.totalRewardFlow(state.stashId, stakingOption.fullId)
     }
 
     fun observeNetworkInfoState(chainId: ChainId, scope: CoroutineScope): Flow<NetworkInfo> = flow {
-        val lockupPeriod = getLockupDuration(chainId)
+        val lockupPeriod = getLockupDuration(chainId, scope)
 
         val innerFlow = stakingSharedComputation.activeEraInfo(chainId, scope).map { activeEraInfo ->
             val exposures = activeEraInfo.exposures.values
@@ -196,12 +210,12 @@ class StakingInteractor(
         emitAll(innerFlow)
     }
 
-    suspend fun getLockupDuration() = withContext(Dispatchers.Default) {
-        getLockupDuration(stakingSharedState.chainId())
+    suspend fun getLockupDuration(sharedComputationScope: CoroutineScope) = withContext(Dispatchers.Default) {
+        getLockupDuration(stakingSharedState.chainId(), sharedComputationScope)
     }
 
-    suspend fun getEraDuration() = withContext(Dispatchers.Default) {
-        getEraTimeCalculator().eraDuration()
+    suspend fun getEraDuration(sharedComputationScope: CoroutineScope) = withContext(Dispatchers.Default) {
+        getEraTimeCalculator(sharedComputationScope).eraDuration()
     }
 
     fun selectedAccountStakingStateFlow(scope: CoroutineScope) = flowOfAll {
@@ -255,8 +269,12 @@ class StakingInteractor(
         stakingConstantsRepository.maxRewardedNominatorPerValidator(stakingSharedState.chainId())
     }
 
-    private suspend fun getEraTimeCalculator(): EraTimeCalculator {
-        return factory.create(stakingSharedState.chainAsset())
+    private suspend fun eraTimeCalculatorFlow(coroutineScope: CoroutineScope): Flow<EraTimeCalculator> {
+        return stakingSharedComputation.eraCalculatorFlow(stakingSharedState.selectedOption(), coroutineScope)
+    }
+
+    private suspend fun getEraTimeCalculator(coroutineScope: CoroutineScope): EraTimeCalculator {
+        return eraTimeCalculatorFlow(coroutineScope).first()
     }
 
     private fun remainingEras(
@@ -272,16 +290,16 @@ class StakingInteractor(
     private suspend fun <S> observeStakeSummary(
         state: StakingState.Stash,
         scope: CoroutineScope,
-        statusResolver: suspend (StatusResolutionContext) -> S,
+        statusResolver: suspend FlowCollector<S>.(StatusResolutionContext) -> Unit,
     ): Flow<StakeSummary<S>> = withContext(Dispatchers.Default) {
         val chainAsset = stakingSharedState.chainAsset()
         val chainId = chainAsset.chainId
 
-        combine(
+        combineTransform(
             stakingSharedComputation.activeEraInfo(chainId, scope),
             walletRepository.assetFlow(state.accountId, chainAsset)
         ) { activeEraInfo, asset ->
-            val totalStaked = asset.bonded
+            val activeStake = asset.bondedInPlanks
 
             val rewardedNominatorsPerValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
@@ -289,14 +307,17 @@ class StakingInteractor(
                 activeEraInfo,
                 asset,
                 rewardedNominatorsPerValidator,
+                activeStake = activeStake
             )
 
-            val status = statusResolver(statusResolutionContext)
+            val summary = flow { statusResolver(statusResolutionContext) }.map { status ->
+                StakeSummary(
+                    status = status,
+                    activeStake = activeStake
+                )
+            }
 
-            StakeSummary(
-                status = status,
-                totalStaked = totalStaked
-            )
+            emitAll(summary)
         }
     }
 
@@ -322,8 +343,8 @@ class StakingInteractor(
         return exposures.sumOf(Exposure::total)
     }
 
-    private suspend fun getLockupDuration(chainId: ChainId): Duration {
-        val eraCalculator = getEraTimeCalculator()
+    private suspend fun getLockupDuration(chainId: ChainId, coroutineScope: CoroutineScope): Duration {
+        val eraCalculator = getEraTimeCalculator(coroutineScope)
         val eraDuration = eraCalculator.eraDuration()
 
         return eraDuration * stakingConstantsRepository.lockupPeriodInEras(chainId).toInt()
@@ -333,5 +354,6 @@ class StakingInteractor(
         val activeEraInfo: ActiveEraInfo,
         val asset: Asset,
         val rewardedNominatorsPerValidator: Int,
+        val activeStake: Balance,
     )
 }

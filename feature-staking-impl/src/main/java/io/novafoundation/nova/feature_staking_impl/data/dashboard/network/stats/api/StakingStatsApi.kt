@@ -3,9 +3,13 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats
 import io.novafoundation.nova.common.data.network.subquery.SubQueryResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Url
 
 interface StakingStatsApi {
 
-    @POST("nova-wallet/subquery-staking")
-    suspend fun fetchStakingStats(@Body request: StakingStatsRequest): SubQueryResponse<StakingStatsResponse>
+    @POST
+    suspend fun fetchStakingStats(
+        @Body request: StakingStatsRequest,
+        @Url url: String
+    ): SubQueryResponse<StakingStatsResponse>
 }

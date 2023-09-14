@@ -8,17 +8,32 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.di.staking.UpdatersModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.dashboard.StakingDashboardModule
+import io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool.NominationPoolModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.ParachainStakingModule
+import io.novafoundation.nova.feature_staking_impl.di.staking.stakingTypeDetails.StakingTypeDetailsModule
+import io.novafoundation.nova.feature_staking_impl.di.staking.startMultiStaking.StartMultiStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.unbond.StakingUnbondModule
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.di.RebagComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.confirm.di.ConfirmStakingComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.confirm.nominations.di.ConfirmNominationsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.di.ConfirmChangeValidatorsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations.di.ConfirmNominationsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.di.StakingDashboardComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.di.NominationPoolsConfirmBondMoreComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.setup.di.NominationPoolsSetupBondMoreComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.claimRewards.di.NominationPoolsClaimRewardsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.redeem.di.NominationPoolsRedeemComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.confirm.di.NominationPoolsConfirmUnbondComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.setup.di.NominationPoolsSetupUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.di.CurrentCollatorsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.search.di.SearchCollatorComponent
@@ -28,7 +43,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.di.ParachainStakingRebondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.redeem.di.ParachainStakingRedeemComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.di.ConfirmStartParachainStakingComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.di.StartParachainStakingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.di.SetupStartParachainStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.di.ParachainStakingUnbondConfirmComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.setup.di.ParachainStakingUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.confirm.di.YieldBoostConfirmComponent
@@ -37,7 +52,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.di.PayoutDetailsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.list.di.PayoutsListComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.period.di.StakingPeriodComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.setup.di.SetupStakingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.searchPool.di.SearchPoolComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.di.SelectPoolComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.di.ConfirmBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.di.SelectBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.controller.confirm.di.ConfirmSetControllerComponent
@@ -48,6 +64,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.c
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.di.RedeemComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.di.ConfirmRewardDestinationComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.select.di.SelectRewardDestinationComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.di.ConfirmMultiStakingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.di.SetupStakingTypeComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.di.StartStakingLandingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.di.SetupAmountMultiStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.di.ConfirmUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.select.di.SelectUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.story.di.StoryComponent
@@ -72,7 +92,10 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
         StakingValidationModule::class,
         StakingUnbondModule::class,
         ParachainStakingModule::class,
+        NominationPoolModule::class,
         StakingDashboardModule::class,
+        StartMultiStakingModule::class,
+        StakingTypeDetailsModule::class
     ]
 )
 @FeatureScope
@@ -81,6 +104,16 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun dashboardComponentFactory(): StakingDashboardComponent.Factory
 
     fun moreStakingOptionsFactory(): MoreStakingOptionsComponent.Factory
+
+    // start multi-staking
+
+    fun startStakingLandingComponentFactory(): StartStakingLandingComponent.Factory
+
+    fun setupAmountMultiStakingComponentFactory(): SetupAmountMultiStakingComponent.Factory
+
+    fun setupStakingType(): SetupStakingTypeComponent.Factory
+
+    fun confirmMultiStakingComponentFactory(): ConfirmMultiStakingComponent.Factory
 
     // relaychain staking
 
@@ -94,15 +127,17 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun startChangeValidatorsComponentFactory(): StartChangeValidatorsComponent.Factory
 
+    fun selectPoolComponentFactory(): SelectPoolComponent.Factory
+
+    fun searchPoolComponentFactory(): SearchPoolComponent.Factory
+
     fun recommendedValidatorsComponentFactory(): RecommendedValidatorsComponent.Factory
 
     fun stakingComponentFactory(): StakingComponent.Factory
 
     fun stakingPeriodComponentFactory(): StakingPeriodComponent.Factory
 
-    fun setupStakingComponentFactory(): SetupStakingComponent.Factory
-
-    fun confirmStakingComponentFactory(): ConfirmStakingComponent.Factory
+    fun confirmStakingComponentFactory(): ConfirmChangeValidatorsComponent.Factory
 
     fun confirmNominationsComponentFactory(): ConfirmNominationsComponent.Factory
 
@@ -144,7 +179,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     // parachain staking
 
-    fun startParachainStakingFactory(): StartParachainStakingComponent.Factory
+    fun startParachainStakingFactory(): SetupStartParachainStakingComponent.Factory
 
     fun confirmStartParachainStakingFactory(): ConfirmStartParachainStakingComponent.Factory
 
@@ -168,6 +203,20 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun confirmYieldBoostComponentFactory(): YieldBoostConfirmComponent.Factory
 
+    // nomination pools
+
+    fun nominationPoolsStakingSetupBondMore(): NominationPoolsSetupBondMoreComponent.Factory
+
+    fun nominationPoolsStakingConfirmBondMore(): NominationPoolsConfirmBondMoreComponent.Factory
+
+    fun nominationPoolsStakingSetupUnbond(): NominationPoolsSetupUnbondComponent.Factory
+
+    fun nominationPoolsStakingConfirmUnbond(): NominationPoolsConfirmUnbondComponent.Factory
+
+    fun nominationPoolsStakingRedeem(): NominationPoolsRedeemComponent.Factory
+
+    fun nominationPoolsStakingClaimRewards(): NominationPoolsClaimRewardsComponent.Factory
+
     @Component.Factory
     interface Factory {
 
@@ -177,6 +226,11 @@ interface StakingFeatureComponent : StakingFeatureApi {
             @BindsInstance parachainStaking: ParachainStakingRouter,
             @BindsInstance selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
             @BindsInstance selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
+
+            @BindsInstance nominationPoolsRouter: NominationPoolsRouter,
+
+            @BindsInstance startMultiStakingRouter: StartMultiStakingRouter,
+            @BindsInstance stakingDashboardRouter: StakingDashboardRouter,
 
             deps: StakingFeatureDependencies
         ): StakingFeatureComponent
@@ -193,4 +247,10 @@ interface StakingFeatureComponent : StakingFeatureApi {
         ]
     )
     interface StakingFeatureDependenciesComponent : StakingFeatureDependencies
+
+    val nominationPoolRewardCalculatorFactory: NominationPoolRewardCalculatorFactory
+
+    val stakingUpdateSystem: StakingUpdateSystem
+
+    val stakingSharedState: StakingSharedState
 }

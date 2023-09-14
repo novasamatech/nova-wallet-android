@@ -14,9 +14,9 @@ class InflationConfigUpdater(
     stakingSharedState: StakingSharedState,
     chainRegistry: ChainRegistry,
     storageCache: StorageCache
-) : SingleStorageKeyUpdater<GlobalScope>(GlobalScope, stakingSharedState, chainRegistry, storageCache), ParachainStakingUpdater {
+) : SingleStorageKeyUpdater<Unit>(GlobalScope, stakingSharedState, chainRegistry, storageCache), ParachainStakingUpdater<Unit> {
 
-    override suspend fun storageKey(runtime: RuntimeSnapshot): String {
+    override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: Unit): String {
         return runtime.metadata.parachainStaking().storage("InflationConfig").storageKey()
     }
 }

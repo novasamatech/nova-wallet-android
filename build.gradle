@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '6.7.3'
-        versionCode = 86
+        versionName = '7.0.0'
+        versionCode = 89
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -204,7 +204,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.0'
+        classpath 'com.android.tools.build:gradle:7.4.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.google.gms:google-services:4.3.14'
         classpath "com.google.firebase:firebase-appdistribution-gradle:$firebaseAppDistrVersion"

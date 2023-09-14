@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
@@ -29,7 +29,7 @@ class Texts(
 
 class StartChangeValidatorsViewModel(
     private val router: StakingRouter,
-    private val validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+    private val validatorRecommenderFactory: ValidatorRecommenderFactory,
     private val setupStakingSharedState: SetupStakingSharedState,
     private val appLinksProvider: AppLinksProvider,
     private val resourceManager: ResourceManager,
@@ -46,13 +46,13 @@ class StartChangeValidatorsViewModel(
 
     val customValidatorsTexts = setupStakingSharedState.setupStakingProcess.transform {
         when {
-            it is SetupStakingProcess.ReadyToSubmit && it.payload.validators.isNotEmpty() -> emit(
+            it is SetupStakingProcess.ReadyToSubmit && it.validators.isNotEmpty() -> emit(
                 Texts(
                     toolbarTitle = resourceManager.getString(R.string.staking_change_validators),
                     selectManuallyTitle = resourceManager.getString(R.string.staking_select_custom),
                     selectManuallyBadge = resourceManager.getString(
                         R.string.staking_max_format,
-                        it.payload.validators.size,
+                        it.validators.size,
                         maxValidatorsPerNominator.first()
                     )
                 )
@@ -69,7 +69,7 @@ class StartChangeValidatorsViewModel(
 
     init {
         launch {
-            validatorRecommendatorFactory.awaitValidatorLoading(scope = viewModelScope)
+            validatorRecommenderFactory.awaitRecommendatorLoading(scope = viewModelScope)
 
             validatorsLoading.value = false
         }

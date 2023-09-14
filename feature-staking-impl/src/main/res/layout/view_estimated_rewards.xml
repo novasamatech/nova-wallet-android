@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:background="@color/secondary_screen_background"
+    tools:gravity="center_vertical"
+    tools:orientation="horizontal"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="13dp"
+        android:layout_marginEnd="16dp"
+        android:layout_weight="1"
+        android:text="@string/staking_earnings_per_year" />
+
+    <TextView
+        android:id="@+id/viewEstimatedRewardsEarnings"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:textColor="@color/text_positive"
+        tools:text="19.47%" />
+
+    <TextView
+        android:id="@+id/viewEstimatedRewardsEarningsSuffix"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption2.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
+        android:includeFontPadding="false"
+        android:text="@string/common_per_year" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/viewEstimatedRewardsEarningsShimmer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:visibility="gone">
+
+        <View
+            android:layout_width="57dp"
+            android:layout_height="10dp"
+            android:background="@drawable/bg_shimmering" />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+</merge>

@@ -13,8 +13,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriodType
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.runtime.state.chain
-import io.novafoundation.nova.runtime.state.chainAsset
 import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -105,19 +103,15 @@ class StakingPeriodViewModel(
     }
 
     private suspend fun getSelectedRewardPeriod(): RewardPeriod {
-        val chain = stakingSharedState.chain()
-        val chainAsset = stakingSharedState.chainAsset()
-        val stakingType = stakingSharedState.selectedOption().additional.stakingType
-        return stakingRewardPeriodInteractor.getRewardPeriod(chain, chainAsset, stakingType)
+        val stakingOption = stakingSharedState.selectedOption()
+        return stakingRewardPeriodInteractor.getRewardPeriod(stakingOption)
     }
 
     fun onSaveClick() {
         launch {
-            val chain = stakingSharedState.chain()
-            val chainAsset = stakingSharedState.chainAsset()
-            val stakingType = stakingSharedState.selectedOption().additional.stakingType
             val result = mapSelectedPeriod(selectedPeriod.value, _customPeriod.value)
-            result?.let { stakingRewardPeriodInteractor.setRewardPeriod(chain, chainAsset, stakingType, it) }
+            val stakingOption = stakingSharedState.selectedOption()
+            result?.let { stakingRewardPeriodInteractor.setRewardPeriod(stakingOption, it) }
             router.back()
         }
     }

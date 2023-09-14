@@ -13,7 +13,9 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboardUpdateSystem
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.StakingDashboardViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.components.ComponentsModule
@@ -29,18 +31,22 @@ class StakingDashboardModule {
         accountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
         dashboardUpdateSystem: StakingDashboardUpdateSystem,
+        dashboardRouter: StakingDashboardRouter,
         router: StakingRouter,
         stakingSharedState: StakingSharedState,
         presentationMapper: StakingDashboardPresentationMapper,
+        startMultiStakingRouter: StartMultiStakingRouter,
     ): ViewModel {
         return StakingDashboardViewModel(
             interactor = interactor,
             accountUseCase = accountUseCase,
             resourceManager = resourceManager,
             stakingDashboardUpdateSystem = dashboardUpdateSystem,
+            dashboardRouter = dashboardRouter,
             router = router,
             stakingSharedState = stakingSharedState,
-            presentationMapper = presentationMapper
+            presentationMapper = presentationMapper,
+            startMultiStakingRouter = startMultiStakingRouter,
         )
     }
 

@@ -15,9 +15,9 @@ class TuringAdditionalIssuanceUpdater(
     stakingSharedState: StakingSharedState,
     chainRegistry: ChainRegistry,
     storageCache: StorageCache
-) : SingleStorageKeyUpdater<GlobalScope>(GlobalScope, stakingSharedState, chainRegistry, storageCache) {
+) : SingleStorageKeyUpdater<Unit>(GlobalScope, stakingSharedState, chainRegistry, storageCache) {
 
-    override suspend fun storageKey(runtime: RuntimeSnapshot): String {
+    override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: Unit): String {
         return runtime.metadata.vesting().storage("TotalUnvestedAllocation").storageKey()
     }
 

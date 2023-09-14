@@ -9,7 +9,7 @@
     </style>
 
     <style name="TextAppearance.NovaFoundation.TransactionDetailToolbar" parent="TextAppearance.NovaFoundation.Regular.Footnote">
-        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textColor">@color/text_tertiary</item>
     </style>
 
     <style name="Widget.Nova.AssetIcon" parent="">

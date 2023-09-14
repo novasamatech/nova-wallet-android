@@ -14,7 +14,7 @@ import androidx.navigation.ui.setupWithNavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
-import io.novafoundation.nova.app.root.navigation.staking.relaychain.RelayStakingNavigator
+import io.novafoundation.nova.app.root.navigation.staking.StakingDashboardNavigator
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.blur.SweetBlur
@@ -27,7 +27,7 @@ import javax.inject.Inject
 class MainFragment : BaseFragment<MainViewModel>() {
 
     @Inject
-    lateinit var relayStakingNavigator: RelayStakingNavigator
+    lateinit var stakingDashboardNavigator: StakingDashboardNavigator
 
     private var navController: NavController? = null
 
@@ -45,7 +45,7 @@ class MainFragment : BaseFragment<MainViewModel>() {
         super.onDestroyView()
 
         backCallback.isEnabled = false
-        relayStakingNavigator.stakingTabNavController = null
+        stakingDashboardNavigator.clearStakingTabNavController()
     }
 
     override fun initViews() {
@@ -70,7 +70,7 @@ class MainFragment : BaseFragment<MainViewModel>() {
             childFragmentManager.findFragmentById(R.id.bottomNavHost) as NavHostFragment
 
         navController = nestedNavHostFragment.navController
-        relayStakingNavigator.stakingTabNavController = navController
+        stakingDashboardNavigator.setStakingTabNavController(navController!!)
 
         bottomNavigationView.setupWithNavController(navController!!)
 
