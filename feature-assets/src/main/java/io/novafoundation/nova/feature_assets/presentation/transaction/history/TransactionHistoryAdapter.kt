@@ -97,7 +97,7 @@ class TransactionHolder(
     }
 
     fun bindHeader(item: OperationModel) {
-        containerView. header.text = item.header
+        containerView.header.text = item.header
     }
 
     fun bindAmountDetails(item: OperationModel) {
