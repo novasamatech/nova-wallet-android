@@ -46,6 +46,8 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel>(), Setu
         setupStakingTypeToolbar.setHomeButtonListener { viewModel.backPressed() }
         setupStakingTypeList.adapter = adapter
         setupStakingTypeList.itemAnimator = null
+
+        onBackPressed { viewModel.backPressed() }
     }
 
     override fun inject() {
