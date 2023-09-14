@@ -97,6 +97,8 @@ class ExternaSignViewModel(
     }
 
     fun acceptClicked() = launch {
+        _performingOperationInProgress.value = true
+
         val validationPayload = ConfirmDAppOperationValidationPayload(
             token = commissionTokenFlow?.first(),
             decimalFee = originFeeMixin?.awaitOptionalDecimalFee()
