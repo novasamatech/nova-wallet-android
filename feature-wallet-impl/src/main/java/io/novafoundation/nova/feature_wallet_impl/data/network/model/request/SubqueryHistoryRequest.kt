@@ -58,6 +58,7 @@ class SubqueryHistoryRequest(
                     id
                     timestamp
                     extrinsicHash
+                    blockNumber
                     address
                     ${rewardsResponseSections(asset)}
                     extrinsic

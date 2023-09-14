@@ -28,6 +28,7 @@ data class OperationLocal(
     val era: Int? = null,
     val validator: String? = null,
     val poolId: Int? = null,
+    val eventId: String? = null,
 ) {
     enum class Type {
         EXTRINSIC, TRANSFER, REWARD, POOL_REWARD

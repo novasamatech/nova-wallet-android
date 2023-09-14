@@ -310,7 +310,7 @@ suspend fun mapOperationToParcel(
                 when (val rewardKind = operationType.kind) {
                     is RewardKind.Direct -> OperationParcelizeModel.Reward(
                         chainId = chainAsset.chainId,
-                        eventId = id,
+                        eventId = operationType.eventId,
                         address = address,
                         time = time,
                         amount = amount,
@@ -327,7 +327,7 @@ suspend fun mapOperationToParcel(
                         amount = amount,
                         type = resourceManager.getString(typeRes),
                         poolId = rewardKind.poolId,
-                        extrinsicHash = extrinsicHash
+                        eventId = operationType.eventId
                     )
                 }
             }

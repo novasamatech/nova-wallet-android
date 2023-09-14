@@ -147,7 +147,8 @@ abstract class SubstrateAssetHistory(
                     kind = Operation.Type.Reward.RewardKind.Direct(
                         era = era,
                         validator = validator.nullIfEmpty(),
-                    )
+                    ),
+                    eventId = eventId(node.blockNumber, node.reward.eventIdx)
                 )
             }
 
@@ -158,7 +159,8 @@ abstract class SubstrateAssetHistory(
                     isReward = isReward,
                     kind = Operation.Type.Reward.RewardKind.Pool(
                         poolId = poolId
-                    )
+                    ),
+                    eventId = eventId(node.blockNumber, node.poolReward.eventIdx)
                 )
             }
 
@@ -206,5 +208,9 @@ abstract class SubstrateAssetHistory(
             chainAsset = chainAsset,
             extrinsicHash = node.extrinsicHash
         )
+    }
+
+    private fun eventId(blockNumber: Long, eventIdx: Int): String {
+        return "${blockNumber}-${eventIdx}"
     }
 }
