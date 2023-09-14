@@ -211,6 +211,6 @@ abstract class SubstrateAssetHistory(
     }
 
     private fun eventId(blockNumber: Long, eventIdx: Int): String {
-        return "${blockNumber}-${eventIdx}"
+        return "$blockNumber-$eventIdx"
     }
 }
