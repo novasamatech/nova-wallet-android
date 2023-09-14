@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="common_days_and_hours_format_with_delimeter">%s and %s</string>
     <string name="common_frequency_days_daily">daily</string>
 
     <string name="pool_full_failure_title">Pool is full</string>

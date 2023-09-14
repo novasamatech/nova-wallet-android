@@ -5,7 +5,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.utils.formatting.DurationShortcut
 import io.novafoundation.nova.common.utils.formatting.format
 import kotlin.time.Duration
 
