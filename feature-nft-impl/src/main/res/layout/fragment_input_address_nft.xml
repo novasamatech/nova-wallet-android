@@ -17,13 +17,14 @@
 
     <TextView
         android:id="@+id/nftName"
-        style="@style/TextAppearance.NovaFoundation.Bold.LargeTitle"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:includeFontPadding="false"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="10dp"
+        android:includeFontPadding="false"
         android:textColor="@color/text_primary"
-        android:gravity="center"
         tools:text="Bored Ape #00" />
 
     <TextView
@@ -31,9 +32,10 @@
         style="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:includeFontPadding="false"
         android:layout_marginVertical="8dp"
-        android:gravity="center"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="10dp"
+        android:includeFontPadding="false"
         tools:text="Bored Ape Collection" />
 
     <FrameLayout

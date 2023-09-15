@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
-        app:titleText="@string/wallet_asset_send" />
+        app:titleText="@string/nft_send" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -26,6 +26,15 @@
             android:orientation="vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp">
+
+            <ImageView
+                android:id="@+id/nftDetailsMedia"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:adjustViewBounds="true"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center"
+                tools:src="@tools:sample/backgrounds/scenic" />
 
             <TextView
                 android:id="@+id/nftName"

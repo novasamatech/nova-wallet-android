@@ -30,6 +30,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -66,6 +67,10 @@ class ConfirmNftSendViewModel(
     val originFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionTokenFlow)
 
     private val currentAccount = selectedAccountUseCase.selectedMetaAccountFlow()
+        .inBackground()
+        .share()
+
+    val nftDetailsFlow = nftSendInteractor.nftDetailsFlow(transferDraft.nftId)
         .inBackground()
         .share()
 

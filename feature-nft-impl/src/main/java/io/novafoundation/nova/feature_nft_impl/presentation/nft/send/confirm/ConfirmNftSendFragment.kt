@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import coil.ImageLoader
+import coil.load
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -27,6 +29,8 @@ import kotlinx.android.synthetic.main.fragment_confirm_nft_send.confirmSendToolb
 import kotlinx.android.synthetic.main.fragment_confirm_nft_send.confirmSendWallet
 import kotlinx.android.synthetic.main.fragment_confirm_nft_send.nftCollectionName
 import kotlinx.android.synthetic.main.fragment_confirm_nft_send.nftName
+import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsMedia
+import javax.inject.Inject
 
 private const val KEY_DRAFT = "KEY_DRAFT"
 
@@ -38,6 +42,9 @@ class ConfirmNftSendFragment : BaseFragment<ConfirmNftSendViewModel>() {
             return bundleOf(KEY_DRAFT to transferDraft)
         }
     }
+
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,6 +77,14 @@ class ConfirmNftSendFragment : BaseFragment<ConfirmNftSendViewModel>() {
         setupExternalActions(viewModel)
         observeValidations(viewModel)
         setupFeeLoading(viewModel.originFeeMixin, confirmSendOriginFee)
+
+        viewModel.nftDetailsFlow.observe { nftDetails ->
+            nftDetailsMedia.load(nftDetails.media, imageLoader) {
+                placeholder(R.drawable.nft_media_progress)
+                error(R.drawable.nft_media_error)
+                fallback(R.drawable.nft_media_error)
+            }
+        }
 
         nftName.text = viewModel.transferDraft.name
         nftCollectionName.text = viewModel.transferDraft.collectionName
