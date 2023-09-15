@@ -15,9 +15,13 @@ class QrCodeGenerator(
     companion object {
         private const val RECEIVE_QR_SCALE_SIZE = 1024
         private const val PADDING_SIZE = 2
+
+        // Max binary payload length with ErrorCorrectionLevel.H
+        // see https://stackoverflow.com/a/11065449
+        const val MAX_PAYLOAD_LENGTH = 1273
     }
 
-    suspend fun generateQrBitmap(input: String, useUtf8Hint: Boolean = true): Bitmap {
+    suspend fun generateQrBitmap(input: String): Bitmap {
         return withContext(Dispatchers.Default) {
             val hints = HashMap<EncodeHintType, String>()
             val qrCode = Encoder.encode(input, ErrorCorrectionLevel.H, hints)

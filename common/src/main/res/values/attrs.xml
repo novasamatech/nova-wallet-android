@@ -259,4 +259,8 @@
         <attr name="android:hint" />
     </declare-styleable>
 
+    <declare-styleable name="SlideShowView">
+        <attr name="SlideShowView_slideDelayMillis" format="integer" />
+    </declare-styleable>
+
 </resources>

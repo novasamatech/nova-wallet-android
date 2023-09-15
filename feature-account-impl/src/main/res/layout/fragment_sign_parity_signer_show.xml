@@ -41,7 +41,7 @@
         android:layout_gravity="center_horizontal"
         tools:text="@string/account_parity_signer_scan_with" />
 
-    <ImageView
+    <io.novafoundation.nova.common.view.SlideShowView
         android:id="@+id/signParitySignerShowQr"
         android:layout_width="wrap_content"
         android:layout_height="0dp"

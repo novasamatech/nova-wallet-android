@@ -58,6 +58,27 @@ fun ByteArray.startsWith(prefix: ByteArray): Boolean {
     return true
 }
 
+fun ByteArray.windowed(windowSize: Int): List<ByteArray> {
+    require(windowSize > 0) {
+        "Window size should be positive"
+    }
+
+    val result = mutableListOf<ByteArray>()
+
+    var i = 0
+
+    while (i < size) {
+        val copyStart = i
+        val copyEnd = (i + windowSize).coerceAtMost(size)
+
+        result.add(copyOfRange(copyStart, copyEnd))
+
+        i += windowSize
+    }
+
+    return result
+}
+
 /**
  * Compares two BigDecimals taking into account only values but not scale unlike `==` operator
  */
@@ -204,6 +225,15 @@ fun <T> Set<T>.toggle(item: T): Set<T> = if (item in this) {
 
 fun <T> List<T>.cycle(): Sequence<T> {
     if (isEmpty()) return emptySequence()
+
+    var i = 0
+
+    return generateSequence { this[i++ % this.size] }
+}
+
+fun <T> List<T>.cycleMultiple(): Sequence<T> {
+    if (isEmpty()) return emptySequence()
+    if (size == 1) return sequenceOf(single())
 
     var i = 0
 
