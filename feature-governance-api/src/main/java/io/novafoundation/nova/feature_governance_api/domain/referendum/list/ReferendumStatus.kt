@@ -12,7 +12,7 @@ sealed class ReferendumStatus {
 
         data class InQueue(val timeOutIn: TimerValue, val position: TrackQueue.Position) : Ongoing()
 
-        data class Rejecting(val rejectIn: TimerValue) : Ongoing()
+        data class Deciding(val rejectIn: TimerValue) : Ongoing()
 
         data class Confirming(val approveIn: TimerValue) : Ongoing()
     }
