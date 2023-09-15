@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
@@ -76,3 +77,8 @@ class PlaceholderView @JvmOverloads constructor(
 }
 
 class PlaceholderModel(val text: String, @DrawableRes val imageRes: Int)
+
+fun PlaceholderView.setModelOrHide(model: PlaceholderModel?) {
+    model?.let { setModel(it) }
+    isVisible = model != null
+}

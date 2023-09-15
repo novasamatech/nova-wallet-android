@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.aggregatedBalanceB
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
+import jp.co.soramitsu.fearless_utils.hash.isPositive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -38,9 +39,11 @@ class AssetSearchInteractor(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
     ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
-        return searchAssetsInternalFlow(queryFlow, externalBalancesFlow) {
-            val chainAsset = it.token.configuration
-            assetSourceRegistry.sourceFor(chainAsset).transfers.areTransfersEnabled(chainAsset)
+        return searchAssetsInternalFlow(queryFlow, externalBalancesFlow) { asset ->
+            val chainAsset = asset.token.configuration
+            asset.freeInPlanks.isPositive() &&
+                assetSourceRegistry.sourceFor(chainAsset)
+                    .transfers.areTransfersEnabled(chainAsset)
         }
     }
 
