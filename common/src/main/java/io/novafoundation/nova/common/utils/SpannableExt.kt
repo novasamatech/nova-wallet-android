@@ -10,6 +10,7 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.view.View
 import androidx.core.text.toSpannable
+import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 
 fun CharSequence.toSpannable(span: Any): Spannable {
     return this.toSpannable().setFullSpan(span)

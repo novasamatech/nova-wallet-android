@@ -118,6 +118,7 @@ dependencies {
     testImplementation jUnitDep
     testImplementation mockitoDep
     testImplementation project(':test-shared')
+    testImplementation "org.robolectric:robolectric:4.7.2"
 
     implementation permissionsDep
 
