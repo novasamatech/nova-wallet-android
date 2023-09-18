@@ -6,9 +6,6 @@
     <string name="common_days_and_hours_format_with_delimeter">%s and %s</string>
     <string name="common_frequency_days_daily">daily</string>
 
-    <string name="common_days_and_hours_format_with_delimeter">%s and %s</string>
-    <string name="common_frequency_days_daily">daily</string>
-
     <string name="referendum_status_deciding">Deciding</string>
     <string name="referendum_timeline_state_deciding">Voting: Deciding</string>
 
