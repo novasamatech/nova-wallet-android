@@ -27,7 +27,7 @@ class RealPoolDisplayFormatter(
             icon = poolDisplay.icon ?: poolAccount.image.asIcon(),
             title = poolAccount.nameOrAddress,
             poolAccountId = poolDisplay.stashAccountId,
-            address = chain.addressOf(poolDisplay.stashAccountId)
+            address = poolAccount.address
         )
     }
 
