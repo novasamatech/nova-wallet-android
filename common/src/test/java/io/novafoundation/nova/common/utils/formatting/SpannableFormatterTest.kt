@@ -2,11 +2,7 @@ package io.novafoundation.nova.common.utils.formatting
 
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 
 
 class SpannableFormatterTest {
