@@ -9,14 +9,21 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleCoroutineScope
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.formatting.duration.CompoundDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.DayAndHourDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.DayDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.HoursDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.RoundMinutesDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.TimeDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.TimerValue
-import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.formatting.duration.ZeroDurationFormatter
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.onDestroy
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
 
 private val TIMER_TAG = R.string.common_time_left
 
@@ -37,6 +44,8 @@ fun TextView.startTimer(
     onTick: ((view: TextView, millisUntilFinished: Long) -> Unit)? = null,
     onFinish: ((view: TextView) -> Unit)? = null
 ) {
+    val durationFormatter = getTimerDurationFormatter(context)
+
     val timePassedSinceCalculation = if (millisCalculatedAt != null) System.currentTimeMillis() - millisCalculatedAt else 0L
 
     val currentTimer = getTag(TIMER_TAG)
@@ -47,7 +56,7 @@ fun TextView.startTimer(
 
     val newTimer = object : CountDownTimer(millis - timePassedSinceCalculation, 1000) {
         override fun onTick(millisUntilFinished: Long) {
-            setNewValue(millisUntilFinished, customMessageFormat)
+            setNewValue(durationFormatter, millisUntilFinished, customMessageFormat)
 
             onTick?.invoke(this@startTimer, millisUntilFinished)
         }
@@ -56,7 +65,7 @@ fun TextView.startTimer(
             if (onFinish != null) {
                 onFinish(this@startTimer)
             } else {
-                this@startTimer.text = 0L.milliseconds.formatTimer(context)
+                this@startTimer.text = durationFormatter.format(0L.milliseconds)
             }
 
             cancel()
@@ -69,23 +78,28 @@ fun TextView.startTimer(
         newTimer.cancel()
     }
 
-    setNewValue(millis - timePassedSinceCalculation, customMessageFormat)
+    setNewValue(durationFormatter, millis - timePassedSinceCalculation, customMessageFormat)
     newTimer.start()
 
     setTag(TIMER_TAG, newTimer)
 }
 
-private fun Duration.formatTimer(
-    context: Context
-) = format(
-    estimated = false,
-    context = context,
-    timeFormat = { hours, minutes, seconds -> "%02d:%02d:%02d".format(hours, minutes, seconds) }
-)
+private fun getTimerDurationFormatter(context: Context): DurationFormatter {
+    val timeDurationFormatter = TimeDurationFormatter()
+    val compoundFormatter = CompoundDurationFormatter(
+        DayAndHourDurationFormatter(
+            dayFormatter = DayDurationFormatter(context),
+            hoursFormatter = HoursDurationFormatter(context)
+        ),
+        TimeDurationFormatter(),
+        ZeroDurationFormatter(timeDurationFormatter)
+    )
 
-@OptIn(ExperimentalTime::class)
-private fun TextView.setNewValue(mills: Long, timeFormatRes: Int?) {
-    val formattedTime = mills.milliseconds.formatTimer(context)
+    return RoundMinutesDurationFormatter(compoundFormatter, roundMinutesThreshold = 1.days)
+}
+
+private fun TextView.setNewValue(durationFormatter: DurationFormatter, mills: Long, timeFormatRes: Int?) {
+    val formattedTime = durationFormatter.format(mills.milliseconds)
 
     val message = timeFormatRes?.let {
         resources.getString(timeFormatRes, formattedTime)

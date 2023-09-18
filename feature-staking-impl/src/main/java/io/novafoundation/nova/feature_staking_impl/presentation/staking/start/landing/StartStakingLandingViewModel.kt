@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.mixin.api.Validatable
+import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.Perbill
@@ -20,6 +21,14 @@ import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatAsSpannable
+import io.novafoundation.nova.common.utils.formatting.duration.BoundedDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.DayAndHourDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.DayDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.HoursDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.ShortcutDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.baseDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.DayDurationShortcut
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.setEndSpan
 import io.novafoundation.nova.common.utils.setFullSpan
@@ -81,9 +90,14 @@ class StartStakingLandingViewModel(
     private val selectedMetaAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val stakingStartedDetectionService: StakingStartedDetectionService,
+    private val contextManager: ContextManager
 ) : BaseViewModel(),
     Browserable,
     Validatable by validationExecutor {
+
+    private val durationFormatter: DurationFormatter = createBaseDurationFormatter()
+
+    private val durationShortcutFormatter: DurationFormatter = createDurationShortcutFormatter()
 
     private val availableStakingOptionsPayload = startStakingLandingPayload.availableStakingOptions
     private val stakingOptionIds = availableStakingOptionsPayload.toStakingOptionIds()
@@ -264,7 +278,7 @@ class StartStakingLandingViewModel(
     ): StakingConditionRVItem {
         val time = resourceManager.getString(
             R.string.start_staking_fragment_min_stake_condition_duration,
-            resourceManager.formatDuration(eraDuration, false)
+            durationFormatter.format(eraDuration)
         ).toSpannable(colorSpan(themeColor))
 
         return if (minStakeAmount.isPositive()) {
@@ -289,7 +303,7 @@ class StartStakingLandingViewModel(
     ): StakingConditionRVItem {
         val time = resourceManager.getString(
             R.string.start_staking_fragment_unstake_condition_duration,
-            resourceManager.formatDuration(unstakeDuration, false)
+            durationFormatter.format(unstakeDuration)
         ).toSpannable(colorSpan(themeColor))
         return StakingConditionRVItem(
             iconId = R.drawable.ic_unstake_anytime,
@@ -303,10 +317,8 @@ class StartStakingLandingViewModel(
         asset: Asset,
         themeColor: Int
     ): StakingConditionRVItem {
-        val time = resourceManager.getString(
-            R.string.start_staking_fragment_reward_frequency_condition_duration,
-            resourceManager.formatDuration(eraDuration, false)
-        ).toSpannable(colorSpan(themeColor))
+        val time = durationShortcutFormatter.format(eraDuration)
+            .toSpannable(colorSpan(themeColor))
 
         val payoutTypes = payouts.payoutTypes
         val text = when {
@@ -398,5 +410,41 @@ class StartStakingLandingViewModel(
     private fun getThemeColor(chain: Chain): Int {
         return chain.additional?.themeColor?.let { Color.parseColor(it) }
             ?: resourceManager.getColor(R.color.text_positive)
+    }
+
+    private fun createDurationShortcutFormatter(): DurationFormatter {
+        val context = contextManager.getApplicationContext()
+        val durationShortcut = DayDurationShortcut(
+            shortcut = resourceManager.getString(R.string.common_frequency_days_daily)
+        )
+
+        return baseDurationFormatter(
+            contextManager.getApplicationContext(),
+            dayDurationFormatter = ShortcutDurationFormatter(
+                shortcuts = listOf(durationShortcut),
+                nestedFormatter = createDayDurationFormatter()
+            ),
+            hoursDurationFormatter = ShortcutDurationFormatter(
+                shortcuts = listOf(durationShortcut),
+                nestedFormatter = HoursDurationFormatter(context)
+            )
+        )
+    }
+
+    private fun createBaseDurationFormatter(): DurationFormatter {
+        val dayDurationFormatter = createDayDurationFormatter()
+        return baseDurationFormatter(
+            contextManager.getApplicationContext(),
+            dayDurationFormatter = dayDurationFormatter
+        )
+    }
+
+    private fun createDayDurationFormatter(): BoundedDurationFormatter {
+        val context = contextManager.getApplicationContext()
+        return DayAndHourDurationFormatter(
+            dayFormatter = DayDurationFormatter(context),
+            hoursFormatter = HoursDurationFormatter(context),
+            format = resourceManager.getString(R.string.common_days_and_hours_format_with_delimeter)
+        )
     }
 }
