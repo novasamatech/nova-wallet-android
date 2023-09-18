@@ -40,8 +40,12 @@ fun DelegatorState.stakeableAmount(freeBalance: BigInteger): BigDecimal {
 private val DelegatorState.totalBonded: BigInteger
     get() = asDelegator()?.total.orZero()
 
-val DelegatorState.Delegator.activeBonded: BigInteger
-    get() = total - lessTotal
+val DelegatorState.activeBonded: Balance
+    get() = when(this) {
+        is DelegatorState.Delegator -> total - lessTotal
+        is DelegatorState.None -> Balance.ZERO
+    }
+
 
 val DelegatorState.delegationsCount
     get() = when (this) {

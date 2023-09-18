@@ -16,9 +16,9 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redeem
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redeem.RealNominationPoolsRedeemInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redeem.validations.NominationPoolsRedeemValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redeem.validations.nominationPoolsRedeem
-import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.redeem.NominationPoolsRedeemViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -62,7 +62,7 @@ class NominationPoolsRedeemModule {
     @IntoMap
     @ViewModelKey(NominationPoolsRedeemViewModel::class)
     fun provideViewModel(
-        router: NominationPoolsRouter,
+        router: StakingRouter,
         interactor: NominationPoolsRedeemInteractor,
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,

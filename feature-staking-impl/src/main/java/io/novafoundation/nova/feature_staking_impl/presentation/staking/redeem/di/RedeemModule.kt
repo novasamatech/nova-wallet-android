@@ -38,7 +38,6 @@ class RedeemModule {
         iconGenerator: AddressIconGenerator,
         externalActions: ExternalActions.Presentation,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
-        payload: RedeemPayload,
         singleAssetSharedState: StakingSharedState,
         walletUiUseCase: WalletUiUseCase
     ): ViewModel {
@@ -53,7 +52,6 @@ class RedeemModule {
             feeLoaderMixin = feeLoaderMixin,
             externalActions = externalActions,
             selectedAssetState = singleAssetSharedState,
-            payload = payload,
             walletUiUseCase = walletUiUseCase
         )
     }
