@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.Perbill
-import io.novafoundation.nova.common.utils.SpannableFormatter
+import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.drawableSpan

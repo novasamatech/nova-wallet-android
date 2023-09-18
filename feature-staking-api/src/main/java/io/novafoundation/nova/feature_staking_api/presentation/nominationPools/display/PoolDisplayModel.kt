@@ -8,6 +8,7 @@ class PoolDisplayModel(
     val icon: Icon,
     val title: String,
     val poolAccountId: AccountId,
+    val address: String
 )
 
 fun TableCellView.showPool(poolDisplayModel: PoolDisplayModel) {
