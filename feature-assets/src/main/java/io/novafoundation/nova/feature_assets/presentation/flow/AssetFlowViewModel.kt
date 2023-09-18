@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Control
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGroupedAssetsToUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -50,7 +51,7 @@ abstract class AssetFlowViewModel(
         searchAssetsFlow(),
         selectedCurrency,
     ) { assets, currency ->
-        val groupedAssets = assets.mapGroupedAssetsToUi(currency)
+        val groupedAssets = mapAssets(assets, currency)
         AssetFlowListModel(
             groupedAssets,
             getPlaceholder(query.value, groupedAssets)
@@ -66,6 +67,10 @@ abstract class AssetFlowViewModel(
     abstract fun searchAssetsFlow(): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>>
 
     abstract fun assetClicked(assetModel: AssetModel)
+
+    open fun mapAssets(assets: Map<AssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<Any> {
+        return assets.mapGroupedAssetsToUi(currency)
+    }
 
     internal fun validate(assetModel: AssetModel, onAccept: (AssetModel) -> Unit) {
         launch {

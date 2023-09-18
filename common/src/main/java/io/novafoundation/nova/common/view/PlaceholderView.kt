@@ -9,11 +9,14 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
+import kotlinx.android.synthetic.main.view_placeholder.view.viewPlaceholderButton
 import kotlinx.android.synthetic.main.view_placeholder.view.viewPlaceholderImage
 import kotlinx.android.synthetic.main.view_placeholder.view.viewPlaceholderText
 
@@ -31,6 +34,8 @@ class PlaceholderView @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.view_placeholder, this)
+
+        setPadding(16.dp(context), 16.dp(context), 16.dp(context), 32.dp(context))
 
         orientation = VERTICAL
         gravity = Gravity.CENTER_HORIZONTAL
@@ -70,13 +75,22 @@ class PlaceholderView @JvmOverloads constructor(
         viewPlaceholderText.setText(textRes)
     }
 
+    fun setButtonText(text: String?) {
+        viewPlaceholderButton.setTextOrHide(text)
+    }
+
     fun setModel(model: PlaceholderModel) {
         setText(model.text)
         setImage(model.imageRes)
+        setButtonText(model.buttonText)
+    }
+
+    fun setButtonClickListener(listener: OnClickListener?) {
+        viewPlaceholderButton.setOnClickListener(listener)
     }
 }
 
-class PlaceholderModel(val text: String, @DrawableRes val imageRes: Int)
+class PlaceholderModel(val text: String, @DrawableRes val imageRes: Int, val buttonText: String? = null)
 
 fun PlaceholderView.setModelOrHide(model: PlaceholderModel?) {
     model?.let { setModel(it) }

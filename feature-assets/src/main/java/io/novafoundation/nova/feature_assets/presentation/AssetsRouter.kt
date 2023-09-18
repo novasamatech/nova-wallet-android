@@ -51,6 +51,8 @@ interface AssetsRouter {
 
     fun openBuyFlow()
 
+    fun openBuyFlowFromSendFlow()
+
     fun openNfts()
 
     fun finishAddTokenFlow()

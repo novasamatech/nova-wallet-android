@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.domain.common.Amount
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.AssetGroupUi
@@ -21,9 +22,11 @@ import java.math.BigDecimal
 
 fun GroupedList<AssetGroup, AssetWithOffChainBalance>.mapGroupedAssetsToUi(
     currency: Currency,
+    groupBalance: (AssetGroup) -> BigDecimal = AssetGroup::groupTotalBalanceFiat,
+    balance: (AssetWithOffChainBalance.Balance) -> Amount = AssetWithOffChainBalance.Balance::total,
 ): List<Any> {
-    return mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup, currency) }
-        .mapValues { (_, assets) -> mapAssetsToAssetModels(assets) }
+    return mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup, currency, groupBalance) }
+        .mapValues { (_, assets) -> mapAssetsToAssetModels(assets, balance) }
         .toListWithHeaders()
 }
 
@@ -48,26 +51,31 @@ fun mapTokenToTokenModel(token: Token): TokenModel {
 
 private fun mapAssetsToAssetModels(
     assets: List<AssetWithOffChainBalance>,
+    balance: (AssetWithOffChainBalance.Balance) -> Amount
 ): List<AssetModel> {
-    return assets.map(::mapAssetToAssetModel)
+    return assets.map { mapAssetToAssetModel(it, balance) }
 }
 
 private fun mapAssetGroupToUi(
     assetGroup: AssetGroup,
     currency: Currency,
+    groupBalance: (AssetGroup) -> BigDecimal
 ): AssetGroupUi {
     return AssetGroupUi(
         chainUi = mapChainToUi(assetGroup.chain),
-        groupBalanceFiat = assetGroup.groupBalanceFiat.formatAsCurrency(currency)
+        groupBalanceFiat = groupBalance(assetGroup).formatAsCurrency(currency)
     )
 }
 
-private fun mapAssetToAssetModel(assetWithOffChainBalance: AssetWithOffChainBalance): AssetModel {
+private fun mapAssetToAssetModel(
+    assetWithOffChainBalance: AssetWithOffChainBalance,
+    balance: (AssetWithOffChainBalance.Balance) -> Amount
+): AssetModel {
     return with(assetWithOffChainBalance) {
         AssetModel(
             token = mapTokenToTokenModel(asset.token),
             amount = mapAmountToAmountModel(
-                amount = totalWithOffChain.amount,
+                amount = balance(balanceWithOffchain).amount,
                 asset = asset,
                 includeAssetTicker = false
             )

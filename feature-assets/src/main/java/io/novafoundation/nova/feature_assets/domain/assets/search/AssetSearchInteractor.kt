@@ -41,7 +41,7 @@ class AssetSearchInteractor(
     ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
         return searchAssetsInternalFlow(queryFlow, externalBalancesFlow) { asset ->
             val chainAsset = asset.token.configuration
-            asset.freeInPlanks.isPositive() &&
+            asset.transferableInPlanks.isPositive() &&
                 assetSourceRegistry.sourceFor(chainAsset)
                     .transfers.areTransfersEnabled(chainAsset)
         }
