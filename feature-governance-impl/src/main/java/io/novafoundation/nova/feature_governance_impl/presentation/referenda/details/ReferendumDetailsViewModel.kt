@@ -268,7 +268,7 @@ class ReferendumDetailsViewModel(
                 }
             }
             is ReferendumStatus.Ongoing.Confirming -> R.string.referendum_timeline_state_passing
-            is ReferendumStatus.Ongoing.Rejecting -> R.string.referendum_timeline_state_not_passing
+            is ReferendumStatus.Ongoing.Deciding -> R.string.referendum_timeline_state_deciding
             is ReferendumStatus.Ongoing.InQueue -> R.string.referendum_timeline_state_in_queue
             is ReferendumStatus.Approved -> R.string.referendum_timeline_state_approved
             else -> null

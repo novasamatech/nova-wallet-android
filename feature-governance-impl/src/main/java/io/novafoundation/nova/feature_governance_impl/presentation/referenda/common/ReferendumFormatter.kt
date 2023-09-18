@@ -155,9 +155,9 @@ class RealReferendumFormatter(
                 ),
                 colorRes = R.color.text_tertiary
             )
-            is ReferendumStatus.Ongoing.Rejecting -> ReferendumStatusModel(
-                name = resourceManager.getString(R.string.referendum_status_not_passing),
-                colorRes = R.color.text_negative
+            is ReferendumStatus.Ongoing.Deciding -> ReferendumStatusModel(
+                name = resourceManager.getString(R.string.referendum_status_deciding),
+                colorRes = R.color.text_tertiary
             )
             is ReferendumStatus.Ongoing.Confirming -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_passing),
@@ -213,7 +213,7 @@ class RealReferendumFormatter(
                     textStyleRefresher = status.timeOutIn.referendumStatusStyleRefresher()
                 )
             }
-            is ReferendumStatus.Ongoing.Rejecting -> ReferendumTimeEstimation.Timer(
+            is ReferendumStatus.Ongoing.Deciding -> ReferendumTimeEstimation.Timer(
                 time = status.rejectIn,
                 timeFormat = R.string.referendum_status_time_reject_in,
                 textStyleRefresher = status.rejectIn.referendumStatusStyleRefresher()
