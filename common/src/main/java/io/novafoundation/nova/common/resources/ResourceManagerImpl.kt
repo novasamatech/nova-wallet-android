@@ -6,7 +6,8 @@ import androidx.core.content.ContextCompat
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.utils.daysFromMillis
-import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.formatting.duration.EstimatedDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.baseDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
 import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.utils.readText
@@ -19,6 +20,10 @@ import kotlin.time.milliseconds
 class ResourceManagerImpl(
     private val contextManager: ContextManager
 ) : ResourceManager {
+
+    private val defaultDurationFormatter by lazy { baseDurationFormatter(contextManager.getApplicationContext()) }
+
+    private val estimatedDurationFormatter by lazy { EstimatedDurationFormatter(defaultDurationFormatter) }
 
     override fun loadRawString(res: Int): String {
         return contextManager.getApplicationContext().resources
@@ -88,11 +93,11 @@ class ResourceManagerImpl(
     }
 
     override fun formatDuration(duration: Duration, estimated: Boolean): String {
-        return duration.format(
-            estimated = estimated,
-            context = contextManager.getApplicationContext(),
-            timeFormat = null
-        )
+        return if (estimated) {
+            estimatedDurationFormatter.format(duration)
+        } else {
+            defaultDurationFormatter.format(duration)
+        }
     }
 
     override fun getDrawable(id: Int): Drawable {

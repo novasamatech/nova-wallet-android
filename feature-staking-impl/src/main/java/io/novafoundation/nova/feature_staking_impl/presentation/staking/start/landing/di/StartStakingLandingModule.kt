@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -52,7 +53,8 @@ class StartStakingLandingModule {
         validationExecutor: ValidationExecutor,
         selectedMetaAccountUseCase: SelectedAccountUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        stakingStartedDetectionService: StakingStartedDetectionService
+        stakingStartedDetectionService: StakingStartedDetectionService,
+        contextManager: ContextManager
     ): ViewModel {
         return StartStakingLandingViewModel(
             router = router,
@@ -64,7 +66,8 @@ class StartStakingLandingModule {
             validationExecutor = validationExecutor,
             selectedMetaAccountUseCase = selectedMetaAccountUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            stakingStartedDetectionService = stakingStartedDetectionService
+            stakingStartedDetectionService = stakingStartedDetectionService,
+            contextManager = contextManager
         )
     }
 

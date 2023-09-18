@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.apy
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.PoolRvItem
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 suspend fun mapNominationPoolToPoolRvItem(
@@ -27,7 +26,6 @@ suspend fun mapNominationPoolToPoolRvItem(
         model = model,
         subtitle = getSubtitle(pool, resourceManager),
         members = pool.membersCount.format(),
-        address = chain.addressOf(model.poolAccountId),
         isChecked = isChecked
     )
 }

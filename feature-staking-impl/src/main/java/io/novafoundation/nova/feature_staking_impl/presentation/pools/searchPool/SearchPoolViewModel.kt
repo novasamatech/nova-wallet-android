@@ -83,7 +83,7 @@ class SearchPoolViewModel(
     fun poolInfoClicked(poolItem: PoolRvItem) {
         launch {
             externalActions.showExternalActions(
-                ExternalActions.Type.Address(poolItem.address),
+                ExternalActions.Type.Address(poolItem.model.address),
                 stakingOption().chain
             )
         }
@@ -136,12 +136,16 @@ class SearchPoolViewModel(
         searchRaw: String,
         pools: List<PoolRvItem>
     ): PlaceholderModel? {
-        return if (TextUtils.isEmpty(searchRaw)) {
-            PlaceholderModel(resourceManager.getString(R.string.common_search_placeholder_default), R.drawable.ic_placeholder)
-        } else if (pools.isEmpty()) {
-            PlaceholderModel(resourceManager.getString(R.string.search_pool_no_pools_found_placeholder), R.drawable.ic_planet_outline)
-        } else {
-            null
+        return when {
+            TextUtils.isEmpty(searchRaw) -> {
+                PlaceholderModel(resourceManager.getString(R.string.common_search_placeholder_default), R.drawable.ic_placeholder)
+            }
+
+            pools.isEmpty() -> {
+                PlaceholderModel(resourceManager.getString(R.string.search_pool_no_pools_found_placeholder), R.drawable.ic_planet_outline)
+            }
+
+            else -> null
         }
     }
 }

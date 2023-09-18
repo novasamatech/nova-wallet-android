@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.view.setSequence
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -70,7 +71,7 @@ class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>
             onTimerFinished = viewModel::timerFinished
         )
 
-        viewModel.qrCode.observe(signParitySignerShowQr::setImageBitmap)
+        viewModel.qrCodeSequence.observe(signParitySignerShowQr::setSequence)
 
         viewModel.addressModel.observe {
             signParitySignerShowAddress.setLabel(it.nameOrAddress)

@@ -254,7 +254,7 @@ class RealReferendaConstructor(
                     val rejectBlock = status.deciding!!.since + track.decisionPeriod
                     val rejectIn = blockDurationEstimator.timerUntil(rejectBlock)
 
-                    ReferendumStatus.Ongoing.Rejecting(rejectIn)
+                    ReferendumStatus.Ongoing.Deciding(rejectIn)
                 }
             }
 
@@ -268,7 +268,7 @@ class RealReferendaConstructor(
                 if (passing) {
                     ReferendumStatus.Ongoing.Confirming(approveIn = finishIn)
                 } else {
-                    ReferendumStatus.Ongoing.Rejecting(rejectIn = finishIn)
+                    ReferendumStatus.Ongoing.Deciding(rejectIn = finishIn)
                 }
             }
 
