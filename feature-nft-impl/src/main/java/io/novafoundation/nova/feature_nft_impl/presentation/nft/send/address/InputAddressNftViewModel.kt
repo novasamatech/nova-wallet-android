@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountG
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionRequester
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_nft_impl.data.network.blockchain.nfts.transfers.NftTransferModel
@@ -35,12 +36,12 @@ class InputAddressNftViewModel(
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val router: NftRouter,
     val nftPayload: NftPayload,
-    private val nftDetailsInteractor: NftDetailsInteractor,
+    nftDetailsInteractor: NftDetailsInteractor,
     private val nftSendInteractor: NftSendInteractor,
     private val validationExecutor: ValidationExecutor,
-    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-    private val selectedAccountUseCase: SelectedAccountUseCase,
-    private val addressInputMixinFactory: AddressInputMixinFactory,
+    feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    selectedAccountUseCase: SelectedAccountUseCase,
+    addressInputMixinFactory: AddressInputMixinFactory,
     private val selectAddressRequester: SelectAddressForTransactionRequester,
     private val externalActions: ExternalActions.Presentation,
     private val resourceManager: ResourceManager
@@ -55,15 +56,15 @@ class InputAddressNftViewModel(
     val nftName = nftDetailsFlow.map {
         it.nftDetails.name
     }
-    val nftCollectionName = nftDetailsFlow.map {
-        val collection = it.nftDetails.collection
-        mapNftCollectionForUi(collection?.name, collection?.id)
-    }
+
+    val nftMedia = nftDetailsFlow.map { it.nftDetails.media }
 
     private val chainFlow = nftDetailsFlow
         .map { it.nftDetails.chain }
         .inBackground()
         .share()
+
+    val chainUI = chainFlow.map { ChainUi(it.id, it.name, it.icon) }
 
     val addressInputMixin = with(addressInputMixinFactory) {
         create(
@@ -182,7 +183,7 @@ class InputAddressNftViewModel(
             recipientAddress = validPayload.transfer.recipient,
             chainId = chainFlow.first().id,
             name = nftDetails.name,
-            collectionName = nftCollectionName.first()
+            tags = nftDetails.tags
         )
         router.openConfirmScreen(transferDraft)
     }

@@ -1196,5 +1196,6 @@
     <string name="yiled_boost_yield_boosted">С Yield Boost</string>
     <string name="nft_receive">Получить NFT</string>
     <string name="nft_send">Отправить NFT</string>
+    <string name="nft_on_chain">на</string>
     <string name="nft_search_hint">Поиск по названию NFT или коллекции</string>
 </resources>

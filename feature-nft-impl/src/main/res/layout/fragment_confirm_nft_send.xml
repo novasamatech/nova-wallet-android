@@ -47,15 +47,14 @@
                 android:gravity="center"
                 tools:text="Bored Ape #00" />
 
-            <TextView
-                android:id="@+id/nftCollectionName"
-                style="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tagsRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:includeFontPadding="false"
-                android:layout_marginVertical="8dp"
-                android:gravity="center"
-                tools:text="Bored Ape Collection" />
+                android:layout_marginTop="4dp"
+                android:paddingHorizontal="16dp"
+                tools:itemCount="1"
+                tools:listitem="@layout/item_nft_tag" />
 
             <io.novafoundation.nova.common.view.TableView
                 android:layout_width="match_parent"
