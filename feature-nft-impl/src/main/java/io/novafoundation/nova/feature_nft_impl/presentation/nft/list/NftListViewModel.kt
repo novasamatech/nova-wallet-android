@@ -16,9 +16,17 @@ import io.novafoundation.nova.feature_nft_impl.domain.nft.list.NftListInteractor
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.groupNftCards
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.mapNftToListItem
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -35,16 +43,20 @@ class NftListViewModel(
         .share()
         .state(initialValue = "0")
 
-    val nftListItemsFlow = nftsFlow
+    private val hiddenCollections = mutableSetOf<String>()
+    private val hiddenCollectionChanged = MutableStateFlow("")
+
+    val nftListItemsFlow = nftsFlow.combine(hiddenCollectionChanged) { nfts, _ -> nfts }
         .mapList { resourceManager.mapNftToListItem(it) }
         .map {
-            listOf(NftListItem.Actions) + groupNftCards(it)
+            listOf(NftListItem.Actions) + groupNftCards(it, hiddenCollections)
         }
         .inBackground()
         .state(initialValue = listOf(NftListItem.Actions))
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
     val hideRefreshEvent: LiveData<Event<Unit>> = _hideRefreshEvent
+
 
     init {
         subscribeUpdateNftListWhenOwnerChanged()
@@ -87,5 +99,17 @@ class NftListViewModel(
 
     fun onNftSendClick() {
         router.openNftSendFlowFragment()
+    }
+
+    fun toggleCollection(collection: String) {
+        viewModelScope.launch {
+            if (hiddenCollections.contains(collection)) {
+                hiddenCollections.remove(collection)
+                hiddenCollectionChanged.emit("expand:$collection")
+            } else {
+                hiddenCollections.add(collection)
+                hiddenCollectionChanged.emit("collapse:$collection")
+            }
+        }
     }
 }

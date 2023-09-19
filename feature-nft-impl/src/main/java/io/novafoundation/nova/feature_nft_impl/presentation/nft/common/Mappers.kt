@@ -49,7 +49,7 @@ fun ResourceManager.mapNftToListItem(pricedNft: PricedNft): NftListItem.NftListC
     )
 }
 
-fun groupNftCards(nftCards: List<NftListItem.NftListCard>): List<NftListItem> {
+fun groupNftCards(nftCards: List<NftListItem.NftListCard>, hiddenCollections: Set<String>): List<NftListItem> {
     val groupedNfts = nftCards.groupBy { it.content.dataOrNull?.collectionName }
     val collections = groupedNfts.keys.sortedBy { it }
     val nftListItems = mutableListOf<NftListItem>()
@@ -57,21 +57,30 @@ fun groupNftCards(nftCards: List<NftListItem.NftListCard>): List<NftListItem> {
     collections.forEach {
         val nftsPerCollection = groupedNfts[it].orEmpty()
         if (nftsPerCollection.size > 1 && it != null) {
-            nftListItems.add(NftListItem.NftCollection(it))
-            nftListItems.addAll(
-                nftsPerCollection.map { nftCard ->
-                    val content = nftCard.content.dataOrNull
-                    if (content is NftListItem.NftListCard.Content) {
-                        nftCard.copy(
-                            content = LoadingState.Loaded(
-                                content.copy(collectionName = null)
-                            )
-                        )
-                    } else {
-                        nftCard
-                    }
-                }
+            val expanded = hiddenCollections.contains(it).not()
+            nftListItems.add(
+                NftListItem.NftCollection(
+                    name = it,
+                    expanded = expanded,
+                    count = nftsPerCollection.size.toString()
+                )
             )
+            if (expanded) {
+                nftListItems.addAll(
+                    nftsPerCollection.map { nftCard ->
+                        val content = nftCard.content.dataOrNull
+                        if (content is NftListItem.NftListCard.Content) {
+                            nftCard.copy(
+                                content = LoadingState.Loaded(
+                                    content.copy(collectionName = null)
+                                )
+                            )
+                        } else {
+                            nftCard
+                        }
+                    }
+                )
+            }
         } else if (nftsPerCollection.size == 1 || it == null) {
             singleNftsInCollection.addAll(nftsPerCollection)
         }

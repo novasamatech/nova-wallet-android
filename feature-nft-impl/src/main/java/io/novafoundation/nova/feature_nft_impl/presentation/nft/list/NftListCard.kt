@@ -10,7 +10,10 @@ sealed interface NftListItem {
     object Divider : NftListItem
 
     data class NftCollection(
-        val name: String
+        val name: String,
+        val expanded: Boolean,
+        val count: String,
+        val icon: String? = null,
     ) : NftListItem
 
     data class NftListCard(

@@ -47,7 +47,7 @@ class NftListFragment : BaseFragment<NftListViewModel>(), NftGridAdapter.Handler
             }
         }
         nftListNfts.adapter = adapter
-        nftListNfts.itemAnimator = null
+//        nftListNfts.itemAnimator = null
 
         nftListRefresh.setOnRefreshListener { viewModel.syncNfts() }
     }
@@ -85,5 +85,9 @@ class NftListFragment : BaseFragment<NftListViewModel>(), NftGridAdapter.Handler
 
     override fun receiveClicked() {
         viewModel.onNftReceiveClick()
+    }
+
+    override fun groupClicked(collection: String) {
+        viewModel.toggleCollection(collection)
     }
 }
