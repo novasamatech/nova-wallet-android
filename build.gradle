@@ -81,7 +81,7 @@ buildscript {
 
         roomVersion = '2.4.3'
 
-        markdownVersion = '4.6.2'
+        markwonVersion = '4.6.2'
 
         walletConnectCoreVersion = "1.13.0"
         walletConnectWalletVersion = "1.6.0"
@@ -183,11 +183,12 @@ buildscript {
 
         roomTestsDep = "androidx.room:room-testing:$architectureComponentVersion"
 
-        markdownDep = "io.noties.markwon:core:$markdownVersion"
-        markdownImage = "io.noties.markwon:image-coil:$markdownVersion"
-        markdownTables = "io.noties.markwon:ext-tables:$markdownVersion"
-        markdownLinkify = "io.noties.markwon:linkify:$markdownVersion"
-        markdownStrikethrough = "io.noties.markwon:ext-strikethrough:$markdownVersion"
+        markwonDep = "io.noties.markwon:core:$markwonVersion"
+        markwonImage = "io.noties.markwon:image-coil:$markwonVersion"
+        markwonTables = "io.noties.markwon:ext-tables:$markwonVersion"
+        markwonLinkify = "io.noties.markwon:linkify:$markwonVersion"
+        markwonStrikethrough = "io.noties.markwon:ext-strikethrough:$markwonVersion"
+        markwonHtml = "io.noties.markwon:html:$markwonVersion"
 
         multibaseDep = "com.github.multiformats:java-multibase:$multibaseVersion"
 
