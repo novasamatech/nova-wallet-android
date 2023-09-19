@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
-
+    <string name="assets_send_flow_placeholder_button">Buy tokens</string>
+    <string name="assets_send_flow_placeholder">You don’t have tokens to send.\nBuy or Deposit tokens to your account.</string>
     <string name="common_days_and_hours_format_with_delimeter">%s and %s</string>
     <string name="common_frequency_days_daily">daily</string>
 
     <string name="referendum_status_deciding">Deciding</string>
     <string name="referendum_timeline_state_deciding">Voting: Deciding</string>
-
 
     <string name="start_staking_fragment_min_stake_condition_no_min_stake">Stake anytime. Your stake will actively earn rewards %s</string>
 
