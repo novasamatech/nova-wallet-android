@@ -336,7 +336,13 @@ class Navigator(
     override fun nonCancellableVerify() {
         val currentDestination = navController?.currentDestination
 
+        // Don't open on splashScreen
         if (currentDestination?.id == R.id.splashFragment) {
+            return
+        }
+
+        // Don't open if pin already opened
+        if (currentDestination?.id == R.id.pincodeFragment) {
             return
         }
 

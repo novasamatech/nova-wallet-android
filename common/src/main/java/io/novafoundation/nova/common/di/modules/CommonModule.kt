@@ -9,6 +9,7 @@ import coil.ImageLoader
 import coil.decode.SvgDecoder
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.CachingAddressIconGenerator
 import io.novafoundation.nova.common.address.StatelessAddressIconGenerator
@@ -64,6 +65,7 @@ import jp.co.soramitsu.fearless_utils.encrypt.Signer
 import jp.co.soramitsu.fearless_utils.icon.IconGenerator
 import java.security.SecureRandom
 import java.util.Random
+import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 
 const val SHARED_PREFERENCES_FILE = "fearless_prefs"
@@ -115,7 +117,12 @@ class CommonModule {
         preferences: Preferences,
         automaticInteractionGate: AutomaticInteractionGate
     ): BackgroundAccessObserver {
-        return BackgroundAccessObserver(preferences, automaticInteractionGate)
+        val accessTime = if (BuildConfig.DEBUG) {
+            TimeUnit.SECONDS.toMillis(15L)
+        } else {
+            BackgroundAccessObserver.DEFAULT_ACCESS_TIME
+        }
+        return BackgroundAccessObserver(preferences, automaticInteractionGate, accessTime)
     }
 
     @Provides
