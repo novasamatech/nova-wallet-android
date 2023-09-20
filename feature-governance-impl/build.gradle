@@ -48,7 +48,7 @@ dependencies {
     implementation project(":common")
     implementation project(":runtime")
 
-    implementation markdownDep
+    implementation markwonDep
 
     implementation materialDep
 

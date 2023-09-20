@@ -188,7 +188,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         referendumDetailsProgress.setVisible(!visible)
     }
 
-    private fun setDescription(maybeModel: ShortenedTextModel?) {
-        maybeModel.applyTo(referendumDetailsDescription, referendumDetailsReadMore, viewModel.markwon)
+    private fun setDescription(model: ShortenedTextModel?) {
+        model.applyTo(referendumDetailsDescription, referendumDetailsReadMore, viewModel.markwon)
     }
 }
