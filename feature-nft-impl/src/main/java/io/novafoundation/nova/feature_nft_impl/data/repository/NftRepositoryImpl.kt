@@ -45,7 +45,7 @@ class NftRepositoryImpl(
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
 ) : NftRepository {
 
-    private val collectionNames: MutableMap<String, String?> = mutableMapOf()
+    private val collectionNameAndMedias: MutableMap<String, Pair<String?, String?>?> = mutableMapOf()
 
     override fun allNftWithMetadataFlow(metaAccount: MetaAccount): Flow<List<Nft>> {
         return nftDao.nftsFlow(metaAccount.id)
@@ -53,26 +53,26 @@ class NftRepositoryImpl(
                 val chainsById = chainRegistry.chainsById.first()
 
                 nftsLocal.mapNotNull { nftLocal ->
-                    val collectionName = getCollectionName(nftLocal, chainsById)
-                    mapNftLocalToNft(chainsById, metaAccount, nftLocal, collectionName)
+                    val (collectionName, collectionMedia) = getCollectionNameAndMedia(nftLocal, chainsById) ?: Pair(null, null)
+                    mapNftLocalToNft(chainsById, metaAccount, nftLocal, collectionName, collectionMedia)
                 }
             }
     }
 
-    private suspend fun getCollectionName(
+    private suspend fun getCollectionNameAndMedia(
         nftLocal: NftLocal,
         chainsById: Map<ChainId, Chain>
-    ): String? {
+    ): Pair<String?, String?>? {
         val nftTypeKey = mapNftTypeLocalToTypeKey(nftLocal.type)
         val nftProvider = nftProvidersRegistry.get(nftTypeKey)
         val chain = chainsById[nftLocal.chainId]
         val collectionId = nftLocal.collectionId
         return runCatching {
-            if (collectionNames.containsKey(collectionId)) {
-                collectionNames[collectionId]
+            if (collectionNameAndMedias.containsKey(collectionId)) {
+                collectionNameAndMedias[collectionId]
             } else {
-                nftProvider.getCollectionName(collectionId, chain?.id).apply {
-                    collectionNames[collectionId] = this
+                nftProvider.getCollectionNameAndMedia(collectionId, chain?.id).apply {
+                    collectionNameAndMedias[collectionId] = this
                 }
             }
         }.getOrDefault(null)
@@ -84,7 +84,7 @@ class NftRepositoryImpl(
                 val chainsById = chainRegistry.chainsById.first()
 
                 nftsLocal.mapNotNull { nftLocal ->
-                    mapNftLocalToNft(chainsById, metaAccount, nftLocal, null)
+                    mapNftLocalToNft(chainsById, metaAccount, nftLocal, null, null)
                 }
             }
     }

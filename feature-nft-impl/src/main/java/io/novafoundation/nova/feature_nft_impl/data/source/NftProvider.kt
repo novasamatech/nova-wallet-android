@@ -20,10 +20,10 @@ interface NftProvider {
 
     suspend fun nftFullSync(nft: Nft)
 
-    suspend fun getCollectionName(
+    suspend fun getCollectionNameAndMedia(
         collectionId: String,
         chainId: ChainId?
-    ): String?
+    ): Pair<String?, String?>?
 
     fun nftDetailsFlow(nftIdentifier: String): Flow<NftDetails>
 }

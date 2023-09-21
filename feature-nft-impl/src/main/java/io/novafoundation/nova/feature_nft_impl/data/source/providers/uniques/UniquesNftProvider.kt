@@ -116,10 +116,10 @@ class UniquesNftProvider(
         nftDao.insertNftsDiff(NftLocal.Type.UNIQUES, metaAccount.id, newNfts, forceOverwrite)
     }
 
-    override suspend fun getCollectionName(
+    override suspend fun getCollectionNameAndMedia(
         collectionId: String,
         chainId: ChainId?
-    ): String? {
+    ): Pair<String?, String?>? {
         if (chainId == null) return null
 
         val classId = collectionId.toBigInteger()
@@ -137,7 +137,10 @@ class UniquesNftProvider(
                 val url = classMetadataPointer.decodeToString().adoptFileStorageLinkToHttps()
                 val classMetadata = ipfsApi.getIpfsMetadata(url)
 
-                classMetadata.name?.take(MetadataLimits.COLLECTION_NAME_LIMIT)
+                Pair(
+                    classMetadata.name?.take(MetadataLimits.COLLECTION_NAME_LIMIT),
+                    classMetadata.image?.adoptFileStorageLinkToHttps(),
+                )
             }
         }
     }
@@ -267,7 +270,7 @@ class UniquesNftProvider(
     private fun identifier(chainId: ChainId, collectionId: BigInteger, instanceId: BigInteger): String {
         return "$chainId-$collectionId-$instanceId"
     }
-    
+
     private fun bindNftOwnerAddress(scale: String?, runtime: RuntimeSnapshot): String {
         return scale?.let { bindOrmlAccountData(it, runtime) } ?: ""
     }

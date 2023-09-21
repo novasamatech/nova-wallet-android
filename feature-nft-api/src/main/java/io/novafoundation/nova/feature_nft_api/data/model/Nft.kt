@@ -26,6 +26,7 @@ class Nft(
             val name: String?,
             val label: String?,
             val media: String?,
+            val collectionMedia: String?,
         ) : Details()
 
         object Loadable : Details()

@@ -37,7 +37,8 @@ fun ResourceManager.mapNftToListItem(pricedNft: PricedNft): NftListItem.NftListC
                     price = amountModel,
                     media = details.media,
                     collectionName = mapNftCollectionForUi(details.collectionName, pricedNft.nft.collectionId),
-                    wholeDetailsLoaded = pricedNft.nft.wholeDetailsLoaded
+                    wholeDetailsLoaded = pricedNft.nft.wholeDetailsLoaded,
+                    collectionMedia = details.collectionMedia
                 )
             )
         }
@@ -62,7 +63,8 @@ fun groupNftCards(nftCards: List<NftListItem.NftListCard>, hiddenCollections: Se
                 NftListItem.NftCollection(
                     name = it,
                     expanded = expanded,
-                    count = nftsPerCollection.size.toString()
+                    count = nftsPerCollection.size.toString(),
+                    icon = nftsPerCollection[0].content.dataOrNull?.collectionMedia
                 )
             )
             if (expanded) {

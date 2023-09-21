@@ -69,7 +69,7 @@ class RmrkV1NftProvider(
         }
     }
 
-    override suspend fun getCollectionName(collectionId: String, chainId: ChainId?): String? {
+    override suspend fun getCollectionNameAndMedia(collectionId: String, chainId: ChainId?): Pair<String?, String?>? {
         return null
     }
 }

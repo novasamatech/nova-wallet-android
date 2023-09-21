@@ -13,7 +13,7 @@ sealed interface NftListItem {
         val name: String,
         val expanded: Boolean,
         val count: String,
-        val icon: String? = null,
+        val icon: String?,
     ) : NftListItem
 
     data class NftListCard(
@@ -23,6 +23,7 @@ sealed interface NftListItem {
 
         data class Content(
             val collectionName: String?,
+            val collectionMedia: String?,
             val title: String,
             val price: AmountModel?,
             val media: String?,

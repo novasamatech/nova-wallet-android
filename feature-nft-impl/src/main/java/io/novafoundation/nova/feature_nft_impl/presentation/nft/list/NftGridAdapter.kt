@@ -22,6 +22,7 @@ import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_nft_impl.R
 import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.item_nft_collection_name.view.itemCollectionMedia
 import kotlinx.android.synthetic.main.item_nft_collection_name.view.itemCollectionName
 import kotlinx.android.synthetic.main.item_nft_collection_name.view.itemCounter
 import kotlinx.android.synthetic.main.item_nft_collection_name.view.itemExpanded
@@ -75,7 +76,7 @@ class NftGridAdapter(
             }
 
             TYPE_COLLECTION -> {
-                CollectionHolder(parent.inflateChild(R.layout.item_nft_collection_name), handler)
+                CollectionHolder(parent.inflateChild(R.layout.item_nft_collection_name), imageLoader, handler)
             }
 
             TYPE_DIVIDER -> {
@@ -155,6 +156,7 @@ class ActionsHolder(
 
 class CollectionHolder(
     override val containerView: View,
+    private val imageLoader: ImageLoader,
     private val itemHandler: NftGridAdapter.Handler,
 ) : NftGridListHolder(containerView) {
 
@@ -170,6 +172,18 @@ class CollectionHolder(
     }
 
     fun bind(item: NftListItem.NftCollection) = with(containerView) {
+        if (item.icon != null) {
+            itemCollectionMedia.makeVisible()
+            itemCollectionMedia.load(item.icon, imageLoader) {
+                transformations(RoundedCornersTransformation(4.dpF(context)))
+                placeholder(R.drawable.nft_media_progress)
+                error(R.drawable.nft_media_error)
+                fallback(R.drawable.nft_media_error)
+            }
+        } else {
+            itemCollectionMedia.makeGone()
+        }
+
         itemCollectionName.text = item.name
         itemExpanded.setImageResource(if (item.expanded) R.drawable.ic_chevron_up else R.drawable.ic_chevron_down)
         itemCounter.text = item.count

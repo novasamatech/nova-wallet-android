@@ -162,16 +162,18 @@ class RmrkV2NftProvider(
         }
     }
 
-    override suspend fun getCollectionName(
+    override suspend fun getCollectionNameAndMedia(
         collectionId: String,
         chainId: ChainId?
-    ): String? {
+    ): Pair<String?, String?> {
         val collection = singularV2Api.getCollection(collectionId).first()
         val collectionMetadata = collection.metadata?.let {
             singularV2Api.getIpfsMetadata(it.adoptFileStorageLinkToHttps())
         }
-        return collectionMetadata?.name
-            ?.take(MetadataLimits.COLLECTION_NAME_LIMIT)
+        return Pair(
+            collectionMetadata?.name?.take(MetadataLimits.COLLECTION_NAME_LIMIT),
+            collectionMetadata?.image?.adoptFileStorageLinkToHttps()
+        )
     }
 
     private fun localIdentifier(chainId: ChainId, remoteId: String): String {

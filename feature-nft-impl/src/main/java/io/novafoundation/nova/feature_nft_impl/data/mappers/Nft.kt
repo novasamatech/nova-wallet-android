@@ -41,7 +41,8 @@ fun mapNftLocalToNft(
     chainsById: Map<ChainId, Chain>,
     metaAccount: MetaAccount,
     nftLocal: NftLocal,
-    collectionName: String?
+    collectionName: String?,
+    collectionMedia: String?
 ): Nft? {
     val chain = chainsById[nftLocal.chainId] ?: return null
 
@@ -60,7 +61,8 @@ fun mapNftLocalToNft(
             label = nftLocal.label,
             media = nftLocal.media,
             price = nftPrice(nftLocal),
-            collectionName = collectionName
+            collectionName = collectionName,
+            collectionMedia = collectionMedia
         ),
         wholeDetailsLoaded = nftLocal.wholeDetailsLoaded
     )
