@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.Stakin
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.bagListLocatorOrNull
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListScoreConverter
 import io.novafoundation.nova.feature_staking_impl.domain.minimumStake
@@ -43,6 +44,7 @@ class StakingSharedComputation(
     private val bagListRepository: BagListRepository,
     private val totalIssuanceRepository: TotalIssuanceRepository,
     private val eraTimeCalculatorFactory: EraTimeCalculatorFactory,
+    private val stakingConstantsRepository: StakingConstantsRepository
 ) {
 
     fun eraCalculatorFlow(stakingOption: StakingOption, scope: CoroutineScope): Flow<EraTimeCalculator> {
@@ -84,12 +86,14 @@ class StakingSharedComputation(
             val bagListScoreConverter = BagListScoreConverter.U128(totalIssuance)
             val maxElectingVoters = bagListRepository.maxElectingVotes(chainId)
             val bagListSize = bagListRepository.bagListSize(chainId)
+            val maxNominatorsInValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
             electedExposuresWithActiveEraFlow(chainId, scope).map { (exposures, activeEraIndex) ->
                 val minStake = minimumStake(
                     exposures = exposures.values,
                     minimumNominatorBond = minBond,
                     bagListLocator = bagListLocator,
+                    maxNominatorsInValidator = maxNominatorsInValidator,
                     bagListScoreConverter = bagListScoreConverter,
                     bagListSize = bagListSize,
                     maxElectingVoters = maxElectingVoters
