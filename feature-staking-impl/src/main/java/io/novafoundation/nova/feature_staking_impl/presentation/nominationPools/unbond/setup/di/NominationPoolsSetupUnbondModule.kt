@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.NominationPoolsUnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
@@ -32,6 +33,7 @@ class NominationPoolsSetupUnbondModule {
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
         validationSystem: NominationPoolsUnbondValidationSystem,
+        stakingSharedState: StakingSharedState,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         assetUseCase: AssetUseCase,
         hintsFactory: NominationPoolsUnbondHintsFactory,
@@ -46,7 +48,8 @@ class NominationPoolsSetupUnbondModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             assetUseCase = assetUseCase,
             hintsFactory = hintsFactory,
-            amountChooserMixinFactory = amountChooserMixinFactory
+            amountChooserMixinFactory = amountChooserMixinFactory,
+            stakingSharedState = stakingSharedState
         )
     }
 

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import io.novafoundation.nova.feature_account_api.domain.validation.notSystemAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDeposit
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
@@ -9,7 +10,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.recipientOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.sendingAmountInCommissionAsset
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.AmountProducer
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
@@ -104,12 +104,6 @@ fun AssetTransfersValidationSystemBuilder.recipientIsNotSystemAccount() = notSys
 
 private suspend fun AssetSourceRegistry.existentialDepositForUsedAsset(transfer: AssetTransfer): BigDecimal {
     return existentialDeposit(transfer.originChain, transfer.originChainAsset)
-}
-
-private suspend fun AssetSourceRegistry.existentialDeposit(chain: Chain, asset: Chain.Asset): BigDecimal {
-    val inPlanks = sourceFor(asset).balance.existentialDeposit(chain, asset)
-
-    return asset.amountFromPlanks(inPlanks)
 }
 
 private fun Chain.Asset.existentialDepositError(amount: BigDecimal): WillRemoveAccount = when (type) {

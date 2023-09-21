@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redeem
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redeem.validations.nominationPoolsRedeem
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.redeem.NominationPoolsRedeemViewModel
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
@@ -54,8 +55,8 @@ class NominationPoolsRedeemModule {
 
     @Provides
     @ScreenScope
-    fun provideValidationSystem(): NominationPoolsRedeemValidationSystem {
-        return ValidationSystem.nominationPoolsRedeem()
+    fun provideValidationSystem(assetSourceRegistry: AssetSourceRegistry): NominationPoolsRedeemValidationSystem {
+        return ValidationSystem.nominationPoolsRedeem(assetSourceRegistry)
     }
 
     @Provides

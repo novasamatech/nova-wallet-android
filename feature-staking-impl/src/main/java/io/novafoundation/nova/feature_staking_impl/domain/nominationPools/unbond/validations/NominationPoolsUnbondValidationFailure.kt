@@ -26,4 +26,6 @@ sealed class NominationPoolsUnbondValidationFailure {
     class PoolUnlockChunksLimitReached(val timeTillNextAvailableSlot: Duration) : NominationPoolsUnbondValidationFailure()
 
     class PoolMemberMaxUnlockingLimitReached(val limit: Int) : NominationPoolsUnbondValidationFailure()
+
+    class ToStayAboveED(val asset: Chain.Asset) : NominationPoolsUnbondValidationFailure()
 }

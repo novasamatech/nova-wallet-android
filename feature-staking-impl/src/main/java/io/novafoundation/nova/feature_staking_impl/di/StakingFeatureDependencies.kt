@@ -32,6 +32,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
@@ -118,6 +119,8 @@ interface StakingFeatureDependencies {
     fun sharedPreferences(): SharedPreferences
 
     fun stakingRewardPeriodDao(): StakingRewardPeriodDao
+
+    fun assetSourceRegistry(): AssetSourceRegistry
 
     val amountChooserMixinFactory: AmountChooserMixin.Factory
 

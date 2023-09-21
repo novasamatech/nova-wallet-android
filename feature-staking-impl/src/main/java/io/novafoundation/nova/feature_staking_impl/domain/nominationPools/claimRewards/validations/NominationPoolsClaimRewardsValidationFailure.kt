@@ -13,4 +13,6 @@ sealed class NominationPoolsClaimRewardsValidationFailure {
     ) : NominationPoolsClaimRewardsValidationFailure(), NotEnoughToPayFeesError
 
     object NonProfitableClaim : NominationPoolsClaimRewardsValidationFailure()
+
+    class ToStayAboveED(val asset: Chain.Asset) : NominationPoolsClaimRewardsValidationFailure()
 }

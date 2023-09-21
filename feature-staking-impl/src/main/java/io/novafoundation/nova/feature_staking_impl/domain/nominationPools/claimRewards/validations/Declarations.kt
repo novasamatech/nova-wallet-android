@@ -3,17 +3,37 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.claim
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_staking_impl.domain.common.validation.profitableAction
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDeposit
+import io.novafoundation.nova.feature_wallet_api.domain.validation.enoughTotalToStayAboveED
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
+import io.novafoundation.nova.runtime.ext.utilityAsset
 
 typealias NominationPoolsClaimRewardsValidationSystem =
     ValidationSystem<NominationPoolsClaimRewardsValidationPayload, NominationPoolsClaimRewardsValidationFailure>
+
 typealias NominationPoolsClaimRewardsValidationSystemBuilder =
     ValidationSystemBuilder<NominationPoolsClaimRewardsValidationPayload, NominationPoolsClaimRewardsValidationFailure>
 
-fun ValidationSystem.Companion.nominationPoolsClaimRewards(): NominationPoolsClaimRewardsValidationSystem = ValidationSystem {
+fun ValidationSystem.Companion.nominationPoolsClaimRewards(
+    assetSourceRegistry: AssetSourceRegistry
+): NominationPoolsClaimRewardsValidationSystem = ValidationSystem {
     enoughToPayFees()
 
+    sufficientCommissionBalanceToStayAboveED(assetSourceRegistry)
+
     profitableClaim()
+}
+
+private fun NominationPoolsClaimRewardsValidationSystemBuilder.sufficientCommissionBalanceToStayAboveED(
+    assetSourceRegistry: AssetSourceRegistry
+) {
+    enoughTotalToStayAboveED(
+        fee = { it.fee },
+        total = { it.asset.total },
+        existentialDeposit = { assetSourceRegistry.existentialDeposit(it.chain, it.chain.utilityAsset) },
+        error = { NominationPoolsClaimRewardsValidationFailure.ToStayAboveED(it.chain.utilityAsset) }
+    )
 }
 
 private fun NominationPoolsClaimRewardsValidationSystemBuilder.enoughToPayFees() {

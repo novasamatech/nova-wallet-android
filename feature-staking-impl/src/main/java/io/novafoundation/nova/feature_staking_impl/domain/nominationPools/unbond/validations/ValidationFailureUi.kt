@@ -47,5 +47,10 @@ fun nominationPoolsUnbondValidationFailure(
                     resourceManager.getString(R.string.nomination_pools_pool_reached_unbondings_limit_message, durationFormatted)
             )
         }
+
+        is NominationPoolsUnbondValidationFailure.ToStayAboveED -> TransformedFailure.Default(
+            resourceManager.getString(R.string.common_not_enough_funds_title) to
+                resourceManager.getString(R.string.wallet_send_insufficient_balance_commission, failure.asset.symbol)
+        )
     }
 }
