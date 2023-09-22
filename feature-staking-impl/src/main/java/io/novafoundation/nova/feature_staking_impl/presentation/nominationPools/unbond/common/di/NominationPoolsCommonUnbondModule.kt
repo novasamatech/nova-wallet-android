@@ -21,7 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.nominationPoolsUnbond
 import io.novafoundation.nova.feature_staking_impl.presentation.common.hints.StakingHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.hints.NominationPoolsUnbondHintsFactory
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 
 @Module
 class NominationPoolsCommonUnbondModule {
@@ -66,8 +66,8 @@ class NominationPoolsCommonUnbondModule {
     @ScreenScope
     fun provideValidationSystem(
         validationFactory: NominationPoolsUnbondValidationFactory,
-        assetSourceRegistry: AssetSourceRegistry
-    ): NominationPoolsUnbondValidationSystem = ValidationSystem.nominationPoolsUnbond(validationFactory, assetSourceRegistry)
+        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
+    ): NominationPoolsUnbondValidationSystem = ValidationSystem.nominationPoolsUnbond(validationFactory, enoughTotalToStayAboveEDValidationFactory)
 
     @Provides
     @ScreenScope

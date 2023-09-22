@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.doNotCrossExistentialDeposit
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInCommissionAsset
@@ -41,6 +42,7 @@ class RealCrossChainTransactor(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val phishingValidationFactory: PhishingValidationFactory,
     private val palletXcmRepository: PalletXcmRepository,
+    private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 ) : CrossChainTransactor {
 
     override val validationSystem: AssetTransfersValidationSystem = ValidationSystem {
@@ -53,7 +55,7 @@ class RealCrossChainTransactor(
         notDeadRecipientInCommissionAsset(assetSourceRegistry)
         notDeadRecipientInUsedAsset(assetSourceRegistry)
 
-        sufficientCommissionBalanceToStayAboveED(assetSourceRegistry)
+        sufficientCommissionBalanceToStayAboveED(enoughTotalToStayAboveEDValidationFactory)
 
         sufficientTransferableBalanceToPayOriginFee()
         canPayCrossChainFee()

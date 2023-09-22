@@ -3,12 +3,11 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbon
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDeposit
-import io.novafoundation.nova.feature_wallet_api.domain.validation.enoughTotalToStayAboveED
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 
 typealias NominationPoolsUnbondValidationSystem = ValidationSystem<NominationPoolsUnbondValidationPayload, NominationPoolsUnbondValidationFailure>
 typealias NominationPoolsUnbondValidationSystemBuilder =
@@ -18,7 +17,7 @@ typealias NominationPoolsUnbondValidation = Validation<NominationPoolsUnbondVali
 
 fun ValidationSystem.Companion.nominationPoolsUnbond(
     unbondValidationFactory: NominationPoolsUnbondValidationFactory,
-    assetSourceRegistry: AssetSourceRegistry
+    enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 ): NominationPoolsUnbondValidationSystem = ValidationSystem {
     unbondValidationFactory.poolCanUnbond()
 
@@ -28,7 +27,7 @@ fun ValidationSystem.Companion.nominationPoolsUnbond(
 
     enoughToPayFees()
 
-    sufficientCommissionBalanceToStayAboveED(assetSourceRegistry)
+    sufficientCommissionBalanceToStayAboveED(enoughTotalToStayAboveEDValidationFactory)
 
     positiveUnbond()
 
@@ -65,12 +64,14 @@ private fun NominationPoolsUnbondValidationSystemBuilder.positiveUnbond() {
 }
 
 private fun NominationPoolsUnbondValidationSystemBuilder.sufficientCommissionBalanceToStayAboveED(
-    assetSourceRegistry: AssetSourceRegistry
+    enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 ) {
-    enoughTotalToStayAboveED(
-        fee = { it.fee },
-        total = { it.asset.total },
-        existentialDeposit = { assetSourceRegistry.existentialDeposit(it.chain, it.chain.utilityAsset) },
-        error = { NominationPoolsUnbondValidationFailure.ToStayAboveED(it.chain.utilityAsset) }
+    validate(
+        enoughTotalToStayAboveEDValidationFactory.create(
+            fee = { it.fee },
+            total = { it.asset.total },
+            chainWithAsset = { ChainWithAsset(it.chain, it.chain.utilityAsset) },
+            error = { NominationPoolsUnbondValidationFailure.ToStayAboveED(it.chain.utilityAsset) }
+        )
     )
 }

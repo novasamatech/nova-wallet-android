@@ -11,15 +11,16 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.recipientOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.sendingAmountInCommissionAsset
 import io.novafoundation.nova.feature_wallet_api.domain.validation.AmountProducer
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
 import io.novafoundation.nova.feature_wallet_api.domain.validation.doNotCrossExistentialDeposit
-import io.novafoundation.nova.feature_wallet_api.domain.validation.enoughTotalToStayAboveED
 import io.novafoundation.nova.feature_wallet_api.domain.validation.notPhishingAccount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validAddress
 import io.novafoundation.nova.runtime.ext.commissionAsset
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
 import java.math.BigDecimal
@@ -45,13 +46,17 @@ fun AssetTransfersValidationSystemBuilder.validAddress() = validAddress(
 )
 
 fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAboveED(
-    assetSourceRegistry: AssetSourceRegistry
-) = enoughTotalToStayAboveED(
-    fee = { it.originFee },
-    total = { it.originCommissionAsset.total },
-    existentialDeposit = { assetSourceRegistry.existentialDeposit(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
-    error = { AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(it.transfer.originChain.commissionAsset) }
-)
+    enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
+) {
+    validate(
+        enoughTotalToStayAboveEDValidationFactory.create(
+            fee = { it.originFee },
+            total = { it.originCommissionAsset.total },
+            chainWithAsset = { ChainWithAsset(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
+            error = { AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(it.transfer.originChain.commissionAsset) }
+        )
+    )
+}
 
 fun AssetTransfersValidationSystemBuilder.checkForFeeChanges(
     assetSourceRegistry: AssetSourceRegistry
