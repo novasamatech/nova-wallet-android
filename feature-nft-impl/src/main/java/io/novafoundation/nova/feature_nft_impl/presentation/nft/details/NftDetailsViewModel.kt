@@ -48,7 +48,7 @@ class NftDetailsViewModel(
 
     private val nftSupportedForSendFlow = nftDetailsFlow.map {
         val nftType = it.nftDetails.type
-        interactor.isNftTypeSupportedForSend(nftType)
+        interactor.isNftTypeSupportedForSend(nftType, it.nftDetails.chain)
     }
         .state(initialValue = false)
 

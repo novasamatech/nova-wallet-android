@@ -23,6 +23,10 @@ class NftTransfersRegistry @Inject constructor(
         }
     }
 
+    fun getAllTransfers(): List<BaseNftTransfer> {
+        return listOf(rmrk1NftTransfer, rmrk2NftTransfer, uniquesNftTransfer)
+    }
+
     fun defaultValidationSystem(): NftTransfersValidationSystem {
         return uniquesNftTransfer.defaultValidationSystem()
     }

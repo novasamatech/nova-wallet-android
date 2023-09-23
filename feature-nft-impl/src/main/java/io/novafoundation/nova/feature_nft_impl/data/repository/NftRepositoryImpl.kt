@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_nft_impl.data.repository
 import android.util.Log
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
 import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.model.NftLocal
@@ -15,6 +17,7 @@ import io.novafoundation.nova.feature_nft_impl.data.mappers.mapNftTypeLocalToTyp
 import io.novafoundation.nova.feature_nft_impl.data.source.JobOrchestrator
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvidersRegistry
 import io.novafoundation.nova.feature_nft_impl.data.source.NftTransfersRegistry
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.subscribe
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -31,13 +34,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.math.BigInteger
 import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.suspendCoroutine
 
@@ -52,6 +61,9 @@ class NftRepositoryImpl(
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     private val nftTransfersRegistry: NftTransfersRegistry
 ) : NftRepository {
+
+    private val mutex = Mutex()
+    private val subscriptionBuilders: MutableMap<ChainId, StorageSharedRequestsBuilder> = mutableMapOf()
 
     override fun allNftFlow(metaAccount: MetaAccount): Flow<List<Nft>> {
         return nftDao.nftsFlow(metaAccount.id)
@@ -75,16 +87,25 @@ class NftRepositoryImpl(
 
     override suspend fun subscribeNftOwnerAccountId(nftId: String): Flow<Pair<AccountId?, NftLocal>> {
         val nftLocal = getLocalNft(nftId)
-        val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(nftLocal.chainId)
-        val nftTypeKey = mapNftTypeLocalToTypeKey(nftDao.getNftType(nftLocal.identifier))
-        val nftProvider = nftProvidersRegistry.get(nftTypeKey)
-        return nftProvider.subscribeNftOwnerAccountId(
-            subscriptionBuilder,
-            nftLocal
-        ).onStart {
-            subscriptionBuilder.subscribe(coroutineContext)
+        mutex.withLock {
+            var isNewSubscriptionBuilder = false
+            val subscriptionBuilder = subscriptionBuilders.getOrPut(nftLocal.chainId) {
+                isNewSubscriptionBuilder = true
+                storageSharedRequestsBuilderFactory.create(nftLocal.chainId)
+            }
+            val nftTypeKey = mapNftTypeLocalToTypeKey(nftDao.getNftType(nftLocal.identifier))
+            val nftProvider = nftProvidersRegistry.get(nftTypeKey)
+            return nftProvider.subscribeNftOwnerAccountId(
+                subscriptionBuilder,
+                nftLocal
+            )
+                .onStart {
+                    if (isNewSubscriptionBuilder) {
+                        subscriptionBuilder.subscribe(coroutineContext)
+                    }
+                }
+                .map { address -> address to nftLocal }
         }
-            .map { address -> address to nftLocal }
     }
 
     override suspend fun getLocalNft(nftIdentifier: String): NftLocal {
@@ -151,7 +172,17 @@ class NftRepositoryImpl(
             val blockNumberKey = storage.storageKey()
             val blocksFlow = subscriptionBuilder.subscribe(blockNumberKey)
             subscriptionBuilder.subscribe(this)
-            blocksFlow.drop(1).first().block
+            var previousBlockNumber: BlockNumber = BigInteger.ZERO
+            var currentBlockNumber: BlockNumber = BigInteger.ZERO
+            blocksFlow
+                .onEach {
+                    previousBlockNumber = currentBlockNumber
+                    currentBlockNumber = bindBlockNumber(it.value.orEmpty(), runtime)
+                }
+                .filter { currentBlockNumber > previousBlockNumber }
+                .drop(1)
+                .first()
+                .block
         }
     }
 
@@ -168,12 +199,16 @@ class NftRepositoryImpl(
     override suspend fun getAvailableChains(): List<Chain> {
         val chains = chainRegistry.currentChains.first()
         return chains.mapNotNull { chain ->
-            chain.takeIf { nftProvidersRegistry.isNftTransferAvailableOnChain(chain) }
+            chain.takeIf {
+                nftTransfersRegistry.getAllTransfers().any {
+                    it.areTransfersSupported(chain)
+                }
+            }
         }
     }
 
-    override fun isNftTypeSupportedForSend(nftType: Nft.Type): Boolean {
-        return nftTransfersRegistry.get(nftType.key).areTransfersSupported()
+    override fun isNftTypeSupportedForSend(nftType: Nft.Type, chain: Chain): Boolean {
+        return nftTransfersRegistry.get(nftType.key).areTransfersSupported(chain)
     }
 
     override suspend fun getChainForNftId(nftId: String): Chain {

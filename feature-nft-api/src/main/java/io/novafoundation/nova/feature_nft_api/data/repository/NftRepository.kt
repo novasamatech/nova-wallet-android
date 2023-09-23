@@ -38,7 +38,7 @@ interface NftRepository {
 
     suspend fun getLocalNfts(nftIdentifiers: List<String>): List<NftLocal>
 
-    fun isNftTypeSupportedForSend(nftType: Nft.Type): Boolean
+    fun isNftTypeSupportedForSend(nftType: Nft.Type, chain: Chain): Boolean
 
     suspend fun getChainForNftId(chainId: ChainId): Chain
 }

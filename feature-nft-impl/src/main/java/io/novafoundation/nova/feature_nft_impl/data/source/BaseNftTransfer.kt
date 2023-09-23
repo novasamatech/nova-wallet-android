@@ -33,7 +33,7 @@ abstract class BaseNftTransfer(
 
     abstract fun ExtrinsicBuilder.transfer(transfer: NftTransferModel)
 
-    suspend fun performTransfer(transfer: NftTransferModel): Result<String> {
+    override suspend fun performTransfer(transfer: NftTransferModel): Result<String> {
         return withContext(Dispatchers.IO) {
             val senderAccountId = transfer.sender.requireAccountIdIn(transfer.originChain)
 
@@ -43,7 +43,7 @@ abstract class BaseNftTransfer(
         }
     }
 
-    suspend fun calculateFee(transfer: NftTransferModel): BigInteger {
+    override suspend fun calculateFee(transfer: NftTransferModel): BigInteger {
         return withContext(Dispatchers.IO) {
             extrinsicService.estimateFee(transfer.originChain) {
                 transfer(transfer)
@@ -51,7 +51,7 @@ abstract class BaseNftTransfer(
         }
     }
 
-    suspend fun nftDetails(nftId: String): NftDetails {
+    override suspend fun nftDetails(nftId: String): NftDetails {
         return runCatching {
             val nftTypeKey = mapNftTypeLocalToTypeKey(nftDao.getNftType(nftId))
             val nftProvider = nftProvidersRegistry.get(nftTypeKey)
@@ -61,7 +61,7 @@ abstract class BaseNftTransfer(
             .first()
     }
 
-    fun defaultValidationSystem(): NftTransfersValidationSystem = ValidationSystem {
+    override fun defaultValidationSystem(): NftTransfersValidationSystem = ValidationSystem {
         validAddress()
 
         notPhishingRecipient(phishingValidationFactory)

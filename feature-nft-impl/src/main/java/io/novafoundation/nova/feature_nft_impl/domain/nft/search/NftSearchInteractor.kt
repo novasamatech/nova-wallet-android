@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
-import io.novafoundation.nova.feature_nft_api.data.model.NftDetails
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_nft_impl.domain.common.mapNftDetailsToListItem
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -22,17 +21,17 @@ class NftSearchInteractor @Inject constructor(
 ) {
 
     fun sendNftSearch(queryFlow: Flow<String>): Flow<Map<Chain, List<SendNftListItem>>> {
-        return combine(getUserNfts(), queryFlow) { nfts, query ->
+        return combine(getUserSendableNfts(), queryFlow) { nfts, query ->
             nfts.filterByQuery(query)
                 .groupBy { nftDetails -> nftDetails.chain }
         }
     }
 
-    private fun getUserNfts(): Flow<List<SendNftListItem>> {
+    private fun getUserSendableNfts(): Flow<List<SendNftListItem>> {
         return accountRepository.selectedMetaAccountFlow()
             .flatMapLatest(nftRepository::allNftFlow)
             .map { nfts ->
-                nfts.filter { nftRepository.isNftTypeSupportedForSend(it.type) }
+                nfts.filter { nftRepository.isNftTypeSupportedForSend(it.type, it.chain) }
             }
             .map { nfts ->
                 val nftLocals = nftRepository.getLocalNfts(nfts.map { it.identifier })

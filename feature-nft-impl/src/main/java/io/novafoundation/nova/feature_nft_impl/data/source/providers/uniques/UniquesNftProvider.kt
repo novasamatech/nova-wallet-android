@@ -64,7 +64,7 @@ class UniquesNftProvider(
     ) {
         val accountId = metaAccount.accountIdIn(chain) ?: return
 
-        val newNfts = remoteStorage.query(chain.id) {
+        val newNfts = remoteStorage.query(chain.id, at = at) {
             val classesWithInstances = runtime.metadata.uniques().storage("Account").keys(accountId)
                 .map { (_: AccountId, collection: BigInteger, instance: BigInteger) ->
                     listOf(collection, instance)

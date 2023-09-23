@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_nft_impl.data.source.BaseNftTransfer
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvidersRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import javax.inject.Inject
 
@@ -34,5 +35,5 @@ class Rmrk2NftTransfer @Inject constructor(
         throw UnsupportedOperationException("RmrkV2 doesn't supported")
     }
 
-    override fun areTransfersSupported(): Boolean = false
+    override fun areTransfersSupported(chain: Chain): Boolean = false
 }

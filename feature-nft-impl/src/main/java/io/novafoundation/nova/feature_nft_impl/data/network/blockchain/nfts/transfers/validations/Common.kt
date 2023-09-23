@@ -56,7 +56,7 @@ fun NftTransfersValidationSystemBuilder.nftExists(
     nftDetails: suspend (nftId: String) -> NftDetails
 ) = nftExists(
     nftDetails = nftDetails,
-    substratePublicKey = { value ->
+    accountId = { value ->
         val metaAccount = value.transfer.sender
         val chain = value.transfer.originChain
         metaAccount.requireAccountIdIn(chain)
