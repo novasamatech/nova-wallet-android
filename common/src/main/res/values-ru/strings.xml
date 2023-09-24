@@ -166,6 +166,8 @@
     <string name="assets_search_hint">Поиск по названию сети или токена</string>
     <string name="assets_search_placeholder">Токены и сети с указанным именем\nне найдены</string>
     <string name="assets_select_send_your_wallets">Ваши кошельки</string>
+    <string name="assets_send_flow_placeholder">У вас нет токенов для отправки.\nКупите или внесите токены на свой счет.</string>
+    <string name="assets_send_flow_placeholder_button">Купить токены</string>
     <string name="biometric_auth_title">Биометрия</string>
     <string name="buy_completed">Покупка совершена! Ожидайте до 60 минут. Вы можете отслеживать статус по электронной почте.</string>
     <string name="choose_amount_asset">Токен</string>
@@ -220,6 +222,7 @@
     <string name="common_copy_id">Копировать идентификатор</string>
     <string name="common_crypto_type">Тип ключевой пары</string>
     <string name="common_date">Дата</string>
+    <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s и %s</string>
     <string name="common_details">Подробности</string>
     <string name="common_disabled">Отключен</string>
     <string name="common_disconnect">Отключить</string>
@@ -247,6 +250,7 @@
         <item quantity="many">каждые %s дней</item>
         <item quantity="other">каждый %s день</item>
     </plurals>
+    <string name="common_frequency_days_daily">ежедневно</string>
     <string name="common_frequency_days_everyday">ежедневно</string>
     <string name="common_governance">Демократия</string>
     <plurals name="common_hours_format">
@@ -577,7 +581,7 @@
     <string name="nft_your_nfts">Ваши NFT</string>
     <string name="nomination_pool_claim_rewards">Забрать награды</string>
     <string name="nomination_pools_claim_rewards_restake_subtitle">Ваши токены будут добавлены обратно в стейкинг</string>
-    <string name="nomination_pools_direct">Напрямую</string>
+    <string name="nomination_pools_direct">Прямой</string>
     <string name="nomination_pools_info">Информация о стейкинге в пулах</string>
     <string name="nomination_pools_pending_claim_hint_format">Ваши награды (%s) также будут забраны и добавлены к вашему доступному балансу.</string>
     <string name="nomination_pools_pool">Пул</string>
@@ -669,6 +673,7 @@
     <string name="referendum_staking_admin">Стейкинг</string>
     <string name="referendum_status_approved">Одобрен</string>
     <string name="referendum_status_cancelled">Отменен</string>
+    <string name="referendum_status_deciding">Решение</string>
     <string name="referendum_status_deciding_in">Начнёт решаться через %s</string>
     <string name="referendum_status_executed">Выполнен</string>
     <string name="referendum_status_in_queue_format" formatted="false">В очереди (%s из %s)</string>
@@ -687,6 +692,7 @@
     <string name="referendum_timeline_state_approved">Результат: Одобрен</string>
     <string name="referendum_timeline_state_cancelled">Отменён</string>
     <string name="referendum_timeline_state_created">Создан</string>
+    <string name="referendum_timeline_state_deciding">Голосование: Решение</string>
     <string name="referendum_timeline_state_executed">Выполнен</string>
     <string name="referendum_timeline_state_in_queue">Голосование: В очереди</string>
     <string name="referendum_timeline_state_killed">Удалён</string>
@@ -810,7 +816,7 @@
     <string name="staking_alert_start_next_era_message">Пожалуйста, дождитесь начала следующей эры.</string>
     <string name="staking_alert_title">Предупреждения</string>
     <string name="staking_already_controller_title">Уже контроллер</string>
-    <string name="staking_already_staking_title">У вас уже есть стейкинг используя %s</string>
+    <string name="staking_already_staking_title">У вас уже есть стейкинг в %s</string>
     <string name="staking_balance_title">Баланс стейкинга</string>
     <string name="staking_balance_title_v2_2_0">Баланс</string>
     <string name="staking_bond_more_v1_9_0">Застейкать ещё</string>
@@ -985,7 +991,7 @@
     <string name="staking_rewards_destination_title_v2_0_0">Назначение наград</string>
     <string name="staking_select_custom">Выбрать самому</string>
     <string name="staking_select_payout_account">Выберите аккаунт для выплат</string>
-    <string name="staking_select_recommended">Выбрать рекомендованных</string>
+    <string name="staking_select_recommended">Выбрать рекомендацию</string>
     <string name="staking_selected_validators_count_v1.9.1" formatted="false">выбрано %d (макс. %d)</string>
     <string name="staking_selected_validators_mask">Валидаторы (%d)</string>
     <string name="staking_set_controller_deprecated_action">Изменить контроллер на стэш</string>
@@ -1096,6 +1102,7 @@
     <string name="start_staking_fragment_governance_participation_with_min_amount_accent">участвуйте в голосованиях</string>
     <string name="start_staking_fragment_min_stake_condition">Стейкайте в любое время всего с %1$s. Ваш стейк активно будет зарабатывать вознаграждения %2$s</string>
     <string name="start_staking_fragment_min_stake_condition_duration">через %s</string>
+    <string name="start_staking_fragment_min_stake_condition_no_min_stake">Стейкайте в любое время. Ваш стейк активно будет зарабатывать вознаграждения %s</string>
     <string name="start_staking_fragment_more_info">Узнайте больше о стейкинге\n%1$s на %2$s</string>
     <string name="start_staking_fragment_more_info_clicable_part">Nova Wiki</string>
     <string name="start_staking_fragment_reward_frequency_condition_automatic_and_manual">Вознаграждения начисляются %1$s. Для автоматической выплаты вознаграждений застейкайте более %2$s, в противном случае вам необходимо будет получать вознаграждения вручную</string>
