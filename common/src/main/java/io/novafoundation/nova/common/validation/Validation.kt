@@ -19,7 +19,7 @@ fun <S> validOrWarning(
     ValidationStatus.NotValid(DefaultFailureLevel.WARNING, lazyReason())
 }
 
-fun <S> validOrError(
+inline fun <S> validOrError(
     isValid: Boolean,
     lazyReason: () -> S,
 ): ValidationStatus<S> = if (isValid) {
@@ -32,8 +32,8 @@ fun <S> validationError(reason: S) = ValidationStatus.NotValid(DefaultFailureLev
 fun <S> validationWarning(reason: S) = ValidationStatus.NotValid(DefaultFailureLevel.WARNING, reason)
 fun <S> valid() = ValidationStatus.Valid<S>()
 
-infix fun <E> Boolean.isTrueOrError(error: () -> E) = validOrError(this, error)
-infix fun <E> Boolean.isFalseOrError(error: () -> E) = this.not().isTrueOrError(error)
+inline infix fun <E> Boolean.isTrueOrError(error: () -> E) = validOrError(this, error)
+inline infix fun <E> Boolean.isFalseOrError(error: () -> E) = this.not().isTrueOrError(error)
 
 infix fun <E> Boolean.isTrueOrWarning(warning: () -> E) = validOrWarning(this, warning)
 infix fun <E> Boolean.isFalseOrWarning(warning: () -> E) = this.not().isTrueOrWarning(warning)
@@ -120,7 +120,14 @@ class ValidationSystem<T, S>(
             }
         }
     }
+
+    fun copyTo(validationSystemBuilder: ValidationSystemBuilder<T, S>) {
+        validationSystemBuilder.validate(validation)
+    }
 }
+
+context (ValidationSystemBuilder<P, E>)
+fun <P, E> ValidationSystem<P, E>.copyIntoCurrent() = copyTo(this@ValidationSystemBuilder)
 
 fun <T, S> ValidationSystem.Companion.from(validations: Collection<Validation<T, S>>): ValidationSystem<T, S> {
     return ValidationSystem(CompositeValidation(validations))

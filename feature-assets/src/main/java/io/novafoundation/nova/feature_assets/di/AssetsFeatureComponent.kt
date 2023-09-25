@@ -24,12 +24,14 @@ import io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChain
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.di.ManageChainTokensComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.di.ManageTokensComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.ExtrinsicDetailComponent
+import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.PoolRewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.RewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.TransactionDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.di.TransactionHistoryFilterComponent
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
+import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -59,6 +61,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun transactionHistoryComponentFactory(): TransactionHistoryFilterComponent.Factory
 
     fun rewardDetailComponentFactory(): RewardDetailComponent.Factory
+
+    fun poolRewardDetailComponentFactory(): PoolRewardDetailComponent.Factory
 
     fun extrinsicDetailComponentFactory(): ExtrinsicDetailComponent.Factory
 
@@ -104,6 +108,7 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
             AccountFeatureApi::class,
             CurrencyFeatureApi::class,
             CrowdloanFeatureApi::class,
+            StakingFeatureApi::class,
             Web3NamesApi::class,
             WalletConnectFeatureApi::class
         ]

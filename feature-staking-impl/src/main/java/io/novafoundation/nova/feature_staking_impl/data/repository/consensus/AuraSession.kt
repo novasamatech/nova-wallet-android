@@ -1,23 +1,27 @@
 package io.novafoundation.nova.feature_staking_impl.data.repository.consensus
 
-import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.committeeManagementOrNull
 import io.novafoundation.nova.common.utils.electionsOrNull
 import io.novafoundation.nova.common.utils.numberConstantOrNull
-import io.novafoundation.nova.common.utils.system
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.number
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.system
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
+import io.novafoundation.nova.runtime.storage.source.query.metadata
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import java.math.BigInteger
 
 private const val SESSION_PERIOD_DEFAULT = 50
 
 class AuraSession(
     private val chainRegistry: ChainRegistry,
-    private val remoteStorage: StorageDataSource,
+    private val localStorage: StorageDataSource,
 ) : ElectionsSession {
 
     override suspend fun sessionLength(chainId: ChainId): BigInteger {
@@ -28,10 +32,29 @@ class AuraSession(
             ?: SESSION_PERIOD_DEFAULT.toBigInteger()
     }
 
-    override suspend fun currentSlot(chainId: ChainId) = remoteStorage.query(chainId) {
-        val bestBlock = runtime.metadata.system().storage("Number").query(binding = ::bindNumber)
+    override fun currentEpochIndexFlow(chainId: ChainId): Flow<BigInteger?> {
+        return flowOf(null)
+    }
 
-        bestBlock
+    override fun currentSlotFlow(chainId: ChainId) = localStorage.subscribe(chainId) {
+        metadata.system.number.observeNonNull()
+    }
+
+    override suspend fun currentSlotStorageKey(chainId: ChainId): String? {
+        /**
+         * we're already syncing system number as part of [BlockNumberUpdater]
+         */
+        return null
+    }
+
+    override suspend fun genesisSlotStorageKey(chainId: ChainId): String? {
+        // genesis slot for aura is zero so nothing to sync
+        return null
+    }
+
+    override suspend fun currentEpochIndexStorageKey(chainId: ChainId): String? {
+        // there is no separate epoch index for aura
+        return null
     }
 
     override suspend fun genesisSlot(chainId: ChainId): BigInteger = BigInteger.ZERO

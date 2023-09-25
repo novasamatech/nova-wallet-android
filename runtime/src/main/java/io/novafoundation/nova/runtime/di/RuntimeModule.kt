@@ -9,7 +9,11 @@ import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.StorageDao
+import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
+import io.novafoundation.nova.runtime.call.RealMultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
+import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
+import io.novafoundation.nova.runtime.ethereum.gas.RealGasPriceProviderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicSerializers
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
@@ -73,7 +77,8 @@ class RuntimeModule {
     fun provideLocalStorageSource(
         chainRegistry: ChainRegistry,
         storageCache: StorageCache,
-    ): StorageDataSource = LocalStorageSource(chainRegistry, storageCache)
+        sharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
+    ): StorageDataSource = LocalStorageSource(chainRegistry, sharedRequestsBuilderFactory, storageCache)
 
     @Provides
     @ApplicationScope
@@ -86,8 +91,9 @@ class RuntimeModule {
     @ApplicationScope
     fun provideRemoteStorageSource(
         chainRegistry: ChainRegistry,
+        sharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
         bulkRetriever: BulkRetriever,
-    ): StorageDataSource = RemoteStorageSource(chainRegistry, bulkRetriever)
+    ): StorageDataSource = RemoteStorageSource(chainRegistry, sharedRequestsBuilderFactory, bulkRetriever)
 
     @Provides
     @ApplicationScope
@@ -114,8 +120,9 @@ class RuntimeModule {
     @Provides
     @ApplicationScope
     fun provideSubstrateCalls(
-        chainRegistry: ChainRegistry
-    ) = RpcCalls(chainRegistry)
+        chainRegistry: ChainRegistry,
+        multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi
+    ) = RpcCalls(chainRegistry, multiChainRuntimeCallsApi)
 
     @Provides
     @ApplicationScope
@@ -180,4 +187,14 @@ class RuntimeModule {
     @Provides
     @ApplicationScope
     fun provideStorageSharedRequestBuilderFactory(chainRegistry: ChainRegistry) = StorageSharedRequestsBuilderFactory(chainRegistry)
+
+    @Provides
+    @ApplicationScope
+    fun provideMultiChainRuntimeCallsApi(chainRegistry: ChainRegistry): MultiChainRuntimeCallsApi = RealMultiChainRuntimeCallsApi(chainRegistry)
+
+    @Provides
+    @ApplicationScope
+    fun provideGasPriceProviderFactory(
+        chainRegistry: ChainRegistry
+    ): GasPriceProviderFactory = RealGasPriceProviderFactory(chainRegistry)
 }

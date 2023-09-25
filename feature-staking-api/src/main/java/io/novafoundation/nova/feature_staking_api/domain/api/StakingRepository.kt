@@ -33,9 +33,9 @@ interface StakingRepository {
 
     suspend fun getElectedValidatorsExposure(chainId: ChainId, eraIndex: EraIndex): AccountIdMap<Exposure>
 
-    suspend fun getValidatorPrefs(chainId: ChainId, accountIdsHex: List<String>): AccountIdMap<ValidatorPrefs?>
+    suspend fun getValidatorPrefs(chainId: ChainId, accountIdsHex: Collection<String>): AccountIdMap<ValidatorPrefs?>
 
-    suspend fun getSlashes(chainId: ChainId, accountIdsHex: List<String>): AccountIdMap<Boolean>
+    suspend fun getSlashes(chainId: ChainId, accountIdsHex: Collection<String>): AccountIdMap<Boolean>
 
     suspend fun getSlashingSpan(chainId: ChainId, accountId: AccountId): SlashingSpans?
 
@@ -49,7 +49,7 @@ interface StakingRepository {
 
     suspend fun ledgerFlow(stakingState: StakingState.Stash): Flow<StakingLedger>
 
-    suspend fun ledger(chainId: ChainId, address: String): StakingLedger?
+    suspend fun ledger(chainId: ChainId, accountId: AccountId): StakingLedger?
 
     suspend fun getRewardDestination(stakingState: StakingState.Stash): RewardDestination
 
@@ -58,8 +58,6 @@ interface StakingRepository {
     suspend fun maxNominators(chainId: ChainId): BigInteger?
 
     suspend fun nominatorsCount(chainId: ChainId): BigInteger?
-
-    fun electedExposuresInActiveEra(chainId: ChainId): Flow<ExposuresWithEraIndex>
 }
 
 suspend fun StakingRepository.historicalEras(chainId: ChainId): List<BigInteger> {

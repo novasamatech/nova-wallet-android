@@ -3,7 +3,9 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
-import io.novafoundation.nova.common.presentation.toLoadingState
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.asLoaded
+import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.LOG_TAG
@@ -28,13 +30,14 @@ import java.math.RoundingMode
 abstract class BaseNetworkInfoComponent(
     private val resourceManager: ResourceManager,
     coroutineScope: CoroutineScope,
+    @StringRes titleRes: Int,
 ) : NetworkInfoComponent,
     CoroutineScope by coroutineScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
     override val events = MutableLiveData<Event<StakeActionsEvent>>()
 
-    override val state = MutableStateFlow(initialState())
+    override val state = MutableStateFlow(initialState(titleRes))
 
     abstract fun initialItems(): List<NetworkInfoItem>
 
@@ -47,7 +50,7 @@ abstract class BaseNetworkInfoComponent(
     protected fun createNetworkInfoItems(
         asset: Asset,
         networkInfo: NetworkInfo,
-        @StringRes nominatorsLabel: Int
+        @StringRes nominatorsLabel: Int?
     ): List<NetworkInfoItem> {
         val unstakingPeriod = resourceManager.formatDuration(networkInfo.lockupPeriod)
 
@@ -56,11 +59,11 @@ abstract class BaseNetworkInfoComponent(
         }
 
         return createNetworkInfoItems(
-            totalStaked = mapAmountToAmountModel(networkInfo.totalStake, asset),
-            minimumStake = mapAmountToAmountModel(networkInfo.minimumStake, asset, roundingMode = RoundingMode.CEILING),
-            activeNominators = networkInfo.nominatorsCount.format(),
-            unstakingPeriod = unstakingPeriod,
-            stakingPeriod = stakingPeriod,
+            totalStaked = mapAmountToAmountModel(networkInfo.totalStake, asset).asLoaded(),
+            minimumStake = mapAmountToAmountModel(networkInfo.minimumStake, asset, roundingMode = RoundingMode.CEILING).asLoaded(),
+            activeNominators = networkInfo.nominatorsCount?.format()?.asLoaded(),
+            unstakingPeriod = unstakingPeriod.asLoaded(),
+            stakingPeriod = stakingPeriod.asLoaded(),
             nominatorsLabel = nominatorsLabel
         )
     }
@@ -69,28 +72,35 @@ abstract class BaseNetworkInfoComponent(
         state.value = update(state.value)
     }
 
-    private fun initialState(): NetworkInfoState {
+    private fun initialState(@StringRes titleRes: Int): NetworkInfoState {
         return NetworkInfoState(
+            title = resourceManager.getString(titleRes),
             actions = initialItems(),
             expanded = false
         )
     }
 
     protected fun createNetworkInfoItems(
-        totalStaked: AmountModel?,
-        minimumStake: AmountModel?,
-        activeNominators: String?,
-        stakingPeriod: String?,
-        unstakingPeriod: String?,
-        @StringRes nominatorsLabel: Int
+        totalStaked: ExtendedLoadingState<AmountModel> = ExtendedLoadingState.Loading,
+        minimumStake: ExtendedLoadingState<AmountModel> = ExtendedLoadingState.Loading,
+        activeNominators: ExtendedLoadingState<String>? = ExtendedLoadingState.Loading,
+        stakingPeriod: ExtendedLoadingState<String> = ExtendedLoadingState.Loading,
+        unstakingPeriod: ExtendedLoadingState<String> = ExtendedLoadingState.Loading,
+        @StringRes nominatorsLabel: Int?
     ): List<NetworkInfoItem> {
-        return listOf(
-            NetworkInfoItem.totalStaked(resourceManager, totalStaked.toNetworkInfoContent()),
-            NetworkInfoItem.minimumStake(resourceManager, minimumStake.toNetworkInfoContent()),
+        val nominatorsItem = if (nominatorsLabel != null && activeNominators != null) {
             NetworkInfoItem(
                 title = resourceManager.getString(nominatorsLabel),
-                content = activeNominators.toNetworkInfoContent().toLoadingState()
-            ),
+                content = activeNominators.toNetworkInfoContent()
+            )
+        } else {
+            null
+        }
+
+        return listOfNotNull(
+            NetworkInfoItem.totalStaked(resourceManager, totalStaked.toNetworkInfoContent()),
+            NetworkInfoItem.minimumStake(resourceManager, minimumStake.toNetworkInfoContent()),
+            nominatorsItem,
             NetworkInfoItem.stakingPeriod(resourceManager, stakingPeriod.toNetworkInfoContent()),
             NetworkInfoItem.unstakingPeriod(resourceManager, unstakingPeriod.toNetworkInfoContent())
         )
@@ -108,6 +118,7 @@ abstract class BaseNetworkInfoComponent(
         it.copy(expanded = expanded(it))
     }
 
-    private fun String?.toNetworkInfoContent() = this?.let { NetworkInfoItem.Content(primary = this, secondary = null) }
-    private fun AmountModel?.toNetworkInfoContent() = this?.let { NetworkInfoItem.Content(primary = token, secondary = fiat) }
+    @JvmName("toNetworkInfoContentString")
+    private fun ExtendedLoadingState<String>.toNetworkInfoContent() = map { NetworkInfoItem.Content(primary = it, secondary = null) }
+    private fun ExtendedLoadingState<AmountModel>.toNetworkInfoContent() = map { NetworkInfoItem.Content(primary = it.token, secondary = it.fiat) }
 }

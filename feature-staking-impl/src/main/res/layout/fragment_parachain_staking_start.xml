@@ -34,7 +34,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:text="@string/staking_parachain_collator"
-                android:textColor="@color/text_secondary" />
+                android:textColor="@color/text_tertiary" />
 
             <io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.view.SelectCollatorView
                 android:id="@+id/startParachainStakingCollator"
@@ -79,6 +79,14 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 app:dividerVisible="false" />
+
+            <io.novafoundation.nova.common.mixin.hints.HintsView
+                android:id="@+id/startParachainStakingHints"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp" />
         </LinearLayout>
     </ScrollView>
 

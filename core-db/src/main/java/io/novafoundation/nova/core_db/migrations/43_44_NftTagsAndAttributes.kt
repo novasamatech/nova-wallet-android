@@ -3,7 +3,7 @@ package io.novafoundation.nova.core_db.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-val NftTagsAndAttributes_43_44 = object : Migration(43, 44) {
+val NftTagsAndAttributes_48_49 = object : Migration(48, 49) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         createCoinPriceTable(database)

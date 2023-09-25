@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/start_multi_staking_nav_graph"
+    app:startDestination="@id/setupAmountMultiStakingFragment">
+
+    <fragment
+        android:id="@+id/setupAmountMultiStakingFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.SetupAmountMultiStakingFragment"
+        android:label="SetupAmountMultiStakingFragment"
+        tools:layout="@layout/fragment_start_multi_staking_amount">
+
+        <action
+            android:id="@+id/action_setupAmountMultiStakingFragment_to_setupStakingType"
+            app:destination="@id/setupStakingType"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_setupAmountMultiStakingFragment_to_confirmMultiStakingFragment"
+            app:destination="@id/confirmMultiStakingFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/setupStakingType"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypeFragment"
+        android:label="SetupStakingTypeFragment"
+        tools:layout="@layout/fragment_setup_staking_type">
+
+        <action
+            android:id="@+id/action_setupStakingType_to_selectCustomValidatorsFragment"
+            app:destination="@id/setup_staking_validators_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_setupStakingType_to_selectCustomPoolFragment"
+            app:destination="@id/selectPoolFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/selectPoolFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectPoolFragment"
+        android:label="SelectPoolFragment">
+
+        <action
+            android:id="@+id/action_selectPool_to_setupAmountMultiStakingFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/setupAmountMultiStakingFragment" />
+
+        <action
+            android:id="@+id/action_selectPool_to_searchPoolFragment"
+            app:destination="@id/searchPoolFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/confirmMultiStakingFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.ConfirmMultiStakingFragment"
+        android:label="ConfirmMultiStakingFragment">
+        <action
+            android:id="@+id/action_confirmMultiStakingFragment_to_confirmNominationsFragment"
+            app:destination="@id/confirmNominationsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/confirmNominationsFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations.ConfirmNominationsFragment"
+        android:label="ConfirmNominationsFragment"
+        tools:layout="@layout/fragment_confirm_nominations" />
+
+    <fragment
+        android:id="@+id/searchPoolFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.pools.searchPool.SearchPoolFragment"
+        android:label="SearchPoolFragment">
+
+        <action
+            android:id="@+id/action_searchPool_to_setupAmountMultiStakingFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/setupAmountMultiStakingFragment" />
+
+    </fragment>
+
+    <include app:graph="@navigation/setup_staking_validators_graph" />
+
+</navigation>

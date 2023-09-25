@@ -27,6 +27,7 @@ class Caip19MatcherTest {
 
     private val substrateChainId = "0x0"
     private val ethereumChainId = "eip155:1"
+    private val eip155ChainId = 1
 
     @Mock
     private lateinit var chain: Chain
@@ -54,7 +55,16 @@ class Caip19MatcherTest {
 
     @Test
     fun `eip155 erc20 should match`() = runBlocking {
-        mockChain(chainId = ethereumChainId, isEthereumBased = true)
+        mockChain(chainId = ethereumChainId, isEthereumBased = true, addressPrefix = eip155ChainId)
+        mockAsset(type = Chain.Asset.Type.EvmErc20("0x0"))
+        val identifier = getIdentifier("$ethereumChainId/erc20:0x0")
+        val matcher = caip19MatcherFactory.getCaip19Matcher(chain, chainAsset)
+        assertTrue(matcher.match(identifier))
+    }
+
+    @Test
+    fun `substrate-chainId ethereum-based erc20 should match`() = runBlocking {
+        mockChain(chainId = substrateChainId, isEthereumBased = true, addressPrefix = eip155ChainId)
         mockAsset(type = Chain.Asset.Type.EvmErc20("0x0"))
         val identifier = getIdentifier("$ethereumChainId/erc20:0x0")
         val matcher = caip19MatcherFactory.getCaip19Matcher(chain, chainAsset)
@@ -91,9 +101,13 @@ class Caip19MatcherTest {
         return parser.parseCaip19(raw).requireValue()
     }
 
-    private fun mockChain(chainId: String, isEthereumBased: Boolean) {
+    private fun mockChain(chainId: String, isEthereumBased: Boolean, addressPrefix: Int? = null) {
         `when`(chain.id).thenReturn(chainId)
         `when`(chain.isEthereumBased).thenReturn(isEthereumBased)
+
+        addressPrefix?.let {
+            `when`(chain.addressPrefix).thenReturn(addressPrefix)
+        }
     }
 
     private fun mockAsset(type: Chain.Asset.Type) {

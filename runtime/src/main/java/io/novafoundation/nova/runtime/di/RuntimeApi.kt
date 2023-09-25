@@ -2,7 +2,9 @@ package io.novafoundation.nova.runtime.di
 
 import com.google.gson.Gson
 import io.novafoundation.nova.core.storage.StorageCache
+import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
+import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
@@ -74,4 +76,8 @@ interface RuntimeApi {
     val extrinsicSplitter: ExtrinsicSplitter
 
     val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+
+    val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi
+
+    val gasPriceProviderFactory: GasPriceProviderFactory
 }

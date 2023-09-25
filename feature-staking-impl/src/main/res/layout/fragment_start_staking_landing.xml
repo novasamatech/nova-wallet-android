@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/secondary_screen_background"
+    android:orientation="vertical">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/startStakingLandingToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:contentBackground="@android:color/transparent"
+        app:dividerVisible="false"
+        app:homeButtonIcon="@drawable/ic_close"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/startStakingLandingList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="28dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@+id/startStakingLandingButtonContainer"
+        app:layout_constraintTop_toBottomOf="@+id/startStakingLandingToolbar" />
+
+    <LinearLayout
+        android:id="@+id/startStakingLandingButtonContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="-1dp"
+        android:background="@drawable/bg_start_staking_button_container"
+        android:orientation="vertical"
+        android:paddingHorizontal="17dp"
+        android:paddingTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/startStakingLandingButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/start_staking_fragment_start_staking" />
+
+        <TextView
+            android:id="@+id/startStakingLandingAvailableBalance"
+            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="24dp"
+            android:gravity="center"
+            android:textColor="@color/text_tertiary"
+            tools:text="@string/start_staking_fragment_available_balance" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

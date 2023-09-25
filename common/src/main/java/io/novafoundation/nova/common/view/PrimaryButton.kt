@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.ContextThemeWrapper
 import androidx.annotation.ColorInt
+import androidx.annotation.StyleRes
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.lifecycle.LifecycleOwner
 import com.github.razir.progressbutton.bindProgressButton
@@ -85,8 +86,10 @@ class PrimaryButton @JvmOverloads constructor(
         abstract fun enabledColor(context: Context): Int
     }
 
-    enum class Size(val heightDp: Int, val cornerSizeDp: Int) {
-        LARGE(52, 12), SMALL(44, 10);
+    enum class Size(val heightDp: Int, val cornerSizeDp: Int, @StyleRes val textAppearance: Int) {
+        LARGE(52, 12, R.style.TextAppearance_NovaFoundation_SemiBold_SubHeadline),
+        SMALL(44, 10, R.style.TextAppearance_NovaFoundation_SemiBold_SubHeadline),
+        EXTRA_SMALL(32, 10, R.style.TextAppearance_NovaFoundation_SemiBold_Footnote);
     }
 
     private var cachedText: String? = null
@@ -104,17 +107,6 @@ class PrimaryButton @JvmOverloads constructor(
 
     init {
         attrs?.let(this::applyAttrs)
-    }
-
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
-
-        var newHeightMeasureSpec = heightMeasureSpec
-        if (heightMode == MeasureSpec.AT_MOST) {
-            newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(size.heightDp.dp(context), heightMode)
-        }
-
-        super.onMeasure(widthMeasureSpec, newHeightMeasureSpec)
     }
 
     fun prepareForProgress(lifecycleOwner: LifecycleOwner) {
@@ -161,8 +153,14 @@ class PrimaryButton @JvmOverloads constructor(
     }
 
     private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.PrimaryButton) { typedArray ->
-        val appearance = typedArray.getEnum(R.styleable.PrimaryButton_appearance, Appearance.PRIMARY)
         size = typedArray.getEnum(R.styleable.PrimaryButton_size, Size.LARGE)
+        setTextAppearance(size.textAppearance)
+
+        // we set textColor since `setTextAppearance` above overrides it and sets to default one
+        val textColor = typedArray.getColorStateList(R.styleable.PrimaryButton_android_textColor)
+        setTextColor(textColor)
+
+        minimumHeight = size.heightDp.dp(context)
 
         typedArray.getDrawable(R.styleable.PrimaryButton_iconSrc)?.let { icon = drawableToBitmap(it) }
         icon?.let { icon ->
@@ -173,6 +171,7 @@ class PrimaryButton @JvmOverloads constructor(
             iconDestRect = Rect()
         }
 
+        val appearance = typedArray.getEnum(R.styleable.PrimaryButton_appearance, Appearance.PRIMARY)
         setAppearance(appearance, cornerSizeDp = size.cornerSizeDp)
     }
 
@@ -221,6 +220,10 @@ class PrimaryButton @JvmOverloads constructor(
         drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.draw(canvas)
         return bitmap
+    }
+
+    fun setButtonColor(color: Int) {
+        background.setTint(color)
     }
 }
 

@@ -6,6 +6,7 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.storage.insertPrefixEntries
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -27,11 +28,14 @@ class TuringAutomationTasksUpdater(
     private val remoteStorageSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
     override val scope: AccountUpdateScope,
-) : ParachainStakingUpdater {
+) : ParachainStakingUpdater<MetaAccount> {
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
+    override suspend fun listenForUpdates(
+        storageSubscriptionBuilder: SharedRequestsBuilder,
+        scopeValue: MetaAccount
+    ): Flow<Updater.SideEffect> {
         val chain = stakingSharedState.chain()
-        val metaAccount = scope.getAccount()
+        val metaAccount = scopeValue
         val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
         val runtime = chainRegistry.getRuntime(chain.id)
 

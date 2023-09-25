@@ -40,7 +40,7 @@
             android:layout_marginTop="8dp"
             android:paddingBottom="4dp"
             android:text="@string/delegation_list_banner_description"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/text_tertiary"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"

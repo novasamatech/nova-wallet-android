@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsAccounts
 import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsContent
 import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsList
@@ -68,11 +68,11 @@ class RecommendedValidatorsFragment : BaseFragment<RecommendedValidatorsViewMode
         viewModel.selectedTitle.observe(recommendedValidatorsAccounts::setText)
     }
 
-    override fun stakeTargetInfoClicked(validatorModel: ValidatorModel) {
+    override fun stakeTargetInfoClicked(validatorModel: ValidatorStakeTargetModel) {
         viewModel.validatorInfoClicked(validatorModel)
     }
 
-    override fun stakeTargetClicked(validatorModel: ValidatorModel) {
+    override fun stakeTargetClicked(validatorModel: ValidatorStakeTargetModel) {
         viewModel.validatorInfoClicked(validatorModel)
     }
 }

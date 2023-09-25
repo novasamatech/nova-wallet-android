@@ -64,11 +64,11 @@ class YourDelegationsFragment :
             when (it) {
                 is ExtendedLoadingState.Error -> {}
                 is ExtendedLoadingState.Loaded -> {
-                    placeholderAdapter.showPlaceholder(false)
+                    placeholderAdapter.show(false)
                     delegateListAdapter.submitListPreservingViewPoint(it.data, yourDelegationsList)
                 }
                 ExtendedLoadingState.Loading -> {
-                    placeholderAdapter.showPlaceholder(true)
+                    placeholderAdapter.show(true)
                     delegateListAdapter.submitList(emptyList())
                 }
             }

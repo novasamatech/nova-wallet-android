@@ -5,6 +5,8 @@ import androidx.lifecycle.asFlow
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import io.novafoundation.nova.app.R
+import io.novafoundation.nova.app.root.navigation.delayedNavigation.BackDelayedNavigation
+import io.novafoundation.nova.app.root.navigation.delayedNavigation.NavComponentDelayedNavigation
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.navigation.DelayedNavigation
 import io.novafoundation.nova.common.utils.getParcelableCompat
@@ -50,7 +52,8 @@ import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.A
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment
-import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.RewardDetailFragment
+import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.direct.RewardDetailFragment
+import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.pool.PoolRewardDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer.TransferDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
@@ -69,14 +72,7 @@ import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.Welco
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 import io.novafoundation.nova.splash.SplashRouter
-import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.Flow
-
-@Parcelize
-class NavComponentDelayedNavigation(val globalActionId: Int, val extras: Bundle? = null) : DelayedNavigation
-
-@Parcelize
-object BackDelayedNavigation : DelayedNavigation
 
 class Navigator(
     private val navigationHolder: NavigationHolder,
@@ -247,6 +243,12 @@ class Navigator(
         navController?.navigate(R.id.open_reward_detail, bundle)
     }
 
+    override fun openPoolRewardDetail(reward: OperationParcelizeModel.PoolReward) {
+        val bundle = PoolRewardDetailFragment.getBundle(reward)
+
+        navController?.navigate(R.id.open_pool_reward_detail, bundle)
+    }
+
     override fun openExtrinsicDetail(extrinsic: OperationParcelizeModel.Extrinsic) {
         val bundle = ExtrinsicDetailFragment.getBundle(extrinsic)
 
@@ -304,6 +306,10 @@ class Navigator(
 
     override fun openBuyFlow() {
         navController?.navigate(R.id.action_mainFragment_to_buyFlow)
+    }
+
+    override fun openBuyFlowFromSendFlow() {
+        navController?.navigate(R.id.action_sendFlow_to_buyFlow)
     }
 
     override fun openAddTokenEnterInfo(payload: AddTokenEnterInfoPayload) {

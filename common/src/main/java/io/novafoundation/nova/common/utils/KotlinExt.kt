@@ -12,14 +12,11 @@ import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
+import java.util.Calendar
+import java.util.Collections
 import java.util.Date
 import java.util.UUID
-import java.util.Collections
-import java.util.Calendar
 import java.util.concurrent.TimeUnit
-import kotlin.Comparator
-import kotlin.collections.HashMap
-import kotlin.collections.LinkedHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.sqrt
@@ -32,6 +29,8 @@ fun Double.percentageToFraction() = this / PERCENTAGE_MULTIPLIER.toDouble()
 fun BigDecimal.percentageToFraction() = this.divide(PERCENTAGE_MULTIPLIER, MathContext.DECIMAL64)
 
 infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
+
+fun Double.ceil(): Double = kotlin.math.ceil(this)
 
 inline fun <reified E : Enum<E>> enumValueOfOrNull(raw: String): E? = runCatching { enumValueOf<E>(raw) }.getOrNull()
 
@@ -47,6 +46,37 @@ inline fun <K, V> List<V>.associateByMultiple(keysExtractor: (V) -> Iterable<K>)
     }
 
     return destination
+}
+
+fun ByteArray.startsWith(prefix: ByteArray): Boolean {
+    if (prefix.size > size) return false
+
+    prefix.forEachIndexed { index, byte ->
+        if (get(index) != byte) return false
+    }
+
+    return true
+}
+
+fun ByteArray.windowed(windowSize: Int): List<ByteArray> {
+    require(windowSize > 0) {
+        "Window size should be positive"
+    }
+
+    val result = mutableListOf<ByteArray>()
+
+    var i = 0
+
+    while (i < size) {
+        val copyStart = i
+        val copyEnd = (i + windowSize).coerceAtMost(size)
+
+        result.add(copyOfRange(copyStart, copyEnd))
+
+        i += windowSize
+    }
+
+    return result
 }
 
 /**
@@ -71,12 +101,11 @@ val BigDecimal.isPositive: Boolean
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 
+val BigInteger.isNonPositive: Boolean
+    get() = signum() <= 0
+
 val BigInteger.isZero: Boolean
     get() = signum() == 0
-
-inline fun <T : Comparable<T>, R : Comparable<R>> ClosedRange<T>.map(mapper: (T) -> R): ClosedRange<R> {
-    return mapper(start)..mapper(endInclusive)
-}
 
 fun BigInteger?.orZero(): BigInteger = this ?: BigInteger.ZERO
 fun BigDecimal?.orZero(): BigDecimal = this ?: 0.toBigDecimal()
@@ -88,6 +117,8 @@ fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = M
 }
 
 fun BigInteger.atLeastZero() = coerceAtLeast(BigInteger.ZERO)
+
+fun BigDecimal.atLeastZero() = coerceAtLeast(BigDecimal.ZERO)
 
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
@@ -178,6 +209,12 @@ fun List<Double>.median(): Double = sorted().let {
     (middleLeft + middleRight) / 2
 }
 
+fun Collection<BigInteger>.average(): BigInteger {
+    if (isEmpty()) throw NoSuchFieldException("Collection is empty")
+
+    return sum() / size.toBigInteger()
+}
+
 fun generateLinearSequence(initial: Int, step: Int) = generateSequence(initial) { it + step }
 
 fun <T> Set<T>.toggle(item: T): Set<T> = if (item in this) {
@@ -188,6 +225,15 @@ fun <T> Set<T>.toggle(item: T): Set<T> = if (item in this) {
 
 fun <T> List<T>.cycle(): Sequence<T> {
     if (isEmpty()) return emptySequence()
+
+    var i = 0
+
+    return generateSequence { this[i++ % this.size] }
+}
+
+fun <T> List<T>.cycleMultiple(): Sequence<T> {
+    if (isEmpty()) return emptySequence()
+    if (size == 1) return sequenceOf(single())
 
     var i = 0
 
@@ -208,7 +254,7 @@ inline fun CoroutineScope.invokeOnCompletion(crossinline action: () -> Unit) {
 
 inline fun <T> Iterable<T>.filterToSet(predicate: (T) -> Boolean): Set<T> = filterTo(mutableSetOf(), predicate)
 
-fun String.nullIfEmpty(): String? = if (isEmpty()) null else this
+fun String?.nullIfEmpty(): String? = if (isNullOrEmpty()) null else this
 
 fun String.ensureSuffix(suffix: String) = if (endsWith(suffix)) this else this + suffix
 
@@ -282,6 +328,12 @@ fun <K, V> Map<K, V>.inserted(key: K, value: V): Map<K, V> {
 }
 
 inline fun <T, R> Iterable<T>.mapToSet(mapper: (T) -> R): Set<R> = mapTo(mutableSetOf(), mapper)
+
+inline fun <T, R> Iterable<T>.foldToSet(mapper: (T) -> Iterable<R>): Set<R> = fold(mutableSetOf()) { acc, value ->
+    acc += mapper(value)
+    acc
+}
+
 inline fun <T, R : Any> Iterable<T>.mapNotNullToSet(mapper: (T) -> R?): Set<R> = mapNotNullTo(mutableSetOf(), mapper)
 
 fun <T> List<T>.indexOfFirstOrNull(predicate: (T) -> Boolean) = indexOfFirst(predicate).takeIf { it >= 0 }

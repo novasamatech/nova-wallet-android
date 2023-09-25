@@ -37,7 +37,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="12dp"
             android:src="@drawable/ic_info_24"
-            app:tint="@color/text_secondary" />
+            app:tint="@color/text_tertiary" />
 
     </LinearLayout>
 

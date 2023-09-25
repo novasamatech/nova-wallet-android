@@ -28,7 +28,7 @@ class HintsView @JvmOverloads constructor(
             TextView(context).apply {
                 setTextAppearance(R.style.TextAppearance_NovaFoundation_Regular_Caption1)
 
-                setTextColorRes(R.color.text_secondary)
+                setTextColorRes(R.color.text_tertiary)
                 setDrawableStart(R.drawable.ic_nova, widthInDp = 16, paddingInDp = 8, tint = R.color.icon_secondary)
 
                 text = hint

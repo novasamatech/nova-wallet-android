@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemNftContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="11dp"
+    android:layout_marginBottom="12dp"
+    app:shimmer_auto_start="false"
+    tools:background="@color/block_background">
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/itemNftShimmer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="262dp"
+            android:background="@drawable/bg_shimmering" />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+
+    <LinearLayout
+        android:id="@+id/itemNftContent"
+        android:layout_width="match_parent"
+        android:layout_height="262dp"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/itemNftMedia"
+            android:layout_width="match_parent"
+            android:layout_height="154dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="6dp"
+            android:adjustViewBounds="true"
+            android:maxHeight="154dp"
+            tools:src="@drawable/nft_media_progress" />
+
+        <TextView
+            android:id="@+id/itemNftTitle"
+            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@color/text_primary"
+            tools:text="Honeybird" />
+
+        <io.novafoundation.nova.feature_nft_impl.presentation.nft.common.NftIssuanceView
+            android:id="@+id/itemNftIssuance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="12dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            tools:text="#11 Edition of 9978" />
+
+        <View
+            android:id="@+id/itemNftPriceDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/divider" />
+
+        <LinearLayout
+            android:id="@+id/itemNftPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/itemNftPricePlaceholder"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/nft_price_not_listed"
+                android:textColor="@color/text_tertiary"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/itemNftPriceToken"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                tools:text="5 KSM" />
+
+            <TextView
+                android:id="@+id/itemNftPriceFiat"
+                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="@color/text_tertiary"
+                tools:text="($865.19)" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

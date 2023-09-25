@@ -121,11 +121,14 @@
         <attr name="size" format="enum">
             <enum name="large" value="0" />
             <enum name="small" value="1" />
+            <enum name="extra_small" value="2" />
         </attr>
 
         <attr name="iconSrc" format="reference" />
         <attr name="iconSize" format="dimension" />
         <attr name="iconPadding" format="dimension" />
+
+        <attr name="android:textColor" />
     </declare-styleable>
 
     <declare-styleable name="PlaceholderView">
@@ -219,6 +222,7 @@
     <declare-styleable name="BannerView">
         <attr name="android:src" format="reference" />
         <attr name="bannerBackground" format="reference|color" />
+        <attr name="android:scaleType" />
         <attr name="showClose" />
     </declare-styleable>
 
@@ -249,4 +253,14 @@
         <attr name="layout_cardBorderColor" format="color" />
         <attr name="layout_cardRadius" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="TitledSearchToolbar">
+        <attr name="titleText" />
+        <attr name="android:hint" />
+    </declare-styleable>
+
+    <declare-styleable name="SlideShowView">
+        <attr name="SlideShowView_slideDelayMillis" format="integer" />
+    </declare-styleable>
+
 </resources>

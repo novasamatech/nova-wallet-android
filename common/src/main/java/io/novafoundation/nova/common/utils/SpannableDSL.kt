@@ -4,25 +4,10 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.Spanned
-import android.text.TextPaint
-import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
-import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.resources.ResourceManager
-
-private fun clickableSpan(onClick: () -> Unit) = object : ClickableSpan() {
-    override fun updateDrawState(ds: TextPaint) {
-        ds.isUnderlineText = false
-    }
-
-    override fun onClick(widget: View) {
-        onClick()
-    }
-}
-
-private fun colorSpan(color: Int) = ForegroundColorSpan(color)
 
 class SpannableStyler(val content: String) {
 

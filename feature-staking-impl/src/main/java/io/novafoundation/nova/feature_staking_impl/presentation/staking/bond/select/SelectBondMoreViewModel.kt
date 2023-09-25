@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
-import kotlin.time.ExperimentalTime
 
 class SelectBondMoreViewModel(
     private val router: StakingRouter,
@@ -85,7 +84,6 @@ class SelectBondMoreViewModel(
         router.back()
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun listenFee() {
         amountChooserMixin.backPressuredAmount
             .onEach { loadFee(it) }

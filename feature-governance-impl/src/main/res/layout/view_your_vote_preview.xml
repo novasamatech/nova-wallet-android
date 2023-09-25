@@ -27,7 +27,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginStart="6dp"
         android:includeFontPadding="false"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         tools:text="To pass: 50%" />
 
 </merge>

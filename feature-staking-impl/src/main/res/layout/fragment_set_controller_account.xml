@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/staking_stash_can_hint_v2_2_0"
-                android:textColor="@color/text_secondary" />
+                android:textColor="@color/text_tertiary" />
 
             <io.novafoundation.nova.feature_account_api.view.AccountView
                 android:id="@+id/setControllerStash"
@@ -85,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/staking_controller_can_hint_v2_2_0"
-                android:textColor="@color/text_secondary" />
+                android:textColor="@color/text_tertiary" />
 
             <io.novafoundation.nova.feature_account_api.view.AccountView
                 android:id="@+id/setControllerController"

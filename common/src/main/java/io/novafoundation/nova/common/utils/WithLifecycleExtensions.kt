@@ -8,6 +8,10 @@ interface WithLifecycleExtensions {
     val lifecycleOwner: LifecycleOwner
 
     fun <V> LiveData<Event<V>>.observeEvent(observer: (V) -> Unit) {
-        observe(lifecycleOwner, EventObserver(observer::invoke))
+        observeEvent(lifecycleOwner, observer)
     }
+}
+
+fun <V> LiveData<Event<V>>.observeEvent(lifecycleOwner: LifecycleOwner, observer: (V) -> Unit) {
+    observe(lifecycleOwner, EventObserver(observer))
 }

@@ -28,9 +28,11 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.currentSt
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.SelectedStakeTargetStatusModel
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.Waiting
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.formatStakeTargetRewardsOrNull
+import io.novafoundation.nova.feature_staking_impl.presentation.openStartStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.model.ManageCollatorsAction
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.details.parachain
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.mapCollatorToDetailsParcelModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.StartParachainStakingMode
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -123,7 +125,7 @@ class CurrentCollatorsViewModel(
     override fun changeClicked() {
         launch {
             when (selectManageCollatorsAction.awaitAction()) {
-                ManageCollatorsAction.BOND_MORE -> router.openStartStaking()
+                ManageCollatorsAction.BOND_MORE -> router.openStartStaking(StartParachainStakingMode.BOND_MORE)
                 ManageCollatorsAction.UNBOND -> router.openUnbond()
             }
         }

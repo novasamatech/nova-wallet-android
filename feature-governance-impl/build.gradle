@@ -30,6 +30,7 @@ android {
 
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
     }
 
     compileOptions {
@@ -47,7 +48,7 @@ dependencies {
     implementation project(":common")
     implementation project(":runtime")
 
-    implementation markdownDep
+    implementation markwonDep
 
     implementation materialDep
 

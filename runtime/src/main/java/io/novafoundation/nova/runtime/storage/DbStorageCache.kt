@@ -50,7 +50,7 @@ class DbStorageCache(
         storageDao.removeByPrefixExcept(prefixKey, fullKeyExceptions, chainId)
     }
 
-    override suspend fun observeEntry(key: String, chainId: String): Flow<StorageEntry> {
+    override fun observeEntry(key: String, chainId: String): Flow<StorageEntry> {
         return storageDao.observeEntry(chainId, key)
             .filterNotNull()
             .map { mapStorageEntryFromLocal(it) }

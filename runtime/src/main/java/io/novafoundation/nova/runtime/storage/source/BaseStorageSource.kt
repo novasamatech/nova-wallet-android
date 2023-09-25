@@ -4,6 +4,8 @@ import io.novafoundation.nova.common.data.network.rpc.childStateKey
 import io.novafoundation.nova.common.data.network.runtime.binding.Binder
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.core.updater.SubstrateSubscriptionBuilder
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
+import io.novafoundation.nova.runtime.ethereum.subscribe
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
@@ -14,9 +16,11 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.coroutineContext
 
 abstract class BaseStorageSource(
-    protected val chainRegistry: ChainRegistry
+    protected val chainRegistry: ChainRegistry,
+    private val sharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
 ) : StorageDataSource {
 
     protected abstract suspend fun query(key: String, chainId: String, at: BlockHash?): String?
@@ -112,5 +116,21 @@ abstract class BaseStorageSource(
         val context = createQueryContext(chainId, at, runtime, subscriptionBuilder)
 
         return subscribe(context)
+    }
+
+    override suspend fun <R> subscribeBatched(
+        chainId: String,
+        at: BlockHash?,
+        subscribe: suspend StorageQueryContext.() -> Flow<R>
+    ): Flow<R> {
+        val runtime = chainRegistry.getRuntime(chainId)
+        val sharedSubscription = sharedRequestsBuilderFactory.create(chainId)
+        val context = createQueryContext(chainId, at, runtime, sharedSubscription)
+
+        val result = subscribe(context)
+
+        sharedSubscription.subscribe(coroutineContext)
+
+        return result
     }
 }

@@ -11,6 +11,7 @@ import io.novafoundation.nova.core_db.dao.CoinPriceDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.core_db.dao.CurrencyDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
+import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
 import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.core_db.dao.LockDao
@@ -20,8 +21,8 @@ import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.PhishingSitesDao
-import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingDashboardDao
+import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
@@ -80,4 +81,6 @@ interface DbApi {
     val walletConnectSessionsDao: WalletConnectSessionsDao
 
     val stakingDashboardDao: StakingDashboardDao
+
+    val externalBalanceDao: ExternalBalanceDao
 }

@@ -9,7 +9,5 @@ interface ChainAssetRepository {
 
     suspend fun insertCustomAsset(chainAsset: Chain.Asset)
 
-    suspend fun getAssetSymbol(id: FullChainAssetId): String?
-
     suspend fun getEnabledAssets(): List<Chain.Asset>
 }

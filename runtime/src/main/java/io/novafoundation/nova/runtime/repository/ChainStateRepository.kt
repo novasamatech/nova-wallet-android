@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.optionalNumberConstant
 import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.common.utils.timestampOrNull
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.network.updaters.SampledBlockTime
@@ -46,8 +47,9 @@ class ChainStateRepository(
 
     suspend fun predictedBlockTime(chainId: ChainId): BigInteger {
         val runtime = chainRegistry.getRuntime(chainId)
+        val chain = chainRegistry.getChain(chainId)
 
-        val blockTimeFromConstants = blockTimeFromConstants(runtime)
+        val blockTimeFromConstants = blockTimeFromConstants(chain, runtime)
         val sampledBlockTime = sampledBlockTimeStorage.get(chainId)
 
         return weightedAverageBlockTime(sampledBlockTime, blockTimeFromConstants)
@@ -55,8 +57,9 @@ class ChainStateRepository(
 
     suspend fun predictedBlockTimeFlow(chainId: ChainId): Flow<BigInteger> {
         val runtime = chainRegistry.getRuntime(chainId)
+        val chain = chainRegistry.getChain(chainId)
 
-        val blockTimeFromConstants = blockTimeFromConstants(runtime)
+        val blockTimeFromConstants = blockTimeFromConstants(chain, runtime)
 
         return sampledBlockTimeStorage.observe(chainId).map {
             weightedAverageBlockTime(it, blockTimeFromConstants)
@@ -74,8 +77,9 @@ class ChainStateRepository(
         return (sampledPart + constantsPart) / REQUIRED_SAMPLED_BLOCKS
     }
 
-    private fun blockTimeFromConstants(runtime: RuntimeSnapshot): BigInteger {
-        return runtime.metadata.babeOrNull()?.numberConstant("ExpectedBlockTime", runtime)
+    private fun blockTimeFromConstants(chain: Chain, runtime: RuntimeSnapshot): BigInteger {
+        return chain.additional?.defaultBlockTimeMillis?.toBigInteger()
+            ?: runtime.metadata.babeOrNull()?.numberConstant("ExpectedBlockTime", runtime)
             // Some chains incorrectly use these, i.e. it is set to values such as 0 or even 2
             // Use a low minimum validity threshold to check these against
             ?: runtime.metadata.timestampOrNull()?.numberConstant("MinimumPeriod", runtime)?.takeIf { it > PERIOD_VALIDITY_THRESHOLD }

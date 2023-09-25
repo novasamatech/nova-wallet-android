@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.formatters
 
+import io.novafoundation.nova.common.utils.SemiUnboundedRange
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -8,15 +9,21 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
 
-fun BigInteger.formatPlanks(chainAsset: Chain.Asset): String {
-    return chainAsset.amountFromPlanks(this).formatTokenAmount(chainAsset)
+fun BigInteger.formatPlanks(chainAsset: Chain.Asset, roundingMode: RoundingMode = RoundingMode.FLOOR): String {
+    return chainAsset.amountFromPlanks(this).formatTokenAmount(chainAsset, roundingMode)
 }
 
-fun ClosedRange<Balance>.formatPlanksRange(chainAsset: Chain.Asset): String {
+fun SemiUnboundedRange<Balance>.formatPlanksRange(chainAsset: Chain.Asset): String {
+    val end = endInclusive
     val startFormatted = chainAsset.amountFromPlanks(start).format()
-    val endFormatted = endInclusive.formatPlanks(chainAsset)
 
-    return "$startFormatted — $endFormatted"
+    return if (end != null) {
+        val endFormatted = end.formatPlanks(chainAsset)
+
+        "$startFormatted — $endFormatted"
+    } else {
+        "$startFormatted+".withTokenSymbol(chainAsset.symbol)
+    }
 }
 
 fun BigDecimal.formatTokenAmount(chainAsset: Chain.Asset, roundingMode: RoundingMode = RoundingMode.FLOOR): String {
@@ -24,7 +31,11 @@ fun BigDecimal.formatTokenAmount(chainAsset: Chain.Asset, roundingMode: Rounding
 }
 
 fun BigDecimal.formatTokenAmount(tokenSymbol: String, roundingMode: RoundingMode = RoundingMode.FLOOR): String {
-    return "${format(roundingMode)} $tokenSymbol"
+    return format(roundingMode).withTokenSymbol(tokenSymbol)
+}
+
+fun String.withTokenSymbol(tokenSymbol: String): String {
+    return "$this $tokenSymbol"
 }
 
 fun BigDecimal.formatTokenChange(chainAsset: Chain.Asset, isIncome: Boolean): String {

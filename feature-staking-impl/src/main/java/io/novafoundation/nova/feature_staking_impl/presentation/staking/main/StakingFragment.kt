@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
@@ -16,17 +17,17 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.setupNetworkInfoComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.setupStakeActionsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.setupStakeSummaryComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.startStaking.setupStartStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.setupUnbondingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.setupUserRewardsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.setupYourPoolComponent
 import kotlinx.android.synthetic.main.fragment_staking.stakingAlertsInfo
-import kotlinx.android.synthetic.main.fragment_staking.stakingEstimate
 import kotlinx.android.synthetic.main.fragment_staking.stakingNetworkInfo
 import kotlinx.android.synthetic.main.fragment_staking.stakingStakeManage
 import kotlinx.android.synthetic.main.fragment_staking.stakingStakeSummary
 import kotlinx.android.synthetic.main.fragment_staking.stakingStakeUnbondings
 import kotlinx.android.synthetic.main.fragment_staking.stakingToolbar
 import kotlinx.android.synthetic.main.fragment_staking.stakingUserRewards
+import kotlinx.android.synthetic.main.fragment_staking.stakingYourPool
 import javax.inject.Inject
 
 class StakingFragment : BaseFragment<StakingViewModel>() {
@@ -59,14 +60,15 @@ class StakingFragment : BaseFragment<StakingViewModel>() {
 
     override fun subscribe(viewModel: StakingViewModel) {
         observeValidations(viewModel)
+        setupExternalActions(viewModel)
 
         setupNetworkInfoComponent(viewModel.networkInfoComponent, stakingNetworkInfo)
         setupStakeSummaryComponent(viewModel.stakeSummaryComponent, stakingStakeSummary)
         setupUserRewardsComponent(viewModel.userRewardsComponent, stakingUserRewards, viewModel.router)
         setupUnbondingComponent(viewModel.unbondingComponent, stakingStakeUnbondings)
         setupStakeActionsComponent(viewModel.stakeActionsComponent, stakingStakeManage)
-        setupStartStakingComponent(viewModel.startStakingComponent, stakingEstimate)
         setupAlertsComponent(viewModel.alertsComponent, stakingAlertsInfo)
+        setupYourPoolComponent(viewModel.yourPoolComponent, stakingYourPool)
 
         viewModel.titleFlow.observe(stakingToolbar::setTitle)
     }
