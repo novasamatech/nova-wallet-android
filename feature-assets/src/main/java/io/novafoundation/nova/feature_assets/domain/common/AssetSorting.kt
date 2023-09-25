@@ -38,23 +38,16 @@ class Amount(
 fun groupAndSortAssetsByNetwork(
     assets: List<Asset>,
     externalBalances: Map<FullChainAssetId, Balance>,
-    chainsById: Map<String, Chain>
+    chainsById: Map<String, Chain>,
+    assetGroupComparator: Comparator<AssetGroup> = getAssetGroupBaseComparator(),
+    assetComparator: Comparator<AssetWithOffChainBalance> = getAssetBaseComparator()
 ): Map<AssetGroup, List<AssetWithOffChainBalance>> {
-    val assetGroupComparator = compareByDescending(AssetGroup::groupTotalBalanceFiat)
-        .thenByDescending { it.zeroBalance } // non-zero balances first
-        .then(Chain.defaultComparatorFrom(AssetGroup::chain))
 
     return assets
         .map { asset -> AssetWithOffChainBalance(asset, asset.totalWithOffChain(externalBalances)) }
         .groupBy { chainsById.getValue(it.asset.token.configuration.chainId) }
-        .mapValues { (_, assets) ->
-            assets.sortedWith(
-                compareByDescending<AssetWithOffChainBalance> { it.balanceWithOffchain.total.fiat }
-                    .thenByDescending { it.balanceWithOffchain.total.amount }
-                    .thenByDescending { it.asset.token.configuration.isUtilityAsset } // utility assets first
-                    .thenBy { it.asset.token.configuration.symbol }
-            )
-        }.mapKeys { (chain, assets) ->
+        .mapValues { (_, assets) -> assets.sortedWith(assetComparator) }
+        .mapKeys { (chain, assets) ->
             AssetGroup(
                 chain = chain,
                 groupTotalBalanceFiat = assets.sumByBigDecimal { it.balanceWithOffchain.total.fiat },
@@ -62,6 +55,19 @@ fun groupAndSortAssetsByNetwork(
                 zeroBalance = assets.any { it.balanceWithOffchain.total.amount > BigDecimal.ZERO }
             )
         }.toSortedMap(assetGroupComparator)
+}
+
+fun getAssetBaseComparator(): Comparator<AssetWithOffChainBalance> {
+    return compareByDescending<AssetWithOffChainBalance> { it.balanceWithOffchain.total.fiat }
+        .thenByDescending { it.balanceWithOffchain.total.amount }
+        .thenByDescending { it.asset.token.configuration.isUtilityAsset } // utility assets first
+        .thenBy { it.asset.token.configuration.symbol }
+}
+
+fun getAssetGroupBaseComparator(): Comparator<AssetGroup> {
+    return compareByDescending(AssetGroup::groupTotalBalanceFiat)
+        .thenByDescending { it.zeroBalance } // non-zero balances first
+        .then(Chain.defaultComparatorFrom(AssetGroup::chain))
 }
 
 private fun Asset.totalWithOffChain(externalBalances: Map<FullChainAssetId, Balance>): AssetWithOffChainBalance.Balance {
