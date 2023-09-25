@@ -42,7 +42,6 @@ fun groupAndSortAssetsByNetwork(
     assetGroupComparator: Comparator<AssetGroup> = getAssetGroupBaseComparator(),
     assetComparator: Comparator<AssetWithOffChainBalance> = getAssetBaseComparator()
 ): Map<AssetGroup, List<AssetWithOffChainBalance>> {
-
     return assets
         .map { asset -> AssetWithOffChainBalance(asset, asset.totalWithOffChain(externalBalances)) }
         .groupBy { chainsById.getValue(it.asset.token.configuration.chainId) }
