@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.domain.validation
 
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
+import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDeposit
@@ -41,4 +42,14 @@ class EnoughTotalToStayAboveEDValidationFactory(private val assetSourceRegistry:
             error = error
         )
     }
+}
+
+context(ValidationSystemBuilder<P, E>)
+fun <P, E> EnoughTotalToStayAboveEDValidationFactory.validate(
+    fee: AmountProducer<P>,
+    total: AmountProducer<P>,
+    chainWithAsset: (P) -> ChainWithAsset,
+    error: (P) -> E
+) {
+    validate(create(fee, total, chainWithAsset, error))
 }

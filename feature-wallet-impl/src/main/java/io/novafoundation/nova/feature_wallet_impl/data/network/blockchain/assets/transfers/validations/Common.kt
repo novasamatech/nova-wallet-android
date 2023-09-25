@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.notPhishingAc
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validAddress
+import io.novafoundation.nova.feature_wallet_api.domain.validation.validate
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -48,13 +49,11 @@ fun AssetTransfersValidationSystemBuilder.validAddress() = validAddress(
 fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAboveED(
     enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 ) {
-    validate(
-        enoughTotalToStayAboveEDValidationFactory.create(
-            fee = { it.originFee },
-            total = { it.originCommissionAsset.total },
-            chainWithAsset = { ChainWithAsset(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
-            error = { AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(it.transfer.originChain.commissionAsset) }
-        )
+    enoughTotalToStayAboveEDValidationFactory.validate(
+        fee = { it.originFee },
+        total = { it.originCommissionAsset.total },
+        chainWithAsset = { ChainWithAsset(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
+        error = { AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(it.transfer.originChain.commissionAsset) }
     )
 }
 

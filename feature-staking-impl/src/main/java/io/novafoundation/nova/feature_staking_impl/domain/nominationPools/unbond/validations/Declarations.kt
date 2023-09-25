@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
+import io.novafoundation.nova.feature_wallet_api.domain.validation.validate
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 
@@ -66,12 +67,10 @@ private fun NominationPoolsUnbondValidationSystemBuilder.positiveUnbond() {
 private fun NominationPoolsUnbondValidationSystemBuilder.sufficientCommissionBalanceToStayAboveED(
     enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 ) {
-    validate(
-        enoughTotalToStayAboveEDValidationFactory.create(
-            fee = { it.fee },
-            total = { it.asset.total },
-            chainWithAsset = { ChainWithAsset(it.chain, it.chain.utilityAsset) },
-            error = { NominationPoolsUnbondValidationFailure.ToStayAboveED(it.chain.utilityAsset) }
-        )
+    enoughTotalToStayAboveEDValidationFactory.validate(
+        fee = { it.fee },
+        total = { it.asset.total },
+        chainWithAsset = { ChainWithAsset(it.chain, it.chain.utilityAsset) },
+        error = { NominationPoolsUnbondValidationFailure.ToStayAboveED(it.chain.utilityAsset) }
     )
 }
