@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.claimRewards.NominationPoolsClaimRewardsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
 @Module(includes = [ViewModelModule::class])
@@ -47,8 +48,10 @@ class NominationPoolsClaimRewardsModule {
 
     @Provides
     @ScreenScope
-    fun provideValidationSystem(): NominationPoolsClaimRewardsValidationSystem {
-        return ValidationSystem.nominationPoolsClaimRewards()
+    fun provideValidationSystem(
+        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
+    ): NominationPoolsClaimRewardsValidationSystem {
+        return ValidationSystem.nominationPoolsClaimRewards(enoughTotalToStayAboveEDValidationFactory)
     }
 
     @Provides

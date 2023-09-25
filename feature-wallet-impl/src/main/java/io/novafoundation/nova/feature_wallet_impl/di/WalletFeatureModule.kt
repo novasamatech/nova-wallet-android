@@ -62,6 +62,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletC
 import io.novafoundation.nova.feature_wallet_impl.data.repository.TokenRepositoryImpl
 import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.source.CoingeckoCoinPriceDataSource
@@ -236,12 +237,14 @@ class WalletFeatureModule {
         assetSourceRegistry: AssetSourceRegistry,
         phishingValidationFactory: PhishingValidationFactory,
         palletXcmRepository: PalletXcmRepository,
+        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
     ): CrossChainTransactor = RealCrossChainTransactor(
         weigher = weigher,
         extrinsicService = extrinsicService,
         assetSourceRegistry = assetSourceRegistry,
         phishingValidationFactory = phishingValidationFactory,
-        palletXcmRepository = palletXcmRepository
+        palletXcmRepository = palletXcmRepository,
+        enoughTotalToStayAboveEDValidationFactory = enoughTotalToStayAboveEDValidationFactory
     )
 
     @Provides
@@ -279,4 +282,14 @@ class WalletFeatureModule {
         walletRepository: WalletRepository,
         chainRegistry: ChainRegistry
     ): ArbitraryAssetUseCase = RealArbitraryAssetUseCase(accountRepository, walletRepository, chainRegistry)
+
+    @Provides
+    @FeatureScope
+    fun provideEnoughTotalToStayAboveEDValidationFactory(
+        assetSourceRegistry: AssetSourceRegistry
+    ): EnoughTotalToStayAboveEDValidationFactory {
+        return EnoughTotalToStayAboveEDValidationFactory(
+            assetSourceRegistry
+        )
+    }
 }
