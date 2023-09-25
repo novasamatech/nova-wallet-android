@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.domain.assets.search
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
+import io.novafoundation.nova.feature_assets.domain.common.getAssetGroupBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByNetwork
 import io.novafoundation.nova.feature_assets.domain.common.searchTokens
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -10,8 +11,10 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.aggregatedBalanceByAsset
+import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import jp.co.soramitsu.fearless_utils.hash.isPositive
 import kotlinx.coroutines.flow.Flow
@@ -39,7 +42,10 @@ class AssetSearchInteractor(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
     ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
-        return searchAssetsInternalFlow(queryFlow, externalBalancesFlow) { asset ->
+        val comparator = compareByDescending(AssetGroup::groupTransferableBalanceFiat)
+            .then(Chain.defaultComparatorFrom(AssetGroup::chain))
+
+        return searchAssetsInternalFlow(queryFlow, externalBalancesFlow, comparator) { asset ->
             val chainAsset = asset.token.configuration
             asset.transferableInPlanks.isPositive() &&
                 assetSourceRegistry.sourceFor(chainAsset)
@@ -51,13 +57,14 @@ class AssetSearchInteractor(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
     ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
-        return searchAssetsInternalFlow(queryFlow, externalBalancesFlow, null)
+        return searchAssetsInternalFlow(queryFlow, externalBalancesFlow, filter = null)
     }
 
     private fun searchAssetsInternalFlow(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
-        filter: (suspend (Asset) -> Boolean)?
+        assetGroupComparator: Comparator<AssetGroup> = getAssetGroupBaseComparator(),
+        filter: (suspend (Asset) -> Boolean)?,
     ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
         var assetsFlow = accountRepository.selectedMetaAccountFlow()
             .flatMapLatest { walletRepository.syncedAssetsFlow(it.id) }
@@ -74,7 +81,7 @@ class AssetSearchInteractor(
             val chainsById = chainRegistry.chainsById()
             val filtered = assets.filterBy(query, chainsById)
 
-            groupAndSortAssetsByNetwork(filtered, externalBalances, chainsById)
+            groupAndSortAssetsByNetwork(filtered, externalBalances, chainsById, assetGroupComparator)
         }
     }
 
