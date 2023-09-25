@@ -11,8 +11,10 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.aggregatedBalanceByAsset
+import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import jp.co.soramitsu.fearless_utils.hash.isPositive
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +43,7 @@ class AssetSearchInteractor(
         externalBalancesFlow: Flow<List<ExternalBalance>>,
     ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
         val comparator = compareByDescending(AssetGroup::groupTransferableBalanceFiat)
+            .then(Chain.defaultComparatorFrom(AssetGroup::chain))
 
         return searchAssetsInternalFlow(queryFlow, externalBalancesFlow, comparator) { asset ->
             val chainAsset = asset.token.configuration
