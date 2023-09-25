@@ -56,15 +56,19 @@ fun groupAndSortAssetsByNetwork(
         }.toSortedMap(assetGroupComparator)
 }
 
-fun getAssetBaseComparator(): Comparator<AssetWithOffChainBalance> {
-    return compareByDescending<AssetWithOffChainBalance> { it.balanceWithOffchain.total.fiat }
+fun getAssetBaseComparator(
+    comparing: (AssetWithOffChainBalance) -> Comparable<*> = { it.balanceWithOffchain.total.fiat }
+): Comparator<AssetWithOffChainBalance> {
+    return compareByDescending(comparing)
         .thenByDescending { it.balanceWithOffchain.total.amount }
         .thenByDescending { it.asset.token.configuration.isUtilityAsset } // utility assets first
         .thenBy { it.asset.token.configuration.symbol }
 }
 
-fun getAssetGroupBaseComparator(): Comparator<AssetGroup> {
-    return compareByDescending(AssetGroup::groupTotalBalanceFiat)
+fun getAssetGroupBaseComparator(
+    comparing: (AssetGroup) -> Comparable<*> = AssetGroup::groupTotalBalanceFiat
+): Comparator<AssetGroup> {
+    return compareByDescending(comparing)
         .thenByDescending { it.zeroBalance } // non-zero balances first
         .then(Chain.defaultComparatorFrom(AssetGroup::chain))
 }
