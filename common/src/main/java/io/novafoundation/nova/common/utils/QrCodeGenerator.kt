@@ -19,7 +19,7 @@ class QrCodeGenerator(
         // Max binary payload length with ErrorCorrectionLevel.H is 1273 bytes however nginx still fails with this amount
         // With 1000 it works well
         // See https://stackoverflow.com/a/11065449
-        const val MAX_PAYLOAD_LENGTH = 1000
+        const val MAX_PAYLOAD_LENGTH = 512
     }
 
     suspend fun generateQrBitmap(input: String): Bitmap {
