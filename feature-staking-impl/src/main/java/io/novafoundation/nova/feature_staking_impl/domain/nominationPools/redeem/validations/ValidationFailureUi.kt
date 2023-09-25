@@ -13,7 +13,7 @@ fun nominationPoolsRedeemValidationFailure(
     return when (failure) {
         is NotEnoughBalanceToPayFees -> handleNotEnoughFeeError(failure, resourceManager)
         is NominationPoolsRedeemValidationFailure.ToStayAboveED -> handleInsufficientBalanceCommission(
-            failure.asset,
+            failure,
             resourceManager
         )
     }

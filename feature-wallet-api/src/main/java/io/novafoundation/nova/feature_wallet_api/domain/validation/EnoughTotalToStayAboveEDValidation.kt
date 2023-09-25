@@ -7,6 +7,11 @@ import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDeposit
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+
+interface InsufficientTotalToStayAboveEDError {
+    val asset: Chain.Asset
+}
 
 class EnoughTotalToStayAboveEDValidation<P, E>(
     private val assetSourceRegistry: AssetSourceRegistry,

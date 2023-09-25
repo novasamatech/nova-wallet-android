@@ -50,7 +50,7 @@ fun nominationPoolsUnbondValidationFailure(
         }
 
         is NominationPoolsUnbondValidationFailure.ToStayAboveED -> handleInsufficientBalanceCommission(
-            failure.asset,
+            failure,
             resourceManager
         ).asDefault()
     }

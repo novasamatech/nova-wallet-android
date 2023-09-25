@@ -78,7 +78,7 @@ fun CoroutineScope.mapAssetTransferValidationFailureToUI(
         )
 
         is AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED -> handleInsufficientBalanceCommission(
-            reason.commissionAsset,
+            reason,
             resourceManager
         ).asDefault()
 

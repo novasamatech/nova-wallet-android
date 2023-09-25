@@ -18,7 +18,7 @@ fun nominationPoolsClaimRewardsValidationFailure(
             resourceManager.getString(R.string.staking_warning_tiny_payout)
 
         is NominationPoolsClaimRewardsValidationFailure.ToStayAboveED -> handleInsufficientBalanceCommission(
-            failure.asset,
+            failure,
             resourceManager
         )
     }
