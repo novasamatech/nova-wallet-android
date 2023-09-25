@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
-import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.common.utils.xTokensName
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -109,7 +109,7 @@ class RealCrossChainTransactor(
         val lowestMultiAssetVersion = palletXcmRepository.lowestPresentMultiAssetVersion(assetTransfer.originChain.id)
 
         call(
-            moduleName = Modules.X_TOKENS,
+            moduleName = runtime.metadata.xTokensName(),
             callName = "transfer_multiasset",
             arguments = mapOf(
                 "asset" to multiAsset.versioned(lowestMultiAssetVersion).toEncodableInstance(),
