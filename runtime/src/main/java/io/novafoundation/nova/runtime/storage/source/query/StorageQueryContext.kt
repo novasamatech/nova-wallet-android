@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.storage.source.query
 
 import io.novafoundation.nova.common.utils.ComponentHolder
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
@@ -15,14 +16,23 @@ typealias DynamicInstanceBinderWithKey<K, V> = (dynamicInstance: Any?, key: K) -
 
 interface StorageQueryContext {
 
+    val chainId: ChainId
+
     val runtime: RuntimeSnapshot
+
+    fun StorageEntry.createStorageKey(vararg keyArguments: Any?): String
 
     suspend fun StorageEntry.keys(vararg prefixArgs: Any?): List<StorageKeyComponents>
 
-    suspend fun <V> StorageEntry.observe(
+    fun <V> StorageEntry.observe(
         vararg keyArguments: Any?,
         binding: DynamicInstanceBinder<V>
     ): Flow<V>
+
+    fun <V> StorageEntry.observeWithRaw(
+        vararg keyArguments: Any?,
+        binding: DynamicInstanceBinder<V>
+    ): Flow<WithRawValue<V>>
 
     suspend fun <K, V> StorageEntry.observe(
         keysArguments: List<List<Any?>>,

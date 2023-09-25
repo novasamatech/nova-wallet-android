@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats
 
-import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.subquery.SubQueryNodes
 import io.novafoundation.nova.common.utils.asPerbill
 import io.novafoundation.nova.common.utils.atLeastZero
@@ -11,19 +10,16 @@ import io.novafoundation.nova.common.utils.toPercent
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.StakingStatsApi
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.StakingStatsRequest
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.StakingStatsResponse
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.StakingStatsResponse.AccumulatedReward
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.StakingStatsResponse.WithStakingId
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.StakingStatsRewards
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.mapSubQueryIdToStakingType
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.UTILITY_ASSET_ID
-import io.novafoundation.nova.runtime.ext.supportedStakingOptions
-import io.novafoundation.nova.runtime.ext.utilityAsset
-import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapStakingStringToStakingType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-
-typealias StakingAccounts = Map<StakingOptionId, AccountIdKey?>
 
 interface StakingStatsDataSource {
 
@@ -31,7 +27,8 @@ interface StakingStatsDataSource {
 }
 
 class RealStakingStatsDataSource(
-    private val api: StakingStatsApi
+    private val api: StakingStatsApi,
+    private val dashboardApiUrl: String,
 ) : StakingStatsDataSource {
 
     override suspend fun fetchStakingStats(
@@ -40,25 +37,23 @@ class RealStakingStatsDataSource(
     ): MultiChainStakingStats = withContext(Dispatchers.IO) {
         retryUntilDone {
             val request = StakingStatsRequest(stakingAccounts, stakingChains)
-            val response = api.fetchStakingStats(request).data
+            val response = api.fetchStakingStats(request, dashboardApiUrl).data
 
             val earnings = response.stakingApies.associatedById()
             val rewards = response.rewards.associatedById()
             val slashes = response.slashes.associatedById()
-            val activeStakers = response.activeStakers.associatedById()
+            val activeStakers = response.activeStakers.groupedById()
 
-            val keys = stakingChains.flatMap { chain ->
-                chain.utilityAsset.supportedStakingOptions().map { stakingType ->
-                    StakingOptionId(chain.id, UTILITY_ASSET_ID, stakingType)
-                }
-            }
+            request.stakingKeysMapping.mapValues { (originalStakingOptionId, stakingKeys) ->
+                val totalReward = rewards.getPlanks(originalStakingOptionId) - slashes.getPlanks(originalStakingOptionId)
 
-            keys.associateWith { key ->
-                val totalReward = rewards.getPlanks(key) - slashes.getPlanks(key)
+                val stakingStatusAddress = stakingKeys.stakingStatusAddress
+                val stakingOptionActiveStakers = activeStakers[stakingKeys.stakingStatusOptionId].orEmpty()
+                val isStakingActive = stakingStatusAddress != null && stakingStatusAddress in stakingOptionActiveStakers
 
                 ChainStakingStats(
-                    estimatedEarnings = earnings[key]?.maxAPY.orZero().asPerbill().toPercent(),
-                    accountPresentInActiveStakers = key in activeStakers,
+                    estimatedEarnings = earnings[originalStakingOptionId]?.maxAPY.orZero().asPerbill().toPercent(),
+                    accountPresentInActiveStakers = isStakingActive,
                     rewards = totalReward.atLeastZero()
                 )
             }
@@ -74,9 +69,22 @@ class RealStakingStatsDataSource(
             StakingOptionId(
                 chainId = it.networkId.removeHexPrefix(),
                 chainAssetId = UTILITY_ASSET_ID,
-                stakingType = mapStakingStringToStakingType(it.stakingType)
+                stakingType = mapSubQueryIdToStakingType(it.stakingType)
             )
         }
+    }
+
+    private fun SubQueryNodes<StakingStatsResponse.ActiveStaker>.groupedById(): Map<StakingOptionId, List<String>> {
+        return nodes.groupBy(
+            keySelector = {
+                StakingOptionId(
+                    chainId = it.networkId.removeHexPrefix(),
+                    chainAssetId = UTILITY_ASSET_ID,
+                    stakingType = mapSubQueryIdToStakingType(it.stakingType)
+                )
+            },
+            valueTransform = { it.address }
+        )
     }
 
     private fun StakingStatsRewards.associatedById(): Map<StakingOptionId, AccumulatedReward> {
@@ -87,7 +95,7 @@ class RealStakingStatsDataSource(
                 StakingOptionId(
                     chainId = networkId.removeHexPrefix(),
                     chainAssetId = UTILITY_ASSET_ID,
-                    stakingType = mapStakingStringToStakingType(stakingTypeRaw)
+                    stakingType = mapSubQueryIdToStakingType(stakingTypeRaw)
                 )
             },
             valueTransform = { rewardAggregate -> rewardAggregate.sum }

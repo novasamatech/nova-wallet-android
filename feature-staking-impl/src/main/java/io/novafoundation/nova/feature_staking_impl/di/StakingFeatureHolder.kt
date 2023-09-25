@@ -6,8 +6,11 @@ import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
+import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -19,6 +22,9 @@ class StakingFeatureHolder @Inject constructor(
     featureContainer: FeatureContainer,
     private val router: StakingRouter,
     private val parachainStakingRouter: ParachainStakingRouter,
+    private val nominationPoolsRouter: NominationPoolsRouter,
+    private val startMultiStakingRouter: StartMultiStakingRouter,
+    private val stakingDashboardRouter: StakingDashboardRouter,
     private val selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
     private val selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
 ) : FeatureApiHolder(featureContainer) {
@@ -39,6 +45,9 @@ class StakingFeatureHolder @Inject constructor(
                 parachainStaking = parachainStakingRouter,
                 selectCollatorInterScreenCommunicator = selectCollatorInterScreenCommunicator,
                 selectCollatorSettingsInterScreenCommunicator = selectCollatorSettingsInterScreenCommunicator,
+                nominationPoolsRouter = nominationPoolsRouter,
+                startMultiStakingRouter = startMultiStakingRouter,
+                stakingDashboardRouter = stakingDashboardRouter,
                 deps = dependencies
             )
     }

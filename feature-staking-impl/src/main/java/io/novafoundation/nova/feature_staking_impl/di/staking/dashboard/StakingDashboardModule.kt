@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.StakingDashboardDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
@@ -21,6 +22,8 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.Rea
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.RealTotalStakeChainComparatorProvider
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.TotalStakeChainComparatorProvider
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.domain.dashboard.RealStakingDashboardInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -39,12 +42,17 @@ class StakingDashboardModule {
     @Provides
     @FeatureScope
     fun provideStakingStatsApi(apiCreator: NetworkApiCreator): StakingStatsApi {
-        return apiCreator.create(StakingStatsApi::class.java, customBaseUrl = BuildConfig.DASHBOARD_SUBQUERY_URL)
+        return apiCreator.create(StakingStatsApi::class.java)
     }
 
     @Provides
     @FeatureScope
-    fun provideStakingStatsDataSource(api: StakingStatsApi): StakingStatsDataSource = RealStakingStatsDataSource(api)
+    fun provideStakingStatsDataSource(api: StakingStatsApi): StakingStatsDataSource {
+        return RealStakingStatsDataSource(
+            api = api,
+            dashboardApiUrl = BuildConfig.DASHBOARD_SUBQUERY_URL
+        )
+    }
 
     @Provides
     @FeatureScope
@@ -54,8 +62,11 @@ class StakingDashboardModule {
     @FeatureScope
     fun provideStakingDashboardUpdaterFactory(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
-        stakingDashboardCache: StakingDashboardCache
-    ) = StakingDashboardUpdaterFactory(stakingDashboardCache, remoteStorageSource)
+        stakingDashboardCache: StakingDashboardCache,
+        nominationPoolBalanceRepository: NominationPoolStateRepository,
+        poolAccountDerivation: PoolAccountDerivation,
+        storageCache: StorageCache
+    ) = StakingDashboardUpdaterFactory(stakingDashboardCache, remoteStorageSource, nominationPoolBalanceRepository, poolAccountDerivation, storageCache)
 
     @Provides
     @FeatureScope

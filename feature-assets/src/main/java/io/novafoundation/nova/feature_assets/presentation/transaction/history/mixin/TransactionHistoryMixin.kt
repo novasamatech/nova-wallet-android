@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin
 
-import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
@@ -23,7 +22,7 @@ interface TransactionHistoryUi {
 
     val state: Flow<State>
 
-    fun transactionClicked(transactionModel: OperationModel)
+    fun transactionClicked(transactionId: String)
 }
 
 interface TransactionHistoryMixin : TransactionHistoryUi, CoroutineScope {

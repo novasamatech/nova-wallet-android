@@ -12,7 +12,7 @@
     tools:background="@color/secondary_screen_background">
 
     <ImageView
-        android:id="@+id/itemValidatorActionIcon"
+        android:id="@+id/itemStakingTargetActionIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
@@ -25,7 +25,7 @@
         tools:visibility="visible" />
 
     <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/itemValidationCheck"
+        android:id="@+id/itemStakingTargetCheck"
         style="@style/Widget.Nova.Checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,12 +33,12 @@
         android:clickable="false"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/itemValidatorActionIcon"
+        app:layout_constraintStart_toEndOf="@+id/itemStakingTargetActionIcon"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
 
     <ImageView
-        android:id="@+id/itemValidatorIcon"
+        android:id="@+id/itemStakingTargetIcon"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_gravity="center_vertical"
@@ -46,12 +46,12 @@
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/itemValidationCheck"
+        app:layout_constraintStart_toEndOf="@+id/itemStakingTargetCheck"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@color/icon_accent" />
 
     <TextView
-        android:id="@+id/itemValidatorName"
+        android:id="@+id/itemStakingTargetName"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -60,68 +60,68 @@
         android:ellipsize="middle"
         android:singleLine="true"
         android:textColor="@color/text_primary"
-        app:layout_constraintBottom_toTopOf="@+id/itemValidatorSubtitleValue"
+        app:layout_constraintBottom_toTopOf="@+id/itemStakingTargetSubtitleValue"
         app:layout_constraintEnd_toStartOf="@+id/amountBarrier"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/itemValidatorIcon"
+        app:layout_constraintStart_toEndOf="@+id/itemStakingTargetIcon"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="SUPERSYMMETRY" />
 
     <TextView
-        android:id="@+id/itemValidatorSubtitleLabel"
+        android:id="@+id/itemStakingTargetSubtitleLabel"
         style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingEnd="4dp"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/itemValidatorSubtitleValue"
-        app:layout_constraintStart_toStartOf="@+id/itemValidatorName"
-        app:layout_constraintTop_toTopOf="@+id/itemValidatorSubtitleValue"
+        app:layout_constraintBottom_toBottomOf="@+id/itemStakingTargetSubtitleValue"
+        app:layout_constraintStart_toStartOf="@+id/itemStakingTargetName"
+        app:layout_constraintTop_toTopOf="@+id/itemStakingTargetSubtitleValue"
         tools:text="Rewards:" />
 
     <TextView
-        android:id="@+id/itemValidatorSubtitleValue"
+        android:id="@+id/itemStakingTargetSubtitleValue"
         style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/text_primary"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/itemValidatorSubtitleLabel"
-        app:layout_constraintTop_toBottomOf="@+id/itemValidatorName"
+        app:layout_constraintStart_toEndOf="@+id/itemStakingTargetSubtitleLabel"
+        app:layout_constraintTop_toBottomOf="@+id/itemStakingTargetName"
         app:layout_constraintVertical_bias="0.0"
         tools:text="29.75%" />
 
     <TextView
-        android:id="@+id/itemValidatorScoringPrimary"
+        android:id="@+id/itemStakingTargetScoringPrimary"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:textColor="@color/text_primary"
-        app:layout_constraintBottom_toTopOf="@+id/itemValidatorScoringSecondary"
-        app:layout_constraintEnd_toStartOf="@+id/itemValidatorInfo"
+        app:layout_constraintBottom_toTopOf="@+id/itemStakingTargetScoringSecondary"
+        app:layout_constraintEnd_toStartOf="@+id/itemStakingTargetInfo"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="Token" />
 
     <TextView
-        android:id="@+id/itemValidatorScoringSecondary"
+        android:id="@+id/itemStakingTargetScoringSecondary"
         style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|end"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/itemValidatorInfo"
-        app:layout_constraintTop_toBottomOf="@+id/itemValidatorScoringPrimary"
+        app:layout_constraintEnd_toStartOf="@+id/itemStakingTargetInfo"
+        app:layout_constraintTop_toBottomOf="@+id/itemStakingTargetScoringPrimary"
         tools:text="Fiat" />
 
 
     <ImageView
-        android:id="@+id/itemValidatorInfo"
+        android:id="@+id/itemStakingTargetInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
@@ -138,5 +138,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="left"
-        app:constraint_referenced_ids="itemValidatorScoringPrimary,itemValidatorScoringSecondary" />
+        app:constraint_referenced_ids="itemStakingTargetScoringPrimary,itemStakingTargetScoringSecondary" />
 </androidx.constraintlayout.widget.ConstraintLayout>

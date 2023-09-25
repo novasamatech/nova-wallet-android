@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.activeBonded
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.stakeSummary.DelegatorStatus
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.stakeSummary.ParachainStakingStakeSummaryInteractor
@@ -15,7 +16,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryState
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
@@ -28,11 +28,11 @@ class ParachainStakeSummaryComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: ChainWithAsset,
+        stakingOption: StakingOption,
         hostContext: ComponentHostContext,
     ): StakeSummaryComponent = ParachainStakeSummaryComponent(
         resourceManager = resourceManager,
-        assetWithChain = assetWithChain,
+        stakingOption = stakingOption,
         hostContext = hostContext,
         delegatorStateUseCase = delegatorStateUseCase,
         interactor = interactor
@@ -45,13 +45,13 @@ private class ParachainStakeSummaryComponent(
     private val interactor: ParachainStakingStakeSummaryInteractor,
     private val resourceManager: ResourceManager,
 
-    assetWithChain: ChainWithAsset,
+    stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
 ) : BaseStakeSummaryComponent(hostContext.scope) {
 
     override val state: Flow<StakeSummaryState?> = delegatorStateUseCase.loadDelegatingState(
         hostContext = hostContext,
-        assetWithChain = assetWithChain,
+        assetWithChain = stakingOption.assetWithChain,
         stateProducer = ::delegatorSummaryStateFlow
     )
         .shareInBackground()

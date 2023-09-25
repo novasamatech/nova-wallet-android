@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.PlaceholderModel
 import kotlinx.android.synthetic.main.item_placeholder.view.itemPlaceholder
 
-class EditablePlaceholderAdapter() : PlaceholderAdapter<EditableStubHolder>() {
+class EditablePlaceholderAdapter() : SingleItemAdapter<EditableStubHolder>() {
 
     private var model: PlaceholderModel? = null
 

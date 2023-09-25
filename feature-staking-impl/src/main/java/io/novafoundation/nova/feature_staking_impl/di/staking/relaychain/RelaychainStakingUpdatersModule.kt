@@ -5,7 +5,6 @@ import dagger.Provides
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
-import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -24,13 +23,22 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.MinBondUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ParachainsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLedgerUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ValidatorExposureUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.controller.AccountControllerBalanceUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.historical.HistoricalTotalValidatorRewardUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.historical.HistoricalUpdateMediator
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.historical.HistoricalValidatorRewardPointsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.scope.AccountStakingScope
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.scope.ActiveEraScope
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentEpochIndexUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentSessionIndexUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentSlotUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.EraStartSessionIndexUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.GenesisSlotUpdater
+import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.ElectionsSessionRegistry
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -47,6 +55,16 @@ class RelaychainStakingUpdatersModule {
         accountRepository,
         accountStakingDao,
         sharedState
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideActiveEraScope(
+        stakingSharedComputation: StakingSharedComputation,
+        stakingSharedState: StakingSharedState
+    ) = ActiveEraScope(
+        stakingSharedComputation = stakingSharedComputation,
+        stakingSharedState = stakingSharedState
     )
 
     @Provides
@@ -171,6 +189,7 @@ class RelaychainStakingUpdatersModule {
         @DefaultBulkRetriever bulkRetriever: BulkRetriever,
         stakingRepository: StakingRepository,
         storageCache: StorageCache,
+        activeEraScope: ActiveEraScope,
     ) = HistoricalUpdateMediator(
         historicalUpdaters = listOf(
             HistoricalTotalValidatorRewardUpdater(),
@@ -180,6 +199,75 @@ class RelaychainStakingUpdatersModule {
         chainRegistry = chainRegistry,
         bulkRetriever = bulkRetriever,
         stakingRepository = stakingRepository,
+        storageCache = storageCache,
+        scope = activeEraScope
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideEraStartSessionIndexUpdater(
+        sharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+        storageCache: StorageCache,
+        activeEraScope: ActiveEraScope,
+    ) = EraStartSessionIndexUpdater(
+        activeEraScope = activeEraScope,
+        storageCache = storageCache,
+        stakingSharedState = sharedState,
+        chainRegistry = chainRegistry
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideCurrentSessionIndexUpdater(
+        sharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+        storageCache: StorageCache,
+    ) = CurrentSessionIndexUpdater(
+        sharedState,
+        chainRegistry,
+        storageCache
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideCurrentSlotUpdater(
+        sharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+        storageCache: StorageCache,
+        electionsSessionRegistry: ElectionsSessionRegistry,
+    ) = CurrentSlotUpdater(
+        electionsSessionRegistry = electionsSessionRegistry,
+        stakingSharedState = sharedState,
+        chainRegistry = chainRegistry,
+        storageCache = storageCache
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideGenesisSlotUpdater(
+        sharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+        storageCache: StorageCache,
+        electionsSessionRegistry: ElectionsSessionRegistry,
+    ) = GenesisSlotUpdater(
+        electionsSessionRegistry = electionsSessionRegistry,
+        stakingSharedState = sharedState,
+        chainRegistry = chainRegistry,
+        storageCache = storageCache
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideCurrentEpochIndexUpdater(
+        sharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+        storageCache: StorageCache,
+        electionsSessionRegistry: ElectionsSessionRegistry,
+    ) = CurrentEpochIndexUpdater(
+        electionsSessionRegistry = electionsSessionRegistry,
+        stakingSharedState = sharedState,
+        chainRegistry = chainRegistry,
         storageCache = storageCache
     )
 
@@ -290,8 +378,13 @@ class RelaychainStakingUpdatersModule {
         counterForNominatorsUpdater: CounterForNominatorsUpdater,
         bagListNodeUpdater: BagListNodeUpdater,
         counterForListNodesUpdater: CounterForListNodesUpdater,
-        parachainsUpdater: ParachainsUpdater
-    ): List<Updater> = listOf(
+        parachainsUpdater: ParachainsUpdater,
+        currentEpochIndexUpdater: CurrentEpochIndexUpdater,
+        currentSlotUpdater: CurrentSlotUpdater,
+        genesisSlotUpdater: GenesisSlotUpdater,
+        currentSessionIndexUpdater: CurrentSessionIndexUpdater,
+        eraStartSessionIndexUpdater: EraStartSessionIndexUpdater,
+    ) = StakingUpdaters.Group(
         activeEraUpdater,
         validatorExposureUpdater,
         currentEraUpdater,
@@ -307,6 +400,11 @@ class RelaychainStakingUpdatersModule {
         counterForNominatorsUpdater,
         bagListNodeUpdater,
         counterForListNodesUpdater,
-        parachainsUpdater
+        parachainsUpdater,
+        currentEpochIndexUpdater,
+        currentSlotUpdater,
+        genesisSlotUpdater,
+        currentSessionIndexUpdater,
+        eraStartSessionIndexUpdater
     )
 }

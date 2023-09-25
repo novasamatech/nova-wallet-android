@@ -10,7 +10,7 @@
     android:layout_marginBottom="4dp"
     android:ellipsize="end"
     android:lines="1"
-    android:textColor="@color/text_secondary"
+    android:textColor="@color/text_tertiary"
     tools:background="@color/secondary_screen_background"
     tools:text="Cryptocurrencies" />
 

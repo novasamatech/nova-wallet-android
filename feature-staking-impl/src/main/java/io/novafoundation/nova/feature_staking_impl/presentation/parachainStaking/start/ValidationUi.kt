@@ -10,6 +10,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationFailure.NotPositiveAmount
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationFailure.PendingRevoke
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationFailure.TooLowStake
+import io.novafoundation.nova.feature_wallet_api.domain.validation.amountIsTooBig
+import io.novafoundation.nova.feature_wallet_api.domain.validation.zeroAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 
 fun startParachainStakingValidationFailure(
@@ -21,10 +23,9 @@ fun startParachainStakingValidationFailure(
             resourceManager.getString(R.string.common_not_enough_funds_title) to
                 resourceManager.getString(R.string.common_not_enough_funds_message)
         }
-        NotEnoughStakeableBalance -> {
-            resourceManager.getString(R.string.common_not_enough_funds_title) to
-                resourceManager.getString(R.string.choose_amount_error_too_big)
-        }
+
+        NotEnoughStakeableBalance -> resourceManager.amountIsTooBig()
+
         is TooLowStake -> {
             val formattedMinStake = mapAmountToAmountModel(failure.minimumStake, failure.asset).token
 
@@ -45,10 +46,8 @@ fun startParachainStakingValidationFailure(
                 }
             }
         }
-        NotPositiveAmount -> {
-            resourceManager.getString(R.string.common_amount_low) to
-                resourceManager.getString(R.string.common_zero_amount_error)
-        }
+        NotPositiveAmount -> resourceManager.zeroAmount()
+
         CollatorIsNotActive -> {
             resourceManager.getString(R.string.parachain_staking_cannot_stake_with_collator) to
                 resourceManager.getString(R.string.parachain_staking_not_active_collator_message)

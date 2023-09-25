@@ -1,0 +1,82 @@
+package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.nominationPools
+
+import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.main.unbondings.NominationPoolUnbondingsInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.nominationPools.loadPoolMemberState
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingAction
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingEvent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingState
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.from
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
+
+class NominationPoolsUnbondingComponentFactory(
+    private val nominationPoolSharedComputation: NominationPoolSharedComputation,
+    private val interactor: NominationPoolUnbondingsInteractor,
+    private val router: NominationPoolsRouter,
+) {
+
+    fun create(
+        stakingOption: StakingOption,
+        hostContext: ComponentHostContext,
+    ): UnbondingComponent = NominationPoolsUnbondingComponent(
+        nominationPoolSharedComputation = nominationPoolSharedComputation,
+        interactor = interactor,
+        hostContext = hostContext,
+        stakingOption = stakingOption,
+        router = router
+    )
+}
+
+private class NominationPoolsUnbondingComponent(
+    private val router: NominationPoolsRouter,
+    private val nominationPoolSharedComputation: NominationPoolSharedComputation,
+    private val interactor: NominationPoolUnbondingsInteractor,
+
+    private val stakingOption: StakingOption,
+    private val hostContext: ComponentHostContext,
+) : UnbondingComponent,
+    CoroutineScope by hostContext.scope,
+    WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
+
+    override val events = MutableLiveData<Event<UnbondingEvent>>()
+
+    override val state = nominationPoolSharedComputation.loadPoolMemberState(
+        hostContext = hostContext,
+        chain = stakingOption.assetWithChain.chain,
+        stateProducer = ::loadUnbondings
+    )
+        .shareInBackground()
+
+    override fun onAction(action: UnbondingAction) {
+        launch {
+            when (action) {
+                UnbondingAction.RebondClicked -> {} // rebond is not supported in nomination pools
+                UnbondingAction.RedeemClicked -> redeemClicked()
+            }
+        }
+    }
+
+    private fun loadUnbondings(poolMember: PoolMember): Flow<UnbondingState> {
+        return combine(
+            interactor.unbondingsFlow(poolMember, stakingOption, hostContext.scope),
+            hostContext.assetFlow,
+        ) { unbondings, asset ->
+            UnbondingState.from(unbondings, asset)
+        }
+    }
+
+    fun redeemClicked() {
+        router.openRedeem()
+    }
+}

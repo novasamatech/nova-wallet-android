@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.mappers
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.address.createAddressModel
+import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
@@ -17,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settin
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.TotalStakeSorting
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.sortings.ValidatorOwnStakeSorting
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.ValidatorAlert
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.model.ValidatorDetailsModel
@@ -61,7 +62,7 @@ suspend fun mapValidatorToValidatorModel(
     token: Token,
     isChecked: Boolean? = null,
     sorting: RecommendationSorting = APYSorting,
-): ValidatorModel {
+): ValidatorStakeTargetModel {
     val address = chain.addressOf(validator.accountIdHex.fromHex())
     val addressModel = createIcon(address)
 
@@ -76,7 +77,7 @@ suspend fun mapValidatorToValidatorModel(
             else -> throw NotImplementedError("Unsupported sorting: $sorting")
         }
 
-        ValidatorModel(
+        ValidatorStakeTargetModel(
             accountIdHex = accountIdHex,
             slashed = slashed,
             addressModel = addressModel,
@@ -91,7 +92,7 @@ suspend fun mapValidatorToValidatorModel(
 fun rewardsToScoring(rewardsGain: BigDecimal?) = rewardsToColoredText(rewardsGain)?.let(StakeTargetModel.Scoring::OneField)
 
 fun rewardsToColoredText(rewardsGain: BigDecimal?) = formatStakeTargetRewardsOrNull(rewardsGain)?.let {
-    StakeTargetModel.ColoredText(it, R.color.text_positive)
+    ColoredText(it, R.color.text_positive)
 }
 
 fun stakeToScoring(stakeInPlanks: BigInteger?, token: Token): StakeTargetModel.Scoring.TwoFields? {

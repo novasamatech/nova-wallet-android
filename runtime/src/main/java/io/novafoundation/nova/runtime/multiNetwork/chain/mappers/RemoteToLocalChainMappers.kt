@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain.mappers
 
 import com.google.gson.Gson
+import io.novafoundation.nova.common.utils.asGsonParsedLongOrNull
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
@@ -20,6 +21,9 @@ private const val TESTNET_OPTION = "testnet"
 private const val NO_SUBSTRATE_RUNTIME = "noSubstrateRuntime"
 
 private const val CHAIN_ADDITIONAL_TIP = "defaultTip"
+private const val CHAIN_THEME_COLOR = "themeColor"
+private const val CHAIN_STAKING_WIKI = "stakingWiki"
+private const val DEFAULT_BLOCK_TIME = "defaultBlockTime"
 
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
@@ -34,7 +38,10 @@ fun mapRemoteChainToLocal(
 
     val additional = chainRemote.additional?.let {
         Chain.Additional(
-            defaultTip = (it[CHAIN_ADDITIONAL_TIP] as? String)?.toBigInteger()
+            defaultTip = (it[CHAIN_ADDITIONAL_TIP] as? String)?.toBigInteger(),
+            themeColor = (it[CHAIN_THEME_COLOR] as? String),
+            stakingWiki = (it[CHAIN_STAKING_WIKI] as? String),
+            defaultBlockTimeMillis = it[DEFAULT_BLOCK_TIME].asGsonParsedLongOrNull()
         )
     }
 
@@ -169,6 +176,7 @@ fun mapStakingStringToStakingType(stakingString: String?): Chain.Asset.StakingTy
         null -> Chain.Asset.StakingType.UNSUPPORTED
         "relaychain" -> Chain.Asset.StakingType.RELAYCHAIN
         "parachain" -> Chain.Asset.StakingType.PARACHAIN
+        "nomination-pools" -> Chain.Asset.StakingType.NOMINATION_POOLS
         "aura-relaychain" -> Chain.Asset.StakingType.RELAYCHAIN_AURA
         "turing" -> Chain.Asset.StakingType.TURING
         "aleph-zero" -> Chain.Asset.StakingType.ALEPH_ZERO
@@ -184,6 +192,7 @@ fun mapStakingTypeToStakingString(stakingType: Chain.Asset.StakingType): String?
         Chain.Asset.StakingType.RELAYCHAIN_AURA -> "aura-relaychain"
         Chain.Asset.StakingType.TURING -> "turing"
         Chain.Asset.StakingType.ALEPH_ZERO -> "aleph-zero"
+        Chain.Asset.StakingType.NOMINATION_POOLS -> "nomination-pools"
     }
 }
 

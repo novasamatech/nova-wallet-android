@@ -17,9 +17,11 @@ import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingStory
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.erasStartSessionIndex
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.ledger
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.staking
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindActiveEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindCurrentEra
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindErasStartSessionIndex
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindExposure
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindHistoryDepth
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindMaxNominators
@@ -29,7 +31,6 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindin
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindRewardDestination
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSlashDeferDuration
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSlashingSpans
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedger
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindValidatorPrefs
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.activeEraStorageKey
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
@@ -40,7 +41,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.observeNonNull
-import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
+import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
+import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
@@ -48,14 +50,12 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageOrNull
-import jp.co.soramitsu.fearless_utils.ss58.SS58Encoder.toAccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
 
@@ -69,12 +69,9 @@ class StakingRepositoryImpl(
 ) : StakingRepository {
 
     override suspend fun eraStartSessionIndex(chainId: ChainId, currentEra: BigInteger): EraIndex {
-        val runtime = runtimeFor(chainId)
-        return remoteStorage.queryNonNull( // Index of session from with the era started
-            keyBuilder = { it.metadata.staking().storage("ErasStartSessionIndex").storageKey(runtime, currentEra) },
-            binding = ::bindErasStartSessionIndex,
-            chainId = chainId
-        )
+        return localStorage.query(chainId) {
+            metadata.staking.erasStartSessionIndex.queryNonNull(currentEra)
+        }
     }
 
     override suspend fun eraLength(chainId: ChainId): BigInteger {
@@ -112,10 +109,6 @@ class StakingRepositoryImpl(
         binding = { scale, runtime -> bindActiveEra(scale, runtime) }
     )
 
-    override fun electedExposuresInActiveEra(chainId: ChainId) = observeActiveEraIndex(chainId).mapLatest { activeEraIndex ->
-        getElectedValidatorsExposure(chainId, activeEraIndex) to activeEraIndex
-    }
-
     override suspend fun getElectedValidatorsExposure(chainId: ChainId, eraIndex: EraIndex) = localStorage.query(chainId) {
         runtime.metadata.staking().storage("ErasStakers").entries(
             eraIndex,
@@ -126,18 +119,18 @@ class StakingRepositoryImpl(
 
     override suspend fun getValidatorPrefs(
         chainId: ChainId,
-        accountIdsHex: List<String>,
+        accountIdsHex: Collection<String>,
     ): AccountIdMap<ValidatorPrefs?> {
         return remoteStorage.query(chainId) {
             runtime.metadata.staking().storage("Validators").entries(
-                keysArguments = accountIdsHex.map(String::fromHex).wrapSingleArgumentKeys(),
+                keysArguments = accountIdsHex.map { listOf(it.fromHex()) },
                 keyExtractor = { (accountId: AccountId) -> accountId.toHexString() },
                 binding = { decoded, _ -> decoded?.let { bindValidatorPrefs(decoded) } }
             )
         }
     }
 
-    override suspend fun getSlashes(chainId: ChainId, accountIdsHex: List<String>): AccountIdMap<Boolean> = withContext(Dispatchers.Default) {
+    override suspend fun getSlashes(chainId: ChainId, accountIdsHex: Collection<String>): AccountIdMap<Boolean> = withContext(Dispatchers.Default) {
         remoteStorage.query(chainId) {
             val activeEraIndex = getActiveEraIndex(chainId)
 
@@ -145,7 +138,7 @@ class StakingRepositoryImpl(
             val slashDeferDuration = bindSlashDeferDuration(slashDeferDurationConstant, runtime)
 
             runtime.metadata.staking().storage("SlashingSpans").entries(
-                keysArguments = accountIdsHex.map(String::fromHex).wrapSingleArgumentKeys(),
+                keysArguments = accountIdsHex.map { listOf(it.fromHex()) },
                 keyExtractor = { (accountId: AccountId) -> accountId.toHexString() },
                 binding = { decoded, _ ->
                     val span = decoded?.let { bindSlashingSpans(it) }
@@ -232,18 +225,14 @@ class StakingRepositoryImpl(
     }
 
     override suspend fun ledgerFlow(stakingState: StakingState.Stash): Flow<StakingLedger> {
-        return localStorage.observe(
-            keyBuilder = { it.metadata.staking().storage("Ledger").storageKey(it, stakingState.controllerId) },
-            binder = { scale, runtime -> scale?.let { bindStakingLedger(it, runtime) } },
-            chainId = stakingState.chain.id
-        ).filterNotNull()
+        return localStorage.query(stakingState.chain.id) {
+            metadata.staking.ledger.observe(stakingState.controllerId)
+        }.filterNotNull()
     }
 
-    override suspend fun ledger(chainId: ChainId, address: String) = remoteStorage.query(
-        keyBuilder = { it.metadata.staking().storage("Ledger").storageKey(it, address.toAccountId()) },
-        binding = { scale, runtime -> scale?.let { bindStakingLedger(it, runtime) } },
-        chainId = chainId
-    )
+    override suspend fun ledger(chainId: ChainId, accountId: AccountId): StakingLedger? = remoteStorage.query(chainId) {
+        metadata.staking.ledger.query(accountId)
+    }
 
     private fun observeStashState(
         chain: Chain,

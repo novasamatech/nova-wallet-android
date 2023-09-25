@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.ParachainStakingUnbondPreliminaryValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.ParachainStakingUnbondPreliminaryValidationSystem
@@ -18,6 +19,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTE
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_VALIDATORS
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.validation.unbondPreliminaryValidationFailure
+import io.novafoundation.nova.feature_staking_impl.presentation.openStartStaking
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.StartParachainStakingMode
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.parachainStaking.loadDelegatingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.ManageStakeAction
@@ -27,7 +30,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.bondMore
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.unbond
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -42,12 +44,12 @@ class ParachainStakeActionsComponentFactory(
 ) {
 
     fun create(
-        assetWithChain: ChainWithAsset,
+        stakingOption: StakingOption,
         hostContext: ComponentHostContext
     ): StakeActionsComponent = ParachainStakeActionsComponent(
         delegatorStateUseCase = delegatorStateUseCase,
         resourceManager = resourceManager,
-        assetWithChain = assetWithChain,
+        stakingOption = stakingOption,
         hostContext = hostContext,
         router = router,
         validationExecutor = validationExecutor,
@@ -60,7 +62,7 @@ internal open class ParachainStakeActionsComponent(
     private val resourceManager: ResourceManager,
     private val router: ParachainStakingRouter,
 
-    private val assetWithChain: ChainWithAsset,
+    private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
 
     private val unbondValidationSystem: ParachainStakingUnbondPreliminaryValidationSystem,
@@ -73,7 +75,7 @@ internal open class ParachainStakeActionsComponent(
 
     override val state = delegatorStateUseCase.loadDelegatingState(
         hostContext = hostContext,
-        assetWithChain = assetWithChain,
+        assetWithChain = stakingOption.assetWithChain,
         stateProducer = ::stateFor
     )
         .map { it?.dataOrNull } // we don't need loading state in this component
@@ -90,7 +92,7 @@ internal open class ParachainStakeActionsComponent(
     private fun navigateToAction(action: ManageStakeAction) {
         when (action.id) {
             SYSTEM_MANAGE_VALIDATORS -> router.openCurrentCollators()
-            SYSTEM_MANAGE_STAKING_BOND_MORE -> router.openStartStaking()
+            SYSTEM_MANAGE_STAKING_BOND_MORE -> router.openStartStaking(StartParachainStakingMode.BOND_MORE)
             SYSTEM_MANAGE_STAKING_UNBOND -> openUnbondIfValid()
         }
     }
@@ -117,6 +119,7 @@ internal open class ParachainStakeActionsComponent(
             payload = ParachainStakingUnbondPreliminaryValidationPayload,
             errorDisplayer = hostContext.errorDisplayer,
             validationFailureTransformerDefault = { unbondPreliminaryValidationFailure(it, resourceManager) },
+            scope = hostContext.scope
         ) {
             router.openUnbond()
         }

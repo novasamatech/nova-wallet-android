@@ -51,6 +51,10 @@ inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = 
     list.map { item -> mapper(item) }
 }
 
+inline fun <T, R> Flow<Result<T>>.mapResult(crossinline mapper: suspend (T) -> R) = map { result ->
+    result.map { item -> mapper(item) }
+}
+
 inline fun <T, R> Flow<List<T>>.mapListNotNull(crossinline mapper: suspend (T) -> R?) = map { list ->
     list.mapNotNull { item -> mapper(item) }
 }
@@ -62,6 +66,10 @@ inline fun <T, R> Flow<List<T>>.mapListNotNull(crossinline mapper: suspend (T) -
 fun <T> Flow<T>.withLoading(): Flow<LoadingState<T>> {
     return map<T, LoadingState<T>> { LoadingState.Loaded(it) }
         .onStart { emit(LoadingState.Loading()) }
+}
+
+fun <T> MutableStateFlow<T>.setter(): (T) -> Unit {
+    return { value = it }
 }
 
 fun <T> Flow<T>.withItemScope(parentScope: CoroutineScope): Flow<Pair<T, CoroutineScope>> {
@@ -97,6 +105,14 @@ fun <T> List<Flow<T>>.mergeIfMultiple(): Flow<T> = when (size) {
     0 -> emptyFlow()
     1 -> first()
     else -> merge()
+}
+
+inline fun <T> withFlowScope(crossinline block: suspend (scope: CoroutineScope) -> Flow<T>): Flow<T> {
+    return flowOfAll {
+        val flowScope = CoroutineScope(coroutineContext)
+
+        block(flowScope)
+    }
 }
 
 fun <T1, T2> combineToPair(flow1: Flow<T1>, flow2: Flow<T2>): Flow<Pair<T1, T2>> = combine(flow1, flow2, ::Pair)

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.repository
 
+import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -20,11 +21,17 @@ class RealBalanceLocksRepository(
 
     override suspend fun observeBalanceLocks(chain: Chain, chainAsset: Chain.Asset): Flow<List<BalanceLock>> {
         val metaAccount = accountRepository.getSelectedMetaAccount()
-        return lockDao.observeBalanceLocks(metaAccount.id, chain.id, chainAsset.id).map { list ->
-            list.map { mapBalanceLockFromLocal(chainAsset, it) }
-        }
+        return lockDao.observeBalanceLocks(metaAccount.id, chain.id, chainAsset.id)
+            .mapList { lock -> mapBalanceLockFromLocal(chainAsset, lock) }
     }
 
+    override suspend fun getBiggestLock(chain: Chain, chainAsset: Chain.Asset): BalanceLock? {
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+
+        return lockDao.getBiggestBalanceLock(metaAccount.id, chain.id, chainAsset.id)?.let {
+            mapBalanceLockFromLocal(chainAsset, it)
+        }
+    }
     override suspend fun observeBalanceLock(chainAsset: Chain.Asset, lockId: String): Flow<BalanceLock?> {
         val metaAccount = accountRepository.getSelectedMetaAccount()
 

@@ -30,7 +30,7 @@
             android:layout_gravity="start"
             android:text="@string/account_info_title"
             android:textAllCaps="true"
-            android:textColor="@color/text_secondary" />
+            android:textColor="@color/text_tertiary" />
 
         <TextView
             style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
@@ -40,7 +40,7 @@
             android:layout_marginStart="16dp"
             android:text="@string/staking_recommended_validators_apy"
             android:textAllCaps="true"
-            android:textColor="@color/text_secondary" />
+            android:textColor="@color/text_tertiary" />
     </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView

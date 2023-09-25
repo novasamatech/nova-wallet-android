@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -23,12 +25,20 @@ import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startPara
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingCollator
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingContainer
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingFee
+import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingHints
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingMinStake
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingNext
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingRewards
 import kotlinx.android.synthetic.main.fragment_parachain_staking_start.startParachainStakingToolbar
 
 class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewModel>() {
+
+    companion object {
+
+        private const val PAYLOAD = "StartParachainStakingFragment.Payload"
+
+        fun getBundle(payload: StartParachainStakingPayload) = bundleOf(PAYLOAD to payload)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,7 +66,7 @@ class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewMode
             StakingFeatureApi::class.java
         )
             .startParachainStakingFactory()
-            .create(this)
+            .create(this, argument(PAYLOAD))
             .inject(this)
     }
 
@@ -66,6 +76,7 @@ class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewMode
         setupAmountChooser(viewModel.amountChooserMixin, startParachainStakingAmountField)
         setupParachainStakingRewardsComponent(viewModel.rewardsComponent, startParachainStakingRewards)
         setupFeeLoading(viewModel, startParachainStakingFee)
+        observeHints(viewModel.hintsMixin, startParachainStakingHints)
 
         viewModel.title.observe(startParachainStakingToolbar::setTitle)
 

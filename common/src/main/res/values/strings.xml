@@ -1,5 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="assets_send_flow_placeholder_button">Buy tokens</string>
+    <string name="assets_send_flow_placeholder">You don’t have tokens to send.\nBuy or Deposit tokens to your account.</string>
+    <string name="common_days_and_hours_format_with_delimeter">%s and %s</string>
+    <string name="common_frequency_days_daily">daily</string>
+
+    <string name="referendum_status_deciding">Deciding</string>
+    <string name="referendum_timeline_state_deciding">Voting: Deciding</string>
+
+    <string name="start_staking_fragment_min_stake_condition_no_min_stake">Stake anytime. Your stake will actively earn rewards %s</string>
+
+
+    <string name="pool_full_failure_title">Pool is full</string>
+    <string name="pool_full_failure_message">You cannot join pool since it reached maximum number of members</string>
+
+    <string name="pool_inactive_failure_title">Pool is not open</string>
+    <string name="pool_inactive_failure_message">You cannot join pool that is not open. Please, contact the pool owner.</string>
+
+    <string name="common_close_confirmation_message">Are you sure you want to close this screen?\nYour changes will not be applied.</string>
+
+    <string name="common_search_placeholder_default">Search result will be displayed here</string>
+
+    <string name="search_pool_no_pools_found_placeholder">No pool with entered name or pool ID were found. Make sure you entered correct data</string>
+
+    <string name="select_custom_pool_title">Select pool</string>
+    <string name="select_custom_pool_active_pools_count">active pools: %d</string>
+    <string name="select_custom_pool_members">members</string>
+
+    <string name="setup_staking_type_staking_amount_is_less_than_min_amount_title">Your stake is less than the minimum to earn rewards</string>
+    <string name="setup_staking_type_direct_staking_amount_is_less_than_min_amount_message">You have specified less than the minimum stake of %s required to earn rewards with %s. You should consider using Pool staking to earn rewards.</string>
+    <string name="setup_staking_type_already_used_title">Staking type cannot be changed</string>
+    <string name="setup_staking_type_pool_already_used_message">You are already staking in a pool</string>
+    <string name="setup_staking_type_direct_already_used_message">You are already have Direct staking</string>
+    <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Unsupported staking type</string>
+
+    <string name="setup_staking_type_min_amount_condition">Minimum stake: %s</string>
+    <string name="setup_staking_type_payout_type_manual_condition">Rewards: Claim manually</string>
+    <string name="setup_staking_type_payout_type_automatically_condition">Rewards: Paid automatically</string>
+    <string name="setup_staking_type_governance_condition">Reuse tokens in Governance</string>
+    <string name="setup_staking_type_advanced_options_condition">Advanced staking management</string>
+
+    <string name="staking_type_title">Staking Type</string>
+    <string name="setup_staking_type_pool_staking">Pool staking</string>
+    <string name="setup_staking_type_direct_staking">Direct staking</string>
+
+    <string name="staking_unstake_all">Unstake all</string>
+
+    <string name="choose_amount_error_too_big">Sorry, you don\'t have enough funds to spend the specified amount</string>
+
+    <string name="staking_setup_amount_too_low">You can\'t stake less than the minimal value (%s)</string>
+
+    <string name="staking_missing_account_message">You need to add a %s account to your wallet in order to start staking</string>
+    <string name="add_delegation_missing_account_message">You need to add a %s account to the wallet in order to delegate</string>
+    <string name="referendum_missing_account_message">You need to add a %s account to the wallet in order to vote</string>
+    <string name="crowdloan_missing_account_message">You need to add a %s account to the wallet in order to contribute</string>
+
+
+    <string name="staking_info">Staking info</string>
+    <string name="nomination_pools_info">Pool staking info</string>
+
+    <string name="staking_already_staking_title">You are already have staking in %s</string>
+
+    <string name="staking_unable_to_stake_more_title">Unable to stake more</string>
+    <string name="staking_unable_to_stake_more_message">You are unstaking all of your tokens and can\'t stake more.</string>
+
+    <string name="staking_stake_max">Stake max</string>
+    <string name="staking_pool_available_validation_message">Your available balance is %s, you need to leave %s as minimal balance and pay network fee of %s. You can stake not more than %s.</string>
+    <string name="staking_staking_type">Staking type</string>
+
+    <string name="start_staking_inactive_pool_message">The pool you have selected is inactive due to no validators selected or its stake is less than the minimum.\nAre you sure you want to proceed with the selected Pool?</string>
+
+    <string name="start_staking_cant_stake_amount">You can\'t stake the specified amount</string>
+    <string name="start_staking_available_balance_gap_message">You have locked tokens on your balance due to %s. In order to continue you should enter less than %s or more than %s. To stake another amount you should remove your %s locks.</string>
+
+    <string name="start_staking_max_nominators_reached_title">%s is currently unavailable</string>
+    <string name="start_staking_max_nominators_reached_message">The maximum number of nominators has been reached. Try again later</string>
+
+    <string name="start_staking_selection_validators_subtitle">Validators: %d (max %d)</string>
+    <string name="start_staking_editing_selection_validators_subtitle">Selected: %d (max %d)</string>
+    <string name="common_recommended">Recommended</string>
+
     <string name="common_fee_changed_title">Network fee is too high</string>
     <string name="common_fee_changed_message">The estimated network fee %s is much higher than the default network fee (%s). This might be due to temporary network congestion. You can refresh to wait for a lower network fee.</string>
     <string name="common_refresh_fee">Refresh fee</string>
@@ -9,6 +90,63 @@
 
     <string name="asset_add_evm_token_already_exist_title">This token already exists</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">The entered contract address is present in Nova as a %s token. Are you sure you want to modify it?</string>
+
+    <string name="nomination_pool_claim_rewards">Claim rewards</string>
+    <string name="nomination_pools_claim_rewards_restake_subtitle">Your tokens will be added back to the stake</string>
+
+    <string name="nomination_pools_pool_reached_unbondings_limit_title">Too many people are unstaking from your pool</string>
+    <string name="nomination_pools_pool_reached_unbondings_limit_message">There are currently no free spots in unstaking queue for your pool. Please try again in %s</string>
+
+    <string name="staking_unbond_crossed_existential">When unstaking partially, you should leave at least %s in stake. Do you want to perform full unstake by unstaking remaining %s as well?</string>
+    <string name="staking_unbond_crossed_existential_title">Too small amount remains in stake</string>
+
+    <string name="nomination_pools_pool_destroying_error_message">Cannot perform specified operation since pool is in destroying state. It will be closed soon.</string>
+    <string name="nomination_pools_pool_destroying_error_title">Pool is destroying</string>
+
+    <string name="nomination_pools_pending_claim_hint_format">Your rewards (%s) will also be claimed and added to your free balance</string>
+
+    <string name="nomination_pools_your_pool_format">Your pool (#%s)</string>
+    <string name="nomination_pools_your_pool">Your pool</string>
+
+    <string name="nomination_pools_pool">Pool</string>
+    <string name="nomination_pools_direct">Direct</string>
+
+    <string name="start_staking_fragment_start_staking">Start Staking</string>
+    <string name="start_staking_fragment_available_balance">Available balance: %1$s (%2$s)</string>
+
+    <string name="start_staking_fragment_title_APY">Earn up to %s</string>
+    <string name="start_staking_fragment_title">%1$s\non your %2$s tokens\nper year</string>
+
+    <string name="start_staking_fragment_min_stake_condition">Stake anytime with as little as %1$s. Your stake will actively earn rewards %2$s</string>
+    <string name="start_staking_fragment_min_stake_condition_duration">in %s</string>
+    <string name="start_staking_fragment_test_network_condition">%1$s is a %2$s with %3$s</string>
+    <string name="start_staking_fragment_test_network_condition_test_network">test network</string>
+    <string name="start_staking_fragment_test_network_condition_no_token">no token value</string>
+
+    <string name="start_staking_fragment_unstake_condition">Unstake anytime, and redeem your funds %s. No rewards are earned while unstaking</string>
+    <string name="start_staking_fragment_unstake_condition_duration">after %s</string>
+
+    <string name="start_staking_fragment_reward_frequency_condition_duration">every %s</string>
+    <string name="start_staking_fragment_reward_frequency_condition_restake_only">Rewards accrue %s and added back to the stake</string>
+    <string name="start_staking_fragment_reward_frequency_condition_payout_only">Rewards accrue %s and added to the transferable balance</string>
+    <string name="start_staking_fragment_reward_frequency_condition_automatic_and_manual">Rewards accrue %1$s. Stake over %2$s for automatic rewards payout, otherwise you need to claim rewards manually</string>
+    <string name="start_staking_fragment_reward_frequency_condition_manual">Rewards accrue %s. You need to claim rewards manually</string>
+    <string name="start_staking_fragment_reward_frequency_condition_fallback">Rewards accrue %s</string>
+
+    <string name="start_staking_fragment_governance_participation_no_conditions">%s with your staked tokens</string>
+    <string name="start_staking_fragment_governance_participation_no_conditions_accent">Participate in governance</string>
+
+    <string name="start_staking_fragment_governance_participation_with_min_amount">Stake over %1$s and %2$s with your staked tokens</string>
+    <string name="start_staking_fragment_governance_participation_with_min_amount_accent">participate in governance</string>
+
+    <string name="start_staking_fragment_stake_monitoring_monitor_stake">Monitor your stake</string>
+    <string name="start_staking_fragment_stake_monitoring">Rewards and staking status vary over time. %s from time to time</string>
+
+    <string name="start_staking_fragment_more_info">Find out more information about\n%1$s staking over at the %2$s</string>
+    <string name="start_staking_fragment_more_info_clicable_part">Nova Wiki</string>
+
+    <string name="start_staking_fragment_terms_of_use">See %s</string>
+    <string name="start_staking_fragment_terms_of_use_clicable_part">Terms of Use</string>
 
     <string name="account_parity_signer_sign_qr_code_expired_descrition">For security reasons generated operations valid for only %s.\nPlease generate new QR code and sign it with %s</string>
     <string name="account_parity_signer_import_scan_invalid_qr">Invalid QR code, please make sure you are scanning QR code from %s</string>
@@ -185,8 +323,6 @@
     <string name="common_some_tx_failed_title">Failed to submit some transactions</string>
     <string name="common_some_tx_failed_message">There was an error while submitting some transactions. Do you want to retry?</string>
 
-    <string name="staking_setup_amount_too_low">You cannot stake less than the network minimum value (%s)</string>
-
     <string name="staking_setup_amount_less_than_recommended">The recommended minimum stake to consistently receive rewards is %s.</string>
 
     <string name="staking_alert_bond_more_title">Stake more tokens</string>
@@ -199,7 +335,6 @@
     <string name="staking_alert_rebag_title">Staking improvements</string>
     <string name="staking_alert_rebag_message">Having outdated position in the queue of stake assignment to a validator may suspend your rewards</string>
 
-    <string name="delegate_search_placeholder_default">Search result will be displayed here</string>
     <string name="delegate_search_placeholder_empty">Address format is invalid. Make sure that address belongs to the right network</string>
     <string name="delegate_search_result_count">search results: %d</string>
     <string name="delegate_search_hint">Search by address or name</string>
@@ -210,7 +345,6 @@
     <string name="staking_reward_payouts_payout_all">Pay out all (%s)</string>
     <string name="staking_pending_rewards_subtitle">You can pay them out yourself, when they are close to expire, but you will pay the fee</string>
 
-    <string name="add_delegation_missing_account_message">You should add %s account to the wallet in order to delegate</string>
 
     <string name="referendum_vote_abstain">Abstain</string>
 
@@ -406,8 +540,6 @@
 
     <string name="referenda_list_placeholder">Referenda information will appear here when they start</string>
 
-    <string name="referendum_missing_account_message">You should add %s account to the wallet in order to vote</string>
-
     <string name="dapp_sign_error_unsupported_chain">Unsupported chain with genesis hash %s</string>
 
     <string name="referendum_unlock_remains_locked_format">remains locked in %s</string>
@@ -537,8 +669,6 @@
     <string name="crowdloan_contributions_parallel_source">Parallel</string>
 
     <string name="assets_balance_details_locks_crowdloans">Crowdloans</string>
-
-    <string name="crowdloan_missing_account_message">You should add %s account to the wallet in order to contribute</string>
 
     <string name="common_accept_terms">Accept terms...</string>
     <string name="yield_boost_terms">Yield Boost will automatically stake %s all my transferable tokens above %s</string>
@@ -809,7 +939,6 @@
     <string name="staking_setup_amount_too_low_strict">Minimum stake should be greater than %s</string>
 
     <string name="common_missing_account_title">%s account is missing</string>
-    <string name="staking_missing_account_message">You should add %s account to the wallet in order to start staking</string>
 
     <string name="common_enter_amount">Enter amount…</string>
     <string name="staking_parachain_select_collator_hint">Select collator…</string>
@@ -928,7 +1057,6 @@
 
     <string name="wallet_send_insufficient_balance_commission">You don\'t have enough %s to pay fees</string>
 
-    <string name="dapp_browser_close_warning_message">Are you sure you want to close this screen?\nYour changes will not be applied.</string>
     <string name="common_close">Close</string>
 
     <string name="dapp_search_hint">Search by name or enter URL</string>
@@ -1018,7 +1146,6 @@
     <string name="choose_amount_available_balance">Available balance</string>
     <string name="choose_amount_error_balance">Sorry, balance checking request failed. Please, try again later.</string>
     <string name="choose_amount_error_fee">Sorry, we couldn\'t contact transfer provider. Please, try again later.</string>
-    <string name="choose_amount_error_too_big">Sorry, you don\'t have enough funds to spend specified amount</string>
     <string name="choose_amount_fee">Transfer fee</string>
     <string name="choose_amount_initial" translatable="false">0</string>
     <string name="choose_amount_network_error">Network not responding</string>
@@ -1240,7 +1367,6 @@
     <string name="settings_youtube">Youtube</string>
     <string name="sr25519_selection_subtitle">sr25519 (recommended)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
-    <string name="staking_about">About staking</string>
     <string name="staking_account_is_used_as_controller">Selected account is already in use as controller</string>
     <string name="staking_add_controller">Add controller account %s to the application to perform this action.</string>
     <string name="staking_alert_change_validators">Change your validators.</string>
@@ -1378,7 +1504,6 @@
     <string name="staking_title">Staking</string>
     <string name="staking_total_rewards_v1.9.0">Rewarded</string>
     <string name="staking_total_staked">Total staked</string>
-    <string name="staking_unbond_crossed_existential">After operation the resulting bonded balance will be less than minimal balance. It will cause the whole bonded balance to be unbonded.</string>
     <string name="staking_unbond_v1_9_0">Unstake</string>
     <string name="staking_unbonding_empty_list_v1_9_0">Unstaking transactions will appear here</string>
     <string name="staking_unbonding_empty_list_v2_2_0">Unstaking transactions will be displayed here</string>

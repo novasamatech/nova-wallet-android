@@ -146,7 +146,8 @@ class EvmNativeAssetHistory(
             address = accountAddress,
             type = type,
             time = remote.timeStamp.seconds.inWholeMilliseconds,
-            chainAsset = chainAsset
+            chainAsset = chainAsset,
+            extrinsicHash = remote.hash,
         )
     }
 
@@ -157,7 +158,6 @@ class EvmNativeAssetHistory(
         coinRate: CoinRate?
     ): Operation.Type.Transfer {
         return Operation.Type.Transfer(
-            hash = remote.hash,
             myAddress = accountAddress,
             amount = remote.value,
             fiatAmount = coinRate?.convertPlanks(chainAsset, remote.value),
@@ -174,7 +174,6 @@ class EvmNativeAssetHistory(
         coinRate: CoinRate?
     ): Operation.Type.Extrinsic {
         return Operation.Type.Extrinsic(
-            hash = remote.hash,
             content = Content.ContractCall(
                 contractAddress = remote.to,
                 function = remote.functionName,

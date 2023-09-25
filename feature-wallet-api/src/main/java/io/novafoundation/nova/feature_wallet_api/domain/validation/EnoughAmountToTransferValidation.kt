@@ -63,6 +63,12 @@ fun <P, E> ValidationSystemBuilder<P, E>.sufficientBalance(
 fun ResourceManager.notSufficientBalanceToPayFeeErrorMessage() = getString(R.string.common_not_enough_funds_title) to
     getString(R.string.common_not_enough_funds_message)
 
+fun ResourceManager.amountIsTooBig() = getString(R.string.common_not_enough_funds_title) to
+    getString(R.string.choose_amount_error_too_big)
+
+fun ResourceManager.zeroAmount() = getString(R.string.common_amount_low) to
+    getString(R.string.common_zero_amount_error)
+
 fun handleNotEnoughFeeError(error: NotEnoughToPayFeesError, resourceManager: ResourceManager): TitleAndMessage {
     val title = resourceManager.getString(R.string.common_cannot_pay_network_fee_title)
 

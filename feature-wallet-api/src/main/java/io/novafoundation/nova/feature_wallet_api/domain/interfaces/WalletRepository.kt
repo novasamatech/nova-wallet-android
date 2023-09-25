@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
@@ -54,7 +55,7 @@ interface WalletRepository {
         fee: BigDecimal
     )
 
-    suspend fun clearAssets(chainAssets: List<Chain.Asset>)
+    suspend fun clearAssets(assetIds: List<FullChainAssetId>)
 
     suspend fun updatePhishingAddresses()
 

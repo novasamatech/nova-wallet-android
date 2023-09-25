@@ -37,7 +37,7 @@
             android:ellipsize="end"
             android:gravity="end"
             android:includeFontPadding="false"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/text_tertiary"
             tools:text="Approve in 3:59:59" />
 
     </LinearLayout>

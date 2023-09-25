@@ -21,13 +21,11 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contrib
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsWithTotalAmount
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.leasePeriodInMillis
-import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
@@ -53,15 +51,6 @@ class RealContributionsInteractor(
     override fun runUpdate(): Flow<Updater.SideEffect> {
         return contributionsUpdateSystemFactory.create()
             .start()
-    }
-
-    override fun observeTotalContributedByAssets(): Flow<Map<FullChainAssetId, BigInteger>> {
-        return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
-            contributionsRepository.observeContributions(metaAccount)
-        }.map { contributions ->
-            contributions.groupBy { it.asset.fullId }
-                .mapValues { entry -> entry.value.sumOf(Contribution::amountInPlanks) }
-        }
     }
 
     override fun observeSelectedChainContributionsWithMetadata(): Flow<ContributionsWithTotalAmount<ContributionWithMetadata>> {

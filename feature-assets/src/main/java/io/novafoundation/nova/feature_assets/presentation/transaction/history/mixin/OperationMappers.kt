@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.common.utils.splitSnakeOrCamelCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.presentation.model.AmountParcelModel
 import io.novafoundation.nova.feature_assets.presentation.model.ExtrinsicContentParcel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
@@ -16,6 +17,7 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
+import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Reward.RewardKind
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
@@ -122,16 +124,20 @@ private fun formatContractFunctionName(extrinsicContent: Content.ContractCall): 
     }
 }
 
-private fun mapExtrinsicContentToParcel(extrinsic: Operation.Type.Extrinsic, resourceManager: ResourceManager): ExtrinsicContentParcel {
+private fun mapExtrinsicContentToParcel(
+    extrinsic: Operation.Type.Extrinsic,
+    extrinsicHash: String?,
+    resourceManager: ResourceManager
+): ExtrinsicContentParcel {
     return when (val content = extrinsic.content) {
-        is Content.ContractCall -> contractCallUi(content, extrinsic.hash, resourceManager)
-        is Content.SubstrateCall -> substrateCallUi(content, extrinsic.hash, resourceManager)
+        is Content.ContractCall -> contractCallUi(content, extrinsicHash, resourceManager)
+        is Content.SubstrateCall -> substrateCallUi(content, extrinsicHash, resourceManager)
     }
 }
 
 private fun contractCallUi(
     content: Content.ContractCall,
-    txHash: String,
+    txHash: String?,
     resourceManager: ResourceManager
 ) = ExtrinsicContentParcel {
     block {
@@ -142,18 +148,22 @@ private fun contractCallUi(
         }
     }
 
-    block {
-        transactionId(txHash)
+    txHash?.let {
+        block {
+            transactionId(txHash)
+        }
     }
 }
 
 private fun substrateCallUi(
     content: Content.SubstrateCall,
-    txHash: String,
+    txHash: String?,
     resourceManager: ResourceManager
 ) = ExtrinsicContentParcel {
     block {
-        transactionId(txHash)
+        txHash?.let {
+            transactionId(txHash)
+        }
 
         value(resourceManager.getString(R.string.common_module), content.module.itemToCapitalizedWords())
 
@@ -175,13 +185,14 @@ fun mapOperationToOperationModel(
         when (val operationType = type) {
             is Operation.Type.Reward -> {
                 val headerResId = if (operationType.isReward) R.string.staking_reward else R.string.staking_slash
+                val subtitleRes = if (operationType.kind is RewardKind.Direct) R.string.tabbar_staking_title else R.string.setup_staking_type_pool_staking
                 OperationModel(
                     id = id,
                     amount = formatAmount(chainAsset, operationType),
                     amountDetails = mapToFiatWithTime(token, operationType.fiatAmount, formattedTime, resourceManager),
                     amountColorRes = if (operationType.isReward) R.color.text_positive else R.color.text_primary,
                     header = resourceManager.getString(headerResId),
-                    subHeader = resourceManager.getString(R.string.tabbar_staking_title),
+                    subHeader = resourceManager.getString(subtitleRes),
                     subHeaderEllipsize = TextUtils.TruncateAt.END,
                     statusAppearance = statusAppearance,
                     operationIcon = resourceManager.getDrawable(R.drawable.ic_staking_filled).asIcon(),
@@ -192,7 +203,7 @@ fun mapOperationToOperationModel(
                 val isIncome = operationType.isIncome(chain)
 
                 val amountColor = when {
-                    operationType.status == Operation.Status.FAILED -> R.color.text_secondary
+                    operationType.status == Operation.Status.FAILED -> R.color.text_tertiary
                     isIncome -> R.color.text_positive
                     else -> R.color.text_primary
                 }
@@ -219,7 +230,7 @@ fun mapOperationToOperationModel(
             }
 
             is Operation.Type.Extrinsic -> {
-                val amountColor = if (operationType.status == Operation.Status.FAILED) R.color.text_secondary else R.color.text_primary
+                val amountColor = if (operationType.status == Operation.Status.FAILED) R.color.text_tertiary else R.color.text_primary
                 val (header, subHeader) = mapExtrinsicContentToHeaderAndSubHeader(operationType.content, resourceManager)
 
                 OperationModel(
@@ -273,9 +284,11 @@ suspend fun mapOperationToParcel(
                     assetId = operation.chainAsset.id,
                     time = time,
                     address = address,
-                    hash = operationType.hash,
-                    formattedAmount = formatAmount(operation.chainAsset, isIncome, operationType),
-                    formattedFiatAmount = operationType.fiatAmount?.formatAsCurrency(currency),
+                    hash = operation.extrinsicHash,
+                    amount = AmountParcelModel(
+                        token = formatAmount(operation.chainAsset, isIncome, operationType),
+                        fiat = operationType.fiatAmount?.formatAsCurrency(currency)
+                    ),
                     receiver = operationType.receiver,
                     sender = operationType.sender,
                     fee = operationType.fee,
@@ -289,18 +302,34 @@ suspend fun mapOperationToParcel(
             is Operation.Type.Reward -> {
                 val typeRes = if (operationType.isReward) R.string.staking_reward else R.string.staking_slash
 
-                OperationParcelizeModel.Reward(
-                    chainId = chainAsset.chainId,
-                    eventId = id,
-                    address = address,
-                    time = time,
-                    amount = formatAmount(chainAsset, operationType),
-                    fiatAmount = operationType.fiatAmount?.formatAsCurrency(currency),
-                    type = resourceManager.getString(typeRes),
-                    era = resourceManager.getString(R.string.staking_era_index_no_prefix, operationType.era),
-                    validator = operationType.validator,
-                    statusAppearance = OperationStatusAppearance.COMPLETED
+                val amount = AmountParcelModel(
+                    token = formatAmount(chainAsset, operationType),
+                    fiat = operationType.fiatAmount?.formatAsCurrency(currency)
                 )
+
+                when (val rewardKind = operationType.kind) {
+                    is RewardKind.Direct -> OperationParcelizeModel.Reward(
+                        chainId = chainAsset.chainId,
+                        eventId = operationType.eventId,
+                        address = address,
+                        time = time,
+                        amount = amount,
+                        type = resourceManager.getString(typeRes),
+                        era = resourceManager.getString(R.string.staking_era_index_no_prefix, rewardKind.era),
+                        validator = rewardKind.validator,
+                        statusAppearance = OperationStatusAppearance.COMPLETED
+                    )
+
+                    is RewardKind.Pool -> OperationParcelizeModel.PoolReward(
+                        chainId = chainAsset.chainId,
+                        address = address,
+                        time = time,
+                        amount = amount,
+                        type = resourceManager.getString(typeRes),
+                        poolId = rewardKind.poolId,
+                        eventId = operationType.eventId
+                    )
+                }
             }
 
             is Operation.Type.Extrinsic -> {
@@ -309,7 +338,7 @@ suspend fun mapOperationToParcel(
                     chainAssetId = chainAsset.id,
                     time = time,
                     originAddress = address,
-                    content = mapExtrinsicContentToParcel(operationType, resourceManager),
+                    content = mapExtrinsicContentToParcel(operationType, extrinsicHash, resourceManager),
                     fee = formatFee(chainAsset, operationType),
                     fiatFee = operationType.fiatFee?.formatAsCurrency(currency),
                     statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus)

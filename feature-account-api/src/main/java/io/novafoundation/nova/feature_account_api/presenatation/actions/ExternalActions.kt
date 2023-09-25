@@ -49,3 +49,8 @@ suspend fun ExternalActions.Presentation.showAddressActions(accountId: AccountId
     type = ExternalActions.Type.Address(chain.addressOf(accountId)),
     chain = chain
 )
+
+suspend fun ExternalActions.Presentation.showAddressActions(address: String, chain: Chain) = showExternalActions(
+    type = ExternalActions.Type.Address(address),
+    chain = chain
+)

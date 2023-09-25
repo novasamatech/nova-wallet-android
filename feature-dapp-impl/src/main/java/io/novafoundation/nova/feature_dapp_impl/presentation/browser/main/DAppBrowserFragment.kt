@@ -186,7 +186,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
             setNegativeButton(R.string.common_cancel) { _, _ -> pendingConfirmation.onCancel() }
 
             setTitle(R.string.common_confirmation_title)
-            setMessage(R.string.dapp_browser_close_warning_message)
+            setMessage(R.string.common_close_confirmation_message)
         }
     }
 

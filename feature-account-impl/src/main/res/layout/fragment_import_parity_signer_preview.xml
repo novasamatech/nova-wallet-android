@@ -36,7 +36,7 @@
             android:id="@+id/previewImportParitySignerDescription"
             android:layout_marginEnd="16dp"
             tools:text="@string/account_parity_signer_import_preview_description"
-            android:textColor="@color/text_secondary" />
+            android:textColor="@color/text_tertiary" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/previewImportParitySignerAccounts"

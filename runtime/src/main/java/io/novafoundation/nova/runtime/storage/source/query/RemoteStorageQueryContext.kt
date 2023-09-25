@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.rpc.queryKey
 import io.novafoundation.nova.common.data.network.rpc.retrieveAllValues
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.core.updater.SubstrateSubscriptionBuilder
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.wsrpc.SocketService
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.storage.SubscribeStorageRequest
@@ -17,9 +18,10 @@ class RemoteStorageQueryContext(
     private val bulkRetriever: BulkRetriever,
     private val socketService: SocketService,
     private val subscriptionBuilder: SubstrateSubscriptionBuilder?,
+    chainId: ChainId,
     at: BlockHash?,
     runtime: RuntimeSnapshot
-) : BaseStorageQueryContext(runtime, at) {
+) : BaseStorageQueryContext(chainId, runtime, at) {
 
     override suspend fun queryKeysByPrefix(prefix: String, at: BlockHash?): List<String> {
         return bulkRetriever.retrieveAllKeys(socketService, prefix, at)
@@ -38,7 +40,7 @@ class RemoteStorageQueryContext(
     }
 
     @Suppress("IfThenToElvis")
-    override suspend fun observeKey(key: String): Flow<String?> {
+    override fun observeKey(key: String): Flow<String?> {
         return if (subscriptionBuilder != null) {
             subscriptionBuilder.subscribe(key).map { it.value }
         } else {

@@ -83,3 +83,5 @@ fun CoroutineScope.childScope(supervised: Boolean = true): CoroutineScope {
 }
 
 fun Int.asBoolean() = this != 0
+
+fun Boolean?.orFalse() = this ?: false

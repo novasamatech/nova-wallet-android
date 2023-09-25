@@ -16,7 +16,9 @@ sealed class Icon {
     class FromDrawableRes(@DrawableRes val res: Int) : Icon()
 }
 
-fun ImageView.setIcon(icon: Icon, imageLoader: ImageLoader, builder: ImageRequest.Builder.() -> Unit = {}) {
+typealias ExtraImageRequestBuilding = ImageRequest.Builder.() -> Unit
+
+fun ImageView.setIcon(icon: Icon, imageLoader: ImageLoader, builder: ExtraImageRequestBuilding = {}) {
     when (icon) {
         is Icon.FromDrawable -> load(icon.data, imageLoader, builder)
         is Icon.FromLink -> load(icon.data, imageLoader, builder)

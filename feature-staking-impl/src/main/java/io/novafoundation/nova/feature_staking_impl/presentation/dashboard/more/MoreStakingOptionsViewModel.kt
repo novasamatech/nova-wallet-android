@@ -3,14 +3,19 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
-import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MoreStakingOptions
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDApp
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.allStakingTypes
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.model.MoreStakingOptionsModel
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.model.StakingDAppModel
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.AvailableStakingOptionsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -18,6 +23,8 @@ import kotlinx.coroutines.launch
 
 class MoreStakingOptionsViewModel(
     private val interactor: StakingDashboardInteractor,
+    private val startStakingRouter: StartMultiStakingRouter,
+    private val dashboardRouter: StakingDashboardRouter,
     private val router: StakingRouter,
     private val stakingSharedState: StakingSharedState,
     private val presentationMapper: StakingDashboardPresentationMapper,
@@ -37,17 +44,12 @@ class MoreStakingOptionsViewModel(
     fun onInAppStakingItemClicked(index: Int) = launch {
         val withoutStakeItems = moreStakingOptionsFlow.first().inAppStaking
         val withoutStakeItem = withoutStakeItems.getOrNull(index) ?: return@launch
-        val noStakeItemState = withoutStakeItem.stakingState as? NoStake ?: return@launch
 
-        when (val flowType = noStakeItemState.flowType) {
-            is NoStake.FlowType.Aggregated -> {} // TODO feature aggregated flows & nomination pools
+        val noStakeItemState = withoutStakeItem.stakingState as? AggregatedStakingDashboardOption.NoStake ?: return@launch
 
-            is NoStake.FlowType.Single -> openChainStaking(
-                chain = withoutStakeItem.chain,
-                chainAsset = withoutStakeItem.token.configuration,
-                stakingType = flowType.stakingType
-            )
-        }
+        val stakingTypes = noStakeItemState.flowType.allStakingTypes
+
+        openChainStaking(withoutStakeItem.chain, withoutStakeItem.token.configuration, stakingTypes)
     }
 
     fun onBrowserStakingItemClicked(item: StakingDAppModel) = launch {
@@ -71,21 +73,15 @@ class MoreStakingOptionsViewModel(
         }
     }
 
-    private suspend fun openChainStaking(
-        chain: Chain,
-        chainAsset: Chain.Asset,
-        stakingType: Chain.Asset.StakingType
-    ) {
-        stakingSharedState.setSelectedOption(
-            chain = chain,
-            chainAsset = chainAsset,
-            stakingType = stakingType
-        )
+    private suspend fun openChainStaking(chain: Chain, chainAsset: Chain.Asset, stakingTypes: List<Chain.Asset.StakingType>) {
+        stakingSharedState.setSelectedOption(chain, chainAsset, stakingTypes.first())
 
-        router.openChainStakingMain()
+        val payload = StartStakingLandingPayload(AvailableStakingOptionsPayload(chain.id, chainAsset.id, stakingTypes))
+
+        startStakingRouter.openStartStakingLanding(payload)
     }
 
     fun goBack() {
-        router.backInStakingTab()
+        dashboardRouter.backInStakingTab()
     }
 }

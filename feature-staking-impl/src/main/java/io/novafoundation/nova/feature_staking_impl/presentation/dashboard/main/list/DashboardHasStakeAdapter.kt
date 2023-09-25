@@ -36,6 +36,7 @@ class DashboardHasStakeAdapter(
                 HasStakeItem::status -> holder.bindStatus(item)
                 HasStakeItem::earnings -> holder.bindEarnings(item)
                 HasStakeItem::chainUi -> holder.bindChain(item)
+                HasStakeItem::stakingTypeBadge -> holder.bindStakingType(item)
             }
         }
     }
@@ -56,6 +57,7 @@ class DashboardHasStakeViewHolder(
         bindStake(model)
         bindStatus(model)
         bindChain(model)
+        bindStakingType(model)
     }
 
     fun bindChain(model: HasStakeItem) {
@@ -64,6 +66,10 @@ class DashboardHasStakeViewHolder(
 
     fun bindEarnings(model: HasStakeItem) {
         containerView.setEarnings(model.earnings)
+    }
+
+    fun bindStakingType(model: HasStakeItem) {
+        containerView.setStakingTypeBadge(model.stakingTypeBadge)
     }
 
     fun bindStake(model: HasStakeItem) {
@@ -91,6 +97,7 @@ private class DashboardHasStakeDiffCallback : DiffUtil.ItemCallback<HasStakeItem
         HasStakeItem::earnings,
         HasStakeItem::status,
         HasStakeItem::rewards,
+        HasStakeItem::stakingTypeBadge
     )
 
     override fun areItemsTheSame(oldItem: HasStakeItem, newItem: HasStakeItem): Boolean {

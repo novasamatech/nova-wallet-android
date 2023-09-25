@@ -67,7 +67,7 @@ class PincodeFragment : BaseFragment<PinCodeViewModel>() {
     }
 
     override fun subscribe(viewModel: PinCodeViewModel) {
-        setupConfirmationOrDenyDialog(viewModel.confirmationAwaitableAction)
+        setupConfirmationOrDenyDialog(R.style.AccentAlertDialogTheme, viewModel.confirmationAwaitableAction)
 
         viewModel.pinCodeAction.toolbarConfiguration.titleRes?.let {
             toolbar.setTitle(getString(it))

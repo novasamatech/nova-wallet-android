@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi.State.ListState
@@ -111,11 +110,11 @@ class TransactionHistoryProvider(
         }
     }
 
-    override fun transactionClicked(transactionModel: OperationModel) {
+    override fun transactionClicked(transactionId: String) {
         launch {
             val operations = (domainState.first() as? State.WithData)?.data ?: return@launch
 
-            val clickedOperation = operations.first { it.id == transactionModel.id }
+            val clickedOperation = operations.first { it.id == transactionId }
 
             val currency = currencyRepository.getSelectedCurrency()
 
@@ -131,6 +130,10 @@ class TransactionHistoryProvider(
 
                     is OperationParcelizeModel.Reward -> {
                         router.openRewardDetail(payload)
+                    }
+
+                    is OperationParcelizeModel.PoolReward -> {
+                        router.openPoolRewardDetail(payload)
                     }
                 }
             }
