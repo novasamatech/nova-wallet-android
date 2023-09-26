@@ -4,7 +4,7 @@ import io.noties.markwon.AbstractMarkwonPlugin
 
 class RemoveHtmlTagsPlugin(vararg tagNames: String) : AbstractMarkwonPlugin() {
 
-    private val typeNamesRegex = tagNames.map { "\\n?<$it(\\s[^>]*)?>.*?</$it>|\\n?<$it(\\s[^>]*)?>".toRegex() }
+    private val typeNamesRegex = tagNames.map { "<$it(\\s[^>]*)?>.*?</$it>|<$it(\\s[^>]*)?>".toRegex() }
 
     override fun processMarkdown(markdown: String): String {
         var result = markdown
