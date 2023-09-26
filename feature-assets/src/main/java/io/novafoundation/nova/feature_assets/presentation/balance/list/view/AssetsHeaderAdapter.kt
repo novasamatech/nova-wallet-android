@@ -137,6 +137,9 @@ class HeaderHolder(
             balanceListTotalBalance.onSendClick { handler.sendClicked() }
             balanceListTotalBalance.onReceiveClick { handler.receiveClicked() }
             balanceListTotalBalance.onBuyClick { handler.buyClicked() }
+            balanceListAssetPlaceholder.setButtonClickListener { handler.buyClicked() }
+
+            balanceListAssetPlaceholder.setButtonText(R.string.assets_buy_tokens_placeholder_button)
         }
     }
 
