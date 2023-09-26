@@ -95,13 +95,15 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    override fun onBackPressed(action: () -> Unit) {
+        super.onBackPressed(action)
 
         assetFlowToolbar.searchField.hideSoftKeyboard()
     }
 
     override fun assetClicked(asset: AssetModel) {
         viewModel.assetClicked(asset)
+
+        assetFlowToolbar.searchField.hideSoftKeyboard()
     }
 }
