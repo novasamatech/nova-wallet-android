@@ -6,5 +6,4 @@ import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 
 class SwapNavigator(
     navigationHolder: NavigationHolder
-) : BaseNavigator(navigationHolder), SwapRouter {
-}
+) : BaseNavigator(navigationHolder), SwapRouter
