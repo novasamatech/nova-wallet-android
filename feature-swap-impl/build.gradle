@@ -1,0 +1,67 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    namespace 'io.novafoundation.nova.feature_swap_impl'
+
+    compileSdkVersion rootProject.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+}
+
+dependencies {
+    implementation project(':feature-account-api')
+    implementation project(':feature-wallet-api')
+    implementation project(':feature-swap-api')
+
+    implementation project(":common")
+    implementation project(":runtime")
+
+    implementation materialDep
+
+    implementation fearlessLibDep
+
+    implementation kotlinDep
+
+    implementation androidDep
+
+    implementation coroutinesDep
+    implementation coroutinesAndroidDep
+    implementation lifeCycleKtxDep
+
+    implementation project(":core-db")
+
+    implementation viewModelKtxDep
+
+    implementation shimmerDep
+
+    implementation daggerDep
+    kapt daggerKapt
+
+    testImplementation jUnitDep
+    testImplementation mockitoDep
+}
