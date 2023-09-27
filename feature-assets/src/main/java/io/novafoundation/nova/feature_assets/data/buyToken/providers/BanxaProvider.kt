@@ -8,8 +8,6 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.data.buyToken.ExternalProvider
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
-private const val TYPE_BUY = "buy"
-
 private const val BLOCKCHAIN_KEY = "blockchain"
 private const val COIN_KEY = "coinType"
 
@@ -45,7 +43,6 @@ class BanxaProvider(
             return Uri.Builder()
                 .scheme("https")
                 .authority(host)
-                .appendQueryParameter("type", TYPE_BUY)
                 .appendNullableQueryParameter(BLOCKCHAIN_KEY, blockchain)
                 .appendNullableQueryParameter(COIN_KEY, coinType)
                 .appendQueryParameter("walletAddress", address)
