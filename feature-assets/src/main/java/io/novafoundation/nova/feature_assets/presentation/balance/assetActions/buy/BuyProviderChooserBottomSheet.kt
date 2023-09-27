@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBo
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ReferentialEqualityDiffCallBack
+import io.novafoundation.nova.common.view.dialog.infoDialog
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
 import kotlinx.android.synthetic.main.item_sheet_buy_provider.view.itemSheetBuyProviderImage
@@ -26,7 +27,8 @@ class BuyProviderChooserBottomSheet(
     payload = payload,
     diffCallback = ReferentialEqualityDiffCallBack(),
     onClicked = onSelect,
-    onCancel = onCancel
+    onCancel = onCancel,
+    dismissOnClick = false
 ) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +39,18 @@ class BuyProviderChooserBottomSheet(
 
     override fun holderCreator(): HolderCreator<BuyProvider> = {
         BuyProviderHolder(it.inflateChild(R.layout.item_sheet_buy_provider))
+    }
+
+    override fun itemClicked(item: BuyProvider) {
+        infoDialog(context) {
+            setTitle(R.string.buy_provider_open_confirmation_title)
+            setMessage(context.getString(R.string.buy_provider_open_confirmation_message, item.officialUrl))
+            setPositiveButton(R.string.common_continue) { _, _ ->
+                super.itemClicked(item)
+                this@BuyProviderChooserBottomSheet.dismiss()
+            }
+            setNegativeButton(R.string.common_cancel, null)
+        }
     }
 }
 
