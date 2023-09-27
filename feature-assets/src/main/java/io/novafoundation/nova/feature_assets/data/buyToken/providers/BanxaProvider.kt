@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.data.buyToken.providers
 
 import android.content.Context
 import android.net.Uri
+import io.novafoundation.nova.common.utils.appendNullableQueryParameter
 import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.data.buyToken.ExternalProvider
@@ -45,8 +46,8 @@ class BanxaProvider(
                 .scheme("https")
                 .authority(host)
                 .appendQueryParameter("type", TYPE_BUY)
-                .appendQueryParameter("blockchain", blockchain)
-                .appendQueryParameter("coinType", coinType)
+                .appendNullableQueryParameter(BLOCKCHAIN_KEY, blockchain)
+                .appendNullableQueryParameter(COIN_KEY, coinType)
                 .appendQueryParameter("walletAddress", address)
                 .build()
                 .toString()
