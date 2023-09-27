@@ -45,6 +45,11 @@ class WalletInteractorImpl(
     private val currencyRepository: CurrencyRepository
 ) : WalletInteractor {
 
+    override fun isFiltersEnabledFlow(): Flow<Boolean> {
+        return assetFiltersRepository.assetFiltersFlow()
+            .map { it.isNotEmpty() }
+    }
+
     override fun filterAssets(assetsFlow: Flow<List<Asset>>): Flow<List<Asset>> {
         return combine(assetsFlow, assetFiltersRepository.assetFiltersFlow()) { assets, filters ->
             assets.applyFilters(filters)

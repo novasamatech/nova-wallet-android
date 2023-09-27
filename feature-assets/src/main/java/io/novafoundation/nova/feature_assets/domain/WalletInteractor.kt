@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface WalletInteractor {
 
+    fun isFiltersEnabledFlow(): Flow<Boolean>
+
     fun filterAssets(assetsFlow: Flow<List<Asset>>): Flow<List<Asset>>
 
     fun assetsFlow(): Flow<List<Asset>>
