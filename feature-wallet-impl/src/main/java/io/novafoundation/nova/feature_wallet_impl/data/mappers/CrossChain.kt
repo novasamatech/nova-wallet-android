@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.mappers
 
 import io.novafoundation.nova.common.utils.asGsonParsedNumber
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.toInterior
 import io.novafoundation.nova.feature_wallet_api.domain.model.AssetLocationPath
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.AssetTransfers
@@ -13,6 +12,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation.Junction
 import io.novafoundation.nova.feature_wallet_api.domain.model.XCMInstructionType
 import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
+import io.novafoundation.nova.feature_wallet_api.domain.model.toInterior
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainOriginAssetRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainTransfersConfigRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.JunctionsRemote
