@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine.canAcceptFunds
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.bindAssetAccountOrEmpty
@@ -27,8 +28,9 @@ class StatemineAssetTransfers(
     assetSourceRegistry: AssetSourceRegistry,
     extrinsicService: ExtrinsicService,
     phishingValidationFactory: PhishingValidationFactory,
-    private val remoteStorage: StorageDataSource,
-) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory) {
+    enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
+    private val remoteStorage: StorageDataSource
+) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory) {
 
     override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem()
 

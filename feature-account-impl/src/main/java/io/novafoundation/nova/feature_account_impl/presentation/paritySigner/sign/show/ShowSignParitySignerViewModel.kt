@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.SharedState
+import io.novafoundation.nova.common.utils.cycleMultiple
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.getOrThrow
@@ -63,12 +64,13 @@ class ShowSignParitySignerViewModel(
         chainRegistry.getChain(chainId)
     }.shareInBackground()
 
-    val qrCode = flowOf {
+    val qrCodeSequence = flowOf {
         val signPayload = signSharedState.getOrThrow()
 
-        val qrContent = interactor.qrCodeContent(signPayload)
+        val frames = interactor.qrCodeContent(signPayload).frames
 
-        qrCodeGenerator.generateQrBitmap(qrContent.frame)
+        frames.map { qrCodeGenerator.generateQrBitmap(it) }
+            .cycleMultiple()
     }.shareInBackground()
 
     val addressModel = chain.map { chain ->

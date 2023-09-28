@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.receive.flow
 
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
@@ -20,6 +21,7 @@ class AssetReceiveFlowViewModel(
     externalBalancesInteractor: ExternalBalancesInteractor,
     controllableAssetCheck: ControllableAssetCheckMixin,
     accountUseCase: SelectedAccountUseCase,
+    resourceManager: ResourceManager,
 ) : AssetFlowViewModel(
     interactor,
     router,
@@ -27,6 +29,7 @@ class AssetReceiveFlowViewModel(
     controllableAssetCheck,
     accountUseCase,
     externalBalancesInteractor,
+    resourceManager,
 ) {
     override fun searchAssetsFlow(): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
         return interactor.searchAssetsFlow(query, externalBalancesFlow)

@@ -31,7 +31,7 @@ sealed class OperationParcelizeModel : Parcelable {
         val amount: AmountParcelModel,
         val type: String,
         val poolId: Int,
-        val extrinsicHash: String?,
+        val eventId: String,
     ) : OperationParcelizeModel()
 
     @Parcelize

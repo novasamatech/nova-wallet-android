@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbon
 
 import io.novafoundation.nova.feature_wallet_api.domain.validation.CrossMinimumBalanceValidation
 import io.novafoundation.nova.feature_wallet_api.domain.validation.CrossMinimumBalanceValidationFailure
+import io.novafoundation.nova.feature_wallet_api.domain.validation.InsufficientTotalToStayAboveEDError
 import io.novafoundation.nova.feature_wallet_api.domain.validation.NotEnoughToPayFeesError
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -26,4 +27,6 @@ sealed class NominationPoolsUnbondValidationFailure {
     class PoolUnlockChunksLimitReached(val timeTillNextAvailableSlot: Duration) : NominationPoolsUnbondValidationFailure()
 
     class PoolMemberMaxUnlockingLimitReached(val limit: Int) : NominationPoolsUnbondValidationFailure()
+
+    class ToStayAboveED(override val asset: Chain.Asset) : NominationPoolsUnbondValidationFailure(), InsufficientTotalToStayAboveEDError
 }

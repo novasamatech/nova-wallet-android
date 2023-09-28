@@ -89,7 +89,7 @@ class SetupStakingTypeViewModel(
         .map { it.sortedWith(editableStakingTypeComparator) }
         .shareInBackground()
 
-    val availableToRewriteData = combine(
+    val dataHasBeenChanged = combine(
         currentSelectionFlow,
         editableSelectionFlow
     ) { current, editable ->
@@ -116,14 +116,18 @@ class SetupStakingTypeViewModel(
 
     fun backPressed() {
         launch {
-            closeConfirmationAction.awaitAction(
-                ConfirmationDialogInfo(
-                    R.string.common_confirmation_title,
-                    R.string.common_close_confirmation_message,
-                    R.string.common_close,
-                    R.string.common_cancel,
+            val dataHasBeenChanged = dataHasBeenChanged.first()
+
+            if (dataHasBeenChanged) {
+                closeConfirmationAction.awaitAction(
+                    ConfirmationDialogInfo(
+                        R.string.common_confirmation_title,
+                        R.string.common_close_confirmation_message,
+                        R.string.common_close,
+                        R.string.common_cancel,
+                    )
                 )
-            )
+            }
 
             router.back()
         }

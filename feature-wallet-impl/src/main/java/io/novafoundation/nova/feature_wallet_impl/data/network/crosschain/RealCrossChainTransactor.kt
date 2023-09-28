@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
-import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.common.utils.xTokensName
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.doNotCrossExistentialDeposit
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInCommissionAsset
@@ -41,6 +42,7 @@ class RealCrossChainTransactor(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val phishingValidationFactory: PhishingValidationFactory,
     private val palletXcmRepository: PalletXcmRepository,
+    private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 ) : CrossChainTransactor {
 
     override val validationSystem: AssetTransfersValidationSystem = ValidationSystem {
@@ -53,7 +55,7 @@ class RealCrossChainTransactor(
         notDeadRecipientInCommissionAsset(assetSourceRegistry)
         notDeadRecipientInUsedAsset(assetSourceRegistry)
 
-        sufficientCommissionBalanceToStayAboveED(assetSourceRegistry)
+        sufficientCommissionBalanceToStayAboveED(enoughTotalToStayAboveEDValidationFactory)
 
         sufficientTransferableBalanceToPayOriginFee()
         canPayCrossChainFee()
@@ -107,7 +109,7 @@ class RealCrossChainTransactor(
         val lowestMultiAssetVersion = palletXcmRepository.lowestPresentMultiAssetVersion(assetTransfer.originChain.id)
 
         call(
-            moduleName = Modules.X_TOKENS,
+            moduleName = runtime.metadata.xTokensName(),
             callName = "transfer_multiasset",
             arguments = mapOf(
                 "asset" to multiAsset.versioned(lowestMultiAssetVersion).toEncodableInstance(),

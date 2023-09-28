@@ -14,50 +14,66 @@ import java.math.BigDecimal
 
 class AssetGroup(
     val chain: Chain,
-    val groupBalanceFiat: BigDecimal,
+    val groupTotalBalanceFiat: BigDecimal,
+    val groupTransferableBalanceFiat: BigDecimal,
     val zeroBalance: Boolean
 )
 
 class AssetWithOffChainBalance(
     val asset: Asset,
-    val totalWithOffChain: TotalBalance,
+    val balanceWithOffchain: Balance,
 ) {
 
-    class TotalBalance(
-        val amount: BigDecimal,
-        val fiat: BigDecimal
+    class Balance(
+        val total: Amount,
+        val transferable: Amount
     )
 }
+
+class Amount(
+    val amount: BigDecimal,
+    val fiat: BigDecimal
+)
 
 fun groupAndSortAssetsByNetwork(
     assets: List<Asset>,
     externalBalances: Map<FullChainAssetId, Balance>,
-    chainsById: Map<String, Chain>
+    chainsById: Map<String, Chain>,
+    assetGroupComparator: Comparator<AssetGroup> = getAssetGroupBaseComparator(),
+    assetComparator: Comparator<AssetWithOffChainBalance> = getAssetBaseComparator()
 ): Map<AssetGroup, List<AssetWithOffChainBalance>> {
-    val assetGroupComparator = compareByDescending(AssetGroup::groupBalanceFiat)
-        .thenByDescending { it.zeroBalance } // non-zero balances first
-        .then(Chain.defaultComparatorFrom(AssetGroup::chain))
-
     return assets
         .map { asset -> AssetWithOffChainBalance(asset, asset.totalWithOffChain(externalBalances)) }
         .groupBy { chainsById.getValue(it.asset.token.configuration.chainId) }
-        .mapValues { (_, assets) ->
-            assets.sortedWith(
-                compareByDescending<AssetWithOffChainBalance> { it.totalWithOffChain.fiat }
-                    .thenByDescending { it.totalWithOffChain.amount }
-                    .thenByDescending { it.asset.token.configuration.isUtilityAsset } // utility assets first
-                    .thenBy { it.asset.token.configuration.symbol }
-            )
-        }.mapKeys { (chain, assets) ->
+        .mapValues { (_, assets) -> assets.sortedWith(assetComparator) }
+        .mapKeys { (chain, assets) ->
             AssetGroup(
                 chain = chain,
-                groupBalanceFiat = assets.sumByBigDecimal { it.totalWithOffChain.fiat },
-                zeroBalance = assets.any { it.totalWithOffChain.amount > BigDecimal.ZERO }
+                groupTotalBalanceFiat = assets.sumByBigDecimal { it.balanceWithOffchain.total.fiat },
+                groupTransferableBalanceFiat = assets.sumByBigDecimal { it.balanceWithOffchain.transferable.fiat },
+                zeroBalance = assets.any { it.balanceWithOffchain.total.amount > BigDecimal.ZERO }
             )
         }.toSortedMap(assetGroupComparator)
 }
 
-private fun Asset.totalWithOffChain(externalBalances: Map<FullChainAssetId, Balance>): AssetWithOffChainBalance.TotalBalance {
+fun getAssetBaseComparator(
+    comparing: (AssetWithOffChainBalance) -> Comparable<*> = { it.balanceWithOffchain.total.fiat }
+): Comparator<AssetWithOffChainBalance> {
+    return compareByDescending(comparing)
+        .thenByDescending { it.balanceWithOffchain.total.amount }
+        .thenByDescending { it.asset.token.configuration.isUtilityAsset } // utility assets first
+        .thenBy { it.asset.token.configuration.symbol }
+}
+
+fun getAssetGroupBaseComparator(
+    comparing: (AssetGroup) -> Comparable<*> = AssetGroup::groupTotalBalanceFiat
+): Comparator<AssetGroup> {
+    return compareByDescending(comparing)
+        .thenByDescending { it.zeroBalance } // non-zero balances first
+        .then(Chain.defaultComparatorFrom(AssetGroup::chain))
+}
+
+private fun Asset.totalWithOffChain(externalBalances: Map<FullChainAssetId, Balance>): AssetWithOffChainBalance.Balance {
     val onChainTotal = total
     val offChainTotal = externalBalances[token.configuration.fullId]
         ?.let(token::amountFromPlanks)
@@ -66,5 +82,8 @@ private fun Asset.totalWithOffChain(externalBalances: Map<FullChainAssetId, Bala
     val overallTotal = onChainTotal + offChainTotal
     val overallFiat = token.amountToFiat(overallTotal)
 
-    return AssetWithOffChainBalance.TotalBalance(overallTotal, overallFiat)
+    return AssetWithOffChainBalance.Balance(
+        Amount(overallTotal, overallFiat),
+        Amount(transferable, token.amountToFiat(transferable))
+    )
 }

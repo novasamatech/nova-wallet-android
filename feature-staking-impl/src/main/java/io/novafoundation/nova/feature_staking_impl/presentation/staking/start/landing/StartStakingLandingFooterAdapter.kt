@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.SingleItemAdapter
-import io.novafoundation.nova.common.utils.SpannableFormatter
+import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.dp

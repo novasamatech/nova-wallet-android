@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.NominationPool
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.address
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.name
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.nameOrAddress
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.NominationPoolProvider
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.poolAvailable
@@ -37,7 +36,7 @@ class SearchNominationPoolInteractor(
     ): Flow<List<NominationPool>> {
         val nominationPools = nominationPoolProvider.getNominationPools(stakingOption, coroutineScope)
         val comparator = getPoolComparator(knownNovaPools, stakingOption.chain)
-            .thenComparing { pool: NominationPool -> pool.nameOrAddress(stakingOption.chain) }
+
         return queryFlow.map { query ->
             if (query.isEmpty()) {
                 return@map emptyList()

@@ -88,7 +88,7 @@ class BalanceListFragment :
     override fun subscribe(viewModel: BalanceListViewModel) {
         viewModel.assetModelsFlow.observe {
             assetsAdapter.submitList(it) {
-                balanceListAssets.invalidateItemDecorations()
+                balanceListAssets?.invalidateItemDecorations()
             }
         }
 

@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.amountIsTooBi
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleWith
 import io.novafoundation.nova.feature_wallet_api.domain.validation.zeroAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
 
 fun nominationPoolsUnbondValidationFailure(
     status: ValidationStatus.NotValid<NominationPoolsUnbondValidationFailure>,
@@ -47,5 +48,10 @@ fun nominationPoolsUnbondValidationFailure(
                     resourceManager.getString(R.string.nomination_pools_pool_reached_unbondings_limit_message, durationFormatted)
             )
         }
+
+        is NominationPoolsUnbondValidationFailure.ToStayAboveED -> handleInsufficientBalanceCommission(
+            failure,
+            resourceManager
+        ).asDefault()
     }
 }

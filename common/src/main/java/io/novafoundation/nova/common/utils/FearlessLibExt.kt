@@ -230,6 +230,8 @@ fun Module.firstExistingCallName(vararg options: String): String {
 
 fun RuntimeMetadata.xcmPalletName() = firstExistingModuleName("XcmPallet", "PolkadotXcm")
 
+fun RuntimeMetadata.xTokensName() = firstExistingModuleName("XTokens", "Xtokens")
+
 fun StorageEntry.splitKeyToComponents(runtime: RuntimeSnapshot, key: String): ComponentHolder {
     return ComponentHolder(splitKey(runtime, key))
 }
@@ -299,8 +301,6 @@ object Modules {
 
     const val PARACHAIN_INFO = "ParachainInfo"
     const val PARAS = "Paras"
-
-    const val X_TOKENS = "XTokens"
 
     const val AUTOMATION_TIME = "AutomationTime"
 

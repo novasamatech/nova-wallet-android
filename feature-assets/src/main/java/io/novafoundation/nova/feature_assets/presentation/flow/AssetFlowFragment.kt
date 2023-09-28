@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
+import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetGroupingDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
@@ -75,11 +76,11 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
         assetFlowToolbar.searchField.content.bindTo(viewModel.query, lifecycleScope)
 
         viewModel.searchResults.observe { searchResult ->
-            assetFlowPlaceholder.setVisible(searchResult.isEmpty())
-            assetFlowList.setVisible(searchResult.isNotEmpty())
+            assetFlowPlaceholder.setModelOrHide(searchResult.placeholder)
+            assetFlowList.setVisible(searchResult.assets.isNotEmpty())
 
             assetsAdapter.submitListPreservingViewPoint(
-                data = searchResult,
+                data = searchResult.assets,
                 into = assetFlowList,
                 extraDiffCompletedCallback = { assetFlowList.invalidateItemDecorations() }
             )

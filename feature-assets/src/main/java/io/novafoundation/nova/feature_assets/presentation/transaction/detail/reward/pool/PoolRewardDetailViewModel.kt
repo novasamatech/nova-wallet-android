@@ -41,10 +41,8 @@ class PoolRewardDetailViewModel(
         router.back()
     }
 
-    fun transactionIdClicked() {
-        operation.extrinsicHash?.let { hash ->
-            shoExternalActions(ExternalActions.Type.Extrinsic(hash))
-        }
+    fun eventIdClicked() {
+        shoExternalActions(ExternalActions.Type.Event(operation.eventId))
     }
 
     fun poolClicked() = launch {
