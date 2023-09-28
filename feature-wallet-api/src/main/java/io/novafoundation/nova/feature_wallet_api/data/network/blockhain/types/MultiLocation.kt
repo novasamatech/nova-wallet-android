@@ -65,7 +65,6 @@ private fun bindAccountIdJunction(instance: Any?, accountIdKey: String): Account
     return bindAccountId(asStruct[accountIdKey])
 }
 
-
 // ------ Encode ------
 
 fun MultiLocation.toEncodableInstance() = structOf(

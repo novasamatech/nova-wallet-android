@@ -9,7 +9,7 @@ import java.math.BigInteger
 
 class NativeAssetLocationConverter(
     private val chain: Chain
-): MultiLocationConverter {
+) : MultiLocationConverter {
 
     override suspend fun toMultiLocation(chainAsset: Chain.Asset): MultiLocation? {
         return if (chainAsset.chainId == chain.id && chainAsset.isUtilityAsset) {

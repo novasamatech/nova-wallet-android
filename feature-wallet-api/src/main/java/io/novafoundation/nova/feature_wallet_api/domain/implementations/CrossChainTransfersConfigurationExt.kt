@@ -56,7 +56,6 @@ operator fun MultiLocation.plus(suffix: MultiLocation): MultiLocation {
     )
 }
 
-
 fun MultiLocation.childView() = MultiLocation(parents + BigInteger.ONE, interior)
 
 fun CrossChainTransfersConfiguration.availableDestinations(origin: Chain.Asset): List<Pair<ChainId, ChainAssetId>> {

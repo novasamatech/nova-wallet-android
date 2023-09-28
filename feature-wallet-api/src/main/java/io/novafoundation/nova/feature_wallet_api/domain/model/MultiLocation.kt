@@ -34,7 +34,7 @@ class MultiLocation(
 
         class AccountId32(val accountId: AccountId) : Junction()
 
-        object Unsupported: Junction()
+        object Unsupported : Junction()
     }
 }
 
