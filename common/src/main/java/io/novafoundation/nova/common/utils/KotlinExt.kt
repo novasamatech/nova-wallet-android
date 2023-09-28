@@ -32,6 +32,14 @@ infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
 
 fun Double.ceil(): Double = kotlin.math.ceil(this)
 
+@Suppress("UNCHECKED_CAST")
+inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
+    return fold(
+        onSuccess = { transform(it) },
+        onFailure = { this as Result<R> }
+    )
+}
+
 inline fun <reified E : Enum<E>> enumValueOfOrNull(raw: String): E? = runCatching { enumValueOf<E>(raw) }.getOrNull()
 
 inline fun <K, V> List<V>.associateByMultiple(keysExtractor: (V) -> Iterable<K>): Map<K, V> {

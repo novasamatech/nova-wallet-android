@@ -17,6 +17,8 @@ typealias FormExtrinsicWithOrigin = suspend ExtrinsicBuilder.(origin: AccountId)
 typealias FormMultiExtrinsicWithOrigin = suspend CallBuilder.(origin: AccountId) -> Unit
 typealias FormMultiExtrinsic = suspend CallBuilder.() -> Unit
 
+typealias ExtrinsicHash = String
+
 interface ExtrinsicService {
 
     suspend fun submitMultiExtrinsicWithSelectedWalletAwaitingInclusion(
@@ -26,7 +28,7 @@ interface ExtrinsicService {
     suspend fun submitExtrinsicWithSelectedWallet(
         chain: Chain,
         formExtrinsic: FormExtrinsicWithOrigin,
-    ): Result<String>
+    ): Result<ExtrinsicHash>
 
     suspend fun submitAndWatchExtrinsicWithSelectedWallet(
         chain: Chain,
@@ -37,7 +39,7 @@ interface ExtrinsicService {
         chain: Chain,
         accountId: ByteArray,
         formExtrinsic: FormExtrinsicWithOrigin,
-    ): Result<String>
+    ): Result<ExtrinsicHash>
 
     suspend fun submitAndWatchExtrinsicAnySuitableWallet(
         chain: Chain,
