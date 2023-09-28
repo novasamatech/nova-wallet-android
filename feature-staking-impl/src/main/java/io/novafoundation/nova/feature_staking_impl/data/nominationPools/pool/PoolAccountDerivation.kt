@@ -51,9 +51,12 @@ class RealPoolAccountDerivation(
     private fun ByteArray.truncateToAccountId(): AccountId = copyOf(newSize = 32)
 
     private suspend fun palletId(chainId: ChainId): ByteArray? {
-        return localDataSource.query(chainId) {
-            metadata.nominationPoolsOrNull()?.constantOrNull("PalletId")?.value
-        }
+        return runCatching {
+            // We might fail to initiate query by chainId, e.g. in case it is EVM-only and doesn't have runtime
+            localDataSource.query(chainId) {
+                metadata.nominationPoolsOrNull()?.constantOrNull("PalletId")?.value
+            }
+        }.getOrNull()
     }
 
     private val PoolAccountType.derivationIndex: Byte
