@@ -46,19 +46,20 @@ class BalancesIntegrationTest(
 
     companion object {
         @JvmStatic
-        @Parameterized.Parameters(name = "Getting balance for {1} network")
+        @Parameterized.Parameters(name = "{1}")
         fun data(): ArrayList<Array<String?>> {
             val arrayOfNetworks: Array<TestData> = Gson().fromJson(URL(TEST_CHAINS_URL).readText())
+//            val arrayOfNetworks: Array<TestData> = arrayOf(TestData(Chain.Geneses.ACALA, "statemine", "a"))
             val listNetworks: ArrayList<Array<String?>> = ArrayList()
             arrayOfNetworks.forEach { listNetworks.add(arrayOf(it.chainId, it.name, it.account)) }
             return listNetworks
         }
 
-        class TestData {
-            var chainId: String? = null
-            var name: String? = null
+        class TestData(
+            var chainId: String? = null,
+            var name: String? = null,
             var account: String? = null
-        }
+        )
     }
 
     private val maxAmount = BigInteger.valueOf(10).pow(30)
@@ -120,13 +121,11 @@ class BalancesIntegrationTest(
         }
     }
 
-    private suspend fun testFeeLoadingAsync(chain: Chain): Result<*> {
+    private suspend fun testFeeLoadingAsync(chain: Chain) {
         return coroutineScope {
-            runCatching {
-                withTimeout(80.seconds) {
-                    extrinsicService.estimateFee(chain) {
-                        systemRemark(byteArrayOf(0))
-                    }
+            withTimeout(20.seconds) {
+                extrinsicService.estimateFee(chain) {
+                    systemRemark(byteArrayOf(0))
                 }
             }
         }

@@ -25,7 +25,7 @@ object CustomSignedExtensions {
 
     fun extensionsWithValues(): Map<SignedExtensionId, Any?> {
         return CustomExtension.values().mapNotNull { customExtension ->
-            customExtension.name to customExtension.createPayload()
+            customExtension.extensionName to customExtension.createPayload()
         }.toMap()
     }
 }
