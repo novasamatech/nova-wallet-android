@@ -67,7 +67,7 @@ internal class RealSwapService(
             }.awaitAll()
 
             directionsByExchange.fold(mutableMultiMapOf()) { acc, directions ->
-                // MultiMap is not castable to MultiMap in general but its safe here since we don't access inner MutableSet
+                // MultiMap is not castable to MutableMultiMap in general but its safe here since we don't access inner MutableSet
                 @Suppress("UNCHECKED_CAST")
                 acc.putAll(directions as MutableMultiMap<FullChainAssetId, FullChainAssetId>)
                 acc
