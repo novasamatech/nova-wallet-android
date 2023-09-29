@@ -9,3 +9,8 @@ interface MultiLocationConverter {
 
     suspend fun toChainAsset(multiLocation: MultiLocation): Chain.Asset?
 }
+
+
+suspend fun MultiLocationConverter.toMultiLocationOrThrow(chainAsset: Chain.Asset): MultiLocation {
+    return toMultiLocation(chainAsset) ?: error("Failed to convert asset location")
+}
