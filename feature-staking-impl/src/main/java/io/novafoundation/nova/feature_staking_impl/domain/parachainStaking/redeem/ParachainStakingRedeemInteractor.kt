@@ -1,15 +1,18 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.redeem
 
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.ScheduledDelegationRequest
+import io.novafoundation.nova.feature_staking_api.domain.model.parachain.activeBonded
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.redeemableIn
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.calls.executeDelegationRequest
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
+import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +25,7 @@ interface ParachainStakingRedeemInteractor {
 
     suspend fun redeemableAmount(delegatorState: DelegatorState): BigInteger
 
-    suspend fun redeem(delegatorState: DelegatorState): Result<*>
+    suspend fun redeem(delegatorState: DelegatorState): Result<RedeemConsequences>
 }
 
 class RealParachainStakingRedeemInteractor(
@@ -43,9 +46,11 @@ class RealParachainStakingRedeemInteractor(
         return redeemableUnbondings.values.sumByBigInteger { it.action.amount }
     }
 
-    override suspend fun redeem(delegatorState: DelegatorState): Result<*> = withContext(Dispatchers.Default) {
+    override suspend fun redeem(delegatorState: DelegatorState): Result<RedeemConsequences> = withContext(Dispatchers.Default) {
         extrinsicService.submitExtrinsicWithSelectedWalletAndWaitBlockInclusion(delegatorState.chain) {
             redeem(delegatorState)
+        }.map {
+            RedeemConsequences(willKillStash = delegatorState.activeBonded.isZero)
         }
     }
 
