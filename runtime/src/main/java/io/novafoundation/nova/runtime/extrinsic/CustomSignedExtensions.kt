@@ -9,7 +9,7 @@ import java.math.BigInteger
 
 object CustomSignedExtensions {
 
-    private enum class CustomExtension(val extensionName: String, val typeNames: List<>) {
+    private enum class CustomExtension(val extensionName: String, val typeName: String) {
 
         ASSETS_TX_PAYMENT("ChargeAssetTxPayment", "pallet_asset_tx_payment.ChargeAssetTxPayment") {
 
@@ -42,7 +42,7 @@ object CustomSignedExtensions {
         runtime: RuntimeSnapshot,
         customExtension: CustomExtension,
     ): SignedExtension? {
-        return runtime.typeRegistry[customExtension.typeNames]?.let { signedExtraType ->
+        return runtime.typeRegistry[customExtension.typeName]?.let { signedExtraType ->
             SignedExtension(customExtension.extensionName, signedExtraType)
         }
     }
