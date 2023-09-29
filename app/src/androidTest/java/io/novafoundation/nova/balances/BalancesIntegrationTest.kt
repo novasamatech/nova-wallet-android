@@ -49,16 +49,15 @@ class BalancesIntegrationTest(
         @Parameterized.Parameters(name = "{1}")
         fun data(): ArrayList<Array<String?>> {
             val arrayOfNetworks: Array<TestData> = Gson().fromJson(URL(TEST_CHAINS_URL).readText())
-//            val arrayOfNetworks: Array<TestData> = arrayOf(TestData(Chain.Geneses.ACALA, "statemine", "a"))
             val listNetworks: ArrayList<Array<String?>> = ArrayList()
             arrayOfNetworks.forEach { listNetworks.add(arrayOf(it.chainId, it.name, it.account)) }
             return listNetworks
         }
 
         class TestData(
-            var chainId: String? = null,
-            var name: String? = null,
-            var account: String? = null
+            val chainId: String,
+            val name: String,
+            val account: String?
         )
     }
 
