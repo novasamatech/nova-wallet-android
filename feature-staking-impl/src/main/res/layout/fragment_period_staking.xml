@@ -105,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="16dp"
                 app:dividerVisible="false"
-                app:primaryValueIcon="@drawable/ic_chevron_right"
+                app:primaryValueEndIcon="@drawable/ic_chevron_right"
                 app:primaryValueIconTint="@color/icon_accent"
                 app:title="@string/staking_period_start_title" />
 
@@ -123,7 +123,7 @@
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="16dp"
                 app:dividerVisible="false"
-                app:primaryValueIcon="@drawable/ic_chevron_right"
+                app:primaryValueEndIcon="@drawable/ic_chevron_right"
                 app:primaryValueIconTint="@color/icon_accent"
                 app:title="@string/staking_period_end_title" />
 

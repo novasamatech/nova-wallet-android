@@ -68,7 +68,7 @@
                     android:id="@+id/rewardDetailValidator"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                    app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
                     app:primaryValueIconTint="@color/icon_secondary"
                     app:title="@string/staking_reward_details_validator" />
 
@@ -98,7 +98,7 @@
                     android:id="@+id/rewardDetailEvent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                    app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
                     app:primaryValueIconTint="@color/icon_secondary"
                     app:title="@string/common_event" />
 

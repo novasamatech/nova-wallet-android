@@ -38,6 +38,8 @@ import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureHolder
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureHolder
+import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
+import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureHolder
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_versions_impl.di.VersionsFeatureHolder
 import io.novafoundation.nova.feature_vote.di.VoteFeatureApi
@@ -191,4 +193,10 @@ interface ComponentHolderModule {
     @ClassKey(SettingsFeatureApi::class)
     @IntoMap
     fun provideSettingsFeature(holder: SettingsFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(SwapFeatureApi::class)
+    @IntoMap
+    fun provideSwapFeature(holder: SwapFeatureHolder): FeatureApiHolder
 }

@@ -329,6 +329,10 @@ class Navigator(
         walletConnectDelegate.openScanPairingQrCode()
     }
 
+    override fun openSwapFlow() {
+        navController?.navigate(R.id.action_mainFragment_to_swapFlow)
+    }
+
     override fun openNfts() {
         navController?.navigate(R.id.action_mainFragment_to_nfts_nav_graph)
     }

@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="fragment_swap_main_settings_max_button">Max:</string>
+    <string name="fragment_swap_main_settings_pay_title">You pay</string>
+    <string name="fragment_swap_main_settings_receive_title">You receive</string>
+    <string name="fragment_swap_main_settings_details_title">Swap details</string>
+    <string name="fragment_swap_main_settings_rate_title">Rate</string>
+    <string name="fragment_swap_main_settings_network_fee_title">Network fee</string>
+    <string name="fragment_swap_main_settings_button_text">Select a token to receive</string>
+    <string name="wallet_asset_swap">Swap</string>
+    <string name="fragment_swap_main_settings_select_token">Select a token</string>
+
     <string name="assets_send_flow_placeholder_button">Buy tokens</string>
     <string name="assets_send_flow_placeholder">You don’t have tokens to send.\nBuy or Deposit tokens to your account.</string>
     <string name="common_days_and_hours_format_with_delimeter">%s and %s</string>
