@@ -16,7 +16,7 @@ class SwapButtonState(
 
 class SwapMainSettingsViewModel() : BaseViewModel() {
 
-    //Placeholders
+    // Placeholders
     val payInput: MutableSharedFlow<String> = MutableStateFlow("")
     val receiveInput: MutableSharedFlow<String> = MutableStateFlow("")
 
