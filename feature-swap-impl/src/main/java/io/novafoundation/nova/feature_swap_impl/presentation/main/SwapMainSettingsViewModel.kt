@@ -17,8 +17,8 @@ class SwapButtonState(
 class SwapMainSettingsViewModel() : BaseViewModel() {
 
     //Placeholders
-    val payInput: MutableSharedFlow<String?> = MutableStateFlow(null)
-    val receiveInput: MutableSharedFlow<String?> = MutableStateFlow(null)
+    val payInput: MutableSharedFlow<String> = MutableStateFlow("")
+    val receiveInput: MutableSharedFlow<String> = MutableStateFlow("")
 
     val paymentAsset: Flow<SwapAssetModel> = flowOf { SwapAssetModel(null, "Pay", null, "Select a token") }
     val receivingAsset: Flow<SwapAssetModel> = flowOf { SwapAssetModel(null, "Receive", null, "Select a token") }
