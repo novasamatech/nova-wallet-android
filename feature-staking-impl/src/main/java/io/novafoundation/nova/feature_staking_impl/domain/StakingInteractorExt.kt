@@ -71,19 +71,24 @@ fun minimumStake(
     if (bagListSize == null || maxElectingVoters == null || bagListSize < maxElectingVoters) return minimumNominatorBond
 
     val stakeByNominator = exposures
-        .fold(mutableMapOf<AccountIdKey, BigInteger>()) { acc, exposure ->
-            exposure.others
-                .take(maxNominatorsInValidator)
-                .forEach { individualExposure ->
-                    val key = individualExposure.who.intoKey()
-                    val currentExposure = acc.getOrDefault(key, BigInteger.ZERO)
-                    acc[key] = currentExposure + individualExposure.value
-                }
+        .fold(mutableMapOf<AccountIdKey, ActiveStakingEntry>()) { acc, exposure ->
+            exposure.others.forEachIndexed { index, individualExposure ->
+                val key = individualExposure.who.intoKey()
+                val currentEntry = acc.getOrPut(key) { ActiveStakingEntry() }
+
+                val isStakeActive = index < maxNominatorsInValidator
+                currentEntry.addStake(individualExposure.value, isStakeActive)
+            }
 
             acc
         }
 
-    val minElectedStake = stakeByNominator.values.minOrNull().orZero().coerceAtLeast(minimumNominatorBond)
+    val minElectedStake = stakeByNominator.values
+        .asSequence()
+        .mapNotNull { it.totalStakedIfAnyActive() }
+        .minOrNull()
+        .orZero()
+        .coerceAtLeast(minimumNominatorBond)
 
     if (bagListLocator == null) return minElectedStake
 
@@ -95,4 +100,22 @@ fun minimumStake(
     val nextBagRequiredAmount = nextBagThreshold + epsilon
 
     return nextBagRequiredAmount.coerceAtLeast(minElectedStake)
+}
+
+
+private class ActiveStakingEntry {
+
+    private var totalStaked: Balance = Balance.ZERO
+    private var numberOfValidators: Short = 0
+    private var allStakeInactive: Boolean = true
+
+    fun addStake(stake: Balance, isStakeActive: Boolean) {
+        totalStaked += stake
+        numberOfValidators++
+        allStakeInactive = allStakeInactive && !isStakeActive
+    }
+
+    fun totalStakedIfAnyActive(): Balance? {
+        return totalStaked.takeUnless { allStakeInactive }
+    }
 }
