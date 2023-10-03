@@ -57,10 +57,10 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
 
         val swapQuote = swapService.quote(
             args = SwapQuoteArgs(
-                tokenIn = tokenRepository.getToken(wndOnWestmint),
-                tokenOut = tokenRepository.getToken(siriOnWestmint),
-                amount = wndOnWestmint.planksFromAmount(0.000001.toBigDecimal()),
-                swapDirection = SwapDirection.SPECIFIED_IN,
+                tokenIn = tokenRepository.getToken(siriOnWestmint),
+                tokenOut = tokenRepository.getToken(wndOnWestmint),
+                amount = wndOnWestmint.planksFromAmount(10.toBigDecimal()),
+                swapDirection = SwapDirection.SPECIFIED_OUT,
                 slippage = Percent(1.0)
             )
         ).getOrThrow()
