@@ -106,12 +106,10 @@ fun minimumStake(
 private class ActiveStakingEntry {
 
     private var totalStaked: Balance = Balance.ZERO
-    private var numberOfValidators: Short = 0
     private var allStakeInactive: Boolean = true
 
     fun addStake(stake: Balance, isStakeActive: Boolean) {
         totalStaked += stake
-        numberOfValidators++
         allStakeInactive = allStakeInactive && !isStakeActive
     }
 
