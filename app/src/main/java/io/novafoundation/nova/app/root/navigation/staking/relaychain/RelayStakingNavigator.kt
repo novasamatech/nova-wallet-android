@@ -1,19 +1,20 @@
 package io.novafoundation.nova.app.root.navigation.staking.relaychain
 
-import androidx.navigation.NavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.Navigator
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
+import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.ConfirmPayoutFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.PayoutDetailsFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
-import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectPoolFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.SelectingPoolPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.searchPool.SearchPoolFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool.SelectPoolFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMoreFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMorePayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select.SelectBondMoreFragment
@@ -40,10 +41,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 class RelayStakingNavigator(
     private val navigationHolder: NavigationHolder,
     private val commonNavigator: Navigator,
+    private val stakingDashboardRouter: StakingDashboardRouter,
 ) : BaseNavigator(navigationHolder), StakingRouter {
-
-    private val navController: NavController?
-        get() = navigationHolder.navController
 
     override fun returnToStakingMain() = performNavigation(R.id.back_to_staking_main)
 
@@ -214,5 +213,13 @@ class RelayStakingNavigator(
                 R.id.selectPoolFragment to R.id.action_selectPool_to_setupAmountMultiStakingFragment,
             )
         )
+    }
+
+    override fun finishRedeemFlow(redeemConsequences: RedeemConsequences) {
+        if (redeemConsequences.willKillStash) {
+            stakingDashboardRouter.returnToStakingDashboard()
+        } else {
+            returnToStakingMain()
+        }
     }
 }
