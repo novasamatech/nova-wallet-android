@@ -69,7 +69,7 @@ class ExtrinsicBuilderFactory(
                 genesisHash = chain.requireGenesisHash().fromHex(),
                 blockHash = mortality.blockHash.fromHex(),
                 era = mortality.era,
-                customSignedExtensions = CustomSignedExtensions.extensionsWithValues(runtime),
+                customSignedExtensions = CustomSignedExtensions.extensionsWithValues(),
                 signer = signer,
                 accountId = accountId
             )
