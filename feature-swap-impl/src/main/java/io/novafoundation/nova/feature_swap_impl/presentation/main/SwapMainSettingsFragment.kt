@@ -64,7 +64,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         viewModel.paymentTokenMaxAmount.observe { swapMainSettingsMaxAmount.text = it }
         viewModel.paymentAsset.observe { swapMainSettingsPayInput.setModel(it) }
         viewModel.receivingAsset.observe { swapMainSettingsReceiveInput.setModel(it) }
-        viewModel.rateDetails.observe { swapMainSettingsDetailsRate.valuePrimary.text = it }
+        viewModel.rateDetails.observe { swapMainSettingsDetailsRate.showValue(it) }
         viewModel.networkFee.observe { swapMainSettingsDetailsNetworkFee.showAmount(it) }
         viewModel.showDetails.observe { swapMainSettingsDetails.setVisible(it) }
         viewModel.buttonState.observe {
