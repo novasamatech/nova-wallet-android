@@ -12,7 +12,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Junctions
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation.Junction
 import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
+import io.novafoundation.nova.feature_wallet_api.domain.model.junctionList
 import io.novafoundation.nova.feature_wallet_api.domain.model.order
+import io.novafoundation.nova.feature_wallet_api.domain.model.toInterior
 import io.novafoundation.nova.runtime.ext.isParachain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
@@ -52,17 +54,6 @@ operator fun MultiLocation.plus(suffix: MultiLocation): MultiLocation {
         parents = parents,
         interior = newJunctions.toInterior()
     )
-}
-
-private val MultiLocation.Interior.junctionList: List<Junction>
-    get() = when (this) {
-        MultiLocation.Interior.Here -> emptyList()
-        is MultiLocation.Interior.Junctions -> junctions
-    }
-
-fun List<Junction>.toInterior() = when (size) {
-    0 -> MultiLocation.Interior.Here
-    else -> MultiLocation.Interior.Junctions(this)
 }
 
 fun MultiLocation.childView() = MultiLocation(parents + BigInteger.ONE, interior)

@@ -263,6 +263,8 @@ object ChainGeneses {
     const val TURING = "0f62b701fb12d02237a33b84818c11f621653d2b1614c777973babf4652b535d"
 
     const val ZEITGEIST = "1bf2a2ecb4a868de66ea8610f2ce7c8c43706561b6476031315f6640fe38e060"
+
+    const val WESTMINT = "67f9723393ef76214df0118c34bbbd3dbebc8ed46a10973a8c969d48fe7598c9"
 }
 
 object ChainIds {
@@ -283,6 +285,10 @@ fun Chain.Asset.requireStatemine(): Type.Statemine {
     require(type is Type.Statemine)
 
     return type
+}
+
+fun Chain.Asset.statemineOrNull(): Type.Statemine? {
+    return type as? Type.Statemine
 }
 
 fun Type.Statemine.palletNameOrDefault(): String {

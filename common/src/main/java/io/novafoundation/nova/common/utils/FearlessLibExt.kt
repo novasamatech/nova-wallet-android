@@ -216,6 +216,8 @@ fun RuntimeMetadata.nominationPools() = module(Modules.NOMINATION_POOLS)
 
 fun RuntimeMetadata.nominationPoolsOrNull() = moduleOrNull(Modules.NOMINATION_POOLS)
 
+fun RuntimeMetadata.assetConversionOrNull() = moduleOrNull(Modules.ASSET_CONVERSION)
+
 fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
 }
@@ -321,4 +323,6 @@ object Modules {
     const val ELECTION_PROVIDER_MULTI_PHASE = "ElectionProviderMultiPhase"
 
     const val NOMINATION_POOLS = "NominationPools"
+
+    const val ASSET_CONVERSION = "AssetConversion"
 }
