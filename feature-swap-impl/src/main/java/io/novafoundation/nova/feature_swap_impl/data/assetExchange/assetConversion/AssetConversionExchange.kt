@@ -166,7 +166,7 @@ private class AssetConversionExchange(
 
         val includeFee = true
 
-        val (multiLocationTypeName, balanceTypeName) = runtime.metadata.quoteTypes()
+        val multiLocationTypeName = runtime.metadata.assetIdTypeName()
 
         val quote = call(
             section = "AssetConversionApi",
@@ -174,22 +174,21 @@ private class AssetConversionExchange(
             arguments = listOf(
                 asset1 to multiLocationTypeName,
                 asset2 to multiLocationTypeName,
-                swapQuoteArgs.amount to balanceTypeName,
+                swapQuoteArgs.amount to "Balance",
                 includeFee to BooleanType.name
             ),
-            returnType = balanceTypeName,
+            returnType = "Option<Balance>",
             returnBinding = ::bindNumberOrNull
         )
 
         return requireNotNull(quote)
     }
 
-    private fun RuntimeMetadata.quoteTypes(): Pair<String, String> {
-        val (assetIdArgument, _, amountArgument) = assetConversion().call("add_liquidity").arguments
+    private fun RuntimeMetadata.assetIdTypeName(): String {
+        val (assetIdArgument) = assetConversion().call("add_liquidity").arguments
 
         val assetIdType = assetIdArgument.type!!
-        val balanceType = amountArgument.type!!
 
-        return assetIdType.name to balanceType.name
+        return assetIdType.name
     }
 }

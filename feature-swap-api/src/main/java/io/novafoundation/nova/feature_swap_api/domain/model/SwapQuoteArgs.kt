@@ -23,12 +23,12 @@ class SwapExecuteArgs(
 
 sealed class SwapLimit {
 
-    class SpecifiedIn(val amountIn: Balance, val amountOutMin: Balance): SwapLimit()
+    class SpecifiedIn(val amountIn: Balance, val amountOutMin: Balance) : SwapLimit()
 
-    class SpecifiedOut(val amountInMax: Balance, val amountOut: Balance): SwapLimit()
+    class SpecifiedOut(val amountInMax: Balance, val amountOut: Balance) : SwapLimit()
 }
 
-fun SwapQuoteArgs.toExecuteArgs(quotedBalance: Balance) :SwapExecuteArgs {
+fun SwapQuoteArgs.toExecuteArgs(quotedBalance: Balance): SwapExecuteArgs {
     return SwapExecuteArgs(
         assetIn = tokenIn.configuration,
         assetOut = tokenOut.configuration,
@@ -37,7 +37,7 @@ fun SwapQuoteArgs.toExecuteArgs(quotedBalance: Balance) :SwapExecuteArgs {
 }
 
 fun SwapQuoteArgs.swapLimits(quotedBalance: Balance): SwapLimit {
-    return when(swapDirection) {
+    return when (swapDirection) {
         SwapDirection.SPECIFIED_IN -> SpecifiedIn(amount, slippage, quotedBalance)
         SwapDirection.SPECIFIED_OUT -> SpecifiedOut(amount, slippage, quotedBalance)
     }

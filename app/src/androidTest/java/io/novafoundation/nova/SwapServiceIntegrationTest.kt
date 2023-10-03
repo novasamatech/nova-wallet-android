@@ -59,7 +59,7 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
             args = SwapQuoteArgs(
                 tokenIn = tokenRepository.getToken(wndOnWestmint),
                 tokenOut = tokenRepository.getToken(siriOnWestmint),
-                amount = wndOnWestmint.planksFromAmount(0.001.toBigDecimal()),
+                amount = wndOnWestmint.planksFromAmount(0.000001.toBigDecimal()),
                 swapDirection = SwapDirection.SPECIFIED_IN,
                 slippage = Percent(1.0)
             )
