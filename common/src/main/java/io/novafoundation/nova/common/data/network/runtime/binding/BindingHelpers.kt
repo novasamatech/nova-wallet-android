@@ -95,6 +95,6 @@ fun <D> RuntimeType<*, D>.fromByteArrayOrIncompatible(scale: ByteArray, runtime:
     fromByteArray(runtime, scale)
 }
 
-private fun <T> successOrIncompatible(block: () -> T) : T = runCatching {
+private fun <T> successOrIncompatible(block: () -> T): T = runCatching {
     block()
 }.getOrElse { incompatible() }
