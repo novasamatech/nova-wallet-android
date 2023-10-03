@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
@@ -87,7 +88,8 @@ private class AssetConversionExchange(
 
     override suspend fun quote(args: SwapQuoteArgs): AssetExchangeQuote {
         val runtimeCallsApi = multiChainRuntimeCallsApi.forChain(chain.id)
-        val quotedBalance = runtimeCallsApi.quote(args)
+        val quotedBalance = runtimeCallsApi.quote(args) ?: throw SwapQuoteException.NotEnoughLiquidity
+
         val executeArgs = args.toExecuteArgs(quotedBalance)
 
         val fee = extrinsicService.estimateFeeV2(chain) {
@@ -155,7 +157,7 @@ private class AssetConversionExchange(
         }
     }
 
-    private suspend fun RuntimeCallsApi.quote(swapQuoteArgs: SwapQuoteArgs): Balance {
+    private suspend fun RuntimeCallsApi.quote(swapQuoteArgs: SwapQuoteArgs): Balance? {
         val method = when (swapQuoteArgs.swapDirection) {
             SwapDirection.SPECIFIED_IN -> "quote_price_exact_tokens_for_tokens"
             SwapDirection.SPECIFIED_OUT -> "quote_price_tokens_for_exact_tokens"
@@ -168,7 +170,7 @@ private class AssetConversionExchange(
 
         val multiLocationTypeName = runtime.metadata.assetIdTypeName()
 
-        val quote = call(
+        return call(
             section = "AssetConversionApi",
             method = method,
             arguments = listOf(
@@ -180,8 +182,6 @@ private class AssetConversionExchange(
             returnType = "Option<Balance>",
             returnBinding = ::bindNumberOrNull
         )
-
-        return requireNotNull(quote)
     }
 
     private fun RuntimeMetadata.assetIdTypeName(): String {
