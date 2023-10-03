@@ -8,13 +8,16 @@ import io.novafoundation.nova.runtime.ext.palletNameOrDefault
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.ext.statemineOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.asNumberOrNull
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.asNumberOrThrow
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
 import java.math.BigInteger
 
 private typealias PalletName = String
-private typealias StatemineAssetId = BigInteger
-private typealias MappingKey = Pair<PalletName, StatemineAssetId>
+private typealias LocalAssetsAssetId = BigInteger
+private typealias MappingKey = Pair<PalletName, LocalAssetsAssetId>
 private typealias Mapping = Map<MappingKey, Chain.Asset>
 
 class LocalAssetsLocationConverter(
@@ -28,13 +31,15 @@ class LocalAssetsLocationConverter(
         if (chainAsset.chainId != chain.id) return null
 
         val assetsType = chainAsset.statemineOrNull() ?: return null
+        // LocalAssets converter only supports number ids to use as GeneralIndex
+        val index = assetsType.id.asNumberOrNull() ?: return null
         val pallet = runtime.metadata.moduleOrNull(assetsType.palletNameOrDefault()) ?: return null
 
         return MultiLocation(
             parents = BigInteger.ZERO, // For Local Assets chain serves as a reserve
             interior = Junctions(
                 Junction.PalletInstance(pallet.index),
-                Junction.GeneralIndex(assetsType.id)
+                Junction.GeneralIndex(index)
             )
         )
     }
@@ -57,12 +62,15 @@ class LocalAssetsLocationConverter(
 
     private fun constructAssetIdToAssetMapping(): Mapping {
         return chain.assets
-            .filter { it.type is Chain.Asset.Type.Statemine }
+            .filter {
+                val type = it.type
+                type is Chain.Asset.Type.Statemine && type.id is StatemineAssetId.Number
+            }
             .associateBy { statemineAsset ->
                 val assetsType = statemineAsset.requireStatemine()
                 val palletName = assetsType.palletNameOrDefault()
 
-                palletName to assetsType.id
+                palletName to assetsType.id.asNumberOrThrow()
             }
     }
 }

@@ -16,10 +16,15 @@ import io.novafoundation.nova.runtime.ext.palletNameOrDefault
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
+import jp.co.soramitsu.fearless_utils.runtime.metadata.call
+import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import java.math.BigInteger
 
@@ -56,13 +61,25 @@ class StatemineAssetTransfers(
 
         val assetAccount = remoteStorage.query(chainAsset.chainId) {
             runtime.metadata.statemineModule(statemineType).storage("Account").query(
-                statemineType.id,
+                statemineType.prepareIdForEncoding(runtime),
                 recipient,
                 binding = ::bindAssetAccountOrEmpty
             )
         }
 
         return assetAccount.canAcceptFunds
+    }
+
+    private fun Chain.Asset.Type.Statemine.prepareIdForEncoding(runtimeSnapshot: RuntimeSnapshot): Any? {
+        return when(val id = id) {
+            is StatemineAssetId.Number -> id.value
+            is StatemineAssetId.ScaleEncoded -> {
+                val transferCall = runtimeSnapshot.metadata.module(palletNameOrDefault()).call("transfer")
+                val assetIdType = transferCall.arguments.first().type!!
+
+                assetIdType.fromHex(runtimeSnapshot, id.scaleHex)
+            }
+        }
     }
 
     private fun ExtrinsicBuilder.statemineTransfer(
@@ -74,7 +91,7 @@ class StatemineAssetTransfers(
             moduleName = assetType.palletNameOrDefault(),
             callName = "transfer",
             arguments = mapOf(
-                "id" to assetType.id,
+                "id" to assetType.prepareIdForEncoding(runtime),
                 "target" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, target),
                 "amount" to amount
             )
