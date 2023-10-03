@@ -17,8 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redeem
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redeem.validations.NominationPoolsRedeemValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redeem.validations.NominationPoolsRedeemValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.redeem.validations.nominationPoolsRedeemValidationFailure
-import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
-import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
@@ -34,7 +33,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 class NominationPoolsRedeemViewModel(
-    private val router: NominationPoolsRouter,
+    private val router: StakingRouter,
     private val interactor: NominationPoolsRedeemInteractor,
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
@@ -122,21 +121,13 @@ class NominationPoolsRedeemViewModel(
 
     private fun sendTransaction() = launch {
         interactor.redeem(poolMemberFlow.first())
-            .onSuccess { outcome ->
+            .onSuccess { redeemConsequences ->
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                finishFlow(outcome)
+                router.finishRedeemFlow(redeemConsequences)
             }
             .onFailure(::showError)
 
         _showNextProgress.value = false
-    }
-
-    private fun finishFlow(outcome: RedeemConsequences) {
-        if (outcome.willKillStash) {
-            router.returnToMain()
-        } else {
-            router.returnToStakingMain()
-        }
     }
 }

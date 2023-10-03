@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.redee
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.redeem.RealParachainStakingRedeemInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.redeem.validations.ParachainStakingRedeemValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.redeem.validations.parachainStakingRedeem
-import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.redeem.ParachainStakingRedeemViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -55,7 +55,7 @@ class ParachainStakingRedeemModule {
     @IntoMap
     @ViewModelKey(ParachainStakingRedeemViewModel::class)
     fun provideViewModel(
-        router: ParachainStakingRouter,
+        router: StakingRouter,
         addressIconGenerator: AddressIconGenerator,
         resourceManager: ResourceManager,
         validationSystem: ParachainStakingRedeemValidationSystem,

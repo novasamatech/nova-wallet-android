@@ -70,6 +70,10 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
 
         assetFlowToolbar.searchField.requestFocus()
         assetFlowToolbar.searchField.content.showSoftKeyboard()
+
+        onBackPressed {
+            assetFlowToolbar.searchField.hideSoftKeyboard()
+        }
     }
 
     override fun subscribe(viewModel: T) {
@@ -95,13 +99,9 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        assetFlowToolbar.searchField.hideSoftKeyboard()
-    }
-
     override fun assetClicked(asset: AssetModel) {
         viewModel.assetClicked(asset)
+
+        assetFlowToolbar.searchField.hideSoftKeyboard()
     }
 }
