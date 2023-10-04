@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/start_swap_graph"
+    app:startDestination="@id/swapFlowFragment">
+
+    <fragment
+        android:id="@+id/swapFlowFragment"
+        android:name="io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment"
+        android:label="SwapMainSettingsFragment">
+
+        <action
+            android:id="@+id/action_swapMainSettingsFragment_to_swapConfirmationFragment"
+            app:destination="@id/swapConfirmationFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"/>
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/swapConfirmationFragment"
+        android:name="io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationFragment"
+        android:label="SwapConfirmationFragment"
+        tools:layout="@layout/fragment_swap_confirmation_settings"/>
+
+</navigation>

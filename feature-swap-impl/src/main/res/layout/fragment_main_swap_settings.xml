@@ -139,14 +139,14 @@
                     android:id="@+id/swapMainSettingsDetailsRate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:title="@string/fragment_swap_main_settings_rate_title"
+                    app:title="@string/swap_rate_title"
                     app:titleIcon="@drawable/ic_info_cicrle_filled_16" />
 
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/swapMainSettingsDetailsNetworkFee"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:title="@string/fragment_swap_main_settings_network_fee_title"
+                    app:title="@string/swap_network_fee_title"
                     app:titleIcon="@drawable/ic_info_cicrle_filled_16" />
 
             </io.novafoundation.nova.common.view.TableView>
@@ -162,7 +162,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginBottom="24dp"
         android:enabled="false"
-        android:text="@string/fragment_swap_main_settings_button_text"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="Enter amount" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -63,7 +63,7 @@ class BalanceListViewModel(
     private val walletInteractor: WalletInteractor,
     private val assetsListInteractor: AssetsListInteractor,
     private val selectedAccountUseCase: SelectedAccountUseCase,
-    private val router: AssetsRouter,
+    private val assetsRouter: AssetsRouter,
     private val currencyInteractor: CurrencyInteractor,
     private val balanceBreakdownInteractor: BalanceBreakdownInteractor,
     private val externalBalancesInteractor: ExternalBalancesInteractor,
@@ -189,36 +189,36 @@ class BalanceListViewModel(
             chainAssetId = asset.token.configuration.id
         )
 
-        router.openAssetDetails(payload)
+        assetsRouter.openAssetDetails(payload)
     }
 
     fun avatarClicked() {
-        router.openSwitchWallet()
+        assetsRouter.openSwitchWallet()
     }
 
     fun filtersClicked() {
-        router.openAssetFilters()
+        assetsRouter.openAssetFilters()
     }
 
     fun manageClicked() {
-        router.openManageTokens()
+        assetsRouter.openManageTokens()
     }
 
     fun goToNftsClicked() {
-        router.openNfts()
+        assetsRouter.openNfts()
     }
 
     fun searchClicked() {
-        router.openAssetSearch()
+        assetsRouter.openAssetSearch()
     }
 
     fun walletConnectClicked() {
         launch {
             if (walletConnectAccountSessionCount.first() > 0) {
                 val metaAccount = selectedMetaAccount.first()
-                router.openWalletConnectSessions(metaAccount.id)
+                assetsRouter.openWalletConnectSessions(metaAccount.id)
             } else {
-                router.openWalletConnectScan()
+                assetsRouter.openWalletConnectScan()
             }
         }
     }
@@ -301,18 +301,18 @@ class BalanceListViewModel(
     }
 
     fun sendClicked() {
-        router.openSendFlow()
+        assetsRouter.openSendFlow()
     }
 
     fun receiveClicked() {
-        router.openReceiveFlow()
+        assetsRouter.openReceiveFlow()
     }
 
     fun buyClicked() {
-        router.openBuyFlow()
+        assetsRouter.openBuyFlow()
     }
 
     fun swapClicked() {
-        router.openSwapFlow()
+        assetsRouter.openSwapFlow()
     }
 }

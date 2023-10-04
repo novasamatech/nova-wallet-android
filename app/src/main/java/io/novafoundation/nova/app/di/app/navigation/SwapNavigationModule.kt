@@ -5,7 +5,7 @@ import dagger.Provides
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.swap.SwapNavigator
 import io.novafoundation.nova.common.di.scope.ApplicationScope
-import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
+import io.novafoundation.nova.feature_swap_api.presentation.SwapRouter
 
 @Module
 class SwapNavigationModule {

@@ -31,7 +31,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/swapAmountInputSubtitle"
         app:layout_constraintStart_toEndOf="@+id/swapAmountInputImageBarier"
         app:layout_constraintTop_toTopOf="@+id/swapAmountInputSubtitle"
-        app:tint="@color/icon_primary"
         tools:src="@drawable/ic_nova_logo" />
 
     <androidx.constraintlayout.widget.Barrier
