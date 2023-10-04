@@ -21,7 +21,6 @@ fun StatemineAssetId.asNumberOrNull(): BigInteger? {
     return (this as? StatemineAssetId.Number)?.value
 }
 
-
 fun StatemineAssetId.asNumberOrThrow(): BigInteger {
     return (this as StatemineAssetId.Number).value
 }

@@ -46,9 +46,9 @@ class ForeignAssetsLocationConverter(
         return chain.assets
             .filter {
                 val type = it.type
-                type is Chain.Asset.Type.Statemine
-                    && type.palletName == FOREIGN_ASSETS_PALLET_NAME
-                    && type.id is StatemineAssetId.ScaleEncoded
+                type is Chain.Asset.Type.Statemine &&
+                    type.palletName == FOREIGN_ASSETS_PALLET_NAME &&
+                    type.id is StatemineAssetId.ScaleEncoded
             }
             .associateBy { statemineAsset ->
                 val assetsType = statemineAsset.requireStatemine()

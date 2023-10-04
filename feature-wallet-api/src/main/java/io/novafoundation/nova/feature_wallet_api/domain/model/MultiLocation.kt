@@ -36,7 +36,7 @@ class MultiLocation(
 
         class AccountId32(val accountId: AccountId) : Junction()
 
-        class GlobalConsensus(chainId: ChainId): Junction() {
+        class GlobalConsensus(chainId: ChainId) : Junction() {
 
             val chainId = chainId.removeHexPrefix()
         }
