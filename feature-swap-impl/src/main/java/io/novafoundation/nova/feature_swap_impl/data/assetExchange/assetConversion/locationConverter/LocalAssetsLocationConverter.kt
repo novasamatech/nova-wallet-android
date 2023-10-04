@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter
 
+import io.novafoundation.nova.common.utils.PalletName
 import io.novafoundation.nova.feature_wallet_api.domain.model.Junctions
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation.Junction
@@ -15,10 +16,9 @@ import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
 import java.math.BigInteger
 
-private typealias PalletName = String
 private typealias LocalAssetsAssetId = BigInteger
-private typealias MappingKey = Pair<PalletName, LocalAssetsAssetId>
-private typealias Mapping = Map<MappingKey, Chain.Asset>
+private typealias LocalAssetsMappingKey = Pair<PalletName, LocalAssetsAssetId>
+private typealias LocalAssetsMapping = Map<LocalAssetsMappingKey, Chain.Asset>
 
 class LocalAssetsLocationConverter(
     private val chain: Chain,
@@ -60,7 +60,7 @@ class LocalAssetsLocationConverter(
         return assetIdToAssetMapping[pallet.name to assetId]
     }
 
-    private fun constructAssetIdToAssetMapping(): Mapping {
+    private fun constructAssetIdToAssetMapping(): LocalAssetsMapping {
         return chain.assets
             .filter {
                 val type = it.type

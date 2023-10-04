@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.CompoundMultiLocationConverter
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.ForeignAssetsLocationConverter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.LocalAssetsLocationConverter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.MultiLocationConverter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.NativeAssetLocationConverter
@@ -57,7 +58,8 @@ class AssetConversionExchangeFactory(
 
         val converter = CompoundMultiLocationConverter(
             NativeAssetLocationConverter(chain),
-            LocalAssetsLocationConverter(chain, runtime)
+            LocalAssetsLocationConverter(chain, runtime),
+            ForeignAssetsLocationConverter(chain, runtime)
         )
 
         return AssetConversionExchange(

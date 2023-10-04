@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -16,9 +17,11 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatT
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureComponent
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
+import kotlinx.coroutines.CoroutineScope
 import org.junit.Test
 import java.math.BigDecimal
 
@@ -41,25 +44,49 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
         }
 
         Log.d("SwapServiceIntegrationTest", "All available tokens: ${allAvailableChainAssetsToSwap.joinToString()}")
+    }
 
-        val westmint = chainRegistry.getChain(Chain.Geneses.WESTMINT)
-        val wndOnWestmint = westmint.utilityAsset
-        val siriOnWestmint = westmint.assets.first { it.symbol == "SIRI" }
+    @Test
+    fun shouldRetrieveAvailableDirectionsForNativeAsset() = runTest {
+        val westmint = chainRegistry.westmint()
 
-        val directionsForWnd = swapService.availableSwapDirectionsFor(wndOnWestmint, this)
-        val directionsForWndFormatted = directionsForWnd.map { otherId ->
-            val asset = chainRegistry.asset(otherId)
+        findAvailableDirectionsFor(westmint.wnd())
+    }
 
-            "${wndOnWestmint.symbol} - ${asset.symbol}"
-        }
+    @Test
+    fun shouldRetrieveAvailableDirectionsForLocalAsset() = runTest {
+        val westmint = chainRegistry.westmint()
 
-        Log.d("SwapServiceIntegrationTest", "Available directions for ${wndOnWestmint.symbol}: ${directionsForWndFormatted.joinToString()}")
+        findAvailableDirectionsFor(westmint.siri())
+    }
 
+    @Test
+    fun shouldRetrieveAvailableDirectionsForForeignAsset() = runTest {
+        val westmint = chainRegistry.westmint()
+
+        findAvailableDirectionsFor(westmint.dot())
+    }
+
+    @Test
+    fun shouldQuoteLocalAssetSwap() = runTest {
+        val westmint = chainRegistry.westmint()
+
+        quoteSwap(from = westmint.wnd(), to = westmint.siri(), amount = 0.000001)
+    }
+
+    @Test(expected = SwapQuoteException.NotEnoughLiquidity::class)
+    fun shouldQuoteForeignAssetSwap() = runTest {
+        val westmint = chainRegistry.westmint()
+
+        quoteSwap(from = westmint.wnd(), to = westmint.dot(), amount = 0.000001)
+    }
+
+    private suspend fun quoteSwap(from: Chain.Asset, to: Chain.Asset, amount: Double) {
         val swapQuote = swapService.quote(
             args = SwapQuoteArgs(
-                tokenIn = tokenRepository.getToken(wndOnWestmint),
-                tokenOut = tokenRepository.getToken(siriOnWestmint),
-                amount = wndOnWestmint.planksFromAmount(0.000001.toBigDecimal()),
+                tokenIn = tokenRepository.getToken(from),
+                tokenOut = tokenRepository.getToken(to),
+                amount = from.planksFromAmount(amount.toBigDecimal()),
                 swapDirection = SwapDirection.SPECIFIED_IN,
                 slippage = Percent(1.0)
             )
@@ -68,10 +95,37 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
         Log.d("SwapServiceIntegrationTest", swapQuote.format())
     }
 
+    private suspend fun CoroutineScope.findAvailableDirectionsFor(asset: Chain.Asset) {
+        val directionsForWnd = swapService.availableSwapDirectionsFor(asset, this)
+        val directionsForWndFormatted = directionsForWnd.map { otherId ->
+            val otherAsset = chainRegistry.asset(otherId)
+
+            "${asset.symbol} - ${otherAsset.symbol}"
+        }
+
+        Log.d("SwapServiceIntegrationTest", "Available directions for ${asset.symbol}: ${directionsForWndFormatted.joinToString()}")
+    }
+
     private fun SwapQuote.format(): String {
         return """
             Swapping ${planksIn.formatPlanks(assetIn)} yields ${planksOut.formatPlanks(assetOut)}.
             Swap rate is ${BigDecimal.ONE.formatTokenAmount(assetIn)} = ${swapRate().formatTokenAmount(assetOut)}"
         """.trimIndent()
+    }
+
+    private suspend fun ChainRegistry.westmint(): Chain {
+        return getChain(Chain.Geneses.WESTMINT)
+    }
+
+    private fun Chain.siri(): Chain.Asset {
+        return assets.first { it.symbol == "SIRI" }
+    }
+
+    private fun Chain.dot(): Chain.Asset {
+        return assets.first { it.symbol == "DOT" }
+    }
+
+    private fun Chain.wnd(): Chain.Asset {
+        return utilityAsset
     }
 }
