@@ -71,11 +71,17 @@ internal class RealSwapService(
                 planksOut = amountOut,
                 direction = args.swapDirection,
                 priceImpact = args.calculatePriceImpact(amountIn, amountOut),
-                fee = SwapFee(
-                    onChainFee = quote.networkFee
-                )
             )
         }
+    }
+
+    override suspend fun estimateFee(args: SwapExecuteArgs): SwapFee {
+        val computationScope = CoroutineScope(coroutineContext)
+        val exchange = exchanges(computationScope).getValue(args.assetIn.chainId)
+
+        val assetExchangeFee = exchange.estimateFee(args)
+
+        return SwapFee(networkFee = assetExchangeFee.networkFee)
     }
 
     override suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicHash> {
