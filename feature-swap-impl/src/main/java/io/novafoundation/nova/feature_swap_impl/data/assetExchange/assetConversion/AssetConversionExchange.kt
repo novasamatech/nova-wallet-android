@@ -31,6 +31,7 @@ import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions.assetTxPayment
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -128,7 +129,8 @@ private class AssetConversionExchange(
 
     private suspend fun ExtrinsicBuilder.executeSwap(swapExecuteArgs: SwapExecuteArgs, origin: AccountId) {
         val path = listOf(swapExecuteArgs.assetIn, swapExecuteArgs.assetOut)
-            .map { multiLocationConverter.toMultiLocationOrThrow(it).toEncodableInstance() }
+            .map { asset -> multiLocationConverter.encodableMultiLocationOf(asset) }
+
         val keepAlive = false
 
         when (val swapLimit = swapExecuteArgs.swapLimit) {
@@ -156,6 +158,20 @@ private class AssetConversionExchange(
                 )
             )
         }
+
+        setFeeAsset(swapExecuteArgs.customFeeAsset)
+    }
+
+    private suspend fun ExtrinsicBuilder.setFeeAsset(feeAsset: Chain.Asset?) {
+        if (feeAsset == null) return
+
+        val assetId = multiLocationConverter.encodableMultiLocationOf(feeAsset)
+
+        assetTxPayment(assetId)
+    }
+
+    private suspend fun MultiLocationConverter.encodableMultiLocationOf(chainAsset: Chain.Asset): Any? {
+        return toMultiLocationOrThrow(chainAsset).toEncodableInstance()
     }
 
     private suspend fun RuntimeCallsApi.quote(swapQuoteArgs: SwapQuoteArgs): Balance? {

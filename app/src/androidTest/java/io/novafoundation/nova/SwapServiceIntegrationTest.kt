@@ -71,7 +71,7 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
     }
 
     @Test
-    fun shouldCalculateFee() = runTest {
+    fun shouldCalculateNativeAssetFee() = runTest {
         val westmint = chainRegistry.westmint()
         val wnd = westmint.wnd()
         val siri = westmint.siri()
@@ -82,12 +82,34 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
             swapLimit = SwapLimit.SpecifiedIn(
                 amountIn = wnd.planksFromAmount(0.000001.toBigDecimal()),
                 amountOutMin = Balance.ZERO
-            )
+            ),
+            customFeeAsset = null
         )
 
         val fee = swapService.estimateFee(swapArgs)
 
         Log.d("SwapServiceIntegrationTest", "Fee for swapping ${wnd.symbol} to ${wnd.symbol} is ${fee.networkFee.amount.formatPlanks(wnd)}")
+    }
+
+    @Test
+    fun shouldCalculateCustomAssetFee() = runTest {
+        val westmint = chainRegistry.westmint()
+        val wnd = westmint.wnd()
+        val joe = westmint.joe()
+
+        val swapArgs = SwapExecuteArgs(
+            assetIn = joe,
+            assetOut = wnd,
+            swapLimit = SwapLimit.SpecifiedIn(
+                amountIn = wnd.planksFromAmount(0.000001.toBigDecimal()),
+                amountOutMin = Balance.ZERO
+            ),
+            customFeeAsset = joe
+        )
+
+        val fee = swapService.estimateFee(swapArgs)
+
+        Log.d("SwapServiceIntegrationTest", "Fee for swapping ${wnd.symbol} to ${wnd.symbol} is ${fee.networkFee.amount.formatPlanks(joe)}")
     }
 
     @Test
@@ -142,6 +164,10 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
 
     private fun Chain.siri(): Chain.Asset {
         return assets.first { it.symbol == "SIRI" }
+    }
+
+    private fun Chain.joe(): Chain.Asset {
+        return assets.first { it.symbol == "JOE" }
     }
 
     private fun Chain.dot(): Chain.Asset {
