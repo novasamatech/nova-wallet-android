@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.prepareIdForEncoding
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.network.updaters.insert
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -73,16 +74,18 @@ class StatemineAssetBalance(
         accountId: AccountId,
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<BalanceSyncUpdate> {
-        val statemineType = chainAsset.requireStatemine()
-
         val runtime = chainRegistry.getRuntime(chain.id)
+
+        val statemineType = chainAsset.requireStatemine()
+        val encodableAssetId = statemineType.prepareIdForEncoding(runtime)
+
         val module = runtime.metadata.statemineModule(statemineType)
 
         val assetDetailsStorage = module.storage("Asset")
-        val assetDetailsKey = assetDetailsStorage.storageKey(runtime, statemineType.id)
+        val assetDetailsKey = assetDetailsStorage.storageKey(runtime, encodableAssetId)
 
         val assetAccountStorage = module.storage("Account")
-        val assetAccountKey = assetAccountStorage.storageKey(runtime, statemineType.id, accountId)
+        val assetAccountKey = assetAccountStorage.storageKey(runtime, encodableAssetId, accountId)
 
         val assetDetailsFlow = subscriptionBuilder.subscribe(assetDetailsKey)
             .onEach { storageCache.insert(it, chain.id) }
@@ -113,8 +116,9 @@ class StatemineAssetBalance(
 
     private suspend fun queryAssetDetails(chainAsset: Chain.Asset): AssetDetails {
         val statemineType = chainAsset.requireStatemine()
-
         return localStorage.query(chainAsset.chainId) {
+            val encodableAssetId = statemineType.prepareIdForEncoding(runtime)
+
             runtime.metadata.statemineModule(statemineType).storage("Asset").query(statemineType.id, binding = ::bindAssetDetails)
         }
     }
