@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_swap_impl.presentation.main
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.view.ButtonState
-import io.novafoundation.nova.feature_swap_api.presentation.SwapRouter
+import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.views.SwapAmountInputView
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.coroutines.flow.Flow
