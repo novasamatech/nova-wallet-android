@@ -47,6 +47,8 @@ android {
             buildConfigField "String", "MERCURYO_SECRET", readStringSecret("MERCURYO_PRODUCTION_SECRET")
             buildConfigField "String", "MERCURYO_HOST", "\"exchange.mercuryo.io\""
 
+            buildConfigField "String", "BANXA_HOST", "\"novawallet.banxa.com\""
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

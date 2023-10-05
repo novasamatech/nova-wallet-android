@@ -78,6 +78,6 @@ private class BuyMixinProvider(
 
         val integrator = provider.createIntegrator(chainAsset, address)
 
-        integrateWithBuyProviderEvent.value = BuyMixin.IntegrationPayload(integrator).event()
+        integrateWithBuyProviderEvent.value = BuyMixin.IntegrationPayload(provider, integrator).event()
     }
 }

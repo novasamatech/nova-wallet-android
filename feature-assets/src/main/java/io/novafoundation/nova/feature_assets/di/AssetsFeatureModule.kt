@@ -130,8 +130,8 @@ class AssetsFeatureModule {
         return BuyTokenRegistry(
             providers = listOf(
                 transakProvider,
-                mercuryoProvider,
-                banxaProvider
+                banxaProvider,
+                mercuryoProvider
             )
         )
     }

@@ -28,7 +28,7 @@ class BanxaProvider(
         return BanxaIntegrator(host, blockchain, coinType, address)
     }
 
-    class BanxaIntegrator(
+    private class BanxaIntegrator(
         private val host: String,
         private val blockchain: String?,
         private val coinType: String?,
