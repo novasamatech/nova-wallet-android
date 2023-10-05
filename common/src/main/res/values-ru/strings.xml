@@ -158,6 +158,7 @@
     <string name="assets_balance_details_locks_phrelect">Выборы</string>
     <string name="assets_balance_details_locks_staking">Стейкинг</string>
     <string name="assets_balance_details_locks_vesting">Вестинг</string>
+    <string name="assets_buy_tokens_placeholder_button">Купить токены</string>
     <string name="assets_filter_title">Фильтр токенов</string>
     <string name="assets_manage_tokens_all_networks">Все сети</string>
     <string name="assets_manage_tokens_title">Управление токенами</string>
@@ -167,7 +168,6 @@
     <string name="assets_search_placeholder">Токены и сети с указанным именем\nне найдены</string>
     <string name="assets_select_send_your_wallets">Ваши кошельки</string>
     <string name="assets_send_flow_placeholder">У вас нет токенов для отправки.\nКупите или получите токены\nна свой аккаунт.</string>
-    <string name="assets_send_flow_placeholder_button">Купить токены</string>
     <string name="biometric_auth_title">Биометрия</string>
     <string name="buy_completed">Покупка совершена! Ожидайте до 60 минут. Вы можете отслеживать статус по электронной почте.</string>
     <string name="buy_provider_open_confirmation_message">Для продолжения покупки вы будете перенаправлены из приложения Nova Wallet на сайт %s</string>
