@@ -125,6 +125,8 @@ class BalanceListFragment :
         viewModel.walletConnectAccountSessionsUI.observe {
             headerAdapter.setWalletConnectModel(it)
         }
+
+        viewModel.filtersIndicatorIcon.observe(headerAdapter::setFilterIconRes)
     }
 
     override fun assetClicked(asset: AssetModel) {

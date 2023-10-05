@@ -4,7 +4,9 @@
     <string name="buy_provider_open_confirmation_title">Continue in browser?</string>
     <string name="buy_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>
 
-    <string name="assets_send_flow_placeholder_button">Buy tokens</string>
+    <!--<string name="assets_send_flow_placeholder_button">Buy tokens</string>-->
+    <string name="assets_buy_tokens_placeholder_button">Buy tokens</string>
+
     <string name="assets_send_flow_placeholder">You don’t have tokens to send.\nBuy or Deposit tokens to your account.</string>
     <string name="common_days_and_hours_format_with_delimeter">%s and %s</string>
     <string name="common_frequency_days_daily">daily</string>
