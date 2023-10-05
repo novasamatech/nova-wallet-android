@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.Phase
 import io.novafoundation.nova.common.data.network.runtime.binding.bindEventRecords
 import io.novafoundation.nova.common.utils.extrinsicHash
 import io.novafoundation.nova.common.utils.system
-import io.novafoundation.nova.runtime.extrinsic.create
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -56,7 +55,6 @@ class RemoteEventsRepository(
         blockHash: BlockHash?
     ): List<ExtrinsicWithEvents> {
         val runtime = chainRegistry.getRuntime(chainId)
-        val extrinsicType = Extrinsic.create(runtime)
 
         val block = rpcCalls.getBlock(chainId, blockHash)
         val events = getEventsInBlock(chainId, blockHash)
@@ -71,7 +69,7 @@ class RemoteEventsRepository(
         )
 
         return block.block.extrinsics.mapIndexed { index, extrinsicScale ->
-            val decodedExtrinsic = extrinsicType.fromHexOrNull(runtime, extrinsicScale)
+            val decodedExtrinsic = Extrinsic.fromHexOrNull(runtime, extrinsicScale)
 
             decodedExtrinsic?.let {
                 val extrinsicEvents = eventsByExtrinsicIndex[index] ?: emptyList()

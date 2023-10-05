@@ -1,9 +1,12 @@
 package io.novafoundation.nova.app.root.navigation.staking
 
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
+import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 
 class StakingDashboardNavigator(
@@ -12,6 +15,8 @@ class StakingDashboardNavigator(
 
     private var stakingTabNavController: NavController? = null
     private var pendingAction: Int? = null
+
+    override val scrollToDashboardTopEvent = MutableLiveData<Event<Unit>>()
 
     fun setStakingTabNavController(navController: NavController) {
         stakingTabNavController = navController
@@ -34,7 +39,13 @@ class StakingDashboardNavigator(
         stakingTabNavController?.popBackStack()
     }
 
-    override fun returnToStakingTabRoot() {
+    override fun returnToStakingDashboard() {
+        performNavigation(R.id.back_to_main)
+        returnToStakingTabRoot()
+        scrollToDashboardTopEvent.value = Unit.event()
+    }
+
+    private fun returnToStakingTabRoot() {
         stakingTabNavController.performNavigationOrDelay(R.id.return_to_staking_dashboard)
     }
 
