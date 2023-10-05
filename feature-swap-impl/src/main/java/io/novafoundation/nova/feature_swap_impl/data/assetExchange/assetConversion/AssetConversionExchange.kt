@@ -140,7 +140,7 @@ private class AssetConversionExchange(
     private suspend fun convertNativeFeeToPayingTokenFee(nativeTokenFee: Fee, args: SwapExecuteArgs): Fee {
         val customFeeAsset = args.customFeeAsset
 
-        return  if (customFeeAsset != null) {
+        return if (customFeeAsset != null) {
             val converted = multiChainRuntimeCallsApi.forChain(chain.id).quote(
                 swapDirection = SwapDirection.SPECIFIED_OUT,
                 assetIn = customFeeAsset,

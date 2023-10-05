@@ -29,13 +29,13 @@ object CustomSignedExtensions {
         signedExtra(ASSETS_TX_PAYMENT.extensionName, extensionValue)
     }
 
-    fun extensionsWithValues(): Map<SignedExtensionId,SignedExtensionValue> {
+    fun extensionsWithValues(): Map<SignedExtensionId, SignedExtensionValue> {
         return CustomExtension.values().mapNotNull { customExtension ->
             customExtension.extensionName to customExtension.createPayload()
         }.toMap()
     }
 
-    private fun assetTxPaymentPayload(assetId: Any?, tip: BigInteger = BigInteger.ZERO) : Any {
+    private fun assetTxPaymentPayload(assetId: Any?, tip: BigInteger = BigInteger.ZERO): Any {
         return structOf(
             "tip" to tip,
             "assetId" to assetId
