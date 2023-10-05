@@ -166,10 +166,6 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
         return assets.first { it.symbol == "SIRI" }
     }
 
-    private fun Chain.joe(): Chain.Asset {
-        return assets.first { it.symbol == "JOE" }
-    }
-
     private fun Chain.dot(): Chain.Asset {
         return assets.first { it.symbol == "DOT" }
     }

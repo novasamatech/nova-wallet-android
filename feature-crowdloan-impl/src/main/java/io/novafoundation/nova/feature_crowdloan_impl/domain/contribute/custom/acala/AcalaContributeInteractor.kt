@@ -113,7 +113,7 @@ class AcalaContributeInteractor(
         extrinsicBuilder: ExtrinsicBuilder,
     ) = with(extrinsicBuilder) {
         if (contributionType == ContributionType.LIQUID) {
-            reset()
+            resetCalls()
 
             val (chain, chainAsset) = selectedAssetState.chainAndAsset()
             val amountInPlanks = chainAsset.planksFromAmount(amount)
@@ -134,7 +134,7 @@ class AcalaContributeInteractor(
         extrinsicBuilder: ExtrinsicBuilder,
     ) = with(extrinsicBuilder) {
         if (contributionType == ContributionType.LIQUID) {
-            reset()
+            resetCalls()
 
             val chainAsset = selectedAssetState.chainAsset()
             val amountInPlanks = chainAsset.planksFromAmount(amount)
