@@ -8,6 +8,8 @@ import io.novafoundation.nova.common.utils.mutableMultiMapOf
 import io.novafoundation.nova.common.utils.put
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicHash
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.model.InlineFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
@@ -31,6 +33,7 @@ import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions.assetTxPayment
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -91,17 +94,24 @@ private class AssetConversionExchange(
 
     override suspend fun quote(args: SwapQuoteArgs): AssetExchangeQuote {
         val runtimeCallsApi = multiChainRuntimeCallsApi.forChain(chain.id)
-        val quotedBalance = runtimeCallsApi.quote(args) ?: throw SwapQuoteException.NotEnoughLiquidity
+        val quotedBalance = runtimeCallsApi.quote(
+            swapDirection = args.swapDirection,
+            assetIn = args.tokenIn.configuration,
+            assetOut = args.tokenOut.configuration,
+            amount = args.amount
+        ) ?: throw SwapQuoteException.NotEnoughLiquidity
 
         return AssetExchangeQuote(quote = quotedBalance)
     }
 
     override suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee {
-        val fee = extrinsicService.estimateFeeV2(chain) {
+        val nativeAssetFee = extrinsicService.estimateFeeV2(chain) {
             executeSwap(args, origin = chain.emptyAccountId())
         }
 
-        return AssetExchangeFee(networkFee = fee)
+        val converted = convertNativeFeeToPayingTokenFee(nativeAssetFee, args)
+
+        return AssetExchangeFee(networkFee = converted)
     }
 
     override suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicHash> {
@@ -125,6 +135,23 @@ private class AssetConversionExchange(
         }
 
         return multiMap
+    }
+
+    private suspend fun convertNativeFeeToPayingTokenFee(nativeTokenFee: Fee, args: SwapExecuteArgs): Fee {
+        val customFeeAsset = args.customFeeAsset
+
+        return  if (customFeeAsset != null) {
+            val converted = multiChainRuntimeCallsApi.forChain(chain.id).quote(
+                swapDirection = SwapDirection.SPECIFIED_OUT,
+                assetIn = customFeeAsset,
+                assetOut = chain.utilityAsset,
+                amount = nativeTokenFee.amount
+            )
+
+            InlineFee(requireNotNull(converted))
+        } else {
+            nativeTokenFee
+        }
     }
 
     private suspend fun ExtrinsicBuilder.executeSwap(swapExecuteArgs: SwapExecuteArgs, origin: AccountId) {
@@ -174,14 +201,19 @@ private class AssetConversionExchange(
         return toMultiLocationOrThrow(chainAsset).toEncodableInstance()
     }
 
-    private suspend fun RuntimeCallsApi.quote(swapQuoteArgs: SwapQuoteArgs): Balance? {
-        val method = when (swapQuoteArgs.swapDirection) {
+    private suspend fun RuntimeCallsApi.quote(
+        swapDirection: SwapDirection,
+        assetIn: Chain.Asset,
+        assetOut: Chain.Asset,
+        amount: Balance,
+    ): Balance? {
+        val method = when (swapDirection) {
             SwapDirection.SPECIFIED_IN -> "quote_price_exact_tokens_for_tokens"
             SwapDirection.SPECIFIED_OUT -> "quote_price_tokens_for_exact_tokens"
         }
 
-        val asset1 = multiLocationConverter.toMultiLocationOrThrow(swapQuoteArgs.tokenIn.configuration).toEncodableInstance()
-        val asset2 = multiLocationConverter.toMultiLocationOrThrow(swapQuoteArgs.tokenOut.configuration).toEncodableInstance()
+        val asset1 = multiLocationConverter.toMultiLocationOrThrow(assetIn).toEncodableInstance()
+        val asset2 = multiLocationConverter.toMultiLocationOrThrow(assetOut).toEncodableInstance()
 
         val includeFee = true
 
@@ -193,7 +225,7 @@ private class AssetConversionExchange(
             arguments = listOf(
                 asset1 to multiLocationTypeName,
                 asset2 to multiLocationTypeName,
-                swapQuoteArgs.amount to "Balance",
+                amount to "Balance",
                 includeFee to BooleanType.name
             ),
             returnType = "Option<Balance>",
