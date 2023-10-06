@@ -7,8 +7,9 @@ class BuyTokenRegistry(providers: List<Provider<*>>) {
 
     private val providerById = providers.associateBy(Provider<*>::id)
 
-    fun availableSortedProvidersFor(chainAsset: Chain.Asset) = chainAsset.buyProviders.keys
-        .mapNotNull(providerById::get)
+    fun availableProvidersFor(chainAsset: Chain.Asset) = providerById
+        .filterKeys { key -> chainAsset.buyProviders.containsKey(key) }
+        .map { it.value }
 
     interface Provider<I : Integrator<*>> {
         val id: String
