@@ -218,6 +218,8 @@ fun RuntimeMetadata.nominationPoolsOrNull() = moduleOrNull(Modules.NOMINATION_PO
 
 fun RuntimeMetadata.assetConversionOrNull() = moduleOrNull(Modules.ASSET_CONVERSION)
 
+fun RuntimeMetadata.assetConversion() = module(Modules.ASSET_CONVERSION)
+
 fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
 }
