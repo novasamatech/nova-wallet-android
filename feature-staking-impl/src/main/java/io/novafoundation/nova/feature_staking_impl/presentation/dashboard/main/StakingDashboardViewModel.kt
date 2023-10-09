@@ -50,7 +50,7 @@ class StakingDashboardViewModel(
     private val dashboardUpdatePeriod: Duration = 200.milliseconds
 ) : BaseViewModel() {
 
-    val scrollToTopEvent = startMultiStakingRouter.stakingFlowFinishedEvent
+    val scrollToTopEvent = dashboardRouter.scrollToDashboardTopEvent
 
     val walletUi = accountUseCase.selectedWalletModelFlow()
         .shareInBackground()

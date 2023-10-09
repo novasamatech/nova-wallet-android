@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.redeem.ParachainStakingRedeemInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.redeem.validations.ParachainStakingRedeemValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.redeem.validations.ParachainStakingRedeemValidationSystem
-import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 class ParachainStakingRedeemViewModel(
-    private val router: ParachainStakingRouter,
+    private val router: StakingRouter,
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
     private val validationSystem: ParachainStakingRedeemValidationSystem,
@@ -126,10 +126,10 @@ class ParachainStakingRedeemViewModel(
     private fun sendTransaction() = launch {
         interactor.redeem(delegatorState.first())
             .onFailure(::showError)
-            .onSuccess {
+            .onSuccess { redeemConsequences ->
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.returnToStakingMain()
+                router.finishRedeemFlow(redeemConsequences)
             }
 
         _showNextProgress.value = false

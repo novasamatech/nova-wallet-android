@@ -21,9 +21,9 @@ import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.DefaultSignedExtensions
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.SignedExtras
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.skipAliases
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.genesisHash
@@ -138,7 +138,7 @@ fun Constant.decodedValue(runtimeSnapshot: RuntimeSnapshot): Any? {
 
 fun String.toHexAccountId(): String = toAccountId().toHexString()
 
-fun Extrinsic.DecodedInstance.tip(): BigInteger? = signature?.signedExtras?.get(SignedExtras.TIP) as? BigInteger
+fun Extrinsic.DecodedInstance.tip(): BigInteger? = signature?.signedExtras?.get(DefaultSignedExtensions.CHECK_TX_PAYMENT) as? BigInteger
 
 fun Module.constant(name: String) = constantOrNull(name) ?: throw NoSuchElementException()
 

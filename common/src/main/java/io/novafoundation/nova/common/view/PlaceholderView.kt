@@ -79,6 +79,10 @@ class PlaceholderView @JvmOverloads constructor(
         viewPlaceholderButton.setTextOrHide(text)
     }
 
+    fun setButtonText(@StringRes textRes: Int) {
+        setButtonText(context.getString(textRes))
+    }
+
     fun setModel(model: PlaceholderModel) {
         setText(model.text)
         setImage(model.imageRes)

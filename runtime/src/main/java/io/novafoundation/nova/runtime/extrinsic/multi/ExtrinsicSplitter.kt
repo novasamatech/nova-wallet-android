@@ -102,7 +102,7 @@ internal class RealExtrinsicSplitter(
             genesisHash = genesisHash,
             blockHash = genesisHash,
             era = Era.Immortal,
-            customSignedExtensions = CustomSignedExtensions.extensionsWithValues(runtime),
+            customSignedExtensions = CustomSignedExtensions.extensionsWithValues(),
             signer = signer,
             accountId = signer.accountId()
         )

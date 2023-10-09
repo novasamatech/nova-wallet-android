@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
-import io.novafoundation.nova.runtime.extrinsic.create
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.extrinsic.multi.SimpleCallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -132,8 +131,7 @@ class RealExtrinsicService(
 
         val runtime = chainRegistry.getRuntime(chainId)
 
-        val extrinsicType = Extrinsic.create(runtime)
-        val decodedExtrinsic = extrinsicType.fromHex(runtime, extrinsic)
+        val decodedExtrinsic = Extrinsic.fromHex(runtime, extrinsic)
 
         val tip = decodedExtrinsic.tip().orZero()
 
