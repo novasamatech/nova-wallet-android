@@ -16,6 +16,7 @@ import io.novafoundation.nova.runtime.ext.palletNameOrDefault
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.prepareIdForEncoding
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
@@ -56,7 +57,7 @@ class StatemineAssetTransfers(
 
         val assetAccount = remoteStorage.query(chainAsset.chainId) {
             runtime.metadata.statemineModule(statemineType).storage("Account").query(
-                statemineType.id,
+                statemineType.prepareIdForEncoding(runtime),
                 recipient,
                 binding = ::bindAssetAccountOrEmpty
             )
@@ -74,7 +75,7 @@ class StatemineAssetTransfers(
             moduleName = assetType.palletNameOrDefault(),
             callName = "transfer",
             arguments = mapOf(
-                "id" to assetType.id,
+                "id" to assetType.prepareIdForEncoding(runtime),
                 "target" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, target),
                 "amount" to amount
             )

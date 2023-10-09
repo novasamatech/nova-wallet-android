@@ -74,7 +74,7 @@ data class Chain(
             object Native : Type()
 
             data class Statemine(
-                val id: BigInteger,
+                val id: StatemineAssetId,
                 val palletName: String?
             ) : Type()
 

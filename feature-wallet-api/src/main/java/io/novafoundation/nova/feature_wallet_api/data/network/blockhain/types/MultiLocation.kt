@@ -9,6 +9,9 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation.Junction
+import io.novafoundation.nova.runtime.ext.Geneses
+import io.novafoundation.nova.runtime.ext.Ids
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -52,6 +55,7 @@ private fun bindJunction(instance: Any?): Junction {
         "PalletInstance" -> Junction.PalletInstance(bindNumber(asDictEnum.value))
         "Parachain" -> Junction.ParachainId(bindNumber(asDictEnum.value))
         "GeneralIndex" -> Junction.GeneralIndex(bindNumber(asDictEnum.value))
+        "GlobalConsensus" -> bindGlobalConsensusJunction(asDictEnum.value)
         "AccountKey20" -> Junction.AccountKey20(bindAccountIdJunction(asDictEnum.value, accountIdKey = "key"))
         "AccountId32" -> Junction.AccountId32(bindAccountIdJunction(asDictEnum.value, accountIdKey = "id"))
 
@@ -63,6 +67,22 @@ private fun bindAccountIdJunction(instance: Any?, accountIdKey: String): Account
     val asStruct = instance.castToStruct()
 
     return bindAccountId(asStruct[accountIdKey])
+}
+
+private fun bindGlobalConsensusJunction(instance: Any?): Junction {
+    val asDictEnum = instance.castToDictEnum()
+
+    return when (asDictEnum.name) {
+        "ByGenesis" -> {
+            val genesis = bindByteArray(asDictEnum.value).toHexString(withPrefix = false)
+            Junction.GlobalConsensus(chainId = genesis)
+        }
+        "Polkadot" -> Junction.GlobalConsensus(chainId = Chain.Geneses.POLKADOT)
+        "Kusama" -> Junction.GlobalConsensus(chainId = Chain.Geneses.KUSAMA)
+        "Westend" -> Junction.GlobalConsensus(chainId = Chain.Geneses.WESTEND)
+        "Ethereum" -> Junction.GlobalConsensus(chainId = Chain.Ids.ETHEREUM)
+        else -> Junction.Unsupported
+    }
 }
 
 // ------ Encode ------
@@ -95,7 +115,20 @@ private fun Junction.toEncodableInstance() = when (this) {
     is Junction.AccountKey20 -> DictEnum.Entry("AccountKey20", accountId.toJunctionAccountIdInstance(accountIdKey = "key"))
     is Junction.AccountId32 -> DictEnum.Entry("AccountId32", accountId.toJunctionAccountIdInstance(accountIdKey = "id"))
     is Junction.GeneralIndex -> DictEnum.Entry("GeneralIndex", index)
+    is Junction.GlobalConsensus -> toEncodableInstance()
     Junction.Unsupported -> error("Unsupported junction")
+}
+
+private fun Junction.GlobalConsensus.toEncodableInstance(): Any {
+    val innerValue = when (chainId) {
+        Chain.Geneses.POLKADOT -> DictEnum.Entry("Polkadot", null)
+        Chain.Geneses.KUSAMA -> DictEnum.Entry("Kusama", null)
+        Chain.Geneses.WESTEND -> DictEnum.Entry("Westend", null)
+        Chain.Ids.ETHEREUM -> DictEnum.Entry("Ethereum", null)
+        else -> DictEnum.Entry("ByGenesis", chainId.fromHex())
+    }
+
+    return DictEnum.Entry("GlobalConsensus", innerValue)
 }
 
 private fun AccountId.toJunctionAccountIdInstance(accountIdKey: String) = structOf(
