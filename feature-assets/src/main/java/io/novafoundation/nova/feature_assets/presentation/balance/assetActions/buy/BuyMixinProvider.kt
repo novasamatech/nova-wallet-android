@@ -52,12 +52,12 @@ private class BuyMixinProvider(
     override val integrateWithBuyProviderEvent = MutableLiveData<Event<BuyMixin.IntegrationPayload>>()
 
     override fun buyEnabledFlow(chainAsset: Chain.Asset): Flow<Boolean> {
-        return flowOf { buyTokenRegistry.availableSortedProvidersFor(chainAsset).isNotEmpty() }
+        return flowOf { buyTokenRegistry.availableProvidersFor(chainAsset).isNotEmpty() }
     }
 
     override fun buyClicked(chainAsset: Chain.Asset) {
         launch {
-            val availableProviders = buyTokenRegistry.availableSortedProvidersFor(chainAsset)
+            val availableProviders = buyTokenRegistry.availableProvidersFor(chainAsset)
 
             when {
                 availableProviders.isEmpty() -> return@launch
