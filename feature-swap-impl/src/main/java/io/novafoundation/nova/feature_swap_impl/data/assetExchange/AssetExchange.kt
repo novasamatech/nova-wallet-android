@@ -22,10 +22,15 @@ interface AssetExchange {
     @Throws(SwapQuoteException::class)
     suspend fun quote(args: SwapQuoteArgs): AssetExchangeQuote
 
+    suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee
+
     suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicHash>
 }
 
 class AssetExchangeQuote(
-    val networkFee: Fee,
     val quote: Balance,
+)
+
+class AssetExchangeFee(
+    val networkFee: Fee
 )

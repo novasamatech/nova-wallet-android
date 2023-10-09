@@ -14,7 +14,6 @@ class SwapQuote(
     val planksOut: Balance,
     val direction: SwapDirection,
     val priceImpact: Percent,
-    val fee: SwapFee
 ) {
 
     init {
@@ -32,5 +31,5 @@ fun SwapQuote.swapRate(): BigDecimal {
 }
 
 class SwapFee(
-    val onChainFee: Fee
+    val networkFee: Fee
 )

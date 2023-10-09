@@ -13,8 +13,8 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
-import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.CompoundMultiLocationConverter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.ForeignAssetsLocationConverter
@@ -92,16 +92,15 @@ private class AssetConversionExchange(
         val runtimeCallsApi = multiChainRuntimeCallsApi.forChain(chain.id)
         val quotedBalance = runtimeCallsApi.quote(args) ?: throw SwapQuoteException.NotEnoughLiquidity
 
-        val executeArgs = args.toExecuteArgs(quotedBalance)
+        return AssetExchangeQuote(quote = quotedBalance)
+    }
 
+    override suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee {
         val fee = extrinsicService.estimateFeeV2(chain) {
-            executeSwap(executeArgs, origin = chain.emptyAccountId())
+            executeSwap(args, origin = chain.emptyAccountId())
         }
 
-        return AssetExchangeQuote(
-            networkFee = fee,
-            quote = quotedBalance
-        )
+        return AssetExchangeFee(networkFee = fee)
     }
 
     override suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicHash> {
