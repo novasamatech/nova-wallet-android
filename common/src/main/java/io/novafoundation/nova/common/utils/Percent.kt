@@ -23,10 +23,18 @@ value class Perbill(val value: Double) : Comparable<Perbill> {
 @JvmInline
 value class Percent(val value: Double) : Comparable<Percent> {
 
+    companion object {
+
+        fun zero(): Percent = Percent(0.0)
+    }
+
     override fun compareTo(other: Percent): Int {
         return value.compareTo(other.value)
     }
 }
+
+val Percent.fraction: BigDecimal
+    get() = toPerbill().value.toBigDecimal()
 
 inline fun BigDecimal.asPerbill(): Perbill = Perbill(this.toDouble())
 

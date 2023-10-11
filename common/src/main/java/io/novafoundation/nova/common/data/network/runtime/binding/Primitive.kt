@@ -6,6 +6,8 @@ import java.math.BigInteger
 @HelperBinding
 fun bindNumber(dynamicInstance: Any?): BigInteger = dynamicInstance.cast()
 
+fun bindNumberOrNull(dynamicInstance: Any?): BigInteger? = dynamicInstance?.cast()
+
 fun bindInt(dynamicInstance: Any?): Int = bindNumber(dynamicInstance).toInt()
 
 @HelperBinding

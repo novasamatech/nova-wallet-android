@@ -3,14 +3,24 @@ package io.novafoundation.nova.feature_swap_impl.domain.swap
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.MultiMap
 import io.novafoundation.nova.common.utils.MutableMultiMap
+import io.novafoundation.nova.common.utils.Percent
+import io.novafoundation.nova.common.utils.asPerbill
+import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.flatMap
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.mutableMultiMapOf
+import io.novafoundation.nova.common.utils.toPercent
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicHash
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -21,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
+import java.math.BigDecimal
 import kotlin.coroutines.coroutineContext
 
 private const val ALL_DIRECTIONS_CACHE = "RealSwapService.ALL_DIRECTIONS"
@@ -44,18 +55,62 @@ internal class RealSwapService(
         allAvailableDirections(computationScope)[asset.fullId].orEmpty()
     }
 
-    override suspend fun quote(args: SwapArgs): Result<SwapQuote> {
+    override suspend fun quote(args: SwapQuoteArgs): Result<SwapQuote> {
         val computationScope = CoroutineScope(coroutineContext)
 
-        return runCatching { exchanges(computationScope).getValue(args.assetIn.chainId) }
-            .flatMap { exchange -> exchange.quote(args) }
+        return runCatching {
+            val exchange = exchanges(computationScope).getValue(args.tokenIn.configuration.chainId)
+            val quote = exchange.quote(args)
+
+            val (amountIn, amountOut) = args.inAndOutAmounts(quote)
+
+            SwapQuote(
+                assetIn = args.tokenIn.configuration,
+                assetOut = args.tokenOut.configuration,
+                planksIn = amountIn,
+                planksOut = amountOut,
+                direction = args.swapDirection,
+                priceImpact = args.calculatePriceImpact(amountIn, amountOut),
+            )
+        }
     }
 
-    override suspend fun swap(args: SwapArgs): Result<ExtrinsicHash> {
+    override suspend fun estimateFee(args: SwapExecuteArgs): SwapFee {
+        val computationScope = CoroutineScope(coroutineContext)
+        val exchange = exchanges(computationScope).getValue(args.assetIn.chainId)
+
+        val assetExchangeFee = exchange.estimateFee(args)
+
+        return SwapFee(networkFee = assetExchangeFee.networkFee)
+    }
+
+    override suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicHash> {
         val computationScope = CoroutineScope(coroutineContext)
 
         return runCatching { exchanges(computationScope).getValue(args.assetIn.chainId) }
             .flatMap { exchange -> exchange.swap(args) }
+    }
+
+    private fun SwapQuoteArgs.calculatePriceImpact(amountIn: Balance, amountOut: Balance): Percent {
+        val fiatIn = tokenIn.planksToFiat(amountIn)
+        val fiatOut = tokenOut.planksToFiat(amountOut)
+
+        return calculatePriceImpact(fiatIn, fiatOut)
+    }
+
+    private fun SwapQuoteArgs.inAndOutAmounts(quote: AssetExchangeQuote): Pair<Balance, Balance> {
+        return when (swapDirection) {
+            SwapDirection.SPECIFIED_IN -> amount to quote.quote
+            SwapDirection.SPECIFIED_OUT -> quote.quote to amount
+        }
+    }
+
+    private fun calculatePriceImpact(fiatIn: BigDecimal, fiatOut: BigDecimal): Percent {
+        if (fiatIn.isZero || fiatOut.isZero) return Percent.zero()
+
+        val priceImpact = (BigDecimal.ONE - fiatOut / fiatIn).atLeastZero()
+
+        return priceImpact.asPerbill().toPercent()
     }
 
     private suspend fun allAvailableDirections(computationScope: CoroutineScope): MultiMap<FullChainAssetId, FullChainAssetId> {

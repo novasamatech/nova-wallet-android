@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenReposito
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -80,4 +81,6 @@ interface SwapFeatureDependencies {
     val identityMixinFactory: IdentityMixin.Factory
 
     val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+
+    val runtimeCallsApi: MultiChainRuntimeCallsApi
 }

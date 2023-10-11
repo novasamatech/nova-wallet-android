@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model
 
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
+import io.novafoundation.nova.common.utils.removeHexPrefix
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigInteger
 
@@ -34,12 +36,19 @@ class MultiLocation(
 
         class AccountId32(val accountId: AccountId) : Junction()
 
+        class GlobalConsensus(chainId: ChainId) : Junction() {
+
+            val chainId = chainId.removeHexPrefix()
+        }
+
         object Unsupported : Junction()
     }
 }
 
 val MultiLocation.Junction.order
     get() = when (this) {
+        is MultiLocation.Junction.GlobalConsensus -> 0
+
         is MultiLocation.Junction.ParachainId -> 1
 
         // All of these are on the same "level" - mutually exhaustive
