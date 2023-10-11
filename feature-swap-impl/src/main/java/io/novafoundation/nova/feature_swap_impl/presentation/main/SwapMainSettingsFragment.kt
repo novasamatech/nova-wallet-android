@@ -4,16 +4,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.bindSilentTo
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmountOrHide
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsContinue
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetails
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetailsNetworkFee
@@ -58,14 +63,20 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
     }
 
     override fun subscribe(viewModel: SwapMainSettingsViewModel) {
-        swapMainSettingsPayInput.amountInput.bindTo(viewModel.payInput, lifecycleScope)
-        swapMainSettingsPayInput.amountInput.bindTo(viewModel.receiveInput, lifecycleScope)
+        swapMainSettingsPayInput.amountInput.bindSilentTo(viewModel.amountOutInput, lifecycleScope)
+        swapMainSettingsReceiveInput.amountInput.bindSilentTo(viewModel.amountInInput, lifecycleScope)
 
-        viewModel.paymentTokenMaxAmount.observe { swapMainSettingsMaxAmount.text = it }
+        viewModel.amountOutFiat.observe { swapMainSettingsPayInput.setFiatAmount(it) }
+        viewModel.amountInFiat.observe { swapMainSettingsReceiveInput.setFiatAmount(it) }
+
+        viewModel.paymentTokenMaxAmount.observe {
+            swapMainSettingsMaxAmountButton.isGone = it.isNullOrEmpty()
+            swapMainSettingsMaxAmount.setTextOrHide(it)
+        }
         viewModel.paymentAsset.observe { swapMainSettingsPayInput.setModel(it) }
         viewModel.receivingAsset.observe { swapMainSettingsReceiveInput.setModel(it) }
-        viewModel.rateDetails.observe { swapMainSettingsDetailsRate.showValue(it) }
-        viewModel.networkFee.observe { swapMainSettingsDetailsNetworkFee.showAmount(it) }
+        viewModel.rateDetails.observe { swapMainSettingsDetailsRate.showValueOrHide(it) }
+        viewModel.networkFee.observe { swapMainSettingsDetailsNetworkFee.showAmountOrHide(it) }
         viewModel.showDetails.observe { swapMainSettingsDetails.setVisible(it) }
         viewModel.buttonState.observe {
             swapMainSettingsContinue.text = it.text

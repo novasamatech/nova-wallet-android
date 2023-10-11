@@ -282,6 +282,7 @@ fun InsertableInputField.bindTo(flow: MutableSharedFlow<String>, scope: Coroutin
     content.bindTo(flow, scope)
 }
 
+//TODO merge the next two methods since removing textWatcher listener before setText will not cause any problems
 fun EditText.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
     scope.launch {
         flow.collect { input ->
@@ -294,6 +295,24 @@ fun EditText.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
     onTextChanged {
         scope.launch {
             flow.emit(it)
+        }
+    }
+}
+
+fun EditText.bindSilentTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
+    val listener = this.onTextChanged {
+        scope.launch {
+            flow.emit(it)
+        }
+    }
+
+    scope.launch {
+        flow.collect { input ->
+            if (text.toString() != input) {
+                removeTextChangedListener(listener)
+                setText(input)
+                addTextChangedListener(listener)
+            }
         }
     }
 }

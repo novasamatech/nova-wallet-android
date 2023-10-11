@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.WithContextExtensions
@@ -79,6 +80,8 @@ class SwapAmountInputView @JvmOverloads constructor(
         setAssetImageUrl(model.assetImageUrl)
         setTitle(model.title)
         setSubtitle(model.subtitleIcon, model.subtitle)
+        swapAmountInputFiat.isVisible = model.showInput
+        amountInput.isVisible = model.showInput
     }
 
     fun setFiatAmount(priceAmount: String?) {
@@ -89,6 +92,7 @@ class SwapAmountInputView @JvmOverloads constructor(
         val assetImageUrl: String?,
         val title: String,
         val subtitleIcon: Icon?,
-        val subtitle: String
+        val subtitle: String,
+        val showInput: Boolean
     )
 }

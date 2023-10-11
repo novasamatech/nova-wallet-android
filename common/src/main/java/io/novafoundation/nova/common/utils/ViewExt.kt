@@ -43,8 +43,8 @@ fun View.updatePadding(
     setPadding(start, top, end, bottom)
 }
 
-inline fun EditText.onTextChanged(crossinline listener: (String) -> Unit) {
-    addTextChangedListener(object : TextWatcher {
+inline fun EditText.onTextChanged(crossinline listener: (String) -> Unit): TextWatcher {
+    val textWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {
         }
 
@@ -54,7 +54,11 @@ inline fun EditText.onTextChanged(crossinline listener: (String) -> Unit) {
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
             listener.invoke(s.toString())
         }
-    })
+    }
+
+    addTextChangedListener(textWatcher)
+
+    return textWatcher
 }
 
 inline fun EditText.onDoneClicked(crossinline listener: () -> Unit) {

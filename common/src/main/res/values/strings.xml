@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="swap_price_impact">%s ≈ %s</string>
+
+    <string name="swap_field_subtitle_default">Select a token</string>
+    <string name="swap_field_asset_from_title">Pay</string>
+    <string name="swap_field_asset_to_title">Receive</string>
+
     <string name="swap_rate_title">Rate</string>
     <string name="swap_price_difference_title">Price difference</string>
     <string name="swap_slippage_title">Slippage</string>
