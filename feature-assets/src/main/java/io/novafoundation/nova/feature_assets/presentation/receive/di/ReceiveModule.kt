@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 @Module(includes = [ViewModelModule::class])
 class ReceiveModule {
@@ -45,7 +46,8 @@ class ReceiveModule {
         router: AssetsRouter,
         chainRegistry: ChainRegistry,
         selectedAccountUseCase: SelectedAccountUseCase,
-        payload: AssetPayload,
+        payload: AssetPayload?,
+        chainId: ChainId?
     ): ViewModel {
         return ReceiveViewModel(
             interactor,
@@ -54,6 +56,7 @@ class ReceiveModule {
             resourceManager,
             externalActions,
             payload,
+            chainId,
             chainRegistry,
             selectedAccountUseCase,
             router,

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_nft_impl.presentation.nft.details
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -16,11 +17,13 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddr
 import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_nft_impl.domain.nft.details.NftDetailsInteractor
 import io.novafoundation.nova.feature_nft_impl.domain.nft.details.PricedNftDetails
+import io.novafoundation.nova.feature_nft_impl.presentation.NftPayload
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatIssuance
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -43,8 +46,15 @@ class NftDetailsViewModel(
         .catch { showExitingError(it) }
         .share()
 
-    val nftDetailsUi = nftDetailsFlow
-        .map(::mapNftDetailsToUi)
+    private val nftSupportedForSendFlow = nftDetailsFlow.map {
+        val nftType = it.nftDetails.type
+        interactor.isNftTypeSupportedForSend(nftType, it.nftDetails.chain)
+    }
+        .state(initialValue = false)
+
+    val nftDetailsUi = combine(nftDetailsFlow, nftSupportedForSendFlow) { nftDetails, nftSupportedForSend ->
+        mapNftDetailsToUi(nftDetails, nftSupportedForSend)
+    }
         .inBackground()
         .share()
 
@@ -68,7 +78,10 @@ class NftDetailsViewModel(
         _exitingErrorLiveData.value = exception.message.orEmpty().event()
     }
 
-    private suspend fun mapNftDetailsToUi(pricedNftDetails: PricedNftDetails): NftDetailsModel {
+    private suspend fun mapNftDetailsToUi(
+        pricedNftDetails: PricedNftDetails,
+        nftSupportedForSend: Boolean
+    ): NftDetailsModel {
         val nftDetails = pricedNftDetails.nftDetails
 
         return NftDetailsModel(
@@ -89,7 +102,8 @@ class NftDetailsViewModel(
             creator = nftDetails.creator?.let {
                 createAddressModel(it, nftDetails.chain)
             },
-            network = mapChainToUi(nftDetails.chain)
+            network = mapChainToUi(nftDetails.chain),
+            isSupportedForSend = nftSupportedForSend
         )
     }
 
@@ -103,5 +117,18 @@ class NftDetailsViewModel(
 
     fun backClicked() {
         router.back()
+    }
+
+    fun assetActionSend() {
+        viewModelScope.launch {
+            val nftDetails = nftDetailsFlow.first().nftDetails
+
+            router.openInputAddressNftFromNftList(
+                nftPayload = NftPayload(
+                    chainId = nftDetails.chain.id,
+                    identifier = nftIdentifier
+                )
+            )
+        }
     }
 }

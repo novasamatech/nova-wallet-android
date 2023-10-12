@@ -8,6 +8,8 @@ import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
+import io.novafoundation.nova.common.presentation.asset.AbstractAssetGroupViewHolder
+import io.novafoundation.nova.common.presentation.asset.AbstractAssetViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
@@ -74,7 +76,7 @@ class BalanceListAdapter(
 
 class AssetGroupViewHolder(
     containerView: View,
-) : GroupedListHolder(containerView) {
+) : GroupedListHolder(containerView), AbstractAssetGroupViewHolder {
 
     fun bind(assetGroup: AssetGroupUi) = with(containerView) {
         itemAssetGroupChain.setChain(assetGroup.chainUi)
@@ -85,7 +87,7 @@ class AssetGroupViewHolder(
 class AssetViewHolder(
     containerView: View,
     private val imageLoader: ImageLoader,
-) : GroupedListHolder(containerView) {
+) : GroupedListHolder(containerView), AbstractAssetViewHolder {
 
     fun bind(asset: AssetModel, itemHandler: BalanceListAdapter.ItemAssetHandler) = with(containerView) {
         itemAssetImage.loadTokenIcon(asset.token.configuration.iconUrl, imageLoader)

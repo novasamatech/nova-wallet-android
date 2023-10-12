@@ -1,14 +1,9 @@
-package io.novafoundation.nova.feature_wallet_impl.domain.validaiton
+package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers
 
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.isTrueOrError
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidation
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.recipientOrNull
 
 class RecipientCanAcceptTransferValidation(
     private val assetSourceRegistry: AssetSourceRegistry,

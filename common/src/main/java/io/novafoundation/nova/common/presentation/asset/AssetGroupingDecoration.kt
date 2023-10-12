@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.balance.common
+package io.novafoundation.nova.common.presentation.asset
 
 import android.content.Context
 import android.graphics.Canvas
@@ -8,11 +8,11 @@ import android.view.View
 import androidx.core.view.children
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import io.novafoundation.nova.feature_assets.R
 import kotlin.math.roundToInt
 
 /**
@@ -117,7 +117,7 @@ class AssetGroupingDecoration(
 
     private fun shouldSkip(viewHolder: RecyclerView.ViewHolder): Boolean {
         return viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION ||
-            (viewHolder !is AssetViewHolder && viewHolder !is AssetGroupViewHolder)
+            (viewHolder !is AbstractAssetViewHolder && viewHolder !is AbstractAssetGroupViewHolder)
     }
 }
 

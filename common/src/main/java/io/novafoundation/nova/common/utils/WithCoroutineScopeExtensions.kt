@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 
 // TODO waiting for multiple receivers feature, probably in Kotlin 1.7
 interface WithCoroutineScopeExtensions {
@@ -14,6 +15,11 @@ interface WithCoroutineScopeExtensions {
     fun <T> Flow<T>.share(
         started: SharingStarted = SharingStarted.Eagerly
     ) = shareIn(coroutineScope, started = started, replay = 1)
+
+    fun <T> Flow<T>.state(
+        initialValue: T,
+        started: SharingStarted = SharingStarted.Eagerly
+    ) = stateIn(coroutineScope, started = started, initialValue = initialValue)
 
     fun <T> Flow<T>.shareLazily() = shareIn(coroutineScope, started = SharingStarted.Lazily, replay = 1)
 

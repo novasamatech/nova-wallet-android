@@ -44,19 +44,7 @@ fun mapNftLocalToNft(
 ): Nft? {
     val chain = chainsById[nftLocal.chainId] ?: return null
 
-    val type = when (nftLocal.type) {
-        NftLocal.Type.UNIQUES -> Nft.Type.Uniques(
-            instanceId = nftLocal.instanceId!!.toBigInteger(),
-            collectionId = nftLocal.collectionId.toBigInteger(),
-        )
-        NftLocal.Type.RMRK1 -> Nft.Type.Rmrk1(
-            instanceId = nftLocal.instanceId!!,
-            collectionId = nftLocal.collectionId
-        )
-        NftLocal.Type.RMRK2 -> Nft.Type.Rmrk2(
-            collectionId = nftLocal.collectionId
-        )
-    }
+    val type = mapNftLocalToNftType(nftLocal)
 
     val details = if (nftLocal.wholeDetailsLoaded) {
         val issuance = nftIssuance(nftLocal)
@@ -82,4 +70,20 @@ fun mapNftLocalToNft(
         type = type,
         details = details
     )
+}
+
+fun mapNftLocalToNftType(nftLocal: NftLocal): Nft.Type {
+    return when (nftLocal.type) {
+        NftLocal.Type.UNIQUES -> Nft.Type.Uniques(
+            instanceId = nftLocal.instanceId!!.toBigInteger(),
+            collectionId = nftLocal.collectionId.toBigInteger(),
+        )
+        NftLocal.Type.RMRK1 -> Nft.Type.Rmrk1(
+            instanceId = nftLocal.instanceId!!,
+            collectionId = nftLocal.collectionId
+        )
+        NftLocal.Type.RMRK2 -> Nft.Type.Rmrk2(
+            collectionId = nftLocal.collectionId
+        )
+    }
 }
