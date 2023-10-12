@@ -19,6 +19,7 @@ import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
+import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
@@ -361,11 +362,13 @@ class AccountFeatureModule {
     fun provideEvmTransactionService(
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        signerProvider: SignerProvider
+        signerProvider: SignerProvider,
+        gasPriceProviderFactory: GasPriceProviderFactory,
     ): EvmTransactionService = RealEvmTransactionService(
         accountRepository = accountRepository,
         chainRegistry = chainRegistry,
-        signerProvider = signerProvider
+        signerProvider = signerProvider,
+        gasPriceProviderFactory = gasPriceProviderFactory
     )
 
     @Provides

@@ -48,11 +48,9 @@ class NftListViewModel(
 
     val nftListItemsFlow = nftsFlow.combine(hiddenCollectionChanged) { nfts, _ -> nfts }
         .mapList { resourceManager.mapNftToListItem(it) }
-        .map {
-            listOf(NftListItem.Actions) + groupNftCards(it, hiddenCollections)
-        }
+        .map { groupNftCards(it, hiddenCollections) }
         .inBackground()
-        .state(initialValue = listOf(NftListItem.Actions))
+        .state(initialValue = emptyList())
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
     val hideRefreshEvent: LiveData<Event<Unit>> = _hideRefreshEvent

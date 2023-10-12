@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_external_sign_impl.data.evmApi
 
+import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProvider
+import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmChainSource
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmChainSource.UnknownChainOptions
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
@@ -63,6 +65,7 @@ interface EvmApi {
 class EvmApiFactory(
     private val okHttpClient: OkHttpClient,
     private val chainRegistry: ChainRegistry,
+    private val gasPriceProviderFactory: GasPriceProviderFactory,
 ) {
 
     suspend fun create(chainSource: EvmChainSource): EvmApi? {
@@ -70,12 +73,21 @@ class EvmApiFactory(
         val unknownChainOptions = chainSource.unknownChainOptions
 
         return when {
-            knownWeb3jApi != null -> Web3JEvmApi(knownWeb3jApi, shouldShutdown = false)
+            knownWeb3jApi != null -> {
+                Web3JEvmApi(
+                    web3 = knownWeb3jApi,
+                    shouldShutdown = false,
+                    gasPriceProvider = gasPriceProviderFactory.create(knownWeb3jApi)
+                )
+            }
 
             unknownChainOptions is UnknownChainOptions.WithFallBack -> {
+                val web3Api = createWeb3j(unknownChainOptions.evmChain.rpcUrl)
+
                 Web3JEvmApi(
-                    web3 = createWeb3j(unknownChainOptions.evmChain.rpcUrl),
-                    shouldShutdown = true
+                    web3 = web3Api,
+                    shouldShutdown = true,
+                    gasPriceProvider = gasPriceProviderFactory.create(web3Api)
                 )
             }
 
@@ -91,6 +103,7 @@ class EvmApiFactory(
 private class Web3JEvmApi(
     private val web3: Web3j,
     private val shouldShutdown: Boolean,
+    private val gasPriceProvider: GasPriceProvider,
 ) : EvmApi {
 
     override suspend fun formTransaction(
@@ -103,7 +116,7 @@ private class Web3JEvmApi(
         gasPrice: BigInteger?,
     ): RawTransaction {
         val finalNonce = nonce ?: getNonce(fromAddress)
-        val finalGasPrice = gasPrice ?: getGasPrice()
+        val finalGasPrice = gasPrice ?: gasPriceProvider.getGasPrice()
 
         val dataOrDefault = data.orEmpty()
 
@@ -170,10 +183,6 @@ private class Web3JEvmApi(
 
     private suspend fun sendTransaction(transactionData: String): String {
         return web3.ethSendRawTransaction(transactionData).sendSuspend().transactionHash
-    }
-
-    private suspend fun getGasPrice(): BigInteger {
-        return web3.ethGasPrice().sendSuspend().gasPrice
     }
 
     private suspend fun getNonce(address: String): BigInteger {

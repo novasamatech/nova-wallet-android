@@ -24,10 +24,6 @@ class NftProvidersRegistry(
         }
     }
 
-    fun isAvailableChain(chain: Chain): Boolean {
-        return chain.id in setOf(Chain.Geneses.STATEMINE)
-    }
-
     fun get(nftTypeKey: Nft.Type.Key): NftProvider {
         return when (nftTypeKey) {
             Nft.Type.Key.RMRKV1 -> rmrkV1NftProvider

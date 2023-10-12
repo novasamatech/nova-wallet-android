@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Price
 import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -30,7 +31,7 @@ class NftDetailsInteractor(
         }
     }
 
-    fun isNftTypeSupportedForSend(nftType: Nft.Type): Boolean {
-        return nftRepository.isNftTypeSupportedForSend(nftType)
+    fun isNftTypeSupportedForSend(nftType: Nft.Type, chain: Chain): Boolean {
+        return nftRepository.isNftTypeSupportedForSend(nftType, chain)
     }
 }

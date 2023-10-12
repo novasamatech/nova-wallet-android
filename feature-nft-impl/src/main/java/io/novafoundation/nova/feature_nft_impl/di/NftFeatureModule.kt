@@ -6,9 +6,12 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_nft_api.data.repository.PendingSendNftTransactionRepository
 import io.novafoundation.nova.feature_nft_impl.data.repository.NftRepositoryImpl
+import io.novafoundation.nova.feature_nft_impl.data.repository.PendingSendNftTransactionRepositoryImpl
 import io.novafoundation.nova.feature_nft_impl.data.source.JobOrchestrator
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvidersRegistry
+import io.novafoundation.nova.feature_nft_impl.data.source.NftTransfersRegistry
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV1.RmrkV1NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.RmrkV2NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.UniquesNftProvider
@@ -17,6 +20,7 @@ import io.novafoundation.nova.feature_nft_impl.di.modules.RmrkV2Module
 import io.novafoundation.nova.feature_nft_impl.di.modules.UniquesModule
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import javax.inject.Singleton
 
 @Module(
     includes = [
@@ -47,13 +51,20 @@ class NftFeatureModule {
         jobOrchestrator: JobOrchestrator,
         nftDao: NftDao,
         httpExceptionHandler: HttpExceptionHandler,
-        storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+        storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
+        nftTransfersRegistry: NftTransfersRegistry
     ): NftRepository = NftRepositoryImpl(
         nftProvidersRegistry = nftProvidersRegistry,
         chainRegistry = chainRegistry,
         jobOrchestrator = jobOrchestrator,
         nftDao = nftDao,
         exceptionHandler = httpExceptionHandler,
-        storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory
+        storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
+        nftTransfersRegistry = nftTransfersRegistry
     )
+
+    @Provides
+    @FeatureScope
+    fun providePendingSendNftTransactionRepository(
+    ): PendingSendNftTransactionRepository = PendingSendNftTransactionRepositoryImpl()
 }

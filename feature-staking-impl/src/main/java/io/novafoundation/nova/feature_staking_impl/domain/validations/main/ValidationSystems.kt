@@ -10,5 +10,6 @@ const val SYSTEM_MANAGE_REWARD_DESTINATION = "ManageStakingRewardDestination"
 const val SYSTEM_MANAGE_PAYOUTS = "ManageStakingPayouts"
 const val SYSTEM_MANAGE_VALIDATORS = "ManageStakingValidators"
 const val SYSTEM_MANAGE_CONTROLLER = "ManageStakingController"
+const val SYSTEM_MANAGE_STAKING_REBAG = "ManageStakingRebag"
 
 typealias StakeActionsValidationSystem = ValidationSystem<StakeActionsValidationPayload, StakeActionsValidationFailure>

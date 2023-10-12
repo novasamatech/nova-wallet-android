@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionRequester
@@ -28,19 +29,21 @@ import io.novafoundation.nova.feature_assets.presentation.send.TransferDirection
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.CrossChainDestinationModel
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.SelectCrossChainDestinationBottomSheet
+import io.novafoundation.nova.feature_assets.presentation.send.autoFixSendValidationPayload
 import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.WillRemoveAccount
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.BaseAssetTransfer
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireOptionalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.asset
@@ -57,7 +60,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
-import java.math.BigInteger
 
 class SelectSendViewModel(
     private val interactor: WalletInteractor,
@@ -171,33 +173,46 @@ class SelectSendViewModel(
         syncCrossChainConfig()
     }
 
-    fun nextClicked() = originFeeMixin.requireFee(this) { originFee ->
-        crossChainFeeMixin.requireOptionalFee(this) { crossChainFee ->
-            launch {
-                val payload = AssetTransferPayload(
-                    transfer = buildTransfer(
-                        destination = destinationChainWithAsset.first(),
-                        amount = amountChooserMixin.amount.first(),
-                        address = addressInputMixin.getAddress()
-                    ),
-                    originFee = originFee,
-                    crossChainFee = crossChainFee,
-                    originCommissionAsset = commissionAssetFlow.first(),
-                    originUsedAsset = assetFlow.first()
+    fun nextClicked() = launch {
+        sendInProgressFlow.value = true
+
+        val originFee = originFeeMixin.awaitDecimalFee()
+        val crossChainFee = crossChainFeeMixin.awaitOptionalDecimalFee()
+
+        val transfer = buildTransfer(
+            destination = destinationChainWithAsset.first(),
+            amount = amountChooserMixin.amount.first(),
+            address = addressInputMixin.getAddress(),
+        )
+
+        val payload = AssetTransferPayload(
+            transfer = WeightedAssetTransfer(
+                assetTransfer = transfer,
+                fee = originFee,
+            ),
+            crossChainFee = crossChainFee?.decimalAmount,
+            originFee = originFee.decimalAmount,
+            originCommissionAsset = commissionAssetFlow.first(),
+            originUsedAsset = assetFlow.first()
+        )
+
+        validationExecutor.requireValid(
+            validationSystem = sendInteractor.validationSystemFor(payload.transfer),
+            payload = payload,
+            progressConsumer = sendInProgressFlow.progressConsumer(),
+            autoFixPayload = ::autoFixSendValidationPayload,
+            validationFailureTransformerCustom = { status, actions ->
+                viewModelScope.mapAssetTransferValidationFailureToUI(
+                    resourceManager = resourceManager,
+                    status = status,
+                    actions = actions,
+                    feeLoaderMixin = originFeeMixin
                 )
+            },
+        ) {
+            sendInProgressFlow.value = false
 
-                validationExecutor.requireValid(
-                    validationSystem = sendInteractor.validationSystemFor(payload.transfer),
-                    payload = payload,
-                    progressConsumer = sendInProgressFlow.progressConsumer(),
-                    autoFixPayload = ::autoFixValidationPayload,
-                    validationFailureTransformer = { mapAssetTransferValidationFailureToUI(resourceManager, it) }
-                ) {
-                    sendInProgressFlow.value = false
-
-                    openConfirmScreen(it)
-                }
-            }
+            openConfirmScreen(it)
         }
     }
 
@@ -267,7 +282,7 @@ class SelectSendViewModel(
     }
 
     private fun FeeLoaderMixin.Presentation.setupFee(
-        feeConstructor: suspend Token.(transfer: AssetTransfer) -> BigInteger?
+        feeConstructor: suspend Token.(transfer: AssetTransfer) -> Fee?
     ) {
         connectWith(
             inputSource1 = amountChooserMixin.backPressuredAmount,
@@ -285,7 +300,7 @@ class SelectSendViewModel(
     private fun openConfirmScreen(validPayload: AssetTransferPayload) = launch {
         val transferDraft = TransferDraft(
             amount = validPayload.transfer.amount,
-            originFee = validPayload.originFee,
+            originFee = mapFeeToParcel(validPayload.transfer.decimalFee),
             origin = assetPayload,
             destination = AssetPayload(
                 chainId = validPayload.transfer.destinationChain.id,
@@ -298,20 +313,12 @@ class SelectSendViewModel(
         router.openConfirmTransfer(transferDraft)
     }
 
-    private fun autoFixValidationPayload(
-        payload: AssetTransferPayload,
-        failureReason: AssetTransferValidationFailure
-    ) = when (failureReason) {
-        is WillRemoveAccount.WillTransferDust -> payload.copy(
-            transfer = payload.transfer.copy(
-                amount = payload.transfer.amount + failureReason.dust
-            )
-        )
-        else -> payload
-    }
-
-    private suspend fun buildTransfer(destination: ChainWithAsset, amount: BigDecimal, address: String): AssetTransfer {
-        return AssetTransfer(
+    private suspend fun buildTransfer(
+        destination: ChainWithAsset,
+        amount: BigDecimal,
+        address: String,
+    ): AssetTransfer {
+        return BaseAssetTransfer(
             sender = selectedAccount.first(),
             recipient = address,
             originChain = originChain(),
@@ -319,7 +326,7 @@ class SelectSendViewModel(
             destinationChain = destination.chain,
             destinationChainAsset = destination.asset,
             amount = amount,
-            commissionAssetToken = commissionAssetFlow.first().token
+            commissionAssetToken = commissionAssetFlow.first().token,
         )
     }
 
@@ -344,7 +351,6 @@ class SelectSendViewModel(
         }
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     private suspend fun buildDestinationsMap(crossChainDestinations: List<ChainWithAsset>): Map<TextHeader, List<CrossChainDestinationModel>> {
         val crossChainDestinationModels = crossChainDestinations.map {
             CrossChainDestinationModel(

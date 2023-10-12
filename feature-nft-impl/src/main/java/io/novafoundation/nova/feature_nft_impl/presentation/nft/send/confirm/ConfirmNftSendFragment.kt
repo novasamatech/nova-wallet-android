@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -109,7 +110,7 @@ class ConfirmNftSendFragment : BaseFragment<ConfirmNftSendViewModel>() {
         viewModel.recipientModel.observe(confirmSendRecipient::showAddress)
         viewModel.senderModel.observe(confirmSendSender::showAddress)
 
-        viewModel.sendButtonStateLiveData.observe(confirmSendConfirm::setState)
+        viewModel.sendButtonStateFlow.observe(confirmSendConfirm::setProgress)
 
         viewModel.wallet.observe(confirmSendWallet::showWallet)
 

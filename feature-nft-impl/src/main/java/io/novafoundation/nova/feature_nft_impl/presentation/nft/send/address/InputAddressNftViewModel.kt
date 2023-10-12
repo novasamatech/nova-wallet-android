@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_nft_impl.domain.nft.send.NftSendInteractor
 import io.novafoundation.nova.feature_nft_impl.presentation.NftPayload
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.send.NftTransferDraft
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.send.mapNftTransferValidationFailureToUI
+import io.novafoundation.nova.feature_nft_impl.presentation.nft.send.mapToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.requireFee
@@ -179,7 +180,7 @@ class InputAddressNftViewModel(
         val transferDraft = NftTransferDraft(
             originFee = validPayload.originFee,
             nftId = nftDetails.identifier,
-            nftType = nftDetails.type,
+            nftType = nftDetails.type.mapToParcel(),
             recipientAddress = validPayload.transfer.recipient,
             chainId = chainFlow.first().id,
             name = nftDetails.name,

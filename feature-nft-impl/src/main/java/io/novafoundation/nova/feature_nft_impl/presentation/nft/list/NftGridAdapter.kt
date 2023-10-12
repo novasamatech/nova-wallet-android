@@ -30,10 +30,9 @@ import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftContent
 import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftMedia
 import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftShimmer
 import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftTitle
+import kotlinx.android.synthetic.main.item_nft_grid.view.nftCollectionName
 import kotlinx.android.synthetic.main.item_nft_list_actions.view.nftActionsReceive
 import kotlinx.android.synthetic.main.item_nft_list_actions.view.nftActionsSend
-import kotlinx.android.synthetic.main.item_nft_grid.view.nftCollectionName
-import kotlinx.coroutines.withContext
 
 class NftGridAdapter(
     private val imageLoader: ImageLoader,
@@ -41,10 +40,9 @@ class NftGridAdapter(
 ) : ListAdapter<NftListItem, NftGridListHolder>(DiffCallback) {
 
     companion object {
-        private const val TYPE_ACTIONS = 1
-        private const val TYPE_DIVIDER = 2
-        private const val TYPE_COLLECTION = 3
-        private const val TYPE_NFT = 4
+        private const val TYPE_DIVIDER = 1
+        private const val TYPE_COLLECTION = 2
+        private const val TYPE_NFT = 3
     }
 
     interface Handler {
@@ -62,7 +60,6 @@ class NftGridAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
-            NftListItem.Actions -> TYPE_ACTIONS
             is NftListItem.NftCollection -> TYPE_COLLECTION
             NftListItem.Divider -> TYPE_DIVIDER
             is NftListItem.NftListCard -> TYPE_NFT
@@ -71,10 +68,6 @@ class NftGridAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NftGridListHolder {
         return when (viewType) {
-            TYPE_ACTIONS -> {
-                ActionsHolder(parent.inflateChild(R.layout.item_nft_list_actions), handler)
-            }
-
             TYPE_COLLECTION -> {
                 CollectionHolder(parent.inflateChild(R.layout.item_nft_collection_name), imageLoader, handler)
             }
@@ -93,7 +86,6 @@ class NftGridAdapter(
 
     override fun onBindViewHolder(holder: NftGridListHolder, position: Int) {
         when (holder) {
-            is ActionsHolder -> {}
             is CollectionHolder -> {
                 holder.bind(getItem(position) as NftListItem.NftCollection)
             }
@@ -116,10 +108,6 @@ private object DiffCallback : DiffUtil.ItemCallback<NftListItem>() {
 
     override fun areItemsTheSame(oldItem: NftListItem, newItem: NftListItem): Boolean {
         return when {
-            oldItem is NftListItem.Actions && newItem is NftListItem.Actions -> {
-                return true
-            }
-
             oldItem is NftListItem.NftListCard && newItem is NftListItem.NftListCard -> {
                 oldItem.identifier == newItem.identifier
             }
@@ -140,19 +128,6 @@ private object DiffCallback : DiffUtil.ItemCallback<NftListItem>() {
 }
 
 sealed class NftGridListHolder(containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer
-
-class ActionsHolder(
-    override val containerView: View,
-    private val itemHandler: NftGridAdapter.Handler
-) : NftGridListHolder(containerView) {
-
-    init {
-        with(containerView) {
-            nftActionsSend.setOnClickListener { itemHandler.sendClicked() }
-            nftActionsReceive.setOnClickListener { itemHandler.receiveClicked() }
-        }
-    }
-}
 
 class CollectionHolder(
     override val containerView: View,

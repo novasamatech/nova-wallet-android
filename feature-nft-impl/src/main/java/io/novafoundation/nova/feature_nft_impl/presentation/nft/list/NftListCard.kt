@@ -5,8 +5,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 
 sealed interface NftListItem {
 
-    object Actions : NftListItem
-
     object Divider : NftListItem
 
     data class NftCollection(
