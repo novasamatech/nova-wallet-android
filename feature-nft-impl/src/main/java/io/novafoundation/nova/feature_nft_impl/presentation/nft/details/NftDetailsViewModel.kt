@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
@@ -49,7 +50,7 @@ class NftDetailsViewModel(
 
     private val nftSupportedForSendFlow = nftDetailsFlow.map {
         val nftType = it.nftDetails.type
-        interactor.isNftTypeSupportedForSend(nftType)
+        interactor.isNftTypeSupportedForSend(nftType, it.nftDetails.chain)
     }
         .state(initialValue = false)
 
@@ -105,15 +106,19 @@ class NftDetailsViewModel(
             },
             network = mapChainToUi(nftDetails.chain),
             isSupportedForSend = nftSupportedForSend,
-            tags = nftDetails.tags,
+            tags = mapTags(nftDetails.tags),
             attributes = mapAttributes(nftDetails.attributes)
         )
+    }
+
+    private fun mapTags(tags: List<String>): List<String> {
+        return tags.map { it.uppercase() }
     }
 
     private fun mapAttributes(attributes: List<NftDetails.Attribute>): List<NftDetailsModel.Attribute> {
         return attributes.map {
             NftDetailsModel.Attribute(
-                label = it.label,
+                label = it.label.lowercase().capitalize(),
                 value = it.value
             )
         }

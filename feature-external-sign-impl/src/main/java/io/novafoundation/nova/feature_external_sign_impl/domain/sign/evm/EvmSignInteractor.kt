@@ -12,8 +12,11 @@ import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
-import io.novafoundation.nova.common.validation.EmptyValidationSystem
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
+import io.novafoundation.nova.feature_account_api.data.model.EvmFee
+import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.model.zero
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
@@ -34,11 +37,12 @@ import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.Ev
 import io.novafoundation.nova.feature_external_sign_impl.data.evmApi.EvmApi
 import io.novafoundation.nova.feature_external_sign_impl.data.evmApi.EvmApiFactory
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.BaseExternalSignInteractor
+import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationFailure
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationSystem
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -110,7 +114,16 @@ class EvmSignInteractor(
         }
     }
 
-    override val validationSystem: ConfirmDAppOperationValidationSystem = EmptyValidationSystem()
+    override val validationSystem: ConfirmDAppOperationValidationSystem = ValidationSystem {
+        if (payload is ConfirmTx) {
+            checkForFeeChanges(
+                calculateFee = { calculateFee() },
+                currentFee = { it.decimalFee!!.decimalAmount },
+                chainAsset = { it.token!!.configuration },
+                error = ConfirmDAppOperationValidationFailure::FeeSpikeDetected
+            )
+        }
+    }
 
     override suspend fun createAccountAddressModel(): AddressModel = withContext(Dispatchers.Default) {
         val address = request.payload.originAddress
@@ -145,21 +158,21 @@ class EvmSignInteractor(
         }
     }
 
-    override suspend fun calculateFee(): Balance = withContext(Dispatchers.Default) {
-        if (payload !is ConfirmTx) return@withContext Balance.ZERO
+    override suspend fun calculateFee(): Fee = withContext(Dispatchers.Default) {
+        if (payload !is ConfirmTx) return@withContext Fee.zero()
 
-        val api = ethereumApi() ?: return@withContext Balance.ZERO
+        val api = ethereumApi() ?: return@withContext Fee.zero()
 
-        val tx = api.formTransaction(payload.transaction)
+        val tx = api.formTransaction(payload.transaction, feeOverride = null)
         mostRecentFormedTx.emit(tx)
 
         tx.fee()
     }
 
-    override suspend fun performOperation(): ExternalSignCommunicator.Response? = withContext(Dispatchers.Default) {
+    override suspend fun performOperation(upToDateFee: Fee?): ExternalSignCommunicator.Response? = withContext(Dispatchers.Default) {
         runCatching {
             when (payload) {
-                is ConfirmTx -> confirmTx(payload.transaction, payload.chainSource.evmChainId.toLong(), payload.action)
+                is ConfirmTx -> confirmTx(payload.transaction, upToDateFee, payload.chainSource.evmChainId.toLong(), payload.action)
                 is SignTypedMessage -> signTypedMessage(payload.message)
                 is PersonalSign -> personalSign(payload.message)
             }
@@ -182,10 +195,10 @@ class EvmSignInteractor(
         ethereumApi()?.shutdown()
     }
 
-    private suspend fun confirmTx(basedOn: EvmTransaction, evmChainId: Long, action: ConfirmTx.Action): ExternalSignCommunicator.Response {
+    private suspend fun confirmTx(basedOn: EvmTransaction, upToDateFee: Fee?, evmChainId: Long, action: ConfirmTx.Action): ExternalSignCommunicator.Response {
         val api = requireNotNull(ethereumApi())
 
-        val tx = api.formTransaction(basedOn)
+        val tx = api.formTransaction(basedOn, upToDateFee)
 
         val originAccountId = originAccountId()
         val signer = resolveWalletSigner()
@@ -253,19 +266,23 @@ class EvmSignInteractor(
         )
     }
 
-    private suspend fun EvmApi.formTransaction(basedOn: EvmTransaction): RawTransaction {
+    private suspend fun EvmApi.formTransaction(basedOn: EvmTransaction, feeOverride: Fee?): RawTransaction {
         return when (basedOn) {
             is EvmTransaction.Raw -> TransactionDecoder.decode(basedOn.rawContent)
 
-            is EvmTransaction.Struct -> formTransaction(
-                fromAddress = basedOn.from,
-                toAddress = basedOn.to,
-                data = basedOn.data,
-                value = basedOn.value?.decodeEvmQuantity(),
-                nonce = basedOn.nonce?.decodeEvmQuantity(),
-                gasLimit = basedOn.gas?.decodeEvmQuantity(),
-                gasPrice = basedOn.gasPrice?.decodeEvmQuantity()
-            )
+            is EvmTransaction.Struct -> {
+                val evmFee = feeOverride.castOrNull<EvmFee>()
+
+                formTransaction(
+                    fromAddress = basedOn.from,
+                    toAddress = basedOn.to,
+                    data = basedOn.data,
+                    value = basedOn.value?.decodeEvmQuantity(),
+                    nonce = basedOn.nonce?.decodeEvmQuantity(),
+                    gasLimit = evmFee?.gasLimit ?: basedOn.gas?.decodeEvmQuantity(),
+                    gasPrice = evmFee?.gasPrice ?: basedOn.gasPrice?.decodeEvmQuantity()
+                )
+            }
         }
     }
 
@@ -297,7 +314,7 @@ class EvmSignInteractor(
         )
     }
 
-    private fun RawTransaction.fee() = gasLimit * gasPrice
+    private fun RawTransaction.fee(): Fee = EvmFee(gasLimit = gasLimit, gasPrice = gasPrice)
 
     private fun originAccountId() = payload.originAddress.asEthereumAddress().toAccountId().value
 

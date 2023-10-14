@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.AddEvmTokenValidationSystem
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
-import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.evmAssetNotExist
+import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.evmAssetNotExists
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validCoinGeckoLink
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validErc20Contract
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validTokenDecimals
@@ -94,7 +94,7 @@ class RealAddTokensInteractor(
 
     override fun getValidationSystem(): AddEvmTokenValidationSystem {
         return ValidationSystem {
-            evmAssetNotExist(chainAssetRepository)
+            evmAssetNotExists(chainRegistry)
             validErc20Contract(ethereumAddressFormat, erc20Standard, chainRegistry)
             validTokenDecimals()
             validCoinGeckoLink(coinGeckoLinkValidationFactory)

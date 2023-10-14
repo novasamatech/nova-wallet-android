@@ -2,13 +2,16 @@ package io.novafoundation.nova.feature_nft_impl.domain.nft.list
 
 import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_nft_api.data.repository.PendingSendNftTransactionRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -27,14 +30,20 @@ class NftListInteractor(
     private val accountRepository: AccountRepository,
     private val tokenRepository: TokenRepository,
     private val nftRepository: NftRepository,
+    private val pendingSendNftTransactionRepository: PendingSendNftTransactionRepository,
     private val chainStateRepository: ChainStateRepository
 ) {
 
     fun userNftsFlow(): Flow<List<PricedNft>> {
         return accountRepository.selectedMetaAccountFlow()
-            .flatMapLatest(nftRepository::allNftWithMetadataFlow)
+            .flatMapLatest(nftRepository::allNftFlow)
             .map { nfts ->
                 nfts.sortedBy { it.identifier }
+            }
+            .onEach {
+                pendingSendNftTransactionRepository.removeOldPendingTransactions(
+                    myNftIds = it.map { it.identifier }
+                )
             }
             .flatMapLatest { nfts ->
                 val allUtilityAssets = nfts.map { it.chain.utilityAsset }.distinct()
@@ -51,7 +60,19 @@ class NftListInteractor(
     }
 
     suspend fun syncNftsList() = withContext(Dispatchers.Default) {
-        nftRepository.initialNftSync(accountRepository.getSelectedMetaAccount(), forceOverwrite = true)
+        nftRepository.initialNftSync(
+            accountRepository.getSelectedMetaAccount(),
+            forceOverwrite = true
+        )
+    }
+
+    suspend fun syncNftListFromNextBlock(chainId: ChainId) = withContext(Dispatchers.Default) {
+        nftRepository.initialNftSyncForChainId(
+            chainId,
+            accountRepository.getSelectedMetaAccount(),
+            forceOverwrite = true,
+            skipFirstBlock = true
+        )
     }
 
     suspend fun fullSyncNft(nft: Nft) {
@@ -60,23 +81,20 @@ class NftListInteractor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun subscribeNftOwnerChanged(): Flow<Unit> {
-        return nftRepository.getPendingSendTransactionsNftLocals()
-            .flatMapLatest(::subscribeNftsOwnerAddresses)
-            .onEach {
-                val blockTimeInMillis = chainStateRepository.expectedBlockTimeInMillis(it.chainId)
-                delay(blockTimeInMillis.toLong())
-                syncNftsList()
-                nftRepository.removeOldPendingTransactions(it)
-            }.map {}
+        return pendingSendNftTransactionRepository.getPendingSendTransactionsNftIds()
+            .flatMapLatest(::subscribeNftsOwnerAccountId)
+            .onEach { syncNftListFromNextBlock(it.chainId) }
+            .map {}
     }
 
-    private suspend fun subscribeNftsOwnerAddresses(nftLocals: Set<NftLocal>): Flow<NftLocal> {
-        val myAccountAddress = accountRepository.getSelectedMetaAccount().substrateAccountId?.toHexString()
-        return nftLocals.map { nftLocal ->
-            nftRepository.subscribeNftOwnerAddress(nftLocal)
+    private suspend fun subscribeNftsOwnerAccountId(nftIds: Set<String>): Flow<NftLocal> {
+        return nftIds.map { nftId ->
+            val chain = nftRepository.getChainForNftId(nftId)
+            val myAccountAddress = accountRepository.getSelectedMetaAccount().accountIdIn(chain)
+            nftRepository.subscribeNftOwnerAccountId(nftId)
                 .distinctUntilChanged()
-                .filter { ownerAddress -> myAccountAddress != ownerAddress }
-                .map { nftLocal }
+                .filter { (ownerAddress, _) -> !(myAccountAddress contentEquals ownerAddress) }
+                .map { (_, nftLocal) -> nftLocal }
         }
             .merge()
     }

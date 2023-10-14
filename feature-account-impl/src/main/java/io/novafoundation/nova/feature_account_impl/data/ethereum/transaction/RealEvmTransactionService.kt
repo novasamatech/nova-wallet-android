@@ -1,16 +1,20 @@
 package io.novafoundation.nova.feature_account_impl.data.ethereum.transaction
 
+import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionBuilding
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionHash
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
+import io.novafoundation.nova.feature_account_api.data.model.EvmFee
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.runtime.ethereum.EvmRpcException
+import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -33,6 +37,7 @@ internal class RealEvmTransactionService(
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
     private val signerProvider: SignerProvider,
+    private val gasPriceProviderFactory: GasPriceProviderFactory,
 ) : EvmTransactionService {
 
     override suspend fun calculateFee(
@@ -40,7 +45,7 @@ internal class RealEvmTransactionService(
         origin: TransactionOrigin,
         fallbackGasLimit: BigInteger,
         building: EvmTransactionBuilding
-    ): BigInteger {
+    ): Fee {
         val web3Api = chainRegistry.awaitCallEthereumApiOrThrow(chainId)
         val chain = chainRegistry.getChain(chainId)
 
@@ -50,13 +55,15 @@ internal class RealEvmTransactionService(
         val txBuilder = EvmTransactionBuilder().apply(building)
         val txForFee = txBuilder.buildForFee(submittingAddress)
 
-        val gasPrice = web3Api.gasPrice()
+        val gasPrice = gasPriceProviderFactory.createKnown(chainId).getGasPrice()
+        val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
 
-        return gasPrice * web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
+        return EvmFee(gasLimit, gasPrice)
     }
 
     override suspend fun transact(
         chainId: ChainId,
+        presetFee: Fee?,
         origin: TransactionOrigin,
         fallbackGasLimit: BigInteger,
         building: EvmTransactionBuilding
@@ -67,13 +74,18 @@ internal class RealEvmTransactionService(
 
         val web3Api = chainRegistry.awaitCallEthereumApiOrThrow(chainId)
         val txBuilder = EvmTransactionBuilder().apply(building)
-        val txForFee = txBuilder.buildForFee(submittingAddress)
 
-        val gasPrice = web3Api.gasPrice()
-        val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
+        val evmFee = presetFee?.castOrNull<EvmFee>() ?: run {
+            val txForFee = txBuilder.buildForFee(submittingAddress)
+            val gasPrice = gasPriceProviderFactory.createKnown(chainId).getGasPrice()
+            val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
+
+            EvmFee(gasLimit, gasPrice)
+        }
+
         val nonce = web3Api.getNonce(submittingAddress)
 
-        val txForSign = txBuilder.buildForSign(nonce = nonce, gasPrice = gasPrice, gasLimit = gasLimit)
+        val txForSign = txBuilder.buildForSign(nonce = nonce, gasPrice = evmFee.gasPrice, gasLimit = evmFee.gasLimit)
         val toSubmit = signTransaction(txForSign, submittingMetaAccount, chain)
 
         web3Api.sendTransaction(toSubmit)
@@ -105,8 +117,6 @@ internal class RealEvmTransactionService(
             .sendSuspend()
             .transactionCount
     }
-
-    private suspend fun Web3Api.gasPrice(): BigInteger = ethGasPrice().sendSuspend().gasPrice
 
     private suspend fun Web3Api.gasLimitOrDefault(tx: Transaction, default: BigInteger): BigInteger = try {
         ethEstimateGas(tx).sendSuspend().amountUsed

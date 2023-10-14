@@ -11,8 +11,14 @@ fun mapAddEvmTokensValidationFailureToUI(
 ): TitleAndMessage {
     return when (failure) {
         is AddEvmTokensValidationFailure.AssetExist -> {
-            resourceManager.getString(R.string.asset_add_evm_token_already_exist_title) to
+            val title = resourceManager.getString(R.string.asset_add_evm_token_already_exist_title)
+            val message = if (failure.canModify) {
+                resourceManager.getString(R.string.asset_add_evm_token_already_exist_modifiable_message, failure.alreadyExistingSymbol)
+            } else {
                 resourceManager.getString(R.string.asset_add_evm_token_already_exist_message, failure.alreadyExistingSymbol)
+            }
+
+            title to message
         }
         is AddEvmTokensValidationFailure.InvalidTokenContractAddress -> {
             resourceManager.getString(R.string.asset_add_evm_token_invalid_contract_address_title) to

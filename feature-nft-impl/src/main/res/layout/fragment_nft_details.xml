@@ -1,158 +1,206 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:background="@color/secondary_screen_background">
 
-    <LinearLayout
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/nftDetailsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        app:dividerVisible="false" />
 
-        <io.novafoundation.nova.common.view.Toolbar
-            android:id="@+id/nftDetailsToolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:dividerVisible="false" />
-
-        <ProgressBar
-            android:id="@+id/nftDetailsProgress"
-            style="@style/Widget.Nova.ProgressBar.Indeterminate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp" />
-
-        <ImageView
-            android:id="@+id/nftDetailsMedia"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            tools:src="@tools:sample/backgrounds/scenic" />
-
-        <TextView
-            android:id="@+id/nftDetailsTitle"
-            style="@style/TextAppearance.NovaFoundation.Bold.Title1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="16dp"
-            android:textColor="@color/text_primary"
-            tools:text="Honeybird" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tagsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            tools:itemCount="1"
-            tools:listitem="@layout/item_nft_tag"
-            android:paddingHorizontal="14dp"/>
-
-        <TextView
-            android:id="@+id/nftDetailsDescription"
-            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="12dp"
-            android:textColor="@color/text_secondary"
-            tools:text="Wayne: Hello sir, what's your name and what brings you to Pastel Beach Mall?" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.0">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
-            android:layout_marginHorizontal="16dp"
-            android:background="@drawable/bg_shimmering_container">
+            android:orientation="vertical">
+
+            <ProgressBar
+                android:id="@+id/nftDetailsProgress"
+                style="@style/Widget.Nova.ProgressBar.Indeterminate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp" />
+
+            <ImageView
+                android:id="@+id/nftDetailsMedia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                tools:src="@tools:sample/backgrounds/scenic" />
 
             <TextView
-                android:id="@+id/assetActionsSend"
-                style="@style/Widget.Nova.ActionButton"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="@string/wallet_asset_send"
+                android:id="@+id/nftDetailsTitle"
+                style="@style/TextAppearance.NovaFoundation.Bold.Title1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="16dp"
+                android:textColor="@color/text_primary"
+                tools:text="Honeybird" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tagsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:paddingHorizontal="14dp"
+                tools:itemCount="1"
+                tools:listitem="@layout/item_nft_tag" />
+
+            <TextView
+                android:id="@+id/nftDetailsDescription"
+                style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="12dp"
+                android:textColor="@color/text_secondary"
+                tools:text="Wayne: Hello sir, what's your name and what brings you to Pastel Beach Mall?" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/nftTokenPriceDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:layout_marginBottom="12dp"
+                android:paddingBottom="16dp"
+                android:background="@drawable/bg_shimmering_container">
+
+                <TextView
+                    android:id="@+id/nftTokenPriceTitle"
+                    style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/common_price"
+                    android:textColor="@color/text_secondary"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/nftTokenPrice"
+                    style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/text_primary"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/nftTokenPriceTitle"
+                    tools:text="1 KSM" />
+
+                <TextView
+                    android:id="@+id/nftTokenPriceNotListed"
+                    style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/text_secondary"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:text="@string/nft_price_not_listed"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/nftTokenPriceTitle"
+                    />
+
+                <TextView
+                    android:id="@+id/nftTokenPriceFiat"
+                    style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:textColor="@color/text_secondary"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/nftTokenPrice"
+                    tools:text="($245.44)" />
+
+                <io.novafoundation.nova.common.view.PrimaryButton
+                    android:id="@+id/assetActionsSend"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="16dp"
+                    app:appearance="secondary"
+                    android:text="@string/wallet_asset_send"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@+id/nftTokenPriceFiat"
+                    tools:visibility="visible" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <io.novafoundation.nova.common.view.TableView
+                android:id="@+id/nftAttributesTable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
                 android:visibility="gone"
-                android:layout_gravity="center_horizontal"
-                app:drawableTopCompat="@drawable/ic_send"
-                tools:drawableTop="@drawable/ic_send"
-                tools:visibility="visible" />
+                />
 
+            <io.novafoundation.nova.common.view.TableView
+                android:id="@+id/nftDetailsTable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="24dp">
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/nftDetailsCollection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/nft_collection" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/nftDetailsIssuance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/nft_token" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/nftDetailsOnwer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                    app:primaryValueIconTint="@color/icon_secondary"
+                    app:title="@string/nft_owned_by" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/nftDetailsCreator"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                    app:primaryValueIconTint="@color/icon_secondary"
+                    app:title="@string/nft_created_by" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/nftDetailsChain"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/common_network" />
+
+            </io.novafoundation.nova.common.view.TableView>
         </LinearLayout>
-
-        <io.novafoundation.nova.common.view.TableView
-            android:id="@+id/nftAttributesTable"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:visibility="gone">
-        </io.novafoundation.nova.common.view.TableView>
-
-        <io.novafoundation.nova.feature_wallet_api.presentation.view.PriceSectionView
-            android:id="@+id/nftDetailsPrice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="12dp" />
-
-        <io.novafoundation.nova.common.view.TableView
-            android:id="@+id/nftDetailsTable"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="24dp">
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/nftDetailsCollection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/nft_collection" />
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/nftDetailsIssuance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/nft_token" />
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/nftDetailsOnwer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
-                app:primaryValueIconTint="@color/icon_secondary"
-                app:title="@string/nft_owned_by" />
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/nftDetailsCreator"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
-                app:primaryValueIconTint="@color/icon_secondary"
-                app:title="@string/nft_created_by" />
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/nftDetailsChain"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/common_network" />
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/nftDetailsTokenPrice"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/nft_price" />
-
-        </io.novafoundation.nova.common.view.TableView>
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</LinearLayout>

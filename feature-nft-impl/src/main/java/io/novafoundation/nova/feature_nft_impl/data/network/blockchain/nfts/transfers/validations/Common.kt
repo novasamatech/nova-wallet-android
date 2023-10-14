@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_nft_impl.data.network.blockchain.nfts.transfers.validations
 
-import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_nft_api.data.model.NftDetails
 import io.novafoundation.nova.feature_nft_impl.data.network.blockchain.nfts.transfers.NftTransferValidationFailure
 import io.novafoundation.nova.feature_nft_impl.data.network.blockchain.nfts.transfers.NftTransfersValidationSystemBuilder
 import io.novafoundation.nova.feature_nft_impl.domain.validaiton.nftExists
@@ -51,9 +52,15 @@ fun NftTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOrigin
     }
 )
 
-fun NftTransfersValidationSystemBuilder.nftExists(nftRepository: NftRepository) = nftExists(
-    nftRepository = nftRepository,
-    substratePublicKey = { value -> value.transfer.sender.substratePublicKey!! },
+fun NftTransfersValidationSystemBuilder.nftExists(
+    nftDetails: suspend (nftId: String) -> NftDetails
+) = nftExists(
+    nftDetails = nftDetails,
+    accountId = { value ->
+        val metaAccount = value.transfer.sender
+        val chain = value.transfer.originChain
+        metaAccount.requireAccountIdIn(chain)
+    },
     nftId = { value -> value.transfer.nftId },
     error = { NftTransferValidationFailure.NftAbsent }
 )

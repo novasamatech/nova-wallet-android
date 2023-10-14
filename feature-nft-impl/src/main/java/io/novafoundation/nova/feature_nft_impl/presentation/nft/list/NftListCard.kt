@@ -5,12 +5,13 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 
 sealed interface NftListItem {
 
-    object Actions : NftListItem
-
     object Divider : NftListItem
 
     data class NftCollection(
-        val name: String
+        val name: String,
+        val expanded: Boolean,
+        val count: String,
+        val icon: String?,
     ) : NftListItem
 
     data class NftListCard(
@@ -20,6 +21,7 @@ sealed interface NftListItem {
 
         data class Content(
             val collectionName: String?,
+            val collectionMedia: String?,
             val title: String,
             val price: AmountModel?,
             val media: String?,

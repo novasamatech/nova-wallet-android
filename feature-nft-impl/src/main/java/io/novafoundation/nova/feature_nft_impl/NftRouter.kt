@@ -22,5 +22,5 @@ interface NftRouter {
 
     fun openNftSendFlowFragment()
 
-    fun openReceive(chainId: ChainId)
+    fun openReceive(chainId: ChainId, titleRes: Int? = null)
 }

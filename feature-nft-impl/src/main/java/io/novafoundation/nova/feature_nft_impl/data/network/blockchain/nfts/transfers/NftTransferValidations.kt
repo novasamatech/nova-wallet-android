@@ -13,7 +13,6 @@ typealias NftTransfersValidationSystemBuilder = ValidationSystemBuilder<NftTrans
 sealed class NftTransferValidationFailure {
 
     sealed class NotEnoughFunds : NftTransferValidationFailure() {
-        object InUsedAsset : NotEnoughFunds()
 
         class InCommissionAsset(
             override val chainAsset: Chain.Asset,

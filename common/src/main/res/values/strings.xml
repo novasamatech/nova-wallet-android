@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="common_fee_changed_title">Network fee is too high</string>
+    <string name="common_fee_changed_message">The estimated network fee %s is much higher than the default network fee (%s). This might be due to temporary network congestion. You can refresh to wait for a lower network fee.</string>
+    <string name="common_refresh_fee">Refresh fee</string>
+
+    <string name="send_recipient_system_account_title">Tokens will be lost</string>
+    <string name="send_recipient_system_account_message">Recipient is a system account. It is not controlled by any company or individual.\nAre you sure you still want to perform this transfer?</string>
+
+    <string name="asset_add_evm_token_already_exist_title">This token already exists</string>
+    <string name="asset_add_evm_token_already_exist_modifiable_message">The entered contract address is present in Nova as a %s token. Are you sure you want to modify it?</string>
+
     <string name="account_parity_signer_sign_qr_code_expired_descrition">For security reasons generated operations valid for only %s.\nPlease generate new QR code and sign it with %s</string>
     <string name="account_parity_signer_import_scan_invalid_qr">Invalid QR code, please make sure you are scanning QR code from %s</string>
     <string name="account_parity_signer_sign_have_error">I have an error in %s</string>
@@ -356,7 +366,6 @@
 
     <string name="manage_assets_add_token">Add token</string>
 
-    <string name="asset_add_evm_token_already_exist_title">This token already exist</string>
     <string name="asset_add_evm_token_already_exist_message">The entered contract address is present in Nova as a %s token.</string>
 
     <string name="asset_add_evm_token_invalid_contract_address_title">Invalid contract address</string>
@@ -1459,6 +1468,7 @@
     <string name="wallet_nickname_create_caption_v2_2_0">Name examples: Main account, My validator, Dotsama crowdloans, etc.</string>
     <string name="wallet_receive_description">Share this QR to sender</string>
     <string name="wallet_receive_description_v2_2_0">Let sender scan this QR code</string>
+    <!-- <string name="wallet_receive_share_message" formatted="false">My %s address to receive %s:</string> -->
     <string name="wallet_receive_share_message_token" formatted="false">My %s address to receive %s:</string>
     <string name="wallet_receive_share_message" formatted="false">My %s address:</string>
     <string name="wallet_receive_share_qr">Share QR code</string>
@@ -1475,7 +1485,8 @@
     <string name="wallet_transfer_details_title">Transfer details</string>
     <string name="wallet_your_balance">Your balance</string>
     <string name="yesterday">Yesterday</string>
-    <string name="nft_receive">Receive</string>
-    <string name="nft_send">Send</string>
+    <string name="nft_receive">Receive NFT</string>
+    <string name="nft_send">Send NFT</string>
+    <string name="nft_on_chain">on</string>
     <string name="nft_search_hint">Search by NFT name or Collection name</string>
 </resources>
