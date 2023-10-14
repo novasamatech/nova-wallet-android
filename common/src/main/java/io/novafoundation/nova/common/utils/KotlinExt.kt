@@ -12,14 +12,11 @@ import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
+import java.util.Calendar
+import java.util.Collections
 import java.util.Date
 import java.util.UUID
-import java.util.Collections
-import java.util.Calendar
 import java.util.concurrent.TimeUnit
-import kotlin.Comparator
-import kotlin.collections.HashMap
-import kotlin.collections.LinkedHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.sqrt
@@ -49,6 +46,16 @@ inline fun <K, V> List<V>.associateByMultiple(keysExtractor: (V) -> Iterable<K>)
     return destination
 }
 
+fun ByteArray.startsWith(prefix: ByteArray): Boolean {
+    if (prefix.size > size) return false
+
+    prefix.forEachIndexed { index, byte ->
+        if (get(index) != byte) return false
+    }
+
+    return true
+}
+
 /**
  * Compares two BigDecimals taking into account only values but not scale unlike `==` operator
  */
@@ -73,10 +80,6 @@ val BigDecimal.isNonNegative: Boolean
 
 val BigInteger.isZero: Boolean
     get() = signum() == 0
-
-inline fun <T : Comparable<T>, R : Comparable<R>> ClosedRange<T>.map(mapper: (T) -> R): ClosedRange<R> {
-    return mapper(start)..mapper(endInclusive)
-}
 
 fun BigInteger?.orZero(): BigInteger = this ?: BigInteger.ZERO
 fun BigDecimal?.orZero(): BigDecimal = this ?: 0.toBigDecimal()
@@ -176,6 +179,12 @@ fun List<Double>.median(): Double = sorted().let {
     val middleLeft = it[(it.size - 1) / 2] // will be same as middleRight if list size is odd
 
     (middleLeft + middleRight) / 2
+}
+
+fun Collection<BigInteger>.average(): BigInteger {
+    if (isEmpty()) throw NoSuchFieldException("Collection is empty")
+
+    return sum() / size.toBigInteger()
 }
 
 fun generateLinearSequence(initial: Int, step: Int) = generateSequence(initial) { it + step }

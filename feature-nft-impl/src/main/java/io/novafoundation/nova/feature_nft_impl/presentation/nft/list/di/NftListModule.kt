@@ -6,13 +6,16 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_nft_api.data.repository.PendingSendNftTransactionRepository
 import io.novafoundation.nova.feature_nft_impl.NftRouter
+import io.novafoundation.nova.feature_nft_impl.data.repository.PendingSendNftTransactionRepositoryImpl
 import io.novafoundation.nova.feature_nft_impl.domain.nft.list.NftListInteractor
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.list.NftListViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
@@ -27,12 +30,14 @@ class NftListModule {
         accountRepository: AccountRepository,
         nftRepository: NftRepository,
         tokenRepository: TokenRepository,
-        chainStateRepository: ChainStateRepository
+        chainStateRepository: ChainStateRepository,
+        pendingSendNftTransactionRepository: PendingSendNftTransactionRepository
     ) = NftListInteractor(
         accountRepository = accountRepository,
         tokenRepository = tokenRepository,
         nftRepository = nftRepository,
-        chainStateRepository = chainStateRepository
+        chainStateRepository = chainStateRepository,
+        pendingSendNftTransactionRepository = pendingSendNftTransactionRepository
     )
 
     @Provides

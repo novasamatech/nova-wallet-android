@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV1
 
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.core.model.StorageChange
 import io.novafoundation.nova.core_db.dao.NftDao
@@ -17,6 +18,7 @@ import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV1.netw
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 
@@ -27,14 +29,19 @@ class RmrkV1NftProvider(
     private val nftDao: NftDao
 ) : NftProvider {
 
-    override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
+    override suspend fun initialNftsSync(
+        chain: Chain,
+        metaAccount: MetaAccount,
+        forceOverwrite: Boolean,
+        at: BlockHash?
+    ) {
         throw UnsupportedOperationException("RmrkV1 not supported")
     }
 
-    override suspend fun subscribeNftOwnerAddress(
+    override suspend fun subscribeNftOwnerAccountId(
         subscriptionBuilder: StorageSharedRequestsBuilder,
         nftLocal: NftLocal
-    ): Flow<String> {
+    ): Flow<AccountId?> {
         throw UnsupportedOperationException("RmrkV1 doesn't supported")
     }
 
@@ -69,7 +76,7 @@ class RmrkV1NftProvider(
         }
     }
 
-    override suspend fun getCollectionName(collectionId: String, chainId: ChainId?): String? {
+    override suspend fun getCollectionNameAndMedia(collectionId: String, chainId: ChainId?): Pair<String?, String?>? {
         return null
     }
 }

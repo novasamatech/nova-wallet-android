@@ -134,6 +134,7 @@
     <string name="accounts_change_chain_secrets">Изменить аккаунт</string>
     <string name="add_delegation_missing_account_message">Вы должны добавить %s аккаунт в кошелек, чтобы иметь возможность делегировать</string>
     <string name="asset_add_evm_token_already_exist_message">Введенный адрес контракта уже добавлен в Nova как токен %s.</string>
+    <string name="asset_add_evm_token_already_exist_modifiable_message">Введенный адрес контракта присутствует в Nova как токен %s. Вы уверены, что хотите изменить его?</string>
     <string name="asset_add_evm_token_already_exist_title">Этот токен уже добавлен</string>
     <string name="asset_add_evm_token_invalid_coin_gecko_link_message">Пожалуйста, убедитесь, что введенный URL-адрес имеет следующую форму: www.coingecko.com/en/coins/tether.</string>
     <string name="asset_add_evm_token_invalid_coin_gecko_link_title">Недействительная ссылка на CoinGecko</string>
@@ -163,7 +164,7 @@
     <string name="assets_receive_ledger_not_supported_message" formatted="false">Не переводите %s на Ledger аккаунт так как Ledger не поддерживает переводы %s, таким образом ассет будет недоступен для перевода на этом аккаунте</string>
     <string name="assets_receive_ledger_not_supported_title">Ledger не поддерживает этот токен</string>
     <string name="assets_search_hint">Поиск по названию сети или токена</string>
-    <string name="assets_search_placeholder">Токены с указанным именем\nне найдены</string>
+    <string name="assets_search_placeholder">Токены и сети с указанным именем\nне найдены</string>
     <string name="assets_select_send_your_wallets">Ваши кошельки</string>
     <string name="biometric_auth_title">Биометрия</string>
     <string name="buy_completed">Покупка совершена! Ожидайте до 60 минут. Вы можете отслеживать статус по электронной почте.</string>
@@ -234,6 +235,8 @@
     <string name="common_existential_warning_title">Операция удалит аккаунт</string>
     <string name="common_expired">Истекла</string>
     <string name="common_explore">Исследуй</string>
+    <string name="common_fee_changed_message" formatted="false">Предполагаемая комиссия %s намного выше, чем комиссия по умолчанию (%s). Это может быть связано с временной перегрузкой сети. Вы можете обновить комиссию, чтобы дождаться более низкой суммы.</string>
+    <string name="common_fee_changed_title">Комиссия сети слишком высокая</string>
     <string name="common_filter_sort_header">Сортировать по:</string>
     <string name="common_filters">Фильтры</string>
     <string name="common_find_out_more">Узнать больше</string>
@@ -307,6 +310,7 @@
     <string name="common_price">Цена</string>
     <string name="common_proceed">Продолжить</string>
     <string name="common_read_more">Подробнее</string>
+    <string name="common_refresh_fee">Обновить</string>
     <string name="common_reject">Отклонить</string>
     <string name="common_remove">Удалить</string>
     <string name="common_required">Обязательные</string>
@@ -742,6 +746,8 @@
     <string name="select_ledger_location_enable_request_message">Nova нуждается в включении местоположения, чтобы иметь возможность выполнять сканирование Bluetooth для поиска вашего устройства Ledger</string>
     <string name="select_ledger_location_enable_request_title">Пожалуйста, включите геолокацию в настройках устройства</string>
     <string name="send_address_hint">Адрес или w3n</string>
+    <string name="send_recipient_system_account_message">Получатель является системным аккаунтом. Этот аккаунт не контролируется какой-либо компанией или частным лицом. \nВы уверены, что все еще хотите выполнить данный перевод?</string>
+    <string name="send_recipient_system_account_title">Токены будут потеряны</string>
     <string name="settings_biometric_not_ready_message">Пожалуйста, убедитесь, что биометрия включена в настройках</string>
     <string name="settings_biometric_not_ready_title">Биометрия отключена в настройках</string>
     <string name="settings_community">Сообщество</string>
@@ -802,8 +808,8 @@
     <string name="staking_custom_validators_update_list">Обновить свой список</string>
     <string name="staking_dashboard_browser_stake_header">Стейкинг через DApp браузер Nova</string>
     <string name="staking_dashboard_more_options">Больше вариантов стейкинга</string>
-    <string name="staking_dashboard_no_stake_header">Стейкайте и получайте вознаграждения</string>
-    <string name="staking_earnings_per_year">Примерная доходность</string>
+    <string name="staking_dashboard_no_stake_header">Стейкайте и получайте награды</string>
+    <string name="staking_earnings_per_year">Примерный доход</string>
     <string name="staking_era_title">эра %s</string>
     <string name="staking_estimate_earning_title_v1.9.0">Расчёт доходности</string>
     <string name="staking_estimate_earning_title_v2_2_0">Расчёт доходности %s</string>
@@ -1194,7 +1200,8 @@
     <string name="yield_boost_stake_increase_time">Частота увеличения стейка</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost будет автоматически стейкать %s все мои переводные токены выше %s</string>
     <string name="yiled_boost_yield_boosted">С Yield Boost</string>
-    <string name="nft_receive">Получить</string>
-    <string name="nft_send">Отправить</string>
+    <string name="nft_receive">Получить NFT</string>
+    <string name="nft_send">Отправить NFT</string>
+    <string name="nft_on_chain">на</string>
     <string name="nft_search_hint">Поиск по названию NFT или коллекции</string>
 </resources>

@@ -11,10 +11,6 @@ fun mapNftTransferValidationFailureToUI(
     failure: NftTransferValidationFailure
 ): TitleAndMessage {
     return when (failure) {
-        NftTransferValidationFailure.NotEnoughFunds.InUsedAsset -> {
-            resourceManager.getString(R.string.common_not_enough_funds_title) to
-                resourceManager.getString(R.string.choose_amount_error_too_big)
-        }
         is NftTransferValidationFailure.NotEnoughFunds.InCommissionAsset -> {
             handleNotEnoughFeeError(failure, resourceManager)
         }

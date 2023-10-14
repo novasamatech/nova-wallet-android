@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_external_sign_impl.domain.sign
 
 import io.novafoundation.nova.common.address.AddressModel
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import kotlinx.coroutines.flow.Flow
 
@@ -21,9 +21,9 @@ interface ExternalSignInteractor {
 
     fun commissionTokenFlow(): Flow<Token?>?
 
-    suspend fun calculateFee(): Balance?
+    suspend fun calculateFee(): Fee?
 
-    suspend fun performOperation(): ExternalSignCommunicator.Response?
+    suspend fun performOperation(upToDateFee: Fee?): ExternalSignCommunicator.Response?
 
     suspend fun readableOperationContent(): String
 

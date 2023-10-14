@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_nft_impl.data.source.providers.nfts
 
 import com.google.gson.Gson
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
@@ -14,6 +15,7 @@ import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_api.data.model.NftDetails
 import io.novafoundation.nova.feature_nft_impl.data.mappers.mapNftLocalToNftType
@@ -31,7 +33,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.singleValueOf
-import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
@@ -54,7 +55,12 @@ class NftsNftProvider(
     private val gson: Gson
 ) : NftProvider {
 
-    override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
+    override suspend fun initialNftsSync(
+        chain: Chain,
+        metaAccount: MetaAccount,
+        forceOverwrite: Boolean,
+        at: BlockHash?
+    ) {
         val accountId = metaAccount.accountIdIn(chain) ?: return
 
         val newNfts = remoteStorage.query(chain.id) {
@@ -116,10 +122,10 @@ class NftsNftProvider(
         nftDao.insertNftsDiff(NftLocal.Type.NFTS, metaAccount.id, newNfts, forceOverwrite)
     }
 
-    override suspend fun getCollectionName(
+    override suspend fun getCollectionNameAndMedia(
         collectionId: String,
         chainId: ChainId?
-    ): String? {
+    ): Pair<String?, String?>? {
         if (chainId == null) return null
 
         val classId = collectionId.toBigInteger()
@@ -137,7 +143,10 @@ class NftsNftProvider(
                 val url = classMetadataPointer.decodeToString().adoptFileStorageLinkToHttps()
                 val classMetadata = ipfsApi.getIpfsMetadata(url)
 
-                classMetadata.name?.take(MetadataLimits.COLLECTION_NAME_LIMIT)
+                Pair(
+                    classMetadata.name?.take(MetadataLimits.COLLECTION_NAME_LIMIT),
+                    classMetadata.image?.adoptFileStorageLinkToHttps(),
+                )
             }
         }
     }
@@ -180,10 +189,10 @@ class NftsNftProvider(
         }
     }
 
-    override suspend fun subscribeNftOwnerAddress(
+    override suspend fun subscribeNftOwnerAccountId(
         subscriptionBuilder: StorageSharedRequestsBuilder,
         nftLocal: NftLocal
-    ): Flow<String> {
+    ): Flow<AccountId?> {
         return remoteStorage.query(nftLocal.chainId) {
             val storage = runtime.metadata.nfts().storage("Item")
             val key = storage.storageKey(
@@ -193,7 +202,7 @@ class NftsNftProvider(
             )
             try {
                 subscriptionBuilder.subscribe(key)
-                    .map { bindNftOwnerAddress(it.value, runtime) }
+                    .map { bindNftOwnerAccountId(it.value, runtime) }
                     .flowOn(Dispatchers.IO)
             } catch (e: Exception) {
                 emptyFlow()
@@ -239,7 +248,7 @@ class NftsNftProvider(
                 NftDetails(
                     identifier = syncedNftLocal.identifier,
                     chain = chain,
-                    owner = metaAccount.accountIdIn(chain)!!,
+                    owner = metaAccount.requireAccountIdIn(chain),
                     creator = null,
                     media = syncedNftLocal.media,
                     name = mapNftNameForUi(syncedNftLocal.name, syncedNftLocal.instanceId),
@@ -265,16 +274,16 @@ class NftsNftProvider(
         return "$chainId-$collectionId-$instanceId"
     }
 
-    private fun bindNftOwnerAddress(scale: String?, runtime: RuntimeSnapshot): String {
-        return scale?.let { bindOrmlAccountData(it, runtime) } ?: ""
+    private fun bindNftOwnerAccountId(scale: String?, runtime: RuntimeSnapshot): AccountId? {
+        return scale?.let { bindOrmlAccountData(it, runtime) }
     }
 
     @UseCaseBinding
-    private fun bindOrmlAccountData(scale: String, runtime: RuntimeSnapshot): String {
+    private fun bindOrmlAccountData(scale: String, runtime: RuntimeSnapshot): AccountId {
         val type = runtime.metadata.nfts().storage("Item").returnType()
 
         val dynamicInstance = type.fromHexOrNull(runtime, scale).cast<Struct.Instance>()
 
-        return bindAccountId(dynamicInstance["owner"]).toHexString()
+        return bindAccountId(dynamicInstance["owner"])
     }
 }

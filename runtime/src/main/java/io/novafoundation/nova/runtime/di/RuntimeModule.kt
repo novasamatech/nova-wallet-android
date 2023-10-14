@@ -10,6 +10,8 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
+import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
+import io.novafoundation.nova.runtime.ethereum.gas.RealGasPriceProviderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicSerializers
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
@@ -180,4 +182,10 @@ class RuntimeModule {
     @Provides
     @ApplicationScope
     fun provideStorageSharedRequestBuilderFactory(chainRegistry: ChainRegistry) = StorageSharedRequestsBuilderFactory(chainRegistry)
+
+    @Provides
+    @ApplicationScope
+    fun provideGasPriceProviderFactory(
+        chainRegistry: ChainRegistry
+    ): GasPriceProviderFactory = RealGasPriceProviderFactory(chainRegistry)
 }

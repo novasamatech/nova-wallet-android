@@ -14,9 +14,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenI
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.receive.model.QrSharingPayload
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.synthetic.main.fragment_receive.receiveFrom
 import kotlinx.android.synthetic.main.fragment_receive.receiveQrCode
 import kotlinx.android.synthetic.main.fragment_receive.receiveShare
@@ -25,6 +23,7 @@ import javax.inject.Inject
 
 private const val KEY_PAYLOAD = "KEY_PAYLOAD"
 private const val KEY_CHAIN_ID = "KEY_CHAIN"
+private const val KEY_TITLE_RES = "KEY_TITLE_RES"
 
 class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
 
@@ -33,12 +32,16 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
 
     companion object {
 
-        fun getBundle(assetPayload: AssetPayload) = Bundle().apply {
-            putParcelable(KEY_PAYLOAD, assetPayload)
-        }
-
-        fun getBundle(chainId: ChainId) = Bundle().apply {
-            putString(KEY_CHAIN_ID, chainId)
+        fun getBundle(payload: ReceivePayload) = Bundle().apply {
+            when (payload) {
+                is ReceivePayload.Asset -> {
+                    putParcelable(KEY_PAYLOAD, payload.assetPayload)
+                }
+                is ReceivePayload.Chain -> {
+                    putString(KEY_CHAIN_ID, payload.chainId)
+                    payload.titleRes?.let { putInt(KEY_TITLE_RES, it) }
+                }
+            }
         }
     }
 
@@ -83,7 +86,9 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
             receiveFrom.setLabel(it.chain.name)
         }
 
-        viewModel.toolbarTitle.observe(receiveToolbar::setTitle)
+        argument<Int?>(KEY_TITLE_RES)?.let {
+            receiveToolbar.setTitle(it)
+        } ?: viewModel.toolbarTitle.observe(receiveToolbar::setTitle)
 
         viewModel.shareEvent.observeEvent(::startQrSharingIntent)
     }

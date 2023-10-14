@@ -86,8 +86,10 @@ fun minimumStake(
 
     val lastElectedBag = bagListLocator.bagBoundaries(bagListScoreConverter.scoreOf(minElectedStake))
 
-    val nextBagThreshold = bagListScoreConverter.balanceOf(lastElectedBag.endInclusive)
+    val nextBagThreshold = bagListScoreConverter.balanceOf(lastElectedBag.endInclusive ?: lastElectedBag.start)
     val epsilon = Balance.ONE
 
-    return nextBagThreshold + epsilon
+    val nextBagRequiredAmount = nextBagThreshold + epsilon
+
+    return nextBagRequiredAmount.coerceAtLeast(minElectedStake)
 }
