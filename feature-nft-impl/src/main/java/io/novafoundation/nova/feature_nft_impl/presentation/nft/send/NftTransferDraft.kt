@@ -13,5 +13,5 @@ class NftTransferDraft(
     val recipientAddress: String,
     val chainId: ChainId,
     val name: String,
-    val issuance: String
+    val tags: List<String>,
 ) : Parcelable

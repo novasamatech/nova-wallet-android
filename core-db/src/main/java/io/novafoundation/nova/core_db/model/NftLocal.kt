@@ -25,6 +25,8 @@ data class NftLocal(
     val name: String? = null,
     val label: String? = null,
     val media: String? = null,
+    val tags: String? = null,
+    val attributes: String? = null,
     // --- !metadata fields ---
 
     val issuanceTotal: Int? = null,

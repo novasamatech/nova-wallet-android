@@ -40,25 +40,13 @@ fun nftPrice(nftLocal: NftLocal): BigInteger? {
 fun mapNftLocalToNft(
     chainsById: Map<ChainId, Chain>,
     metaAccount: MetaAccount,
-    nftLocal: NftLocal
+    nftLocal: NftLocal,
+    collectionName: String?,
+    collectionMedia: String?
 ): Nft? {
     val chain = chainsById[nftLocal.chainId] ?: return null
 
     val type = mapNftLocalToNftType(nftLocal)
-
-    val details = if (nftLocal.wholeDetailsLoaded) {
-        val issuance = nftIssuance(nftLocal)
-
-        Nft.Details.Loaded(
-            name = nftLocal.name,
-            label = nftLocal.label,
-            media = nftLocal.media,
-            price = nftPrice(nftLocal),
-            issuance = issuance,
-        )
-    } else {
-        Nft.Details.Loadable
-    }
 
     return Nft(
         identifier = nftLocal.identifier,
@@ -68,7 +56,15 @@ fun mapNftLocalToNft(
         owner = metaAccount.accountIdIn(chain)!!,
         metadataRaw = nftLocal.metadata,
         type = type,
-        details = details
+        details = Nft.Details.Loaded(
+            name = nftLocal.name,
+            label = nftLocal.label,
+            media = nftLocal.media,
+            price = nftPrice(nftLocal),
+            collectionName = collectionName,
+            collectionMedia = collectionMedia
+        ),
+        wholeDetailsLoaded = nftLocal.wholeDetailsLoaded
     )
 }
 

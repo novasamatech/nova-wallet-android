@@ -19,6 +19,7 @@ import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 
 class RmrkV1NftProvider(
@@ -68,8 +69,14 @@ class RmrkV1NftProvider(
                 issuance = nftIssuance(nftLocal),
                 price = nftPrice(nftLocal),
                 collection = null,
-                type = mapNftLocalToNftType(nftLocal)
+                type = mapNftLocalToNftType(nftLocal),
+                tags = emptyList(),
+                attributes = emptyList()
             )
         }
+    }
+
+    override suspend fun getCollectionNameAndMedia(collectionId: String, chainId: ChainId?): Pair<String?, String?>? {
+        return null
     }
 }

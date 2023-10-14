@@ -40,7 +40,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -48,7 +47,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
 import kotlin.coroutines.coroutineContext
-import kotlin.coroutines.suspendCoroutine
 
 private const val NFT_TAG = "NFT"
 
@@ -65,20 +63,54 @@ class NftRepositoryImpl(
     private val mutex = Mutex()
     private val subscriptionBuilders: MutableMap<ChainId, StorageSharedRequestsBuilder> = mutableMapOf()
 
+    private val collectionNameAndMedias: MutableMap<String, Pair<String?, String?>?> = mutableMapOf()
+
+    override fun allNftWithMetadataFlow(metaAccount: MetaAccount): Flow<List<Nft>> {
+        return nftDao.nftsFlow(metaAccount.id)
+            .map { nftsLocal ->
+                val chainsById = chainRegistry.chainsById.first()
+
+                nftsLocal.mapNotNull { nftLocal ->
+                    val (collectionName, collectionMedia) = getCollectionNameAndMedia(nftLocal, chainsById) ?: Pair(null, null)
+                    mapNftLocalToNft(chainsById, metaAccount, nftLocal, collectionName, collectionMedia)
+                }
+            }
+    }
+
+    private suspend fun getCollectionNameAndMedia(
+        nftLocal: NftLocal,
+        chainsById: Map<ChainId, Chain>
+    ): Pair<String?, String?>? {
+        val nftTypeKey = mapNftTypeLocalToTypeKey(nftLocal.type)
+        val nftProvider = nftProvidersRegistry.get(nftTypeKey)
+        val chain = chainsById[nftLocal.chainId]
+        val collectionId = nftLocal.collectionId
+        return runCatching {
+            if (collectionNameAndMedias.containsKey(collectionId)) {
+                collectionNameAndMedias[collectionId]
+            } else {
+                nftProvider.getCollectionNameAndMedia(collectionId, chain?.id).apply {
+                    collectionNameAndMedias[collectionId] = this
+                }
+            }
+        }.getOrDefault(null)
+    }
+
     override fun allNftFlow(metaAccount: MetaAccount): Flow<List<Nft>> {
         return nftDao.nftsFlow(metaAccount.id)
             .map { nftsLocal ->
                 val chainsById = chainRegistry.chainsById.first()
 
                 nftsLocal.mapNotNull { nftLocal ->
-                    mapNftLocalToNft(chainsById, metaAccount, nftLocal)
+                    mapNftLocalToNft(chainsById, metaAccount, nftLocal, null, null)
                 }
             }
     }
 
     override fun nftDetails(nftId: String): Flow<NftDetails> {
         return flow {
-            val nftTypeKey = mapNftTypeLocalToTypeKey(nftDao.getNftType(nftId))
+            val nftType = nftDao.getNftType(nftId)
+            val nftTypeKey = mapNftTypeLocalToTypeKey(nftType)
             val nftProvider = nftProvidersRegistry.get(nftTypeKey)
 
             emitAll(nftProvider.nftDetailsFlow(nftId))
@@ -114,6 +146,10 @@ class NftRepositoryImpl(
 
     override suspend fun getLocalNfts(nftIdentifiers: List<String>): List<NftLocal> {
         return nftDao.getNfts(nftIdentifiers)
+    }
+
+    override suspend fun getLocalNftOrNull(nftIdentifier: String): NftLocal? {
+        return nftDao.getNftOrNull(nftIdentifier)
     }
 
     override suspend fun initialNftSync(

@@ -13,16 +13,18 @@ class Nft(
     val metadataRaw: ByteArray?,
     val details: Details,
     val type: Type,
+    val wholeDetailsLoaded: Boolean
 ) {
 
     sealed class Details {
 
         class Loaded(
             val price: BigInteger?,
-            val issuance: Issuance,
+            val collectionName: String?,
             val name: String?,
             val label: String?,
             val media: String?,
+            val collectionMedia: String?,
         ) : Details()
 
         object Loadable : Details()

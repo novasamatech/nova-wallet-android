@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
@@ -36,7 +37,9 @@ class NftListInteractor(
     fun userNftsFlow(): Flow<List<PricedNft>> {
         return accountRepository.selectedMetaAccountFlow()
             .flatMapLatest(nftRepository::allNftFlow)
-            .map { nfts -> nfts.sortedBy { it.identifier } }
+            .map { nfts ->
+                nfts.sortedBy { it.identifier }
+            }
             .onEach {
                 pendingSendNftTransactionRepository.removeOldPendingTransactions(
                     myNftIds = it.map { it.identifier }

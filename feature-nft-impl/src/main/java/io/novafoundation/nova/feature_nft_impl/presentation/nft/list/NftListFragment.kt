@@ -48,11 +48,12 @@ class NftListFragment : BaseFragment<NftListViewModel>(), NftGridAdapter.Handler
         nftListNfts.setHasFixedSize(true)
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return if (position == 0) 2 else 1
+                val nftItem = viewModel.nftListItemsFlow.value.getOrNull(position - 1)
+                return if (nftItem is NftListItem.NftListCard) 1 else 2
             }
         }
         nftListNfts.adapter = adapter
-        nftListNfts.itemAnimator = null
+        nftListNfts.animation = null
 
         nftListRefresh.setOnRefreshListener { viewModel.syncNfts() }
     }
@@ -76,11 +77,11 @@ class NftListFragment : BaseFragment<NftListViewModel>(), NftGridAdapter.Handler
         viewModel.nftCountFlow.observe(nftListCounter::setText)
     }
 
-    override fun itemClicked(item: NftListItem) {
+    override fun itemClicked(item: NftListItem.NftListCard) {
         viewModel.nftClicked(item)
     }
 
-    override fun loadableItemShown(item: NftListItem) {
+    override fun loadableItemShown(item: NftListItem.NftListCard) {
         viewModel.loadableNftShown(item)
     }
 
@@ -90,5 +91,9 @@ class NftListFragment : BaseFragment<NftListViewModel>(), NftGridAdapter.Handler
 
     override fun receiveClicked() {
         viewModel.onNftReceiveClick()
+    }
+
+    override fun groupClicked(collection: String) {
+        viewModel.toggleCollection(collection)
     }
 }

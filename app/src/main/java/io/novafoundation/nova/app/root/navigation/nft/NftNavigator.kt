@@ -55,7 +55,7 @@ class NftNavigator(
         return performNavigation(actionId = R.id.action_show_nftSendFlowFragment)
     }
 
-    override fun openReceive(chainId: ChainId) {
-        return performNavigation(R.id.action_open_receive, ReceiveFragment.getBundle(ReceivePayload.Chain(chainId)))
+    override fun openReceive(chainId: ChainId, titleRes: Int?) {
+        return performNavigation(R.id.action_open_receive, ReceiveFragment.getBundle(ReceivePayload.Chain(chainId, titleRes)))
     }
 }

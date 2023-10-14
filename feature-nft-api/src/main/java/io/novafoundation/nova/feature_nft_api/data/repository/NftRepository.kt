@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface NftRepository {
 
+    fun allNftWithMetadataFlow(metaAccount: MetaAccount): Flow<List<Nft>>
+
     fun allNftFlow(metaAccount: MetaAccount): Flow<List<Nft>>
 
     fun nftDetails(nftId: String): Flow<NftDetails>
@@ -37,6 +39,8 @@ interface NftRepository {
     suspend fun getLocalNft(nftIdentifier: String): NftLocal
 
     suspend fun getLocalNfts(nftIdentifiers: List<String>): List<NftLocal>
+
+    suspend fun getLocalNftOrNull(nftIdentifier: String): NftLocal?
 
     fun isNftTypeSupportedForSend(nftType: Nft.Type, chain: Chain): Boolean
 

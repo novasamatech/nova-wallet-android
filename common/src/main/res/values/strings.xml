@@ -650,6 +650,8 @@
     <string name="wallet_currency_category_fiat">Fiat currencies</string>
     <string name="wallet_currency_category_popular_fiat">Popular fiat currencies</string>
 
+    <string name="settings_nfts_title" translatable="false">NFTs</string>
+
     <string name="assets_select_send_your_wallets">Your wallets</string>
 
     <string name="assets_balance_details_locks_staking">Staking</string>
@@ -912,11 +914,12 @@
     <string name="common_price">Price</string>
 
     <string name="nft_collection">Collection</string>
+    <string name="nft_token">Token ID</string>
     <string name="nft_owned_by">Owned by</string>
     <string name="nft_created_by">Created by</string>
+    <string name="nft_price">Price</string>
 
     <string name="nft_issuance_unlimited">Unlimited series</string>
-    <string name="nft_issuance_limited_format">#%s Edition of %s</string>
     <string name="nft_your_nfts">Your NFTs</string>
 
     <string name="wallet_assets_empty">Your assets will appear here.\nMake sure the "Hide zero balances" filter is turned off</string>
@@ -1235,6 +1238,7 @@
     <string name="settings_community">Community</string>
     <string name="settings_email">Email</string>
     <string name="settings_general">General</string>
+    <string name="settings_more">More</string>
     <string name="settings_preferences">Preferences</string>
     <string name="settings_security">Security</string>
     <string name="settings_support">Support &amp; Feedback</string>
@@ -1481,7 +1485,8 @@
     <string name="wallet_transfer_details_title">Transfer details</string>
     <string name="wallet_your_balance">Your balance</string>
     <string name="yesterday">Yesterday</string>
-    <string name="nft_receive">Receive</string>
-    <string name="nft_send">Send</string>
+    <string name="nft_receive">Receive NFT</string>
+    <string name="nft_send">Send NFT</string>
+    <string name="nft_on_chain">on</string>
     <string name="nft_search_hint">Search by NFT name or Collection name</string>
 </resources>

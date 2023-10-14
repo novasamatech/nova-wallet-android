@@ -8,31 +8,69 @@
     android:orientation="vertical"
     tools:background="@color/secondary_screen_background">
 
-    <io.novafoundation.nova.common.view.Toolbar
-        android:id="@+id/inputAddressToolbar"
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/toolbarContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:dividerVisible="false"
-        app:homeButtonIcon="@drawable/ic_close" />
+        android:layout_height="?attr/actionBarSize"
+        android:gravity="center_vertical"
+        tools:layout_height="48dp">
+
+        <ImageView
+            android:id="@+id/closeAction"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:src="@drawable/ic_close"
+            app:tint="@color/actions_color" />
+
+        <ImageView
+            android:id="@+id/nftThumb"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center" />
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/nftName"
-        style="@style/TextAppearance.NovaFoundation.Bold.LargeTitle"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:includeFontPadding="false"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="10dp"
+        android:includeFontPadding="false"
         android:textColor="@color/text_primary"
-        android:gravity="center"
         tools:text="Bored Ape #00" />
 
-    <io.novafoundation.nova.feature_nft_impl.presentation.nft.common.NftIssuanceView
-        android:id="@+id/nftIssuance"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_gravity="center"
-        tools:text="#11 Edition of 9978" />
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:text="@string/nft_on_chain"
+            android:textColor="@color/text_primary" />
+
+        <io.novafoundation.nova.feature_account_api.view.ChainChipView
+            android:id="@+id/nftChain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="10dp" />
+
+    </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"

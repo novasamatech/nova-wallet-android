@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
-        app:titleText="@string/wallet_asset_send" />
+        app:titleText="@string/nft_send" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -27,6 +27,15 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp">
 
+            <ImageView
+                android:id="@+id/nftDetailsMedia"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:adjustViewBounds="true"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center"
+                tools:src="@tools:sample/backgrounds/scenic" />
+
             <TextView
                 android:id="@+id/nftName"
                 style="@style/TextAppearance.NovaFoundation.Bold.LargeTitle"
@@ -38,13 +47,14 @@
                 android:gravity="center"
                 tools:text="Bored Ape #00" />
 
-            <io.novafoundation.nova.feature_nft_impl.presentation.nft.common.NftIssuanceView
-                android:id="@+id/nftIssuance"
-                android:layout_width="wrap_content"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tagsRecyclerView"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_gravity="center"
-                tools:text="#11 Edition of 9978" />
+                android:layout_marginTop="4dp"
+                android:paddingHorizontal="16dp"
+                tools:itemCount="1"
+                tools:listitem="@layout/item_nft_tag" />
 
             <io.novafoundation.nova.common.view.TableView
                 android:layout_width="match_parent"

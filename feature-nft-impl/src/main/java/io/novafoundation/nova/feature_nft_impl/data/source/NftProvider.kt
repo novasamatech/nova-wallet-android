@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_nft_api.data.model.NftDetails
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
 
 interface NftProvider {
@@ -25,6 +26,11 @@ interface NftProvider {
     ): Flow<AccountId?>
 
     suspend fun nftFullSync(nft: Nft)
+
+    suspend fun getCollectionNameAndMedia(
+        collectionId: String,
+        chainId: ChainId?
+    ): Pair<String?, String?>?
 
     fun nftDetailsFlow(nftIdentifier: String): Flow<NftDetails>
 }

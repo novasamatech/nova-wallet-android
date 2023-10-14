@@ -54,7 +54,7 @@ class ConfirmNftSendModule {
         walletUiUseCase: WalletUiUseCase,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         transferDraft: NftTransferDraft,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
     ): ViewModel {
         return ConfirmNftSendViewModel(
             nftSendInteractor = nftSendInteractor,

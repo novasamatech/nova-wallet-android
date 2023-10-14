@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginEnd="11dp"
-    android:layout_marginBottom="12dp"
+    android:layout_marginBottom="8dp"
     app:shimmer_auto_start="false"
     tools:background="@color/block_background">
 
@@ -17,7 +17,7 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="262dp"
+            android:layout_height="200dp"
             android:background="@drawable/bg_shimmering" />
 
     </com.facebook.shimmer.ShimmerFrameLayout>
@@ -26,8 +26,9 @@
     <LinearLayout
         android:id="@+id/itemNftContent"
         android:layout_width="match_parent"
-        android:layout_height="262dp"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="12dp">
 
         <ImageView
             android:id="@+id/itemNftMedia"
@@ -53,65 +54,17 @@
             android:textColor="@color/text_primary"
             tools:text="Honeybird" />
 
-        <io.novafoundation.nova.feature_nft_impl.presentation.nft.common.NftIssuanceView
-            android:id="@+id/itemNftIssuance"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/nftCollectionName"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:includeFontPadding="false"
             android:layout_marginTop="4dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="12dp"
+            android:layout_marginHorizontal="8dp"
+            android:maxLines="1"
             android:ellipsize="end"
-            android:singleLine="true"
-            tools:text="#11 Edition of 9978" />
+            tools:text="Bored Ape Collection" />
 
-        <View
-            android:id="@+id/itemNftPriceDivider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:background="@color/divider" />
-
-        <LinearLayout
-            android:id="@+id/itemNftPrice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="12dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/itemNftPricePlaceholder"
-                style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="@string/nft_price_not_listed"
-                android:textColor="@color/text_secondary"
-                android:visibility="gone"
-                tools:visibility="visible" />
-
-            <TextView
-                android:id="@+id/itemNftPriceToken"
-                style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/text_primary"
-                tools:text="5 KSM" />
-
-            <TextView
-                android:id="@+id/itemNftPriceFiat"
-                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:textColor="@color/text_secondary"
-                tools:text="($865.19)" />
-        </LinearLayout>
     </LinearLayout>
 </FrameLayout>

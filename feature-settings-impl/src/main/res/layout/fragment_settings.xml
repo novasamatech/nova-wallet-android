@@ -72,6 +72,24 @@
         <io.novafoundation.nova.feature_settings_impl.presentation.settings.view.SettingsGroupHeaderView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@string/settings_more" />
+
+        <io.novafoundation.nova.feature_settings_impl.presentation.settings.view.SettingsGroupView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <io.novafoundation.nova.feature_settings_impl.presentation.settings.view.SettingsItemView
+                android:id="@+id/settingsNfts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_currency"
+                app:title="@string/settings_nfts_title" />
+
+        </io.novafoundation.nova.feature_settings_impl.presentation.settings.view.SettingsGroupView>
+
+        <io.novafoundation.nova.feature_settings_impl.presentation.settings.view.SettingsGroupHeaderView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="@string/settings_preferences" />
 
         <io.novafoundation.nova.feature_settings_impl.presentation.settings.view.SettingsGroupView

@@ -8,13 +8,19 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import coil.ImageLoader
 import coil.load
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.flexbox.JustifyContent
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeInvisible
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.dialog.errorDialog
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
@@ -22,8 +28,10 @@ import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.R
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureComponent
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.setPriceOrHide
 import kotlinx.android.synthetic.main.fragment_nft_details.assetActionsSend
+import kotlinx.android.synthetic.main.fragment_nft_details.nftAttributesTable
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsChain
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsCollection
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsCreator
@@ -31,11 +39,15 @@ import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsDescription
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsIssuance
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsMedia
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsOnwer
-import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsPrice
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsProgress
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsTable
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsTitle
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsToolbar
+import kotlinx.android.synthetic.main.fragment_nft_details.nftTokenPrice
+import kotlinx.android.synthetic.main.fragment_nft_details.nftTokenPriceDetails
+import kotlinx.android.synthetic.main.fragment_nft_details.nftTokenPriceFiat
+import kotlinx.android.synthetic.main.fragment_nft_details.nftTokenPriceNotListed
+import kotlinx.android.synthetic.main.fragment_nft_details.tagsRecyclerView
 import javax.inject.Inject
 
 class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
@@ -50,10 +62,14 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
     @Inject
     lateinit var imageLoader: ImageLoader
 
+    private val adapter by lazy(LazyThreadSafetyMode.NONE) {
+        NftTagsAdapter()
+    }
+
     private val contentViews by lazy(LazyThreadSafetyMode.NONE) {
         listOf(
             nftDetailsMedia, nftDetailsTitle, nftDetailsDescription, nftDetailsIssuance,
-            nftDetailsPrice, nftDetailsTable, assetActionsSend
+            nftTokenPriceDetails, nftDetailsTable, assetActionsSend
         )
     }
 
@@ -77,6 +93,11 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
 
         nftDetailsProgress.makeVisible()
         contentViews.forEach(View::makeGone)
+
+        tagsRecyclerView.layoutManager = FlexboxLayoutManager(context, FlexDirection.ROW, FlexWrap.WRAP).apply {
+            justifyContent = JustifyContent.FLEX_START
+        }
+        tagsRecyclerView.adapter = adapter
     }
 
     override fun inject() {
@@ -95,13 +116,45 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
 
             nftDetailsMedia.load(it.media, imageLoader) {
                 placeholder(R.drawable.nft_media_progress)
-                error(R.drawable.nft_media_progress)
+                error(R.drawable.nft_media_error)
+                fallback(R.drawable.nft_media_error)
             }
+            adapter.submitList(it.tags)
+
+            if (it.attributes.isEmpty()) {
+                nftAttributesTable.makeGone()
+            } else {
+                nftAttributesTable.makeVisible()
+            }
+            nftAttributesTable.removeAllViews()
+            it.attributes.forEach {
+                nftAttributesTable.addView(
+                    TableCellView(nftAttributesTable.context).apply {
+                        layoutParams = ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        )
+                        setTitle(it.label)
+                        showValue(it.value)
+                    }
+                )
+            }
+
             nftDetailsTitle.text = it.name
             nftDetailsDescription.setTextOrHide(it.description)
-            nftDetailsIssuance.text = it.issuance
 
-            nftDetailsPrice.setPriceOrHide(it.price)
+            nftTokenPriceDetails.makeVisible()
+            if (it.price != null) {
+                nftTokenPrice.makeVisible()
+                nftTokenPrice.text = it.price.token
+                nftTokenPriceFiat.makeVisible()
+                nftTokenPriceFiat.text = it.price.fiat
+                nftTokenPriceNotListed.makeGone()
+            } else {
+                nftTokenPrice.makeInvisible()
+                nftTokenPriceFiat.makeGone()
+                nftTokenPriceNotListed.makeVisible()
+            }
 
             if (it.collection != null) {
                 nftDetailsCollection.makeVisible()
@@ -110,6 +163,8 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
             } else {
                 nftDetailsCollection.makeGone()
             }
+
+            nftDetailsIssuance.showValue(it.issuance)
 
             nftDetailsOnwer.showAddress(it.owner)
 

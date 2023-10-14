@@ -71,7 +71,7 @@ class NftViewHolder(
 
     fun bind(item: SendNftListItem) = with(containerView) {
         itemNftImage.load(item.media, imageLoader) {
-            transformations(RoundedCornersTransformation(8.dpF(context)))
+            transformations(RoundedCornersTransformation(6.dpF(context)))
             placeholder(R.drawable.nft_media_progress)
             error(R.drawable.nft_media_error)
             fallback(R.drawable.nft_media_error)

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques
 
+import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
@@ -22,7 +23,11 @@ import io.novafoundation.nova.feature_nft_impl.data.mappers.mapNftLocalToNftType
 import io.novafoundation.nova.feature_nft_impl.data.mappers.nftIssuance
 import io.novafoundation.nova.feature_nft_impl.data.network.distributed.FileStorageAdapter.adoptFileStorageLinkToHttps
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.common.MetadataLimits
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.common.mapJsonToAttributes
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.network.IpfsApi
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.network.UniquesMetadata
+import io.novafoundation.nova.feature_nft_impl.domain.common.mapNftNameForUi
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -54,6 +59,7 @@ class UniquesNftProvider(
     private val chainRegistry: ChainRegistry,
     private val nftDao: NftDao,
     private val ipfsApi: IpfsApi,
+    private val gson: Gson
 ) : NftProvider {
 
     override suspend fun initialNftsSync(
@@ -82,10 +88,6 @@ class UniquesNftProvider(
                 instanceMetadataStorage.queryKeys(classesWithInstances)
             }
 
-            val classMetadatas = multiQueryResults.getValue(classMetadataStorage)
-                .mapKeys { (keyComponents, _) -> keyComponents.component1<BigInteger>() }
-                .mapValues { (_, parsedValue) -> bindMetadata(parsedValue) }
-
             val totalIssuances = multiQueryResults.getValue(classStorage)
                 .mapKeys { (keyComponents, _) -> keyComponents.component1<BigInteger>() }
                 .mapValues { (_, parsedValue) ->
@@ -99,7 +101,7 @@ class UniquesNftProvider(
             classesWithInstances.map { (collectionId, instanceId) ->
                 val instanceKey = collectionId to instanceId
 
-                val metadata = instancesMetadatas[instanceKey] ?: classMetadatas[collectionId]
+                val metadata = instancesMetadatas[instanceKey]
 
                 NftLocal(
                     identifier = identifier(chain.id, collectionId, instanceId),
@@ -117,6 +119,7 @@ class UniquesNftProvider(
                     name = null,
                     label = null,
                     media = null,
+                    tags = null,
 
                     wholeDetailsLoaded = false
                 )
@@ -126,21 +129,68 @@ class UniquesNftProvider(
         nftDao.insertNftsDiff(NftLocal.Type.UNIQUES, metaAccount.id, newNfts, forceOverwrite)
     }
 
-    override suspend fun nftFullSync(nft: Nft) {
-        if (nft.metadataRaw == null) {
-            nftDao.markFullSynced(nft.identifier)
+    override suspend fun getCollectionNameAndMedia(
+        collectionId: String,
+        chainId: ChainId?
+    ): Pair<String?, String?>? {
+        if (chainId == null) return null
 
+        val classId = collectionId.toBigInteger()
+        return remoteStorage.query(chainId) {
+            val classMetadataStorage = runtime.metadata.uniques().storage("ClassMetadataOf")
+            val classStorage = runtime.metadata.uniques().storage("Class")
+
+            val queryResults = multi {
+                classMetadataStorage.queryKey(classId)
+                classStorage.queryKey(classId)
+            }
+            val classMetadataPointer = bindMetadata(queryResults.singleValueOf(classMetadataStorage))
+
+            classMetadataPointer?.let {
+                val url = classMetadataPointer.decodeToString().adoptFileStorageLinkToHttps()
+                val classMetadata = ipfsApi.getIpfsMetadata(url)
+
+                Pair(
+                    classMetadata.name?.take(MetadataLimits.COLLECTION_NAME_LIMIT),
+                    classMetadata.image?.adoptFileStorageLinkToHttps(),
+                )
+            }
+        }
+    }
+
+    override suspend fun nftFullSync(nft: Nft) {
+        nftFullSync(nft.metadataRaw, nft.identifier)
+    }
+
+    private suspend fun nftFullSync(
+        metadataRaw: ByteArray?,
+        identifier: String
+    ) {
+        if (metadataRaw == null) {
+            nftDao.markFullSynced(identifier)
             return
         }
 
-        val metadataLink = nft.metadataRaw!!.decodeToString().adoptFileStorageLinkToHttps()
-        val metadata = ipfsApi.getIpfsMetadata(metadataLink)
+        val metadataLink = metadataRaw.decodeToString().adoptFileStorageLinkToHttps()
 
-        nftDao.updateNft(nft.identifier) { local ->
+        val metadata = runCatching {
+            ipfsApi.getIpfsMetadata(metadataLink)
+        }.getOrDefault(UniquesMetadata.Default).run {
+            copy(
+                name = name?.take(MetadataLimits.NFT_NAME_LIMIT),
+                description = description?.take(MetadataLimits.DESCRIPTION_LIMIT),
+                tags = tags?.take(MetadataLimits.TAGS_LIMIT),
+                attributes = attributes?.take(MetadataLimits.ATTRIBUTES_LIMIT)
+            )
+        }
+
+        nftDao.updateNft(identifier) { local ->
             local.copy(
-                name = metadata.name!!,
-                media = metadata.image?.adoptFileStorageLinkToHttps(),
-                label = metadata.description,
+                name = metadata.name ?: local.name,
+                media = metadata.image?.adoptFileStorageLinkToHttps() ?: local.media,
+                label = metadata.description ?: local.label,
+                tags = metadata.tags?.let { gson.toJson(it) } ?: local.tags,
+                attributes = metadata.attributes?.let { gson.toJson(it) } ?: local.attributes,
                 wholeDetailsLoaded = true
             )
         }
@@ -169,15 +219,15 @@ class UniquesNftProvider(
 
     override fun nftDetailsFlow(nftIdentifier: String): Flow<NftDetails> {
         return flowOf {
-            val nftLocal = nftDao.getNft(nftIdentifier)
-            require(nftLocal.wholeDetailsLoaded) {
-                "Cannot load details of non fully-synced NFT"
-            }
+            val notSyncedNftLocal = nftDao.getNft(nftIdentifier)
 
-            val chain = chainRegistry.getChain(nftLocal.chainId)
-            val metaAccount = accountRepository.getMetaAccount(nftLocal.metaId)
+            nftFullSync(notSyncedNftLocal.metadata, notSyncedNftLocal.identifier)
+            val syncedNftLocal = nftDao.getNft(nftIdentifier)
 
-            val classId = nftLocal.collectionId.toBigInteger()
+            val chain = chainRegistry.getChain(syncedNftLocal.chainId)
+            val metaAccount = accountRepository.getMetaAccount(syncedNftLocal.metaId)
+
+            val classId = syncedNftLocal.collectionId.toBigInteger()
 
             remoteStorage.query(chain.id) {
                 val classMetadataStorage = runtime.metadata.uniques().storage("ClassMetadataOf")
@@ -190,13 +240,13 @@ class UniquesNftProvider(
                 val classMetadataPointer = bindMetadata(queryResults.singleValueOf(classMetadataStorage))
 
                 val collection = if (classMetadataPointer == null) {
-                    NftDetails.Collection(nftLocal.collectionId)
+                    NftDetails.Collection(syncedNftLocal.collectionId)
                 } else {
                     val url = classMetadataPointer.decodeToString().adoptFileStorageLinkToHttps()
                     val classMetadata = ipfsApi.getIpfsMetadata(url)
 
                     NftDetails.Collection(
-                        id = nftLocal.collectionId,
+                        id = syncedNftLocal.collectionId,
                         name = classMetadata.name,
                         media = classMetadata.image?.adoptFileStorageLinkToHttps()
                     )
@@ -206,17 +256,23 @@ class UniquesNftProvider(
                 val classIssuer = bindAccountId(classIssuerRaw.cast<Struct.Instance>()["issuer"])
 
                 NftDetails(
-                    identifier = nftLocal.identifier,
+                    identifier = syncedNftLocal.identifier,
                     chain = chain,
                     owner = metaAccount.accountIdIn(chain)!!,
                     creator = classIssuer,
-                    media = nftLocal.media,
-                    name = nftLocal.name ?: nftLocal.instanceId!!,
-                    description = nftLocal.label,
-                    issuance = nftIssuance(nftLocal),
-                    price = nftLocal.price,
+                    media = syncedNftLocal.media,
+                    name = mapNftNameForUi(syncedNftLocal.name, syncedNftLocal.instanceId),
+                    description = syncedNftLocal.label,
+                    issuance = nftIssuance(syncedNftLocal),
+                    price = syncedNftLocal.price,
                     collection = collection,
-                    type = mapNftLocalToNftType(nftLocal)
+                    type = mapNftLocalToNftType(syncedNftLocal),
+                    tags = if (syncedNftLocal.tags == null) {
+                        emptyList()
+                    } else {
+                        gson.fromJson(syncedNftLocal.tags, List::class.java) as List<String>
+                    },
+                    attributes = mapJsonToAttributes(gson, syncedNftLocal.attributes),
                 )
             }
         }

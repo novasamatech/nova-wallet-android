@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.AddressD
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_nft_api.data.model.NftDetails
 import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_nft_impl.domain.nft.details.NftDetailsInteractor
 import io.novafoundation.nova.feature_nft_impl.domain.nft.details.PricedNftDetails
@@ -95,7 +97,7 @@ class NftDetailsViewModel(
             collection = nftDetails.collection?.let {
                 NftDetailsModel.Collection(
                     name = it.name ?: it.id,
-                    media = it.media,
+                    media = it.media
                 )
             },
             owner = createAddressModel(nftDetails.owner, nftDetails.chain),
@@ -103,8 +105,23 @@ class NftDetailsViewModel(
                 createAddressModel(it, nftDetails.chain)
             },
             network = mapChainToUi(nftDetails.chain),
-            isSupportedForSend = nftSupportedForSend
+            isSupportedForSend = nftSupportedForSend,
+            tags = mapTags(nftDetails.tags),
+            attributes = mapAttributes(nftDetails.attributes)
         )
+    }
+
+    private fun mapTags(tags: List<String>): List<String> {
+        return tags.map { it.uppercase() }
+    }
+
+    private fun mapAttributes(attributes: List<NftDetails.Attribute>): List<NftDetailsModel.Attribute> {
+        return attributes.map {
+            NftDetailsModel.Attribute(
+                label = it.label.lowercase().capitalize(),
+                value = it.value
+            )
+        }
     }
 
     private suspend fun createAddressModel(accountId: AccountId, chain: Chain) = addressIconGenerator.createAddressModel(

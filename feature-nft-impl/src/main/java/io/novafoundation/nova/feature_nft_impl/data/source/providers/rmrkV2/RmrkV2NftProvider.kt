@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2
 
+import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.core_db.dao.NftDao
@@ -15,12 +16,17 @@ import io.novafoundation.nova.feature_nft_impl.data.mappers.nftIssuance
 import io.novafoundation.nova.feature_nft_impl.data.mappers.nftPrice
 import io.novafoundation.nova.feature_nft_impl.data.network.distributed.FileStorageAdapter.adoptFileStorageLinkToHttps
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.common.MetadataLimits
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.common.mapJsonToAttributes
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.singular.SingularV2Api
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.singular.SingularV2CollectionMetadata
+import io.novafoundation.nova.feature_nft_impl.domain.common.mapNftNameForUi
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import jnr.ffi.annotations.Meta
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
@@ -28,7 +34,8 @@ class RmrkV2NftProvider(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val singularV2Api: SingularV2Api,
-    private val nftDao: NftDao
+    private val nftDao: NftDao,
+    private val gson: Gson
 ) : NftProvider {
 
     override suspend fun initialNftsSync(
@@ -72,60 +79,108 @@ class RmrkV2NftProvider(
     }
 
     override suspend fun nftFullSync(nft: Nft) {
-        val metadata = nft.metadataRaw?.let {
-            val metadataLink = it.decodeToString().adoptFileStorageLinkToHttps()
+        nftFullSync(
+            nft.metadataRaw,
+            nft.collectionId,
+            nft.identifier
+        )
+    }
 
-            singularV2Api.getIpfsMetadata(metadataLink)
+    private suspend fun nftFullSync(
+        metadataRaw: ByteArray?,
+        collectionId: String,
+        identifier: String
+    ) {
+        val metadata = runCatching {
+            metadataRaw?.let {
+                val metadataLink = it.decodeToString().adoptFileStorageLinkToHttps()
+
+                singularV2Api.getIpfsMetadata(metadataLink)
+            }
+        }.getOrDefault(SingularV2CollectionMetadata.Default)?.run {
+            copy(
+                name = name?.take(MetadataLimits.NFT_NAME_LIMIT),
+                description = description?.take(MetadataLimits.DESCRIPTION_LIMIT),
+                tags = tags?.take(MetadataLimits.TAGS_LIMIT),
+                attributes = attributes?.take(MetadataLimits.ATTRIBUTES_LIMIT)
+            )
         }
 
-        val collection = singularV2Api.getCollection(nft.collectionId).first()
+        val collection = singularV2Api.getCollection(collectionId).first()
 
-        nftDao.updateNft(nft.identifier) { local ->
+        nftDao.updateNft(identifier) { local ->
             // media fetched during initial sync (prerender) has more priority than one from metadata
             val image = local.media ?: metadata?.image?.adoptFileStorageLinkToHttps()
 
             local.copy(
-                media = image,
-                issuanceTotal = collection.max,
+                media = image ?: local.name,
+                issuanceTotal = collection.max ?: local.issuanceTotal,
                 name = metadata?.name ?: local.name,
                 label = metadata?.description ?: local.label,
-                wholeDetailsLoaded = true
+                wholeDetailsLoaded = true,
+                tags = metadata?.tags?.let { gson.toJson(it) } ?: local.tags,
+                attributes = metadata?.attributes?.let { gson.toJson(it) } ?: local.attributes
             )
         }
     }
 
     override fun nftDetailsFlow(nftIdentifier: String): Flow<NftDetails> {
         return flowOf {
-            val nftLocal = nftDao.getNft(nftIdentifier)
-            require(nftLocal.wholeDetailsLoaded) {
-                "Cannot load details of non fully-synced NFT"
-            }
-            val chain = chainRegistry.getChain(nftLocal.chainId)
-            val metaAccount = accountRepository.getMetaAccount(nftLocal.metaId)
+            val notSyncedNftLocal = nftDao.getNft(nftIdentifier)
 
-            val collection = singularV2Api.getCollection(nftLocal.collectionId).first()
+            nftFullSync(
+                notSyncedNftLocal.metadata,
+                notSyncedNftLocal.collectionId,
+                notSyncedNftLocal.identifier
+            )
+            val syncedNftLocal = nftDao.getNft(nftIdentifier)
+
+            val chain = chainRegistry.getChain(syncedNftLocal.chainId)
+            val metaAccount = accountRepository.getMetaAccount(syncedNftLocal.metaId)
+
+            val collection = singularV2Api.getCollection(syncedNftLocal.collectionId).first()
             val collectionMetadata = collection.metadata?.let {
                 singularV2Api.getIpfsMetadata(it.adoptFileStorageLinkToHttps())
             }
 
             NftDetails(
-                identifier = nftLocal.identifier,
+                identifier = syncedNftLocal.identifier,
                 chain = chain,
                 owner = metaAccount.accountIdIn(chain)!!,
                 creator = chain.accountIdOf(collection.issuer),
-                media = nftLocal.media,
-                name = nftLocal.name!!,
-                description = nftLocal.label,
-                issuance = nftIssuance(nftLocal),
-                price = nftPrice(nftLocal),
+                media = syncedNftLocal.media,
+                name = mapNftNameForUi(syncedNftLocal.name, syncedNftLocal.instanceId),
+                description = syncedNftLocal.label,
+                issuance = nftIssuance(syncedNftLocal),
+                price = nftPrice(syncedNftLocal),
                 collection = NftDetails.Collection(
-                    id = nftLocal.collectionId,
+                    id = syncedNftLocal.collectionId,
                     name = collectionMetadata?.name,
                     media = collectionMetadata?.image?.adoptFileStorageLinkToHttps()
                 ),
-                type = mapNftLocalToNftType(nftLocal)
+                type = mapNftLocalToNftType(syncedNftLocal),
+                tags = if (syncedNftLocal.tags == null) {
+                    emptyList()
+                } else {
+                    gson.fromJson(syncedNftLocal.tags, List::class.java) as List<String>
+                },
+                attributes = mapJsonToAttributes(gson, syncedNftLocal.attributes)
             )
         }
+    }
+
+    override suspend fun getCollectionNameAndMedia(
+        collectionId: String,
+        chainId: ChainId?
+    ): Pair<String?, String?> {
+        val collection = singularV2Api.getCollection(collectionId).first()
+        val collectionMetadata = collection.metadata?.let {
+            singularV2Api.getIpfsMetadata(it.adoptFileStorageLinkToHttps())
+        }
+        return Pair(
+            collectionMetadata?.name?.take(MetadataLimits.COLLECTION_NAME_LIMIT),
+            collectionMetadata?.image?.adoptFileStorageLinkToHttps()
+        )
     }
 
     private fun localIdentifier(chainId: ChainId, remoteId: String): String {

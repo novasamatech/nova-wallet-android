@@ -75,6 +75,7 @@ import io.novafoundation.nova.core_db.migrations.ExtractExternalApiToSeparateTab
 import io.novafoundation.nova.core_db.migrations.FixBrokenForeignKeys_31_32
 import io.novafoundation.nova.core_db.migrations.FixMigrationConflicts_13_14
 import io.novafoundation.nova.core_db.migrations.GovernanceFlagToEnum_26_27
+import io.novafoundation.nova.core_db.migrations.NftTagsAndAttributes_43_44
 import io.novafoundation.nova.core_db.migrations.NullableSubstrateAccountId_21_22
 import io.novafoundation.nova.core_db.migrations.NullableSubstratePublicKey_15_16
 import io.novafoundation.nova.core_db.migrations.RemoveChainForeignKeyFromChainAccount_11_12
@@ -114,7 +115,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
 
 @Database(
-    version = 43,
+    version = 44,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -192,6 +193,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddExtrinsicContentField_37_38, AddNodeSelectionStrategyField_38_39)
                     .addMigrations(AddWalletConnectSessions_39_40, TransferFiatAmount_40_41)
                     .addMigrations(AddStakingDashboardItems_41_42, StakingRewardPeriods_42_43)
+                    .addMigrations(NftTagsAndAttributes_43_44)
                     .build()
             }
             return instance!!
