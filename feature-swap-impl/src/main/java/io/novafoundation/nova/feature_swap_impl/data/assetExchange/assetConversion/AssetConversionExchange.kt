@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.to
 import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -140,7 +141,7 @@ private class AssetConversionExchange(
     private suspend fun convertNativeFeeToPayingTokenFee(nativeTokenFee: Fee, args: SwapExecuteArgs): Fee {
         val customFeeAsset = args.customFeeAsset
 
-        return if (customFeeAsset != null) {
+        return if (customFeeAsset != null && !customFeeAsset.isCommissionAsset()) {
             val converted = multiChainRuntimeCallsApi.forChain(chain.id).quote(
                 swapDirection = SwapDirection.SPECIFIED_OUT,
                 assetIn = customFeeAsset,
@@ -190,11 +191,15 @@ private class AssetConversionExchange(
     }
 
     private suspend fun ExtrinsicBuilder.setFeeAsset(feeAsset: Chain.Asset?) {
-        if (feeAsset == null) return
+        if (feeAsset == null || feeAsset.isCommissionAsset()) return
 
         val assetId = multiLocationConverter.encodableMultiLocationOf(feeAsset)
 
         assetTxPayment(assetId)
+    }
+
+    private fun Chain.Asset.isCommissionAsset(): Boolean {
+        return fullId == chain.commissionAsset.fullId
     }
 
     private suspend fun MultiLocationConverter.encodableMultiLocationOf(chainAsset: Chain.Asset): Any? {

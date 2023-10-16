@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.setupSwapAmountInput
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmountOrHide
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsContinue
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetails
@@ -69,6 +70,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
     override fun subscribe(viewModel: SwapMainSettingsViewModel) {
         setupSwapAmountInput(viewModel.amountInInput, swapMainSettingsPayInput)
         setupSwapAmountInput(viewModel.amountOutInput, swapMainSettingsReceiveInput)
+        setupFeeLoading(viewModel.feeMixin, swapMainSettingsDetailsNetworkFee)
 
         viewModel.amountInInput.maxAvailable.observe {
             swapMainSettingsMaxAmountButton.isGone = it.isNullOrEmpty()
@@ -76,7 +78,6 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         }
 
         viewModel.rateDetails.observe { swapMainSettingsDetailsRate.showLoadingValue(it) }
-        viewModel.networkFee.observe { swapMainSettingsDetailsNetworkFee.showAmountOrHide(it) }
         viewModel.showDetails.observe { swapMainSettingsDetails.setVisible(it) }
         viewModel.buttonState.observe(swapMainSettingsContinue::setState)
 

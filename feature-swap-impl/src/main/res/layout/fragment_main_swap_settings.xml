@@ -142,7 +142,7 @@
                     app:title="@string/swap_rate_title"
                     app:titleIcon="@drawable/ic_info_cicrle_filled_16" />
 
-                <io.novafoundation.nova.common.view.TableCellView
+                <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
                     android:id="@+id/swapMainSettingsDetailsNetworkFee"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

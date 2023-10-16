@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_swap_impl.domain.interactor
 
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicHash
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.presentation.state.SwapSettingsState
-import io.novafoundation.nova.feature_swap_impl.presentation.state.toExecuteArgs
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.fullId
@@ -37,9 +37,7 @@ class SwapInteractor(
         return swapService.quote(quoteArgs)
     }
 
-    suspend fun swap(): Result<ExtrinsicHash> {
-        val settings = swapSharedState.selectedOption.value
-        val args = settings.toExecuteArgs() ?: return Result.failure(SwapSettingsNotReadyException())
-        return swapService.swap(args)
+    suspend fun estimateFee(executeArgs: SwapExecuteArgs): SwapFee {
+        return swapService.estimateFee(executeArgs)
     }
 }

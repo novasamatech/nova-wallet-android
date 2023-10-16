@@ -55,6 +55,8 @@ interface FeeLoaderMixin : Retriable {
             onRetryCancelled: () -> Unit,
         )
 
+
+
         fun loadFeeV2(
             coroutineScope: CoroutineScope,
             feeConstructor: suspend (Token) -> Fee?,
@@ -62,6 +64,8 @@ interface FeeLoaderMixin : Retriable {
         )
 
         suspend fun setFee(fee: Fee?)
+
+        fun invalidateFee()
 
         suspend fun setFee(feeAmount: BigDecimal?)
 
