@@ -73,6 +73,10 @@ inline fun EditText.onDoneClicked(crossinline listener: () -> Unit) {
     }
 }
 
+fun EditText.setSelectionEnd() {
+    setSelection(text.length)
+}
+
 fun ViewGroup.inflateChild(@LayoutRes id: Int, attachToRoot: Boolean = false): View {
     return LayoutInflater.from(context).run {
         inflate(id, this@inflateChild, attachToRoot)

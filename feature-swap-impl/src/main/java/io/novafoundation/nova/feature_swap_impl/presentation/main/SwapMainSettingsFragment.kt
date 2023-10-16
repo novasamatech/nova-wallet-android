@@ -10,15 +10,17 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindToUserEditable
-import io.novafoundation.nova.common.utils.hideKeyboard
+import io.novafoundation.nova.common.utils.postToUiThread
+import io.novafoundation.nova.common.utils.setSelectionEnd
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.common.view.showValueOrHide
+import io.novafoundation.nova.common.view.setState
+import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmountOrHide
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsAlert
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsContinue
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetails
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetailsNetworkFee
@@ -42,14 +44,12 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
 
     override fun initViews() {
         swapMainSettingsToolbar.applyStatusBarInsets()
+        swapMainSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         swapMainSettingsMaxAmountButton.setOnClickListener { viewModel.maxTokens() }
         swapMainSettingsPayInput.setOnClickListener { viewModel.selectPayToken() }
         swapMainSettingsReceiveInput.setOnClickListener { viewModel.selectReceiveToken() }
         swapMainSettingsFlip.setOnClickListener {
-            hideKeyboard()
-            swapMainSettingsPayInput.clearInputFocus()
-            swapMainSettingsReceiveInput.clearInputFocus()
             viewModel.flipAssets()
         }
         swapMainSettingsDetailsRate.setOnClickListener { viewModel.rateDetailsClicked() }
@@ -68,11 +68,11 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
     }
 
     override fun subscribe(viewModel: SwapMainSettingsViewModel) {
-        swapMainSettingsPayInput.amountInput.bindToUserEditable(viewModel.amountOutInput, lifecycleScope)
-        swapMainSettingsReceiveInput.amountInput.bindToUserEditable(viewModel.amountInInput, lifecycleScope)
+        swapMainSettingsPayInput.amountInput.bindToUserEditable(viewModel.amountInInput, lifecycleScope)
+        swapMainSettingsReceiveInput.amountInput.bindToUserEditable(viewModel.amountOutInput, lifecycleScope)
 
-        viewModel.amountOutFiat.observe { swapMainSettingsPayInput.setFiatAmount(it) }
-        viewModel.amountInFiat.observe { swapMainSettingsReceiveInput.setFiatAmount(it) }
+        viewModel.amountInFiat.observe { swapMainSettingsPayInput.setFiatAmount(it) }
+        viewModel.amountOutFiat.observe { swapMainSettingsReceiveInput.setFiatAmount(it) }
 
         viewModel.paymentTokenMaxAmount.observe {
             swapMainSettingsMaxAmountButton.isGone = it.isNullOrEmpty()
@@ -80,13 +80,22 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         }
         viewModel.paymentAsset.observe { swapMainSettingsPayInput.setModel(it) }
         viewModel.receivingAsset.observe { swapMainSettingsReceiveInput.setModel(it) }
-        viewModel.rateDetails.observe { swapMainSettingsDetailsRate.showValueOrHide(it) }
+        viewModel.rateDetails.observe { swapMainSettingsDetailsRate.showLoadingValue(it) }
         viewModel.networkFee.observe { swapMainSettingsDetailsNetworkFee.showAmountOrHide(it) }
         viewModel.showDetails.observe { swapMainSettingsDetails.setVisible(it) }
-        viewModel.pairAvailabilityFlow.observe { swapMainSettingsAlert.isGone = it }
-        viewModel.buttonState.observe {
-            swapMainSettingsContinue.text = it.text
-            swapMainSettingsContinue.setState(it.state)
+        viewModel.buttonState.observe(swapMainSettingsContinue::setState)
+
+        viewModel.swapDirectionFlipped.observeEvent {
+            postToUiThread {
+                val field = when (it) {
+                    SwapDirection.SPECIFIED_IN -> swapMainSettingsPayInput
+                    SwapDirection.SPECIFIED_OUT -> swapMainSettingsReceiveInput
+                }
+
+                field.requestFocus()
+                field.amountInput.setSelectionEnd()
+            }
         }
     }
 }
+

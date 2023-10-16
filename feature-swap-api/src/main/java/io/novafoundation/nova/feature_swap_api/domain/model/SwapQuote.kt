@@ -24,6 +24,8 @@ class SwapQuote(
 }
 
 fun SwapQuote.swapRate(): BigDecimal {
+    if (planksIn == Balance.ZERO) return BigDecimal.ZERO
+
     val amountIn = assetIn.amountFromPlanks(planksIn)
     val amountOut = assetOut.amountFromPlanks(planksOut)
 

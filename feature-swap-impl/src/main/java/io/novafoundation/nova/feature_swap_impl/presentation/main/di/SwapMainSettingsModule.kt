@@ -12,6 +12,8 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsViewModel
+import io.novafoundation.nova.feature_swap_impl.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -24,13 +26,17 @@ class SwapMainSettingsModule {
         swapRouter: SwapRouter,
         swapInteractor: SwapInteractor,
         resourceManager: ResourceManager,
-        chainRegistry: ChainRegistry
+        swapSettingsStateProvider: SwapSettingsStateProvider,
+        chainRegistry: ChainRegistry,
+        assetUseCase: ArbitraryAssetUseCase
     ): ViewModel {
         return SwapMainSettingsViewModel(
-            swapRouter,
-            swapInteractor,
-            resourceManager,
-            chainRegistry
+            swapRouter = swapRouter,
+            swapInteractor = swapInteractor,
+            swapSettingsStateProvider = swapSettingsStateProvider,
+            resourceManager = resourceManager,
+            chainRegistry = chainRegistry,
+            assetUseCase = assetUseCase
         )
     }
 

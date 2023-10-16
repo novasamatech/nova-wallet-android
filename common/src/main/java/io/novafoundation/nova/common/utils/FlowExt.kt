@@ -1,6 +1,5 @@
 package io.novafoundation.nova.common.utils
 
-import android.util.Log
 import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.RadioGroup
@@ -284,25 +283,31 @@ fun InsertableInputField.bindTo(flow: MutableSharedFlow<String>, scope: Coroutin
 }
 
 fun EditText.bindToUserEditable(flow: MutableSharedFlow<UserEditableString>, scope: CoroutineScope) {
-    bindTo(flow, scope) { UserEditableString(it, editedByUser = true) }
+    bindTo(flow, scope, toT = { UserEditableString(it, editedByUser = true) }, fromT = { it.value })
 }
 
 fun EditText.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
-    bindTo(flow, scope) { it }
+    bindTo(flow, scope, toT = { it }, fromT = { it })
 }
 
-fun <T> EditText.bindTo(flow: MutableSharedFlow<T>, scope: CoroutineScope, mapper: suspend (String) -> T) {
+private inline fun <T> EditText.bindTo(
+    flow: MutableSharedFlow<T>,
+    scope: CoroutineScope,
+    crossinline toT: suspend (String) -> T,
+    crossinline fromT: suspend (T) -> String,
+) {
     val textWatcher = onTextChanged {
         scope.launch {
-            flow.emit(mapper(it))
+            flow.emit(toT(it))
         }
     }
 
     scope.launch {
         flow.collect { input ->
-            if (text.toString() != input.toString()) {
+            val inputString = fromT(input)
+            if (text.toString() != inputString) {
                 removeTextChangedListener(textWatcher)
-                setText(input.toString())
+                setText(inputString)
                 addTextChangedListener(textWatcher)
             }
         }

@@ -16,11 +16,11 @@ import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.common.view.shape.getInputBackgroundError
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_swap_impl.R
-import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputSubtitleImage
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputFiat
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputField
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputImage
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputSubtitle
+import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputSubtitleImage
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputToken
 
 class SwapAmountInputView @JvmOverloads constructor(
@@ -46,10 +46,9 @@ class SwapAmountInputView @JvmOverloads constructor(
     }
 
     fun setModel(model: Model) {
-        setAssetImageUrl(model.assetImageUrl)
+        setAssetIcon(model.assetIcon)
         setTitle(model.title)
         setSubtitle(model.subtitleIcon, model.subtitle)
-        setErrorEnabled(model.isError)
         swapAmountInputFiat.isVisible = model.showInput
         amountInput.isVisible = model.showInput
     }
@@ -63,15 +62,18 @@ class SwapAmountInputView @JvmOverloads constructor(
         swapAmountInputSubtitle.text = subtitle
     }
 
-    fun setAssetImageUrl(imageUrl: String?) {
-        if (imageUrl == null) {
-            swapAmountInputImage.setImageTint(context.getColor(R.color.icon_accent))
-            swapAmountInputImage.setImageResource(R.drawable.ic_add)
-            swapAmountInputImage.setBackgroundResource(R.drawable.ic_swap_asset_default_background)
-        } else {
-            swapAmountInputImage.setImageTint(context.getColor(R.color.icon_primary))
-            swapAmountInputImage.loadTokenIcon(imageUrl, imageLoader)
-            swapAmountInputImage.setBackgroundResource(R.drawable.bg_token_container)
+    fun setAssetIcon(icon: Model.SwapAssetIcon) {
+        return when(icon) {
+            is Model.SwapAssetIcon.Chosen -> {
+                swapAmountInputImage.setImageTint(context.getColor(R.color.icon_primary))
+                swapAmountInputImage.loadTokenIcon(icon.assetIconUrl, imageLoader)
+                swapAmountInputImage.setBackgroundResource(R.drawable.bg_token_container)
+            }
+            Model.SwapAssetIcon.NotChosen -> {
+                swapAmountInputImage.setImageTint(context.getColor(R.color.icon_accent))
+                swapAmountInputImage.setImageResource(R.drawable.ic_add)
+                swapAmountInputImage.setBackgroundResource(R.drawable.ic_swap_asset_default_background)
+            }
         }
     }
 
@@ -94,11 +96,18 @@ class SwapAmountInputView @JvmOverloads constructor(
     }
 
     class Model(
-        val assetImageUrl: String?,
+        val assetIcon: SwapAssetIcon,
         val title: String,
         val subtitleIcon: Icon?,
         val subtitle: String,
         val showInput: Boolean,
-        val isError: Boolean
-    )
+    ) {
+
+        sealed class SwapAssetIcon {
+
+            class Chosen(val assetIconUrl: String?): SwapAssetIcon()
+
+            object NotChosen: SwapAssetIcon()
+        }
+    }
 }
