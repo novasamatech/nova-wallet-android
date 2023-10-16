@@ -68,7 +68,7 @@ class SwapAmountInputView @JvmOverloads constructor(
     }
 
     private fun setAssetIcon(icon: SwapInputAssetModel.SwapAssetIcon) {
-        return when(icon) {
+        return when (icon) {
             is SwapInputAssetModel.SwapAssetIcon.Chosen -> {
                 swapAmountInputImage.setImageTint(context.getColor(R.color.icon_primary))
                 swapAmountInputImage.loadTokenIcon(icon.assetIconUrl, imageLoader)

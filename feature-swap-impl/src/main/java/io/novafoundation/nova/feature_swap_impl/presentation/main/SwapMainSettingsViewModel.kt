@@ -134,9 +134,8 @@ class SwapMainSettingsViewModel(
         feeMixin.setupFees()
     }
 
-    //TODO sync with iOS team
+    // TODO sync with iOS team
     fun maxTokens() {
-
     }
 
     fun selectPayToken() {

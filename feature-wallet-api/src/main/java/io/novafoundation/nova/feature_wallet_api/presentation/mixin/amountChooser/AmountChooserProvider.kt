@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.onStart
 import java.math.BigDecimal
 import java.math.BigInteger
 
-
 class AmountChooserProviderFactory(
     private val resourceManager: ResourceManager
 ) : AmountChooserMixin.Factory {

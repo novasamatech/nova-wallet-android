@@ -18,7 +18,7 @@ fun SwapSettingsStateProvider.swapSettingsFlow(coroutineScope: CoroutineScope): 
 
 class RealSwapSettingsStateProvider(
     private val computationalCache: ComputationalCache,
-): SwapSettingsStateProvider {
+) : SwapSettingsStateProvider {
 
     override suspend fun getSwapSettingsState(coroutineScope: CoroutineScope): SwapSettingsState {
         return computationalCache.useCache("SwapSettingsState", coroutineScope) {
@@ -26,5 +26,3 @@ class RealSwapSettingsStateProvider(
         }
     }
 }
-
-

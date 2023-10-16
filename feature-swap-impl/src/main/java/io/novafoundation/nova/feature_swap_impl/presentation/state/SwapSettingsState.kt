@@ -9,14 +9,13 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SelectedOptionSharedState
 import kotlinx.coroutines.flow.MutableStateFlow
 
-
 class SwapSettingsState(
     initialValue: SwapSettings = SwapSettings()
 ) : SelectedOptionSharedState<SwapSettings> {
 
     override val selectedOption = MutableStateFlow(initialValue)
 
-    fun setAssetInUpdatingFee(asset: Chain.Asset,  chain: Chain) {
+    fun setAssetInUpdatingFee(asset: Chain.Asset, chain: Chain) {
         val current = selectedOption.value
 
         val new = if (current.feeAsset == null || current.feeAsset.chainId != chain.id) {
@@ -56,5 +55,3 @@ class SwapSettingsState(
         return newSettings
     }
 }
-
-

@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase
 import kotlinx.coroutines.flow.Flow
 
-interface SwapAmountInputMixin: AmountChooserMixinBase {
+interface SwapAmountInputMixin : AmountChooserMixinBase {
 
     val fiatAmount: Flow<String>
 
@@ -23,9 +23,9 @@ interface SwapAmountInputMixin: AmountChooserMixinBase {
     ) {
         sealed class SwapAssetIcon {
 
-            class Chosen(val assetIconUrl: String?): SwapAssetIcon()
+            class Chosen(val assetIconUrl: String?) : SwapAssetIcon()
 
-            object NotChosen: SwapAssetIcon()
+            object NotChosen : SwapAssetIcon()
         }
     }
 }

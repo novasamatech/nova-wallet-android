@@ -20,7 +20,6 @@ import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.setupSwapAmountInput
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmountOrHide
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsContinue
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetails
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetailsNetworkFee
@@ -94,4 +93,3 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         }
     }
 }
-
