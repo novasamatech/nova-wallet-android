@@ -45,14 +45,13 @@ class SwapAmountInputView @JvmOverloads constructor(
         setAddStatesFromChildren(true)
     }
 
-    fun setErrorEnabled(enabled: Boolean) {
-        if (enabled) {
-            amountInput.setTextColor(context.getColor(R.color.text_negative))
-            background = context.getInputBackgroundError()
-        } else {
-            amountInput.setTextColor(context.getColor(R.color.text_primary))
-            background = context.getInputBackground()
-        }
+    fun setModel(model: Model) {
+        setAssetImageUrl(model.assetImageUrl)
+        setTitle(model.title)
+        setSubtitle(model.subtitleIcon, model.subtitle)
+        setErrorEnabled(model.isError)
+        swapAmountInputFiat.isVisible = model.showInput
+        amountInput.isVisible = model.showInput
     }
 
     fun setTitle(title: String) {
@@ -76,16 +75,22 @@ class SwapAmountInputView @JvmOverloads constructor(
         }
     }
 
-    fun setModel(model: Model) {
-        setAssetImageUrl(model.assetImageUrl)
-        setTitle(model.title)
-        setSubtitle(model.subtitleIcon, model.subtitle)
-        swapAmountInputFiat.isVisible = model.showInput
-        amountInput.isVisible = model.showInput
-    }
-
     fun setFiatAmount(priceAmount: String?) {
         swapAmountInputFiat.setTextOrHide(priceAmount)
+    }
+
+    fun setErrorEnabled(enabled: Boolean) {
+        if (enabled) {
+            amountInput.setTextColor(context.getColor(R.color.text_negative))
+            background = context.getInputBackgroundError()
+        } else {
+            amountInput.setTextColor(context.getColor(R.color.text_primary))
+            background = context.getInputBackground()
+        }
+    }
+
+    fun clearInputFocus() {
+        amountInput.clearFocus()
     }
 
     class Model(
@@ -93,6 +98,7 @@ class SwapAmountInputView @JvmOverloads constructor(
         val title: String,
         val subtitleIcon: Icon?,
         val subtitle: String,
-        val showInput: Boolean
+        val showInput: Boolean,
+        val isError: Boolean
     )
 }

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.utils
 
+import android.util.Log
 import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.RadioGroup
@@ -282,36 +283,27 @@ fun InsertableInputField.bindTo(flow: MutableSharedFlow<String>, scope: Coroutin
     content.bindTo(flow, scope)
 }
 
-//TODO merge the next two methods since removing textWatcher listener before setText will not cause any problems
-fun EditText.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
-    scope.launch {
-        flow.collect { input ->
-            if (text.toString() != input) {
-                setText(input)
-            }
-        }
-    }
-
-    onTextChanged {
-        scope.launch {
-            flow.emit(it)
-        }
-    }
+fun EditText.bindToUserEditable(flow: MutableSharedFlow<UserEditableString>, scope: CoroutineScope) {
+    bindTo(flow, scope) { UserEditableString(it, editedByUser = true) }
 }
 
-fun EditText.bindSilentTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
-    val listener = this.onTextChanged {
+fun EditText.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
+    bindTo(flow, scope) { it }
+}
+
+fun <T> EditText.bindTo(flow: MutableSharedFlow<T>, scope: CoroutineScope, mapper: suspend (String) -> T) {
+    val textWatcher = onTextChanged {
         scope.launch {
-            flow.emit(it)
+            flow.emit(mapper(it))
         }
     }
 
     scope.launch {
         flow.collect { input ->
-            if (text.toString() != input) {
-                removeTextChangedListener(listener)
-                setText(input)
-                addTextChangedListener(listener)
+            if (text.toString() != input.toString()) {
+                removeTextChangedListener(textWatcher)
+                setText(input.toString())
+                addTextChangedListener(textWatcher)
             }
         }
     }
