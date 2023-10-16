@@ -5,11 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
-import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.utils.bindToUserEditable
 import io.novafoundation.nova.common.utils.postToUiThread
 import io.novafoundation.nova.common.utils.setSelectionEnd
 import io.novafoundation.nova.common.utils.setTextOrHide
@@ -20,6 +18,7 @@ import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.setupSwapAmountInput
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmountOrHide
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsContinue
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetails
@@ -68,18 +67,14 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
     }
 
     override fun subscribe(viewModel: SwapMainSettingsViewModel) {
-        swapMainSettingsPayInput.amountInput.bindToUserEditable(viewModel.amountInInput, lifecycleScope)
-        swapMainSettingsReceiveInput.amountInput.bindToUserEditable(viewModel.amountOutInput, lifecycleScope)
+        setupSwapAmountInput(viewModel.amountInInput, swapMainSettingsPayInput)
+        setupSwapAmountInput(viewModel.amountOutInput, swapMainSettingsReceiveInput)
 
-        viewModel.amountInFiat.observe { swapMainSettingsPayInput.setFiatAmount(it) }
-        viewModel.amountOutFiat.observe { swapMainSettingsReceiveInput.setFiatAmount(it) }
-
-        viewModel.paymentTokenMaxAmount.observe {
+        viewModel.amountInInput.maxAvailable.observe {
             swapMainSettingsMaxAmountButton.isGone = it.isNullOrEmpty()
             swapMainSettingsMaxAmount.setTextOrHide(it)
         }
-        viewModel.paymentAsset.observe { swapMainSettingsPayInput.setModel(it) }
-        viewModel.receivingAsset.observe { swapMainSettingsReceiveInput.setModel(it) }
+
         viewModel.rateDetails.observe { swapMainSettingsDetailsRate.showLoadingValue(it) }
         viewModel.networkFee.observe { swapMainSettingsDetailsNetworkFee.showAmountOrHide(it) }
         viewModel.showDetails.observe { swapMainSettingsDetails.setVisible(it) }

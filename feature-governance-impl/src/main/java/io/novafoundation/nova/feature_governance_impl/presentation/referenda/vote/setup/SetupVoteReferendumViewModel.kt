@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
@@ -150,7 +151,7 @@ class SetupVoteReferendumViewModel(
     }
 
     fun amountChipClicked(chipModel: AmountChipModel) {
-        amountChooserMixin.amountInput.value = chipModel.amountInput
+        amountChooserMixin.setAmountInput(chipModel.amountInput)
     }
 
     private fun openConfirmIfValid(voteType: VoteType) = launch {

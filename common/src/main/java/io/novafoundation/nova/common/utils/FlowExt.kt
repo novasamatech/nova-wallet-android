@@ -278,19 +278,19 @@ fun <T> singleReplaySharedFlow() = MutableSharedFlow<T>(replay = 1, onBufferOver
 
 fun <T> Flow<T>.inBackground() = flowOn(Dispatchers.Default)
 
-fun InsertableInputField.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
-    content.bindTo(flow, scope)
+fun <T> Flow<T>.nullOnStart(): Flow<T?> {
+    return onStart<T?> { emit(null) }
 }
 
-fun EditText.bindToUserEditable(flow: MutableSharedFlow<UserEditableString>, scope: CoroutineScope) {
-    bindTo(flow, scope, toT = { UserEditableString(it, editedByUser = true) }, fromT = { it.value })
+fun InsertableInputField.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
+    content.bindTo(flow, scope)
 }
 
 fun EditText.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
     bindTo(flow, scope, toT = { it }, fromT = { it })
 }
 
-private inline fun <T> EditText.bindTo(
+inline fun <T> EditText.bindTo(
     flow: MutableSharedFlow<T>,
     scope: CoroutineScope,
     crossinline toT: suspend (String) -> T,
