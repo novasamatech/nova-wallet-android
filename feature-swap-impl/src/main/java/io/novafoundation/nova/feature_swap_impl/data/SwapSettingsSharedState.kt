@@ -48,33 +48,29 @@ class SwapSettingsSharedState : SelectedOptionSharedState<SwapSettings> {
     fun setState(settings: SwapSettings) {
         selectedOption.value = settings
     }
-
-    // TODO: computationState
-    fun clear() {
-        selectedOption.value = SwapSettings()
-    }
 }
 
 fun SwapSettings.toQuoteArgs(): SwapQuoteArgs? {
-    return try {
-        SwapQuoteArgs(assetIn!!.token, assetOut!!.token, amount!!, swapDirection!!, slippage)
-    } catch (e: Exception) {
+    return if (assetIn != null && assetOut != null && amount != null && swapDirection != null) {
+        SwapQuoteArgs(assetIn.token, assetOut.token, amount, swapDirection, slippage)
+    } else {
         null
     }
 }
 
 fun SwapSettings.toExecuteArgs(): SwapExecuteArgs? {
-    return try {
-        SwapExecuteArgs(assetIn!!.token.configuration, assetOut!!.token.configuration, feeAsset, getSwapLimit()!!)
-    } catch (e: Exception) {
+    val swapLimits = getSwapLimit()
+    return if (assetIn != null && assetOut != null && amount != null && swapDirection != null && swapLimits != null) {
+        SwapExecuteArgs(assetIn.token.configuration, assetOut.token.configuration, feeAsset, swapLimits)
+    } else {
         null
     }
 }
 
 fun SwapSettings.getSwapLimit(): SwapLimit? {
+    if (amount == null || swapDirection == null) return null
     return when (swapDirection) {
-        SwapDirection.SPECIFIED_IN -> SwapLimit.SpecifiedIn(amount!!, amount!!) //TODO: calculate in and out amount
-        SwapDirection.SPECIFIED_OUT -> SwapLimit.SpecifiedOut(amount!!, amount!!) //TODO: calculate in and out amount
-        null -> null
+        SwapDirection.SPECIFIED_IN -> SwapLimit.SpecifiedIn(amount, amount) //TODO: Provide valid out amount
+        SwapDirection.SPECIFIED_OUT -> SwapLimit.SpecifiedOut(amount, amount) //TODO: Provide valid in amount
     }
 }

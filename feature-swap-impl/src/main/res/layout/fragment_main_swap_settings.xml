@@ -96,7 +96,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
-        android:text="@string/account_details_watch_only_alert"
+        android:text="@string/swap_error_pair_not_supported"
         app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsReceiveInput"
         app:style="error" />
 

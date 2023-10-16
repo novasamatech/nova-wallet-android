@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.transferableFormat
@@ -59,6 +60,7 @@ class SwapMainSettingsViewModel(
     private val swapSettings = swapInteractor.settings()
 
     private val swapQuoteResult = swapInteractor.quotes()
+        .shareInBackground()
 
     private val swapQuote = swapQuoteResult
         .map { it.getOrNull() }
@@ -152,6 +154,7 @@ class SwapMainSettingsViewModel(
         updateSwapSettingsAmountSilently(newSettings)
     }
 
+    //TODO avoid using it
     private fun updateSwapSettingsAmountSilently(swapSettings: SwapSettings) {
         if (swapSettings.amount == null) return
 
@@ -207,6 +210,7 @@ class SwapMainSettingsViewModel(
         return toBigDecimalOrNull() ?: BigDecimal.ZERO
     }
 
+    // TODO choose amount mixin should let us avoid using Asset in SwapSettings
     private fun mapInputToFiatAmount(asset: Asset?, amount: UserEditableString): String? {
         asset ?: return null
         val fiatAmount = asset.token.amountToFiat(amount.value.toBigDecimal())
@@ -222,11 +226,8 @@ class SwapMainSettingsViewModel(
         swapQuoteResult.onEach { result ->
             if (result.isSuccess) {
                 val quote = result.getOrThrow()
-                when (quote?.direction) {
-                    null -> clearFieldsSilently()
-                    SwapDirection.SPECIFIED_OUT -> setInputAmountSilently(quote.assetIn, quote.planksIn, amountInInput)
-                    SwapDirection.SPECIFIED_IN -> setInputAmountSilently(quote.assetOut, quote.planksOut, amountOutInput)
-                }
+                setInputAmountSilently(quote.assetIn, quote.planksIn, amountInInput)
+                setInputAmountSilently(quote.assetOut, quote.planksOut, amountOutInput)
             } else {
                 val settings = swapSettings.first()
                 when (settings.swapDirection) {

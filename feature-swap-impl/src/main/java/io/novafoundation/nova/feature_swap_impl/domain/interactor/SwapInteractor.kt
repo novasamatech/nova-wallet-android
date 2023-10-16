@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -33,7 +34,7 @@ class SwapInteractor(
     private val swapSharedState: SwapSettingsSharedState,
     private val chainRegistry: ChainRegistry,
     private val walletRepository: WalletRepository,
-    private val accountRepository: AccountRepository,
+    private val accountRepository: AccountRepository
 ) {
 
     suspend fun availableAssets(coroutineScope: CoroutineScope): List<Asset> {
@@ -73,16 +74,13 @@ class SwapInteractor(
         return flowOf { "" }
     }
 
-    fun quotes(): Flow<Result<SwapQuote?>> {
+    fun quotes(): Flow<Result<SwapQuote>> {
         return swapSharedState.selectedOption
-            .map { it.toQuoteArgs() }
+            .mapNotNull { it.toQuoteArgs() }
             .mapLatest {
-                if (it == null) {
-                    return@mapLatest Result.success(null)
-                }
-
                 swapService.quote(it)
             }
+
     }
 
     fun fee(): Flow<SwapFee> {
@@ -148,9 +146,5 @@ class SwapInteractor(
         swapSharedState.setState(newSettings)
 
         return newSettings
-    }
-
-    fun clear() {
-        swapSharedState.clear()
     }
 }
