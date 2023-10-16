@@ -22,13 +22,6 @@ import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInpu
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputSubtitle
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputToken
 
-class SwapAssetModel(
-    val assetImageUrl: String?,
-    val title: String,
-    val subtitleIcon: Icon?,
-    val subtitle: String
-)
-
 class SwapAmountInputView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -82,7 +75,7 @@ class SwapAmountInputView @JvmOverloads constructor(
         }
     }
 
-    fun setModel(model: SwapAssetModel) {
+    fun setModel(model: Model) {
         setAssetImageUrl(model.assetImageUrl)
         setTitle(model.title)
         setSubtitle(model.subtitleIcon, model.subtitle)
@@ -91,4 +84,11 @@ class SwapAmountInputView @JvmOverloads constructor(
     fun setFiatAmount(priceAmount: String?) {
         swapAmountInputFiat.setTextOrHide(priceAmount)
     }
+
+    class Model(
+        val assetImageUrl: String?,
+        val title: String,
+        val subtitleIcon: Icon?,
+        val subtitle: String
+    )
 }

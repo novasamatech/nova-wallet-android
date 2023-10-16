@@ -387,7 +387,7 @@
 
         <action
             android:id="@+id/action_mainFragment_to_swapFlow"
-            app:destination="@id/swapFlowFragment"
+            app:destination="@id/start_swap_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -802,10 +802,7 @@
         android:name="io.novafoundation.nova.feature_assets.presentation.buy.flow.AssetBuyFlowFragment"
         android:label="AssetBuyFlowFragment" />
 
-    <fragment
-        android:id="@+id/swapFlowFragment"
-        android:name="io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment"
-        android:label="SwapMainSettingsFragment" />
+    <include app:graph="@navigation/start_swap_nav_graph" />
 
     <include app:graph="@navigation/manage_tokens_graph" />
 
