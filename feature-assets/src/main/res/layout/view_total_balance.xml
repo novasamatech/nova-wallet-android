@@ -126,6 +126,16 @@
             tools:drawableTop="@drawable/ic_receive" />
 
         <TextView
+            android:id="@+id/viewAssetsTotalBalanceSwap"
+            style="@style/Widget.Nova.ActionButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/wallet_asset_swap"
+            app:drawableTopCompat="@drawable/ic_change_account_outline"
+            tools:drawableTop="@drawable/ic_change_account_outline" />
+
+        <TextView
             android:id="@+id/viewAssetsTotalBalanceBuy"
             style="@style/Widget.Nova.ActionButton"
             android:layout_width="0dp"

@@ -41,6 +41,8 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         fun receiveClicked()
 
         fun buyClicked()
+
+        fun swapClicked()
     }
 
     private var shouldShowPlaceholder: Boolean = false
@@ -137,6 +139,7 @@ class HeaderHolder(
             balanceListTotalBalance.onSendClick { handler.sendClicked() }
             balanceListTotalBalance.onReceiveClick { handler.receiveClicked() }
             balanceListTotalBalance.onBuyClick { handler.buyClicked() }
+            balanceListTotalBalance.onSwapClick { handler.swapClicked() }
         }
     }
 

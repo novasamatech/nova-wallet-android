@@ -199,4 +199,10 @@ interface ComponentHolderModule {
     @ClassKey(SettingsFeatureApi::class)
     @IntoMap
     fun provideSettingsFeature(holder: SettingsFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(SwapFeatureApi::class)
+    @IntoMap
+    fun provideSwapFeature(holder: SwapFeatureHolder): FeatureApiHolder
 }

@@ -75,7 +75,8 @@
     <declare-styleable name="TableCellView">
         <attr name="title" />
         <attr name="dividerVisible" />
-        <attr name="primaryValueIcon" format="reference|color" />
+        <attr name="primaryValueEndIcon" format="reference|color" />
+        <attr name="primaryValueStartIcon" format="reference|color" />
         <attr name="primaryValueStyle" format="enum">
             <enum name="primary" value="0" />
             <enum name="secondary" value="1" />
@@ -224,6 +225,11 @@
         <attr name="bannerBackground" format="reference|color" />
         <attr name="android:scaleType" />
         <attr name="showClose" />
+    </declare-styleable>
+
+    <declare-styleable name="ExpandableView">
+        <attr name="chevronId" format="reference" />
+        <attr name="expandableId" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="ListChooserView">

@@ -311,4 +311,8 @@ class BalanceListViewModel(
     fun buyClicked() {
         router.openBuyFlow()
     }
+
+    fun swapClicked() {
+        router.openSwapFlow()
+    }
 }

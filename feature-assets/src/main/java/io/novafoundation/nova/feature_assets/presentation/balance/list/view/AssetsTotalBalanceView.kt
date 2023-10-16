@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.view_total_balance.view.viewAssetsTotalBal
 import kotlinx.android.synthetic.main.view_total_balance.view.viewAssetsTotalBalanceReceive
 import kotlinx.android.synthetic.main.view_total_balance.view.viewAssetsTotalBalanceSend
 import kotlinx.android.synthetic.main.view_total_balance.view.viewAssetsTotalBalanceShimmer
+import kotlinx.android.synthetic.main.view_total_balance.view.viewAssetsTotalBalanceSwap
 import kotlinx.android.synthetic.main.view_total_balance.view.viewAssetsTotalBalanceTotal
 
 class AssetsTotalBalanceView @JvmOverloads constructor(
@@ -53,6 +54,10 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
 
     fun onReceiveClick(clickListener: OnClickListener) {
         viewAssetsTotalBalanceReceive.setOnClickListener(clickListener)
+    }
+
+    fun onSwapClick(clickListener: OnClickListener) {
+        viewAssetsTotalBalanceSwap.setOnClickListener(clickListener)
     }
 
     fun onBuyClick(clickListener: OnClickListener) {

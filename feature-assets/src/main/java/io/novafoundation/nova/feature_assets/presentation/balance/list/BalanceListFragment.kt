@@ -170,4 +170,8 @@ class BalanceListFragment :
     override fun buyClicked() {
         viewModel.buyClicked()
     }
+
+    override fun swapClicked() {
+        viewModel.swapClicked()
+    }
 }

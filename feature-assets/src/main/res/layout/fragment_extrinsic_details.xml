@@ -81,7 +81,7 @@
                     android:id="@+id/extrinsicDetailSender"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                    app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
                     app:primaryValueIconTint="@color/icon_secondary"
                     app:title="@string/wallet_sender" />
 

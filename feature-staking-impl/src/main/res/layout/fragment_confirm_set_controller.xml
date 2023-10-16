@@ -33,7 +33,7 @@
         <io.novafoundation.nova.common.view.TableCellView
             app:title="@string/staking_controller_account"
             android:id="@+id/confirmSetControllerController"
-            app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+            app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </io.novafoundation.nova.common.view.TableView>

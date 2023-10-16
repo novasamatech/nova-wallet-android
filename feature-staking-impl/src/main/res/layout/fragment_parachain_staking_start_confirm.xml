@@ -60,7 +60,7 @@
                         android:layout_width="match_parent"
                         android:id="@+id/confirmStartParachainStakingCollator"
                         android:layout_height="wrap_content"
-                        app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                        app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
                         app:title="@string/staking_parachain_collator" />
                 </io.novafoundation.nova.common.view.TableView>
 

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/swapMainSettingsToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:iconRight="@drawable/ic_options"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleText="@string/wallet_asset_swap" />
+
+    <TextView
+        android:id="@+id/swapMainSettingsPayTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/fragment_swap_main_settings_pay_title"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/swapMainSettingsToolbar" />
+
+    <TextView
+        android:id="@+id/swapMainSettingsMaxAmountButton"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:text="@string/fragment_swap_main_settings_max_button"
+        android:textColor="@color/button_text_accent"
+        app:layout_constraintBottom_toBottomOf="@+id/swapMainSettingsMaxAmount"
+        app:layout_constraintEnd_toStartOf="@+id/swapMainSettingsMaxAmount"
+        app:layout_constraintTop_toTopOf="@+id/swapMainSettingsMaxAmount" />
+
+    <TextView
+        android:id="@+id/swapMainSettingsMaxAmount"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:textColor="@color/text_primary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/swapMainSettingsToolbar"
+        tools:text="4 DOT" />
+
+    <io.novafoundation.nova.feature_swap_impl.presentation.views.SwapAmountInputView
+        android:id="@+id/swapMainSettingsPayInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/swapMainSettingsPayTitle" />
+
+    <ImageView
+        android:id="@+id/swapMainSettingsFlip"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_flip_swap"
+        app:layout_constraintBottom_toTopOf="@+id/swapMainSettingsReceiveInput"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsPayInput" />
+
+    <TextView
+        android:id="@+id/swapMainSettingsReceiveTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/fragment_swap_main_settings_receive_title"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/swapMainSettingsPayInput" />
+
+    <io.novafoundation.nova.feature_swap_impl.presentation.views.SwapAmountInputView
+        android:id="@+id/swapMainSettingsReceiveInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/swapMainSettingsReceiveTitle" />
+
+    <io.novafoundation.nova.common.view.ExpandableView
+        android:id="@+id/swapMainSettingsDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:chevronId="@+id/swapMainSettingsDetailsChevron"
+        app:expandableId="@+id/swapMainSettingsDetailsContainer"
+        app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsReceiveInput">
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginStart="16dp"
+            android:text="@string/fragment_swap_main_settings_details_title"
+            android:textColor="@color/text_secondary"
+            app:layout_constraintBottom_toBottomOf="@+id/swapMainSettingsDetailsChevron"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/swapMainSettingsDetailsChevron" />
+
+        <ImageView
+            android:id="@+id/swapMainSettingsDetailsChevron"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="16dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_chevron_up"
+            app:layout_constraintBottom_toTopOf="@+id/swapMainSettingsReceiveInput"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsPayInput"
+            app:tint="@color/icon_secondary" />
+
+        <FrameLayout
+            android:id="@+id/swapMainSettingsDetailsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsDetailsChevron">
+
+            <io.novafoundation.nova.common.view.TableView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/swapMainSettingsDetailsRate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/fragment_swap_main_settings_rate_title"
+                    app:titleIcon="@drawable/ic_info_cicrle_filled_16" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/swapMainSettingsDetailsNetworkFee"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/fragment_swap_main_settings_network_fee_title"
+                    app:titleIcon="@drawable/ic_info_cicrle_filled_16" />
+
+            </io.novafoundation.nova.common.view.TableView>
+
+        </FrameLayout>
+
+    </io.novafoundation.nova.common.view.ExpandableView>
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/swapMainSettingsContinue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="24dp"
+        android:enabled="false"
+        android:text="@string/fragment_swap_main_settings_button_text"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

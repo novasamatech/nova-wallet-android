@@ -61,6 +61,15 @@ fun Context.getInputBackground() = getCornersStateDrawable(
     idleDrawable = getRoundedCornerDrawable(R.color.input_background)
 )
 
+fun Context.getInputBackgroundError() = getCornersStateDrawable(
+    focusedDrawable = getRoundedCornerDrawableFromColors(
+        fillColor = getColor(R.color.input_background),
+        strokeColor = getColor(R.color.button_background_reject),
+        strokeSizeInDp = 1f
+    ),
+    idleDrawable = getRoundedCornerDrawable(R.color.input_background)
+)
+
 fun Context.getFocusedDrawable(): Drawable = getRoundedCornerDrawable(strokeColorRes = R.color.active_border)
 fun Context.getDisabledDrawable(): Drawable = getRoundedCornerDrawable(fillColorRes = R.color.input_background)
 fun Context.getIdleDrawable(): Drawable = getRoundedCornerDrawable(strokeColorRes = R.color.container_border)
