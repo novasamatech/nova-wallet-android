@@ -1,138 +1,158 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
-import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.UserEditableString
+import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.images.Icon
-import io.novafoundation.nova.common.utils.orFalse
-import io.novafoundation.nova.common.view.ButtonState
-import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
+import io.novafoundation.nova.common.utils.formatting.CompoundNumberFormatter
+import io.novafoundation.nova.common.utils.formatting.DynamicPrecisionFormatter
+import io.novafoundation.nova.common.utils.formatting.FixedPrecisionFormatter
+import io.novafoundation.nova.common.utils.formatting.NumberAbbreviation
+import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.invoke
+import io.novafoundation.nova.common.utils.nullOnStart
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
+import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
+import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_impl.R
-import io.novafoundation.nova.feature_swap_impl.data.SwapSettings
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
-import io.novafoundation.nova.feature_swap_impl.presentation.views.SwapAmountInputView
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.state.SwapSettings
+import io.novafoundation.nova.feature_swap_impl.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_swap_impl.presentation.state.swapSettingsFlow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.transferableFormat
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigDecimal
-import java.math.BigInteger
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import kotlin.time.Duration.Companion.milliseconds
 
-class SwapButtonState(
-    val state: ButtonState,
-    val text: String
-)
+sealed class QuotingState {
 
-class SwapQuoteError(
-    val buttonText: String,
-    val highlightOutInput: Boolean,
-    val highlightInInput: Boolean
-)
+    object Loading : QuotingState()
+
+    object NotAvailable : QuotingState()
+
+    class Loaded(val value: SwapQuote, val quoteArgs: SwapQuoteArgs, val feeAsset: Chain.Asset) : QuotingState()
+}
 
 class SwapMainSettingsViewModel(
     private val swapRouter: SwapRouter,
     private val swapInteractor: SwapInteractor,
+    private val swapSettingsStateProvider: SwapSettingsStateProvider,
     private val resourceManager: ResourceManager,
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
+    private val assetUseCase: ArbitraryAssetUseCase,
+    private val swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
+    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory
 ) : BaseViewModel() {
 
-    private val swapSettings = swapInteractor.settings()
-
-    private val swapQuoteResult = swapInteractor.quotes()
-        .shareInBackground()
-
-    private val swapQuote = swapQuoteResult
-        .map { it.getOrNull() }
-
-    private val swapQuoteError = swapQuoteResult
-        .map { formatQuoteError(it.exceptionOrNull()) }
-
-    private val assetOutFlow = swapInteractor.assetOut()
-    private val assetInFlow = swapInteractor.assetIn()
-    private val feeAsset = swapInteractor.feeAsset()
-
-    val amountOutInput: MutableStateFlow<UserEditableString> = MutableStateFlow(UserEditableString(""))
-    val amountInInput: MutableStateFlow<UserEditableString> = MutableStateFlow(UserEditableString(""))
-
-    val amountOutFiat: Flow<String?> = assetOutFlow.combine(amountOutInput, ::mapInputToFiatAmount)
-        .shareInBackground()
-
-    val amountInFiat: Flow<String?> = assetInFlow.combine(amountInInput, ::mapInputToFiatAmount)
-        .shareInBackground()
-
-    val paymentAsset: Flow<SwapAmountInputView.Model> = combine(swapQuoteError, swapSettings) { quoteError, settings ->
-        formatInputAsset(settings.assetOut, quoteError?.highlightOutInput.orFalse(), R.string.swap_field_asset_from_title)
-    }.shareInBackground()
-
-    val receivingAsset: Flow<SwapAmountInputView.Model> = combine(swapQuoteError, swapSettings) { quoteError, settings ->
-        formatInputAsset(settings.assetIn, quoteError?.highlightInInput.orFalse(), R.string.swap_field_asset_to_title)
-    }.shareInBackground()
-
-    val paymentTokenMaxAmount: Flow<String?> = assetOutFlow.map { it?.transferableFormat() }
-        .shareInBackground()
-
-    val rateDetails: Flow<String?> = flowOf { formatRate() }
-        .shareInBackground()
-
-    val networkFee: Flow<AmountModel?> = feeAsset.filterNotNull()
-        .map { asset -> mapAmountToAmountModel(BigInteger.TEN, asset) }
-        .shareInBackground()
-
-    val showDetails: Flow<Boolean> = swapQuote.map { it != null }
-        .shareInBackground()
-
-    // TODO I guess we can move it to the validation
-    val pairAvailabilityFlow: Flow<Boolean> = swapInteractor.observeAssetsPairAvailability(viewModelScope)
-
-    val buttonState: Flow<SwapButtonState> = swapQuoteError.map {
-        val buttonState = if (it == null) ButtonState.NORMAL else ButtonState.DISABLED
-        SwapButtonState(buttonState, it?.buttonText ?: resourceManager.getString(R.string.common_continue))
-    }.shareInBackground()
-
-    init {
-        handleInputChanges(assetOutFlow, amountOutInput, SwapDirection.SPECIFIED_OUT)
-        handleInputChanges(assetInFlow, amountInInput, SwapDirection.SPECIFIED_IN)
-
-        handleQuote()
+    private val swapSettingState = async {
+        swapSettingsStateProvider.getSwapSettingsState(viewModelScope)
     }
 
-    //TODO sync with iOS team
-    fun maxTokens() {
+    private val swapSettings = swapSettingsStateProvider.swapSettingsFlow(viewModelScope)
 
+    private val quotingState = MutableStateFlow<QuotingState>(QuotingState.NotAvailable)
+
+    private val assetOutFlow = swapSettings.assetFlowOf(SwapSettings::assetOut)
+    private val assetInFlow = swapSettings.assetFlowOf(SwapSettings::assetIn)
+    private val feeAssetFlow = swapSettings.assetFlowOf(SwapSettings::feeAsset)
+
+    val amountInInput = swapAmountInputMixinFactory.create(
+        coroutineScope = viewModelScope,
+        assetFlow = assetInFlow.nullOnStart(),
+        maxAvailable = { it.transferableInPlanks },
+        emptyAssetTitle = R.string.swap_field_asset_from_title
+    )
+
+    val amountOutInput = swapAmountInputMixinFactory.create(
+        coroutineScope = viewModelScope,
+        assetFlow = assetOutFlow.nullOnStart(),
+        maxAvailable = { null },
+        emptyAssetTitle = R.string.swap_field_asset_to_title
+    )
+
+    val feeMixin = feeLoaderMixinFactory.create(
+        tokenFlow = feeAssetFlow.map { it.token }
+    )
+
+    val rateDetails: Flow<ExtendedLoadingState<String>> = quotingState.map {
+        when (it) {
+            is QuotingState.NotAvailable, QuotingState.Loading -> ExtendedLoadingState.Loading
+            is QuotingState.Loaded -> ExtendedLoadingState.Loaded(formatRate(it.value))
+        }
+    }
+        .shareInBackground()
+
+    val showDetails: Flow<Boolean> = quotingState.map { it !is QuotingState.NotAvailable }
+        .shareInBackground()
+
+    val buttonState: Flow<DescriptiveButtonState> = flowOf { DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue)) }
+
+    val swapDirectionFlipped: MutableLiveData<Event<SwapDirection>> = MutableLiveData()
+
+    init {
+        handleInputChanges(amountInInput, SwapSettings::assetIn, SwapDirection.SPECIFIED_IN)
+        handleInputChanges(amountOutInput, SwapSettings::assetOut, SwapDirection.SPECIFIED_OUT)
+
+        setupQuoting()
+
+        feeMixin.setupFees()
+    }
+
+    // TODO sync with iOS team
+    fun maxTokens() {
     }
 
     fun selectPayToken() {
         launch {
             val assets = swapInteractor.availableAssets(viewModelScope)
-            swapInteractor.setAssetOut(assets[1])
+            val chainAsset = assets[0].token.configuration
+            val chain = chainRegistry.getChain(chainAsset.chainId)
+
+            swapSettingState().setAssetInUpdatingFee(chainAsset, chain)
         }
     }
 
     fun selectReceiveToken() {
         launch {
             val assets = swapInteractor.availableAssets(viewModelScope)
-            swapInteractor.setAssetIn(assets[0])
+            val chainAsset = assets[1].token.configuration
+            swapSettingState().setAssetOut(chainAsset)
         }
     }
 
@@ -148,122 +168,164 @@ class SwapMainSettingsViewModel(
         TODO("Not yet implemented")
     }
 
-    fun flipAssets() {
-        val newSettings = swapInteractor.flipAssets()
+    fun flipAssets() = launch {
+        val previousSettings = swapSettings.first()
+        val newSettings = swapSettingState().flipAssets()
 
-        updateSwapSettingsAmountSilently(newSettings)
+        applyFlipToUi(previousSettings, newSettings)
     }
 
-    //TODO avoid using it
-    private fun updateSwapSettingsAmountSilently(swapSettings: SwapSettings) {
-        if (swapSettings.amount == null) return
+    fun backClicked() {
+        swapRouter.back()
+    }
 
-        when (swapSettings.swapDirection) {
+    @OptIn(FlowPreview::class)
+    private fun FeeLoaderMixin.Presentation.setupFees() {
+        quotingState
+            .onEach { if (it is QuotingState.Loading) invalidateFee() }
+            .filterIsInstance<QuotingState.Loaded>()
+            .debounce(300.milliseconds)
+            .onEach { quoteState ->
+                val swapArgs = quoteState.quoteArgs.toExecuteArgs(
+                    quotedBalance = quoteState.value.quotedBalance,
+                    customFeeAsset = quoteState.feeAsset
+                )
+
+                loadFeeV2(
+                    coroutineScope = viewModelScope,
+                    feeConstructor = { swapInteractor.estimateFee(swapArgs).networkFee },
+                    onRetryCancelled = {}
+                )
+            }
+            .inBackground()
+            .launchIn(viewModelScope)
+    }
+
+    private fun applyFlipToUi(previousSettings: SwapSettings, newSettings: SwapSettings) {
+        val amount = previousSettings.amount ?: return
+        val swapDirection = previousSettings.swapDirection ?: return
+
+        when (swapDirection) {
             SwapDirection.SPECIFIED_IN -> {
-                swapSettings.assetIn ?: return
-                setInputAmountSilently(swapSettings.assetIn.token.configuration, swapSettings.amount, amountInInput)
+                val previousIn = previousSettings.assetIn ?: return
+                amountOutInput.updateInput(previousIn, amount)
+                amountInInput.clearInput()
             }
 
             SwapDirection.SPECIFIED_OUT -> {
-                swapSettings.assetOut ?: return
-                setInputAmountSilently(swapSettings.assetOut.token.configuration, swapSettings.amount, amountOutInput)
+                val previousOut = previousSettings.assetOut ?: return
+                amountInInput.updateInput(previousOut, amount)
+                amountOutInput.clearInput()
             }
+        }
 
-            else -> {}
+        swapDirectionFlipped.value = newSettings.swapDirection!!.event()
+    }
+
+    private fun formatRate(swapQuote: SwapQuote): String {
+        val rate = swapQuote.swapRate()
+
+        val assetInUnitFormatted = BigDecimal.ONE.formatTokenAmount(swapQuote.assetIn)
+        val rateAmountFormatted = rate.formatTokenAmount(swapQuote.assetOut)
+
+        return "$assetInUnitFormatted ≈ $rateAmountFormatted"
+    }
+
+    private fun setupQuoting() {
+        swapSettings.mapNotNull { swapSettings ->
+            val swapQuoteArgs = swapSettings.toQuoteArgs(
+                tokenIn = { assetInFlow.ensureToken(it) },
+                tokenOut = { assetOutFlow.ensureToken(it) },
+            )
+
+            swapQuoteArgs?.let { it to swapSettings }
+        }
+            .mapLatest { (quoteArgs, swapSettings) ->
+                quotingState.value = QuotingState.Loading
+
+                val quote = swapInteractor.quote(quoteArgs)
+
+                quotingState.value = quote.fold(
+                    onSuccess = { QuotingState.Loaded(it, quoteArgs, swapSettings.feeAsset!!) },
+                    onFailure = { QuotingState.NotAvailable }
+                )
+
+                quote to swapSettings
+            }
+            .onEach { (quoteResult, swapSettings) -> handleNewQuote(quoteResult, swapSettings) }
+            .launchIn(viewModelScope)
+    }
+
+    private fun handleNewQuote(quoteResult: Result<SwapQuote>, swapSettings: SwapSettings) {
+        quoteResult.onSuccess { quote ->
+            when (swapSettings.swapDirection!!) {
+                SwapDirection.SPECIFIED_IN -> amountOutInput.updateInput(quote.assetOut, quote.planksOut)
+                SwapDirection.SPECIFIED_OUT -> amountInInput.updateInput(quote.assetIn, quote.planksIn)
+            }
+        }.onFailure {
+            when (swapSettings.swapDirection!!) {
+                SwapDirection.SPECIFIED_OUT -> amountInInput.clearInput()
+                SwapDirection.SPECIFIED_IN -> amountOutInput.clearInput()
+            }
         }
     }
 
-    private suspend fun formatInputAsset(asset: Asset?, isError: Boolean, titleRes: Int): SwapAmountInputView.Model {
-        val chainAsset = asset?.token?.configuration
-        if (chainAsset == null) {
-            return defaultInputModel(titleRes)
+    private inline fun SwapSettings.toQuoteArgs(
+        tokenIn: (Chain.Asset) -> Token,
+        tokenOut: (Chain.Asset) -> Token
+    ): SwapQuoteArgs? {
+        return if (assetIn != null && assetOut != null && amount != null && swapDirection != null) {
+            SwapQuoteArgs(tokenIn(assetIn), tokenOut(assetOut), amount, swapDirection, slippage)
+        } else {
+            null
         }
-
-        val chain = chainRegistry.getChain(chainAsset.chainId)
-
-        return SwapAmountInputView.Model(
-            chainAsset.iconUrl,
-            chainAsset.symbol,
-            Icon.FromLink(chain.icon),
-            chain.name,
-            showInput = true,
-            isError = isError
-        )
     }
 
-    private fun defaultInputModel(titleRes: Int): SwapAmountInputView.Model {
-        return SwapAmountInputView.Model(
-            null,
-            resourceManager.getString(titleRes),
-            null,
-            resourceManager.getString(R.string.fragment_swap_main_settings_select_token),
-            showInput = false,
-            isError = false
-        )
+    private fun handleInputChanges(
+        amountInput: SwapAmountInputMixin.Presentation,
+        chainAsset: (SwapSettings) -> Chain.Asset?,
+        swapDirection: SwapDirection
+    ) {
+        amountInput.amountState
+            .filter { it.initiatedByUser }
+            .onEach { state ->
+                val asset = chainAsset(swapSettings.first()) ?: return@onEach
+                val planks = state.value?.let(asset::planksFromAmount)
+                swapSettingState().setAmount(planks, swapDirection)
+            }.launchIn(viewModelScope)
     }
 
-    private fun formatRate(): String {
-        return ""
+    private fun SwapAmountInputMixin.clearInput() {
+        inputState.value = InputState(value = "", initiatedByUser = false)
     }
 
-    private fun String.toBigDecimal(): BigDecimal {
-        return toBigDecimalOrNull() ?: BigDecimal.ZERO
-    }
-
-    // TODO choose amount mixin should let us avoid using Asset in SwapSettings
-    private fun mapInputToFiatAmount(asset: Asset?, amount: UserEditableString): String? {
-        asset ?: return null
-        val fiatAmount = asset.token.amountToFiat(amount.value.toBigDecimal())
-        return fiatAmount.formatAsCurrency(asset.token.currency)
-    }
-
-    private fun setInputAmountSilently(chainAsset: Chain.Asset, planks: Balance, amountInput: MutableStateFlow<UserEditableString>) {
+    private fun SwapAmountInputMixin.updateInput(chainAsset: Chain.Asset, planks: Balance) {
         val amount = chainAsset.amountFromPlanks(planks)
-        amountInput.value = UserEditableString(amount.format(), editedByUser = false)
+        inputState.value = InputState(amountInputFormatter.format(amount), initiatedByUser = false)
     }
 
-    private fun handleQuote() {
-        swapQuoteResult.onEach { result ->
-            if (result.isSuccess) {
-                val quote = result.getOrThrow()
-                setInputAmountSilently(quote.assetIn, quote.planksIn, amountInInput)
-                setInputAmountSilently(quote.assetOut, quote.planksOut, amountOutInput)
-            } else {
-                val settings = swapSettings.first()
-                when (settings.swapDirection) {
-                    SwapDirection.SPECIFIED_OUT -> clearFieldSilently(amountInInput)
-                    SwapDirection.SPECIFIED_IN -> clearFieldSilently(amountOutInput)
-                    else -> {}
-                }
-            }
-        }.launchIn(viewModelScope)
+    private fun Flow<SwapSettings>.assetFlowOf(extractor: (SwapSettings) -> Chain.Asset?): Flow<Asset> {
+        return mapNotNull { extractor(it) }
+            .flatMapLatest { assetUseCase.assetFlow(it) }
+            .shareInBackground()
     }
 
-    private fun handleInputChanges(assetFlow: Flow<Asset?>, amountInput: MutableStateFlow<UserEditableString>, swapDirection: SwapDirection) {
-        amountInput.onEach {
-            val asset = assetFlow.first()
-            if (asset == null) return@onEach
-            if (!it.editedByUser) return@onEach
-            val amount = it.value.toBigDecimalOrNull()
-            val planks = amount?.let { asset.token.planksFromAmount(amount) }
-            swapInteractor.setAmount(planks, swapDirection)
-        }.launchIn(viewModelScope)
-    }
+    private suspend fun Flow<Asset>.ensureToken(asset: Chain.Asset) = first { it.token.configuration.fullId == asset.fullId }.token
 
-    private fun clearFieldsSilently() {
-        clearFieldSilently(amountInInput)
-        clearFieldSilently(amountOutInput)
-    }
-
-    private fun clearFieldSilently(amountInput: MutableStateFlow<UserEditableString>) {
-        amountInput.value = UserEditableString("", editedByUser = false)
-    }
-
-    private fun formatQuoteError(exception: Throwable?): SwapQuoteError? {
-        if (exception == null) return null
-
-        return SwapQuoteError(
-            "", false, false
+    private val amountInputFormatter = CompoundNumberFormatter(
+        abbreviations = listOf(
+            NumberAbbreviation(
+                threshold = BigDecimal.ZERO,
+                divisor = BigDecimal.ONE,
+                suffix = "",
+                formatter = DynamicPrecisionFormatter(minScale = 5, minPrecision = 3)
+            ),
+            NumberAbbreviation(
+                threshold = BigDecimal.ONE,
+                divisor = BigDecimal.ONE,
+                suffix = "",
+                formatter = FixedPrecisionFormatter(precision = 5)
+            ),
         )
-    }
+    )
 }

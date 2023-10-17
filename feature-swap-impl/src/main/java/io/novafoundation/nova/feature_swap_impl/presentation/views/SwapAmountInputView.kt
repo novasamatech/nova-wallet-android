@@ -16,11 +16,12 @@ import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.common.view.shape.getInputBackgroundError
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_swap_impl.R
-import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputSubtitleImage
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin.SwapInputAssetModel
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputFiat
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputField
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputImage
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputSubtitle
+import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputSubtitleImage
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputToken
 
 class SwapAmountInputView @JvmOverloads constructor(
@@ -45,38 +46,40 @@ class SwapAmountInputView @JvmOverloads constructor(
         setAddStatesFromChildren(true)
     }
 
-    fun setModel(model: Model) {
-        setAssetImageUrl(model.assetImageUrl)
+    fun setModel(model: SwapInputAssetModel) {
+        setAssetIcon(model.assetIcon)
         setTitle(model.title)
         setSubtitle(model.subtitleIcon, model.subtitle)
-        setErrorEnabled(model.isError)
         swapAmountInputFiat.isVisible = model.showInput
         amountInput.isVisible = model.showInput
     }
 
-    fun setTitle(title: String) {
+    fun setFiatAmount(priceAmount: String?) {
+        swapAmountInputFiat.setTextOrHide(priceAmount)
+    }
+
+    private fun setTitle(title: String) {
         swapAmountInputToken.text = title
     }
 
-    fun setSubtitle(icon: Icon?, subtitle: String) {
+    private fun setSubtitle(icon: Icon?, subtitle: String) {
         swapAmountInputSubtitleImage.setIconOrMakeGone(icon, imageLoader)
         swapAmountInputSubtitle.text = subtitle
     }
 
-    fun setAssetImageUrl(imageUrl: String?) {
-        if (imageUrl == null) {
-            swapAmountInputImage.setImageTint(context.getColor(R.color.icon_accent))
-            swapAmountInputImage.setImageResource(R.drawable.ic_add)
-            swapAmountInputImage.setBackgroundResource(R.drawable.ic_swap_asset_default_background)
-        } else {
-            swapAmountInputImage.setImageTint(context.getColor(R.color.icon_primary))
-            swapAmountInputImage.loadTokenIcon(imageUrl, imageLoader)
-            swapAmountInputImage.setBackgroundResource(R.drawable.bg_token_container)
+    private fun setAssetIcon(icon: SwapInputAssetModel.SwapAssetIcon) {
+        return when (icon) {
+            is SwapInputAssetModel.SwapAssetIcon.Chosen -> {
+                swapAmountInputImage.setImageTint(context.getColor(R.color.icon_primary))
+                swapAmountInputImage.loadTokenIcon(icon.assetIconUrl, imageLoader)
+                swapAmountInputImage.setBackgroundResource(R.drawable.bg_token_container)
+            }
+            SwapInputAssetModel.SwapAssetIcon.NotChosen -> {
+                swapAmountInputImage.setImageTint(context.getColor(R.color.icon_accent))
+                swapAmountInputImage.setImageResource(R.drawable.ic_add)
+                swapAmountInputImage.setBackgroundResource(R.drawable.ic_swap_asset_default_background)
+            }
         }
-    }
-
-    fun setFiatAmount(priceAmount: String?) {
-        swapAmountInputFiat.setTextOrHide(priceAmount)
     }
 
     fun setErrorEnabled(enabled: Boolean) {
@@ -88,17 +91,4 @@ class SwapAmountInputView @JvmOverloads constructor(
             background = context.getInputBackground()
         }
     }
-
-    fun clearInputFocus() {
-        amountInput.clearFocus()
-    }
-
-    class Model(
-        val assetImageUrl: String?,
-        val title: String,
-        val subtitleIcon: Icon?,
-        val subtitle: String,
-        val showInput: Boolean,
-        val isError: Boolean
-    )
 }
