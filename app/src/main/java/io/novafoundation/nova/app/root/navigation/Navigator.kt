@@ -71,6 +71,8 @@ import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.splash.SplashRouter
 import kotlinx.coroutines.flow.Flow
 
@@ -122,6 +124,7 @@ class Navigator(
 
                 navController?.navigate(delayedNavigation.globalActionId, delayedNavigation.extras, navOptions)
             }
+
             is BackDelayedNavigation -> {
                 navController?.popBackStack()
             }
@@ -331,6 +334,10 @@ class Navigator(
 
     override fun openSwapFlow() {
         navController?.navigate(R.id.action_mainFragment_to_swapFlow)
+    }
+
+    override fun openSwapSettings(chainId: ChainId, assetId: ChainAssetId) {
+        navController?.navigate(R.id.action_swapFlowFragment_to_swapSettings)
     }
 
     override fun openNfts() {

@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_assets.presentation.receive.flow.di.AssetR
 import io.novafoundation.nova.feature_assets.presentation.send.amount.di.SelectSendComponent
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.di.ConfirmSendComponent
 import io.novafoundation.nova.feature_assets.presentation.send.flow.di.AssetSendFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.swap.di.AssetSwapFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.di.AddTokenEnterInfoComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChain.di.AddTokenSelectChainComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.di.ManageChainTokensComponent
@@ -81,6 +82,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun addTokenEnterInfoComponentFactory(): AddTokenEnterInfoComponent.Factory
 
     fun sendFlowComponent(): AssetSendFlowComponent.Factory
+
+    fun swapFlowComponent(): AssetSwapFlowComponent.Factory
 
     fun receiveFlowComponent(): AssetReceiveFlowComponent.Factory
 

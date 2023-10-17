@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/start_swap_graph"
-    app:startDestination="@id/swapFlowFragment">
+    app:startDestination="@id/swapSettingsFragment">
 
     <fragment
-        android:id="@+id/swapFlowFragment"
+        android:id="@+id/swapSettingsFragment"
         android:name="io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment"
         android:label="SwapMainSettingsFragment">
 
