@@ -106,6 +106,10 @@ class FeeLoaderProvider(
         setFee(fee)
     }
 
+    override fun invalidateFee() {
+        feeLiveData.postValue(FeeStatus.Loading)
+    }
+
     override fun requireFee(
         block: (BigDecimal) -> Unit,
         onError: (title: String, message: String) -> Unit,

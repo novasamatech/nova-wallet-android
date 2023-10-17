@@ -63,6 +63,8 @@ interface FeeLoaderMixin : Retriable {
 
         suspend fun setFee(fee: Fee?)
 
+        fun invalidateFee()
+
         suspend fun setFee(feeAmount: BigDecimal?)
 
         fun requireFee(

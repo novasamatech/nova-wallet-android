@@ -23,7 +23,15 @@ class SwapQuote(
     }
 }
 
+val SwapQuote.quotedBalance: Balance
+    get() = when (direction) {
+        SwapDirection.SPECIFIED_IN -> planksOut
+        SwapDirection.SPECIFIED_OUT -> planksIn
+    }
+
 fun SwapQuote.swapRate(): BigDecimal {
+    if (planksIn == Balance.ZERO) return BigDecimal.ZERO
+
     val amountIn = assetIn.amountFromPlanks(planksIn)
     val amountOut = assetOut.amountFromPlanks(planksOut)
 
