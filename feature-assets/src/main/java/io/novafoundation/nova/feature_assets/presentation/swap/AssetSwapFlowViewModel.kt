@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOfAll
-import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
@@ -66,17 +65,5 @@ class AssetSwapFlowViewModel(
 
     override fun mapAssets(assets: Map<AssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<Any> {
         return assets.mapGroupedAssetsToUi(currency, AssetGroup::groupTransferableBalanceFiat, AssetWithOffChainBalance.Balance::transferable)
-    }
-
-    override fun getPlaceholder(query: String, assets: List<Any>): PlaceholderModel? {
-        if (query.isEmpty() && assets.isEmpty()) {
-            return PlaceholderModel(
-                text = resourceManager.getString(R.string.assets_send_flow_placeholder),
-                imageRes = R.drawable.ic_no_search_results,
-                buttonText = resourceManager.getString(R.string.assets_send_flow_placeholder_button),
-            )
-        } else {
-            return super.getPlaceholder(query, assets)
-        }
     }
 }
