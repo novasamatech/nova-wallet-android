@@ -31,6 +31,7 @@ data class Chain(
     val hasSubstrateRuntime: Boolean,
     val hasCrowdloans: Boolean,
     val governance: List<Governance>,
+    val swapSupporting: Boolean,
     val parentId: String?,
     val additional: Additional?
 ) : Identifiable {

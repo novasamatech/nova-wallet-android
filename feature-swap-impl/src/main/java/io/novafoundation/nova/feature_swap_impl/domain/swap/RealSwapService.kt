@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.MutableMultiMap
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.asPerbill
 import io.novafoundation.nova.common.utils.atLeastZero
+import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.mutableMultiMapOf
@@ -23,9 +24,11 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversi
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.findChains
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -40,6 +43,7 @@ private const val EXCHANGES_CACHE = "RealSwapService.EXCHANGES"
 internal class RealSwapService(
     private val assetConversionFactory: AssetConversionExchangeFactory,
     private val computationalCache: ComputationalCache,
+    private val chainRegistry: ChainRegistry
 ) : SwapService {
 
     override suspend fun assetsAvailableForSwap(
@@ -137,14 +141,10 @@ internal class RealSwapService(
     }
 
     private suspend fun createExchanges(): Map<ChainId, AssetExchange> {
-        return listOfNotNull(
-            assetConversionFactory inChain Chain.Geneses.STATEMINE,
-            assetConversionFactory inChain Chain.Geneses.STATEMINT,
-            assetConversionFactory inChain Chain.Geneses.WESTMINT
-        ).toMap()
-    }
-
-    private suspend infix fun AssetExchange.Factory.inChain(chainId: ChainId): Pair<ChainId, AssetExchange>? {
-        return create(chainId)?.let { chainId to it }
+        return chainRegistry.findChains { it.swapSupporting }
+            .associateBy(Chain::id) {
+                assetConversionFactory.create(it.id)
+            }
+            .filterNotNull()
     }
 }

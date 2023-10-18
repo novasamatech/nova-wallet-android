@@ -309,6 +309,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             hasCrowdloans = hasCrowdloans,
             hasSubstrateRuntime = hasSubstrateRuntime,
             governance = mapGovernanceListFromLocal(governance),
+            swapSupporting = swapSupporting,
             additional = additional
         )
     }

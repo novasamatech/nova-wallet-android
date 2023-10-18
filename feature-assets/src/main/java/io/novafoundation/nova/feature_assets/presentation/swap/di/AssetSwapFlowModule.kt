@@ -14,28 +14,40 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.send.flow.AssetSendFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowViewModel
-import io.novafoundation.nova.feature_assets.presentation.swap.InitialSwapFlowExecutor
-import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowExecutorFactory
+import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
+import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
+import io.novafoundation.nova.feature_assets.presentation.swap.executor.ReselectSwapFlowExecutorFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class AssetSwapFlowModule {
 
     @Provides
-    private fun provideInitialSwapFlowExecutor(
+    fun provideReselectSwapFlowExecutorFactory(
+        assetsRouter: AssetsRouter,
+        swapSettingsStateProvider: SwapSettingsStateProvider,
+        chainRegistry: ChainRegistry
+    ): ReselectSwapFlowExecutorFactory {
+        return ReselectSwapFlowExecutorFactory(assetsRouter, swapSettingsStateProvider, chainRegistry)
+    }
+
+    @Provides
+    fun provideInitialSwapFlowExecutor(
         assetsRouter: AssetsRouter
     ): InitialSwapFlowExecutor {
         return InitialSwapFlowExecutor(assetsRouter)
     }
 
     @Provides
-    private fun provideSwapExecutor(
-        initialSwapFlowExecutor: InitialSwapFlowExecutor
+    fun provideSwapExecutor(
+        initialSwapFlowExecutor: InitialSwapFlowExecutor,
+        reselectSwapFlowExecutorFactory: ReselectSwapFlowExecutorFactory
     ): SwapFlowExecutorFactory {
-        return SwapFlowExecutorFactory(initialSwapFlowExecutor, initialSwapFlowExecutor)
+        return SwapFlowExecutorFactory(initialSwapFlowExecutor, reselectSwapFlowExecutorFactory)
     }
 
     @Provides
@@ -45,7 +57,7 @@ class AssetSwapFlowModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(AssetSendFlowViewModel::class)
+    @ViewModelKey(AssetSwapFlowViewModel::class)
     fun provideViewModel(
         interactor: AssetSearchInteractor,
         router: AssetsRouter,
@@ -65,7 +77,8 @@ class AssetSwapFlowModule {
             controllableAssetCheck = controllableAssetCheck,
             accountUseCase = accountUseCase,
             resourceManager = resourceManager,
-            swapFlowExecutor = executorFactory.create(payload)
+            swapFlowExecutor = executorFactory.create(payload),
+            payload = payload
         )
     }
 }

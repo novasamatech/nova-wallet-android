@@ -23,7 +23,7 @@ class AssetSwapFlowFragment : AssetFlowFragment<AssetSwapFlowViewModel>() {
 
     override fun initViews() {
         super.initViews()
-        setTitle(R.string.wallet_asset_send)
+        setTitle(viewModel.getTitleRes())
     }
 
     override fun inject() {

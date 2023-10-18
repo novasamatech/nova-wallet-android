@@ -47,6 +47,9 @@ import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragmen
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
+import io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
+import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload.FlowType
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoFragment
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
@@ -69,6 +72,8 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.sel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerFragment
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
+import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
+import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
@@ -333,11 +338,13 @@ class Navigator(
     }
 
     override fun openSwapFlow() {
-        navController?.navigate(R.id.action_mainFragment_to_swapFlow)
+        val payload = SwapFlowPayload(FlowType.INITIAL_SELECTING)
+        navController?.navigate(R.id.action_mainFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))
     }
 
     override fun openSwapSettings(chainId: ChainId, assetId: ChainAssetId) {
-        navController?.navigate(R.id.action_swapFlowFragment_to_swapSettings)
+        val payload = SwapSettingsPayload(chainId, assetId)
+        navController?.navigate(R.id.action_swapFlowFragment_to_swapSettings, SwapMainSettingsFragment.getBundle(payload))
     }
 
     override fun openNfts() {

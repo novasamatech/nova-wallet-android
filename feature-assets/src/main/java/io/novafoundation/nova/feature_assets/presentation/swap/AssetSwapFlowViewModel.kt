@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_assets.presentation.swap
 
+import androidx.annotation.StringRes
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.R
@@ -12,10 +15,13 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGroupedAssetsToUi
 import io.novafoundation.nova.feature_assets.presentation.flow.AssetFlowViewModel
+import io.novafoundation.nova.feature_assets.presentation.fullChainAssetId
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 class AssetSwapFlowViewModel(
     interactor: AssetSearchInteractor,
@@ -25,7 +31,8 @@ class AssetSwapFlowViewModel(
     controllableAssetCheck: ControllableAssetCheckMixin,
     accountUseCase: SelectedAccountUseCase,
     resourceManager: ResourceManager,
-    private val swapFlowExecutor: SwapFlowExecutor
+    private val swapFlowExecutor: SwapFlowExecutor,
+    private val payload: SwapFlowPayload
 ) : AssetFlowViewModel(
     interactor,
     router,
@@ -36,13 +43,25 @@ class AssetSwapFlowViewModel(
     resourceManager,
 ) {
 
+    @StringRes
+    fun getTitleRes(): Int {
+        return when (payload.flowType) {
+            SwapFlowPayload.FlowType.INITIAL_SELECTING,
+            SwapFlowPayload.FlowType.SELECT_ASSET_IN -> R.string.assets_swap_flow_pay_title
+
+            SwapFlowPayload.FlowType.RESELECT_ASSET_OUT -> R.string.assets_swap_flow_receive_title
+        }
+    }
+
     override fun searchAssetsFlow(): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
-        return interactor.searchAssetsFlow(query, externalBalancesFlow)
+        return flowOfAll { interactor.searchSwapAssetsFlow(payload.selectedAsset?.fullChainAssetId, query, externalBalancesFlow, viewModelScope) }
     }
 
     override fun assetClicked(assetModel: AssetModel) {
-        val chainAsset = assetModel.token.configuration
-        swapFlowExecutor.openNextScreen(chainAsset)
+        launch {
+            val chainAsset = assetModel.token.configuration
+            swapFlowExecutor.openNextScreen(viewModelScope, chainAsset)
+        }
     }
 
     override fun mapAssets(assets: Map<AssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<Any> {

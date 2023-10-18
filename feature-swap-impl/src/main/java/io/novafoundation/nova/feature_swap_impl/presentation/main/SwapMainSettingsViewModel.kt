@@ -27,8 +27,8 @@ import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.state.SwapSettings
-import io.novafoundation.nova.feature_swap_impl.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.state.swapSettingsFlow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -42,6 +42,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
@@ -58,6 +59,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import kotlinx.coroutines.flow.firstOrNull
 import kotlin.time.Duration.Companion.milliseconds
 
 sealed class QuotingState {
@@ -77,7 +79,8 @@ class SwapMainSettingsViewModel(
     private val chainRegistry: ChainRegistry,
     private val assetUseCase: ArbitraryAssetUseCase,
     private val swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
-    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory
+    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    private val payload: SwapSettingsPayload
 ) : BaseViewModel() {
 
     private val swapSettingState = async {
@@ -126,6 +129,8 @@ class SwapMainSettingsViewModel(
     val swapDirectionFlipped: MutableLiveData<Event<SwapDirection>> = MutableLiveData()
 
     init {
+        initAssetIn()
+
         handleInputChanges(amountInInput, SwapSettings::assetIn, SwapDirection.SPECIFIED_IN)
         handleInputChanges(amountOutInput, SwapSettings::assetOut, SwapDirection.SPECIFIED_OUT)
 
@@ -140,19 +145,15 @@ class SwapMainSettingsViewModel(
 
     fun selectPayToken() {
         launch {
-            val assets = swapInteractor.availableAssets(viewModelScope)
-            val chainAsset = assets[0].token.configuration
-            val chain = chainRegistry.getChain(chainAsset.chainId)
-
-            swapSettingState().setAssetInUpdatingFee(chainAsset, chain)
+            val outAsset = assetOutFlow.firstOrNull()
+            swapRouter.selectAssetIn(outAsset?.token?.configuration?.fullId)
         }
     }
 
     fun selectReceiveToken() {
         launch {
-            val assets = swapInteractor.availableAssets(viewModelScope)
-            val chainAsset = assets[1].token.configuration
-            swapSettingState().setAssetOut(chainAsset)
+            val inAsset = assetInFlow.firstOrNull()
+            swapRouter.selectAssetOut(inAsset?.token?.configuration?.fullId)
         }
     }
 
@@ -177,6 +178,13 @@ class SwapMainSettingsViewModel(
 
     fun backClicked() {
         swapRouter.back()
+    }
+
+    private fun initAssetIn() {
+        launch {
+            val chainWithAsset = chainRegistry.chainWithAsset(payload.chainId, payload.assetId)
+            swapSettingState().setAssetInUpdatingFee(chainWithAsset.asset, chainWithAsset.chain)
+        }
     }
 
     @OptIn(FlowPreview::class)
@@ -275,7 +283,7 @@ class SwapMainSettingsViewModel(
         tokenOut: (Chain.Asset) -> Token
     ): SwapQuoteArgs? {
         return if (assetIn != null && assetOut != null && amount != null && swapDirection != null) {
-            SwapQuoteArgs(tokenIn(assetIn), tokenOut(assetOut), amount, swapDirection, slippage)
+            SwapQuoteArgs(tokenIn(assetIn!!), tokenOut(assetOut!!), amount!!, swapDirection!!, slippage)
         } else {
             null
         }
