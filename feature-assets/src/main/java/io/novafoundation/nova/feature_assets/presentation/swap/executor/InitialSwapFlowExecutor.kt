@@ -9,5 +9,4 @@ class InitialSwapFlowExecutor(private val assetsRouter: AssetsRouter) : SwapFlow
     override suspend fun openNextScreen(coroutineScope: CoroutineScope, chainAsset: Chain.Asset) {
         assetsRouter.openSwapSettings(chainAsset.chainId, chainAsset.id)
     }
-
 }

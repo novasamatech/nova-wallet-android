@@ -2,11 +2,9 @@ package io.novafoundation.nova.feature_assets.presentation.swap
 
 import android.os.Bundle
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.flow.AssetFlowFragment
-import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowPlaceholder
 
 class AssetSwapFlowFragment : AssetFlowFragment<AssetSwapFlowViewModel>() {
 

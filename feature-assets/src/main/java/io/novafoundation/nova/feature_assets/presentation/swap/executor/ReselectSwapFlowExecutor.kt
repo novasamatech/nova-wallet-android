@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.swap.executor
 
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -21,7 +20,6 @@ class ReselectSwapFlowExecutorFactory(
             chainRegistry
         )
     }
-
 }
 
 class ReselectSwapFlowExecutor(
