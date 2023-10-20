@@ -14,6 +14,7 @@ fun mapNftTypeLocalToTypeKey(
     NftLocal.Type.UNIQUES -> Nft.Type.Key.UNIQUES
     NftLocal.Type.RMRK1 -> Nft.Type.Key.RMRKV1
     NftLocal.Type.RMRK2 -> Nft.Type.Key.RMRKV2
+    NftLocal.Type.NFTS -> Nft.Type.Key.NFTS
 }
 
 fun nftIssuance(nftLocal: NftLocal): Nft.Issuance {
@@ -72,7 +73,7 @@ fun mapNftLocalToNftType(nftLocal: NftLocal): Nft.Type {
     return when (nftLocal.type) {
         NftLocal.Type.UNIQUES -> Nft.Type.Uniques(
             instanceId = nftLocal.instanceId!!.toBigInteger(),
-            collectionId = nftLocal.collectionId.toBigInteger(),
+            collectionId = nftLocal.collectionId.toBigInteger()
         )
         NftLocal.Type.RMRK1 -> Nft.Type.Rmrk1(
             instanceId = nftLocal.instanceId!!,
@@ -80,6 +81,10 @@ fun mapNftLocalToNftType(nftLocal: NftLocal): Nft.Type {
         )
         NftLocal.Type.RMRK2 -> Nft.Type.Rmrk2(
             collectionId = nftLocal.collectionId
+        )
+        NftLocal.Type.NFTS -> Nft.Type.Nfts(
+            instanceId = nftLocal.instanceId!!.toBigInteger(),
+            collectionId = nftLocal.collectionId.toBigInteger()
         )
     }
 }

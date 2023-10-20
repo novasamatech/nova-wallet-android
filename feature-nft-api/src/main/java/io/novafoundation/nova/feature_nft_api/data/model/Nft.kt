@@ -39,10 +39,12 @@ class Nft(
     sealed class Type(val key: Key) {
 
         enum class Key {
-            UNIQUES, RMRKV1, RMRKV2
+            UNIQUES, RMRKV1, RMRKV2, NFTS
         }
 
         class Uniques(val instanceId: BigInteger, val collectionId: BigInteger) : Type(Key.UNIQUES)
+
+        class Nfts(val instanceId: BigInteger, val collectionId: BigInteger) : Type(Key.NFTS)
 
         class Rmrk1(val instanceId: String, val collectionId: String) : Type(Key.RMRKV1)
 

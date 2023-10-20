@@ -12,9 +12,11 @@ import io.novafoundation.nova.feature_nft_impl.data.repository.PendingSendNftTra
 import io.novafoundation.nova.feature_nft_impl.data.source.JobOrchestrator
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvidersRegistry
 import io.novafoundation.nova.feature_nft_impl.data.source.NftTransfersRegistry
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.nfts.NftsNftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV1.RmrkV1NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.RmrkV2NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.UniquesNftProvider
+import io.novafoundation.nova.feature_nft_impl.di.modules.NftsModule
 import io.novafoundation.nova.feature_nft_impl.di.modules.RmrkV1Module
 import io.novafoundation.nova.feature_nft_impl.di.modules.RmrkV2Module
 import io.novafoundation.nova.feature_nft_impl.di.modules.UniquesModule
@@ -26,7 +28,8 @@ import javax.inject.Singleton
     includes = [
         UniquesModule::class,
         RmrkV1Module::class,
-        RmrkV2Module::class
+        RmrkV2Module::class,
+        NftsModule::class,
     ]
 )
 class NftFeatureModule {
@@ -39,9 +42,10 @@ class NftFeatureModule {
     @FeatureScope
     fun provideNftProviderRegistry(
         uniquesNftProvider: UniquesNftProvider,
+        nftsNftProvider: NftsNftProvider,
         rmrkV1NftProvider: RmrkV1NftProvider,
-        rmrkV2NftProvider: RmrkV2NftProvider,
-    ) = NftProvidersRegistry(uniquesNftProvider, rmrkV1NftProvider, rmrkV2NftProvider)
+        rmrkV2NftProvider: RmrkV2NftProvider
+    ) = NftProvidersRegistry(uniquesNftProvider, nftsNftProvider, rmrkV1NftProvider, rmrkV2NftProvider)
 
     @Provides
     @FeatureScope

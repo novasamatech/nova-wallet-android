@@ -6,7 +6,7 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 
-fun ExtrinsicBuilder.statemineNftTransfer(
+fun ExtrinsicBuilder.statemineUniqueTransfer(
     nftType: Nft.Type.Uniques,
     target: AccountId
 ) {
@@ -21,3 +21,17 @@ fun ExtrinsicBuilder.statemineNftTransfer(
     )
 }
 
+fun ExtrinsicBuilder.statemineNftTransfer(
+    nftType: Nft.Type.Nfts,
+    target: AccountId
+) {
+    call(
+        moduleName = Modules.NFTS,
+        callName = "transfer",
+        arguments = mapOf(
+            "collection" to nftType.collectionId,
+            "item" to nftType.instanceId,
+            "dest" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, target)
+        )
+    )
+}

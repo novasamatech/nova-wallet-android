@@ -36,7 +36,7 @@ data class NftLocal(
 ) : Identifiable {
 
     enum class Type {
-        UNIQUES, RMRK1, RMRK2
+        UNIQUES, RMRK1, RMRK2, NFTS
     }
 
     override fun equals(other: Any?): Boolean {

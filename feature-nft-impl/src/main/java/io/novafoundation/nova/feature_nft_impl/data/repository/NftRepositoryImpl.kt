@@ -31,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emitAll
@@ -114,7 +115,8 @@ class NftRepositoryImpl(
             val nftProvider = nftProvidersRegistry.get(nftTypeKey)
 
             emitAll(nftProvider.nftDetailsFlow(nftId))
-        }.catch { throw exceptionHandler.transformException(it) }
+        }
+            .catch { throw exceptionHandler.transformException(it) }
     }
 
     override suspend fun subscribeNftOwnerAccountId(nftId: String): Flow<Pair<AccountId?, NftLocal>> {
@@ -250,5 +252,10 @@ class NftRepositoryImpl(
     override suspend fun getChainForNftId(nftId: String): Chain {
         val chainId = nftDao.getNft(nftId).chainId
         return chainRegistry.getChain(chainId)
+    }
+
+    companion object {
+        private val supportedSendNftTypes = setOf(Nft.Type.Uniques::class, Nft.Type.Nfts::class)
+        private val pendingSendTransactionsNftLocals = MutableStateFlow(setOf<NftLocal>())
     }
 }

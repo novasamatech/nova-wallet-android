@@ -170,6 +170,7 @@ fun RuntimeMetadata.currencies() = module(Modules.CURRENCIES)
 fun RuntimeMetadata.currenciesOrNull() = moduleOrNull(Modules.CURRENCIES)
 fun RuntimeMetadata.crowdloan() = module(Modules.CROWDLOAN)
 fun RuntimeMetadata.uniques() = module(Modules.UNIQUES)
+fun RuntimeMetadata.nfts() = module(Modules.NFTS)
 
 fun RuntimeMetadata.babe() = module(Modules.BABE)
 fun RuntimeMetadata.elections() = module(Modules.ELECTIONS)
@@ -286,6 +287,7 @@ object Modules {
     const val CURRENCIES = "Currencies"
 
     const val UNIQUES = "Uniques"
+    const val NFTS = "Nfts"
 
     const val PARACHAIN_STAKING = "ParachainStaking"
 

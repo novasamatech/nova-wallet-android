@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques
+package io.novafoundation.nova.feature_nft_impl.data.source.providers.nfts
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
@@ -6,12 +6,10 @@ import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
-import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.system
-import io.novafoundation.nova.common.utils.uniques
+import io.novafoundation.nova.common.utils.nfts
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -33,7 +31,6 @@ import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.singleValueOf
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -43,18 +40,13 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import java.math.BigInteger
 
-class UniquesNftProvider(
+class NftsNftProvider(
     private val remoteStorage: StorageDataSource,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
@@ -71,17 +63,17 @@ class UniquesNftProvider(
     ) {
         val accountId = metaAccount.accountIdIn(chain) ?: return
 
-        val newNfts = remoteStorage.query(chain.id, at = at) {
-            val classesWithInstances = runtime.metadata.uniques().storage("Account").keys(accountId)
+        val newNfts = remoteStorage.query(chain.id) {
+            val classesWithInstances = runtime.metadata.nfts().storage("Account").keys(accountId)
                 .map { (_: AccountId, collection: BigInteger, instance: BigInteger) ->
                     listOf(collection, instance)
                 }
 
             val classesIds = classesWithInstances.map { (collection, _) -> collection }.distinct()
 
-            val classMetadataStorage = runtime.metadata.uniques().storage("ClassMetadataOf")
-            val instanceMetadataStorage = runtime.metadata.uniques().storage("InstanceMetadataOf")
-            val classStorage = runtime.metadata.uniques().storage("Class")
+            val classMetadataStorage = runtime.metadata.nfts().storage("CollectionMetadataOf")
+            val instanceMetadataStorage = runtime.metadata.nfts().storage("ItemMetadataOf")
+            val classStorage = runtime.metadata.nfts().storage("Collection")
 
             val multiQueryResults = multi {
                 classStorage.querySingleArgKeys(classesIds)
@@ -111,7 +103,7 @@ class UniquesNftProvider(
                     collectionId = collectionId.toString(),
                     instanceId = instanceId.toString(),
                     metadata = metadata,
-                    type = NftLocal.Type.UNIQUES,
+                    type = NftLocal.Type.NFTS,
                     issuanceTotal = totalIssuances.getValue(collectionId).toInt(),
                     issuanceMyEdition = instanceId.toString(),
                     price = null,
@@ -127,7 +119,7 @@ class UniquesNftProvider(
             }
         }
 
-        nftDao.insertNftsDiff(NftLocal.Type.UNIQUES, metaAccount.id, newNfts, forceOverwrite)
+        nftDao.insertNftsDiff(NftLocal.Type.NFTS, metaAccount.id, newNfts, forceOverwrite)
     }
 
     override suspend fun getCollectionNameAndMedia(
@@ -138,8 +130,8 @@ class UniquesNftProvider(
 
         val classId = collectionId.toBigInteger()
         return remoteStorage.query(chainId) {
-            val classMetadataStorage = runtime.metadata.uniques().storage("ClassMetadataOf")
-            val classStorage = runtime.metadata.uniques().storage("Class")
+            val classMetadataStorage = runtime.metadata.nfts().storage("CollectionMetadataOf")
+            val classStorage = runtime.metadata.nfts().storage("Collection")
 
             val queryResults = multi {
                 classMetadataStorage.queryKey(classId)
@@ -202,7 +194,7 @@ class UniquesNftProvider(
         nftLocal: NftLocal
     ): Flow<AccountId?> {
         return remoteStorage.query(nftLocal.chainId) {
-            val storage = runtime.metadata.uniques().storage("Asset")
+            val storage = runtime.metadata.nfts().storage("Item")
             val key = storage.storageKey(
                 runtime,
                 nftLocal.collectionId.toBigInteger(),
@@ -231,8 +223,8 @@ class UniquesNftProvider(
             val classId = syncedNftLocal.collectionId.toBigInteger()
 
             remoteStorage.query(chain.id) {
-                val classMetadataStorage = runtime.metadata.uniques().storage("ClassMetadataOf")
-                val classStorage = runtime.metadata.uniques().storage("Class")
+                val classMetadataStorage = runtime.metadata.nfts().storage("CollectionMetadataOf")
+                val classStorage = runtime.metadata.nfts().storage("Collection")
 
                 val queryResults = multi {
                     classMetadataStorage.queryKey(classId)
@@ -253,14 +245,11 @@ class UniquesNftProvider(
                     )
                 }
 
-                val classIssuerRaw = queryResults.singleValueOf(classStorage)
-                val classIssuer = bindAccountId(classIssuerRaw.cast<Struct.Instance>()["issuer"])
-
                 NftDetails(
                     identifier = syncedNftLocal.identifier,
                     chain = chain,
                     owner = metaAccount.requireAccountIdIn(chain),
-                    creator = classIssuer,
+                    creator = null,
                     media = syncedNftLocal.media,
                     name = mapNftNameForUi(syncedNftLocal.name, syncedNftLocal.instanceId),
                     description = syncedNftLocal.label,
@@ -284,14 +273,14 @@ class UniquesNftProvider(
     private fun identifier(chainId: ChainId, collectionId: BigInteger, instanceId: BigInteger): String {
         return "$chainId-$collectionId-$instanceId"
     }
-    
+
     private fun bindNftOwnerAccountId(scale: String?, runtime: RuntimeSnapshot): AccountId? {
         return scale?.let { bindOrmlAccountData(it, runtime) }
     }
 
     @UseCaseBinding
-    fun bindOrmlAccountData(scale: String, runtime: RuntimeSnapshot): AccountId {
-        val type = runtime.metadata.uniques().storage("Asset").returnType()
+    private fun bindOrmlAccountData(scale: String, runtime: RuntimeSnapshot): AccountId {
+        val type = runtime.metadata.nfts().storage("Item").returnType()
 
         val dynamicInstance = type.fromHexOrNull(runtime, scale).cast<Struct.Instance>()
 

@@ -9,7 +9,7 @@ sealed class NftTypeParcel(val key: Key) : Parcelable {
 
     @Parcelize
     enum class Key : Parcelable {
-        UNIQUES, RMRKV1, RMRKV2
+        UNIQUES, RMRKV1, RMRKV2, NFTS
     }
 
     @Parcelize
@@ -20,6 +20,9 @@ sealed class NftTypeParcel(val key: Key) : Parcelable {
 
     @Parcelize
     class Rmrk2(val collectionId: String) : NftTypeParcel(Key.RMRKV2)
+
+    @Parcelize
+    class Nfts(val instanceId: BigInteger, val collectionId: BigInteger) : NftTypeParcel(Key.NFTS)
 }
 
 fun Nft.Type.mapToParcel(): NftTypeParcel {
@@ -27,6 +30,7 @@ fun Nft.Type.mapToParcel(): NftTypeParcel {
         is Nft.Type.Rmrk1 -> NftTypeParcel.Rmrk1(instanceId, collectionId)
         is Nft.Type.Rmrk2 -> NftTypeParcel.Rmrk2(collectionId)
         is Nft.Type.Uniques -> NftTypeParcel.Uniques(instanceId, collectionId)
+        is Nft.Type.Nfts -> NftTypeParcel.Nfts(instanceId, collectionId)
     }
 }
 
@@ -35,5 +39,6 @@ fun NftTypeParcel.mapToDomain(): Nft.Type {
         is NftTypeParcel.Rmrk1 -> Nft.Type.Rmrk1(instanceId, collectionId)
         is NftTypeParcel.Rmrk2 -> Nft.Type.Rmrk2(collectionId)
         is NftTypeParcel.Uniques -> Nft.Type.Uniques(instanceId, collectionId)
+        is NftTypeParcel.Nfts -> Nft.Type.Nfts(instanceId, collectionId)
     }
 }
