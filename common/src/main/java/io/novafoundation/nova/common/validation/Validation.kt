@@ -58,6 +58,18 @@ fun <T> T.validationError(): ValidationStatus.NotValid<T> = ValidationStatus.Not
 @JvmName("validationWarningReceiver")
 fun <T> T.validationWarning(): ValidationStatus.NotValid<T> = ValidationStatus.NotValid(DefaultFailureLevel.WARNING, this)
 
+fun ValidationStatus.NotValid<*>.isError() = this.level == DefaultFailureLevel.ERROR
+
+fun ValidationStatus.NotValid<*>.isWarning() = this.level == DefaultFailureLevel.WARNING
+
+fun <T> ValidationStatus<T>.notValidOrNull(): ValidationStatus.NotValid<T>? {
+    if (this is ValidationStatus.NotValid) {
+        return this
+    }
+
+    return null
+}
+
 enum class DefaultFailureLevel(override val value: Int) : ValidationStatus.NotValid.Level {
     WARNING(1), ERROR(2)
 }

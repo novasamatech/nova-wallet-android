@@ -13,6 +13,8 @@ import io.novafoundation.nova.feature_swap_impl.domain.swap.RealSwapService
 import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSettingsState
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_swap_impl.domain.slippage.RealSlippageRepository
+import io.novafoundation.nova.feature_swap_impl.domain.slippage.SlippageRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -51,8 +53,14 @@ class SwapFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideSwapSettingsSharedState(): RealSwapSettingsState {
-        return RealSwapSettingsState()
+    fun provideSlippageRepository(): SlippageRepository {
+        return RealSlippageRepository()
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSwapSettingsSharedState(slippageRepository: SlippageRepository): RealSwapSettingsState {
+        return RealSwapSettingsState(slippageRepository)
     }
 
     @Provides
@@ -76,8 +84,9 @@ class SwapFeatureModule {
     @Provides
     @FeatureScope
     fun provideSwapSettingsStoreProvider(
-        computationalCache: ComputationalCache
+        computationalCache: ComputationalCache,
+        slippageRepository: SlippageRepository
     ): SwapSettingsStateProvider {
-        return RealSwapSettingsStateProvider(computationalCache)
+        return RealSwapSettingsStateProvider(computationalCache, slippageRepository)
     }
 }

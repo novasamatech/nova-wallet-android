@@ -10,4 +10,6 @@ interface SwapRouter : ReturnableRouter {
     fun selectAssetIn(selectedAsset: FullChainAssetId?)
 
     fun selectAssetOut(selectedAsset: FullChainAssetId?)
+
+    fun openSwapOptions()
 }

@@ -55,6 +55,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
     override fun initViews() {
         swapMainSettingsToolbar.applyStatusBarInsets()
         swapMainSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        swapMainSettingsToolbar.setRightActionClickListener { viewModel.openOptions() }
 
         swapMainSettingsMaxAmountButton.setOnClickListener { viewModel.maxTokens() }
         swapMainSettingsPayInput.setOnClickListener { viewModel.selectPayToken() }

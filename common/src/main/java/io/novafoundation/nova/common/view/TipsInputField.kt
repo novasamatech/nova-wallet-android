@@ -1,0 +1,171 @@
+package io.novafoundation.nova.common.view
+
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.PointF
+import android.text.method.DigitsKeyListener
+import android.util.AttributeSet
+import android.view.Gravity
+import android.view.View
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.core.view.isVisible
+import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.onTextChanged
+import io.novafoundation.nova.common.utils.setImageTintRes
+import io.novafoundation.nova.common.utils.useAttributes
+import io.novafoundation.nova.common.view.shape.getInputBackground
+import io.novafoundation.nova.common.view.shape.getInputBackgroundError
+import kotlinx.android.synthetic.main.view_tips_input.view.tipsInputClear
+import kotlinx.android.synthetic.main.view_tips_input.view.tipsInputContainer
+import kotlinx.android.synthetic.main.view_tips_input.view.tipsInputError
+import kotlinx.android.synthetic.main.view_tips_input.view.tipsInputField
+import kotlinx.android.synthetic.main.view_tips_input.view.tipsInputFieldContainer
+
+class TipsInputField @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyle: Int = 0,
+) : LinearLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
+
+    private var postfix: String? = null
+    private var postfixPadding = 4.dp
+    private var postfixPosition: PointF? = null
+
+    private val textPaint: Paint
+
+    val content: EditText
+        get() = tipsInputField
+
+    init {
+        orientation = VERTICAL
+        View.inflate(context, R.layout.view_tips_input, this)
+        tipsInputFieldContainer.setAddStatesFromChildren(true)
+        tipsInputFieldContainer.background = context.getInputBackground()
+
+        content.onTextChanged {
+            tipsInputClear.isVisible = it.isNotEmpty()
+            tipsInputContainer.isVisible = it.isEmpty()
+            measurePostfix(it)
+            invalidate()
+        }
+
+        textPaint = Paint(content.paint).apply {
+            color = content.currentTextColor
+        }
+
+        tipsInputClear.setOnClickListener { content.text = null }
+
+        attrs?.let(::applyAttributes)
+        setWillNotDraw(false)
+    }
+
+    private fun measurePostfix(text: String) {
+        if (text.isEmpty() || postfix == null) {
+            postfixPosition = null
+            return
+        }
+
+        val textWidth = content.paint.measureText(text, 0, text.length)
+        val textLeft = content.paddingLeft.toFloat()
+        postfixPosition = PointF(
+            content.x + textLeft + textWidth,
+            content.y + content.baseline.toFloat()
+        )
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        if (postfix != null && postfixPosition != null) {
+            canvas.drawText(postfix!!, postfixPosition!!.x + postfixPadding, postfixPosition!!.y, textPaint)
+        }
+    }
+
+    fun setHint(hint: String) {
+        content.hint = hint
+    }
+
+    fun addIconTip(@DrawableRes iconRes: Int, @ColorRes tintRes: Int? = null, onClick: OnClickListener): View {
+        val view = ImageView(context)
+        prepareCommonOptions(view, onClick)
+        view.setImageResource(iconRes)
+        view.setPadding(8.dp, 0.dp, 8.dp, 0.dp)
+        view.setImageTintRes(tintRes)
+        view.scaleType = ImageView.ScaleType.CENTER_INSIDE
+        tipsInputContainer.addView(view)
+        return view
+    }
+
+    fun addTextTip(text: String, @ColorRes tintRes: Int? = null, onClick: OnClickListener): View {
+        val view = TextView(context)
+        prepareCommonOptions(view, onClick)
+        view.text = text
+        view.setTextAppearance(R.style.TextAppearance_NovaFoundation_SemiBold_Footnote)
+        view.setPadding(12.dp, 0.dp, 12.dp, 0.dp)
+        tintRes?.let { view.setTextColor(context.getColor(it)) }
+        view.gravity = Gravity.CENTER
+        tipsInputContainer.addView(view)
+        return view
+    }
+
+    private fun prepareCommonOptions(view: View, onClick: OnClickListener) {
+        view.background = buttonBackground()
+        view.layoutParams = MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT).apply {
+            marginStart = 4.dp
+            marginEnd = 4.dp
+        }
+        view.setOnClickListener(onClick)
+    }
+
+    fun setError(error: String?) {
+        if (error == null) {
+            setErrorEnabled(false)
+        } else {
+            setErrorEnabled(true)
+            setErrorText(error)
+        }
+    }
+
+    fun setErrorEnabled(enabled: Boolean) {
+        tipsInputError.isVisible = enabled
+        if (enabled) {
+            val color = context.getColor(R.color.text_negative)
+            content.setTextColor(color)
+            textPaint.color = color
+            tipsInputFieldContainer.background = context.getInputBackgroundError()
+        } else {
+            val color = context.getColor(R.color.text_primary)
+            content.setTextColor(color)
+            textPaint.color = color
+            tipsInputFieldContainer.background = context.getInputBackground()
+        }
+        invalidate()
+    }
+
+    fun setErrorText(error: String) {
+        tipsInputError.text = error
+    }
+
+    private fun buttonBackground() = addRipple(getRoundedCornerDrawable(R.color.button_background_secondary))
+
+    private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.TipsInputField) {
+        val hint = it.getString(R.styleable.TipsInputField_android_hint)
+        hint?.let { content.hint = hint }
+
+        postfix = it.getString(R.styleable.TipsInputField_postfix)
+
+        val digits = it.getString(R.styleable.TipsInputField_android_digits)
+        digits?.let {
+            content.keyListener = DigitsKeyListener.getInstance("0123456789.")
+        }
+
+        val inputType = it.getInt(R.styleable.TipsInputField_android_inputType, 0)
+        content.setRawInputType(inputType)
+    }
+}

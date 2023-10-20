@@ -308,6 +308,9 @@ inline fun <T> EditText.bindTo(
             if (text.toString() != inputString) {
                 removeTextChangedListener(textWatcher)
                 setText(inputString)
+                if (hasFocus()) {
+                    setSelection(inputString.length)
+                }
                 addTextChangedListener(textWatcher)
             }
         }

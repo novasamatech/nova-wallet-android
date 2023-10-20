@@ -320,6 +320,10 @@ class SwapMainSettingsViewModel(
 
     private suspend fun Flow<Asset>.ensureToken(asset: Chain.Asset) = first { it.token.configuration.fullId == asset.fullId }.token
 
+    fun openOptions() {
+        swapRouter.openSwapOptions()
+    }
+
     private val amountInputFormatter = CompoundNumberFormatter(
         abbreviations = listOf(
             NumberAbbreviation(

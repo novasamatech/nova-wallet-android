@@ -269,4 +269,11 @@
         <attr name="SlideShowView_slideDelayMillis" format="integer" />
     </declare-styleable>
 
+    <declare-styleable name="TipsInputField">
+        <attr name="android:hint" />
+        <attr name="postfix" format="string" />
+        <attr name="android:digits" />
+        <attr name="android:inputType" />
+    </declare-styleable>
+
 </resources>
