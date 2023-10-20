@@ -176,7 +176,7 @@ class BalanceListFragment :
     }
 
     override fun crowdloanBannerClicked() {
-       viewModel.crowdloanBannerClicked()
+        viewModel.crowdloanBannerClicked()
     }
 
     override fun crowdloanBannerCloseClicked() {

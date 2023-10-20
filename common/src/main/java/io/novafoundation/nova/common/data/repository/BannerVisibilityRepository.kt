@@ -23,7 +23,7 @@ internal class RealBannerVisibilityRepository(
 ) : BannerVisibilityRepository {
 
     override fun shouldShowBannerFlow(tag: BannerTag): Flow<Boolean> {
-       return preferences.booleanFlow(prefsTag(tag), defaultValue = SHOW_BANNER_DEFAULT)
+        return preferences.booleanFlow(prefsTag(tag), defaultValue = SHOW_BANNER_DEFAULT)
     }
 
     override suspend fun hideBanner(tag: BannerTag) = withContext(Dispatchers.IO) {
@@ -35,6 +35,6 @@ internal class RealBannerVisibilityRepository(
     }
 
     private fun prefsTag(bannerTag: BannerTag): String {
-        return "BannerVisibilityRepository.${bannerTag}"
+        return "BannerVisibilityRepository.$bannerTag"
     }
 }

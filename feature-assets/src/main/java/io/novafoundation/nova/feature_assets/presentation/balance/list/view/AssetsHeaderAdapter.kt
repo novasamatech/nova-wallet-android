@@ -130,9 +130,14 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
 
     override fun onBindViewHolder(holder: HeaderHolder, position: Int) {
         holder.bind(
-            totalBalance, selectedWalletModel, nftCountLabel,
-            nftPreviews, shouldShowPlaceholder, walletConnectModel,
-            filterIconRes, crowdloanBannerVisible
+            totalBalance,
+            selectedWalletModel,
+            nftCountLabel,
+            nftPreviews,
+            shouldShowPlaceholder,
+            walletConnectModel,
+            filterIconRes,
+            crowdloanBannerVisible
         )
     }
 
