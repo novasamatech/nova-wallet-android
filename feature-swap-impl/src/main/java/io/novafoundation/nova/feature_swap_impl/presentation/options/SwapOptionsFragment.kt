@@ -55,5 +55,6 @@ class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel>() {
         viewModel.buttonState.observe { swapOptionsApplyButton.setState(it) }
         viewModel.slippageErrorState.observe { swapOptionsSlippageInput.setError(it) }
         viewModel.slippageWarningState.observe { swapOptionsAlert.setTextOrHide(it) }
+        viewModel.resetButtonEnabled.observe { swapOptionsToolbar.setRightActionEnabled(it) }
     }
 }

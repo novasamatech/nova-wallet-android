@@ -61,6 +61,10 @@ class SwapOptionsViewModel(
 
     val slippageErrorState = slippageInputValidationStatus.map { formatSlippageError(it) }
 
+    val resetButtonEnabled = combine(slippageInput, swapSettingsStateFlow) { input, settings ->
+        formatResetButtonVisibility(input, settings)
+    }
+
     val buttonState = combine(slippageInput, swapSettingsStateFlow, slippageInputValidationStatus) { input, state, validationStatus ->
         formatButtonState(input, state, validationStatus)
     }
@@ -84,6 +88,22 @@ class SwapOptionsViewModel(
 
     fun tipClicked(index: Int) {
         slippageInput.value = slippageTips[index].formatWithoutSymbol()
+    }
+
+    fun applyClicked() {
+        launch {
+            val slippage = slippageInput.value.formatToPercent()
+            swapSettingState.await().setSlippage(slippage)
+            swapRouter.back()
+        }
+    }
+
+    fun resetClicked() {
+        slippageInput.value = ""
+    }
+
+    fun backClicked() {
+        backClicked()
     }
 
     private fun String.formatToPercent(): Percent {
@@ -152,19 +172,7 @@ class SwapOptionsViewModel(
         }
     }
 
-    fun applyClicked() {
-        launch {
-            val slippage = slippageInput.value.formatToPercent()
-            swapSettingState.await().setSlippage(slippage)
-            swapRouter.back()
-        }
-    }
-
-    fun resetClicked() {
-        slippageInput.value = ""
-    }
-
-    fun backClicked() {
-        backClicked()
+    private fun formatResetButtonVisibility(slippageInput: String, settings: SwapSettings): Boolean {
+        return slippageInput.formatToPercent() != settings.slippage
     }
 }
