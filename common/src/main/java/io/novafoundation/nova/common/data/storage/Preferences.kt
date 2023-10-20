@@ -38,6 +38,11 @@ interface Preferences {
         initialValueProducer: InitialValueProducer<String>? = null
     ): Flow<String?>
 
+    fun booleanFlow(
+        field: String,
+        defaultValue: Boolean
+    ): Flow<Boolean>
+
     fun keyFlow(key: String): Flow<String>
 
     fun keysFlow(vararg keys: String): Flow<List<String>>

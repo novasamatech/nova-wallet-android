@@ -60,4 +60,6 @@ interface AssetsRouter {
     fun openWalletConnectSessions(metaId: Long)
 
     fun openWalletConnectScan()
+
+    fun openStaking()
 }

@@ -102,7 +102,7 @@ class DelegateListViewModel(
         router.openDelegateSearch()
     }
 
-    fun closeBanner() {
+    fun closeBanner() = launch {
         interactor.hideDelegationBanner()
     }
 }
