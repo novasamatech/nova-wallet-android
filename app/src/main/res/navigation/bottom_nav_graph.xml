@@ -26,6 +26,9 @@
 
     <include app:graph="@navigation/staking_dashboard_graph"  />
 
+    <action android:id="@+id/action_open_staking"
+        app:destination="@+id/staking_dashboard_graph" />
+
     <fragment
         android:id="@+id/walletFragment"
         tools:layout="@layout/fragment_balance_list"

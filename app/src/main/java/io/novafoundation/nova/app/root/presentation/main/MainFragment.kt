@@ -9,7 +9,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.NavigationUI.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.di.RootApi
@@ -73,10 +72,6 @@ class MainFragment : BaseFragment<MainViewModel>() {
         stakingDashboardNavigator.setStakingTabNavController(navController!!)
 
         bottomNavigationView.setupWithNavController(navController!!)
-
-        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
-            onNavDestinationSelected(item, navController!!)
-        }
         bottomNavigationView.itemIconTintList = null
 
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)

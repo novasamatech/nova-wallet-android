@@ -127,6 +127,8 @@ class BalanceListFragment :
         }
 
         viewModel.filtersIndicatorIcon.observe(headerAdapter::setFilterIconRes)
+
+        viewModel.shouldShowCrowdloanBanner.observe(headerAdapter::setCrowdloanBannerVisible)
     }
 
     override fun assetClicked(asset: AssetModel) {
@@ -171,5 +173,13 @@ class BalanceListFragment :
 
     override fun buyClicked() {
         viewModel.buyClicked()
+    }
+
+    override fun crowdloanBannerClicked() {
+       viewModel.crowdloanBannerClicked()
+    }
+
+    override fun crowdloanBannerCloseClicked() {
+        viewModel.crowdloanBannerCloseClicked()
     }
 }

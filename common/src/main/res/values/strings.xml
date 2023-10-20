@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="assets_crowdloan_unlock_banner_title">Boost your DOT 🚀</string>
+    <string name="assets_crowdloan_unlock_banner_description">Received your DOT back from crowdloans? Start staking your DOT today to get the maximum possible rewards!</string>
 
     <string name="buy_provider_open_confirmation_title">Continue in browser?</string>
     <string name="buy_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>

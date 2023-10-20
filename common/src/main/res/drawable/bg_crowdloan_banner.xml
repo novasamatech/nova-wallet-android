@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <corners android:radius="@dimen/border_radius" />
+
+    <gradient
+        android:startColor="@color/crowdloan_banner_gradient_start"
+        android:endColor="@color/crowdloan_banner_gradient_end"
+        android:angle="0" />
+</shape>
