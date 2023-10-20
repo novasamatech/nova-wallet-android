@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.TransformedFailure.Default
 import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
+import io.novafoundation.nova.common.validation.asDefault
 import io.novafoundation.nova.feature_account_api.domain.validation.handleSystemAccountValidationFailure
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
@@ -13,6 +14,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpik
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
 import kotlinx.coroutines.CoroutineScope
 
 fun CoroutineScope.mapAssetTransferValidationFailureToUI(
@@ -75,10 +77,10 @@ fun CoroutineScope.mapAssetTransferValidationFailureToUI(
                 )
         )
 
-        is AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED -> Default(
-            resourceManager.getString(R.string.common_not_enough_funds_title) to
-                resourceManager.getString(R.string.wallet_send_insufficient_balance_commission, reason.commissionAsset.symbol)
-        )
+        is AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED -> handleInsufficientBalanceCommission(
+            reason,
+            resourceManager
+        ).asDefault()
 
         AssetTransferValidationFailure.RecipientCannotAcceptTransfer -> Default(
             resourceManager.getString(R.string.wallet_send_recipient_blocked_title) to
@@ -107,10 +109,12 @@ fun autoFixSendValidationPayload(
             amount = payload.transfer.amount + failureReason.dust
         )
     )
+
     is AssetTransferValidationFailure.FeeChangeDetected -> payload.copy(
         transfer = payload.transfer.copy(
             decimalFee = failureReason.payload.newFee
         )
     )
+
     else -> payload
 }

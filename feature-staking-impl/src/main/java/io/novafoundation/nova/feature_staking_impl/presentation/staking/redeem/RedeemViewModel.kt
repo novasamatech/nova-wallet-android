@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
@@ -42,7 +41,6 @@ class RedeemViewModel(
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val externalActions: ExternalActions.Presentation,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
-    private val payload: RedeemPayload,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
@@ -126,16 +124,14 @@ class RedeemViewModel(
     }
 
     private fun sendTransaction(redeemValidationPayload: RedeemValidationPayload) = launch {
-        val result = redeemInteractor.redeem(accountStakingFlow.first(), redeemValidationPayload.asset)
+        redeemInteractor.redeem(accountStakingFlow.first(), redeemValidationPayload.asset)
+            .onSuccess { redeemConsequences ->
+                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+
+                router.finishRedeemFlow(redeemConsequences)
+            }
+            .onFailure(::showError)
 
         _showNextProgress.value = false
-
-        if (result.isSuccess) {
-            showMessage(resourceManager.getString(R.string.common_transaction_submitted))
-
-            router.back()
-        } else {
-            showError(result.requireException())
-        }
     }
 }

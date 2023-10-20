@@ -99,8 +99,9 @@ class NominationPoolsClaimRewardsViewModel(
 
         val payload = NominationPoolsClaimRewardsValidationPayload(
             fee = feeLoaderMixin.awaitFee(),
+            pendingRewardsPlanks = pendingRewards.first(),
             asset = assetFlow.first(),
-            pendingRewardsPlanks = pendingRewards.first()
+            chain = stakingSharedState.chain()
         )
 
         validationExecutor.requireValid(

@@ -14,8 +14,8 @@ import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateS
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_assets.BuildConfig
 import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
+import io.novafoundation.nova.feature_assets.data.buyToken.providers.BanxaProvider
 import io.novafoundation.nova.feature_assets.data.buyToken.providers.MercuryoProvider
-import io.novafoundation.nova.feature_assets.data.buyToken.providers.RampProvider
 import io.novafoundation.nova.feature_assets.data.buyToken.providers.TransakProvider
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_assets.data.repository.RealTransactionHistoryRepository
@@ -94,6 +94,12 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideBanxaProvider(): BanxaProvider {
+        return BanxaProvider(BuildConfig.BANXA_HOST)
+    }
+
+    @Provides
+    @FeatureScope
     fun provideMercuryoProvider(): MercuryoProvider {
         return MercuryoProvider(
             host = BuildConfig.MERCURYO_HOST,
@@ -116,24 +122,15 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideRampProvider(): RampProvider {
-        return RampProvider(
-            host = BuildConfig.RAMP_HOST,
-            apiToken = BuildConfig.RAMP_TOKEN,
-        )
-    }
-
-    @Provides
-    @FeatureScope
     fun provideBuyTokenIntegration(
-        rampProvider: RampProvider,
         transakProvider: TransakProvider,
-        mercuryoProvider: MercuryoProvider
+        mercuryoProvider: MercuryoProvider,
+        banxaProvider: BanxaProvider
     ): BuyTokenRegistry {
         return BuyTokenRegistry(
             providers = listOf(
-                rampProvider,
                 transakProvider,
+                banxaProvider,
                 mercuryoProvider
             )
         )

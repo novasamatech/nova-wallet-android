@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.NominationPoolsUnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.stakedBalance
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationPayload
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -35,6 +37,7 @@ class NominationPoolsSetupUnbondViewModel(
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: NominationPoolsUnbondValidationSystem,
+    private val stakingSharedState: StakingSharedState,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     assetUseCase: AssetUseCase,
     hintsFactory: NominationPoolsUnbondHintsFactory,
@@ -112,7 +115,8 @@ class NominationPoolsSetupUnbondViewModel(
             stakedBalance = stakedBalance,
             asset = asset,
             sharedComputationScope = viewModelScope,
-            amount = amountChooserMixin.amount.first()
+            amount = amountChooserMixin.amount.first(),
+            chain = stakingSharedState.chain()
         )
 
         validationExecutor.requireValid(

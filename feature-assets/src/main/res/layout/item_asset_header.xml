@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="16dp"
-    android:clipToPadding="false">
+    android:clipToPadding="false"
+    android:paddingHorizontal="16dp">
 
     <io.novafoundation.nova.feature_account_api.view.WalletConnectCounterView
         android:id="@+id/balanceListWalletConnect"
@@ -20,12 +20,12 @@
         style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="33dp"
         android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="33dp"
         android:ellipsize="end"
+        android:gravity="center"
         android:includeFontPadding="false"
         android:singleLine="true"
-        android:gravity="center"
         android:textColor="@color/text_primary"
         app:layout_constraintEnd_toStartOf="@+id/balanceListAvatar"
         app:layout_constraintHorizontal_bias="0"
@@ -90,11 +90,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:src="@drawable/ic_filter"
+        android:src="@drawable/ic_chip_filter"
         app:layout_constraintBottom_toBottomOf="@+id/balanceListManage"
         app:layout_constraintEnd_toStartOf="@+id/balanceListManage"
-        app:layout_constraintTop_toTopOf="@+id/balanceListManage"
-        app:tint="@color/chip_icon" />
+        app:layout_constraintTop_toTopOf="@+id/balanceListManage" />
 
     <io.novafoundation.nova.common.view.IconButton
         android:id="@+id/balanceListManage"

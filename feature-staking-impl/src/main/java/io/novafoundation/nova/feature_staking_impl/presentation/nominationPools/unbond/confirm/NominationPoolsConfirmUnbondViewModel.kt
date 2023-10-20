@@ -107,7 +107,8 @@ class NominationPoolsConfirmUnbondViewModel(
             poolMember = poolMemberFlow.first(),
             asset = asset,
             stakedBalance = stakedBalance,
-            sharedComputationScope = viewModelScope
+            sharedComputationScope = viewModelScope,
+            chain = stakingSharedState.chain()
         )
 
         validationExecutor.requireValid(

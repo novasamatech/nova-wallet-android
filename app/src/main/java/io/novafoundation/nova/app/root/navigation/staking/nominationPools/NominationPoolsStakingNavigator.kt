@@ -34,6 +34,7 @@ class NominationPoolsStakingNavigator(
     override fun openSetupUnbond() = performNavigation(R.id.action_stakingFragment_to_PoolsUnbondGraph)
 
     override fun returnToStakingMain() = performNavigation(R.id.back_to_staking_main)
+
     override fun returnToMain() {
         commonNavigator.returnToMain()
     }

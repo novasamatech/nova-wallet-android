@@ -218,14 +218,6 @@
         "coingeckoId": "inr"
     },
     {
-        "code": "KDW",
-        "name": "Kuwaiti Dinar",
-        "category": "fiat",
-        "popular": false,
-        "id": 25,
-        "coingeckoId": "kdw"
-    },
-    {
         "code": "LKR",
         "name": "Sri Lankan Rupee",
         "category": "fiat",

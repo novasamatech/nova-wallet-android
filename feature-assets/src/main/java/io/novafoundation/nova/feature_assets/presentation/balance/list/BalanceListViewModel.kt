@@ -90,6 +90,8 @@ class BalanceListViewModel(
 
     private val filteredAssetsFlow = walletInteractor.filterAssets(assetsFlow)
 
+    private val isFiltersEnabledFlow = walletInteractor.isFiltersEnabledFlow()
+
     private val accountChangeSyncActions: List<SyncAction> = listOf(
         walletInteractor::syncNfts
     )
@@ -153,6 +155,10 @@ class BalanceListViewModel(
 
     val walletConnectAccountSessionsUI = walletConnectAccountSessionCount
         .map(::mapNumberOfActiveSessionsToUi)
+        .shareInBackground()
+
+    val filtersIndicatorIcon = isFiltersEnabledFlow
+        .map { if (it) R.drawable.ic_chip_filter_indicator else R.drawable.ic_chip_filter }
         .shareInBackground()
 
     init {

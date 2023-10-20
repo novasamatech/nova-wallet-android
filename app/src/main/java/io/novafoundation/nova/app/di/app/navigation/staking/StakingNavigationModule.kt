@@ -34,8 +34,8 @@ class StakingNavigationModule {
     fun provideStartMultiStakingRouter(
         navigationHolder: NavigationHolder,
         dashboardRouter: StakingDashboardRouter,
-        commonNavigationHolder: Navigator
+        commonNavigator: Navigator
     ): StartMultiStakingRouter {
-        return StartMultiStakingNavigator(navigationHolder, dashboardRouter, commonNavigationHolder)
+        return StartMultiStakingNavigator(navigationHolder, dashboardRouter, commonNavigator)
     }
 }

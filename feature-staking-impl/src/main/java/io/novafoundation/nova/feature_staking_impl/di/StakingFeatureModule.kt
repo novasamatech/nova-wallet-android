@@ -172,7 +172,8 @@ class StakingFeatureModule {
         accountRepository: AccountRepository,
         bagListRepository: BagListRepository,
         totalIssuanceRepository: TotalIssuanceRepository,
-        eraTimeCalculatorFactory: EraTimeCalculatorFactory
+        eraTimeCalculatorFactory: EraTimeCalculatorFactory,
+        stakingConstantsRepository: StakingConstantsRepository
     ) = StakingSharedComputation(
         stakingRepository = stakingRepository,
         computationalCache = computationalCache,
@@ -180,7 +181,8 @@ class StakingFeatureModule {
         accountRepository = accountRepository,
         bagListRepository = bagListRepository,
         totalIssuanceRepository = totalIssuanceRepository,
-        eraTimeCalculatorFactory = eraTimeCalculatorFactory
+        eraTimeCalculatorFactory = eraTimeCalculatorFactory,
+        stakingConstantsRepository = stakingConstantsRepository
     )
 
     @Provides

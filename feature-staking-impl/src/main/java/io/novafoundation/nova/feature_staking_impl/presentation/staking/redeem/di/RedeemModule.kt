@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.reedeem.RedeemValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.RedeemPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.RedeemViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
@@ -38,7 +37,6 @@ class RedeemModule {
         iconGenerator: AddressIconGenerator,
         externalActions: ExternalActions.Presentation,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
-        payload: RedeemPayload,
         singleAssetSharedState: StakingSharedState,
         walletUiUseCase: WalletUiUseCase
     ): ViewModel {
@@ -53,7 +51,6 @@ class RedeemModule {
             feeLoaderMixin = feeLoaderMixin,
             externalActions = externalActions,
             selectedAssetState = singleAssetSharedState,
-            payload = payload,
             walletUiUseCase = walletUiUseCase
         )
     }
