@@ -75,7 +75,7 @@ class ManageChainTokensViewHolder(
         }
 
         with(containerView) {
-            val contentColorRes = if (item.enabled) R.color.text_primary else R.color.text_secondary
+            val contentColorRes = if (item.enabled) R.color.text_primary else R.color.text_tertiary
             itemManageChainTokenChainName.setTextColorRes(contentColorRes)
         }
     }

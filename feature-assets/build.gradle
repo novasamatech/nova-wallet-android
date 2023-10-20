@@ -27,6 +27,8 @@ android {
         buildConfigField "String", "MERCURYO_WIDGET_ID", "\"fde83da2-2a4c-4af9-a2ca-30aead5d65a0\""
         buildConfigField "String", "MERCURYO_SECRET", readStringSecret("MERCURYO_TEST_SECRET")
         buildConfigField "String", "MERCURYO_HOST", "\"sandbox-exchange.mrcr.io\""
+
+        buildConfigField "String", "BANXA_HOST", "\"novawallet.banxa-sandbox.com\""
     }
 
     buildTypes {
@@ -45,6 +47,8 @@ android {
             buildConfigField "String", "MERCURYO_SECRET", readStringSecret("MERCURYO_PRODUCTION_SECRET")
             buildConfigField "String", "MERCURYO_HOST", "\"exchange.mercuryo.io\""
 
+            buildConfigField "String", "BANXA_HOST", "\"novawallet.banxa.com\""
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -57,6 +61,7 @@ android {
 
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
     }
 }
 
@@ -69,6 +74,7 @@ dependencies {
     implementation project(':feature-currency-api')
     implementation project(':feature-crowdloan-api')
     implementation project(':feature-wallet-connect-api')
+    implementation project(':feature-staking-api')
     implementation project(':web3names')
     implementation project(':runtime')
 

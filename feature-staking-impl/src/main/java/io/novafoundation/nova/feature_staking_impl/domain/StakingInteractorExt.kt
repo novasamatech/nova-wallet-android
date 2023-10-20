@@ -63,19 +63,21 @@ fun minimumStake(
     exposures: Collection<Exposure>,
     minimumNominatorBond: BigInteger,
     bagListLocator: BagListLocator?,
+    maxNominatorsInValidator: Int,
     bagListScoreConverter: BagListScoreConverter,
     bagListSize: BigInteger?,
     maxElectingVoters: BigInteger?
 ): BigInteger {
-    if (bagListSize != null && maxElectingVoters != null && bagListSize < maxElectingVoters) return minimumNominatorBond
+    if (bagListSize == null || maxElectingVoters == null || bagListSize < maxElectingVoters) return minimumNominatorBond
 
     val stakeByNominator = exposures
         .fold(mutableMapOf<AccountIdKey, BigInteger>()) { acc, exposure ->
-            exposure.others.forEach { individualExposure ->
-                val key = individualExposure.who.intoKey()
-                val currentExposure = acc.getOrDefault(key, BigInteger.ZERO)
-                acc[key] = currentExposure + individualExposure.value
-            }
+            exposure.others
+                .forEach { individualExposure ->
+                    val key = individualExposure.who.intoKey()
+                    val currentExposure = acc.getOrDefault(key, BigInteger.ZERO)
+                    acc[key] = currentExposure + individualExposure.value
+                }
 
             acc
         }

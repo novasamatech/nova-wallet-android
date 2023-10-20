@@ -216,7 +216,7 @@ class PolkadotExternalSignInteractor(
                 signer = signer,
                 accountId = accountId,
                 genesisHash = genesisHash,
-                customSignedExtensions = CustomSignedExtensions.extensionsWithValues(runtime),
+                customSignedExtensions = CustomSignedExtensions.extensionsWithValues(),
                 blockHash = blockHash,
                 era = era,
                 tip = tip

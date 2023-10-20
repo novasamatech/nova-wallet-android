@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.domain.model
 
-import java.math.BigDecimal
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 
 class StakeSummary<S>(
     val status: S,
-    val totalStaked: BigDecimal,
+    val activeStake: Balance,
 )
 
 sealed class NominatorStatus {

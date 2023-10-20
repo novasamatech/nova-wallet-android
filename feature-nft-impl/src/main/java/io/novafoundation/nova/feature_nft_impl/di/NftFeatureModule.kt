@@ -20,6 +20,8 @@ import io.novafoundation.nova.feature_nft_impl.di.modules.NftsModule
 import io.novafoundation.nova.feature_nft_impl.di.modules.RmrkV1Module
 import io.novafoundation.nova.feature_nft_impl.di.modules.RmrkV2Module
 import io.novafoundation.nova.feature_nft_impl.di.modules.UniquesModule
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import javax.inject.Singleton
@@ -71,4 +73,14 @@ class NftFeatureModule {
     @FeatureScope
     fun providePendingSendNftTransactionRepository(
     ): PendingSendNftTransactionRepository = PendingSendNftTransactionRepositoryImpl()
+
+    @Provides
+    @FeatureScope
+    fun provideEnoughTotalToStayAboveEDValidationFactory(
+        assetSourceRegistry: AssetSourceRegistry
+    ): EnoughTotalToStayAboveEDValidationFactory {
+        return EnoughTotalToStayAboveEDValidationFactory(
+            assetSourceRegistry
+        )
+    }
 }

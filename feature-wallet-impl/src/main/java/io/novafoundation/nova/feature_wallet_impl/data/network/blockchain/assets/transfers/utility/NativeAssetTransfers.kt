@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.nativeTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.BaseAssetTransfers
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
@@ -19,7 +20,8 @@ class NativeAssetTransfers(
     assetSourceRegistry: AssetSourceRegistry,
     extrinsicService: ExtrinsicService,
     phishingValidationFactory: PhishingValidationFactory,
-) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory) {
+    enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
+) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory) {
 
     override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem()
 

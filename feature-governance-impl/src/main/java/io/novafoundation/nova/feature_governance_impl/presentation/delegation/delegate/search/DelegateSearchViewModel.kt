@@ -63,7 +63,7 @@ class DelegateSearchViewModel(
                 )
             }
             delegates?.isEmpty() == true -> SearchPlaceholderModel(
-                R.string.delegate_search_placeholder_default,
+                R.string.common_search_placeholder_default,
                 R.drawable.ic_placeholder
             )
             else -> null

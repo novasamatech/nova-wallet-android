@@ -17,14 +17,6 @@ class ParachainStakingHintsUseCase(
     private val roundDurationEstimator: RoundDurationEstimator,
 ) {
 
-    fun rewardFrequencyHintFlow(): Flow<String> = flowWithChainId { chainId ->
-        roundDurationEstimator.roundDurationFlow(chainId).map {
-            val durationFormatted = resourceManager.formatDuration(it)
-
-            resourceManager.getString(R.string.staking_parachain_reward_frequency_hint, durationFormatted)
-        }
-    }
-
     fun unstakeDurationHintFlow(): Flow<String> = flowWithChainId { chainId ->
         roundDurationEstimator.unstakeDurationFlow(chainId).map {
             val durationFormatted = resourceManager.formatDuration(it)

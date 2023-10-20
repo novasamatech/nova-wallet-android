@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.utils
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
@@ -36,4 +37,14 @@ interface WithCoroutineScopeExtensions {
 
 fun WithCoroutineScopeExtensions(coroutineScope: CoroutineScope) = object : WithCoroutineScopeExtensions {
     override val coroutineScope: CoroutineScope = coroutineScope
+}
+
+context(CoroutineScope)
+fun <T> Flow<T>.share(started: SharingStarted = SharingStarted.Eagerly): SharedFlow<T> {
+    return shareIn(this@CoroutineScope, started = started, replay = 1)
+}
+
+context(CoroutineScope)
+fun <T> Flow<T>.shareInBackground(started: SharingStarted = SharingStarted.Eagerly): SharedFlow<T> {
+    return inBackground().share(started)
 }

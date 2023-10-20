@@ -1,27 +1,24 @@
 package io.novafoundation.nova.feature_staking_impl.data.repository
 
-import io.novafoundation.nova.common.utils.session
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindCurrentIndex
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.currentIndex
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.session
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.runtime.storage.source.queryNonNull
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
-import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
+import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
+import io.novafoundation.nova.runtime.storage.source.query.metadata
+import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
 
 interface SessionRepository {
 
-    suspend fun currentSessionIndex(chainId: ChainId): BigInteger
+    fun observeCurrentSessionIndex(chainId: ChainId): Flow<BigInteger>
 }
 
 class RealSessionRepository(
-    private val remoteStorage: StorageDataSource
+    private val localStorage: StorageDataSource
 ) : SessionRepository {
 
-    override suspend fun currentSessionIndex(chainId: ChainId) = remoteStorage.queryNonNull(
-        // Current session index
-        keyBuilder = { it.metadata.session().storage("CurrentIndex").storageKey() },
-        binding = ::bindCurrentIndex,
-        chainId = chainId
-    )
+    override fun observeCurrentSessionIndex(chainId: ChainId) = localStorage.subscribe(chainId) {
+        metadata.session.currentIndex.observeNonNull()
+    }
 }

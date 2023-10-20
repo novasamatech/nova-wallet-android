@@ -38,6 +38,14 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/open_pool_reward_detail"
+        app:destination="@id/poolRewardDetailFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/open_extrinsic_detail"
         app:destination="@id/extrinsicDetailFragment"
         app:enterAnim="@anim/fragment_open_enter"
@@ -166,6 +174,14 @@
     <action
         android:id="@+id/action_open_referenda_filters"
         app:destination="@id/referendaFiltersFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/open_validator_details"
+        app:destination="@id/validatorDetailsFragment"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -338,6 +354,14 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
+            android:id="@+id/action_mainFragment_to_startStackingLanding"
+            app:destination="@id/start_staking_nav_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
             android:id="@+id/action_mainFragment_to_sendFlow"
             app:destination="@id/sendFlowFragment"
             app:enterAnim="@anim/fragment_open_enter"
@@ -379,6 +403,8 @@
             app:popUpToInclusive="true" />
 
     </fragment>
+
+    <include app:graph="@navigation/start_staking_nav_graph" />
 
     <dialog
         android:id="@+id/switchWalletFragment"
@@ -527,9 +553,15 @@
 
     <fragment
         android:id="@+id/rewardDetailFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.RewardDetailFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.direct.RewardDetailFragment"
         android:label="RewardDetailFragment"
         tools:layout="@layout/fragment_reward_slash_details" />
+
+    <fragment
+        android:id="@+id/poolRewardDetailFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.pool.PoolRewardDetailFragment"
+        android:label="PoolRewardDetailFragment"
+        tools:layout="@layout/fragment_pool_reward_details" />
 
     <fragment
         android:id="@+id/receiveFragment"
@@ -739,7 +771,18 @@
     <fragment
         android:id="@+id/sendFlowFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.send.flow.AssetSendFlowFragment"
-        android:label="AssetSendFlowFragment" />
+        android:label="AssetSendFlowFragment">
+
+        <action
+            android:id="@+id/action_sendFlow_to_buyFlow"
+            app:destination="@id/buyFlowFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/mainFragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/receiveFlowFragment"
@@ -789,5 +832,11 @@
         android:id="@+id/walletConnectApproveSessionFragment"
         android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.WalletConnectApproveSessionFragment"
         android:label="WalletConnectApproveSessionFragment" />
+
+    <fragment
+        android:id="@+id/validatorDetailsFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment"
+        android:label="validatorDetailsFragment"
+        tools:layout="@layout/fragment_validator_details" />
 
 </navigation>

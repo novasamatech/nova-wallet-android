@@ -21,7 +21,7 @@ private class UnbondHintsMixin(
 ) : ConstantHintsMixin(coroutineScope) {
 
     override suspend fun getHints(): List<String> = listOf(
-        stakingHintsUseCase.unstakingDurationHint(),
+        stakingHintsUseCase.unstakingDurationHint(coroutineScope),
         stakingHintsUseCase.noRewardDurationUnstakingHint(),
         stakingHintsUseCase.redeemHint(),
     )

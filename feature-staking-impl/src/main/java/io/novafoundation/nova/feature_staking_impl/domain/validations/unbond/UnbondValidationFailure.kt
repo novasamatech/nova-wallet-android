@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.validations.unbond
 
-import java.math.BigDecimal
+import io.novafoundation.nova.feature_wallet_api.domain.validation.CrossMinimumBalanceValidation
+import io.novafoundation.nova.feature_wallet_api.domain.validation.CrossMinimumBalanceValidationFailure
 
 sealed class UnbondValidationFailure {
 
@@ -10,7 +11,9 @@ sealed class UnbondValidationFailure {
 
     object ZeroUnbond : UnbondValidationFailure()
 
-    class BondedWillCrossExistential(val willBeUnbonded: BigDecimal) : UnbondValidationFailure()
+    class BondedWillCrossExistential(override val errorContext: CrossMinimumBalanceValidation.ErrorContext) :
+        UnbondValidationFailure(),
+        CrossMinimumBalanceValidationFailure
 
     class UnbondLimitReached(val limit: Int) : UnbondValidationFailure()
 }

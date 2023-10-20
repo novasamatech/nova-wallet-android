@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.data.buyToken.providers
 
 import android.content.Context
 import android.net.Uri
+import io.novafoundation.nova.common.utils.appendNullableQueryParameter
 import io.novafoundation.nova.common.utils.sha512
 import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.common.utils.urlEncoded
@@ -12,6 +13,8 @@ import jp.co.soramitsu.fearless_utils.extensions.toHexString
 
 private const val TYPE_BUY = "buy"
 
+private const val NETWORK_KEY = "network"
+
 class MercuryoProvider(
     private val host: String,
     private val widgetId: String,
@@ -21,17 +24,19 @@ class MercuryoProvider(
     override val id: String = "mercuryo"
 
     override val name: String = "Mercuryo"
+    override val officialUrl: String = "mercuryo.io"
     override val icon: Int = R.drawable.ic_mercuryo
-    override val priority: Int = 0
 
     override fun createIntegrator(chainAsset: Chain.Asset, address: String): ExternalProvider.Integrator {
-        return MercuryoIntegrator(host, widgetId, chainAsset, address, secret)
+        val network = chainAsset.buyProviders.getValue(id)[NETWORK_KEY] as? String
+        return MercuryoIntegrator(host, widgetId, chainAsset, network, address, secret)
     }
 
     class MercuryoIntegrator(
         private val host: String,
         private val widgetId: String,
         private val tokenType: Chain.Asset,
+        private val network: String?,
         private val address: String,
         private val secret: String,
     ) : ExternalProvider.Integrator {
@@ -50,6 +55,7 @@ class MercuryoProvider(
                 .authority(host)
                 .appendQueryParameter("widget_id", widgetId)
                 .appendQueryParameter("type", TYPE_BUY)
+                .appendNullableQueryParameter(NETWORK_KEY, network)
                 .appendQueryParameter("currency", tokenType.symbol)
                 .appendQueryParameter("address", address)
                 .appendQueryParameter("return_url", ExternalProvider.REDIRECT_URL_BASE.urlEncoded())

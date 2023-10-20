@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
+import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
@@ -119,3 +120,18 @@ interface WithContextExtensions {
 fun WithContextExtensions(context: Context) = object : WithContextExtensions {
     override val providedContext: Context = context
 }
+
+context(View)
+fun getRoundedCornerDrawable(
+    @ColorRes fillColorRes: Int = R.color.secondary_screen_background,
+    @ColorRes strokeColorRes: Int? = null,
+    cornerSizeDp: Int = 12,
+) = context.getRoundedCornerDrawable(fillColorRes, strokeColorRes, cornerSizeDp)
+
+context(View)
+fun getRippleMask(
+    cornerSizeDp: Int = 12,
+) = context.getRippleMask(cornerSizeDp)
+
+context(View)
+fun Drawable.withRippleMask(mask: Drawable = getRippleMask()) = context.addRipple(this, mask)

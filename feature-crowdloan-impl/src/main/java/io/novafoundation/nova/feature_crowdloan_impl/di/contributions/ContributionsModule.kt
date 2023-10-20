@@ -5,8 +5,8 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.ContributionDao
+import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdateSystemFactory
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdaterFactory
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
@@ -89,28 +89,26 @@ class ContributionsModule {
     @Provides
     @FeatureScope
     fun provideContributionsUpdaterFactory(
-        accountUpdateScope: AccountUpdateScope,
         contributionsRepository: ContributionsRepository,
         crowdloanRepository: CrowdloanRepository,
-        contributionDao: ContributionDao
+        contributionDao: ContributionDao,
+        externalBalanceDao: ExternalBalanceDao
     ): ContributionsUpdaterFactory = RealContributionsUpdaterFactory(
-        accountUpdateScope,
         contributionsRepository,
         crowdloanRepository,
-        contributionDao
+        contributionDao,
+        externalBalanceDao
     )
 
     @Provides
     @FeatureScope
     fun provideContributionUpdateSystemFactory(
-        accountUpdateScope: AccountUpdateScope,
         contributionsUpdaterFactory: ContributionsUpdaterFactory,
         chainRegistry: ChainRegistry,
         assetBalanceScopeFactory: AssetBalanceScopeFactory,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     ): ContributionsUpdateSystemFactory = RealContributionsUpdateSystemFactory(
         chainRegistry = chainRegistry,
-        accountUpdateScope = accountUpdateScope,
         contributionsUpdaterFactory = contributionsUpdaterFactory,
         assetBalanceScopeFactory = assetBalanceScopeFactory,
         storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory
@@ -119,6 +117,7 @@ class ContributionsModule {
     @Provides
     @FeatureScope
     fun provideAssetBalanceScopeFactory(
-        walletRepository: WalletRepository
-    ) = AssetBalanceScopeFactory(walletRepository)
+        walletRepository: WalletRepository,
+        accountRepository: AccountRepository
+    ) = AssetBalanceScopeFactory(walletRepository, accountRepository)
 }

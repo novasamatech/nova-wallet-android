@@ -86,7 +86,7 @@ fun CoroutineScope.handleFeeSpikeDetected(
     error: FeeChangeDetectedFailure,
     resourceManager: ResourceManager,
     feeLoaderMixin: FeeLoaderMixin.Presentation,
-    actions: ValidationFlowActions
+    actions: ValidationFlowActions<*>
 ): TransformedFailure? {
     if (!error.payload.needsUserAttention) {
         actions.resumeFlow()

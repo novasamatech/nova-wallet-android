@@ -12,7 +12,6 @@
         android:id="@+id/viewPlaceholderImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:src="@drawable/ic_planet_outline"
         app:tint="@color/icon_secondary" />
 
@@ -20,10 +19,20 @@
         android:id="@+id/viewPlaceholderText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="32dp"
         android:gravity="center"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         tools:text="Your assets will appear here.\nMake sure the 'Hide zero balances' filter is turned off" />
+
+    <TextView
+        android:id="@+id/viewPlaceholderButton"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:minHeight="32dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="6dp"
+        android:textColor="@color/button_text_accent"
+        tools:text="Apply" />
 </merge>

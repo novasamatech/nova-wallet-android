@@ -3,6 +3,9 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.common.utils.asNumber
+import io.novafoundation.nova.common.utils.constant
+import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.RoundIndex
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator.DurationCalculator.CalculationResult
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.RoundInfo
@@ -10,10 +13,12 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
@@ -40,12 +45,15 @@ interface RoundDurationEstimator {
     suspend fun unstakeDurationFlow(chainId: ChainId): Flow<Duration>
 
     suspend fun roundDurationFlow(chainId: ChainId): Flow<Duration>
+
+    suspend fun firstRewardReceivingDelayFlow(chainId: ChainId): Flow<Duration>
 }
 
 class RealRoundDurationEstimator(
     private val parachainStakingConstantsRepository: ParachainStakingConstantsRepository,
     private val chainStateRepository: ChainStateRepository,
     private val currentRoundRepository: CurrentRoundRepository,
+    private val storageDataSource: StorageDataSource
 ) : RoundDurationEstimator {
 
     override suspend fun createDurationCalculator(chainId: ChainId): RoundDurationEstimator.DurationCalculator {
@@ -90,8 +98,30 @@ class RealRoundDurationEstimator(
         }
     }
 
+    override suspend fun firstRewardReceivingDelayFlow(chainId: ChainId): Flow<Duration> {
+        return combine(
+            observeCurrentRoundRemainingTime(chainId),
+            roundDurationFlow(chainId)
+        ) { remainingEraDuration, eraDuration ->
+            val receivingDelayInEras = rewardReceivingDelay(chainId)
+            eraDuration * receivingDelayInEras.toInt() + remainingEraDuration
+        }
+    }
+
     private suspend fun estimateDuration(chainId: ChainId, numberOfRounds: BigInteger): Flow<Duration> {
         return roundDurationFlow(chainId).map { roundDuration -> roundDuration * numberOfRounds.toInt() }
+    }
+
+    private fun observeCurrentRoundRemainingTime(chainId: String): Flow<Duration> {
+        return currentRoundRepository.currentRoundInfoFlow(chainId).flatMapLatest {
+            timeTillRoundFlow(chainId, it.current)
+        }
+    }
+
+    private suspend fun rewardReceivingDelay(chainId: ChainId): BigInteger {
+        return storageDataSource.query(chainId) {
+            runtime.metadata.parachainStaking().constant("RewardPaymentDelay").asNumber(runtime)
+        }
     }
 }
 

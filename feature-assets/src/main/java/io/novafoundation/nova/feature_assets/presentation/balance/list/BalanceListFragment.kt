@@ -88,7 +88,7 @@ class BalanceListFragment :
     override fun subscribe(viewModel: BalanceListViewModel) {
         viewModel.assetModelsFlow.observe {
             assetsAdapter.submitList(it) {
-                balanceListAssets.invalidateItemDecorations()
+                balanceListAssets?.invalidateItemDecorations()
             }
         }
 
@@ -125,6 +125,8 @@ class BalanceListFragment :
         viewModel.walletConnectAccountSessionsUI.observe {
             headerAdapter.setWalletConnectModel(it)
         }
+
+        viewModel.filtersIndicatorIcon.observe(headerAdapter::setFilterIconRes)
     }
 
     override fun assetClicked(asset: AssetModel) {

@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess.ReadyToSubmit
@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapValidatorToValidatorModel
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setRecommendedValidators
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 
 class RecommendedValidatorsViewModel(
     private val router: StakingRouter,
-    private val validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+    private val validatorRecommenderFactory: ValidatorRecommenderFactory,
     private val recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
     private val addressIconGenerator: AddressIconGenerator,
     private val interactor: StakingInteractor,
@@ -48,7 +48,7 @@ class RecommendedValidatorsViewModel(
     }
 
     private val recommendedValidators = flow {
-        val validatorRecommendator = validatorRecommendatorFactory.create(scope = viewModelScope)
+        val validatorRecommendator = validatorRecommenderFactory.create(scope = viewModelScope)
         val validators = validatorRecommendator.recommendations(recommendedSettings())
 
         emit(validators)
@@ -70,7 +70,7 @@ class RecommendedValidatorsViewModel(
         router.back()
     }
 
-    fun validatorInfoClicked(validatorModel: ValidatorModel) = launch {
+    fun validatorInfoClicked(validatorModel: ValidatorStakeTargetModel) = launch {
         val stakeTarget = mapValidatorToValidatorDetailsParcelModel(validatorModel.stakeTarget)
         val payload = StakeTargetDetailsPayload.relaychain(stakeTarget, interactor)
 
@@ -87,7 +87,7 @@ class RecommendedValidatorsViewModel(
     private suspend fun convertToModels(
         validators: List<Validator>,
         token: Token
-    ): List<ValidatorModel> {
+    ): List<ValidatorStakeTargetModel> {
         val chain = selectedAssetState.chain()
 
         return validators.map {
@@ -96,7 +96,7 @@ class RecommendedValidatorsViewModel(
     }
 
     private fun retractRecommended() = sharedStateSetup.mutate {
-        if (it is ReadyToSubmit && it.payload.selectionMethod == SelectionMethod.RECOMMENDED) {
+        if (it is ReadyToSubmit && it.selectionMethod == SelectionMethod.RECOMMENDED) {
             it.previous()
         } else {
             it

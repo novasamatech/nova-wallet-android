@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.show
 
+import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.utils.windowed
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.multiFrame.LegacyMultiPart
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.transaction.paritySignerTxPayload
@@ -17,7 +19,7 @@ interface ShowSignParitySignerInteractor {
 }
 
 class ParitySignerSignRequest(
-    val frame: String
+    val frames: List<String>
 )
 
 class RealShowSignParitySignerInteractor : ShowSignParitySignerInteractor {
@@ -30,9 +32,10 @@ class RealShowSignParitySignerInteractor : ShowSignParitySignerInteractor {
             cryptoCode = CryptoType.SR25519.paritySignerUOSCryptoType(),
             payloadCode = ParitySignerUOSPayloadCode.TRANSACTION
         )
-        val multiFramePayload = LegacyMultiPart.createSingle(uosPayload)
+        val windowed = uosPayload.windowed(QrCodeGenerator.MAX_PAYLOAD_LENGTH)
+        val multiFramePayloads = LegacyMultiPart.createMultiple(windowed)
 
-        val frame = multiFramePayload.toString(Charsets.ISO_8859_1)
+        val frame = multiFramePayloads.map { it.toString(Charsets.ISO_8859_1) }
 
         ParitySignerSignRequest(frame)
     }

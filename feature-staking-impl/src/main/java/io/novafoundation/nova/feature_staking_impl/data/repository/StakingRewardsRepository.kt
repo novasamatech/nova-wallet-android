@@ -1,21 +1,32 @@
 package io.novafoundation.nova.feature_staking_impl.data.repository
 
-import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingRewardsDataSource
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
+import io.novafoundation.nova.feature_staking_impl.data.fullId
+import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.StakingRewardsDataSourceRegistry
 import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
-class StakingRewardsRepository(
-    private val stakingRewardsDataSource: StakingRewardsDataSource,
-) {
+interface StakingRewardsRepository {
 
-    fun totalRewardFlow(accountAddress: String, chainId: ChainId, chainAssetId: Int): Flow<TotalReward> {
-        return stakingRewardsDataSource.totalRewardsFlow(accountAddress, chainId, chainAssetId)
+    fun totalRewardFlow(accountId: AccountId, stakingOptionId: StakingOptionId): Flow<TotalReward>
+
+    suspend fun sync(accountId: AccountId, stakingOption: StakingOption, rewardPeriod: RewardPeriod)
+}
+
+class RealStakingRewardsRepository(
+    private val dataSourceRegistry: StakingRewardsDataSourceRegistry,
+) : StakingRewardsRepository {
+
+    override fun totalRewardFlow(accountId: AccountId, stakingOptionId: StakingOptionId): Flow<TotalReward> {
+        return sourceFor(stakingOptionId).totalRewardsFlow(accountId, stakingOptionId)
     }
 
-    suspend fun sync(accountAddress: String, chain: Chain, chainAsset: Chain.Asset, rewardPeriod: RewardPeriod) {
-        stakingRewardsDataSource.sync(accountAddress, chain, chainAsset, rewardPeriod)
+    override suspend fun sync(accountId: AccountId, stakingOption: StakingOption, rewardPeriod: RewardPeriod) {
+        return sourceFor(stakingOption.fullId).sync(accountId, stakingOption, rewardPeriod)
     }
+
+    private fun sourceFor(stakingOption: StakingOptionId) = dataSourceRegistry.getDataSourceFor(stakingOption)
 }

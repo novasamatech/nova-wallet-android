@@ -6,6 +6,7 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.storage.insert
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
@@ -28,10 +29,13 @@ class ScheduledDelegationRequestsUpdater(
     private val stakingSharedState: StakingSharedState,
     private val remoteStorageDataSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
-) : ParachainStakingUpdater {
+) : ParachainStakingUpdater<MetaAccount> {
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
-        val account = scope.getAccount()
+    override suspend fun listenForUpdates(
+        storageSubscriptionBuilder: SharedRequestsBuilder,
+        scopeValue: MetaAccount
+    ): Flow<Updater.SideEffect> {
+        val account = scopeValue
         val (chain, asset) = stakingSharedState.chainAndAsset()
         val runtime = chainRegistry.getRuntime(chain.id)
 

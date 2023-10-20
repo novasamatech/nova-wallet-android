@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.notDeadRecipientInCommissionAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.notDeadRecipientInUsedAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeInUsedAsset
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.recipientCanAcceptTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.doNotCrossExistentialDeposit
@@ -35,6 +36,7 @@ abstract class BaseAssetTransfers(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val extrinsicService: ExtrinsicService,
     private val phishingValidationFactory: PhishingValidationFactory,
+    private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 ) : AssetTransfers {
 
     protected abstract fun ExtrinsicBuilder.transfer(transfer: AssetTransfer)
@@ -78,7 +80,7 @@ abstract class BaseAssetTransfers(
         sufficientBalanceInUsedAsset()
         sufficientTransferableBalanceToPayOriginFee()
 
-        sufficientCommissionBalanceToStayAboveED(assetSourceRegistry)
+        sufficientCommissionBalanceToStayAboveED(enoughTotalToStayAboveEDValidationFactory)
 
         notDeadRecipientInUsedAsset(assetSourceRegistry)
         notDeadRecipientInCommissionAsset(assetSourceRegistry)

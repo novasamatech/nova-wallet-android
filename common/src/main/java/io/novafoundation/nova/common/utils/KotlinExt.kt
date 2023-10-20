@@ -30,6 +30,8 @@ fun BigDecimal.percentageToFraction() = this.divide(PERCENTAGE_MULTIPLIER, MathC
 
 infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
 
+fun Double.ceil(): Double = kotlin.math.ceil(this)
+
 inline fun <reified E : Enum<E>> enumValueOfOrNull(raw: String): E? = runCatching { enumValueOf<E>(raw) }.getOrNull()
 
 inline fun <K, V> List<V>.associateByMultiple(keysExtractor: (V) -> Iterable<K>): Map<K, V> {
@@ -56,6 +58,27 @@ fun ByteArray.startsWith(prefix: ByteArray): Boolean {
     return true
 }
 
+fun ByteArray.windowed(windowSize: Int): List<ByteArray> {
+    require(windowSize > 0) {
+        "Window size should be positive"
+    }
+
+    val result = mutableListOf<ByteArray>()
+
+    var i = 0
+
+    while (i < size) {
+        val copyStart = i
+        val copyEnd = (i + windowSize).coerceAtMost(size)
+
+        result.add(copyOfRange(copyStart, copyEnd))
+
+        i += windowSize
+    }
+
+    return result
+}
+
 /**
  * Compares two BigDecimals taking into account only values but not scale unlike `==` operator
  */
@@ -78,6 +101,9 @@ val BigDecimal.isPositive: Boolean
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 
+val BigInteger.isNonPositive: Boolean
+    get() = signum() <= 0
+
 val BigInteger.isZero: Boolean
     get() = signum() == 0
 
@@ -91,6 +117,8 @@ fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = M
 }
 
 fun BigInteger.atLeastZero() = coerceAtLeast(BigInteger.ZERO)
+
+fun BigDecimal.atLeastZero() = coerceAtLeast(BigDecimal.ZERO)
 
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
@@ -203,6 +231,15 @@ fun <T> List<T>.cycle(): Sequence<T> {
     return generateSequence { this[i++ % this.size] }
 }
 
+fun <T> List<T>.cycleMultiple(): Sequence<T> {
+    if (isEmpty()) return emptySequence()
+    if (size == 1) return sequenceOf(single())
+
+    var i = 0
+
+    return generateSequence { this[i++ % this.size] }
+}
+
 inline fun <reified R> List<*>.findIsInstanceOrNull(): R? {
     return find { it is R } as? R
 }
@@ -217,7 +254,7 @@ inline fun CoroutineScope.invokeOnCompletion(crossinline action: () -> Unit) {
 
 inline fun <T> Iterable<T>.filterToSet(predicate: (T) -> Boolean): Set<T> = filterTo(mutableSetOf(), predicate)
 
-fun String.nullIfEmpty(): String? = if (isEmpty()) null else this
+fun String?.nullIfEmpty(): String? = if (isNullOrEmpty()) null else this
 
 fun String.ensureSuffix(suffix: String) = if (endsWith(suffix)) this else this + suffix
 
@@ -291,6 +328,12 @@ fun <K, V> Map<K, V>.inserted(key: K, value: V): Map<K, V> {
 }
 
 inline fun <T, R> Iterable<T>.mapToSet(mapper: (T) -> R): Set<R> = mapTo(mutableSetOf(), mapper)
+
+inline fun <T, R> Iterable<T>.foldToSet(mapper: (T) -> Iterable<R>): Set<R> = fold(mutableSetOf()) { acc, value ->
+    acc += mapper(value)
+    acc
+}
+
 inline fun <T, R : Any> Iterable<T>.mapNotNullToSet(mapper: (T) -> R?): Set<R> = mapNotNullTo(mutableSetOf(), mapper)
 
 fun <T> List<T>.indexOfFirstOrNull(predicate: (T) -> Boolean) = indexOfFirst(predicate).takeIf { it >= 0 }

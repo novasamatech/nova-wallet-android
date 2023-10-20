@@ -28,6 +28,6 @@
         android:gravity="center_vertical"
         android:includeFontPadding="false"
         android:minHeight="16dp"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_tertiary"
         tools:text="Sept 1, 2022 04:44:31" />
 </merge>

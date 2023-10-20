@@ -51,7 +51,7 @@
                 android:layout_marginTop="8dp"
                 android:gravity="center_horizontal"
                 android:text="@string/dapp_confirm_sign_extrinsic_subtitle"
-                android:textColor="@color/text_secondary" />
+                android:textColor="@color/text_tertiary" />
 
             <io.novafoundation.nova.common.view.TableView
                 android:layout_width="match_parent"

@@ -14,9 +14,9 @@ class BlockNumberUpdater(
     chainRegistry: ChainRegistry,
     crowdloanSharedState: SelectedAssetOptionSharedState<*>,
     storageCache: StorageCache
-) : SingleStorageKeyUpdater<GlobalScope>(GlobalScope, crowdloanSharedState, chainRegistry, storageCache) {
+) : SingleStorageKeyUpdater<Unit>(GlobalScope, crowdloanSharedState, chainRegistry, storageCache) {
 
-    override suspend fun storageKey(runtime: RuntimeSnapshot): String {
+    override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: Unit): String {
         return runtime.metadata.system().storage("Number").storageKey()
     }
 

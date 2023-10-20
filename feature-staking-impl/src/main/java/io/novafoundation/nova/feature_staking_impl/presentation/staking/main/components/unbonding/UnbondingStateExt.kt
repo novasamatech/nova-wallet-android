@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.Unbondings
+import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.Unbondings.RebondState.CAN_REBOND
+import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.Unbondings.RebondState.REBOND_NOT_POSSIBLE
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 
@@ -18,7 +20,8 @@ fun UnbondingState.Companion.from(
                 redeemEnabled = unbondings.anythingToRedeem,
                 cancelState = when {
                     cancelLoading -> ButtonState.PROGRESS
-                    unbondings.anythingToUnbond -> ButtonState.NORMAL
+                    unbondings.rebondState == CAN_REBOND -> ButtonState.NORMAL
+                    unbondings.rebondState == REBOND_NOT_POSSIBLE -> ButtonState.GONE
                     else -> ButtonState.DISABLED
                 },
                 unbondings = unbondings.unbondings.map { unbonding ->

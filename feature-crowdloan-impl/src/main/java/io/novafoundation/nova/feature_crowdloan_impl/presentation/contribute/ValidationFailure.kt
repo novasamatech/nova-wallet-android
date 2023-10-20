@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatT
 
 fun contributeValidationFailure(
     reason: ContributeValidationFailure,
-    validationFlowActions: ValidationFlowActions,
+    validationFlowActions: ValidationFlowActions<*>,
     resourceManager: ResourceManager,
     onOpenCustomContribute: Action?,
 ): TransformedFailure {

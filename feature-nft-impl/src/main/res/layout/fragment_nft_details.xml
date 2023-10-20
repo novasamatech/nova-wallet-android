@@ -67,7 +67,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="12dp"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/text_tertiary"
                 tools:text="Wayne: Hello sir, what's your name and what brings you to Pastel Beach Mall?" />
 
             <androidx.constraintlayout.widget.ConstraintLayout

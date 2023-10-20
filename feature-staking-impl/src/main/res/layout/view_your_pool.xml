@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:background="@color/block_background"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <TextView
+        android:id="@+id/yourPoolTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/nomination_pools_your_pool"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/yourPoolIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginBottom="18dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/yourPoolTitle"
+        app:layout_constraintTop_toBottomOf="@id/yourPoolTitle"
+        tools:src="@drawable/ic_nova_logo" />
+
+
+    <TextView
+        android:id="@+id/yourPoolName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="26dp"
+        android:singleLine="true"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="@+id/yourPoolIcon"
+        app:layout_constraintEnd_toStartOf="@id/yourPoolInfo"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toEndOf="@+id/yourPoolIcon"
+        app:layout_constraintTop_toTopOf="@+id/yourPoolIcon"
+        tools:text="✨ Nova Wallet ✨ — Pool #1 — Recommended Validators" />
+
+    <ImageView
+        android:id="@+id/yourPoolInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:src="@drawable/ic_info_cicrle_filled_16"
+        app:layout_constraintBottom_toBottomOf="@+id/yourPoolIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/yourPoolIcon"
+        app:tint="@color/icon_secondary" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/yourPoolLoadingGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:layout_marginBottom="18dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/yourPoolTitle"
+        app:layout_constraintTop_toBottomOf="@+id/yourPoolTitle">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@+id/yourPoolTitle">
+
+            <View
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/bg_shimmering_circle" />
+
+            <View
+                android:layout_width="135dp"
+                android:layout_height="10dp"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/bg_shimmering" />
+        </LinearLayout>
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/yourPoolContentGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="yourPoolIcon,yourPoolName,yourPoolInfo" />
+
+</merge>

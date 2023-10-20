@@ -76,11 +76,11 @@ class MoreStakingOptionsFragment :
 
             when (val browserStakingState = stakingOptionsModel.browserStaking) {
                 is ExtendedLoadingState.Loaded -> {
-                    dAppLoadingAdapter.showPlaceholder(false)
+                    dAppLoadingAdapter.show(false)
                     dAppAdapter.submitList(browserStakingState.data)
                 }
                 else -> {
-                    dAppLoadingAdapter.showPlaceholder(true)
+                    dAppLoadingAdapter.show(true)
                     dAppAdapter.submitList(listOf())
                 }
             }

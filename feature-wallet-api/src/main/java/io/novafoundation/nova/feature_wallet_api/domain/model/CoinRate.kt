@@ -9,7 +9,7 @@ interface CoinRate {
     val rate: BigDecimal
 }
 
-class CoinRateChange(val recentRateChange: BigDecimal, override val rate: BigDecimal) : CoinRate
+data class CoinRateChange(val recentRateChange: BigDecimal, override val rate: BigDecimal) : CoinRate
 
 class HistoricalCoinRate(val timestamp: Long, override val rate: BigDecimal) : CoinRate
 

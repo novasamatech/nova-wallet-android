@@ -36,7 +36,7 @@
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_icon_container_on_color"
                 android:padding="11dp"
-                app:tint="@color/text_secondary" />
+                app:tint="@color/text_tertiary" />
 
             <TextView
                 android:id="@+id/extrinsicDetailAmount"
@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:layout_marginBottom="4dp"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/text_tertiary"
                 tools:text="$149.36" />
 
             <TextView

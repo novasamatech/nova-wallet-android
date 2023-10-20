@@ -30,6 +30,7 @@ android {
 
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
     }
 
     compileOptions {
@@ -54,7 +55,7 @@ dependencies {
     implementation liveDataKtxDep
     implementation lifeCycleKtxDep
 
-    implementation markdownDep
+    implementation markwonDep
 
     implementation daggerDep
     kapt daggerKapt

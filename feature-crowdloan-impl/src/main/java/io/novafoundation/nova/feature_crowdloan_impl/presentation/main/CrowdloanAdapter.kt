@@ -150,8 +150,8 @@ private class CrowdloanChildHolder(
             itemCrowdloanTimeRemaining.makeGone()
             itemCrowdloanArrow.makeGone()
 
-            itemCrowdloanParaName.setTextColorRes(R.color.text_secondary)
-            itemCrowdloanParaRaisedPercentage.setTextColorRes(R.color.text_secondary)
+            itemCrowdloanParaName.setTextColorRes(R.color.text_tertiary)
+            itemCrowdloanParaRaisedPercentage.setTextColorRes(R.color.text_tertiary)
 
             itemCrowdloanParaRaisedProgress.isEnabled = false
 

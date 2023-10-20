@@ -18,6 +18,7 @@ android {
 
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
     }
 
     namespace 'io.novafoundation.nova.feature_governance_api'
@@ -32,7 +33,7 @@ dependencies {
     api project(":feature-account-api")
     api project(":feature-dapp-api")
 
-    implementation markdownDep
+    implementation markwonDep
 
     implementation daggerDep
 

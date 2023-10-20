@@ -21,9 +21,9 @@ import jp.co.soramitsu.fearless_utils.hash.Hasher.blake2b256
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.DefaultSignedExtensions
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.SignedExtras
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.skipAliases
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.genesisHash
@@ -138,7 +138,7 @@ fun Constant.decodedValue(runtimeSnapshot: RuntimeSnapshot): Any? {
 
 fun String.toHexAccountId(): String = toAccountId().toHexString()
 
-fun Extrinsic.DecodedInstance.tip(): BigInteger? = signature?.signedExtras?.get(SignedExtras.TIP) as? BigInteger
+fun Extrinsic.DecodedInstance.tip(): BigInteger? = signature?.signedExtras?.get(DefaultSignedExtensions.CHECK_TX_PAYMENT) as? BigInteger
 
 fun Module.constant(name: String) = constantOrNull(name) ?: throw NoSuchElementException()
 
@@ -213,6 +213,10 @@ fun RuntimeMetadata.electionProviderMultiPhaseOrNull() = moduleOrNull(Modules.EL
 
 fun RuntimeMetadata.preImage() = module(Modules.PREIMAGE)
 
+fun RuntimeMetadata.nominationPools() = module(Modules.NOMINATION_POOLS)
+
+fun RuntimeMetadata.nominationPoolsOrNull() = moduleOrNull(Modules.NOMINATION_POOLS)
+
 fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
 }
@@ -226,6 +230,8 @@ fun Module.firstExistingCallName(vararg options: String): String {
 }
 
 fun RuntimeMetadata.xcmPalletName() = firstExistingModuleName("XcmPallet", "PolkadotXcm")
+
+fun RuntimeMetadata.xTokensName() = firstExistingModuleName("XTokens", "Xtokens")
 
 fun StorageEntry.splitKeyToComponents(runtime: RuntimeSnapshot, key: String): ComponentHolder {
     return ComponentHolder(splitKey(runtime, key))
@@ -298,8 +304,6 @@ object Modules {
     const val PARACHAIN_INFO = "ParachainInfo"
     const val PARAS = "Paras"
 
-    const val X_TOKENS = "XTokens"
-
     const val AUTOMATION_TIME = "AutomationTime"
 
     const val REFERENDA = "Referenda"
@@ -317,4 +321,6 @@ object Modules {
     const val BAG_LIST = "BagsList"
 
     const val ELECTION_PROVIDER_MULTI_PHASE = "ElectionProviderMultiPhase"
+
+    const val NOMINATION_POOLS = "NominationPools"
 }

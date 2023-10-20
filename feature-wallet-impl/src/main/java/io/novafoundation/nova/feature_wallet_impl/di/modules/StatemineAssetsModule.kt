@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.StaticAssetSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine.StatemineAssetBalance
@@ -55,7 +56,15 @@ class StatemineAssetsModule {
         extrinsicService: ExtrinsicService,
         phishingValidationFactory: PhishingValidationFactory,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorage: StorageDataSource,
-    ) = StatemineAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory, remoteStorage)
+        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
+    ) = StatemineAssetTransfers(
+        chainRegistry,
+        assetSourceRegistry,
+        extrinsicService,
+        phishingValidationFactory,
+        enoughTotalToStayAboveEDValidationFactory,
+        remoteStorage
+    )
 
     @Provides
     @FeatureScope

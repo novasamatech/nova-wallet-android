@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
+import io.novafoundation.nova.common.presentation.setColoredText
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
@@ -14,20 +15,20 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_validator.view.itemValidationCheck
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorActionIcon
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorIcon
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorInfo
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorName
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorScoringPrimary
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorScoringSecondary
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleLabel
-import kotlinx.android.synthetic.main.item_validator.view.itemValidatorSubtitleValue
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetCheck
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetActionIcon
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetIcon
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetInfo
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetName
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetScoringPrimary
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetScoringSecondary
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleLabel
+import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleValue
 
 class StakeTargetAdapter<V>(
     private val itemHandler: ItemHandler<V>,
     initialMode: Mode = Mode.VIEW
-) : ListAdapter<StakeTargetModel<V>, ValidatorViewHolder<V>>(ValidatorDiffCallback()) {
+) : ListAdapter<StakeTargetModel<V>, StakingTargetViewHolder<V>>(StakingTargetDiffCallback()) {
 
     private var mode = initialMode
 
@@ -54,19 +55,19 @@ class StakeTargetAdapter<V>(
         notifyItemRangeChanged(0, itemCount, mode)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ValidatorViewHolder<V> {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StakingTargetViewHolder<V> {
         val view = parent.inflateChild(R.layout.item_validator)
 
-        return ValidatorViewHolder(view)
+        return StakingTargetViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ValidatorViewHolder<V>, position: Int) {
+    override fun onBindViewHolder(holder: StakingTargetViewHolder<V>, position: Int) {
         val item = getItem(position)
 
         holder.bind(item, itemHandler, mode)
     }
 
-    override fun onBindViewHolder(holder: ValidatorViewHolder<V>, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(holder: StakingTargetViewHolder<V>, position: Int, payloads: MutableList<Any>) {
         val item = getItem(position)
 
         resolvePayload(
@@ -85,17 +86,17 @@ class StakeTargetAdapter<V>(
     }
 }
 
-class ValidatorViewHolder<V>(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+class StakingTargetViewHolder<V>(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
     fun bind(
         stakeTargetModel: StakeTargetModel<V>,
         itemHandler: StakeTargetAdapter.ItemHandler<V>,
         mode: StakeTargetAdapter.Mode
     ) = with(containerView) {
-        itemValidatorName.text = stakeTargetModel.addressModel.nameOrAddress
-        itemValidatorIcon.setImageDrawable(stakeTargetModel.addressModel.image)
+        itemStakingTargetName.text = stakeTargetModel.addressModel.nameOrAddress
+        itemStakingTargetIcon.setImageDrawable(stakeTargetModel.addressModel.image)
 
-        itemValidatorInfo.setOnClickListener {
+        itemStakingTargetInfo.setOnClickListener {
             itemHandler.stakeTargetInfoClicked(stakeTargetModel)
         }
 
@@ -116,20 +117,22 @@ class ValidatorViewHolder<V>(override val containerView: View) : RecyclerView.Vi
     ) = with(containerView) {
         when {
             mode == StakeTargetAdapter.Mode.EDIT -> {
-                itemValidatorActionIcon.makeVisible()
-                itemValidationCheck.makeGone()
+                itemStakingTargetActionIcon.makeVisible()
+                itemStakingTargetCheck.makeGone()
 
-                itemValidatorActionIcon.setOnClickListener { handler.removeClicked(StakeTargetModel) }
+                itemStakingTargetActionIcon.setOnClickListener { handler.removeClicked(StakeTargetModel) }
             }
+
             StakeTargetModel.isChecked == null -> {
-                itemValidatorActionIcon.makeGone()
-                itemValidationCheck.makeGone()
+                itemStakingTargetActionIcon.makeGone()
+                itemStakingTargetCheck.makeGone()
             }
-            else -> {
-                itemValidatorActionIcon.makeGone()
-                itemValidationCheck.makeVisible()
 
-                itemValidationCheck.isChecked = StakeTargetModel.isChecked
+            else -> {
+                itemStakingTargetActionIcon.makeGone()
+                itemStakingTargetCheck.makeVisible()
+
+                itemStakingTargetCheck.isChecked = StakeTargetModel.isChecked
             }
         }
     }
@@ -137,45 +140,44 @@ class ValidatorViewHolder<V>(override val containerView: View) : RecyclerView.Vi
     fun bindScoring(StakeTargetModel: StakeTargetModel<*>) = with(containerView) {
         when (val scoring = StakeTargetModel.scoring) {
             null -> {
-                itemValidatorScoringPrimary.makeGone()
-                itemValidatorScoringSecondary.makeGone()
+                itemStakingTargetScoringPrimary.makeGone()
+                itemStakingTargetScoringSecondary.makeGone()
             }
 
             is StakeTargetModel.Scoring.OneField -> {
-                itemValidatorScoringPrimary.setTextColorRes(R.color.text_secondary)
-                itemValidatorScoringPrimary.makeVisible()
-                itemValidatorScoringSecondary.makeGone()
-                itemValidatorScoringPrimary.text = scoring.field.text
-                itemValidatorScoringPrimary.setTextColorRes(scoring.field.colorRes)
+                itemStakingTargetScoringPrimary.setTextColorRes(R.color.text_tertiary)
+                itemStakingTargetScoringPrimary.makeVisible()
+                itemStakingTargetScoringSecondary.makeGone()
+                itemStakingTargetScoringPrimary.setColoredText(scoring.field)
             }
 
             is StakeTargetModel.Scoring.TwoFields -> {
-                itemValidatorScoringPrimary.setTextColorRes(R.color.text_primary)
-                itemValidatorScoringPrimary.makeVisible()
-                itemValidatorScoringSecondary.makeVisible()
-                itemValidatorScoringPrimary.text = scoring.primary
-                itemValidatorScoringSecondary.text = scoring.secondary
+                itemStakingTargetScoringPrimary.setTextColorRes(R.color.text_primary)
+                itemStakingTargetScoringPrimary.makeVisible()
+                itemStakingTargetScoringSecondary.makeVisible()
+                itemStakingTargetScoringPrimary.text = scoring.primary
+                itemStakingTargetScoringSecondary.text = scoring.secondary
             }
         }
     }
 
     fun bindSubtitle(item: StakeTargetModel<*>) = with(containerView) {
         if (item.subtitle != null) {
-            itemValidatorSubtitleLabel.makeVisible()
-            itemValidatorSubtitleValue.makeVisible()
+            itemStakingTargetSubtitleLabel.makeVisible()
+            itemStakingTargetSubtitleValue.makeVisible()
 
-            itemValidatorSubtitleLabel.text = item.subtitle.label
+            itemStakingTargetSubtitleLabel.text = item.subtitle.label
 
-            itemValidatorSubtitleValue.text = item.subtitle.value.text
-            itemValidatorSubtitleValue.setTextColorRes(item.subtitle.value.colorRes)
+            itemStakingTargetSubtitleValue.text = item.subtitle.value.text
+            itemStakingTargetSubtitleValue.setTextColorRes(item.subtitle.value.colorRes)
         } else {
-            itemValidatorSubtitleValue.makeGone()
-            itemValidatorSubtitleLabel.makeGone()
+            itemStakingTargetSubtitleValue.makeGone()
+            itemStakingTargetSubtitleLabel.makeGone()
         }
     }
 }
 
-class ValidatorDiffCallback<V> : DiffUtil.ItemCallback<StakeTargetModel<V>>() {
+class StakingTargetDiffCallback<V> : DiffUtil.ItemCallback<StakeTargetModel<V>>() {
 
     override fun areItemsTheSame(oldItem: StakeTargetModel<V>, newItem: StakeTargetModel<V>): Boolean {
         return oldItem.accountIdHex == newItem.accountIdHex
@@ -186,11 +188,11 @@ class ValidatorDiffCallback<V> : DiffUtil.ItemCallback<StakeTargetModel<V>>() {
     }
 
     override fun getChangePayload(oldItem: StakeTargetModel<V>, newItem: StakeTargetModel<V>): Any? {
-        return ValidatorPayloadGenerator.diff(oldItem, newItem)
+        return StakingTargetPayloadGenerator.diff(oldItem, newItem)
     }
 }
 
-private object ValidatorPayloadGenerator : PayloadGenerator<StakeTargetModel<*>>(
+private object StakingTargetPayloadGenerator : PayloadGenerator<StakeTargetModel<*>>(
     StakeTargetModel<*>::isChecked,
     StakeTargetModel<*>::scoring,
     StakeTargetModel<*>::subtitle

@@ -13,10 +13,11 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.SelectCustomValidatorsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 
@@ -27,7 +28,7 @@ class SelectCustomValidatorsModule {
     @IntoMap
     @ViewModelKey(SelectCustomValidatorsViewModel::class)
     fun provideViewModel(
-        validatorRecommendatorFactory: ValidatorRecommendatorFactory,
+        validatorRecommenderFactory: ValidatorRecommenderFactory,
         recommendationSettingsProviderFactory: RecommendationSettingsProviderFactory,
         @Caching addressIconGenerator: AddressIconGenerator,
         stakingInteractor: StakingInteractor,
@@ -35,18 +36,20 @@ class SelectCustomValidatorsModule {
         setupStakingSharedState: SetupStakingSharedState,
         router: StakingRouter,
         tokenUseCase: TokenUseCase,
-        selectedAssetState: StakingSharedState
+        selectedAssetState: StakingSharedState,
+        payload: CustomValidatorsPayload
     ): ViewModel {
         return SelectCustomValidatorsViewModel(
             router,
-            validatorRecommendatorFactory,
+            validatorRecommenderFactory,
             recommendationSettingsProviderFactory,
             addressIconGenerator,
             stakingInteractor,
             resourceManager,
             setupStakingSharedState,
             tokenUseCase,
-            selectedAssetState
+            selectedAssetState,
+            payload
         )
     }
 

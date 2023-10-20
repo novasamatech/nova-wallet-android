@@ -97,6 +97,8 @@ class ExternaSignViewModel(
     }
 
     fun acceptClicked() = launch {
+        _performingOperationInProgress.value = true
+
         val validationPayload = ConfirmDAppOperationValidationPayload(
             token = commissionTokenFlow?.first(),
             decimalFee = originFeeMixin?.awaitOptionalDecimalFee()
@@ -170,7 +172,7 @@ class ExternaSignViewModel(
 
     private fun validationFailureToUi(
         failure: ValidationStatus.NotValid<ConfirmDAppOperationValidationFailure>,
-        actions: ValidationFlowActions
+        actions: ValidationFlowActions<*>
     ): TransformedFailure? {
         return when (val reason = failure.reason) {
             is ConfirmDAppOperationValidationFailure.FeeSpikeDetected -> originFeeMixin?.let {

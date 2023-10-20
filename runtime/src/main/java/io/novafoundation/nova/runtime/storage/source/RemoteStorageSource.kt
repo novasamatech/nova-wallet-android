@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.rpc.queryKey
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.calls.GetChildStateRequest
 import io.novafoundation.nova.core.updater.SubstrateSubscriptionBuilder
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import io.novafoundation.nova.runtime.storage.source.query.RemoteStorageQueryContext
@@ -19,8 +20,9 @@ import kotlinx.coroutines.flow.map
 
 class RemoteStorageSource(
     chainRegistry: ChainRegistry,
+    sharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     private val bulkRetriever: BulkRetriever,
-) : BaseStorageSource(chainRegistry) {
+) : BaseStorageSource(chainRegistry, sharedRequestsBuilderFactory) {
 
     override suspend fun query(key: String, chainId: String, at: BlockHash?): String? {
         return bulkRetriever.queryKey(getSocketService(chainId), key, at)
@@ -43,7 +45,14 @@ class RemoteStorageSource(
         runtime: RuntimeSnapshot,
         subscriptionBuilder: SubstrateSubscriptionBuilder?
     ): StorageQueryContext {
-        return RemoteStorageQueryContext(bulkRetriever, getSocketService(chainId), subscriptionBuilder, at, runtime)
+        return RemoteStorageQueryContext(
+            bulkRetriever = bulkRetriever,
+            socketService = getSocketService(chainId),
+            subscriptionBuilder = subscriptionBuilder,
+            chainId = chainId,
+            at = at,
+            runtime = runtime
+        )
     }
 
     private fun getSocketService(chainId: String) = chainRegistry.getSocket(chainId)

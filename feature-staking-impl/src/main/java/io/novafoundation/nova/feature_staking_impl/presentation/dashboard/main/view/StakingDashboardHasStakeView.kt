@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.utils.unsafeLazy
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel.StakingTypeModel
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.android.synthetic.main.item_dashboard_has_stake.view.itemDashboardHasStakeChain
@@ -38,6 +39,7 @@ import kotlinx.android.synthetic.main.item_dashboard_has_stake.view.itemDashboar
 import kotlinx.android.synthetic.main.item_dashboard_has_stake.view.itemDashboardHasStakeStakeAmountContainer
 import kotlinx.android.synthetic.main.item_dashboard_has_stake.view.itemDashboardHasStakeStakesFiat
 import kotlinx.android.synthetic.main.item_dashboard_has_stake.view.itemDashboardHasStakeStakesFiatContainer
+import kotlinx.android.synthetic.main.item_dashboard_has_stake.view.itemDashboardHasStakeStakingType
 import kotlinx.android.synthetic.main.item_dashboard_has_stake.view.itemDashboardHasStakeStatus
 import kotlinx.android.synthetic.main.item_dashboard_has_stake.view.itemDashboardHasStakeStatusContainer
 import kotlinx.android.synthetic.main.item_dashboard_has_stake.view.itemDashboardHasStakeStatusShimmer
@@ -126,6 +128,10 @@ class StakingDashboardHasStakeView @JvmOverloads constructor(
         earningsGroup.applyState(earningsState) { text = it }
 
         itemDashboardHasStakeEarningsSuffix.setVisible(earningsState.isLoaded())
+    }
+
+    fun setStakingTypeBadge(model: StakingTypeModel?) {
+        itemDashboardHasStakeStakingType.setModelOrHide(model)
     }
 
     fun unbind() {

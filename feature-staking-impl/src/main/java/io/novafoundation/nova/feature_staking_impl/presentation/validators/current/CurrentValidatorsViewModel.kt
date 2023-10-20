@@ -190,8 +190,8 @@ class CurrentValidatorsViewModel(
             SelectedStakeTargetStatusModel.TitleConfig(
                 text = resourceManager.getString(R.string.staking_your_not_elected_format, statusGroup.numberOfValidators),
                 iconRes = R.drawable.ic_time_16,
-                iconTintRes = R.color.text_secondary,
-                textColorRes = R.color.text_secondary,
+                iconTintRes = R.color.text_tertiary,
+                textColorRes = R.color.text_tertiary,
             ),
             description = resourceManager.getString(R.string.staking_your_inactive_description_v2_2_0)
         )
@@ -209,8 +209,8 @@ class CurrentValidatorsViewModel(
                     statusGroup.maxValidatorsPerNominator
                 ),
                 iconRes = R.drawable.ic_time_16,
-                iconTintRes = R.color.text_secondary,
-                textColorRes = R.color.text_secondary,
+                iconTintRes = R.color.text_tertiary,
+                textColorRes = R.color.text_tertiary,
             ),
             description = resourceManager.getString(R.string.staking_your_validators_changing_title)
         )

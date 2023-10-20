@@ -13,33 +13,34 @@ interface SideEffectScope {
     fun <T> Flow<T>.noSideAffects(): Flow<Updater.SideEffect> = transform { }
 }
 
-interface UpdateScope {
+interface UpdateScope<S> {
 
-    fun invalidationFlow(): Flow<Any>
+    fun invalidationFlow(): Flow<S?>
 }
 
-object GlobalScope : UpdateScope {
+object GlobalScope : UpdateScope<Unit> {
 
     override fun invalidationFlow() = flowOf(Unit)
 }
 
-interface GlobalScopeUpdater : Updater {
+interface GlobalScopeUpdater : Updater<Unit> {
 
     override val scope
         get() = GlobalScope
 }
 
-interface Updater : SideEffectScope {
+interface Updater<V> : SideEffectScope {
 
     val requiredModules: List<String>
 
-    val scope: UpdateScope
+    val scope: UpdateScope<V>
 
     /**
      * Implementations should be aware of cancellation
      */
     suspend fun listenForUpdates(
-        storageSubscriptionBuilder: SharedRequestsBuilder
+        storageSubscriptionBuilder: SharedRequestsBuilder,
+        scopeValue: V,
     ): Flow<SideEffect>
 
     interface SideEffect

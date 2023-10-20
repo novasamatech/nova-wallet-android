@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
+import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.presentation.asset.AssetGroupingDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
@@ -24,7 +25,6 @@ import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNot
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowList
 import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowPlaceholder
-import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowSearch
 import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowSearchContainer
 import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowToolbar
 
@@ -68,19 +68,23 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
             itemAnimator = null
         }
 
-        assetFlowSearch.requestFocus()
-        assetFlowSearch.content.showSoftKeyboard()
+        assetFlowToolbar.searchField.requestFocus()
+        assetFlowToolbar.searchField.content.showSoftKeyboard()
+
+        onBackPressed {
+            assetFlowToolbar.searchField.hideSoftKeyboard()
+        }
     }
 
     override fun subscribe(viewModel: T) {
-        assetFlowSearch.content.bindTo(viewModel.query, lifecycleScope)
+        assetFlowToolbar.searchField.content.bindTo(viewModel.query, lifecycleScope)
 
         viewModel.searchResults.observe { searchResult ->
-            assetFlowPlaceholder.setVisible(searchResult.isEmpty())
-            assetFlowList.setVisible(searchResult.isNotEmpty())
+            assetFlowPlaceholder.setModelOrHide(searchResult.placeholder)
+            assetFlowList.setVisible(searchResult.assets.isNotEmpty())
 
             assetsAdapter.submitListPreservingViewPoint(
-                data = searchResult,
+                data = searchResult.assets,
                 into = assetFlowList,
                 extraDiffCompletedCallback = { assetFlowList.invalidateItemDecorations() }
             )
@@ -95,13 +99,9 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        assetFlowSearch.hideSoftKeyboard()
-    }
-
     override fun assetClicked(asset: AssetModel) {
         viewModel.assetClicked(asset)
+
+        assetFlowToolbar.searchField.hideSoftKeyboard()
     }
 }

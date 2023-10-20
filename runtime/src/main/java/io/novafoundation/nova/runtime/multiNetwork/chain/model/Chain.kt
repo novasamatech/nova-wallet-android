@@ -41,6 +41,9 @@ data class Chain(
 
     data class Additional(
         val defaultTip: BigInteger?,
+        val themeColor: String?,
+        val stakingWiki: String?,
+        val defaultBlockTimeMillis: Long?,
     )
 
     data class Types(
@@ -98,7 +101,8 @@ data class Chain(
         enum class StakingType {
             UNSUPPORTED,
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, // relaychain like
-            PARACHAIN, TURING // parachain-staking like
+            PARACHAIN, TURING, // parachain-staking like
+            NOMINATION_POOLS
         }
 
         override val identifier = "$chainId:$id"
@@ -145,30 +149,32 @@ data class Chain(
         override val identifier = "$chainId:$name"
     }
 
-    sealed class ExternalApi(val url: String) {
+    sealed class ExternalApi {
 
-        sealed class Transfers(url: String) : ExternalApi(url) {
+        abstract val url: String
 
-            class Substrate(url: String) : Transfers(url)
+        sealed class Transfers : ExternalApi() {
 
-            class Evm(url: String) : Transfers(url)
+            data class Substrate(override val url: String) : Transfers()
+
+            data class Evm(override val url: String) : Transfers()
         }
 
-        class Crowdloans(url: String) : ExternalApi(url)
+        data class Crowdloans(override val url: String) : ExternalApi()
 
-        class Staking(url: String) : ExternalApi(url)
+        data class Staking(override val url: String) : ExternalApi()
 
-        class GovernanceReferenda(url: String, val source: Source) : ExternalApi(url) {
+        data class GovernanceReferenda(override val url: String, val source: Source) : ExternalApi() {
 
             sealed class Source {
 
-                class Polkassembly(val network: String?) : Source()
+                data class Polkassembly(val network: String?) : Source()
 
                 object SubSquare : Source()
             }
         }
 
-        class GovernanceDelegations(url: String) : ExternalApi(url)
+        data class GovernanceDelegations(override val url: String) : ExternalApi()
     }
 
     enum class Governance {

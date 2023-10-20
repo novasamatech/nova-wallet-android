@@ -16,13 +16,25 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter.Mode.EDIT
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter.Mode.VIEW
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsAccounts
 import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsList
 import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsNext
 import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsToolbar
 
 class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewModel>(), StakeTargetAdapter.ItemHandler<Validator> {
+
+    companion object {
+
+        private const val KEY_PAYLOAD = "SelectCustomValidatorsFragment.Payload"
+
+        fun getBundle(
+            payload: CustomValidatorsPayload
+        ) = Bundle().apply {
+            putParcelable(KEY_PAYLOAD, payload)
+        }
+    }
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
         StakeTargetAdapter(this)
@@ -59,7 +71,7 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
             StakingFeatureApi::class.java
         )
             .reviewCustomValidatorsComponentFactory()
-            .create(this)
+            .create(this, argument(KEY_PAYLOAD))
             .inject(this)
     }
 
@@ -83,15 +95,15 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
         }
     }
 
-    override fun stakeTargetInfoClicked(validatorModel: ValidatorModel) {
+    override fun stakeTargetInfoClicked(validatorModel: ValidatorStakeTargetModel) {
         viewModel.validatorInfoClicked(validatorModel)
     }
 
-    override fun removeClicked(validatorModel: ValidatorModel) {
+    override fun removeClicked(validatorModel: ValidatorStakeTargetModel) {
         viewModel.deleteClicked(validatorModel)
     }
 
-    override fun stakeTargetClicked(validatorModel: ValidatorModel) {
+    override fun stakeTargetClicked(validatorModel: ValidatorStakeTargetModel) {
         viewModel.validatorInfoClicked(validatorModel)
     }
 }

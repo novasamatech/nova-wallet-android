@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_nft_impl.data.network.blockchain.nfts.tran
 import io.novafoundation.nova.feature_nft_impl.data.network.blockchain.nfts.transfers.validations.sufficientTransferableBalanceToPayOriginFee
 import io.novafoundation.nova.feature_nft_impl.data.network.blockchain.nfts.transfers.validations.validAddress
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
@@ -23,12 +24,12 @@ import kotlinx.coroutines.withContext
 import java.math.BigInteger
 
 abstract class BaseNftTransfer(
-    private val assetSourceRegistry: AssetSourceRegistry,
     private val extrinsicService: ExtrinsicService,
     private val phishingValidationFactory: PhishingValidationFactory,
     private val nftProvidersRegistry: NftProvidersRegistry,
     private val nftDao: NftDao,
-    private val exceptionHandler: HttpExceptionHandler
+    private val exceptionHandler: HttpExceptionHandler,
+    private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 ) : NftTransfer {
 
     abstract fun ExtrinsicBuilder.transfer(transfer: NftTransferModel)
@@ -70,6 +71,6 @@ abstract class BaseNftTransfer(
 
         sufficientTransferableBalanceToPayOriginFee()
 
-        sufficientCommissionBalanceToStayAboveED(assetSourceRegistry)
+        sufficientCommissionBalanceToStayAboveED(enoughTotalToStayAboveEDValidationFactory)
     }
 }

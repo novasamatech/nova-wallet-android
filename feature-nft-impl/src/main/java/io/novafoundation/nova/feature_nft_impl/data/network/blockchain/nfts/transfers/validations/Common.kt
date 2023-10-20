@@ -7,12 +7,14 @@ import io.novafoundation.nova.feature_nft_impl.data.network.blockchain.nfts.tran
 import io.novafoundation.nova.feature_nft_impl.domain.validaiton.nftExists
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
-import io.novafoundation.nova.feature_wallet_api.domain.validation.enoughTotalToStayAboveED
 import io.novafoundation.nova.feature_wallet_api.domain.validation.notPhishingAccount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validAddress
+import io.novafoundation.nova.feature_wallet_api.domain.validation.validate
 import io.novafoundation.nova.runtime.ext.commissionAsset
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
@@ -32,13 +34,15 @@ fun NftTransfersValidationSystemBuilder.validAddress() = validAddress(
 )
 
 fun NftTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAboveED(
-    assetSourceRegistry: AssetSourceRegistry
-) = enoughTotalToStayAboveED(
-    fee = { it.originFee },
-    total = { it.originFeeAsset.total },
-    existentialDeposit = { assetSourceRegistry.existentialDeposit(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
-    error = { NftTransferValidationFailure.NotEnoughFunds.ToStayAboveED(it.transfer.originChain.commissionAsset) }
-)
+    enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
+) {
+    enoughTotalToStayAboveEDValidationFactory.validate(
+        fee = { it.originFee },
+        total = { it.originFeeAsset.total },
+        chainWithAsset = { ChainWithAsset(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
+        error = { NftTransferValidationFailure.NotEnoughFunds.ToStayAboveED(it.transfer.originChain.commissionAsset) }
+    )
+}
 
 fun NftTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOriginFee() = sufficientBalance(
     available = { it.originFeeAsset.transferable },

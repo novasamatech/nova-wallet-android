@@ -2,9 +2,8 @@ package io.novafoundation.nova.feature_assets.domain.tokens.manage
 
 import io.novafoundation.nova.common.utils.isSubsetOf
 import io.novafoundation.nova.feature_assets.domain.common.searchTokens
-import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
+import io.novafoundation.nova.feature_assets.domain.tokens.AssetsDataCleaner
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ext.defaultComparator
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.unifiedSymbol
@@ -32,9 +31,8 @@ interface ManageTokenInteractor {
 
 class RealManageTokenInteractor(
     private val chainRegistry: ChainRegistry,
-    private val walletRepository: WalletRepository,
     private val chainAssetRepository: ChainAssetRepository,
-    private val contributionsRepository: ContributionsRepository,
+    private val assetsDataCleaner: AssetsDataCleaner,
 ) : ManageTokenInteractor {
 
     private val changeTokensMutex = Mutex(false)
@@ -71,6 +69,10 @@ class RealManageTokenInteractor(
             }
 
             chainAssetRepository.setAssetsEnabled(enabled, assetIds)
+
+            if (!enabled) {
+                assetsDataCleaner.clearAssetsData(assetIds)
+            }
         }
     }
 
