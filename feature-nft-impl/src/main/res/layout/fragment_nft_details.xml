@@ -59,9 +59,32 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="12dp"
             android:textColor="@color/text_secondary"
             tools:text="Wayne: Hello sir, what's your name and what brings you to Pastel Beach Mall?" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginHorizontal="16dp"
+            android:background="@drawable/bg_shimmering_container">
+
+            <TextView
+                android:id="@+id/assetActionsSend"
+                style="@style/Widget.Nova.ActionButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/wallet_asset_send"
+                android:visibility="gone"
+                android:layout_gravity="center_horizontal"
+                app:drawableTopCompat="@drawable/ic_send"
+                tools:drawableTop="@drawable/ic_send"
+                tools:visibility="visible" />
+
+        </LinearLayout>
 
         <io.novafoundation.nova.feature_wallet_api.presentation.view.PriceSectionView
             android:id="@+id/nftDetailsPrice"

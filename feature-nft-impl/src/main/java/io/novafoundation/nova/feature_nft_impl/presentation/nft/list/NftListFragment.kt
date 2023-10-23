@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.GridLayoutManager
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -19,12 +21,16 @@ import kotlinx.android.synthetic.main.fragment_nft_list.nftListRefresh
 import kotlinx.android.synthetic.main.fragment_nft_list.nftListToolbar
 import javax.inject.Inject
 
-class NftListFragment : BaseFragment<NftListViewModel>(), NftAdapter.Handler {
+class NftListFragment : BaseFragment<NftListViewModel>(), NftGridAdapter.Handler, ActionsAdapter.Handler {
 
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    private val adapter by lazy(LazyThreadSafetyMode.NONE) { NftAdapter(imageLoader, this) }
+    private val actionsAdapter by lazy(LazyThreadSafetyMode.NONE) { ActionsAdapter(this) }
+    private val nftGridAdapter by lazy(LazyThreadSafetyMode.NONE) { NftGridAdapter(imageLoader, this) }
+    private val adapter by lazy(LazyThreadSafetyMode.NONE) {
+        ConcatAdapter(actionsAdapter, nftGridAdapter)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,7 +44,13 @@ class NftListFragment : BaseFragment<NftListViewModel>(), NftAdapter.Handler {
         nftListToolbar.applyStatusBarInsets()
         nftListBack.setOnClickListener { viewModel.backClicked() }
 
+        val layoutManager = nftListNfts.layoutManager as GridLayoutManager
         nftListNfts.setHasFixedSize(true)
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return if (position == 0) 2 else 1
+            }
+        }
         nftListNfts.adapter = adapter
         nftListNfts.itemAnimator = null
 
@@ -54,7 +66,7 @@ class NftListFragment : BaseFragment<NftListViewModel>(), NftAdapter.Handler {
 
     override fun subscribe(viewModel: NftListViewModel) {
         viewModel.nftListItemsFlow.observe {
-            adapter.submitListPreservingViewPoint(it, nftListNfts)
+            nftGridAdapter.submitListPreservingViewPoint(it, nftListNfts)
         }
 
         viewModel.hideRefreshEvent.observeEvent {
@@ -70,5 +82,13 @@ class NftListFragment : BaseFragment<NftListViewModel>(), NftAdapter.Handler {
 
     override fun loadableItemShown(item: NftListItem) {
         viewModel.loadableNftShown(item)
+    }
+
+    override fun sendClicked() {
+        viewModel.onNftSendClick()
+    }
+
+    override fun receiveClicked() {
+        viewModel.onNftReceiveClick()
     }
 }

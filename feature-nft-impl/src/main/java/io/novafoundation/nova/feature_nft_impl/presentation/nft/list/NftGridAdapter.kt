@@ -20,16 +20,18 @@ import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_nft_impl.R
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_nft.view.itemNftContent
-import kotlinx.android.synthetic.main.item_nft.view.itemNftIssuance
-import kotlinx.android.synthetic.main.item_nft.view.itemNftMedia
-import kotlinx.android.synthetic.main.item_nft.view.itemNftPriceFiat
-import kotlinx.android.synthetic.main.item_nft.view.itemNftPricePlaceholder
-import kotlinx.android.synthetic.main.item_nft.view.itemNftPriceToken
-import kotlinx.android.synthetic.main.item_nft.view.itemNftShimmer
-import kotlinx.android.synthetic.main.item_nft.view.itemNftTitle
+import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftContent
+import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftIssuance
+import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftMedia
+import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftPriceFiat
+import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftPricePlaceholder
+import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftPriceToken
+import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftShimmer
+import kotlinx.android.synthetic.main.item_nft_grid.view.itemNftTitle
+import kotlinx.android.synthetic.main.item_nft_list_actions.view.nftActionsReceive
+import kotlinx.android.synthetic.main.item_nft_list_actions.view.nftActionsSend
 
-class NftAdapter(
+class NftGridAdapter(
     private val imageLoader: ImageLoader,
     private val handler: Handler
 ) : ListAdapter<NftListItem, NftHolder>(DiffCallback) {
@@ -42,7 +44,7 @@ class NftAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NftHolder {
-        return NftHolder(parent.inflateChild(R.layout.item_nft), imageLoader, handler)
+        return NftHolder(parent.inflateChild(R.layout.item_nft_grid), imageLoader, handler)
     }
 
     override fun onBindViewHolder(holder: NftHolder, position: Int) {
@@ -68,7 +70,7 @@ private object DiffCallback : DiffUtil.ItemCallback<NftListItem>() {
 class NftHolder(
     override val containerView: View,
     private val imageLoader: ImageLoader,
-    private val itemHandler: NftAdapter.Handler
+    private val itemHandler: NftGridAdapter.Handler
 ) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
     init {

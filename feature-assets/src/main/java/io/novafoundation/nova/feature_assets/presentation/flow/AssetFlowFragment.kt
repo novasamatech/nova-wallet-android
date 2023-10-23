@@ -16,9 +16,9 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetGroupingDecoration
+import io.novafoundation.nova.common.presentation.asset.AssetGroupingDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
-import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
+import io.novafoundation.nova.common.presentation.asset.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNotSupportedWarningBottomSheet
 import javax.inject.Inject

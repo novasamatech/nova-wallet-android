@@ -42,6 +42,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
+import io.novafoundation.nova.feature_assets.presentation.receive.ReceivePayload
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
@@ -270,7 +271,7 @@ class Navigator(
     }
 
     override fun openReceive(assetPayload: AssetPayload) {
-        navController?.navigate(R.id.action_open_receive, ReceiveFragment.getBundle(assetPayload))
+        navController?.navigate(R.id.action_open_receive, ReceiveFragment.getBundle(ReceivePayload.Asset(assetPayload)))
     }
 
     override fun openAssetFilters() {

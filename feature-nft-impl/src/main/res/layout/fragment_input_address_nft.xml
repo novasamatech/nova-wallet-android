@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/chooseAmountContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:background="@color/secondary_screen_background">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/inputAddressToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:homeButtonIcon="@drawable/ic_close" />
+
+    <TextView
+        android:id="@+id/nftName"
+        style="@style/TextAppearance.NovaFoundation.Bold.LargeTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        android:layout_marginTop="16dp"
+        android:textColor="@color/text_primary"
+        android:gravity="center"
+        tools:text="Bored Ape #00" />
+
+    <io.novafoundation.nova.feature_nft_impl.presentation.nft.common.NftIssuanceView
+        android:id="@+id/nftIssuance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center"
+        tools:text="#11 Edition of 9978" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:clipChildren="false"
+        android:minHeight="24dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="12dp">
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|bottom"
+            android:layout_marginBottom="4dp"
+            android:includeFontPadding="false"
+            android:text="@string/wallet_recipient"
+            android:textColor="@color/text_secondary" />
+
+        <LinearLayout
+            android:id="@+id/inputAddressWallet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="4dp"
+            android:visibility="invisible">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="5dp"
+                app:srcCompat="@drawable/ic_users"
+                app:tint="@color/icon_accent"
+                tools:tint="@color/icon_accent" />
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:text="@string/assets_select_send_your_wallets"
+                android:textColor="@color/button_text_accent" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="5dp"
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/ic_chevron_down"
+                app:tint="@color/icon_accent"
+                tools:tint="@color/icon_accent" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputField
+        android:id="@+id/inputAddressRecipient"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:hint="@string/send_address_hint"
+        app:hasExternalAccountIdentifiers="true" />
+
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+        android:id="@+id/inputAddressFee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:dividerVisible="false" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/inputAddressNext"
+        style="@style/Widget.Nova.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="24dp"
+        android:enabled="true"
+        android:text="@string/common_continue" />
+</LinearLayout>

@@ -14,7 +14,8 @@ class NftDetails(
     val description: String?,
     val issuance: Nft.Issuance,
     val price: BigInteger?,
-    val collection: Collection?
+    val collection: Collection?,
+    val type: Nft.Type
 ) {
 
     class Collection(

@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.dialog.errorDialog
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
@@ -22,6 +23,7 @@ import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.R
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.view.setPriceOrHide
+import kotlinx.android.synthetic.main.fragment_nft_details.assetActionsSend
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsChain
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsCollection
 import kotlinx.android.synthetic.main.fragment_nft_details.nftDetailsCreator
@@ -49,7 +51,10 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
     lateinit var imageLoader: ImageLoader
 
     private val contentViews by lazy(LazyThreadSafetyMode.NONE) {
-        listOf(nftDetailsMedia, nftDetailsTitle, nftDetailsDescription, nftDetailsIssuance, nftDetailsPrice, nftDetailsTable)
+        listOf(
+            nftDetailsMedia, nftDetailsTitle, nftDetailsDescription, nftDetailsIssuance,
+            nftDetailsPrice, nftDetailsTable, assetActionsSend
+        )
     }
 
     override fun onCreateView(
@@ -66,6 +71,7 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
 
         nftDetailsOnwer.setOnClickListener { viewModel.ownerClicked() }
         nftDetailsCreator.setOnClickListener { viewModel.creatorClicked() }
+        assetActionsSend.setOnClickListener { viewModel.assetActionSend() }
 
         nftDetailsCollection.valuePrimary.ellipsize = TextUtils.TruncateAt.END
 
@@ -115,6 +121,7 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel>() {
             }
 
             nftDetailsChain.showChain(it.network)
+            assetActionsSend.setVisible(it.isSupportedForSend)
         }
 
         viewModel.exitingErrorLiveData.observeEvent {

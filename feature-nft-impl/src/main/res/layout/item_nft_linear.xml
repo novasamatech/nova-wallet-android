@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemNftContainer"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:layout_marginHorizontal="16dp"
+    android:background="@drawable/bg_primary_list_item"
+    tools:background="@color/block_background">
+
+    <ImageView
+        android:id="@+id/itemNftImage"
+        android:layout_marginStart="12dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_nova" />
+
+    <TextView
+        android:id="@+id/itemNftName"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/text_primary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/itemNftImage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        tools:text="NFT name" />
+
+    <TextView
+        android:id="@+id/itemNftCollectionName"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="8dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/itemNftImage"
+        app:layout_constraintTop_toBottomOf="@+id/itemNftName"
+        app:layout_constraintHorizontal_bias="0"
+        tools:text="Collection name" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

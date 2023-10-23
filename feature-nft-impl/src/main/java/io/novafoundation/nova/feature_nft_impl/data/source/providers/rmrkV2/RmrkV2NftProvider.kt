@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2
 
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.model.NftLocal
@@ -9,15 +10,18 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_api.data.model.NftDetails
+import io.novafoundation.nova.feature_nft_impl.data.mappers.mapNftLocalToNftType
 import io.novafoundation.nova.feature_nft_impl.data.mappers.nftIssuance
 import io.novafoundation.nova.feature_nft_impl.data.mappers.nftPrice
 import io.novafoundation.nova.feature_nft_impl.data.network.distributed.FileStorageAdapter.adoptFileStorageLinkToHttps
 import io.novafoundation.nova.feature_nft_impl.data.source.NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.network.singular.SingularV2Api
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
 class RmrkV2NftProvider(
@@ -27,7 +31,12 @@ class RmrkV2NftProvider(
     private val nftDao: NftDao
 ) : NftProvider {
 
-    override suspend fun initialNftsSync(chain: Chain, metaAccount: MetaAccount, forceOverwrite: Boolean) {
+    override suspend fun initialNftsSync(
+        chain: Chain,
+        metaAccount: MetaAccount,
+        forceOverwrite: Boolean,
+        at: BlockHash?
+    ) {
         val address = metaAccount.addressIn(chain) ?: return
         val nfts = singularV2Api.getAccountNfts(address)
 
@@ -53,6 +62,13 @@ class RmrkV2NftProvider(
         }
 
         nftDao.insertNftsDiff(NftLocal.Type.RMRK2, metaAccount.id, toSave, forceOverwrite)
+    }
+
+    override suspend fun subscribeNftOwnerAccountId(
+        subscriptionBuilder: StorageSharedRequestsBuilder,
+        nftLocal: NftLocal
+    ): Flow<AccountId?> {
+        throw UnsupportedOperationException("RmrkV2 doesn't supported")
     }
 
     override suspend fun nftFullSync(nft: Nft) {
@@ -106,7 +122,8 @@ class RmrkV2NftProvider(
                     id = nftLocal.collectionId,
                     name = collectionMetadata?.name,
                     media = collectionMetadata?.image?.adoptFileStorageLinkToHttps()
-                )
+                ),
+                type = mapNftLocalToNftType(nftLocal)
             )
         }
     }

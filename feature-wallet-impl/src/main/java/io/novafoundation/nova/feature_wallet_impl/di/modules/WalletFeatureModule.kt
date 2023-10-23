@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.di
+package io.novafoundation.nova.feature_wallet_impl.di.modules
 
 import com.google.gson.Gson
 import dagger.Module

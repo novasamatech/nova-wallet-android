@@ -56,7 +56,7 @@ class NfDetailsModule {
             nftIdentifier = nftIdentifier,
             externalActionsDelegate = accountExternalActions,
             addressIconGenerator = addressIconGenerator,
-            addressDisplayUseCase = addressDisplayUseCase,
+            addressDisplayUseCase = addressDisplayUseCase
         )
     }
 }

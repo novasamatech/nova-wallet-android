@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressCommunicator
 import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -14,6 +15,7 @@ import javax.inject.Inject
 class NftFeatureHolder @Inject constructor(
     featureContainer: FeatureContainer,
     private val router: NftRouter,
+    private val selectAddressCommunicator: SelectAddressCommunicator
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -26,6 +28,6 @@ class NftFeatureHolder @Inject constructor(
             .build()
 
         return DaggerNftFeatureComponent.factory()
-            .create(router, dApp)
+            .create(router, selectAddressCommunicator, dApp)
     }
 }

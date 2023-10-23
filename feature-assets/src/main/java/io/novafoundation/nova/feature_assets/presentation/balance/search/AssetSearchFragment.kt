@@ -18,9 +18,9 @@ import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetGroupingDecoration
+import io.novafoundation.nova.common.presentation.asset.AssetGroupingDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
-import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
+import io.novafoundation.nova.common.presentation.asset.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetContainer
 import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetList
