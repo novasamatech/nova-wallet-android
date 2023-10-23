@@ -12,4 +12,6 @@ interface StakingDashboardRouter {
     fun openMoreStakingOptions()
 
     fun returnToStakingDashboard()
+
+    fun openStakingDashboard()
 }

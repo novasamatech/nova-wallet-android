@@ -161,6 +161,9 @@ class BalanceListViewModel(
         .map { if (it) R.drawable.ic_chip_filter_indicator else R.drawable.ic_chip_filter }
         .shareInBackground()
 
+    val shouldShowCrowdloanBanner = assetsListInteractor.shouldShowCrowdloansBanner()
+        .shareInBackground()
+
     init {
         selectedCurrency
             .onEach { fullSync() }
@@ -316,5 +319,19 @@ class BalanceListViewModel(
 
     fun buyClicked() {
         router.openBuyFlow()
+    }
+
+    fun crowdloanBannerClicked() {
+        router.openStaking()
+
+        hideCrowdloanBanner()
+    }
+
+    fun crowdloanBannerCloseClicked() {
+        hideCrowdloanBanner()
+    }
+
+    private fun hideCrowdloanBanner() = launch {
+        assetsListInteractor.hideCrowdloanBanner()
     }
 }
