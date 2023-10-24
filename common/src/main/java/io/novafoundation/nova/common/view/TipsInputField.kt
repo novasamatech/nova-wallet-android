@@ -91,6 +91,10 @@ class TipsInputField @JvmOverloads constructor(
         content.hint = hint
     }
 
+    fun clearTips() {
+        tipsInputContainer.removeAllViews()
+    }
+
     fun addIconTip(@DrawableRes iconRes: Int, @ColorRes tintRes: Int? = null, onClick: OnClickListener): View {
         val view = ImageView(context)
         prepareCommonOptions(view, onClick)

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange
 
 import io.novafoundation.nova.common.utils.MultiMap
+import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicHash
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
@@ -25,7 +26,18 @@ interface AssetExchange {
     suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee
 
     suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicHash>
+
+    suspend fun slippageConfig(): SlippageConfig
 }
+
+class SlippageConfig(
+    val defaultSlippage: Percent,
+    val slippageTips: List<Percent>,
+    val minAvailableSlippage: Percent,
+    val maxAvailableSlippage: Percent,
+    val smallSlippage: Percent,
+    val bigSlippage: Percent
+)
 
 class AssetExchangeQuote(
     val quote: Balance,

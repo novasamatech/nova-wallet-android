@@ -33,10 +33,6 @@ class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel>() {
         swapOptionsToolbar.applyStatusBarInsets()
         swapOptionsToolbar.setHomeButtonListener { viewModel.backClicked() }
         swapOptionsToolbar.setRightActionClickListener { viewModel.resetClicked() }
-        swapOptionsSlippageInput.setHint(viewModel.getDefaultSlippage())
-        viewModel.getSlippageTips().forEachIndexed { index, text ->
-            swapOptionsSlippageInput.addTextTip(text, R.color.text_primary) { viewModel.tipClicked(index) }
-        }
         swapOptionsApplyButton.setOnClickListener { viewModel.applyClicked() }
     }
 
@@ -52,6 +48,13 @@ class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel>() {
 
     override fun subscribe(viewModel: SwapOptionsViewModel) {
         swapOptionsSlippageInput.content.bindTo(viewModel.slippageInput, viewModel.viewModelScope)
+        viewModel.defaultSlippage.observe { swapOptionsSlippageInput.setHint(it) }
+        viewModel.slippageTips.observe {
+            swapOptionsSlippageInput.clearTips()
+            it.forEachIndexed { index, text ->
+                swapOptionsSlippageInput.addTextTip(text, R.color.text_primary) { viewModel.tipClicked(index) }
+            }
+        }
         viewModel.buttonState.observe { swapOptionsApplyButton.setState(it) }
         viewModel.slippageErrorState.observe { swapOptionsSlippageInput.setError(it) }
         viewModel.slippageWarningState.observe { swapOptionsAlert.setTextOrHide(it) }
