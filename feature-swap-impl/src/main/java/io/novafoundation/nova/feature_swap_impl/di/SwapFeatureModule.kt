@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversi
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.swap.RealSwapService
 import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSettingsStateProvider
-import io.novafoundation.nova.feature_swap_impl.presentation.state.SwapSettingsState
 import io.novafoundation.nova.feature_swap_impl.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -53,23 +52,13 @@ class SwapFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideSwapSettingsSharedState(): SwapSettingsState {
-        return SwapSettingsState()
-    }
-
-    @Provides
-    @FeatureScope
     fun provideSwapInteractor(
         swapService: SwapService,
-        swapSettingsState: SwapSettingsState,
-        chainRegistry: ChainRegistry,
         walletRepository: WalletRepository,
         accountRepository: AccountRepository
     ): SwapInteractor {
         return SwapInteractor(
             swapService,
-            swapSettingsState,
-            chainRegistry,
             walletRepository,
             accountRepository
         )
@@ -78,8 +67,9 @@ class SwapFeatureModule {
     @Provides
     @FeatureScope
     fun provideSwapSettingsStoreProvider(
-        computationalCache: ComputationalCache
+        computationalCache: ComputationalCache,
+        chainRegistry: ChainRegistry
     ): SwapSettingsStateProvider {
-        return RealSwapSettingsStateProvider(computationalCache)
+        return RealSwapSettingsStateProvider(computationalCache, chainRegistry)
     }
 }

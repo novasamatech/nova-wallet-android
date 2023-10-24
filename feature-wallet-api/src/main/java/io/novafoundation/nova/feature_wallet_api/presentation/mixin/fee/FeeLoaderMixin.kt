@@ -25,10 +25,10 @@ import kotlinx.coroutines.flow.transform
 import java.math.BigDecimal
 import java.math.BigInteger
 
-sealed class FeeStatus<out F: GenericFee> {
+sealed class FeeStatus<out F : GenericFee> {
     object Loading : FeeStatus<Nothing>()
 
-    class Loaded<F: GenericFee>(val feeModel: GenericFeeModel<F>) : FeeStatus<F>()
+    class Loaded<F : GenericFee>(val feeModel: GenericFeeModel<F>) : FeeStatus<F>()
 
     object NoFee : FeeStatus<Nothing>()
 
@@ -41,7 +41,7 @@ interface GenericFee {
 }
 
 @JvmInline
-value class SimpleFee(override val networkFee: Fee): GenericFee
+value class SimpleFee(override val networkFee: Fee) : GenericFee
 
 interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
@@ -52,7 +52,7 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
     val feeLiveData: LiveData<FeeStatus<F>>
 
-    interface Presentation<F : GenericFee>: GenericFeeLoaderMixin<F> {
+    interface Presentation<F : GenericFee> : GenericFeeLoaderMixin<F> {
 
         suspend fun loadFeeSuspending(
             retryScope: CoroutineScope,
@@ -80,7 +80,7 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
     interface Factory {
 
         fun <F : GenericFee> createGeneric(
-            tokenFlow: Flow<Token>,
+            tokenFlow: Flow<Token?>,
             configuration: Configuration<F> = Configuration()
         ): Presentation<F>
     }
@@ -89,8 +89,7 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 interface FeeLoaderMixin : GenericFeeLoaderMixin<SimpleFee> {
 
     // Additional methods in this interface are only for backward-compatibility to simplify migration of the old code
-    interface Presentation: GenericFeeLoaderMixin.Presentation<SimpleFee>, FeeLoaderMixin {
-
+    interface Presentation : GenericFeeLoaderMixin.Presentation<SimpleFee>, FeeLoaderMixin {
 
         @Deprecated("Use loadFeeV2")
         fun loadFee(
@@ -116,28 +115,26 @@ interface FeeLoaderMixin : GenericFeeLoaderMixin<SimpleFee> {
             feeConstructor: suspend (Token) -> Fee?,
             onRetryCancelled: () -> Unit,
         ) = loadFeeV2Generic(
-            coroutineScope =coroutineScope,
+            coroutineScope = coroutineScope,
             feeConstructor = { token -> feeConstructor(token)?.let(::SimpleFee) },
             onRetryCancelled = onRetryCancelled
         )
     }
 
-
     interface Factory : GenericFeeLoaderMixin.Factory {
 
         fun create(
-            tokenFlow: Flow<Token>,
+            tokenFlow: Flow<Token?>,
             configuration: Configuration<SimpleFee> = Configuration()
         ): Presentation
     }
 }
 
-suspend fun <F: GenericFee> GenericFeeLoaderMixin<F>.awaitDecimalFee(): GenericDecimalFee<F> = feeLiveData.asFlow()
+suspend fun <F : GenericFee> GenericFeeLoaderMixin<F>.awaitDecimalFee(): GenericDecimalFee<F> = feeLiveData.asFlow()
     .filterIsInstance<FeeStatus.Loaded<F>>()
     .first().feeModel.decimalFee
 
-
-suspend fun  <F: GenericFee> GenericFeeLoaderMixin<F>.awaitOptionalDecimalFee(): GenericDecimalFee<F>? = feeLiveData.asFlow()
+suspend fun <F : GenericFee> GenericFeeLoaderMixin<F>.awaitOptionalDecimalFee(): GenericDecimalFee<F>? = feeLiveData.asFlow()
     .transform { feeStatus ->
         when (feeStatus) {
             is FeeStatus.Loaded -> emit(feeStatus.feeModel.decimalFee)

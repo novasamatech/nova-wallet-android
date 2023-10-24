@@ -13,8 +13,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericFeeMo
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import java.math.BigDecimal
 
-
-
 fun <F : GenericFee> mapFeeToFeeModel(
     fee: F,
     token: Token,
@@ -30,6 +28,7 @@ fun <F : GenericFee> mapFeeToFeeModel(
         includeZeroFiat = includeZeroFiat
     )
 )
+
 @Suppress("DeprecatedCallableAddReplaceWith")
 @Deprecated("Backward-compatible adapter")
 fun mapFeeToFeeModel(

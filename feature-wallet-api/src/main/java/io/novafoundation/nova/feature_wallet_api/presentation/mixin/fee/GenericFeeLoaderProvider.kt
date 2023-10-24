@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.feature_account_api.data.model.InlineFee
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
@@ -13,7 +14,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -24,14 +24,14 @@ class FeeLoaderProviderFactory(
 ) : FeeLoaderMixin.Factory {
 
     override fun create(
-        tokenFlow: Flow<Token>,
+        tokenFlow: Flow<Token?>,
         configuration: GenericFeeLoaderMixin.Configuration<SimpleFee>
     ): FeeLoaderMixin.Presentation {
         return FeeLoaderProvider(resourceManager, configuration, tokenFlow)
     }
 
     override fun <F : GenericFee> createGeneric(
-        tokenFlow: Flow<Token>,
+        tokenFlow: Flow<Token?>,
         configuration: GenericFeeLoaderMixin.Configuration<F>
     ): GenericFeeLoaderMixin.Presentation<F> {
         return GenericFeeLoaderProvider(resourceManager, configuration, tokenFlow)
@@ -41,8 +41,8 @@ class FeeLoaderProviderFactory(
 private class FeeLoaderProvider(
     resourceManager: ResourceManager,
     configuration: GenericFeeLoaderMixin.Configuration<SimpleFee>,
-    tokenFlow: Flow<Token>,
-): GenericFeeLoaderProvider<SimpleFee>(resourceManager, configuration, tokenFlow), FeeLoaderMixin.Presentation {
+    tokenFlow: Flow<Token?>,
+) : GenericFeeLoaderProvider<SimpleFee>(resourceManager, configuration, tokenFlow), FeeLoaderMixin.Presentation {
 
     override fun loadFee(
         coroutineScope: CoroutineScope,
@@ -52,7 +52,7 @@ private class FeeLoaderProvider(
         coroutineScope.launch {
             loadFeeSuspending(
                 retryScope = coroutineScope,
-                feeConstructor = { token -> feeConstructor(token)?.let{ SimpleFee(InlineFee(it)) } },
+                feeConstructor = { token -> feeConstructor(token)?.let { SimpleFee(InlineFee(it)) } },
                 onRetryCancelled = onRetryCancelled
             )
         }
@@ -60,7 +60,7 @@ private class FeeLoaderProvider(
 
     override suspend fun setFee(feeAmount: BigDecimal?) {
         val fee = feeAmount?.let {
-            val token = tokenFlow.first()
+            val token = tokenFlow.firstNotNull()
             InlineFee(token.planksFromAmount(feeAmount))
         }
 
@@ -87,7 +87,7 @@ private class FeeLoaderProvider(
 private open class GenericFeeLoaderProvider<F : GenericFee>(
     protected val resourceManager: ResourceManager,
     protected val configuration: GenericFeeLoaderMixin.Configuration<F>,
-    protected val tokenFlow: Flow<Token>,
+    protected val tokenFlow: Flow<Token?>,
 ) : GenericFeeLoaderMixin.Presentation<F> {
 
     final override val feeLiveData = MutableLiveData<FeeStatus<F>>()
@@ -105,7 +105,7 @@ private open class GenericFeeLoaderProvider<F : GenericFee>(
     ): Unit = withContext(Dispatchers.IO) {
         feeLiveData.postValue(FeeStatus.Loading)
 
-        val token = tokenFlow.first()
+        val token = tokenFlow.firstNotNull()
 
         val value = runCatching {
             feeConstructor(token)
@@ -133,7 +133,7 @@ private open class GenericFeeLoaderProvider<F : GenericFee>(
 
     override suspend fun setFee(fee: F?) {
         if (fee != null) {
-            val token = tokenFlow.first()
+            val token = tokenFlow.firstNotNull()
             val feeModel = mapFeeToFeeModel(fee, token, includeZeroFiat = configuration.showZeroFiat)
 
             feeLiveData.postValue(FeeStatus.Loaded(feeModel))

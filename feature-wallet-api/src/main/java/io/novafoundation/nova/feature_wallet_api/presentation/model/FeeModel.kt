@@ -13,8 +13,7 @@ class GenericFeeModel<F : GenericFee>(
     val display: AmountModel,
 )
 
-
-class GenericDecimalFee<F: GenericFee>(
+class GenericDecimalFee<F : GenericFee>(
     val genericFee: F,
     val networkFeeDecimalAmount: BigDecimal
 ) {

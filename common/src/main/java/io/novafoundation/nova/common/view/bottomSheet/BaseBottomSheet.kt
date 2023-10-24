@@ -20,7 +20,7 @@ abstract class BaseBottomSheet(
     context: Context,
     style: Int = R.style.BottomSheetDialog,
     private val onCancel: (() -> Unit)? = null,
-    ) :
+) :
     BottomSheetDialog(context, style),
     DialogExtensions,
     CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.Main) {

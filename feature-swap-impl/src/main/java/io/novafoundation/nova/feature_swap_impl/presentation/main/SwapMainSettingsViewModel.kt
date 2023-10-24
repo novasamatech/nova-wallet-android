@@ -57,8 +57,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -66,6 +68,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlin.time.Duration.Companion.milliseconds
@@ -128,7 +131,7 @@ class SwapMainSettingsViewModel(
     )
 
     val feeMixin = feeLoaderMixinFactory.createGeneric<SwapFee>(
-        tokenFlow = feeAssetFlow.map { it.token },
+        tokenFlow = feeAssetFlow.map { it?.token },
         configuration = GenericFeeLoaderMixin.Configuration(
             initialStatusValue = FeeStatus.NoFee
         )
@@ -179,7 +182,7 @@ class SwapMainSettingsViewModel(
             val chainAsset = assets[1].token.configuration
             val chain = chainRegistry.getChain(chainAsset.chainId)
 
-            swapSettingState().setAssetInUpdatingFee(chainAsset, chain)
+            swapSettingState().setAssetInUpdatingFee(chainAsset)
         }
     }
 
@@ -274,7 +277,7 @@ class SwapMainSettingsViewModel(
         swapDirectionFlipped.value = newSettings.swapDirection!!.event()
     }
 
-    private suspend fun isEditFeeTokenAvailable(assetIn: Chain.Asset?) : Boolean {
+    private suspend fun isEditFeeTokenAvailable(assetIn: Chain.Asset?): Boolean {
         return assetIn != null && swapInteractor.canPayFeeInCustomAsset(assetIn)
     }
 
@@ -353,8 +356,12 @@ class SwapMainSettingsViewModel(
         val feeAssetNeededForBuyIn = minimumBalanceBuyIn.commissionAssetToSpendOnBuyIn.formatPlanks(minimumBalanceBuyIn.commissionAsset)
         val nativeMinimumBalance = minimumBalanceBuyIn.nativeMinimumBalance.formatPlanks(minimumBalanceBuyIn.nativeAsset)
 
-        return resourceManager.getString(R.string.swap_minimum_balance_buy_in_alert,
-            feeAssetSymbol, feeAssetNeededForBuyIn, nativeMinimumBalance, nativeAssetSymbol
+        return resourceManager.getString(
+            R.string.swap_minimum_balance_buy_in_alert,
+            feeAssetSymbol,
+            feeAssetNeededForBuyIn,
+            nativeMinimumBalance,
+            nativeAssetSymbol
         )
     }
 
@@ -381,13 +388,23 @@ class SwapMainSettingsViewModel(
         inputState.value = InputState(amountInputFormatter.format(amount), initiatedByUser = false)
     }
 
-    private fun Flow<SwapSettings>.assetFlowOf(extractor: (SwapSettings) -> Chain.Asset?): Flow<Asset> {
-        return mapNotNull { extractor(it) }
-            .flatMapLatest { assetUseCase.assetFlow(it) }
+    private fun Flow<SwapSettings>.assetFlowOf(extractor: (SwapSettings) -> Chain.Asset?): Flow<Asset?> {
+        return map { extractor(it) }
+            .transformLatest { chainAsset ->
+                if (chainAsset == null) {
+                    emit(null)
+                } else {
+                    emitAll(assetUseCase.assetFlow(chainAsset))
+                }
+            }
             .shareInBackground()
     }
 
-    private suspend fun Flow<Asset>.ensureToken(asset: Chain.Asset) = first { it.token.configuration.fullId == asset.fullId }.token
+    private suspend fun Flow<Asset?>.ensureToken(asset: Chain.Asset): Token {
+        return filterNotNull()
+            .first { it.token.configuration.fullId == asset.fullId }
+            .token
+    }
 
     private val amountInputFormatter = CompoundNumberFormatter(
         abbreviations = listOf(

@@ -5,18 +5,21 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.flip
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.commissionAsset
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SelectedOptionSharedState
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class SwapSettingsState(
-    initialValue: SwapSettings = SwapSettings()
+    private val chainRegistry: ChainRegistry,
+    initialValue: SwapSettings = SwapSettings(),
 ) : SelectedOptionSharedState<SwapSettings> {
 
     override val selectedOption = MutableStateFlow(initialValue)
 
-    fun setAssetInUpdatingFee(asset: Chain.Asset, chain: Chain) {
+    suspend fun setAssetInUpdatingFee(asset: Chain.Asset) {
         val current = selectedOption.value
+        val chain = chainRegistry.getChain(asset.chainId)
 
         val new = if (current.feeAsset == null || current.feeAsset.chainId != chain.id) {
             current.copy(assetIn = asset, feeAsset = chain.commissionAsset)
@@ -43,11 +46,16 @@ class SwapSettingsState(
         selectedOption.value = selectedOption.value.copy(slippage = slippage)
     }
 
-    fun flipAssets(): SwapSettings {
+    suspend fun flipAssets(): SwapSettings {
         val currentSettings = selectedOption.value
+
+        val newAssetIn = currentSettings.assetOut
+        val chain = newAssetIn?.chainId?.let { chainRegistry.getChain(it) }
+
         val newSettings = currentSettings.copy(
             assetIn = currentSettings.assetOut,
             assetOut = currentSettings.assetIn,
+            feeAsset = chain?.commissionAsset, // we reset commission asset during flipping to ensure we only allow to pay in commissionAsset or assetIn
             swapDirection = currentSettings.swapDirection?.flip()
         )
         selectedOption.value = newSettings
