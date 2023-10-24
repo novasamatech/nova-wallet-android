@@ -6,11 +6,9 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
-import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSettingsState
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.fullId
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.CoroutineScope
 
 class SwapInteractor(
