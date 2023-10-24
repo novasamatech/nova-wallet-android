@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
@@ -40,7 +41,8 @@ class SwapMainSettingsModule {
         swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
         chainRegistry: ChainRegistry,
         assetUseCase: ArbitraryAssetUseCase,
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory
+        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -50,7 +52,8 @@ class SwapMainSettingsModule {
             swapAmountInputMixinFactory = swapAmountInputMixinFactory,
             chainRegistry = chainRegistry,
             assetUseCase = assetUseCase,
-            feeLoaderMixinFactory = feeLoaderMixinFactory
+            feeLoaderMixinFactory = feeLoaderMixinFactory,
+            actionAwaitableFactory = actionAwaitableMixinFactory
         )
     }
 

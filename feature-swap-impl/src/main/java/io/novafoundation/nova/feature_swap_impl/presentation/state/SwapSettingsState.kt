@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.flip
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SelectedOptionSharedState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,13 +18,11 @@ class SwapSettingsState(
     fun setAssetInUpdatingFee(asset: Chain.Asset, chain: Chain) {
         val current = selectedOption.value
 
-//        val new = if (current.feeAsset == null || current.feeAsset.chainId != chain.id) {
-//            current.copy(assetIn = asset, feeAsset = asset)
-//        } else {
-//            current.copy(assetIn = asset)
-//        }
-         // TODO change back to feeAsset = chain.commissionAsset
-        val new = current.copy(assetIn = asset, feeAsset = asset)
+        val new = if (current.feeAsset == null || current.feeAsset.chainId != chain.id) {
+            current.copy(assetIn = asset, feeAsset = chain.commissionAsset)
+        } else {
+            current.copy(assetIn = asset)
+        }
 
         selectedOption.value = new
     }

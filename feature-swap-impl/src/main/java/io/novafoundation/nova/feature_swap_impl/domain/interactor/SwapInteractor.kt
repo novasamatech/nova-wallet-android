@@ -11,9 +11,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
-
-class SwapSettingsNotReadyException : Exception()
 
 class SwapInteractor(
     private val swapService: SwapService,
@@ -35,6 +34,10 @@ class SwapInteractor(
 
     suspend fun quote(quoteArgs: SwapQuoteArgs): Result<SwapQuote> {
         return swapService.quote(quoteArgs)
+    }
+
+    suspend fun canPayFeeInCustomAsset(asset: Chain.Asset): Boolean {
+        return swapService.canPayFeeInNonUtilityAsset(asset)
     }
 
     suspend fun estimateFee(executeArgs: SwapExecuteArgs): SwapFee {

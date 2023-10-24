@@ -415,6 +415,14 @@
         <item name="messageStyle">@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary</item>
     </style>
 
+    <style name="Widget.Nova.Tabs.OnLight" parent="">
+        <item name="TabsView_backgroundTint">@color/segmented_background</item>
+    </style>
+
+    <style name="Widget.Nova.Tabs.OnBlack" parent="">
+        <item name="TabsView_backgroundTint">@color/segmented_background_on_black</item>
+    </style>
+
     <!-- Buttons -->
 
     <!-- Input -->

@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 
@@ -17,6 +18,13 @@ interface AssetExchange {
 
         suspend fun create(chainId: ChainId): AssetExchange?
     }
+
+    /**
+     * Implementations should expect `asset` to be non-utility asset,
+     * e.g. they don't need to additionally check whether asset is utility or not
+     * They can also expect this method is called only when asset is present in [AssetExchange.availableSwapDirections]
+     */
+    suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean
 
     suspend fun availableSwapDirections(): MultiMap<FullChainAssetId, FullChainAssetId>
 

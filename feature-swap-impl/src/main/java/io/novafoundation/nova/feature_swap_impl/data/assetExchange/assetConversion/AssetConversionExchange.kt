@@ -91,6 +91,11 @@ private class AssetConversionExchange(
     private val assetSourceRegistry: AssetSourceRegistry,
 ) : AssetExchange {
 
+    override suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean {
+        // any asset is usable as a fee as soon as it has associated pool
+        return true
+    }
+
     override suspend fun availableSwapDirections(): MultiMap<FullChainAssetId, FullChainAssetId> {
         return remoteStorageSource.query(chain.id) {
             val allPools = metadata.assetConversionOrNull?.pools?.keys().orEmpty()

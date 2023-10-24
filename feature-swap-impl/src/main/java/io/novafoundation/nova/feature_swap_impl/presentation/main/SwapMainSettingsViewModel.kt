@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -86,7 +87,8 @@ class SwapMainSettingsViewModel(
     private val chainRegistry: ChainRegistry,
     private val assetUseCase: ArbitraryAssetUseCase,
     private val swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
-    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory
+    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    private val actionAwaitableFactory: ActionAwaitableMixin.Factory
 ) : BaseViewModel() {
 
     private val swapSettingState = async {
@@ -101,13 +103,14 @@ class SwapMainSettingsViewModel(
     private val assetInFlow = swapSettings.assetFlowOf(SwapSettings::assetIn)
     private val feeAssetFlow = swapSettings.assetFlowOf(SwapSettings::feeAsset)
 
-    private val nativeAssetFlow = swapSettings
+    private val originChainFlow = swapSettings
         .mapNotNull { it.assetIn?.chainId }
         .distinctUntilChanged()
-        .flatMapLatest {
-            val chain = chainRegistry.getChain(it)
-            assetUseCase.assetFlow(chain.commissionAsset)
-        }
+        .map { chainRegistry.getChain(it) }
+        .shareInBackground()
+
+    private val nativeAssetFlow = originChainFlow
+        .flatMapLatest { assetUseCase.assetFlow(it.commissionAsset) }
         .shareInBackground()
 
     val amountInInput = swapAmountInputMixinFactory.create(
@@ -149,6 +152,13 @@ class SwapMainSettingsViewModel(
     val minimumBalanceBuyAlert = feeMixin.loadedFeeFlow()
         .map(::prepareMinimumBalanceBuyInAlertIfNeeded)
         .shareInBackground()
+
+    val canChangeFeeToken = swapSettings.map { it.assetIn }
+        .distinctUntilChanged()
+        .map(::isEditFeeTokenAvailable)
+        .shareInBackground()
+
+    val changeFeeTokenEvent = actionAwaitableFactory.create<FeeAssetSelectorBottomSheet.Payload, Chain.Asset>()
 
     init {
         handleInputChanges(amountInInput, SwapSettings::assetIn, SwapDirection.SPECIFIED_IN)
@@ -204,6 +214,22 @@ class SwapMainSettingsViewModel(
         swapRouter.back()
     }
 
+    fun editFeeTokenClicked() = launch {
+        val swapSettings = swapSettings.first()
+        val originChain = originChainFlow.first()
+
+        val payload = FeeAssetSelectorBottomSheet.Payload(
+            options = listOf(
+                originChain.commissionAsset,
+                swapSettings.assetIn ?: return@launch,
+            ),
+            selectedOption = swapSettings.feeAsset ?: return@launch
+        )
+        val newFeeToken = changeFeeTokenEvent.awaitAction(payload)
+
+        swapSettingState().setFeeAsset(newFeeToken)
+    }
+
     @OptIn(FlowPreview::class)
     private fun GenericFeeLoaderMixin.Presentation<SwapFee>.setupFees() {
         quotingState
@@ -246,6 +272,10 @@ class SwapMainSettingsViewModel(
         }
 
         swapDirectionFlipped.value = newSettings.swapDirection!!.event()
+    }
+
+    private suspend fun isEditFeeTokenAvailable(assetIn: Chain.Asset?) : Boolean {
+        return assetIn != null && swapInteractor.canPayFeeInCustomAsset(assetIn)
     }
 
     private fun formatRate(swapQuote: SwapQuote): String {

@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversi
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -41,6 +42,15 @@ internal class RealSwapService(
     private val assetConversionFactory: AssetConversionExchangeFactory,
     private val computationalCache: ComputationalCache,
 ) : SwapService {
+
+    override suspend fun canPayFeeInNonUtilityAsset(asset: Chain.Asset): Boolean = withContext(Dispatchers.Default) {
+        val computationScope = CoroutineScope(coroutineContext)
+
+        val exchange = exchanges(computationScope).getValue(asset.chainId)
+        val isCustomFeeToken = !asset.isCommissionAsset
+
+        isCustomFeeToken && exchange.canPayFeeInNonUtilityToken(asset)
+    }
 
     override suspend fun assetsAvailableForSwap(
         computationScope: CoroutineScope

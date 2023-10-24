@@ -42,10 +42,7 @@ fun SwapQuote.swapRate(): BigDecimal {
 class SwapFee(
     override val networkFee: Fee,
     val minimumBalanceBuyIn: MinimumBalanceBuyIn,
-) : GenericFee {
-
-
-}
+) : GenericFee
 
 sealed class MinimumBalanceBuyIn {
 

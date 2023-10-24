@@ -94,5 +94,24 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         }
 
         viewModel.minimumBalanceBuyAlert.observe(swapMainSettingsMinBalanceAlert::setModel)
+
+        viewModel.canChangeFeeToken.observe { canChangeFeeToken ->
+            if (canChangeFeeToken) {
+                swapMainSettingsDetailsNetworkFee.setPrimaryValueStartIcon(R.drawable.ic_pencil_edit)
+                swapMainSettingsDetailsNetworkFee.setOnValueClickListener { viewModel.editFeeTokenClicked() }
+            } else {
+                swapMainSettingsDetailsNetworkFee.setPrimaryValueStartIcon(null)
+                swapMainSettingsDetailsNetworkFee.setOnValueClickListener(null)
+            }
+        }
+
+        viewModel.changeFeeTokenEvent.awaitableActionLiveData.observeEvent {
+            FeeAssetSelectorBottomSheet(
+                context = requireContext(),
+                payload = it.payload,
+                onOptionClicked = it.onSuccess,
+                onCancel = it.onCancel
+            ).show()
+        }
     }
 }
