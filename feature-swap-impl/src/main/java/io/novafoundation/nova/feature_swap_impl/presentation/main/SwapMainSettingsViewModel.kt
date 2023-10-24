@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
+import android.text.SpannableStringBuilder
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -7,6 +8,7 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.asPercent
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.CompoundNumberFormatter
@@ -29,6 +31,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmou
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.state.swapSettingsFlow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -59,6 +62,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -80,7 +84,8 @@ class SwapMainSettingsViewModel(
     private val assetUseCase: ArbitraryAssetUseCase,
     private val swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
     private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-    private val payload: SwapSettingsPayload
+    private val payload: SwapSettingsPayload,
+    private val priceImpactFormatter: PriceImpactFormatter
 ) : BaseViewModel() {
 
     private val swapSettingState = async {
@@ -109,11 +114,23 @@ class SwapMainSettingsViewModel(
         emptyAssetTitle = R.string.swap_field_asset_to_title
     )
 
+    val amountOutFiat = combine(quotingState, amountOutInput.fiatAmount) { quote, fiat ->
+        formatOutFiat(quote, fiat)
+    }
+
     val feeMixin = feeLoaderMixinFactory.create(
         tokenFlow = feeAssetFlow.map { it.token }
     )
 
     val rateDetails: Flow<ExtendedLoadingState<String>> = quotingState.map {
+        when (it) {
+            is QuotingState.NotAvailable, QuotingState.Loading -> ExtendedLoadingState.Loading
+            is QuotingState.Loaded -> ExtendedLoadingState.Loaded(formatRate(it.value))
+        }
+    }
+        .shareInBackground()
+
+    val slippageDetails: Flow<ExtendedLoadingState<String>> = quotingState.map {
         when (it) {
             is QuotingState.NotAvailable, QuotingState.Loading -> ExtendedLoadingState.Loading
             is QuotingState.Loaded -> ExtendedLoadingState.Loaded(formatRate(it.value))
@@ -340,4 +357,19 @@ class SwapMainSettingsViewModel(
             ),
         )
     )
+
+    private fun formatOutFiat(
+        quote: QuotingState,
+        fiat: String
+    ) = when (quote) {
+        is QuotingState.NotAvailable, QuotingState.Loading -> fiat
+        is QuotingState.Loaded -> {
+            priceImpactFormatter.formatWithBrackets(quote.value.priceImpact)?.let {
+                SpannableStringBuilder().apply {
+                    append("$fiat ")
+                    append(it)
+                }
+            } ?: fiat
+        }
+    }
 }

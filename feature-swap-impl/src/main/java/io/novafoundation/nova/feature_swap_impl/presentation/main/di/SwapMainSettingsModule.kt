@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsViewModel
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -42,7 +43,8 @@ class SwapMainSettingsModule {
         chainRegistry: ChainRegistry,
         assetUseCase: ArbitraryAssetUseCase,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-        payload: SwapSettingsPayload
+        payload: SwapSettingsPayload,
+        priceImpactFormatter: PriceImpactFormatter
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -53,7 +55,8 @@ class SwapMainSettingsModule {
             chainRegistry = chainRegistry,
             assetUseCase = assetUseCase,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
-            payload = payload
+            payload = payload,
+            priceImpactFormatter = priceImpactFormatter
         )
     }
 

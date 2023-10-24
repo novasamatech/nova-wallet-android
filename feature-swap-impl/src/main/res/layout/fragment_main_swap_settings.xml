@@ -97,8 +97,11 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
         android:text="@string/swap_error_pair_not_supported"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsReceiveInput"
-        app:style="error" />
+        app:style="error"
+        app:styleIcon="@drawable/ic_close_circle"
+        app:styleIconTint="@color/icon_negative" />
 
     <io.novafoundation.nova.common.view.ExpandableView
         android:id="@+id/swapMainSettingsDetails"

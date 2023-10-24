@@ -10,7 +10,9 @@ import androidx.annotation.StringRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getEnum
+import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.letOrHide
+import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
 import kotlinx.android.synthetic.main.view_alert.view.alertIcon
@@ -26,7 +28,7 @@ class AlertView @JvmOverloads constructor(
         WARNING, ERROR
     }
 
-    class Style(@DrawableRes val iconRes: Int, @ColorRes val backgroundColorRes: Int)
+    class Style(@DrawableRes val iconRes: Int, @ColorRes val backgroundColorRes: Int, @ColorRes val iconTintRes: Int? = null)
 
     init {
         View.inflate(context, R.layout.view_alert, this)
@@ -40,7 +42,7 @@ class AlertView @JvmOverloads constructor(
 
     fun setStyle(style: Style) {
         setStyleBackground(style.backgroundColorRes)
-        setStyleIcon(style.iconRes)
+        setStyleIcon(style.iconRes, style.iconTintRes)
     }
 
     fun setStylePreset(preset: StylePreset) {
@@ -59,8 +61,9 @@ class AlertView @JvmOverloads constructor(
         background = getRoundedCornerDrawable(fillColorRes = colorRes)
     }
 
-    private fun setStyleIcon(@DrawableRes iconRes: Int) {
+    private fun setStyleIcon(@DrawableRes iconRes: Int, iconTintRes: Int? = null) {
         alertIcon.setImageResource(iconRes)
+        alertIcon.setImageTintRes(iconTintRes)
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.AlertView) {
@@ -69,8 +72,9 @@ class AlertView @JvmOverloads constructor(
 
         val backgroundColorRes = it.getResourceId(R.styleable.AlertView_styleBackgroundColor, styleFromPreset.backgroundColorRes)
         val iconRes = it.getResourceId(R.styleable.AlertView_styleIcon, styleFromPreset.iconRes)
+        val iconTintRes = it.getResourceIdOrNull(R.styleable.AlertView_styleIconTint)
 
-        setStyle(Style(iconRes, backgroundColorRes))
+        setStyle(Style(iconRes, backgroundColorRes, iconTintRes))
 
         val text = it.getString(R.styleable.AlertView_android_text)
         text?.let(::setText)

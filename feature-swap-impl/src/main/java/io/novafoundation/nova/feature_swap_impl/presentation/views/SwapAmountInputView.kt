@@ -54,15 +54,15 @@ class SwapAmountInputView @JvmOverloads constructor(
         amountInput.isVisible = model.showInput
     }
 
-    fun setFiatAmount(priceAmount: String?) {
+    fun setFiatAmount(priceAmount: CharSequence?) {
         swapAmountInputFiat.setTextOrHide(priceAmount)
     }
 
-    private fun setTitle(title: String) {
+    private fun setTitle(title: CharSequence) {
         swapAmountInputToken.text = title
     }
 
-    private fun setSubtitle(icon: Icon?, subtitle: String) {
+    private fun setSubtitle(icon: Icon?, subtitle: CharSequence) {
         swapAmountInputSubtitleImage.setIconOrMakeGone(icon, imageLoader)
         swapAmountInputSubtitle.text = subtitle
     }

@@ -176,6 +176,7 @@
 
         <attr name="styleBackgroundColor" format="color" />
         <attr name="styleIcon" format="color|reference" />
+        <attr name="styleIconTint" format="color" />
 
         <attr name="android:text" />
     </declare-styleable>
