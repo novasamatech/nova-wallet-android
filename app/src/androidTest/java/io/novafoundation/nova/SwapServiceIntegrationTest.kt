@@ -19,12 +19,14 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatP
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureComponent
 import io.novafoundation.nova.runtime.ext.Geneses
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 import org.junit.Test
 import java.math.BigDecimal
 
@@ -35,6 +37,7 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
     private val walletApi = FeatureUtils.getFeature<WalletFeatureComponent>(context, WalletFeatureApi::class.java)
 
     private val tokenRepository = walletApi.provideTokenRepository()
+    private val arbitraryAssetUseCase = walletApi.arbitraryAssetUseCase
     private val swapService = swapApi.swapService
 
     @Test
@@ -83,7 +86,8 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
                 amountIn = siri.planksFromAmount(0.000001.toBigDecimal()),
                 amountOutMin = Balance.ZERO
             ),
-            customFeeAsset = null
+            customFeeAsset = null,
+            nativeAsset = arbitraryAssetUseCase.assetFlow(westmint.commissionAsset).first()
         )
 
         val fee = swapService.estimateFee(swapArgs)
@@ -104,7 +108,8 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
                 amountIn = siri.planksFromAmount(0.000001.toBigDecimal()),
                 amountOutMin = Balance.ZERO
             ),
-            customFeeAsset = siri
+            customFeeAsset = siri,
+            nativeAsset = arbitraryAssetUseCase.assetFlow(westmint.commissionAsset).first()
         )
 
         val fee = swapService.estimateFee(swapArgs)
@@ -133,7 +138,7 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
                 tokenOut = tokenRepository.getToken(to),
                 amount = from.planksFromAmount(amount.toBigDecimal()),
                 swapDirection = SwapDirection.SPECIFIED_IN,
-                slippage = Percent(1.0)
+                slippage = Percent(1.0),
             )
         ).getOrThrow()
 

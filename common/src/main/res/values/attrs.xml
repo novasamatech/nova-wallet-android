@@ -172,6 +172,7 @@
         <attr name="style" format="enum">
             <enum name="warning" value="0" />
             <enum name="error" value="1" />
+            <enum name="info" value="2" />
         </attr>
 
         <attr name="styleBackgroundColor" format="color" />

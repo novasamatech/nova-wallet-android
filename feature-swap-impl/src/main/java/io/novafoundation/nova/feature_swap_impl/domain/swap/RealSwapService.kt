@@ -81,7 +81,7 @@ internal class RealSwapService(
 
         val assetExchangeFee = exchange.estimateFee(args)
 
-        return SwapFee(networkFee = assetExchangeFee.networkFee)
+        return SwapFee(networkFee = assetExchangeFee.networkFee, minimumBalanceBuyIn = assetExchangeFee.minimumBalanceBuyIn)
     }
 
     override suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicHash> {

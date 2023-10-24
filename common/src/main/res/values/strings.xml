@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="swap_minimum_balance_buy_in_alert">To pay network fee with %s, Nova will automatically swap %s for %s to maintain your account\'s minimum DOT balance.</string>
 
     <string name="swap_error_pair_not_supported">This pair is not supported</string>
     <string name="swap_price_impact">%s ≈ %s</string>

@@ -16,7 +16,10 @@ import io.novafoundation.nova.common.utils.formatting.NumberAbbreviation
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.nullOnStart
+import io.novafoundation.nova.common.view.SimpleAlertModel
+import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
@@ -36,9 +39,14 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeFlow
+import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -47,6 +55,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -92,6 +101,15 @@ class SwapMainSettingsViewModel(
     private val assetInFlow = swapSettings.assetFlowOf(SwapSettings::assetIn)
     private val feeAssetFlow = swapSettings.assetFlowOf(SwapSettings::feeAsset)
 
+    private val nativeAssetFlow = swapSettings
+        .mapNotNull { it.assetIn?.chainId }
+        .distinctUntilChanged()
+        .flatMapLatest {
+            val chain = chainRegistry.getChain(it)
+            assetUseCase.assetFlow(chain.commissionAsset)
+        }
+        .shareInBackground()
+
     val amountInInput = swapAmountInputMixinFactory.create(
         coroutineScope = viewModelScope,
         assetFlow = assetInFlow.nullOnStart(),
@@ -106,8 +124,11 @@ class SwapMainSettingsViewModel(
         emptyAssetTitle = R.string.swap_field_asset_to_title
     )
 
-    val feeMixin = feeLoaderMixinFactory.create(
-        tokenFlow = feeAssetFlow.map { it.token }
+    val feeMixin = feeLoaderMixinFactory.createGeneric<SwapFee>(
+        tokenFlow = feeAssetFlow.map { it.token },
+        configuration = GenericFeeLoaderMixin.Configuration(
+            initialStatusValue = FeeStatus.NoFee
+        )
     )
 
     val rateDetails: Flow<ExtendedLoadingState<String>> = quotingState.map {
@@ -125,6 +146,10 @@ class SwapMainSettingsViewModel(
 
     val swapDirectionFlipped: MutableLiveData<Event<SwapDirection>> = MutableLiveData()
 
+    val minimumBalanceBuyAlert = feeMixin.loadedFeeFlow()
+        .map(::prepareMinimumBalanceBuyInAlertIfNeeded)
+        .shareInBackground()
+
     init {
         handleInputChanges(amountInInput, SwapSettings::assetIn, SwapDirection.SPECIFIED_IN)
         handleInputChanges(amountOutInput, SwapSettings::assetOut, SwapDirection.SPECIFIED_OUT)
@@ -141,7 +166,7 @@ class SwapMainSettingsViewModel(
     fun selectPayToken() {
         launch {
             val assets = swapInteractor.availableAssets(viewModelScope)
-            val chainAsset = assets[0].token.configuration
+            val chainAsset = assets[1].token.configuration
             val chain = chainRegistry.getChain(chainAsset.chainId)
 
             swapSettingState().setAssetInUpdatingFee(chainAsset, chain)
@@ -151,7 +176,7 @@ class SwapMainSettingsViewModel(
     fun selectReceiveToken() {
         launch {
             val assets = swapInteractor.availableAssets(viewModelScope)
-            val chainAsset = assets[1].token.configuration
+            val chainAsset = assets[0].token.configuration
             swapSettingState().setAssetOut(chainAsset)
         }
     }
@@ -180,7 +205,7 @@ class SwapMainSettingsViewModel(
     }
 
     @OptIn(FlowPreview::class)
-    private fun FeeLoaderMixin.Presentation.setupFees() {
+    private fun GenericFeeLoaderMixin.Presentation<SwapFee>.setupFees() {
         quotingState
             .onEach { if (it is QuotingState.Loading) invalidateFee() }
             .filterIsInstance<QuotingState.Loaded>()
@@ -188,12 +213,13 @@ class SwapMainSettingsViewModel(
             .onEach { quoteState ->
                 val swapArgs = quoteState.quoteArgs.toExecuteArgs(
                     quotedBalance = quoteState.value.quotedBalance,
-                    customFeeAsset = quoteState.feeAsset
+                    customFeeAsset = quoteState.feeAsset,
+                    nativeAsset = nativeAssetFlow.first()
                 )
 
-                loadFeeV2(
+                loadFeeV2Generic(
                     coroutineScope = viewModelScope,
-                    feeConstructor = { swapInteractor.estimateFee(swapArgs).networkFee },
+                    feeConstructor = { swapInteractor.estimateFee(swapArgs) },
                     onRetryCancelled = {}
                 )
             }
@@ -275,10 +301,31 @@ class SwapMainSettingsViewModel(
         tokenOut: (Chain.Asset) -> Token
     ): SwapQuoteArgs? {
         return if (assetIn != null && assetOut != null && amount != null && swapDirection != null) {
-            SwapQuoteArgs(tokenIn(assetIn), tokenOut(assetOut), amount, swapDirection, slippage)
+            SwapQuoteArgs(
+                tokenIn = tokenIn(assetIn),
+                tokenOut = tokenOut(assetOut),
+                amount = amount,
+                swapDirection = swapDirection,
+                slippage = slippage,
+            )
         } else {
             null
         }
+    }
+
+    private fun prepareMinimumBalanceBuyInAlertIfNeeded(swapFee: SwapFee?): SimpleAlertModel? {
+        if (swapFee == null) return null
+        val minimumBalanceBuyIn = swapFee.minimumBalanceBuyIn
+        if (minimumBalanceBuyIn !is MinimumBalanceBuyIn.NeedsToBuyMinimumBalance) return null
+
+        val feeAssetSymbol = minimumBalanceBuyIn.commissionAsset.symbol
+        val nativeAssetSymbol = minimumBalanceBuyIn.nativeAsset.symbol
+        val feeAssetNeededForBuyIn = minimumBalanceBuyIn.commissionAssetToSpendOnBuyIn.formatPlanks(minimumBalanceBuyIn.commissionAsset)
+        val nativeMinimumBalance = minimumBalanceBuyIn.nativeMinimumBalance.formatPlanks(minimumBalanceBuyIn.nativeAsset)
+
+        return resourceManager.getString(R.string.swap_minimum_balance_buy_in_alert,
+            feeAssetSymbol, feeAssetNeededForBuyIn, nativeMinimumBalance, nativeAssetSymbol
+        )
     }
 
     private fun handleInputChanges(

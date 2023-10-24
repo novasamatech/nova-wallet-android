@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
@@ -72,8 +73,8 @@ fun <P, E> ValidationSystemBuilder<P, E>.checkForFeeChanges(
             val newFee = calculateFee(payload)
 
             DecimalFee(
-                fee = newFee,
-                decimalAmount = chainAsset(payload).amountFromPlanks(newFee.amount)
+                genericFee = SimpleFee(newFee),
+                networkFeeDecimalAmount = chainAsset(payload).amountFromPlanks(newFee.amount)
             )
         },
         currentFee = currentFee,

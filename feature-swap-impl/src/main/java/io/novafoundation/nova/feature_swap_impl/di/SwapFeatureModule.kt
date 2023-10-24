@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.swap.RealSwapService
 import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.state.SwapSettingsState
 import io.novafoundation.nova.feature_swap_impl.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -30,12 +31,14 @@ class SwapFeatureModule {
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         runtimeCallsApi: MultiChainRuntimeCallsApi,
         extrinsicService: ExtrinsicService,
+        assetSourceRegistry: AssetSourceRegistry,
     ): AssetConversionExchangeFactory {
         return AssetConversionExchangeFactory(
             chainRegistry = chainRegistry,
             remoteStorageSource = remoteStorageSource,
             runtimeCallsApi = runtimeCallsApi,
-            extrinsicService = extrinsicService
+            extrinsicService = extrinsicService,
+            assetSourceRegistry = assetSourceRegistry,
         )
     }
 

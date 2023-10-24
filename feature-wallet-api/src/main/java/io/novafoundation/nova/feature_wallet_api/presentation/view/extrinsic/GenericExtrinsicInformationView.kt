@@ -40,7 +40,7 @@ class GenericExtrinsicInformationView @JvmOverloads constructor(
         viewGenericExtrinsicInformationAccount.showAddress(addressModel)
     }
 
-    fun setFeeStatus(feeStatus: FeeStatus) {
+    fun setFeeStatus(feeStatus: FeeStatus<*>) {
         viewGenericExtrinsicInformationFee.setFeeStatus(feeStatus)
     }
 }

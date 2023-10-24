@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange
 import io.novafoundation.nova.common.utils.MultiMap
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicHash
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
@@ -32,5 +33,6 @@ class AssetExchangeQuote(
 )
 
 class AssetExchangeFee(
-    val networkFee: Fee
+    val networkFee: Fee,
+    val minimumBalanceBuyIn: MinimumBalanceBuyIn
 )
