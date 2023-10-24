@@ -129,14 +129,6 @@ class SwapMainSettingsViewModel(
     }
         .shareInBackground()
 
-    val slippageDetails: Flow<ExtendedLoadingState<String>> = quotingState.map {
-        when (it) {
-            is QuotingState.NotAvailable, QuotingState.Loading -> ExtendedLoadingState.Loading
-            is QuotingState.Loaded -> ExtendedLoadingState.Loaded(formatRate(it.value))
-        }
-    }
-        .shareInBackground()
-
     val showDetails: Flow<Boolean> = quotingState.map { it !is QuotingState.NotAvailable }
         .shareInBackground()
 
