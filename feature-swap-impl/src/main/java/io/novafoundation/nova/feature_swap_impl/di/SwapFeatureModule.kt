@@ -52,11 +52,13 @@ class SwapFeatureModule {
     @FeatureScope
     fun provideSwapInteractor(
         swapService: SwapService,
+        swapSettingsState: RealSwapSettingsState,
         walletRepository: WalletRepository,
         accountRepository: AccountRepository
     ): SwapInteractor {
         return SwapInteractor(
             swapService,
+            swapSettingsState,
             walletRepository,
             accountRepository
         )

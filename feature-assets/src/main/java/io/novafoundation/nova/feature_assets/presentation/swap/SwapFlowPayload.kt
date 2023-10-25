@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.swap
 
 import android.os.Parcelable
-import io.novafoundation.nova.feature_assets.presentation.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

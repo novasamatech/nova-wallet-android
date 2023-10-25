@@ -61,7 +61,7 @@ fun mapRemoteChainToLocal(
             hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty,
             hasSubstrateRuntime = NO_SUBSTRATE_RUNTIME !in optionsOrEmpty,
             governance = mapGovernanceRemoteOptionsToLocal(optionsOrEmpty),
-            swapSupporting = SWAP_HUB in optionsOrEmpty,
+            swap = mapSwapRemoteOptionsToLocal(optionsOrEmpty),
             additional = gson.toJson(additional),
             nodeSelectionStrategy = mapNodeSelectionStrategyToLocal(nodeSelectionStrategy)
         )
@@ -80,10 +80,18 @@ fun mapNodeSelectionStrategyToLocal(remote: String?): NodeSelectionStrategyLocal
 
 fun mapGovernanceListToLocal(governance: List<Chain.Governance>) = governance.joinToString(separator = ",", transform = Chain.Governance::name)
 
+fun mapSwapListToLocal(swap: List<Chain.Swap>) = swap.joinToString(separator = ",", transform = Chain.Swap::name)
+
 fun mapGovernanceRemoteOptionsToLocal(remoteOptions: Set<String>): String {
     val domainGovernanceTypes = remoteOptions.governanceTypesFromOptions()
 
     return mapGovernanceListToLocal(domainGovernanceTypes)
+}
+
+fun mapSwapRemoteOptionsToLocal(remoteOptions: Set<String>): String {
+    val domainGovernanceTypes = remoteOptions.swapTypesFromOptions()
+
+    return mapSwapListToLocal(domainGovernanceTypes)
 }
 
 fun mapRemoteAssetToLocal(
@@ -204,6 +212,15 @@ private fun Set<String>.governanceTypesFromOptions(): List<Chain.Governance> {
             "governance" -> Chain.Governance.V2 // for backward compatibility of dev builds. Can be removed once everyone will update dev app
             "governance-v2" -> Chain.Governance.V2
             "governance-v1" -> Chain.Governance.V1
+            else -> null
+        }
+    }
+}
+
+private fun Set<String>.swapTypesFromOptions(): List<Chain.Swap> {
+    return mapNotNull { option ->
+        when (option) {
+            SWAP_HUB -> Chain.Swap.ASSET_CONVERSION
             else -> null
         }
     }

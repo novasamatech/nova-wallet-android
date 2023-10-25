@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGroupedAssetsToUi
 import io.novafoundation.nova.feature_assets.presentation.flow.AssetFlowViewModel
-import io.novafoundation.nova.feature_assets.presentation.fullChainAssetId
+import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
