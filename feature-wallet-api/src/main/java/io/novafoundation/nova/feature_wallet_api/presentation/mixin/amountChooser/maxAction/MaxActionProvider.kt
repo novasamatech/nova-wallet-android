@@ -24,23 +24,20 @@ interface MaxActionProvider {
     val maxAvailableForAction: Flow<MaxAvailableForAction?>
 }
 
-
 class SimpleMaxActionProvider(
     override val maxAvailableForDisplay: Flow<Balance>,
     override val maxAvailableForAction: Flow<MaxAvailableForAction?>
-): MaxActionProvider
-
-
+) : MaxActionProvider
 
 class AssetMaxActionProvider(
     private val assetFlow: Flow<Asset?>,
     private val assetField: (Asset) -> Balance,
     private val allowMaxAction: Boolean
-): MaxActionProvider {
+) : MaxActionProvider {
 
-    override val maxAvailableForDisplay: Flow<Balance?> = assetFlow.map{ it?.let(assetField) }
+    override val maxAvailableForDisplay: Flow<Balance?> = assetFlow.map { it?.let(assetField) }
 
-    override val maxAvailableForAction: Flow<MaxAvailableForAction?> = assetFlow.map{ asset ->
+    override val maxAvailableForAction: Flow<MaxAvailableForAction?> = assetFlow.map { asset ->
         if (allowMaxAction && asset != null) {
             val extractedBalance = assetField(asset)
 
@@ -51,7 +48,7 @@ class AssetMaxActionProvider(
     }
 }
 
-class FeeAwareMaxActionProvider<F: GenericFee>(
+class FeeAwareMaxActionProvider<F : GenericFee>(
     feeInputMixin: GenericFeeLoaderMixin<F>,
     private val extractTotalFee: (F) -> Balance,
     inner: MaxActionProvider,
@@ -66,7 +63,7 @@ class FeeAwareMaxActionProvider<F: GenericFee>(
     ) { maxAvailable, newFeeStatus ->
         if (maxAvailable == null) return@combine null
 
-        when(newFeeStatus) {
+        when (newFeeStatus) {
             // do not block in case there is no fee or fee is not yet present
             FeeStatus.Error, FeeStatus.NoFee -> maxAvailable
 
@@ -86,11 +83,10 @@ class FeeAwareMaxActionProvider<F: GenericFee>(
 
             FeeStatus.Loading -> null
         }
-
     }
 
     infix operator fun MaxAvailableForAction?.minus(other: BigInteger?): MaxAvailableForAction? {
-        if (this == null  || other == null) return null
+        if (this == null || other == null) return null
 
         val difference = balance - other
 
@@ -104,7 +100,7 @@ object MaxActionProviderDsl {
         return AssetMaxActionProvider(this, field, allowMaxAction)
     }
 
-    fun <F: GenericFee> MaxActionProvider.deductFee(
+    fun <F : GenericFee> MaxActionProvider.deductFee(
         feeLoaderMixin: GenericFeeLoaderMixin<F>,
         extractTotalFee: (F) -> Balance
     ): MaxActionProvider {

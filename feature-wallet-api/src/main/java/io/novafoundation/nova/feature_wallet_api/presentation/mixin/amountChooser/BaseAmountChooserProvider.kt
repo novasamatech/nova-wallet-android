@@ -162,7 +162,7 @@ open class BaseAmountChooserProvider(
 
         private fun MaxActionProvider?.maxAvailableForAction(): Flow<Balance?> = this?.maxAvailableForAction?.balance() ?: flowOf(null)
 
-        private fun MaxActionProvider?.maxAvailableForDisplay(): Flow<Balance?> = this?.maxAvailableForDisplay?: flowOf(null)
+        private fun MaxActionProvider?.maxAvailableForDisplay(): Flow<Balance?> = this?.maxAvailableForDisplay ?: flowOf(null)
 
         private fun Flow<MaxAvailableForAction?>.balance(): Flow<Balance?> = map { it?.balance }
 

@@ -62,7 +62,8 @@ class AmountChooserProvider(
     coroutineScope = coroutineScope,
     tokenFlow = usedAssetFlow.map { it.token },
     maxActionProvider = maxActionProvider,
-), AmountChooserMixin.Presentation {
+),
+    AmountChooserMixin.Presentation {
 
     override val assetModel = usedAssetFlow.map { asset ->
         ChooseAmountModel(asset, resourceManager, balanceLabel)

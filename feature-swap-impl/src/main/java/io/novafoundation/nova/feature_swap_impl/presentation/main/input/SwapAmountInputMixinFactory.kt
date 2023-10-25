@@ -14,7 +14,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-
 class SwapAmountInputMixinFactory(
     private val chainRegistry: ChainRegistry,
     private val resourceManager: ResourceManager
@@ -48,7 +47,8 @@ private class RealSwapAmountInputMixin(
     coroutineScope = coroutineScope,
     tokenFlow = tokenFlow,
     maxActionProvider = maxActionProvider
-), SwapAmountInputMixin.Presentation {
+),
+    SwapAmountInputMixin.Presentation {
 
     override val assetModel: Flow<SwapInputAssetModel> = tokenFlow.map {
         val chainAsset = it?.configuration

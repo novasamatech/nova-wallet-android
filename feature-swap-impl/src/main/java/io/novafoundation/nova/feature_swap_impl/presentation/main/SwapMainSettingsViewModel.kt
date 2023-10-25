@@ -238,7 +238,7 @@ class SwapMainSettingsViewModel(
     private fun GenericFeeLoaderMixin.Presentation<SwapFee>.setupFees() {
         quotingState
             .onEach {
-                when(it) {
+                when (it) {
                     is QuotingState.Loading -> invalidateFee()
                     is QuotingState.NotAvailable -> setFee(null)
                     else -> {}

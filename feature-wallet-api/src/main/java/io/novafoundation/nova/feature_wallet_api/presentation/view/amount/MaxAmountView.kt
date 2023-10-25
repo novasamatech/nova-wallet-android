@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import kotlinx.android.synthetic.main.view_max_amount.view.viewMaxAmountAction
 import kotlinx.android.synthetic.main.view_max_amount.view.viewMaxAmountValue
 
-class MaxAmountView  @JvmOverloads constructor(
+class MaxAmountView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -31,7 +31,7 @@ class MaxAmountView  @JvmOverloads constructor(
     }
 
     override fun setMaxActionAvailability(availability: MaxActionAvailability) {
-        when(availability) {
+        when (availability) {
             is MaxActionAvailability.Available -> {
                 setOnClickListener(availability.onMaxClicked)
                 viewMaxAmountAction.setTextColorRes(R.color.button_text_accent)
