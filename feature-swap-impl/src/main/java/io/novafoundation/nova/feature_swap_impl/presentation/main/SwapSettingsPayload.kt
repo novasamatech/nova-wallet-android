@@ -1,9 +1,8 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
 import android.os.Parcelable
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.parcel.Parcelize
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 
 @Parcelize
-class SwapSettingsPayload(val chainId: ChainId, val assetId: ChainAssetId) : Parcelable
+class SwapSettingsPayload(val assetPayload: AssetPayload) : Parcelable

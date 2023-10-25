@@ -6,22 +6,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 
-class ReselectSwapFlowExecutorFactory(
-    private val assetsRouter: AssetsRouter,
-    private val swapSettingsStateProvider: SwapSettingsStateProvider,
-    private val chainRegistry: ChainRegistry
-) {
-
-    fun create(selectingDirection: ReselectSwapFlowExecutor.SelectingDirection): ReselectSwapFlowExecutor {
-        return ReselectSwapFlowExecutor(
-            assetsRouter,
-            swapSettingsStateProvider,
-            selectingDirection,
-            chainRegistry
-        )
-    }
-}
-
 class ReselectSwapFlowExecutor(
     private val assetsRouter: AssetsRouter,
     private val swapSettingsStateProvider: SwapSettingsStateProvider,

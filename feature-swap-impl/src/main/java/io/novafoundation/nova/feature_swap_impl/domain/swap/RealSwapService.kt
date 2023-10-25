@@ -140,7 +140,7 @@ internal class RealSwapService(
     }
 
     private suspend fun createExchanges(): Map<ChainId, AssetExchange> {
-        return chainRegistry.findChains { it.swapSupporting }
+        return chainRegistry.findChains { it.swap.isNotEmpty() }
             .associateBy(Chain::id) {
                 assetConversionFactory.create(it.id)
             }

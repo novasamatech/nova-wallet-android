@@ -309,7 +309,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             hasCrowdloans = hasCrowdloans,
             hasSubstrateRuntime = hasSubstrateRuntime,
             governance = mapGovernanceListFromLocal(governance),
-            swapSupporting = swapSupporting,
+            swap = mapSwapListFromLocal(swap),
             additional = additional
         )
     }
@@ -337,4 +337,8 @@ fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson): Chain.Asset {
 
 private fun mapGovernanceListFromLocal(governanceLocal: String) = governanceLocal.split(",").mapNotNull {
     runCatching { Chain.Governance.valueOf(it) }.getOrNull()
+}
+
+private fun mapSwapListFromLocal(swapLocal: String) = swapLocal.split(",").mapNotNull {
+    runCatching { Chain.Swap.valueOf(it) }.getOrNull()
 }

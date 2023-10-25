@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenI
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import io.novafoundation.nova.feature_assets.presentation.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.setupBuyButton
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.setupBuyIntegration
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel

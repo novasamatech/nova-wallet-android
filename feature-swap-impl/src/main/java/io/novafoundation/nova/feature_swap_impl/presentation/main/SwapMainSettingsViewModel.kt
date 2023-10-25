@@ -61,6 +61,7 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlinx.coroutines.flow.firstOrNull
 import kotlin.time.Duration.Companion.milliseconds
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 
 sealed class QuotingState {
 
@@ -146,14 +147,20 @@ class SwapMainSettingsViewModel(
     fun selectPayToken() {
         launch {
             val outAsset = assetOutFlow.firstOrNull()
-            swapRouter.selectAssetIn(outAsset?.token?.configuration?.fullId)
+                ?.token
+                ?.configuration
+            val payload = outAsset?.let { AssetPayload(it.chainId, it.id) }
+            swapRouter.selectAssetIn(payload)
         }
     }
 
     fun selectReceiveToken() {
         launch {
             val inAsset = assetInFlow.firstOrNull()
-            swapRouter.selectAssetOut(inAsset?.token?.configuration?.fullId)
+                ?.token
+                ?.configuration
+            val payload = inAsset?.let { AssetPayload(it.chainId, it.id) }
+            swapRouter.selectAssetOut(payload)
         }
     }
 
@@ -182,7 +189,7 @@ class SwapMainSettingsViewModel(
 
     private fun initAssetIn() {
         launch {
-            val chainWithAsset = chainRegistry.chainWithAsset(payload.chainId, payload.assetId)
+            val chainWithAsset = chainRegistry.chainWithAsset(payload.assetPayload.chainId, payload.assetPayload.chainAssetId)
             swapSettingState().setAssetInUpdatingFee(chainWithAsset.asset, chainWithAsset.chain)
         }
     }

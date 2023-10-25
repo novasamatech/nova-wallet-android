@@ -39,7 +39,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeA
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.ToolbarConfiguration
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountFragment
-import io.novafoundation.nova.feature_assets.presentation.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
@@ -76,8 +76,6 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettin
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.splash.SplashRouter
 import kotlinx.coroutines.flow.Flow
 
@@ -342,8 +340,8 @@ class Navigator(
         navController?.navigate(R.id.action_mainFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))
     }
 
-    override fun openSwapSettings(chainId: ChainId, assetId: ChainAssetId) {
-        val payload = SwapSettingsPayload(chainId, assetId)
+    override fun openSwapSettings(assetPayload: AssetPayload) {
+        val payload = SwapSettingsPayload(assetPayload)
         navController?.navigate(R.id.action_swapFlowFragment_to_swapSettings, SwapMainSettingsFragment.getBundle(payload))
     }
 

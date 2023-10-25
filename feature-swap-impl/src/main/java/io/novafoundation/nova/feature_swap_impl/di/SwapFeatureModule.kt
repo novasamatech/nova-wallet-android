@@ -60,14 +60,12 @@ class SwapFeatureModule {
     fun provideSwapInteractor(
         swapService: SwapService,
         swapSettingsState: RealSwapSettingsState,
-        chainRegistry: ChainRegistry,
         walletRepository: WalletRepository,
         accountRepository: AccountRepository
     ): SwapInteractor {
         return SwapInteractor(
             swapService,
             swapSettingsState,
-            chainRegistry,
             walletRepository,
             accountRepository
         )
