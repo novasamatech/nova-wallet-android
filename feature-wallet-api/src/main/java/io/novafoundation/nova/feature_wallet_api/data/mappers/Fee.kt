@@ -20,8 +20,9 @@ fun <F : GenericFee> mapFeeToFeeModel(
 ) = GenericFeeModel(
     decimalFee = GenericDecimalFee(
         genericFee = fee,
-        networkFeeDecimalAmount = token.amountFromPlanks(fee.networkFee.amount)
+        networkFeeDecimalAmount = token.amountFromPlanks(fee.networkFee.amount),
     ),
+    chainAsset = token.configuration,
     display = mapAmountToAmountModel(
         amountInPlanks = fee.networkFee.amount,
         token = token,

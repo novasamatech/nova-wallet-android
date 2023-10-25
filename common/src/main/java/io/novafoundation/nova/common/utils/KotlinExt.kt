@@ -346,6 +346,9 @@ inline fun <T, R : Any> Iterable<T>.mapNotNullToSet(mapper: (T) -> R?): Set<R> =
 
 fun <T> List<T>.indexOfFirstOrNull(predicate: (T) -> Boolean) = indexOfFirst(predicate).takeIf { it >= 0 }
 
+
+
+
 @Suppress("IfThenToElvis")
 fun ByteArray?.optionalContentEquals(other: ByteArray?): Boolean {
     return if (this == null) {
