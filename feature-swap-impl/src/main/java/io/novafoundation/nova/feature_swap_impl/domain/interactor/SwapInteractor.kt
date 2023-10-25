@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
-import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSettingsState
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.fullId
@@ -16,7 +15,6 @@ import kotlinx.coroutines.CoroutineScope
 
 class SwapInteractor(
     private val swapService: SwapService,
-    private val swapSharedState: RealSwapSettingsState,
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository
 ) {
