@@ -13,7 +13,9 @@ import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.isModifiable
 import io.novafoundation.nova.common.utils.input.modifyInput
 import io.novafoundation.nova.common.utils.input.valueOrNull
+import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.common.view.InsertableInputField
+import io.novafoundation.nova.common.view.ValidatableInputField
 import io.novafoundation.nova.common.view.input.seekbar.Seekbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -286,13 +288,18 @@ fun InsertableInputField.bindTo(flow: MutableSharedFlow<String>, scope: Coroutin
     content.bindTo(flow, scope)
 }
 
-fun EditText.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
-    bindTo(flow, scope, toT = { it }, fromT = { it })
+fun EditText.bindTo(
+    flow: MutableSharedFlow<String>,
+    scope: CoroutineScope,
+    moveSelectionToEndOnInsertion: Boolean = false,
+) {
+    bindTo(flow, scope, moveSelectionToEndOnInsertion, toT = { it }, fromT = { it })
 }
 
 inline fun <T> EditText.bindTo(
     flow: MutableSharedFlow<T>,
     scope: CoroutineScope,
+    moveSelectionToEndOnInsertion: Boolean = false,
     crossinline toT: suspend (String) -> T,
     crossinline fromT: suspend (T) -> String,
 ) {
@@ -308,12 +315,39 @@ inline fun <T> EditText.bindTo(
             if (text.toString() != inputString) {
                 removeTextChangedListener(textWatcher)
                 setText(inputString)
-                if (hasFocus()) {
-                    setSelection(inputString.length)
+                if (moveSelectionToEndOnInsertion) {
+                    moveSelectionToTheEnd()
                 }
                 addTextChangedListener(textWatcher)
             }
         }
+    }
+}
+
+fun ValidatableInputField.observeErrors(
+    flow: Flow<FieldValidationResult>,
+    scope: CoroutineScope,
+) {
+    scope.launch {
+        flow.collect { validationResult ->
+            when (validationResult) {
+                is FieldValidationResult.Ok -> {
+                    hideError()
+                }
+
+                is FieldValidationResult.Error -> {
+                    showError(validationResult.reason)
+                }
+
+                else -> {}
+            }
+        }
+    }
+}
+
+fun EditText.moveSelectionToTheEnd() {
+    if (hasFocus()) {
+        setSelection(text.length)
     }
 }
 

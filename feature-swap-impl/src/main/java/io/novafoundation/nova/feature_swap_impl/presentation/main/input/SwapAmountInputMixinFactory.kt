@@ -48,7 +48,7 @@ private class RealSwapAmountInputMixin(
     private val maxAvailableExtractor: MaxAvailableExtractor,
     @StringRes private val emptyAssetTitle: Int,
     private val chainRegistry: ChainRegistry,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
 ) : BaseAmountChooserProvider(coroutineScope), SwapAmountInputMixin.Presentation {
 
     override val fiatAmount: Flow<String> = combine(assetFlow.filterNotNull(), amount) { asset, amount ->

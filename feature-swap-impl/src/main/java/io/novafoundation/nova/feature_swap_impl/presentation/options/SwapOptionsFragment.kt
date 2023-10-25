@@ -9,6 +9,8 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.input.DecimalInputFilter
+import io.novafoundation.nova.common.utils.observeErrors
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.setTextOrHide
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
@@ -34,6 +36,8 @@ class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel>() {
         swapOptionsToolbar.setHomeButtonListener { viewModel.backClicked() }
         swapOptionsToolbar.setRightActionClickListener { viewModel.resetClicked() }
         swapOptionsApplyButton.setOnClickListener { viewModel.applyClicked() }
+
+        swapOptionsSlippageInput.content.filters = arrayOf(DecimalInputFilter())
     }
 
     override fun inject() {
@@ -47,7 +51,7 @@ class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel>() {
     }
 
     override fun subscribe(viewModel: SwapOptionsViewModel) {
-        swapOptionsSlippageInput.content.bindTo(viewModel.slippageInput, viewModel.viewModelScope)
+        swapOptionsSlippageInput.content.bindTo(viewModel.slippageInput, viewModel.viewModelScope, moveSelectionToEndOnInsertion = true)
         viewModel.defaultSlippage.observe { swapOptionsSlippageInput.setHint(it) }
         viewModel.slippageTips.observe {
             swapOptionsSlippageInput.clearTips()
@@ -56,7 +60,7 @@ class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel>() {
             }
         }
         viewModel.buttonState.observe { swapOptionsApplyButton.setState(it) }
-        viewModel.slippageErrorState.observe { swapOptionsSlippageInput.setError(it) }
+        swapOptionsSlippageInput.observeErrors(viewModel.slippageInputValidationResult, viewModel.viewModelScope)
         viewModel.slippageWarningState.observe { swapOptionsAlert.setTextOrHide(it) }
         viewModel.resetButtonEnabled.observe { swapOptionsToolbar.setRightActionEnabled(it) }
     }

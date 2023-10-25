@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange
 
 import io.novafoundation.nova.common.utils.MultiMap
-import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicHash
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
@@ -29,15 +29,6 @@ interface AssetExchange {
 
     suspend fun slippageConfig(): SlippageConfig
 }
-
-class SlippageConfig(
-    val defaultSlippage: Percent,
-    val slippageTips: List<Percent>,
-    val minAvailableSlippage: Percent,
-    val maxAvailableSlippage: Percent,
-    val smallSlippage: Percent,
-    val bigSlippage: Percent
-)
 
 class AssetExchangeQuote(
     val quote: Balance,

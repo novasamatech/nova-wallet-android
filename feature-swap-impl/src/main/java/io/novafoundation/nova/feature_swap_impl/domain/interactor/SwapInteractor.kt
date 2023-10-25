@@ -6,9 +6,11 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.CoroutineScope
 
 class SwapInteractor(
@@ -33,5 +35,9 @@ class SwapInteractor(
 
     suspend fun estimateFee(executeArgs: SwapExecuteArgs): SwapFee {
         return swapService.estimateFee(executeArgs)
+    }
+
+    suspend fun slippageConfig(chainId: ChainId): SlippageConfig? {
+        return swapService.slippageConfig(chainId)
     }
 }

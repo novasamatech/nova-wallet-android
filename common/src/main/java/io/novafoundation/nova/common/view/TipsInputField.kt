@@ -17,6 +17,8 @@ import androidx.annotation.DrawableRes
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.onTextChanged
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.useAttributes
@@ -32,7 +34,7 @@ class TipsInputField @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : LinearLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
+) : LinearLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context), ValidatableInputField {
 
     private var postfix: String? = null
     private var postfixPadding = 4.dp
@@ -127,33 +129,23 @@ class TipsInputField @JvmOverloads constructor(
         view.setOnClickListener(onClick)
     }
 
-    fun setError(error: String?) {
-        if (error == null) {
-            setErrorEnabled(false)
-        } else {
-            setErrorEnabled(true)
-            setErrorText(error)
-        }
-    }
-
-    fun setErrorEnabled(enabled: Boolean) {
-        tipsInputError.isVisible = enabled
-        if (enabled) {
-            val color = context.getColor(R.color.text_negative)
-            content.setTextColor(color)
-            textPaint.color = color
-            tipsInputFieldContainer.background = context.getInputBackgroundError()
-        } else {
-            val color = context.getColor(R.color.text_primary)
-            content.setTextColor(color)
-            textPaint.color = color
-            tipsInputFieldContainer.background = context.getInputBackground()
-        }
+    override fun showError(error: String) {
+        tipsInputError.makeVisible()
+        tipsInputError.text = error
+        val color = context.getColor(R.color.text_negative)
+        content.setTextColor(color)
+        textPaint.color = color
+        tipsInputFieldContainer.background = context.getInputBackgroundError()
         invalidate()
     }
 
-    fun setErrorText(error: String) {
-        tipsInputError.text = error
+    override fun hideError() {
+        tipsInputError.makeGone()
+        val color = context.getColor(R.color.text_primary)
+        content.setTextColor(color)
+        textPaint.color = color
+        tipsInputFieldContainer.background = context.getInputBackground()
+        invalidate()
     }
 
     private fun buttonBackground() = addRipple(getRoundedCornerDrawable(R.color.button_background_secondary))

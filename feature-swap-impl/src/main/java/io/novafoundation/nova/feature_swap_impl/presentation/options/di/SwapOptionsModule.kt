@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
+import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SlippageFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.options.SwapOptionsViewModel
@@ -33,14 +33,14 @@ class SwapOptionsModule {
         resourceManager: ResourceManager,
         swapSettingsStateProvider: SwapSettingsStateProvider,
         slippageFieldValidatorFactory: SlippageFieldValidatorFactory,
-        assetExchangeFactory: AssetConversionExchangeFactory
+        swapInteractor: SwapInteractor
     ): ViewModel {
         return SwapOptionsViewModel(
             swapRouter,
             resourceManager,
             swapSettingsStateProvider,
-            assetExchangeFactory,
-            slippageFieldValidatorFactory
+            slippageFieldValidatorFactory,
+            swapInteractor
         )
     }
 
