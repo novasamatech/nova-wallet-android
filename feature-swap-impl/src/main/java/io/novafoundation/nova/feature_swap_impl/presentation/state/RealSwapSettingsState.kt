@@ -10,7 +10,9 @@ import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class RealSwapSettingsState(initialValue: SwapSettings) : SwapSettingsState {
+class RealSwapSettingsState(
+    initialValue: SwapSettings = SwapSettings()
+) : SwapSettingsState {
 
     override val selectedOption = MutableStateFlow(initialValue)
 
