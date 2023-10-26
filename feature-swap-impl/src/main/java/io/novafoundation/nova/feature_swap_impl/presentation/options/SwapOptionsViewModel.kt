@@ -89,7 +89,7 @@ class SwapOptionsViewModel(
 
     fun applyClicked() {
         launch {
-            val slippage = slippageInput.value.formatToPercent()
+            val slippage = slippageInput.value.formatToPercent() ?: return@launch
             swapSettingState.await().setSlippage(slippage)
             swapRouter.back()
         }
@@ -103,12 +103,12 @@ class SwapOptionsViewModel(
         swapRouter.back()
     }
 
-    private suspend fun String.formatToPercent(): Percent {
+    private suspend fun String.formatToPercent(): Percent? {
         val defaultSlippage = slippageConfig.first().defaultSlippage
         return if (isEmpty()) {
             defaultSlippage
         } else {
-            return Percent(this.toDouble())
+            return this.toDoubleOrNull()?.let { Percent(it) }
         }
     }
 

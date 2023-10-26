@@ -24,7 +24,7 @@ class SlippageFieldValidator(
         val value = input.toPercent()
         return when {
             input.isEmpty() -> FieldValidationResult.Ok
-            value == null -> FieldValidationResult.Error(resourceManager.getString(R.string.common_error_general_title))
+            value == null -> FieldValidationResult.Ok
 
             value !in slippageConfig.minAvailableSlippage..slippageConfig.maxAvailableSlippage -> {
                 FieldValidationResult.Error(

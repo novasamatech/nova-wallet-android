@@ -8,6 +8,7 @@ import android.text.method.DigitsKeyListener
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -158,10 +159,10 @@ class TipsInputField @JvmOverloads constructor(
 
         val digits = it.getString(R.styleable.TipsInputField_android_digits)
         digits?.let {
-            content.keyListener = DigitsKeyListener.getInstance("0123456789.")
+            content.keyListener = DigitsKeyListener.getInstance(it)
         }
 
-        val inputType = it.getInt(R.styleable.TipsInputField_android_inputType, 0)
-        content.setRawInputType(inputType)
+        val inputType = it.getInt(R.styleable.TipsInputField_android_inputType, EditorInfo.TYPE_NULL)
+        content.inputType = inputType
     }
 }
