@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.utils.input.DecimalInputFilter
 import io.novafoundation.nova.common.validation.observeErrors
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.setTextOrHide
@@ -36,8 +35,6 @@ class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel>() {
         swapOptionsToolbar.setHomeButtonListener { viewModel.backClicked() }
         swapOptionsToolbar.setRightActionClickListener { viewModel.resetClicked() }
         swapOptionsApplyButton.setOnClickListener { viewModel.applyClicked() }
-
-        swapOptionsSlippageInput.content.filters = arrayOf(DecimalInputFilter())
     }
 
     override fun inject() {
