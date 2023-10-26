@@ -39,6 +39,7 @@ import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetMod
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -275,7 +276,7 @@ class CrowdloanContributeViewModel(
                     customizationPayload,
                 )
 
-                InlineFee(fee)
+                SimpleFee(InlineFee(fee))
             },
             onRetryCancelled = ::backClicked
         )

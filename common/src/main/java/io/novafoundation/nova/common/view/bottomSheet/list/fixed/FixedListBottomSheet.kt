@@ -25,9 +25,9 @@ typealias ViewGetter<V> = FixedListBottomSheet.() -> V
 
 abstract class FixedListBottomSheet(
     context: Context,
-    private val onCancel: (() -> Unit)? = null,
+    onCancel: (() -> Unit)? = null,
     private val viewConfiguration: ViewConfiguration = ViewConfiguration.default()
-) : BaseBottomSheet(context) {
+) : BaseBottomSheet(context, onCancel = onCancel) {
 
     class ViewConfiguration(
         @LayoutRes val layout: Int,
@@ -50,8 +50,6 @@ abstract class FixedListBottomSheet(
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setOnCancelListener { onCancel?.invoke() }
     }
 
     final override fun setContentView(layoutResId: Int) {

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_swap_api.domain.model
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.fraction
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -12,7 +13,7 @@ class SwapQuoteArgs(
     val tokenOut: Token,
     val amount: Balance,
     val swapDirection: SwapDirection,
-    val slippage: Percent
+    val slippage: Percent,
 )
 
 class SwapExecuteArgs(
@@ -20,6 +21,7 @@ class SwapExecuteArgs(
     val assetOut: Chain.Asset,
     val customFeeAsset: Chain.Asset?,
     val swapLimit: SwapLimit,
+    val nativeAsset: Asset,
 )
 
 sealed class SwapLimit {
@@ -29,12 +31,13 @@ sealed class SwapLimit {
     class SpecifiedOut(val amountInMax: Balance, val amountOut: Balance) : SwapLimit()
 }
 
-fun SwapQuoteArgs.toExecuteArgs(quotedBalance: Balance, customFeeAsset: Chain.Asset?): SwapExecuteArgs {
+fun SwapQuoteArgs.toExecuteArgs(quotedBalance: Balance, customFeeAsset: Chain.Asset?, nativeAsset: Asset): SwapExecuteArgs {
     return SwapExecuteArgs(
         assetIn = tokenIn.configuration,
         assetOut = tokenOut.configuration,
         swapLimit = swapLimits(quotedBalance),
-        customFeeAsset = customFeeAsset
+        customFeeAsset = customFeeAsset,
+        nativeAsset = nativeAsset
     )
 }
 

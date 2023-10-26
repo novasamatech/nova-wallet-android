@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversi
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.swap.RealSwapService
 import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSettingsStateProvider
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -31,12 +32,14 @@ class SwapFeatureModule {
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         runtimeCallsApi: MultiChainRuntimeCallsApi,
         extrinsicService: ExtrinsicService,
+        assetSourceRegistry: AssetSourceRegistry,
     ): AssetConversionExchangeFactory {
         return AssetConversionExchangeFactory(
             chainRegistry = chainRegistry,
             remoteStorageSource = remoteStorageSource,
             runtimeCallsApi = runtimeCallsApi,
-            extrinsicService = extrinsicService
+            extrinsicService = extrinsicService,
+            assetSourceRegistry = assetSourceRegistry,
         )
     }
 
@@ -73,8 +76,9 @@ class SwapFeatureModule {
     @Provides
     @FeatureScope
     fun provideSwapSettingsStoreProvider(
-        computationalCache: ComputationalCache
+        computationalCache: ComputationalCache,
+        chainRegistry: ChainRegistry
     ): SwapSettingsStateProvider {
-        return RealSwapSettingsStateProvider(computationalCache)
+        return RealSwapSettingsStateProvider(computationalCache, chainRegistry)
     }
 }

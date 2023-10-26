@@ -172,6 +172,7 @@
         <attr name="style" format="enum">
             <enum name="warning" value="0" />
             <enum name="error" value="1" />
+            <enum name="info" value="2" />
         </attr>
 
         <attr name="styleBackgroundColor" format="color" />
@@ -277,4 +278,11 @@
         <attr name="android:inputType" />
     </declare-styleable>
 
+    <declare-styleable name="HintsView">
+        <attr name="HintsView_singleHint" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="TabsView">
+        <attr name="TabsView_backgroundTint" format="reference|color" />
+    </declare-styleable>
 </resources>
