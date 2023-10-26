@@ -1,7 +1,10 @@
 package io.novafoundation.nova.common.validation
 
+import io.novafoundation.nova.common.view.ValidatableInputField
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 interface FieldValidator {
     fun observe(inputStream: Flow<String>): Flow<FieldValidationResult>
@@ -22,4 +25,25 @@ sealed class FieldValidationResult {
     class Error(val reason: String) : FieldValidationResult()
 
     class Warning(val reason: String) : FieldValidationResult()
+}
+
+fun ValidatableInputField.observeErrors(
+    flow: Flow<FieldValidationResult>,
+    scope: CoroutineScope,
+) {
+    scope.launch {
+        flow.collect { validationResult ->
+            when (validationResult) {
+                is FieldValidationResult.Ok -> {
+                    hideError()
+                }
+
+                is FieldValidationResult.Error -> {
+                    showError(validationResult.reason)
+                }
+
+                else -> {}
+            }
+        }
+    }
 }

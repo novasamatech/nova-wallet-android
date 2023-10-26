@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.input.DecimalInputFilter
-import io.novafoundation.nova.common.utils.observeErrors
+import io.novafoundation.nova.common.validation.observeErrors
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.setTextOrHide
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi

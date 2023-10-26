@@ -13,9 +13,7 @@ import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.isModifiable
 import io.novafoundation.nova.common.utils.input.modifyInput
 import io.novafoundation.nova.common.utils.input.valueOrNull
-import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.common.view.InsertableInputField
-import io.novafoundation.nova.common.view.ValidatableInputField
 import io.novafoundation.nova.common.view.input.seekbar.Seekbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -319,27 +317,6 @@ inline fun <T> EditText.bindTo(
                     moveSelectionToTheEnd()
                 }
                 addTextChangedListener(textWatcher)
-            }
-        }
-    }
-}
-
-fun ValidatableInputField.observeErrors(
-    flow: Flow<FieldValidationResult>,
-    scope: CoroutineScope,
-) {
-    scope.launch {
-        flow.collect { validationResult ->
-            when (validationResult) {
-                is FieldValidationResult.Ok -> {
-                    hideError()
-                }
-
-                is FieldValidationResult.Error -> {
-                    showError(validationResult.reason)
-                }
-
-                else -> {}
             }
         }
     }

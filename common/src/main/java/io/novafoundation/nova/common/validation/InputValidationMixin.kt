@@ -10,9 +10,9 @@ interface InputValidationMixin {
     }
 }
 
-class RealInputValidationMixinFactory(val validator: FieldValidator) {
+class RealInputValidationMixinFactory {
 
-    fun create(inputStream: Flow<String>): InputValidationMixin {
+    fun create(inputStream: Flow<String>, validator: FieldValidator): InputValidationMixin {
         return RealInputValidationMixin(inputStream, validator)
     }
 }
