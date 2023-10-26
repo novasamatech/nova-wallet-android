@@ -38,6 +38,7 @@ import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRep
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
+import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
@@ -63,8 +64,9 @@ class AssetsFeatureModule {
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        assetSourceRegistry: AssetSourceRegistry
-    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry, assetSourceRegistry)
+        assetSourceRegistry: AssetSourceRegistry,
+        swapService: SwapService
+    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry, assetSourceRegistry, swapService)
 
     @Provides
     @FeatureScope

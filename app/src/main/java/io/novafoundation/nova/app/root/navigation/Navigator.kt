@@ -39,7 +39,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeA
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.ToolbarConfiguration
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountFragment
-import io.novafoundation.nova.feature_assets.presentation.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
@@ -47,6 +47,9 @@ import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragmen
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
+import io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
+import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload.FlowType
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoFragment
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
@@ -69,6 +72,8 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.sel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerFragment
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
+import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
+import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 import io.novafoundation.nova.splash.SplashRouter
@@ -122,6 +127,7 @@ class Navigator(
 
                 navController?.navigate(delayedNavigation.globalActionId, delayedNavigation.extras, navOptions)
             }
+
             is BackDelayedNavigation -> {
                 navController?.popBackStack()
             }
@@ -330,7 +336,13 @@ class Navigator(
     }
 
     override fun openSwapFlow() {
-        navController?.navigate(R.id.action_mainFragment_to_swapFlow)
+        val payload = SwapFlowPayload(FlowType.INITIAL_SELECTING)
+        navController?.navigate(R.id.action_mainFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))
+    }
+
+    override fun openSwapSettings(assetPayload: AssetPayload) {
+        val payload = SwapSettingsPayload(assetPayload)
+        navController?.navigate(R.id.action_swapFlowFragment_to_swapSettings, SwapMainSettingsFragment.getBundle(payload))
     }
 
     override fun openNfts() {

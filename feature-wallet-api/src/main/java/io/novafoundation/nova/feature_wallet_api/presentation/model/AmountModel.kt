@@ -79,6 +79,8 @@ fun mapAmountToAmountModel(
     roundingMode = roundingMode
 )
 
+fun Asset.transferableFormat() = transferable.formatTokenAmount(token.configuration, RoundingMode.FLOOR)
+
 fun Asset.transferableAmountModel() = mapAmountToAmountModel(transferable, this)
 
 fun transferableAmountModelOf(asset: Asset) = mapAmountToAmountModel(asset.transferable, asset)

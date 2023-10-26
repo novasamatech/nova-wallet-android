@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.presentation.state
+package io.novafoundation.nova.feature_swap_api.presentation.state
 
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_swap_api.domain.model.Slippage
