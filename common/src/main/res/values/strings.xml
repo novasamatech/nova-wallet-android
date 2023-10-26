@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
-    <string name="assets_swap_flow_pay_title">Token to pay</string>
-    <string name="assets_swap_flow_receive_title">Token to receive</string>
-
     <string name="swap_slippage_disabled_button_state">Enter other value</string>
     <string name="swap_slippage_error_not_in_available_range">Enter a value between %s and %s</string>
     <string name="swap_slippage_warning_too_small">Transaction might be frontrun because of high slippage.</string>

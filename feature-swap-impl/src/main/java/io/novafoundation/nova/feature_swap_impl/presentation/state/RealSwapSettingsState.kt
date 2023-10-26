@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsState
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.flip
+import io.novafoundation.nova.feature_swap_api.presentation.state.DEFAULT_SLIPPAGE
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.commissionAsset
@@ -11,7 +12,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class RealSwapSettingsState(
-    initialValue: SwapSettings = SwapSettings()
+    initialValue: SwapSettings = SwapSettings(slippage = DEFAULT_SLIPPAGE)
 ) : SwapSettingsState {
 
     override val selectedOption = MutableStateFlow(initialValue)

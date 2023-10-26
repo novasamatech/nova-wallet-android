@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_swap_impl.domain.swap.RealSwapService
 import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSettingsState
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
