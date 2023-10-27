@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsViewModel
@@ -43,10 +44,11 @@ class SwapMainSettingsModule {
         swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
         chainRegistry: ChainRegistry,
         assetUseCase: ArbitraryAssetUseCase,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         payload: SwapSettingsPayload,
-        priceImpactFormatter: PriceImpactFormatter
+        priceImpactFormatter: PriceImpactFormatter,
+        validationExecutor: ValidationExecutor
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -58,9 +60,9 @@ class SwapMainSettingsModule {
             assetUseCase = assetUseCase,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             actionAwaitableFactory = actionAwaitableMixinFactory,
-            feeLoaderMixinFactory = feeLoaderMixinFactory,
             payload = payload,
-            priceImpactFormatter = priceImpactFormatter
+            priceImpactFormatter = priceImpactFormatter,
+            validationExecutor = validationExecutor
         )
     }
 

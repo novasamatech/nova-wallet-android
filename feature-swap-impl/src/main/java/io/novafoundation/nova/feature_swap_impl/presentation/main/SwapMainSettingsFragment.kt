@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.postToUiThread
 import io.novafoundation.nova.common.utils.setSelectionEnd
@@ -80,6 +81,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
     }
 
     override fun subscribe(viewModel: SwapMainSettingsViewModel) {
+        observeValidations(viewModel)
         setupSwapAmountInput(viewModel.amountInInput, swapMainSettingsPayInput)
         setupSwapAmountInput(viewModel.amountOutInput, swapMainSettingsReceiveInput, fiatAmount = viewModel.amountOutFiat)
         setupFeeLoading(viewModel.feeMixin, swapMainSettingsDetailsNetworkFee)

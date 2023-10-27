@@ -47,6 +47,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
+
 class CrowdloanViewModel(
     private val iconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
@@ -106,10 +107,12 @@ class CrowdloanViewModel(
                 status = resourceManager.getString(R.string.common_completed),
                 count = statusCount.toString()
             )
+
             Crowdloan.State.Active::class -> CrowdloanStatusModel(
                 status = resourceManager.getString(R.string.common_active),
                 count = statusCount.toString()
             )
+
             else -> throw IllegalArgumentException("Unsupported crowdloan status type: ${statusClass.simpleName}")
         }
     }

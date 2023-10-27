@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -58,12 +59,16 @@ class SwapFeatureModule {
     fun provideSwapInteractor(
         swapService: SwapService,
         walletRepository: WalletRepository,
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
+        assetExchangeFactory: AssetConversionExchangeFactory,
+        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
     ): SwapInteractor {
         return SwapInteractor(
             swapService,
             walletRepository,
-            accountRepository
+            accountRepository,
+            assetExchangeFactory,
+            enoughTotalToStayAboveEDValidationFactory
         )
     }
 

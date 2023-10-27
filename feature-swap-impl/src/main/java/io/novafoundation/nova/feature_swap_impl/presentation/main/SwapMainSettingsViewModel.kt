@@ -4,8 +4,10 @@ import android.text.SpannableStringBuilder
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -18,6 +20,11 @@ import io.novafoundation.nova.common.utils.formatting.NumberAbbreviation
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.nullOnStart
+import io.novafoundation.nova.common.validation.TransformedFailure
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.ValidationFlowActions
+import io.novafoundation.nova.common.validation.ValidationStatus
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.SimpleAlertModel
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
@@ -34,6 +41,9 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmou
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.*
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.state.swapSettingsFlow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -96,10 +106,11 @@ class SwapMainSettingsViewModel(
     private val assetUseCase: ArbitraryAssetUseCase,
     private val swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
     private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-    private val actionAwaitableFactory: ActionAwaitableMixin.Factory
+    private val actionAwaitableFactory: ActionAwaitableMixin.Factory,
     private val payload: SwapSettingsPayload,
-    private val priceImpactFormatter: PriceImpactFormatter
-) : BaseViewModel() {
+    private val priceImpactFormatter: PriceImpactFormatter,
+    private val validationExecutor: ValidationExecutor,
+) : BaseViewModel(), Validatable by validationExecutor {
 
     private val swapSettingState = async {
         swapSettingsStateProvider.getSwapSettingsState(viewModelScope)
@@ -158,6 +169,8 @@ class SwapMainSettingsViewModel(
     val showDetails: Flow<Boolean> = quotingState.map { it !is QuotingState.NotAvailable }
         .shareInBackground()
 
+    private val _validationProgress = MutableStateFlow(false)
+
     val buttonState: Flow<DescriptiveButtonState> = flowOf { DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue)) }
 
     val swapDirectionFlipped: MutableLiveData<Event<SwapDirection>> = MutableLiveData()
@@ -203,7 +216,82 @@ class SwapMainSettingsViewModel(
     }
 
     fun confirmButtonClicked() {
-        swapRouter.openSwapConfirmation()
+        launch {
+            val assetIn = assetInFlow.first() ?: return@launch
+            val validationSystem = swapInteractor.validationSystem(assetIn.token.configuration.chainId) ?: return@launch
+            val payload = buildValidationPayload() ?: return@launch
+
+            validationExecutor.requireValid<SwapValidationPayload, SwapValidationFailure>(
+                validationSystem = validationSystem,
+                payload = payload,
+                progressConsumer = _validationProgress.progressConsumer(),
+                validationFailureTransformerCustom = { status, actions ->
+                    mapFailure(status, actions)
+                },
+            ) { validPayload ->
+                swapRouter.openSwapConfirmation()
+            }
+        }
+    }
+
+    private fun mapFailure(
+        status: ValidationStatus.NotValid<SwapValidationFailure>,
+        actions: ValidationFlowActions<*>,
+    ): TransformedFailure {
+        return when (status.reason) {
+            NotEnoughFunds -> TransformedFailure.Default(TitleAndMessage("NotEnoughFunds", ""))
+            is InsufficientBalance.NoNeedsToBuyMainAssetED -> TransformedFailure.Default(TitleAndMessage("InsufficientBalance.NativeFee", ""))
+            is InsufficientBalance.NeedsToBuyMainAssetED -> TransformedFailure.Default(TitleAndMessage("InsufficientBalanceWithCustomFee.CustomFee", ""))
+            InvalidSlippage -> TransformedFailure.Default(TitleAndMessage("InvalidSlippage", ""))
+            NewRateExceededSlippage -> TransformedFailure.Default(TitleAndMessage("NewRateExceededSlippage", ""))
+            NonPositiveAmount -> TransformedFailure.Default(TitleAndMessage("NonPositiveAmount", ""))
+            NotEnoughLiquidity -> TransformedFailure.Default(TitleAndMessage("NotEnoughLiquidity", ""))
+            is ToStayAboveED -> TransformedFailure.Default(TitleAndMessage("ToStayAboveED", ""))
+            is TooSmallAmount -> TransformedFailure.Default(TitleAndMessage("TooSmallAmount", ""))
+            is TooSmallAmountWithCustomFee -> TransformedFailure.Default(TitleAndMessage("TooSmallAmountWithCustomFee", ""))
+            is TooSmallRemainingBalance.NeedsToBuyMainAssetED -> TransformedFailure.Default(TitleAndMessage("TooSmallRemainingBalance.CustomFee", ""))
+            is TooSmallRemainingBalance.NoNeedsToBuyMainAssetED -> TransformedFailure.Default(TitleAndMessage("TooSmallRemainingBalance.NativeFee", ""))
+            is FeeChangeDetected -> TransformedFailure.Default(TitleAndMessage("FeeChangeDetected", ""))
+        }
+    }
+
+    private suspend fun buildValidationPayload(): SwapValidationPayload? {
+        val swapSettings = swapSettings.first()
+        val assetIn = assetInFlow.first() ?: return null
+        val assetOut = assetOutFlow.first() ?: return null
+        val feeAsset = feeAssetFlow.first() ?: return null
+        val swapFee = feeMixin.loadedFeeFlow().first() ?: return null
+        val quoteArgs = swapSettings.toQuoteArgs(
+            tokenIn = { assetInFlow.ensureToken(it) },
+            tokenOut = { assetOutFlow.ensureToken(it) },
+        ) ?: return null
+
+
+        //TODO save the last quote and use it here
+        val quote = swapInteractor.quote(quoteArgs).getOrThrow()
+
+        val executeArgs = quoteArgs.toExecuteArgs(
+            quotedBalance = quote.quotedBalance,
+            customFeeAsset = feeAsset.token.configuration,
+            nativeAsset = nativeAssetFlow.first()
+        )
+        return SwapValidationPayload(
+            detailedAssetIn = SwapValidationPayload.SwapAssetData(
+                chain = chainRegistry.getChain(assetIn.token.configuration.chainId),
+                asset = assetIn,
+                amount = assetIn.token.amountFromPlanks(quote.planksIn)
+            ),
+            outDetails = SwapValidationPayload.SwapAssetData(
+                chain = chainRegistry.getChain(assetOut.token.configuration.chainId),
+                asset = assetOut,
+                amount = assetOut.token.amountFromPlanks(quote.planksOut)
+            ),
+            slippage = swapSettings.slippage,
+            feeAsset = feeAsset,
+            swapFee = swapFee,
+            swapQuoteArgs = quoteArgs,
+            swapExecuteArgs = executeArgs
+        )
     }
 
     fun rateDetailsClicked() {

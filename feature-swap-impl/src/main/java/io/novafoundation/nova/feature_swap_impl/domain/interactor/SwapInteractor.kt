@@ -12,10 +12,14 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.utils.SharedQu
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationSystem
 import io.novafoundation.nova.feature_swap_impl.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_swap_impl.domain.validation.availableSlippage
+import io.novafoundation.nova.feature_swap_impl.domain.validation.checkForFeeChanges
 import io.novafoundation.nova.feature_swap_impl.domain.validation.enoughLiquidity
 import io.novafoundation.nova.feature_swap_impl.domain.validation.rateNotExceedSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceInUsedAsset
+import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceToPayFeeInUsedAsset
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientCommissionBalanceToStayAboveED
+import io.novafoundation.nova.feature_swap_impl.domain.validation.swapFeeSufficientBalance
+import io.novafoundation.nova.feature_swap_impl.domain.validation.swapSmallRemainingBalance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
@@ -67,9 +71,17 @@ class SwapInteractor(
 
             rateNotExceedSlippage(sharedQuoteValidationRetriever)
 
+            swapFeeSufficientBalance()
+
+            swapSmallRemainingBalance()
+
+            sufficientBalanceToPayFeeInUsedAsset()
+
             sufficientBalanceInUsedAsset()
 
             sufficientCommissionBalanceToStayAboveED(enoughTotalToStayAboveEDValidationFactory)
+
+            checkForFeeChanges(swapService)
         }
     }
 }
