@@ -27,6 +27,7 @@ import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettin
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsFlip
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsMaxAmount
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsMaxAmountButton
+import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsMinBalanceAlert
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsPayInput
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsReceiveInput
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsToolbar
@@ -101,6 +102,27 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
                 field.requestFocus()
                 field.amountInput.setSelectionEnd()
             }
+        }
+
+        viewModel.minimumBalanceBuyAlert.observe(swapMainSettingsMinBalanceAlert::setModel)
+
+        viewModel.canChangeFeeToken.observe { canChangeFeeToken ->
+            if (canChangeFeeToken) {
+                swapMainSettingsDetailsNetworkFee.setPrimaryValueStartIcon(R.drawable.ic_pencil_edit)
+                swapMainSettingsDetailsNetworkFee.setOnValueClickListener { viewModel.editFeeTokenClicked() }
+            } else {
+                swapMainSettingsDetailsNetworkFee.setPrimaryValueStartIcon(null)
+                swapMainSettingsDetailsNetworkFee.setOnValueClickListener(null)
+            }
+        }
+
+        viewModel.changeFeeTokenEvent.awaitableActionLiveData.observeEvent {
+            FeeAssetSelectorBottomSheet(
+                context = requireContext(),
+                payload = it.payload,
+                onOptionClicked = it.onSuccess,
+                onCancel = it.onCancel
+            ).show()
         }
     }
 }

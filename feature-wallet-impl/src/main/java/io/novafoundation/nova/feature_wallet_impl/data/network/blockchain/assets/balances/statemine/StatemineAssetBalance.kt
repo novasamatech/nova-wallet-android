@@ -57,8 +57,10 @@ class StatemineAssetBalance(
         val statemineType = chainAsset.requireStatemine()
 
         val assetAccount = remoteStorage.query(chain.id) {
+            val encodableId = statemineType.prepareIdForEncoding(runtime)
+
             runtime.metadata.statemineModule(statemineType).storage("Account").query(
-                statemineType.id,
+                encodableId,
                 accountId,
                 binding = ::bindAssetAccountOrEmpty
             )
@@ -119,7 +121,7 @@ class StatemineAssetBalance(
         return localStorage.query(chainAsset.chainId) {
             val encodableAssetId = statemineType.prepareIdForEncoding(runtime)
 
-            runtime.metadata.statemineModule(statemineType).storage("Asset").query(statemineType.id, binding = ::bindAssetDetails)
+            runtime.metadata.statemineModule(statemineType).storage("Asset").query(encodableAssetId, binding = ::bindAssetDetails)
         }
     }
 

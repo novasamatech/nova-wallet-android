@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.domain.assets.search
 
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
@@ -58,17 +59,19 @@ class AssetSearchInteractor(
         }
     }
 
-    suspend fun searchSwapAssetsFlow(
+    fun searchSwapAssetsFlow(
         forAsset: FullChainAssetId?,
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
         coroutineScope: CoroutineScope
     ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
-        val availableAssets = getAvailableSwapAssets(forAsset, coroutineScope)
+        return flowOfAll {
+            val availableAssets = getAvailableSwapAssets(forAsset, coroutineScope)
 
-        return searchAssetsInternalFlow(queryFlow, externalBalancesFlow) {
-            val chainAsset = it.token.configuration
-            chainAsset.fullId in availableAssets
+            searchAssetsInternalFlow(queryFlow, externalBalancesFlow) {
+                val chainAsset = it.token.configuration
+                chainAsset.fullId in availableAssets
+            }
         }
     }
 

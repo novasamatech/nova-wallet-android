@@ -39,5 +39,5 @@ fun mapFeeFromParcel(parcelFee: FeeParcelModel): DecimalFee {
         is SimpleFeeParcelModel -> InlineFee(parcelFee.planks)
     }
 
-    return DecimalFee(fee, parcelFee.amount)
+    return DecimalFee(SimpleFee(fee), parcelFee.amount)
 }

@@ -15,6 +15,8 @@ interface SwapService {
 
     suspend fun availableSwapDirectionsFor(asset: Chain.Asset, computationScope: CoroutineScope): Set<FullChainAssetId>
 
+    suspend fun canPayFeeInNonUtilityAsset(asset: Chain.Asset): Boolean
+
     suspend fun quote(args: SwapQuoteArgs): Result<SwapQuote>
 
     suspend fun estimateFee(args: SwapExecuteArgs): SwapFee

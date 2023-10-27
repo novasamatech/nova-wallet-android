@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.flow
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -18,6 +19,7 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -48,7 +50,7 @@ abstract class AssetFlowViewModel(
     protected val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
 
     val searchResults = combine(
-        searchAssetsFlow(),
+        flowOfAll { searchAssetsFlow() }, // lazy use searchAssetsFlow to let subclasses initialize self
         selectedCurrency,
     ) { assets, currency ->
         val groupedAssets = mapAssets(assets, currency)
@@ -58,7 +60,7 @@ abstract class AssetFlowViewModel(
         )
     }
         .distinctUntilChanged()
-        .shareInBackground()
+        .shareInBackground(SharingStarted.Lazily)
 
     fun backClicked() {
         router.back()
