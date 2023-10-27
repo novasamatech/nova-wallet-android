@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_assets.presentation.swap
 import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
@@ -14,11 +13,11 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGroupedAssetsToUi
 import io.novafoundation.nova.feature_assets.presentation.flow.AssetFlowViewModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
+import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -44,16 +43,19 @@ class AssetSwapFlowViewModel(
 
     @StringRes
     fun getTitleRes(): Int {
-        return when (payload.flowType) {
-            SwapFlowPayload.FlowType.INITIAL_SELECTING,
-            SwapFlowPayload.FlowType.SELECT_ASSET_IN -> R.string.assets_swap_flow_pay_title
-
-            SwapFlowPayload.FlowType.RESELECT_ASSET_OUT -> R.string.assets_swap_flow_receive_title
+        return when (payload) {
+            SwapFlowPayload.InitialSelecting, is SwapFlowPayload.ReselectAssetIn -> R.string.assets_swap_flow_pay_title
+            is SwapFlowPayload.ReselectAssetOut -> R.string.assets_swap_flow_receive_title
         }
     }
 
     override fun searchAssetsFlow(): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
-        return flowOfAll { interactor.searchSwapAssetsFlow(payload.selectedAsset?.fullChainAssetId, query, externalBalancesFlow, viewModelScope) }
+        return interactor.searchSwapAssetsFlow(
+            forAsset = payload.constraintDirectionsAsset?.fullChainAssetId,
+            queryFlow = query,
+            externalBalancesFlow = externalBalancesFlow,
+            coroutineScope = viewModelScope
+        )
     }
 
     override fun assetClicked(assetModel: AssetModel) {

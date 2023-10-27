@@ -17,12 +17,12 @@ class SwapNavigator(
     }
 
     override fun selectAssetIn(selectedAsset: AssetPayload?) {
-        val payload = SwapFlowPayload(SwapFlowPayload.FlowType.SELECT_ASSET_IN, selectedAsset)
+        val payload = SwapFlowPayload.ReselectAssetIn(selectedAsset)
         navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))
     }
 
     override fun selectAssetOut(selectedAsset: AssetPayload?) {
-        val payload = SwapFlowPayload(SwapFlowPayload.FlowType.RESELECT_ASSET_OUT, selectedAsset)
+        val payload = SwapFlowPayload.ReselectAssetOut(selectedAsset)
         navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))
     }
 }

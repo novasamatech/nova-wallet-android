@@ -13,10 +13,10 @@ class SwapFlowExecutorFactory(
     private val swapSettingsStateProvider: SwapSettingsStateProvider,
 ) {
     fun create(payload: SwapFlowPayload): SwapFlowExecutor {
-        return when (payload.flowType) {
-            SwapFlowPayload.FlowType.INITIAL_SELECTING -> initialSwapFlowExecutor
-            SwapFlowPayload.FlowType.RESELECT_ASSET_OUT -> createReselectFlowExecutor(SelectingDirection.OUT)
-            SwapFlowPayload.FlowType.SELECT_ASSET_IN -> createReselectFlowExecutor(SelectingDirection.IN)
+        return when (payload) {
+            SwapFlowPayload.InitialSelecting -> initialSwapFlowExecutor
+            is SwapFlowPayload.ReselectAssetIn -> createReselectFlowExecutor(SelectingDirection.IN)
+            is SwapFlowPayload.ReselectAssetOut -> createReselectFlowExecutor(SelectingDirection.OUT)
         }
     }
 
