@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.receive.ReceiveInteractor
-import io.novafoundation.nova.feature_assets.presentation.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.receive.model.QrSharingPayload
 import io.novafoundation.nova.feature_assets.presentation.receive.model.TokenReceiver

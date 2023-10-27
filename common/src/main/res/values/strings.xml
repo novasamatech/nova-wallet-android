@@ -4,6 +4,9 @@
     <string name="swap_custom_fee_selector_footer">Network fee is added on top of entered amount</string>
     <string name="swap_minimum_balance_buy_in_alert">To pay network fee with %s, Nova will automatically swap %s for %s to maintain your account\'s minimum DOT balance.</string>
 
+    <string name="assets_swap_flow_pay_title">Token to pay</string>
+    <string name="assets_swap_flow_receive_title">Token to receive</string>
+
     <string name="swap_error_pair_not_supported">This pair is not supported</string>
     <string name="swap_price_impact">%s ≈ %s</string>
 

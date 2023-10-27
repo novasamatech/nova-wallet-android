@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_assets.domain.receive.ReceiveInteractor
-import io.novafoundation.nova.feature_assets.presentation.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
