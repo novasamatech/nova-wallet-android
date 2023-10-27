@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import io.novafoundation.nova.feature_assets.presentation.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.SelectCrossChainDestinationBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading

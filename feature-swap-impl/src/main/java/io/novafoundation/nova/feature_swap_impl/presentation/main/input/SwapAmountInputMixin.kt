@@ -6,10 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface SwapAmountInputMixin : AmountChooserMixinBase {
 
-    val fiatAmount: Flow<String>
-
-    val maxAvailable: Flow<String?>
-
     val assetModel: Flow<SwapInputAssetModel>
 
     interface Presentation : SwapAmountInputMixin, AmountChooserMixinBase.Presentation

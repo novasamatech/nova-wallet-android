@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -150,7 +151,7 @@ internal class RealSwapService(
     }
 
     private suspend fun createExchanges(): Map<ChainId, AssetExchange> {
-        return chainRegistry.findChains { it.swapSupporting }
+        return chainRegistry.findChains { it.swap.isNotEmpty() }
             .associateBy(Chain::id) {
                 assetConversionFactory.create(it.id)
             }

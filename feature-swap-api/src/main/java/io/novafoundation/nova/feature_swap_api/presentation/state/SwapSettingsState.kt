@@ -8,7 +8,7 @@ import io.novafoundation.nova.runtime.state.SelectedOptionSharedState
 
 interface SwapSettingsState : SelectedOptionSharedState<SwapSettings> {
 
-    suspend fun setAssetInUpdatingFee(asset: Chain.Asset, chain: Chain)
+    suspend fun setAssetInUpdatingFee(asset: Chain.Asset)
 
     fun setAssetOut(asset: Chain.Asset)
 

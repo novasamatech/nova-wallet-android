@@ -21,12 +21,9 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientComm
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapFeeSufficientBalance
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapSmallRemainingBalance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
-import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.coroutines.CoroutineScope
 
 class SwapInteractor(
     private val swapService: SwapService,
@@ -35,16 +32,6 @@ class SwapInteractor(
     private val assetExchangeFactory: AssetConversionExchangeFactory,
     private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 ) {
-
-    suspend fun availableAssets(coroutineScope: CoroutineScope): List<Asset> {
-        val chainsWithAssets = swapService.assetsAvailableForSwap(coroutineScope)
-        val metaAccount = accountRepository.getSelectedMetaAccount()
-        return walletRepository.getSupportedAssets(metaAccount.id)
-            .filter {
-                val fullId = it.token.configuration.fullId
-                chainsWithAssets.contains(fullId)
-            }
-    }
 
     suspend fun quote(quoteArgs: SwapQuoteArgs): Result<SwapQuote> {
         return swapService.quote(quoteArgs)

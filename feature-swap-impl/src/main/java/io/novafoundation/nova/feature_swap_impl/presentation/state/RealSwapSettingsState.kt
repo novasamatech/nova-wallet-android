@@ -13,12 +13,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class RealSwapSettingsState(
     private val chainRegistry: ChainRegistry,
-    initialValue: SwapSettings
+    initialValue: SwapSettings = SwapSettings(),
 ) : SwapSettingsState {
 
     override val selectedOption = MutableStateFlow(initialValue)
 
-    override suspend fun setAssetInUpdatingFee(asset: Chain.Asset, chain: Chain) {
+    override suspend fun setAssetInUpdatingFee(asset: Chain.Asset) {
         val current = selectedOption.value
         val chain = chainRegistry.getChain(asset.chainId)
 
