@@ -27,13 +27,13 @@ import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.state.SwapSettings
-import io.novafoundation.nova.feature_swap_impl.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.state.swapSettingsFlow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -50,10 +50,14 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeFlow
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeOrNullFlow
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
@@ -66,6 +70,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -93,9 +98,10 @@ class SwapMainSettingsViewModel(
     private val resourceManager: ResourceManager,
     private val chainRegistry: ChainRegistry,
     private val assetUseCase: ArbitraryAssetUseCase,
-    private val swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
-    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-    private val actionAwaitableFactory: ActionAwaitableMixin.Factory
+    swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
+    feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    actionAwaitableFactory: ActionAwaitableMixin.Factory,
+    private val payload: SwapSettingsPayload
 ) : BaseViewModel() {
 
     private val swapSettingState = async {
@@ -169,6 +175,8 @@ class SwapMainSettingsViewModel(
     val changeFeeTokenEvent = actionAwaitableFactory.create<FeeAssetSelectorBottomSheet.Payload, Chain.Asset>()
 
     init {
+        initAssetIn()
+
         handleInputChanges(amountInInput, SwapSettings::assetIn, SwapDirection.SPECIFIED_IN)
         handleInputChanges(amountOutInput, SwapSettings::assetOut, SwapDirection.SPECIFIED_OUT)
 
@@ -179,19 +187,21 @@ class SwapMainSettingsViewModel(
 
     fun selectPayToken() {
         launch {
-            val assets = swapInteractor.availableAssets(viewModelScope)
-            val chainAsset = assets[1].token.configuration
-            val chain = chainRegistry.getChain(chainAsset.chainId)
-
-            swapSettingState().setAssetInUpdatingFee(chainAsset)
+            val outAsset = assetOutFlow.firstOrNull()
+                ?.token
+                ?.configuration
+            val payload = outAsset?.let { AssetPayload(it.chainId, it.id) }
+            swapRouter.selectAssetIn(payload)
         }
     }
 
     fun selectReceiveToken() {
         launch {
-            val assets = swapInteractor.availableAssets(viewModelScope)
-            val chainAsset = assets[0].token.configuration
-            swapSettingState().setAssetOut(chainAsset)
+            val inAsset = assetInFlow.firstOrNull()
+                ?.token
+                ?.configuration
+            val payload = inAsset?.let { AssetPayload(it.chainId, it.id) }
+            swapRouter.selectAssetOut(payload)
         }
     }
 
@@ -216,6 +226,13 @@ class SwapMainSettingsViewModel(
 
     fun backClicked() {
         swapRouter.back()
+    }
+
+    private fun initAssetIn() {
+        launch {
+            val chainWithAsset = chainRegistry.asset(payload.assetPayload.fullChainAssetId)
+            swapSettingState().setAssetInUpdatingFee(chainWithAsset)
+        }
     }
 
     fun editFeeTokenClicked() = launch {
@@ -342,10 +359,10 @@ class SwapMainSettingsViewModel(
     ): SwapQuoteArgs? {
         return if (assetIn != null && assetOut != null && amount != null && swapDirection != null) {
             SwapQuoteArgs(
-                tokenIn = tokenIn(assetIn),
-                tokenOut = tokenOut(assetOut),
-                amount = amount,
-                swapDirection = swapDirection,
+                tokenIn = tokenIn(assetIn!!),
+                tokenOut = tokenOut(assetOut!!),
+                amount = amount!!,
+                swapDirection = swapDirection!!,
                 slippage = slippage,
             )
         } else {

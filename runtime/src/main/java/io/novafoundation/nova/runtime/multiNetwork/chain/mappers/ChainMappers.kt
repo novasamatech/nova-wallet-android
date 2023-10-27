@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork.chain.mappers
 import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.asGsonParsedNumber
+import io.novafoundation.nova.common.utils.enumValueOfOrNull
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.fromJsonOrNull
 import io.novafoundation.nova.common.utils.parseArbitraryObject
@@ -309,6 +310,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             hasCrowdloans = hasCrowdloans,
             hasSubstrateRuntime = hasSubstrateRuntime,
             governance = mapGovernanceListFromLocal(governance),
+            swap = mapSwapListFromLocal(swap),
             additional = additional
         )
     }
@@ -336,4 +338,8 @@ fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson): Chain.Asset {
 
 private fun mapGovernanceListFromLocal(governanceLocal: String) = governanceLocal.split(",").mapNotNull {
     runCatching { Chain.Governance.valueOf(it) }.getOrNull()
+}
+
+private fun mapSwapListFromLocal(swapLocal: String) = swapLocal.split(",").mapNotNull {
+    enumValueOfOrNull<Chain.Swap>(swapLocal)
 }

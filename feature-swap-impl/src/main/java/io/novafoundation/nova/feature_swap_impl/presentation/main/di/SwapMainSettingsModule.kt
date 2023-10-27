@@ -11,11 +11,12 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsViewModel
+import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -42,7 +43,8 @@ class SwapMainSettingsModule {
         chainRegistry: ChainRegistry,
         assetUseCase: ArbitraryAssetUseCase,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        payload: SwapSettingsPayload
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -53,7 +55,8 @@ class SwapMainSettingsModule {
             chainRegistry = chainRegistry,
             assetUseCase = assetUseCase,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
-            actionAwaitableFactory = actionAwaitableMixinFactory
+            actionAwaitableFactory = actionAwaitableMixinFactory,
+            payload = payload
         )
     }
 

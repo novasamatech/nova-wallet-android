@@ -31,6 +31,17 @@ import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettin
 
 class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
 
+    companion object {
+
+        private const val KEY_PAYLOAD = "SwapMainSettingsFragment.payload"
+
+        fun getBundle(payload: SwapSettingsPayload): Bundle {
+            return Bundle().apply {
+                putParcelable(KEY_PAYLOAD, payload)
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -59,7 +70,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
             SwapFeatureApi::class.java
         )
             .swapMainSettings()
-            .create(this)
+            .create(this, argument(KEY_PAYLOAD))
             .inject(this)
     }
 

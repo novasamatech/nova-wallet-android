@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.domain.assets.search
 
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
@@ -7,15 +8,20 @@ import io.novafoundation.nova.feature_assets.domain.common.getAssetBaseComparato
 import io.novafoundation.nova.feature_assets.domain.common.getAssetGroupBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByNetwork
 import io.novafoundation.nova.feature_assets.domain.common.searchTokens
+import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.aggregatedBalanceByAsset
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
+import io.novafoundation.nova.runtime.multiNetwork.asset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import jp.co.soramitsu.fearless_utils.hash.isPositive
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -25,7 +31,8 @@ class AssetSearchInteractor(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
-    private val assetSourceRegistry: AssetSourceRegistry
+    private val assetSourceRegistry: AssetSourceRegistry,
+    private val swapService: SwapService
 ) {
 
     fun buyAssetSearch(
@@ -49,6 +56,31 @@ class AssetSearchInteractor(
             asset.transferableInPlanks.isPositive() &&
                 assetSourceRegistry.sourceFor(chainAsset)
                     .transfers.areTransfersEnabled(chainAsset)
+        }
+    }
+
+    fun searchSwapAssetsFlow(
+        forAsset: FullChainAssetId?,
+        queryFlow: Flow<String>,
+        externalBalancesFlow: Flow<List<ExternalBalance>>,
+        coroutineScope: CoroutineScope
+    ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
+        return flowOfAll {
+            val availableAssets = getAvailableSwapAssets(forAsset, coroutineScope)
+
+            searchAssetsInternalFlow(queryFlow, externalBalancesFlow) {
+                val chainAsset = it.token.configuration
+                chainAsset.fullId in availableAssets
+            }
+        }
+    }
+
+    private suspend fun getAvailableSwapAssets(asset: FullChainAssetId?, coroutineScope: CoroutineScope): Set<FullChainAssetId> {
+        val chainAsset = asset?.let { chainRegistry.asset(it) }
+        return if (chainAsset == null) {
+            swapService.assetsAvailableForSwap(coroutineScope)
+        } else {
+            swapService.availableSwapDirectionsFor(chainAsset, coroutineScope)
         }
     }
 

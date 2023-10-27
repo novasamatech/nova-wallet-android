@@ -31,6 +31,7 @@ data class Chain(
     val hasSubstrateRuntime: Boolean,
     val hasCrowdloans: Boolean,
     val governance: List<Governance>,
+    val swap: List<Swap>,
     val parentId: String?,
     val additional: Additional?
 ) : Identifiable {
@@ -179,6 +180,10 @@ data class Chain(
 
     enum class Governance {
         V1, V2
+    }
+
+    enum class Swap {
+        ASSET_CONVERSION
     }
 
     override val identifier: String = id
