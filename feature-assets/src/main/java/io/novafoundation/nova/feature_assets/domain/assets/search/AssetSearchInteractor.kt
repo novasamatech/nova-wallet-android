@@ -122,7 +122,6 @@ class AssetSearchInteractor(
         var assetsFlow = accountRepository.selectedMetaAccountFlow()
             .flatMapLatest { walletRepository.syncedAssetsFlow(it.id) }
 
-
         assetsFlow = combine(assetsFlow, filterFlow) { assets, filter ->
             if (filter == null) {
                 assets
@@ -149,5 +148,4 @@ class AssetSearchInteractor(
             relevantToChains = { asset, chainIds -> asset.token.configuration.chainId in chainIds }
         )
     }
-
 }

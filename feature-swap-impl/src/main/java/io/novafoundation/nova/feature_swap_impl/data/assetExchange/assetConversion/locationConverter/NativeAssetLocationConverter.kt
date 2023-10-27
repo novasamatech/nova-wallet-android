@@ -63,7 +63,7 @@ class NativeAssetLocationConverter(
 
         val utilitySymbolSameWithParent = selfUtilitySymbol == parentUtilitySymbol
 
-        return parents == BigInteger.ONE && interior  is MultiLocation.Interior.Here && utilitySymbolSameWithParent
+        return parents == BigInteger.ONE && interior is MultiLocation.Interior.Here && utilitySymbolSameWithParent
     }
 
     private suspend fun addKnownLocation(chainAsset: Chain.Asset, location: MultiLocation) = knownChainAssetMultiLocationsMutex.withLock {

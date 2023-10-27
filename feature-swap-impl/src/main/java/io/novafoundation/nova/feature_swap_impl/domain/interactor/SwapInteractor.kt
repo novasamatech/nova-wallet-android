@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.drop
 class SwapInteractor(
     private val swapService: SwapService,
     private val chainStateRepository: ChainStateRepository,
-    ) {
+) {
 
     suspend fun quote(quoteArgs: SwapQuoteArgs): Result<SwapQuote> {
         return swapService.quote(quoteArgs)

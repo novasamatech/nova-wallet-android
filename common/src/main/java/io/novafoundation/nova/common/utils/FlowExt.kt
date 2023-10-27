@@ -108,7 +108,6 @@ fun <T> List<Flow<T>>.mergeIfMultiple(): Flow<T> = when (size) {
     else -> merge()
 }
 
-
 fun <K, V> List<Flow<Map<K, V>>>.accumulateMaps(): Flow<Map<K, V>> {
     return mergeIfMultiple()
         .runningFold(emptyMap()) { acc, directions -> acc + directions }

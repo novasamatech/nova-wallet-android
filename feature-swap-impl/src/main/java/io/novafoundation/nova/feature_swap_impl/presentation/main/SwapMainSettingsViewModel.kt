@@ -179,7 +179,6 @@ class SwapMainSettingsViewModel(
 
     val changeFeeTokenEvent = actionAwaitableFactory.create<FeeAssetSelectorBottomSheet.Payload, Chain.Asset>()
 
-
     init {
         initAssetIn()
 
