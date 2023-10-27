@@ -23,9 +23,9 @@ class RealSwapSettingsState(
         val chain = chainRegistry.getChain(asset.chainId)
 
         val new = if (current.feeAsset == null || current.feeAsset!!.chainId != chain.id) {
-            current.copy(assetIn = asset, feeAsset = chain.commissionAsset, amount = null)
+            current.copy(assetIn = asset, feeAsset = chain.commissionAsset)
         } else {
-            current.copy(assetIn = asset, amount = null)
+            current.copy(assetIn = asset)
         }
 
         selectedOption.value = new
