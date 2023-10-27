@@ -3,22 +3,16 @@ package io.novafoundation.nova.feature_swap_impl.presentation.main.input
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.images.Icon
-import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin.SwapInputAssetModel
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.BaseAmountChooserProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-
-typealias MaxAvailableExtractor = (Asset) -> Balance?
 
 class SwapAmountInputMixinFactory(
     private val chainRegistry: ChainRegistry,
@@ -27,44 +21,37 @@ class SwapAmountInputMixinFactory(
 
     fun create(
         coroutineScope: CoroutineScope,
-        assetFlow: Flow<Asset?>,
-        maxAvailable: MaxAvailableExtractor,
-        @StringRes emptyAssetTitle: Int
+        tokenFlow: Flow<Token?>,
+        @StringRes emptyAssetTitle: Int,
+        maxActionProvider: MaxActionProvider? = null,
     ): SwapAmountInputMixin.Presentation {
         return RealSwapAmountInputMixin(
             coroutineScope = coroutineScope,
-            assetFlow = assetFlow,
-            maxAvailableExtractor = maxAvailable,
+            tokenFlow = tokenFlow,
             emptyAssetTitle = emptyAssetTitle,
             chainRegistry = chainRegistry,
-            resourceManager = resourceManager
+            resourceManager = resourceManager,
+            maxActionProvider = maxActionProvider,
         )
     }
 }
 
 private class RealSwapAmountInputMixin(
     coroutineScope: CoroutineScope,
-    assetFlow: Flow<Asset?>,
-    private val maxAvailableExtractor: MaxAvailableExtractor,
+    tokenFlow: Flow<Token?>,
     @StringRes private val emptyAssetTitle: Int,
     private val chainRegistry: ChainRegistry,
-    private val resourceManager: ResourceManager
-) : BaseAmountChooserProvider(coroutineScope), SwapAmountInputMixin.Presentation {
+    private val resourceManager: ResourceManager,
+    maxActionProvider: MaxActionProvider?,
+) : BaseAmountChooserProvider(
+    coroutineScope = coroutineScope,
+    tokenFlow = tokenFlow,
+    maxActionProvider = maxActionProvider
+),
+    SwapAmountInputMixin.Presentation {
 
-    override val fiatAmount: Flow<String> = combine(assetFlow.filterNotNull(), amount) { asset, amount ->
-        asset.token.amountToFiat(amount).formatAsCurrency(asset.token.currency)
-    }
-        .shareInBackground()
-
-    override val maxAvailable: Flow<String?> = assetFlow.map { asset ->
-        if (asset == null) return@map null
-        val maxAvailableBalance = maxAvailableExtractor.invoke(asset)
-
-        maxAvailableBalance?.formatPlanks(asset.token.configuration)
-    }.shareInBackground()
-
-    override val assetModel: Flow<SwapInputAssetModel> = assetFlow.map {
-        val chainAsset = it?.token?.configuration
+    override val assetModel: Flow<SwapInputAssetModel> = tokenFlow.map {
+        val chainAsset = it?.configuration
 
         if (chainAsset != null) {
             formatInputAsset(chainAsset)

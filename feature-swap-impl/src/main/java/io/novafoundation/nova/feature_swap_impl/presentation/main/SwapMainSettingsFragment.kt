@@ -4,13 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isGone
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.postToUiThread
 import io.novafoundation.nova.common.utils.setSelectionEnd
-import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showLoadingValue
@@ -26,7 +24,6 @@ import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettin
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetailsRate
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsFlip
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsMaxAmount
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsMaxAmountButton
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsMinBalanceAlert
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsPayInput
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsReceiveInput
@@ -57,7 +54,6 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         swapMainSettingsToolbar.applyStatusBarInsets()
         swapMainSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        swapMainSettingsMaxAmountButton.setOnClickListener { viewModel.maxTokens() }
         swapMainSettingsPayInput.setOnClickListener { viewModel.selectPayToken() }
         swapMainSettingsReceiveInput.setOnClickListener { viewModel.selectReceiveToken() }
         swapMainSettingsFlip.setOnClickListener {
@@ -79,14 +75,9 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
     }
 
     override fun subscribe(viewModel: SwapMainSettingsViewModel) {
-        setupSwapAmountInput(viewModel.amountInInput, swapMainSettingsPayInput)
-        setupSwapAmountInput(viewModel.amountOutInput, swapMainSettingsReceiveInput)
+        setupSwapAmountInput(viewModel.amountInInput, swapMainSettingsPayInput, swapMainSettingsMaxAmount)
+        setupSwapAmountInput(viewModel.amountOutInput, swapMainSettingsReceiveInput, maxAvailableView = null)
         setupFeeLoading(viewModel.feeMixin, swapMainSettingsDetailsNetworkFee)
-
-        viewModel.amountInInput.maxAvailable.observe {
-            swapMainSettingsMaxAmountButton.isGone = it.isNullOrEmpty()
-            swapMainSettingsMaxAmount.setTextOrHide(it)
-        }
 
         viewModel.rateDetails.observe { swapMainSettingsDetailsRate.showLoadingValue(it) }
         viewModel.showDetails.observe { swapMainSettingsDetails.setVisible(it) }

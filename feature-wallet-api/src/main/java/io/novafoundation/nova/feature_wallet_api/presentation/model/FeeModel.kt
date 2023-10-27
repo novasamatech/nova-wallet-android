@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.model
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
 typealias FeeModel = GenericFeeModel<SimpleFee>
@@ -11,6 +12,7 @@ typealias DecimalFee = GenericDecimalFee<SimpleFee>
 class GenericFeeModel<F : GenericFee>(
     val decimalFee: GenericDecimalFee<F>,
     val display: AmountModel,
+    val chainAsset: Chain.Asset
 )
 
 class GenericDecimalFee<F : GenericFee>(

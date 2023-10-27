@@ -143,7 +143,7 @@ suspend fun <F : GenericFee> GenericFeeLoaderMixin<F>.awaitOptionalDecimalFee():
         }
     }.first()
 
-fun <F : GenericFee> GenericFeeLoaderMixin<F>.loadedFeeFlow(): Flow<F?> {
+fun <F : GenericFee> GenericFeeLoaderMixin<F>.loadedFeeOrNullFlow(): Flow<F?> {
     return feeLiveData.asFlow().map {
         it.castOrNull<FeeStatus.Loaded<F>>()?.feeModel?.decimalFee?.genericFee
     }
