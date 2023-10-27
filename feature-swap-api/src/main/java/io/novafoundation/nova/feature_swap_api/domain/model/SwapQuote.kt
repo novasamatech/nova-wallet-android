@@ -44,7 +44,7 @@ class SwapFee(
     val minimumBalanceBuyIn: MinimumBalanceBuyIn,
 ) : GenericFee
 
-val SwapFee.totalDeductedPlanks: Balance
+    val SwapFee.totalDeductedPlanks: Balance
     get() = networkFee.amount + minimumBalanceBuyIn.commissionAssetToSpendOnBuyIn
 
 sealed class MinimumBalanceBuyIn {

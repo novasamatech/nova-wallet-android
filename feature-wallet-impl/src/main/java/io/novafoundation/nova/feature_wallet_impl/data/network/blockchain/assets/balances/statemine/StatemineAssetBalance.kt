@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine
 
+import android.util.Log
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -10,10 +11,12 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.b
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.bindAssetAccountOrEmpty
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.statemineModule
+import io.novafoundation.nova.runtime.ext.palletNameOrDefault
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.prepareIdForEncoding
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.statemineAssetIdScaleType
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.network.updaters.insert
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -82,6 +85,11 @@ class StatemineAssetBalance(
         val encodableAssetId = statemineType.prepareIdForEncoding(runtime)
 
         val module = runtime.metadata.statemineModule(statemineType)
+
+        if (chainAsset.symbol == "HOP") {
+            Log.d("RX", "Hop asset id: ${statemineType.id}, encoded: $encodableAssetId")
+            Log.d("RX", "Pallet name: ${statemineType.palletName}, type: ${statemineAssetIdScaleType(runtime, statemineType.palletNameOrDefault())?.name}")
+        }
 
         val assetDetailsStorage = module.storage("Asset")
         val assetDetailsKey = assetDetailsStorage.storageKey(runtime, encodableAssetId)

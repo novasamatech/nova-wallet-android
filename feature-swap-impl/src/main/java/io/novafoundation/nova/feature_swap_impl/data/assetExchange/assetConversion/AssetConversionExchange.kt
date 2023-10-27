@@ -65,10 +65,11 @@ class AssetConversionExchangeFactory(
 
     override suspend fun create(chainId: ChainId, coroutineScope: CoroutineScope): AssetExchange? {
         val chain = chainRegistry.getChainOrNull(chainId) ?: return null
+        val parentChain = chain.parentId?.let { chainRegistry.getChain(it) }
         val runtimeAsync = coroutineScope.async { chainRegistry.getRuntime(chainId) }
 
         val converter = CompoundMultiLocationConverter(
-            NativeAssetLocationConverter(chain),
+            NativeAssetLocationConverter(chain, parentChain),
             LocalAssetsLocationConverter(chain, runtimeAsync),
             ForeignAssetsLocationConverter(chain, runtimeAsync)
         )
