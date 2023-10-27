@@ -1,15 +1,16 @@
 package io.novafoundation.nova.feature_swap_impl.domain.swap
 
+import android.util.Log
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.MultiMap
-import io.novafoundation.nova.common.utils.MutableMultiMap
 import io.novafoundation.nova.common.utils.Percent
+import io.novafoundation.nova.common.utils.accumulateMaps
 import io.novafoundation.nova.common.utils.asPerbill
 import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.flatMap
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.isZero
-import io.novafoundation.nova.common.utils.mutableMultiMapOf
 import io.novafoundation.nova.common.utils.toPercent
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicHash
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
@@ -31,8 +32,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.findChains
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import kotlin.coroutines.coroutineContext
@@ -57,15 +60,15 @@ internal class RealSwapService(
 
     override suspend fun assetsAvailableForSwap(
         computationScope: CoroutineScope
-    ): Set<FullChainAssetId> = withContext(Dispatchers.Default) {
-        allAvailableDirections(computationScope).keys
+    ): Flow<Set<FullChainAssetId>> {
+        return allAvailableDirections(computationScope).map { it.keys }
     }
 
     override suspend fun availableSwapDirectionsFor(
         asset: Chain.Asset,
         computationScope: CoroutineScope
-    ): Set<FullChainAssetId> = withContext(Dispatchers.Default) {
-        allAvailableDirections(computationScope)[asset.fullId].orEmpty()
+    ): Flow<Set<FullChainAssetId>> {
+        return allAvailableDirections(computationScope).map { it[asset.fullId].orEmpty() }
     }
 
     override suspend fun quote(args: SwapQuoteArgs): Result<SwapQuote> {
@@ -126,34 +129,34 @@ internal class RealSwapService(
         return priceImpact.asPerbill().toPercent()
     }
 
-    private suspend fun allAvailableDirections(computationScope: CoroutineScope): MultiMap<FullChainAssetId, FullChainAssetId> {
-        return computationalCache.useCache(ALL_DIRECTIONS_CACHE, computationScope) {
+    private suspend fun allAvailableDirections(computationScope: CoroutineScope): Flow<MultiMap<FullChainAssetId, FullChainAssetId>> {
+        return computationalCache.useSharedFlow(ALL_DIRECTIONS_CACHE, computationScope) {
             val exchanges = exchanges(computationScope)
 
-            val directionsByExchange = exchanges.map { (_, exchange) ->
-                async { exchange.availableSwapDirections() }
-            }.awaitAll()
+            val directionsByExchange = exchanges.map { (chainId, exchange) ->
+                flowOf { exchange.availableSwapDirections() }
+                    .catch {
+                        emit(emptyMap())
 
-            directionsByExchange.fold(mutableMultiMapOf()) { acc, directions ->
-                // MultiMap is not castable to MutableMultiMap in general but its safe here since we don't access inner MutableSet
-                @Suppress("UNCHECKED_CAST")
-                acc.putAll(directions as MutableMultiMap<FullChainAssetId, FullChainAssetId>)
-                acc
+                        Log.d("RealSwapService", "Failed to fetch directions for exchange ${exchange::class} in chain $chainId")
+                    }
             }
+
+            directionsByExchange
+                .accumulateMaps()
+                .filter { it.isNotEmpty() }
         }
     }
 
     private suspend fun exchanges(computationScope: CoroutineScope): Map<ChainId, AssetExchange> {
         return computationalCache.useCache(EXCHANGES_CACHE, computationScope) {
-            createExchanges()
+            createExchanges(computationScope)
         }
     }
 
-    private suspend fun createExchanges(): Map<ChainId, AssetExchange> {
+    private suspend fun createExchanges(coroutineScope: CoroutineScope): Map<ChainId, AssetExchange> {
         return chainRegistry.findChains { it.swap.isNotEmpty() }
-            .associateBy(Chain::id) {
-                assetConversionFactory.create(it.id)
-            }
+            .associateBy(Chain::id) { assetConversionFactory.create(it.id, coroutineScope) }
             .filterNotNull()
     }
 }
