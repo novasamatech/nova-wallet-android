@@ -51,7 +51,13 @@ open class BaseAmountChooserProvider(
 
     final override val inputState = MutableStateFlow(defaultState())
 
-    @Deprecated("Use amountInput instead")
+    @Deprecated(
+        message = "Use `inputState` instead",
+        replaceWith = ReplaceWith(
+            expression = "inputState.map { it.value }",
+            imports = ["kotlinx.coroutines.flow.map"]
+        )
+    )
     final override val amountInput = inputState.map { it.value }
         .stateIn(this, SharingStarted.Eagerly, initialValue = "")
 

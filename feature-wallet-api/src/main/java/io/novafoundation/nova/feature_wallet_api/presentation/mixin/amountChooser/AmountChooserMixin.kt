@@ -20,7 +20,13 @@ interface AmountChooserMixinBase : CoroutineScope {
 
     val inputState: MutableStateFlow<InputState<String>>
 
-    @Deprecated("Use amountInput instead")
+    @Deprecated(
+        message = "Use `inputState` instead",
+        replaceWith = ReplaceWith(
+            expression = "inputState.map { it.value }",
+            imports = ["kotlinx.coroutines.flow.map"]
+        )
+    )
     val amountInput: StateFlow<String>
 
     val maxAction: MaxAction
