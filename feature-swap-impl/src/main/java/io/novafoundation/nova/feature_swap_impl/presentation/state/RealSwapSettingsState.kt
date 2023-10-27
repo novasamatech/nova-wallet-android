@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.state
 
 import io.novafoundation.nova.common.utils.Percent
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsState
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.flip
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsState
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -18,7 +18,7 @@ class RealSwapSettingsState(
 
     override val selectedOption = MutableStateFlow(initialValue)
 
-    suspend fun setAssetInUpdatingFee(asset: Chain.Asset) {
+    override suspend fun setAssetInUpdatingFee(asset: Chain.Asset) {
         val current = selectedOption.value
         val chain = chainRegistry.getChain(asset.chainId)
 
@@ -47,7 +47,7 @@ class RealSwapSettingsState(
         selectedOption.value = selectedOption.value.copy(slippage = slippage)
     }
 
-    suspend fun flipAssets(): SwapSettings {
+    override suspend fun flipAssets(): SwapSettings {
         val currentSettings = selectedOption.value
 
         val newAssetIn = currentSettings.assetOut
