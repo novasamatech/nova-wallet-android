@@ -17,18 +17,6 @@ class SwapNavigator(
         navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapConfirmationFragment)
     }
 
-    override fun selectAssetIn(selectedAsset: FullChainAssetId?) {
-        val selectedAssetModel = selectedAsset?.let { AssetPayload(it.chainId, it.assetId) }
-        val payload = SwapFlowPayload(SwapFlowPayload.FlowType.SELECT_ASSET_IN, selectedAssetModel)
-        navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))
-    }
-
-    override fun selectAssetOut(selectedAsset: FullChainAssetId?) {
-        val selectedAssetModel = selectedAsset?.let { AssetPayload(it.chainId, it.assetId) }
-        val payload = SwapFlowPayload(SwapFlowPayload.FlowType.RESELECT_ASSET_OUT, selectedAssetModel)
-        navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))
-    }
-
     override fun openSwapOptions() {
         navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapOptionsFragment)
     }

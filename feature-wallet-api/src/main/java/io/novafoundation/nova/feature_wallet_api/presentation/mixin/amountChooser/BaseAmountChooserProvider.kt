@@ -112,7 +112,7 @@ open class BaseAmountChooserProvider(
         }.inBackground()
 
         override val maxClick: Flow<MaxClick?> = maxAvailableForActionAmount.map { maxAvailableForAction ->
-            if (maxAvailableForAction != null) createImmediateMaxClicked(maxAvailableForAction) else createDelayedMaxClicked()
+            getMaxClickAction(maxAvailableForAction)
         }.inBackground()
 
         init {
@@ -154,6 +154,14 @@ open class BaseAmountChooserProvider(
                     inputState.value = maxAmountInputState(newAmount)
                 }
                 .launchIn(this@BaseAmountChooserProvider)
+        }
+
+        private fun getMaxClickAction(maxAvailableForAction: BigDecimal?): MaxClick {
+            return if (maxAvailableForAction != null) {
+                createImmediateMaxClicked(maxAvailableForAction)
+            } else {
+                createDelayedMaxClicked()
+            }
         }
 
         private fun cancelDelayedInputOnInputChange() {

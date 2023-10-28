@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class RealSwapSettingsState(
     private val chainRegistry: ChainRegistry,
-    initialValue: SwapSettings = SwapSettings(),
+    initialValue: SwapSettings
 ) : SwapSettingsState {
 
     override val selectedOption = MutableStateFlow(initialValue)

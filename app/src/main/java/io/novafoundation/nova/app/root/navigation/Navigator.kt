@@ -48,9 +48,6 @@ import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSend
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
 import io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment
 import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
-import io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment
-import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
-import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload.FlowType
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoFragment
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
@@ -73,15 +70,11 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.sel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerFragment
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
-import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
-import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.splash.SplashRouter
 import kotlinx.coroutines.flow.Flow
 

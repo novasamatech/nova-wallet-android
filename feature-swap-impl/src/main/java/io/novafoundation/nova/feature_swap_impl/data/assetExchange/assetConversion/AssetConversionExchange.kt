@@ -175,10 +175,11 @@ private class AssetConversionExchange(
         nativeAsset: Asset,
         customFeeAsset: Chain.Asset
     ): AssetExchangeFee {
+        val nativeChainAsset = nativeAsset.token.configuration
         val runtimeCallsApi = multiChainRuntimeCallsApi.forChain(chain.id)
-        val assetBalances = assetSourceRegistry.sourceFor(customFeeAsset).balance
+        val assetBalances = assetSourceRegistry.sourceFor(nativeChainAsset).balance
 
-        val minimumBalance = assetBalances.existentialDeposit(chain, customFeeAsset)
+        val minimumBalance = assetBalances.existentialDeposit(chain, nativeChainAsset)
         // https://github.com/paritytech/polkadot-sdk/blob/39c04fdd9622792ba8478b1c1c300417943a034b/substrate/frame/transaction-payment/asset-conversion-tx-payment/src/payment.rs#L114
         val shouldBuyMinimumBalance = nativeAsset.totalInPlanks < minimumBalance + nativeTokenFee.amount
 

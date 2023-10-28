@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.commissionAssetToSpendOnBuyIn
+import io.novafoundation.nova.feature_swap_api.domain.model.nativeMinimumBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
@@ -15,7 +16,7 @@ import java.math.BigInteger
 
 data class SwapValidationPayload(
     val detailedAssetIn: SwapAssetData,
-    val outDetails: SwapAssetData,
+    val detailedAssetOut: SwapAssetData,
     val slippage: Percent,
     val feeAsset: Asset,
     val swapFee: SwapFee,
@@ -48,9 +49,16 @@ val SwapValidationPayload.feeAmountInFeeToken: BigInteger
         BigInteger.ZERO
     }
 
-val SwapValidationPayload.toBuyEDInFeeAsset: BigInteger
+val SwapValidationPayload.toBuyAmountToKeepEDInFeeAsset: BigInteger
     get() = if (feeAsset.token.configuration.fullId == detailedAssetIn.asset.token.configuration.fullId) {
         swapFee.minimumBalanceBuyIn.commissionAssetToSpendOnBuyIn
+    } else {
+        BigInteger.ZERO
+    }
+
+val SwapValidationPayload.nativeMinimumBalance: BigInteger
+    get() = if (feeAsset.token.configuration.fullId == detailedAssetIn.asset.token.configuration.fullId) {
+        swapFee.minimumBalanceBuyIn.nativeMinimumBalance
     } else {
         BigInteger.ZERO
     }
@@ -58,7 +66,7 @@ val SwapValidationPayload.toBuyEDInFeeAsset: BigInteger
 val SwapValidationPayload.totalDeductedAmountInFeeToken: BigInteger
     get() {
         val feeAmountInFeeToken = feeAmountInFeeToken
-        val toBuyExistentialDeposit = toBuyEDInFeeAsset
+        val toBuyExistentialDeposit = toBuyAmountToKeepEDInFeeAsset
 
         return feeAmountInFeeToken + toBuyExistentialDeposit
     }

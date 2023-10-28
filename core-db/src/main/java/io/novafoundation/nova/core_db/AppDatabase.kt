@@ -52,7 +52,6 @@ import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
 import io.novafoundation.nova.core_db.migrations.AddEnabledColumnToChainAssets_30_31
 import io.novafoundation.nova.core_db.migrations.AddEventIdToOperation_47_48
 import io.novafoundation.nova.core_db.migrations.AddSwapOption_48_49
-import io.novafoundation.nova.core_db.migrations.AddEventIdToOperation_48_49
 import io.novafoundation.nova.core_db.migrations.AddExternalBalances_45_46
 import io.novafoundation.nova.core_db.migrations.AddExtrinsicContentField_37_38
 import io.novafoundation.nova.core_db.migrations.AddFavouriteDApps_9_10

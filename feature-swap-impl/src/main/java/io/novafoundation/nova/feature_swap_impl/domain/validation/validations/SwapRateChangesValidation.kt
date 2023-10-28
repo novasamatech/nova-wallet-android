@@ -11,16 +11,21 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import java.math.BigDecimal
 
 class SwapRateChangesValidation(
-    private val currentRate: suspend (SwapValidationPayload) -> BigDecimal,
+    private val getCurrentRate: suspend (SwapValidationPayload) -> BigDecimal,
 ) : SwapValidation {
 
     override suspend fun validate(value: SwapValidationPayload): ValidationStatus<SwapValidationFailure> {
         val slippage = value.slippage.toPerbill()
-        val currentRate = currentRate(value)
-        val selectedRate = value.outDetails.amount / value.detailedAssetIn.amount
-        val rateDifference = (selectedRate - currentRate).abs() / selectedRate
+        val selectedRate = value.detailedAssetOut.amount / value.detailedAssetIn.amount
+        val newRate = getCurrentRate(value)
+        val rateDifference = (selectedRate - newRate).abs() / selectedRate
         if (rateDifference > slippage.value.toBigDecimal()) {
-            return NewRateExceededSlippage.validationError()
+            return NewRateExceededSlippage(
+                value.detailedAssetIn.asset.token.configuration,
+                value.detailedAssetOut.asset.token.configuration,
+                selectedRate,
+                newRate
+            ).validationError()
         }
 
         return valid()

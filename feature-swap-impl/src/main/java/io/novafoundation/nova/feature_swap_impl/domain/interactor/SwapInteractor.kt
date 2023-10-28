@@ -16,21 +16,23 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.checkForFeeCha
 import io.novafoundation.nova.feature_swap_impl.domain.validation.enoughLiquidity
 import io.novafoundation.nova.feature_swap_impl.domain.validation.rateNotExceedSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceInUsedAsset
-import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceToPayFeeInUsedAsset
+import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceInFeeAsset
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientCommissionBalanceToStayAboveED
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapFeeSufficientBalance
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapSmallRemainingBalance
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class SwapInteractor(
     private val swapService: SwapService,
-    private val walletRepository: WalletRepository,
-    private val accountRepository: AccountRepository,
     private val assetExchangeFactory: AssetConversionExchangeFactory,
-    private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
+    private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
+    private val assetSourceRegistry: AssetSourceRegistry,
+    private val chainRegistry: ChainRegistry
 ) {
 
     suspend fun quote(quoteArgs: SwapQuoteArgs): Result<SwapQuote> {
@@ -60,9 +62,9 @@ class SwapInteractor(
 
             swapFeeSufficientBalance()
 
-            swapSmallRemainingBalance()
+            swapSmallRemainingBalance(assetSourceRegistry, chainRegistry)
 
-            sufficientBalanceToPayFeeInUsedAsset()
+            sufficientBalanceInFeeAsset()
 
             sufficientBalanceInUsedAsset()
 

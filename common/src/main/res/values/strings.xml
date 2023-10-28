@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+
+    <string name="swap_too_low_amount_to_stay_abow_ed_title">You are trying to swap too small amount</string>
+    <string name="swap_too_low_amount_to_stay_abow_ed_message">Amount of %s is less than minimum balance of %s</string>
+
+    <string name="swap_invalid_slippage_failure_title">Invalid slippage</string>
+    <string name="swap_invalid_slippage_failure_message">Slippage must be specified between %s and %s</string>
+    <string name="swap_rate_was_updated_failure_title">Swap rate was updated</string>
+    <string name="swap_rate_was_updated_failure_message">Old rate: %1$s ≈ %2$s.\nNew rate: %1$s ≈ %3$s</string>
+    <string name="swap_not_enought_liquidity_failure">Pool doesn’t have enough liquidity to swap</string>
+    <string name="swap_failure_too_small_remaining_balance_title">Too small amount remains on your balance</string>
+    <string name="swap_failure_too_small_remaining_balance_message">You should leave at least %1$s on your balance. Do you want to perform full swap by adding remaining %2$s as well?</string>
+    <string name="swap_failure_too_small_remaining_balance_with_buy_ed_message">You should keep at least %1$s after paying %2$s network fee and converting %3$s to %4$s to meet %5$s minimum balance.\n\nDo you want to fully swap by adding remaining %6$s as well?</string>
+    <string name="swap_failure_insufficient_balance_message">You can swap up to %1$s since you need to pay %2$s for network fee.</string>
+    <string name="swap_failure_insufficient_balance_with_buy_ed_message">You can swap up to %1$s since you need to pay %2$s for network fee and also convert %3$s to %4$s to meet %5$s minimum balance.</string>
+
+    <string name="swap_failure_swap_max_button">Swap max</string>
+
     <string name="swap_custom_fee_selector_description">Token for paying network fee</string>
     <string name="swap_custom_fee_selector_footer">Network fee is added on top of entered amount</string>
     <string name="swap_minimum_balance_buy_in_alert">To pay network fee with %s, Nova will automatically swap %s for %s to maintain your account\'s minimum DOT balance.</string>

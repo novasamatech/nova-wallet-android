@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialS
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class AssetSwapFlowModule {
@@ -36,8 +37,9 @@ class AssetSwapFlowModule {
         initialSwapFlowExecutor: InitialSwapFlowExecutor,
         assetsRouter: AssetsRouter,
         swapSettingsStateProvider: SwapSettingsStateProvider,
+        chainRegistry: ChainRegistry
     ): SwapFlowExecutorFactory {
-        return SwapFlowExecutorFactory(initialSwapFlowExecutor, assetsRouter, swapSettingsStateProvider)
+        return SwapFlowExecutorFactory(initialSwapFlowExecutor, assetsRouter, swapSettingsStateProvider, chainRegistry)
     }
 
     @Provides

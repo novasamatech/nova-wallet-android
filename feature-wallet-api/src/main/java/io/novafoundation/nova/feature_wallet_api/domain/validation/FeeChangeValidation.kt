@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -88,6 +89,18 @@ fun CoroutineScope.handleFeeSpikeDetected(
     resourceManager: ResourceManager,
     feeLoaderMixin: FeeLoaderMixin.Presentation,
     actions: ValidationFlowActions<*>
+): TransformedFailure? = handleFeeSpikeDetected(
+    error = error,
+    resourceManager = resourceManager,
+    actions = actions,
+    setFee = { feeLoaderMixin.setFee(it.newFee.fee) }
+)
+
+fun CoroutineScope.handleFeeSpikeDetected(
+    error: FeeChangeDetectedFailure,
+    resourceManager: ResourceManager,
+    actions: ValidationFlowActions<*>,
+    setFee: suspend (error: FeeChangeDetectedFailure.Payload) -> Unit,
 ): TransformedFailure? {
     if (!error.payload.needsUserAttention) {
         actions.resumeFlow()
@@ -107,8 +120,7 @@ fun CoroutineScope.handleFeeSpikeDetected(
                 title = resourceManager.getString(R.string.common_proceed),
                 action = {
                     launch {
-                        feeLoaderMixin.setFee(error.payload.newFee.fee)
-
+                        setFee(error.payload)
                         actions.resumeFlow()
                     }
                 }
@@ -117,7 +129,7 @@ fun CoroutineScope.handleFeeSpikeDetected(
                 title = resourceManager.getString(R.string.common_refresh_fee),
                 action = {
                     launch {
-                        feeLoaderMixin.setFee(error.payload.newFee.fee)
+                        setFee(error.payload)
                     }
                 }
             )

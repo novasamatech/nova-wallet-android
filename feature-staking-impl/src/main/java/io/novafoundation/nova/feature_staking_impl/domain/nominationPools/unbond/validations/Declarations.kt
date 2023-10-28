@@ -71,6 +71,6 @@ private fun NominationPoolsUnbondValidationSystemBuilder.sufficientCommissionBal
         fee = { it.fee },
         total = { it.asset.total },
         chainWithAsset = { ChainWithAsset(it.chain, it.chain.utilityAsset) },
-        error = { NominationPoolsUnbondValidationFailure.ToStayAboveED(it.chain.utilityAsset) }
+        error = { payload, _ -> NominationPoolsUnbondValidationFailure.ToStayAboveED(payload.chain.utilityAsset) }
     )
 }
