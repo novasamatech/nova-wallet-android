@@ -8,16 +8,16 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
 
 interface WithFeeLoaderMixin {
 
-    val originFeeMixin: FeeLoaderMixin?
+    val originFeeMixin: GenericFeeLoaderMixin<*>?
 }
 
-fun <V> BaseFragmentMixin<V>.setupFeeLoading(viewModel: V, feeView: FeeView) where V : BaseViewModel, V : FeeLoaderMixin {
+fun <V> BaseFragmentMixin<V>.setupFeeLoading(viewModel: V, feeView: FeeView) where V : BaseViewModel, V : GenericFeeLoaderMixin<*> {
     observeRetries(viewModel)
 
     viewModel.feeLiveData.observe(feeView::setFeeStatus)
 }
 
-fun BaseFragmentMixin<*>.setupFeeLoading(mixin: FeeLoaderMixin, feeView: FeeView) {
+fun BaseFragmentMixin<*>.setupFeeLoading(mixin: GenericFeeLoaderMixin<*>, feeView: FeeView) {
     observeRetries(mixin)
 
     mixin.feeLiveData.observe(feeView::setFeeStatus)

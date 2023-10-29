@@ -60,6 +60,8 @@
     <color name="container_background">#1A999EC7</color>
     <color name="token_container_background">#3D08090E</color>
     <color name="segmented_background">#5208090E</color>
+    <color name="segmented_background_on_black">#1A999EC7</color>
+
     <color name="segmented_tab_active">#3D999EC7</color>
     <color name="switch_background">#3D999EC7</color>
     <color name="progress_bar_background">#3D999EC7</color>

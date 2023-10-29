@@ -16,6 +16,8 @@ import io.novafoundation.nova.common.utils.useAttributes
 import kotlinx.android.synthetic.main.view_alert.view.alertIcon
 import kotlinx.android.synthetic.main.view_alert.view.alertMessage
 
+typealias SimpleAlertModel = String
+
 class AlertView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -23,7 +25,7 @@ class AlertView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
 
     enum class StylePreset {
-        WARNING, ERROR
+        WARNING, ERROR, INFO
     }
 
     class Style(@DrawableRes val iconRes: Int, @ColorRes val backgroundColorRes: Int)
@@ -55,6 +57,10 @@ class AlertView @JvmOverloads constructor(
         alertMessage.setText(textRes)
     }
 
+    fun setModel(maybeModel: SimpleAlertModel?) = letOrHide(maybeModel) { model ->
+        setText(model)
+    }
+
     private fun setStyleBackground(@ColorRes colorRes: Int) {
         background = getRoundedCornerDrawable(fillColorRes = colorRes)
     }
@@ -79,6 +85,7 @@ class AlertView @JvmOverloads constructor(
     private fun styleFromPreset(preset: StylePreset) = when (preset) {
         StylePreset.WARNING -> Style(R.drawable.ic_warning_filled, R.color.warning_block_background)
         StylePreset.ERROR -> Style(R.drawable.ic_slash, R.color.error_block_background)
+        StylePreset.INFO -> Style(R.drawable.ic_info_accent, R.color.individual_chip_background)
     }
 }
 
