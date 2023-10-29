@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConvers
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.MultiMap
+import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.assetConversion
 import io.novafoundation.nova.common.utils.mutableMultiMapOf
 import io.novafoundation.nova.common.utils.put
@@ -19,6 +20,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
+import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.CompoundMultiLocationConverter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.ForeignAssetsLocationConverter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.LocalAssetsLocationConverter
@@ -128,6 +130,17 @@ private class AssetConversionExchange(
         return extrinsicService.submitExtrinsicWithSelectedWallet(chain) { origin ->
             executeSwap(args, origin)
         }
+    }
+
+    override suspend fun slippageConfig(): SlippageConfig {
+        return SlippageConfig(
+            defaultSlippage = Percent(0.5),
+            slippageTips = listOf(Percent(0.1), Percent(1.0), Percent(3.0)),
+            minAvailableSlippage = Percent(0.1),
+            maxAvailableSlippage = Percent(50.0),
+            smallSlippage = Percent(0.5),
+            bigSlippage = Percent(2.5)
+        )
     }
 
     private suspend fun constructAllAvailableDirections(pools: List<Pair<MultiLocation, MultiLocation>>): MultiMap<FullChainAssetId, FullChainAssetId> {

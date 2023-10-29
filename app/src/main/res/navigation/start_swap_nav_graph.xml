@@ -25,6 +25,15 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_swapMainSettingsFragment_to_swapOptionsFragment"
+            app:destination="@id/swapOptionsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
     </fragment>
 
     <fragment
@@ -37,5 +46,10 @@
         android:id="@+id/selectAssetSwapFlowFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment"
         android:label="AssetSwapFlowFragment" />
+
+    <fragment
+        android:id="@+id/swapOptionsFragment"
+        android:name="io.novafoundation.nova.feature_swap_impl.presentation.options.SwapOptionsFragment"
+        android:label="SwapOptionsFragment" />
 
 </navigation>

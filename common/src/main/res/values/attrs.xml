@@ -277,4 +277,12 @@
     <declare-styleable name="TabsView">
         <attr name="TabsView_backgroundTint" format="reference|color" />
     </declare-styleable>
+
+    <declare-styleable name="TipsInputField">
+        <attr name="android:hint" />
+        <attr name="postfix" format="string" />
+        <attr name="android:digits" />
+        <attr name="android:inputType" />
+    </declare-styleable>
+
 </resources>
