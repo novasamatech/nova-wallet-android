@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.TooSmallRemainingBalance
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
-import io.novafoundation.nova.feature_swap_impl.domain.validation.nativeMinimumBalance
 import io.novafoundation.nova.feature_swap_impl.domain.validation.toBuyAmountToKeepEDInFeeAsset
 import io.novafoundation.nova.feature_swap_impl.domain.validation.totalDeductedAmountInFeeToken
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -36,16 +35,15 @@ class SwapSmallRemainingBalanceValidation(
         val remainingBalance = assetInTotal - swapAmount - totalDeductedAmount
 
         if (remainingBalance.isPositive() && remainingBalance < assetInExistentialDeposit) {
-            val nativeExistentialDeposit = value.nativeMinimumBalance
             return if (toBuyAmountToKeepEDInFeeAsset.isZero) {
-                TooSmallRemainingBalance.NoNeedsToBuyMainAssetED(chainAssetIn, remainingBalance, nativeExistentialDeposit).validationError()
+                TooSmallRemainingBalance.NoNeedsToBuyMainAssetED(chainAssetIn, remainingBalance, assetInExistentialDeposit).validationError()
             } else {
                 TooSmallRemainingBalance.NeedsToBuyMainAssetED(
                     feeChainAsset,
                     chainAssetIn,
                     assetInExistentialDeposit,
                     toBuyAmountToKeepEDInCommissionAsset = toBuyAmountToKeepEDInFeeAsset,
-                    toSellAmountToKeepEDUsingAssetIn = BigInteger.ZERO, //TODO how to convert toBuyAmountToKeepEDInFeeAsset to this value?
+                    toSellAmountToKeepEDUsingAssetIn = BigInteger.ZERO, // TODO how to convert toBuyAmountToKeepEDInFeeAsset to this value?
                     remainingBalance,
                     value.swapFee.networkFee
                 ).validationError()

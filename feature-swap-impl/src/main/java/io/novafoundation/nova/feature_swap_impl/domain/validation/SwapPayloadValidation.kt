@@ -33,7 +33,6 @@ data class SwapValidationPayload(
     )
 }
 
-
 val SwapValidationPayload.isFeePayingByAssetIn: Boolean
     get() = feeAsset.token.configuration.fullId == detailedAssetIn.asset.token.configuration.fullId
 

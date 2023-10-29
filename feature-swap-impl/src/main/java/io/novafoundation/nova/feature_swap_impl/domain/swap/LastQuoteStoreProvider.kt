@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_swap_impl.domain.swap
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.runtime.state.SelectedOptionSharedState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow

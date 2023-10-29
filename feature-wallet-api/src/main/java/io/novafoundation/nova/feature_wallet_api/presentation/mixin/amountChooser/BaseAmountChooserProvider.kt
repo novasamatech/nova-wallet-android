@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser
 
+import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.inBackground
@@ -82,6 +84,8 @@ open class BaseAmountChooserProvider(
         get() = _amount.debounce(DEBOUNCE_DURATION_MILLIS.milliseconds)
 
     override val maxAction: AmountChooserMixinBase.MaxAction = RealMaxAction()
+
+    override val requestFocusLiveData: MutableLiveData<Event<Unit>> = MutableLiveData()
 
     private fun String.parseBigDecimalOrNull() = replace(",", "").toBigDecimalOrNull()
 

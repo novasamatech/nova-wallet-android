@@ -34,7 +34,7 @@ class SwapFeeSufficientBalanceValidation : SwapValidation {
                     value.feeAsset.token.configuration,
                     chainAssetIn,
                     toBuyAmountToKeepEDInCommissionAsset = toBuyAmountToKeepEDInFeeAsset,
-                    toSellAmountToKeepEDUsingAssetIn = BigInteger.ZERO, //TODO how to convert toBuyAmountToKeepEDInFeeAsset to this value?
+                    toSellAmountToKeepEDUsingAssetIn = BigInteger.ZERO, // TODO how to convert toBuyAmountToKeepEDInFeeAsset to this value?
                     maxAmountToSwap,
                     value.swapFee.networkFee
                 ).validationError()

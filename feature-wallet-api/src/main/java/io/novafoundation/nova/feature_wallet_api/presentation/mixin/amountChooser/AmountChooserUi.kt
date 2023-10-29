@@ -56,6 +56,10 @@ fun BaseFragment<*>.setupAmountChooserBase(
     amountInputView.amountInput.bindToAmountInput(mixin.inputState, lifecycleScope)
     mixin.fiatAmount.observe(amountInputView::setFiatAmount)
 
+    mixin.requestFocusLiveData.observeEvent {
+        amountInputView.amountInput.requestFocus()
+    }
+
     if (maxAvailableView == null) return
 
     mixin.maxAction.display.observe(maxAvailableView::setMaxAmountDisplay)

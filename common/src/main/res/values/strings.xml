@@ -17,6 +17,7 @@
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">You can swap up to %1$s since you need to pay %2$s for network fee and also convert %3$s to %4$s to meet %5$s minimum balance.</string>
 
     <string name="swap_failure_swap_max_button">Swap max</string>
+    <string name="swap_failure_swap_min_button">Swap min</string>
 
     <string name="swap_custom_fee_selector_description">Token for paying network fee</string>
     <string name="swap_custom_fee_selector_footer">Network fee is added on top of entered amount</string>

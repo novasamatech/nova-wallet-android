@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser
 
 import androidx.annotation.StringRes
+import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
@@ -30,6 +32,8 @@ interface AmountChooserMixinBase : CoroutineScope {
     val amountInput: StateFlow<String>
 
     val maxAction: MaxAction
+
+    val requestFocusLiveData: MutableLiveData<Event<Unit>>
 
     interface Presentation : AmountChooserMixinBase {
 

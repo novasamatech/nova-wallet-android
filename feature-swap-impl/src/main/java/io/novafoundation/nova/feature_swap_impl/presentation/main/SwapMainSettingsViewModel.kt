@@ -38,7 +38,6 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmou
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
-import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.*
 import io.novafoundation.nova.feature_swap_impl.presentation.state.swapSettingsFlow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -239,7 +238,8 @@ class SwapMainSettingsViewModel(
                         status,
                         actions,
                         feeMixin,
-                        amountInInput
+                        amountInInput,
+                        amountOutInput
                     )
                 },
             ) { validPayload ->
@@ -377,7 +377,7 @@ class SwapMainSettingsViewModel(
             .onEach { (quoteResult, swapSettings) -> handleNewQuote(quoteResult, swapSettings) }
             .launchIn(viewModelScope)
 
-        //Store quote to use last quotes on confirmation screen
+        // Store quote to use last quotes on confirmation screen
         quotingState.onEach {
             val storedState = when (it) {
                 is QuotingState.Loaded -> it.quoteArgs to it.value

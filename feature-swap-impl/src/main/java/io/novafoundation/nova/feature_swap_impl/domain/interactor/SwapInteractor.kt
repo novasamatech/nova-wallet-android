@@ -21,7 +21,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.enoughLiquidit
 import io.novafoundation.nova.feature_swap_impl.domain.validation.rateNotExceedSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceInUsedAsset
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceInFeeAsset
-import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientCommissionBalanceToStayAboveED
+import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientRecipientBalanceToStayAboveED
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapFeeSufficientBalance
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapSmallRemainingBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -76,7 +76,7 @@ class SwapInteractor(
 
             sufficientBalanceInUsedAsset()
 
-            sufficientCommissionBalanceToStayAboveED(enoughTotalToStayAboveEDValidationFactory)
+            sufficientRecipientBalanceToStayAboveED(enoughTotalToStayAboveEDValidationFactory)
 
             checkForFeeChanges(swapService)
         }
@@ -110,7 +110,7 @@ class SwapInteractor(
             detailedAssetOut = SwapValidationPayload.SwapAssetData(
                 chain = chainOut,
                 asset = walletRepository.getAsset(metaAccount.id, assetOut) ?: return null,
-                amount = assetIn.amountFromPlanks(swapQuote.planksOut)
+                amount = assetOut.amountFromPlanks(swapQuote.planksOut)
             ),
             slippage = swapSettings.slippage,
             feeAsset = walletRepository.getAsset(metaAccount.id, feeChainAsset) ?: return null,

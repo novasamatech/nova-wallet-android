@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_assets.presentation.swap
 import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor

@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_wallet_api.presentation.validation
 
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.domain.validation.InsufficientTotalToStayAboveEDError
 

@@ -76,7 +76,8 @@ fun SwapValidationSystemBuilder.sufficientBalanceInUsedAsset() = sufficientBalan
     }
 )
 
-fun SwapValidationSystemBuilder.sufficientCommissionBalanceToStayAboveED(
+// TODO change to DeadRecipientValidation
+fun SwapValidationSystemBuilder.sufficientRecipientBalanceToStayAboveED(
     enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 ) {
     enoughTotalToStayAboveEDValidationFactory.validate(

@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.e
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
-import java.math.BigInteger
 
 interface InsufficientTotalToStayAboveEDError {
     val asset: Chain.Asset

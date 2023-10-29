@@ -4,7 +4,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 
-
 class SharedQuoteValidationRetriever(
     private val swapService: SwapService
 ) {

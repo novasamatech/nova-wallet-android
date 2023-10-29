@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFrag
 import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 
 class SwapNavigator(
     private val navigationHolder: NavigationHolder

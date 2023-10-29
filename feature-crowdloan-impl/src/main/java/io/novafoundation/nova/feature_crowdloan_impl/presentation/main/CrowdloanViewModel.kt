@@ -47,7 +47,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
-
 class CrowdloanViewModel(
     private val iconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
