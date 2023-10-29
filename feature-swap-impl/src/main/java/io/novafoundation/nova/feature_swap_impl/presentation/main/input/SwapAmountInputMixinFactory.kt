@@ -50,7 +50,8 @@ private class RealSwapAmountInputMixin(
     coroutineScope = coroutineScope,
     tokenFlow = tokenFlow,
     maxActionProvider = maxActionProvider
-), SwapAmountInputMixin.Presentation {
+),
+    SwapAmountInputMixin.Presentation {
 
     override val fiatAmount: Flow<String> = combine(tokenFlow.filterNotNull(), amount) { token, amount ->
         token.amountToFiat(amount).formatAsCurrency(token.currency)
