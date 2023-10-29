@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
+import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.fullId
@@ -102,6 +103,12 @@ internal class RealSwapService(
 
         return runCatching { exchanges(computationScope).getValue(args.assetIn.chainId) }
             .flatMap { exchange -> exchange.swap(args) }
+    }
+
+    override suspend fun slippageConfig(chainId: ChainId): SlippageConfig? {
+        val computationScope = CoroutineScope(coroutineContext)
+        val exchanges = exchanges(computationScope)
+        return exchanges[chainId]?.slippageConfig()
     }
 
     private fun SwapQuoteArgs.calculatePriceImpact(amountIn: Balance, amountOut: Balance): Percent {

@@ -271,13 +271,6 @@
         <attr name="SlideShowView_slideDelayMillis" format="integer" />
     </declare-styleable>
 
-    <declare-styleable name="TipsInputField">
-        <attr name="android:hint" />
-        <attr name="postfix" format="string" />
-        <attr name="android:digits" />
-        <attr name="android:inputType" />
-    </declare-styleable>
-
     <declare-styleable name="HintsView">
         <attr name="HintsView_singleHint" format="string" />
     </declare-styleable>
@@ -285,4 +278,12 @@
     <declare-styleable name="TabsView">
         <attr name="TabsView_backgroundTint" format="reference|color" />
     </declare-styleable>
+
+    <declare-styleable name="TipsInputField">
+        <attr name="android:hint" />
+        <attr name="postfix" format="string" />
+        <attr name="android:digits" />
+        <attr name="android:inputType" />
+    </declare-styleable>
+
 </resources>

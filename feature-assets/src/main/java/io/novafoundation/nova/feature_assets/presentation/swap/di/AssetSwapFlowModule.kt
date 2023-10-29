@@ -21,6 +21,11 @@ import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlow
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
+import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
+import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
+import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 
 @Module(includes = [ViewModelModule::class])
 class AssetSwapFlowModule {

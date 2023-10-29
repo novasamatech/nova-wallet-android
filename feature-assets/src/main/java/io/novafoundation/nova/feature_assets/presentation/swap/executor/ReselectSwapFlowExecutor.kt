@@ -4,13 +4,11 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 class ReselectSwapFlowExecutor(
     private val assetsRouter: AssetsRouter,
     private val swapSettingsStateProvider: SwapSettingsStateProvider,
-    private val selectingDirection: SelectingDirection,
-    private val chainRegistry: ChainRegistry
+    private val selectingDirection: SelectingDirection
 ) : SwapFlowExecutor {
 
     enum class SelectingDirection {

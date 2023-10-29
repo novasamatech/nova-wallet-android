@@ -12,7 +12,6 @@ class SwapFlowExecutorFactory(
     private val initialSwapFlowExecutor: InitialSwapFlowExecutor,
     private val assetsRouter: AssetsRouter,
     private val swapSettingsStateProvider: SwapSettingsStateProvider,
-    private val chainRegistry: ChainRegistry
 ) {
     fun create(payload: SwapFlowPayload): SwapFlowExecutor {
         return when (payload) {
@@ -27,7 +26,6 @@ class SwapFlowExecutorFactory(
             assetsRouter = assetsRouter,
             swapSettingsStateProvider = swapSettingsStateProvider,
             selectingDirection = selectingDirection,
-            chainRegistry = chainRegistry
         )
     }
 }

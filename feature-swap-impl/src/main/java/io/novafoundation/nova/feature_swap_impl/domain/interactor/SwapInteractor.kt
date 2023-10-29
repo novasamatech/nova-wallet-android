@@ -32,6 +32,9 @@ import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class SwapInteractor(
     private val swapService: SwapService,
@@ -53,6 +56,10 @@ class SwapInteractor(
 
     suspend fun estimateFee(executeArgs: SwapExecuteArgs): SwapFee {
         return swapService.estimateFee(executeArgs)
+    }
+
+    suspend fun slippageConfig(chainId: ChainId): SlippageConfig? {
+        return swapService.slippageConfig(chainId)
     }
 
     suspend fun validationSystem(chainId: ChainId): SwapValidationSystem? {

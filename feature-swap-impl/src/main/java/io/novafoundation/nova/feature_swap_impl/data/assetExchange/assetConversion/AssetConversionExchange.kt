@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.SlippageConfig
+import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.CompoundMultiLocationConverter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.ForeignAssetsLocationConverter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.LocalAssetsLocationConverter
@@ -134,12 +134,12 @@ private class AssetConversionExchange(
 
     override suspend fun slippageConfig(): SlippageConfig {
         return SlippageConfig(
-            Percent(0.5),
-            listOf(Percent(0.1), Percent(1.0), Percent(3.0)),
-            Percent(0.1),
-            Percent(50.0),
-            Percent(0.5),
-            Percent(2.5)
+            defaultSlippage = Percent(0.5),
+            slippageTips = listOf(Percent(0.1), Percent(1.0), Percent(3.0)),
+            minAvailableSlippage = Percent(0.1),
+            maxAvailableSlippage = Percent(50.0),
+            smallSlippage = Percent(0.5),
+            bigSlippage = Percent(2.5)
         )
     }
 
