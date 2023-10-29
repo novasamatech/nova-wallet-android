@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.swap.RealSwapService
 import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
@@ -56,18 +57,28 @@ class SwapFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideLastQuoteStoreSharedStateProvider(computationalCache: ComputationalCache): LastQuoteStoreSharedStateProvider {
+        return LastQuoteStoreSharedStateProvider(computationalCache)
+    }
+
+    @Provides
+    @FeatureScope
     fun provideSwapInteractor(
         swapService: SwapService,
         assetExchangeFactory: AssetConversionExchangeFactory,
         enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
         assetSourceRegistry: AssetSourceRegistry,
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
+        walletRepository: WalletRepository,
+        accountRepository: AccountRepository
     ): SwapInteractor {
         return SwapInteractor(
             swapService,
             assetExchangeFactory,
             enoughTotalToStayAboveEDValidationFactory,
             assetSourceRegistry,
+            accountRepository,
+            walletRepository,
             chainRegistry
         )
     }

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_swap_impl.domain.validation
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.commissionAssetToSpendOnBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.nativeMinimumBalance
@@ -20,6 +21,7 @@ data class SwapValidationPayload(
     val slippage: Percent,
     val feeAsset: Asset,
     val swapFee: SwapFee,
+    val swapQuote: SwapQuote,
     val swapQuoteArgs: SwapQuoteArgs,
     val swapExecuteArgs: SwapExecuteArgs
 ) {

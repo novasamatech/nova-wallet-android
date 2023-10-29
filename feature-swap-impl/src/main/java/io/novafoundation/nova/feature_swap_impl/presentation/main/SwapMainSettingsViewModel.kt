@@ -37,10 +37,8 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmou
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
-import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
+import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.*
-import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
-import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.state.swapSettingsFlow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -105,8 +103,8 @@ class SwapMainSettingsViewModel(
     private val chainRegistry: ChainRegistry,
     private val assetUseCase: ArbitraryAssetUseCase,
     private val payload: SwapSettingsPayload,
-    private val priceImpactFormatter: PriceImpactFormatter,
     private val validationExecutor: ValidationExecutor,
+    lastQuoteStoreSharedStateProvider: LastQuoteStoreSharedStateProvider,
     swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
@@ -114,6 +112,10 @@ class SwapMainSettingsViewModel(
 
     private val swapSettingState = async {
         swapSettingsStateProvider.getSwapSettingsState(viewModelScope)
+    }
+
+    private val lastQuoteStore = async {
+        lastQuoteStoreSharedStateProvider.create(viewModelScope)
     }
 
     private val swapSettings = swapSettingsStateProvider.swapSettingsFlow(viewModelScope)
@@ -215,13 +217,19 @@ class SwapMainSettingsViewModel(
         }
     }
 
-    fun confirmButtonClicked() {
+    fun applyButtonClicked() {
         launch {
             val assetIn = assetInFlow.first() ?: return@launch
             val validationSystem = swapInteractor.validationSystem(assetIn.token.configuration.chainId) ?: return@launch
-            val payload = buildValidationPayload() ?: return@launch
+            val lastQuoteState = lastQuoteStore().getLastQuote() ?: return@launch
+            val payload = swapInteractor.getValidationPayload(
+                swapSettings = swapSettings.first(),
+                quoteArgs = lastQuoteState.first,
+                swapQuote = lastQuoteState.second,
+                swapFee = feeMixin.loadedFeeOrNullFlow().first() ?: return@launch
+            ) ?: return@launch
 
-            validationExecutor.requireValid<SwapValidationPayload, SwapValidationFailure>(
+            validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
                 progressConsumer = _validationProgress.progressConsumer(),
@@ -238,45 +246,6 @@ class SwapMainSettingsViewModel(
                 swapRouter.openSwapConfirmation()
             }
         }
-    }
-
-    private suspend fun buildValidationPayload(): SwapValidationPayload? {
-        val swapSettings = swapSettings.first()
-        val assetIn = assetInFlow.first() ?: return null
-        val assetOut = assetOutFlow.first() ?: return null
-        val feeAsset = feeAssetFlow.first() ?: return null
-        val swapFee = feeMixin.loadedFeeOrNullFlow().first() ?: return null
-        val quoteArgs = swapSettings.toQuoteArgs(
-            tokenIn = { assetInFlow.ensureToken(it) },
-            tokenOut = { assetOutFlow.ensureToken(it) },
-        ) ?: return null
-
-
-        //TODO save the last quote and use it here
-        val quote = swapInteractor.quote(quoteArgs).getOrThrow()
-
-        val executeArgs = quoteArgs.toExecuteArgs(
-            quotedBalance = quote.quotedBalance,
-            customFeeAsset = feeAsset.token.configuration,
-            nativeAsset = nativeAssetFlow.first()
-        )
-        return SwapValidationPayload(
-            detailedAssetIn = SwapValidationPayload.SwapAssetData(
-                chain = chainRegistry.getChain(assetIn.token.configuration.chainId),
-                asset = assetIn,
-                amount = assetIn.token.amountFromPlanks(quote.planksIn)
-            ),
-            detailedAssetOut = SwapValidationPayload.SwapAssetData(
-                chain = chainRegistry.getChain(assetOut.token.configuration.chainId),
-                asset = assetOut,
-                amount = assetOut.token.amountFromPlanks(quote.planksOut)
-            ),
-            slippage = swapSettings.slippage,
-            feeAsset = feeAsset,
-            swapFee = swapFee,
-            swapQuoteArgs = quoteArgs,
-            swapExecuteArgs = executeArgs
-        )
     }
 
     fun rateDetailsClicked() {
@@ -407,6 +376,16 @@ class SwapMainSettingsViewModel(
             }
             .onEach { (quoteResult, swapSettings) -> handleNewQuote(quoteResult, swapSettings) }
             .launchIn(viewModelScope)
+
+        //Store quote to use last quotes on confirmation screen
+        quotingState.onEach {
+            val storedState = when (it) {
+                is QuotingState.Loaded -> it.quoteArgs to it.value
+                else -> null
+            }
+
+            lastQuoteStore.await().setLastQuote(storedState)
+        }.launchIn(this)
     }
 
     private fun handleNewQuote(quoteResult: Result<SwapQuote>, swapSettings: SwapSettings) {

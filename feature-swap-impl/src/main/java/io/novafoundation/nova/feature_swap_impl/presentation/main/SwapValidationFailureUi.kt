@@ -117,12 +117,11 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
             amountInputMixin = amountInputMixin
         )
 
-        //TODO
         is FeeChangeDetected -> handleFeeSpikeDetected(
             error = reason,
             resourceManager = resourceManager,
             actions = actions,
-            setFee = { feeLoaderMixin.loadFeeV2Generic(coroutineScope = this, feeConstructor = { TODO() }, onRetryCancelled = { }) }
+            setFee = { feeLoaderMixin.setFee(it.newFee.genericFee) }
         )
     }
 }

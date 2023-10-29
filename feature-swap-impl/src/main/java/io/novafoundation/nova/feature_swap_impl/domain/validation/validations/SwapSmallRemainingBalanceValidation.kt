@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_swap_impl.domain.validation.validations
 
-import io.novafoundation.nova.common.utils.isNonPositive
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.valid

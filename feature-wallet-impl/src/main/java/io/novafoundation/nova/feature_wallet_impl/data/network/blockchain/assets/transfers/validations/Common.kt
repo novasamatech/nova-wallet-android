@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.domain.validation.AmountProducer
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
-import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
+import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForSimpleFeeChanges
 import io.novafoundation.nova.feature_wallet_api.domain.validation.doNotCrossExistentialDeposit
 import io.novafoundation.nova.feature_wallet_api.domain.validation.notPhishingAccount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
@@ -59,7 +59,7 @@ fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAbove
 
 fun AssetTransfersValidationSystemBuilder.checkForFeeChanges(
     assetSourceRegistry: AssetSourceRegistry
-) = checkForFeeChanges(
+) = checkForSimpleFeeChanges(
     calculateFee = {
         val transfers = assetSourceRegistry.sourceFor(it.transfer.originChainAsset).transfers
         transfers.calculateFee(it.transfer)

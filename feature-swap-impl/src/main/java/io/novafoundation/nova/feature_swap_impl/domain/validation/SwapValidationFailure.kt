@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.domain.validation
 
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeChangeDetectedFailure
 import io.novafoundation.nova.feature_wallet_api.domain.validation.NotEnoughToPayFeesError
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -9,7 +10,7 @@ import java.math.BigInteger
 
 sealed class SwapValidationFailure {
 
-    class FeeChangeDetected(override val payload: FeeChangeDetectedFailure.Payload) : SwapValidationFailure(), FeeChangeDetectedFailure
+    class FeeChangeDetected(override val payload: FeeChangeDetectedFailure.Payload<SwapFee>) : SwapValidationFailure(), FeeChangeDetectedFailure<SwapFee>
 
     object NonPositiveAmount : SwapValidationFailure()
 

@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsViewModel
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -45,9 +46,9 @@ class SwapMainSettingsModule {
         chainRegistry: ChainRegistry,
         assetUseCase: ArbitraryAssetUseCase,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        lastQuoteStoreSharedStateProvider: LastQuoteStoreSharedStateProvider,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         payload: SwapSettingsPayload,
-        priceImpactFormatter: PriceImpactFormatter,
         validationExecutor: ValidationExecutor
     ): ViewModel {
         return SwapMainSettingsViewModel(
@@ -59,9 +60,9 @@ class SwapMainSettingsModule {
             chainRegistry = chainRegistry,
             assetUseCase = assetUseCase,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
+            lastQuoteStoreSharedStateProvider = lastQuoteStoreSharedStateProvider,
             actionAwaitableFactory = actionAwaitableMixinFactory,
             payload = payload,
-            priceImpactFormatter = priceImpactFormatter,
             validationExecutor = validationExecutor
         )
     }

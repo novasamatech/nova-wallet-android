@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalTo
 import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validate
-import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import java.math.BigDecimal
@@ -97,10 +96,7 @@ fun SwapValidationSystemBuilder.sufficientCommissionBalanceToStayAboveED(
 fun SwapValidationSystemBuilder.checkForFeeChanges(
     swapService: SwapService
 ) = checkForFeeChanges(
-    calculateFee = {
-        val swapFee = swapService.estimateFee(it.swapExecuteArgs)
-        swapFee.networkFee
-    },
+    calculateFee = { swapService.estimateFee(it.swapExecuteArgs) },
     currentFee = { it.feeAsset.token.amountFromPlanks(it.swapFee.networkFee.amount) },
     chainAsset = { it.feeAsset.token.configuration },
     error = SwapValidationFailure::FeeChangeDetected

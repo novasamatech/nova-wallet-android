@@ -4,13 +4,14 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeChangeDetectedFailure
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import java.math.BigDecimal
 import java.math.BigInteger
 
 sealed class ConfirmDAppOperationValidationFailure {
 
-    class FeeSpikeDetected(override val payload: FeeChangeDetectedFailure.Payload) : ConfirmDAppOperationValidationFailure(), FeeChangeDetectedFailure
+    class FeeSpikeDetected(override val payload: FeeChangeDetectedFailure.Payload<SimpleFee>) : ConfirmDAppOperationValidationFailure(), FeeChangeDetectedFailure<SimpleFee>
 }
 
 data class ConfirmDAppOperationValidationPayload(
