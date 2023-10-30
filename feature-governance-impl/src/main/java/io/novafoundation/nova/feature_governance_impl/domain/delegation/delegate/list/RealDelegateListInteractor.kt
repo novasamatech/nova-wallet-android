@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.list
 
+import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.utils.applyFilter
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
@@ -8,23 +9,24 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegateSorting
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.delegateComparator
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.hasMetadata
-import io.novafoundation.nova.feature_governance_impl.data.repository.DelegationBannerRepository
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.DelegatesSharedComputation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+private const val DELEGATION_BANNER_TAG = "DELEGATION_BANNER"
+
 class RealDelegateListInteractor(
-    private val delegationBannerService: DelegationBannerRepository,
+    private val bannerVisibilityRepository: BannerVisibilityRepository,
     private val delegatesSharedComputation: DelegatesSharedComputation
 ) : DelegateListInteractor {
 
     override fun shouldShowDelegationBanner(): Flow<Boolean> {
-        return delegationBannerService.shouldShowBannerFlow()
+        return bannerVisibilityRepository.shouldShowBannerFlow(DELEGATION_BANNER_TAG)
     }
 
-    override fun hideDelegationBanner() {
-        delegationBannerService.hideBanner()
+    override suspend fun hideDelegationBanner() {
+        bannerVisibilityRepository.hideBanner(DELEGATION_BANNER_TAG)
     }
 
     override suspend fun getDelegates(

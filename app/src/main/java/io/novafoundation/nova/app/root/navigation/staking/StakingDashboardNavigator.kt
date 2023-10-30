@@ -45,6 +45,10 @@ class StakingDashboardNavigator(
         scrollToDashboardTopEvent.value = Unit.event()
     }
 
+    override fun openStakingDashboard() {
+        stakingTabNavController.performNavigationOrDelay(R.id.action_open_staking)
+    }
+
     private fun returnToStakingTabRoot() {
         stakingTabNavController.performNavigationOrDelay(R.id.return_to_staking_dashboard)
     }

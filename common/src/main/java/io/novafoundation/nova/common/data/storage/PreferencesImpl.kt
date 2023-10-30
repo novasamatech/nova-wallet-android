@@ -93,6 +93,12 @@ class PreferencesImpl(
             }
         }
 
+    override fun booleanFlow(field: String, defaultValue: Boolean): Flow<Boolean> {
+        return keyFlow(field).map {
+            getBoolean(field, defaultValue)
+        }
+    }
+
     override fun keyFlow(key: String): Flow<String> = keysFlow(key)
         .map { it.first() }
 

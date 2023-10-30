@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.splash.SplashRouter
 
@@ -44,8 +45,9 @@ class NavigationModule {
     @Provides
     fun provideNavigator(
         navigatorHolder: NavigationHolder,
-        walletConnectRouter: WalletConnectRouter
-    ): Navigator = Navigator(navigatorHolder, walletConnectRouter)
+        walletConnectRouter: WalletConnectRouter,
+        stakingDashboardRouter: StakingDashboardRouter,
+    ): Navigator = Navigator(navigatorHolder, walletConnectRouter, stakingDashboardRouter)
 
     @Provides
     @ApplicationScope
