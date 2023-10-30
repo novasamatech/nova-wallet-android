@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoos
 
 import androidx.annotation.StringRes
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
@@ -16,7 +17,7 @@ typealias MaxClick = () -> Unit
 
 interface AmountChooserMixinBase : CoroutineScope {
 
-    val fiatAmount: Flow<String>
+    val fiatAmount: Flow<CharSequence>
 
     val inputState: MutableStateFlow<InputState<String>>
 
@@ -39,6 +40,11 @@ interface AmountChooserMixinBase : CoroutineScope {
         val amountState: Flow<InputState<BigDecimal?>>
 
         val backPressuredAmount: Flow<BigDecimal>
+    }
+
+    interface FiatFormatter {
+
+        fun formatFlow(tokenFlow: Flow<Token>, amountFlow: Flow<BigDecimal>): Flow<CharSequence>
     }
 
     class InputState<T>(val value: T, val initiatedByUser: Boolean, val inputKind: InputKind) {

@@ -16,7 +16,9 @@ import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsViewModel
+import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -33,6 +35,12 @@ class SwapMainSettingsModule {
     ) = SwapAmountInputMixinFactory(chainRegistry, resourceManager)
 
     @Provides
+    @ScreenScope
+    fun provideSwapInputMixinPriceImpactFiatFormatterFactory(
+        priceImpactFormatter: PriceImpactFormatter
+    ) = SwapInputMixinPriceImpactFiatFormatterFactory(priceImpactFormatter)
+
+    @Provides
     @IntoMap
     @ViewModelKey(SwapMainSettingsViewModel::class)
     fun provideViewModel(
@@ -47,6 +55,7 @@ class SwapMainSettingsModule {
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         payload: SwapSettingsPayload,
         swapUpdateSystemFactory: SwapUpdateSystemFactory,
+        swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -59,7 +68,8 @@ class SwapMainSettingsModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             actionAwaitableFactory = actionAwaitableMixinFactory,
             payload = payload,
-            swapUpdateSystemFactory = swapUpdateSystemFactory
+            swapUpdateSystemFactory = swapUpdateSystemFactory,
+            swapInputMixinPriceImpactFiatFormatterFactory = swapInputMixinPriceImpactFiatFormatterFactory
         )
     }
 

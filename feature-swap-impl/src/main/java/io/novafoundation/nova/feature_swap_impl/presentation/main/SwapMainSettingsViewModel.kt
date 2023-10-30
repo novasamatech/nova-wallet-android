@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.state.swapSettingsFlow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -105,7 +106,8 @@ class SwapMainSettingsViewModel(
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
     private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
-    private val payload: SwapSettingsPayload
+    private val payload: SwapSettingsPayload,
+    private val swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory
 ) : BaseViewModel() {
 
     private val swapSettingState = async {
@@ -120,6 +122,13 @@ class SwapMainSettingsViewModel(
     private val assetOutFlow = swapSettings.assetFlowOf(SwapSettings::assetOut)
     private val assetInFlow = swapSettings.assetFlowOf(SwapSettings::assetIn)
     private val feeAssetFlow = swapSettings.assetFlowOf(SwapSettings::feeAsset)
+
+    private val priceImpact = quotingState.map { quoteState ->
+        when (quoteState) {
+            is QuotingState.NotAvailable, QuotingState.Loading -> null
+            is QuotingState.Loaded -> quoteState.value.priceImpact
+        }
+    }
 
     private val originChainFlow = swapSettings
         .mapNotNull { it.assetIn?.chainId }
@@ -150,7 +159,8 @@ class SwapMainSettingsViewModel(
     val amountOutInput = swapAmountInputMixinFactory.create(
         coroutineScope = viewModelScope,
         tokenFlow = assetOutFlow.token().nullOnStart(),
-        emptyAssetTitle = R.string.swap_field_asset_to_title
+        emptyAssetTitle = R.string.swap_field_asset_to_title,
+        fiatFormatter = swapInputMixinPriceImpactFiatFormatterFactory.create(priceImpact)
     )
 
     val rateDetails: Flow<ExtendedLoadingState<String>> = quotingState.map {
