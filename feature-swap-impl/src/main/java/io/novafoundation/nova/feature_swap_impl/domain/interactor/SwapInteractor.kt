@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.domain.validation.utils.SharedQuoteValidationRetriever
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationSystem
@@ -21,13 +20,12 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.enoughLiquidit
 import io.novafoundation.nova.feature_swap_impl.domain.validation.rateNotExceedSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceInUsedAsset
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceInFeeAsset
-import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientRecipientBalanceToStayAboveED
+import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientAssetOutBalanceToStayAboveED
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapFeeSufficientBalance
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapSmallRemainingBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -36,8 +34,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 
 class SwapInteractor(
     private val swapService: SwapService,
-    private val assetExchangeFactory: AssetConversionExchangeFactory,
-    private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val accountRepository: AccountRepository,
     private val walletRepository: WalletRepository,
@@ -60,28 +56,27 @@ class SwapInteractor(
         return swapService.slippageConfig(chainId)
     }
 
-    suspend fun validationSystem(chainId: ChainId): SwapValidationSystem? {
-        val assetExchange = assetExchangeFactory.create(chainId) ?: return null
+    suspend fun validationSystem(chainId: ChainId): SwapValidationSystem {
         val sharedQuoteValidationRetriever = SharedQuoteValidationRetriever(swapService)
 
         return ValidationSystem {
             positiveAmount()
 
-            availableSlippage(assetExchange)
+            availableSlippage(swapService)
 
             enoughLiquidity(sharedQuoteValidationRetriever)
 
             rateNotExceedSlippage(sharedQuoteValidationRetriever)
 
-            swapFeeSufficientBalance()
+            sufficientBalanceInUsedAsset()
 
-            swapSmallRemainingBalance(assetSourceRegistry, chainRegistry)
+            swapFeeSufficientBalance()
 
             sufficientBalanceInFeeAsset()
 
-            sufficientBalanceInUsedAsset()
+            swapSmallRemainingBalance(assetSourceRegistry)
 
-            sufficientRecipientBalanceToStayAboveED(enoughTotalToStayAboveEDValidationFactory)
+            sufficientAssetOutBalanceToStayAboveED(assetSourceRegistry)
 
             checkForFeeChanges(swapService)
         }

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlinx.coroutines.flow.first
 
 typealias MaxClick = () -> Unit
 
@@ -86,10 +87,14 @@ interface AmountChooserMixin : AmountChooserMixinBase {
     }
 }
 
-fun AmountChooserMixin.Presentation.setAmount(amount: BigDecimal) {
-    inputState.value = InputState(value = amount.toPlainString(), initiatedByUser = false, inputKind = InputKind.REGULAR)
+fun AmountChooserMixinBase.Presentation.setAmount(amount: BigDecimal, initiatedByUser: Boolean = false) {
+    inputState.value = InputState(value = amount.toPlainString(), initiatedByUser, inputKind = InputKind.REGULAR)
 }
 
-fun AmountChooserMixin.Presentation.setAmountInput(amountInput: String) {
-    inputState.value = InputState(value = amountInput, initiatedByUser = false, inputKind = InputKind.REGULAR)
+fun AmountChooserMixinBase.Presentation.setAmountInput(amountInput: String, initiatedByUser: Boolean = false) {
+    inputState.value = InputState(value = amountInput, initiatedByUser, inputKind = InputKind.REGULAR)
+}
+
+suspend fun AmountChooserMixinBase.Presentation.invokeMaxClick() {
+    maxAction.maxClick.first()?.invoke()
 }

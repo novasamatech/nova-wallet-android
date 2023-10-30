@@ -11,7 +11,7 @@ sealed class StartMultiStakingValidationFailure {
 
     class NotEnoughToPayFees(
         override val chainAsset: Chain.Asset,
-        override val availableToPayFees: BigDecimal,
+        override val maxUsable: BigDecimal,
         override val fee: BigDecimal
     ) : StartMultiStakingValidationFailure(), NotEnoughToPayFeesError
 

@@ -12,7 +12,7 @@ sealed class NominationPoolsUnbondValidationFailure {
 
     class NotEnoughBalanceToPayFees(
         override val chainAsset: Chain.Asset,
-        override val availableToPayFees: BigDecimal,
+        override val maxUsable: BigDecimal,
         override val fee: BigDecimal
     ) : NominationPoolsUnbondValidationFailure(), NotEnoughToPayFeesError
 

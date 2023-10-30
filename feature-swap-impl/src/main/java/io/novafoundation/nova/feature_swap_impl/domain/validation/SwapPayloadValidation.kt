@@ -42,7 +42,7 @@ val SwapValidationPayload.swapAmountInFeeToken: BigInteger
         BigInteger.ZERO
     }
 
-val SwapValidationPayload.toBuyAmountToKeepEDInFeeAsset: BigInteger
+val SwapValidationPayload.toBuyAmountToKeepMainEDInFeeAsset: BigInteger
     get() = if (isFeePayingByAssetIn) {
         swapFee.minimumBalanceBuyIn.commissionAssetToSpendOnBuyIn
     } else {
@@ -58,7 +58,8 @@ val SwapValidationPayload.totalDeductedAmountInFeeToken: BigInteger
 
 val SwapValidationPayload.maxAmountToSwap: BigInteger
     get() = if (isFeePayingByAssetIn) {
-        detailedAssetIn.asset.transferableInPlanks - totalDeductedAmountInFeeToken
+        val maxAmount = detailedAssetIn.asset.transferableInPlanks - totalDeductedAmountInFeeToken
+        maxAmount.coerceAtLeast(BigInteger.ZERO)
     } else {
         detailedAssetIn.asset.transferableInPlanks
     }

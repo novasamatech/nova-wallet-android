@@ -42,7 +42,7 @@ private fun NominationPoolsUnbondValidationSystemBuilder.enoughToPayFees() {
         error = { payload, leftForFees ->
             NominationPoolsUnbondValidationFailure.NotEnoughBalanceToPayFees(
                 chainAsset = payload.asset.token.configuration,
-                availableToPayFees = leftForFees,
+                maxUsable = leftForFees,
                 fee = payload.fee
             )
         }
