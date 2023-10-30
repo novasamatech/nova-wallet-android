@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.commissionAssetToSpendOnBuyIn
-import io.novafoundation.nova.feature_swap_api.domain.model.nativeMinimumBalance
+import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
@@ -43,43 +43,23 @@ val SwapValidationPayload.swapAmountInFeeToken: BigInteger
         BigInteger.ZERO
     }
 
-val SwapValidationPayload.feeAmountInFeeToken: BigInteger
-    get() = if (isFeePayingByAssetIn) {
-        swapFee.networkFee.amount
-    } else {
-        BigInteger.ZERO
-    }
-
 val SwapValidationPayload.toBuyAmountToKeepEDInFeeAsset: BigInteger
-    get() = if (feeAsset.token.configuration.fullId == detailedAssetIn.asset.token.configuration.fullId) {
+    get() = if (isFeePayingByAssetIn) {
         swapFee.minimumBalanceBuyIn.commissionAssetToSpendOnBuyIn
     } else {
         BigInteger.ZERO
     }
 
-val SwapValidationPayload.nativeMinimumBalance: BigInteger
-    get() = if (feeAsset.token.configuration.fullId == detailedAssetIn.asset.token.configuration.fullId) {
-        swapFee.minimumBalanceBuyIn.nativeMinimumBalance
+val SwapValidationPayload.totalDeductedAmountInFeeToken: BigInteger
+    get() = if (isFeePayingByAssetIn) {
+        swapFee.totalDeductedPlanks
     } else {
         BigInteger.ZERO
     }
 
-val SwapValidationPayload.totalDeductedAmountInFeeToken: BigInteger
-    get() {
-        val feeAmountInFeeToken = feeAmountInFeeToken
-        val toBuyExistentialDeposit = toBuyAmountToKeepEDInFeeAsset
-
-        return feeAmountInFeeToken + toBuyExistentialDeposit
-    }
-
 val SwapValidationPayload.maxAmountToSwap: BigInteger
-    get() = if (feeAsset.token.configuration.fullId == detailedAssetIn.asset.token.configuration.fullId) {
+    get() = if (isFeePayingByAssetIn) {
         detailedAssetIn.asset.transferableInPlanks - totalDeductedAmountInFeeToken
     } else {
         detailedAssetIn.asset.transferableInPlanks
     }
-
-fun SwapValidationSystemBuilder.positiveAmount() = positiveAmount(
-    amount = { it.detailedAssetIn.amount },
-    error = { SwapValidationFailure.NonPositiveAmount }
-)

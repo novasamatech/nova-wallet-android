@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
+import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validate
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -101,4 +102,9 @@ fun SwapValidationSystemBuilder.checkForFeeChanges(
     currentFee = { it.feeAsset.token.amountFromPlanks(it.swapFee.networkFee.amount) },
     chainAsset = { it.feeAsset.token.configuration },
     error = SwapValidationFailure::FeeChangeDetected
+)
+
+fun SwapValidationSystemBuilder.positiveAmount() = positiveAmount(
+    amount = { it.detailedAssetIn.amount },
+    error = { SwapValidationFailure.NonPositiveAmount }
 )

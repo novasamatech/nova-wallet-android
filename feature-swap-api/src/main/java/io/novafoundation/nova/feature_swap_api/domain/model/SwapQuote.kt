@@ -64,9 +64,3 @@ val MinimumBalanceBuyIn.commissionAssetToSpendOnBuyIn: Balance
         is MinimumBalanceBuyIn.NeedsToBuyMinimumBalance -> commissionAssetToSpendOnBuyIn
         MinimumBalanceBuyIn.NoBuyInNeeded -> Balance.ZERO
     }
-
-val MinimumBalanceBuyIn.nativeMinimumBalance: Balance
-    get() = when (this) {
-        is MinimumBalanceBuyIn.NeedsToBuyMinimumBalance -> nativeMinimumBalance
-        MinimumBalanceBuyIn.NoBuyInNeeded -> Balance.ZERO
-    }
