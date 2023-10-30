@@ -7,10 +7,12 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Disabled
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Enabled
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.accumulate
 import io.novafoundation.nova.common.utils.event
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.CompoundNumberFormatter
 import io.novafoundation.nova.common.utils.formatting.DynamicPrecisionFormatter
 import io.novafoundation.nova.common.utils.formatting.FixedPrecisionFormatter
@@ -52,6 +54,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.AmountErrorState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProviderDsl.deductFee
@@ -88,6 +91,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import kotlinx.coroutines.flow.combine
 import kotlin.time.Duration.Companion.milliseconds
 
 class SwapMainSettingsViewModel(
@@ -171,7 +175,14 @@ class SwapMainSettingsViewModel(
 
     private val _validationProgress = MutableStateFlow(false)
 
-    val buttonState: Flow<DescriptiveButtonState> = flowOf { DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue)) }
+    val buttonState: Flow<DescriptiveButtonState> = combine(
+        accumulate(amountInInput.fieldError, amountOutInput.fieldError),
+        assetOutFlow,
+        amountInInput.inputState,
+        amountOutInput.inputState
+    ) { fieldErrorStates, assetOut, amountIn, amountOut ->
+        formatButtonStates(fieldErrorStates, assetOut, amountIn, amountOut)
+    }
 
     val swapDirectionFlipped: MutableLiveData<Event<SwapDirection>> = MutableLiveData()
 
@@ -356,6 +367,29 @@ class SwapMainSettingsViewModel(
         val rateAmountFormatted = rate.formatTokenAmount(swapQuote.assetOut)
 
         return "$assetInUnitFormatted ≈ $rateAmountFormatted"
+    }
+
+    private fun formatButtonStates(
+        errorStates: List<AmountErrorState>,
+        assetOut: Asset?,
+        amountIn: InputState<String>,
+        amountOut: InputState<String>
+    ): DescriptiveButtonState {
+        return when {
+            assetOut == null -> {
+                Disabled(resourceManager.getString(R.string.swap_main_settings_select_token_disabled_button_state))
+            }
+
+            amountIn.value.isEmpty() && amountOut.value.isEmpty() -> {
+                Disabled(resourceManager.getString(R.string.swap_main_settings_enter_amount_disabled_button_state))
+            }
+
+            errorStates.any { it is AmountErrorState.Invalid } -> {
+                Disabled(resourceManager.getString(R.string.swap_main_settings_wrong_amount_disabled_button_state))
+            }
+
+            else -> return Enabled(resourceManager.getString(R.string.common_continue))
+        }
     }
 
     private fun setupQuoting() {

@@ -17,7 +17,7 @@ interface AmountInputView {
 
     fun setFiatAmount(fiat: String?)
 
-    fun setError(error: String?)
+    fun setError(errorState: AmountChooserMixinBase.AmountErrorState)
 }
 
 interface MaxAvailableView {

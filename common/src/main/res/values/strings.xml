@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="swap_main_settings_select_token_disabled_button_state">Select tokens to swap</string>
+    <string name="swap_main_settings_enter_amount_disabled_button_state">Enter amount</string>
+    <string name="swap_main_settings_wrong_amount_disabled_button_state">Enter other amount</string>
+
     <string name="swap_field_validation_not_enough_liquidity">Not enough liquidity</string>
     <string name="swap_field_validation_not_enough_amount_to_swap">Not enough tokens to swap</string>
     <string name="swap_field_validation_to_low_amount_out">You can’t receive less than %s</string>
