@@ -14,7 +14,6 @@ import io.novafoundation.nova.feature_buy_impl.R
 import kotlinx.android.synthetic.main.item_sheet_buy_provider.view.itemSheetBuyProviderImage
 import kotlinx.android.synthetic.main.item_sheet_buy_provider.view.itemSheetBuyProviderText
 
-
 class BuyProviderChooserBottomSheet(
     context: Context,
     payload: Payload<BuyProvider>,

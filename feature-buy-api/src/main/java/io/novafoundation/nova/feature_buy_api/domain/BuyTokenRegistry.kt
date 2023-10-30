@@ -7,7 +7,7 @@ typealias BuyProvider = BuyTokenRegistry.Provider<*>
 
 interface BuyTokenRegistry {
 
-    fun availableProvidersFor(chainAsset: Chain.Asset) : List<Provider<*>>
+    fun availableProvidersFor(chainAsset: Chain.Asset): List<Provider<*>>
 
     interface Provider<I : Integrator<*>> {
         val id: String

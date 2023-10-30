@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.Flow
 
 class RealBuyMixinUi : BuyMixinUi {
 
-
     override fun setupBuyIntegration(fragment: BaseFragment<*>, mixin: BuyMixin) = with(fragment) {
         mixin.integrateWithBuyProviderEvent.observeEvent {
             with(it) {

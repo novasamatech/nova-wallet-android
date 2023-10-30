@@ -22,7 +22,7 @@ class BuyFeatureHolder @Inject constructor(
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .build()
-        
+
         return DaggerBuyFeatureComponent.factory()
             .create(router, dependencies)
     }
