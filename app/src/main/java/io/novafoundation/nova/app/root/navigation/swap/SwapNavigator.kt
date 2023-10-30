@@ -25,4 +25,8 @@ class SwapNavigator(
         val payload = SwapFlowPayload.ReselectAssetOut(selectedAsset)
         navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))
     }
+
+    override fun openSwapOptions() {
+        navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapOptionsFragment)
+    }
 }

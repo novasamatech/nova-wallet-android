@@ -292,13 +292,18 @@ fun InsertableInputField.bindTo(flow: MutableSharedFlow<String>, scope: Coroutin
     content.bindTo(flow, scope)
 }
 
-fun EditText.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
-    bindTo(flow, scope, toT = { it }, fromT = { it })
+fun EditText.bindTo(
+    flow: MutableSharedFlow<String>,
+    scope: CoroutineScope,
+    moveSelectionToEndOnInsertion: Boolean = false,
+) {
+    bindTo(flow, scope, moveSelectionToEndOnInsertion, toT = { it }, fromT = { it })
 }
 
 inline fun <T> EditText.bindTo(
     flow: MutableSharedFlow<T>,
     scope: CoroutineScope,
+    moveSelectionToEndOnInsertion: Boolean = false,
     crossinline toT: suspend (String) -> T,
     crossinline fromT: suspend (T) -> String,
 ) {
@@ -314,9 +319,18 @@ inline fun <T> EditText.bindTo(
             if (text.toString() != inputString) {
                 removeTextChangedListener(textWatcher)
                 setText(inputString)
+                if (moveSelectionToEndOnInsertion) {
+                    moveSelectionToTheEnd()
+                }
                 addTextChangedListener(textWatcher)
             }
         }
+    }
+}
+
+fun EditText.moveSelectionToTheEnd() {
+    if (hasFocus()) {
+        setSelection(text.length)
     }
 }
 

@@ -11,6 +11,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
+import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 
 class SwapInteractor(
     private val swapService: SwapService,
@@ -27,6 +28,10 @@ class SwapInteractor(
 
     suspend fun estimateFee(executeArgs: SwapExecuteArgs): SwapFee {
         return swapService.estimateFee(executeArgs)
+    }
+
+    suspend fun slippageConfig(chainId: ChainId): SlippageConfig? {
+        return swapService.slippageConfig(chainId)
     }
 
     fun blockNumberUpdates(chainId: ChainId): Flow<BlockNumber> {

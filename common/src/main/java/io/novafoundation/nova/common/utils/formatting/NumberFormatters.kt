@@ -108,6 +108,10 @@ fun Percent.format(): String {
     return value.toBigDecimal().formatAsPercentage()
 }
 
+fun Percent.formatWithoutSymbol(): String {
+    return defaultAbbreviationFormatter.format(value.toBigDecimal())
+}
+
 fun Perbill.format(): String {
     return toPercent().format()
 }

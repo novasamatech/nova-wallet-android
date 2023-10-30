@@ -461,6 +461,10 @@ class SwapMainSettingsViewModel(
             .token
     }
 
+    fun openOptions() {
+        swapRouter.openSwapOptions()
+    }
+
     private val amountInputFormatter = CompoundNumberFormatter(
         abbreviations = listOf(
             NumberAbbreviation(
