@@ -114,7 +114,7 @@ class SwapMainSettingsViewModel(
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
     private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
     private val swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory
-) : BaseViewModel(), Validatable by validationExecutor  {
+) : BaseViewModel(), Validatable by validationExecutor {
 
     private val swapSettingState = async {
         swapSettingsStateProvider.getSwapSettingsState(viewModelScope)

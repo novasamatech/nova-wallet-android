@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsSt
 import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealPriceImpactFormatter
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -78,8 +77,8 @@ class SwapFeatureModule {
     ): SwapInteractor {
         return SwapInteractor(
             swapService,
-            assetSourceRegistry,
             chainStateRepository,
+            assetSourceRegistry,
             accountRepository,
             walletRepository,
             chainRegistry

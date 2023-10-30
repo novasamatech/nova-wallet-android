@@ -84,16 +84,6 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
         android:text="@string/swap_error_pair_not_supported"
-        app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsReceiveInput"
-        app:style="error" />
-
-    <io.novafoundation.nova.common.view.AlertView
-        android:id="@+id/swapMainSettingsAlert"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/swap_error_pair_not_supported"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsReceiveInput"
         app:style="error"
