@@ -25,7 +25,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+
+private typealias AssetSearchFilter = suspend (Asset) -> Boolean
 
 class AssetSearchInteractor(
     private val walletRepository: WalletRepository,
@@ -65,23 +68,17 @@ class AssetSearchInteractor(
         externalBalancesFlow: Flow<List<ExternalBalance>>,
         coroutineScope: CoroutineScope
     ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
-        return flowOfAll {
-            val availableAssets = getAvailableSwapAssets(forAsset, coroutineScope)
+        val filterFlow = getAvailableSwapAssets(forAsset, coroutineScope).map { availableAssetsForSwap ->
+            val filter: AssetSearchFilter = { asset ->
+                val chainAsset = asset.token.configuration
 
-            searchAssetsInternalFlow(queryFlow, externalBalancesFlow) {
-                val chainAsset = it.token.configuration
-                chainAsset.fullId in availableAssets
+                chainAsset.fullId in availableAssetsForSwap
             }
-        }
-    }
 
-    private suspend fun getAvailableSwapAssets(asset: FullChainAssetId?, coroutineScope: CoroutineScope): Set<FullChainAssetId> {
-        val chainAsset = asset?.let { chainRegistry.asset(it) }
-        return if (chainAsset == null) {
-            swapService.assetsAvailableForSwap(coroutineScope)
-        } else {
-            swapService.availableSwapDirectionsFor(chainAsset, coroutineScope)
+            filter
         }
+
+        return searchAssetsInternalFlow(queryFlow, externalBalancesFlow, filterFlow = filterFlow)
     }
 
     fun searchAssetsFlow(
@@ -91,18 +88,44 @@ class AssetSearchInteractor(
         return searchAssetsInternalFlow(queryFlow, externalBalancesFlow, filter = null)
     }
 
+    private fun getAvailableSwapAssets(asset: FullChainAssetId?, coroutineScope: CoroutineScope): Flow<Set<FullChainAssetId>> {
+        return flowOfAll {
+            val chainAsset = asset?.let { chainRegistry.asset(it) }
+
+            if (chainAsset == null) {
+                swapService.assetsAvailableForSwap(coroutineScope)
+            } else {
+                swapService.availableSwapDirectionsFor(chainAsset, coroutineScope)
+            }
+        }
+    }
+
     private fun searchAssetsInternalFlow(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
         assetGroupComparator: Comparator<AssetGroup> = getAssetGroupBaseComparator(),
         assetsComparator: Comparator<AssetWithOffChainBalance> = getAssetBaseComparator(),
-        filter: (suspend (Asset) -> Boolean)?,
+        filter: AssetSearchFilter?,
+    ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
+        val filterFlow = flowOf(filter)
+
+        return searchAssetsInternalFlow(queryFlow, externalBalancesFlow, assetGroupComparator, assetsComparator, filterFlow)
+    }
+
+    private fun searchAssetsInternalFlow(
+        queryFlow: Flow<String>,
+        externalBalancesFlow: Flow<List<ExternalBalance>>,
+        assetGroupComparator: Comparator<AssetGroup> = getAssetGroupBaseComparator(),
+        assetsComparator: Comparator<AssetWithOffChainBalance> = getAssetBaseComparator(),
+        filterFlow: Flow<AssetSearchFilter?>,
     ): Flow<Map<AssetGroup, List<AssetWithOffChainBalance>>> {
         var assetsFlow = accountRepository.selectedMetaAccountFlow()
             .flatMapLatest { walletRepository.syncedAssetsFlow(it.id) }
 
-        if (filter != null) {
-            assetsFlow = assetsFlow.map { assets ->
+        assetsFlow = combine(assetsFlow, filterFlow) { assets, filter ->
+            if (filter == null) {
+                assets
+            } else {
                 assets.filter { filter(it) }
             }
         }

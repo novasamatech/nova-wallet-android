@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter
 
+import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.toHexUntypedOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.bindMultiLocation
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.toEncodableInstance
@@ -13,6 +14,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.isScaleEncoded
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.prepareIdForEncoding
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.statemineAssetIdScaleType
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
+import kotlinx.coroutines.Deferred
 
 private typealias ScaleEncodedMultiLocation = String
 private typealias ForeignAssetsAssetId = ScaleEncodedMultiLocation
@@ -23,7 +25,7 @@ private const val FOREIGN_ASSETS_PALLET_NAME = "ForeignAssets"
 
 class ForeignAssetsLocationConverter(
     private val chain: Chain,
-    private val runtime: RuntimeSnapshot
+    private val runtime: Deferred<RuntimeSnapshot>
 ) : MultiLocationConverter {
 
     private val assetIdToAssetMapping by lazy { constructAssetIdToAssetMapping() }
@@ -35,9 +37,9 @@ class ForeignAssetsLocationConverter(
     }
 
     override suspend fun toChainAsset(multiLocation: MultiLocation): Chain.Asset? {
-        val assetIdType = statemineAssetIdScaleType(runtime, FOREIGN_ASSETS_PALLET_NAME) ?: return null
+        val assetIdType = statemineAssetIdScaleType(runtime(), FOREIGN_ASSETS_PALLET_NAME) ?: return null
         val encodableInstance = multiLocation.toEncodableInstance()
-        val multiLocationHex = assetIdType.toHexUntypedOrNull(runtime, encodableInstance) ?: return null
+        val multiLocationHex = assetIdType.toHexUntypedOrNull(runtime(), encodableInstance) ?: return null
 
         return assetIdToAssetMapping[multiLocationHex]
     }
@@ -56,12 +58,12 @@ class ForeignAssetsLocationConverter(
             }
     }
 
-    private fun Chain.Asset.extractMultiLocation(): MultiLocation? {
+    private suspend fun Chain.Asset.extractMultiLocation(): MultiLocation? {
         val assetsType = statemineOrNull() ?: return null
         if (!assetsType.id.isScaleEncoded()) return null
 
         return runCatching {
-            val encodableMultiLocation = assetsType.prepareIdForEncoding(runtime)
+            val encodableMultiLocation = assetsType.prepareIdForEncoding(runtime())
             bindMultiLocation(encodableMultiLocation)
         }.getOrNull()
     }
