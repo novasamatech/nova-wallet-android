@@ -10,12 +10,13 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 
 interface SwapService {
 
-    suspend fun assetsAvailableForSwap(computationScope: CoroutineScope): Set<FullChainAssetId>
+    suspend fun assetsAvailableForSwap(computationScope: CoroutineScope): Flow<Set<FullChainAssetId>>
 
-    suspend fun availableSwapDirectionsFor(asset: Chain.Asset, computationScope: CoroutineScope): Set<FullChainAssetId>
+    suspend fun availableSwapDirectionsFor(asset: Chain.Asset, computationScope: CoroutineScope): Flow<Set<FullChainAssetId>>
 
     suspend fun canPayFeeInNonUtilityAsset(asset: Chain.Asset): Boolean
 

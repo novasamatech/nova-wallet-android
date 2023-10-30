@@ -54,7 +54,7 @@ class SwapAmountInputView @JvmOverloads constructor(
         amountInput.isVisible = model.showInput
     }
 
-    override fun setFiatAmount(fiat: String?) {
+    override fun setFiatAmount(fiat: CharSequence?) {
         swapAmountInputFiat.setTextOrHide(fiat)
     }
 
@@ -74,6 +74,7 @@ class SwapAmountInputView @JvmOverloads constructor(
                 swapAmountInputImage.loadTokenIcon(icon.assetIconUrl, imageLoader)
                 swapAmountInputImage.setBackgroundResource(R.drawable.bg_token_container)
             }
+
             SwapInputAssetModel.SwapAssetIcon.NotChosen -> {
                 swapAmountInputImage.setImageTint(context.getColor(R.color.icon_accent))
                 swapAmountInputImage.setImageResource(R.drawable.ic_add)

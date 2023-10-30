@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_impl.domain.interactor
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
@@ -28,12 +29,16 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.drop
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 
 class SwapInteractor(
     private val swapService: SwapService,
+    private val chainStateRepository: ChainStateRepository,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val accountRepository: AccountRepository,
     private val walletRepository: WalletRepository,
@@ -54,6 +59,11 @@ class SwapInteractor(
 
     suspend fun slippageConfig(chainId: ChainId): SlippageConfig? {
         return swapService.slippageConfig(chainId)
+    }
+
+    fun blockNumberUpdates(chainId: ChainId): Flow<BlockNumber> {
+        return chainStateRepository.currentBlockNumberFlow(chainId)
+            .drop(1) // skip immediate value from the cache to not perform double-quote on chain change
     }
 
     suspend fun validationSystem(chainId: ChainId): SwapValidationSystem {

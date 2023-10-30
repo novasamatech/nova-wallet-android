@@ -34,15 +34,14 @@ fun ValidatableInputField.observeErrors(
     scope.launch {
         flow.collect { validationResult ->
             when (validationResult) {
-                is FieldValidationResult.Ok -> {
+                is FieldValidationResult.Ok,
+                is FieldValidationResult.Warning -> {
                     hideError()
                 }
 
                 is FieldValidationResult.Error -> {
                     showError(validationResult.reason)
                 }
-
-                else -> {}
             }
         }
     }

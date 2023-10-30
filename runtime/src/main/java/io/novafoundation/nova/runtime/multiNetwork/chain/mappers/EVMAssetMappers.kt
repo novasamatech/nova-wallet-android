@@ -30,7 +30,7 @@ fun mapEVMAssetRemoteToLocalAssets(evmAssetRemote: EVMAssetRemote, gson: Gson): 
             staking = mapStakingTypeToLocal(Chain.Asset.StakingType.UNSUPPORTED),
             source = AssetSourceLocal.ERC20,
             type = type,
-            buyProviders = null,
+            buyProviders = gson.toJson(it.buyProviders),
             typeExtras = gson.toJson(typeExtras),
             enabled = true
         )

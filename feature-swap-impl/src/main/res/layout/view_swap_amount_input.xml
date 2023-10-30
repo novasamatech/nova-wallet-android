@@ -93,6 +93,7 @@
         android:inputType="numberDecimal"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
+        android:saveEnabled="false"
         android:textColor="@color/text_primary"
         android:textColorHint="@color/hint_text"
         android:textCursorDrawable="@null"

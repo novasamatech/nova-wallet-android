@@ -41,3 +41,5 @@ suspend fun SelectedAssetOptionSharedState<*>.chainAndAsset() = assetWithChain.f
 suspend fun <A> SelectedAssetOptionSharedState<A>.selectedOption(): SupportedAssetOption<A> {
     return selectedOption.first()
 }
+
+fun SupportedAssetOption(assetWithChain: ChainWithAsset): SupportedAssetOption<Unit> = SupportedAssetOption(assetWithChain, additional = Unit)

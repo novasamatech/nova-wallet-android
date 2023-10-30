@@ -54,6 +54,8 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.primitives.Boole
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
 import jp.co.soramitsu.fearless_utils.runtime.metadata.call
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 
 class AssetConversionExchangeFactory(
     private val chainRegistry: ChainRegistry,
@@ -63,14 +65,15 @@ class AssetConversionExchangeFactory(
     private val assetSourceRegistry: AssetSourceRegistry,
 ) : AssetExchange.Factory {
 
-    override suspend fun create(chainId: ChainId): AssetExchange? {
+    override suspend fun create(chainId: ChainId, coroutineScope: CoroutineScope): AssetExchange? {
         val chain = chainRegistry.getChainOrNull(chainId) ?: return null
-        val runtime = chainRegistry.getRuntime(chainId)
+        val parentChain = chain.parentId?.let { chainRegistry.getChain(it) }
+        val runtimeAsync = coroutineScope.async { chainRegistry.getRuntime(chainId) }
 
         val converter = CompoundMultiLocationConverter(
-            NativeAssetLocationConverter(chain),
-            LocalAssetsLocationConverter(chain, runtime),
-            ForeignAssetsLocationConverter(chain, runtime)
+            NativeAssetLocationConverter(chain, parentChain),
+            LocalAssetsLocationConverter(chain, runtimeAsync),
+            ForeignAssetsLocationConverter(chain, runtimeAsync)
         )
 
         return AssetConversionExchange(

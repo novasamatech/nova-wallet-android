@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecutor
+import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
@@ -153,4 +154,6 @@ interface CommonApi {
     val partialRetriableMixinFactory: PartialRetriableMixin.Factory
 
     val automaticInteractionGate: AutomaticInteractionGate
+
+    val bannerVisibilityRepository: BannerVisibilityRepository
 }

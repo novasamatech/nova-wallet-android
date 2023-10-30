@@ -15,7 +15,7 @@ interface AmountInputView {
 
     val amountInput: EditText
 
-    fun setFiatAmount(fiat: String?)
+    fun setFiatAmount(fiat: CharSequence?)
 }
 
 interface MaxAvailableView {

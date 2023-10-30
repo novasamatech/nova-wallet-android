@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.transformWhile
@@ -105,6 +106,11 @@ fun <T> List<Flow<T>>.mergeIfMultiple(): Flow<T> = when (size) {
     0 -> emptyFlow()
     1 -> first()
     else -> merge()
+}
+
+fun <K, V> List<Flow<Map<K, V>>>.accumulateMaps(): Flow<Map<K, V>> {
+    return mergeIfMultiple()
+        .runningFold(emptyMap()) { acc, directions -> acc + directions }
 }
 
 inline fun <T> withFlowScope(crossinline block: suspend (scope: CoroutineScope) -> Flow<T>): Flow<T> {
