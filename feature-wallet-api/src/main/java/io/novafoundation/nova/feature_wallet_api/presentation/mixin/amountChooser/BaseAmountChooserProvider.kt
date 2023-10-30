@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.common.validation.getReasonOrNull
-import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks

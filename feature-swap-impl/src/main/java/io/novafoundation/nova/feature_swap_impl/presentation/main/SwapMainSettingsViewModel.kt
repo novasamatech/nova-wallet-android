@@ -138,7 +138,7 @@ class SwapMainSettingsViewModel(
 
     private val priceImpact = quotingState.map { quoteState ->
         when (quoteState) {
-            is QuotingState.NotAvailable, QuotingState.Loading -> null
+            is QuotingState.NotAvailable, QuotingState.Loading, QuotingState.Default -> null
             is QuotingState.Loaded -> quoteState.value.priceImpact
         }
     }

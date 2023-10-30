@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.validation.FieldValidator
-import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin.SwapInputAssetModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
