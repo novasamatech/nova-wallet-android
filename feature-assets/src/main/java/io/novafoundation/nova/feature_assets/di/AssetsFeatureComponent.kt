@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.RewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.TransactionDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.di.TransactionHistoryFilterComponent
+import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
@@ -115,7 +116,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
             StakingFeatureApi::class,
             Web3NamesApi::class,
             WalletConnectFeatureApi::class,
-            SwapFeatureApi::class
+            SwapFeatureApi::class,
+            BuyFeatureApi::class
         ]
     )
     interface AssetsFeatureDependenciesComponent : AssetsFeatureDependencies

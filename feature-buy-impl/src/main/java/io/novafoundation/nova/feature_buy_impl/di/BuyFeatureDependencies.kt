@@ -1,14 +1,14 @@
 package io.novafoundation.nova.feature_buy_impl.di
 
-import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 interface BuyFeatureDependencies {
 
-    val resourceManager: ResourceManager
+    val chainRegistry: ChainRegistry
 
-    val accountRepository: AccountRepository
+    val accountUseCase: SelectedAccountUseCase
 
-    val walletRepository: WalletRepository
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 }

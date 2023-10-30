@@ -4,10 +4,14 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.setupBuyIntegration
 import io.novafoundation.nova.feature_assets.presentation.flow.AssetFlowFragment
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
+import javax.inject.Inject
 
 class AssetBuyFlowFragment : AssetFlowFragment<AssetBuyFlowViewModel>() {
+
+    @Inject
+    lateinit var buyMixin: BuyMixinUi
 
     override fun initViews() {
         super.initViews()
@@ -24,6 +28,6 @@ class AssetBuyFlowFragment : AssetFlowFragment<AssetBuyFlowViewModel>() {
     override fun subscribe(viewModel: AssetBuyFlowViewModel) {
         super.subscribe(viewModel)
 
-        setupBuyIntegration(mixin = viewModel.buyMixin)
+        buyMixin.setupBuyIntegration(this, viewModel.buyMixin)
     }
 }

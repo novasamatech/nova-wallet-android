@@ -13,9 +13,9 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.buy.flow.AssetBuyFlowViewModel
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 
 @Module(includes = [ViewModelModule::class])
@@ -36,7 +36,7 @@ class AssetBuyFlowModule {
         currencyInteractor: CurrencyInteractor,
         controllableAssetCheck: ControllableAssetCheckMixin,
         accountUseCase: SelectedAccountUseCase,
-        buyMixinFactory: BuyMixinFactory,
+        buyMixinFactory: BuyMixin.Factory,
         resourceManager: ResourceManager
     ): ViewModel {
         return AssetBuyFlowViewModel(

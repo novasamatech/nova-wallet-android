@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy
+package io.novafoundation.nova.feature_buy_impl.presentation.mixin
 
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -9,24 +9,24 @@ import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.model.addressIn
-import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
+import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
+import io.novafoundation.nova.feature_buy_api.domain.BuyProvider
+import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-class BuyMixinFactory(
+internal class BuyMixinFactory(
     private val buyTokenRegistry: BuyTokenRegistry,
     private val chainRegistry: ChainRegistry,
     private val accountUseCase: SelectedAccountUseCase,
     private val awaitableMixinFactory: ActionAwaitableMixin.Factory
-) {
+) : BuyMixin.Factory {
 
-    fun create(
-        scope: CoroutineScope,
-    ): BuyMixin.Presentation {
+    override fun create(scope: CoroutineScope): BuyMixin.Presentation {
         return BuyMixinProvider(
             buyTokenRegistry = buyTokenRegistry,
             chainRegistry = chainRegistry,
@@ -74,7 +74,7 @@ private class BuyMixinProvider(
 
     private suspend fun openProvider(chainAsset: Chain.Asset, provider: BuyTokenRegistry.Provider<*>) {
         val chain = chainRegistry.getChain(chainAsset.chainId)
-        val address = accountUseCase.getSelectedMetaAccount().addressIn(chain)!!
+        val address = accountUseCase.getSelectedMetaAccount().requireAddressIn(chain)
 
         val integrator = provider.createIntegrator(chainAsset, address)
 

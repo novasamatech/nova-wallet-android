@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy
+package io.novafoundation.nova.feature_buy_impl.presentation.mixin
 
 import android.content.Context
 import android.os.Bundle
@@ -9,12 +9,11 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBo
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ReferentialEqualityDiffCallBack
-import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
+import io.novafoundation.nova.feature_buy_api.domain.BuyProvider
+import io.novafoundation.nova.feature_buy_impl.R
 import kotlinx.android.synthetic.main.item_sheet_buy_provider.view.itemSheetBuyProviderImage
 import kotlinx.android.synthetic.main.item_sheet_buy_provider.view.itemSheetBuyProviderText
 
-typealias BuyProvider = BuyTokenRegistry.Provider<*>
 
 class BuyProviderChooserBottomSheet(
     context: Context,
