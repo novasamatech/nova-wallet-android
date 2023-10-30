@@ -1,0 +1,48 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    namespace 'io.novafoundation.nova.feature_buy_api'
+
+    compileSdkVersion rootProject.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
+    }
+}
+
+dependencies {
+    implementation coroutinesDep
+    implementation project(':runtime')
+    implementation project(":feature-account-api")
+    implementation project(":feature-wallet-api")
+    implementation project(":common")
+
+    implementation androidDep
+    implementation materialDep
+
+    implementation daggerDep
+    kapt daggerKapt
+
+    implementation fearlessLibDep
+
+    implementation androidDep
+    implementation constraintDep
+
+    implementation lifeCycleKtxDep
+
+    api project(':core-api')
+
+    testImplementation project(':test-shared')
+}

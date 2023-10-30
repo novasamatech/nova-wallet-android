@@ -216,6 +216,9 @@ dependencies {
     implementation project(':feature-swap-api')
     implementation project(':feature-swap-impl')
 
+    implementation project(":feature-buy-api")
+    implementation project(":feature-buy-impl")
+
     implementation kotlinDep
 
     implementation biometricDep

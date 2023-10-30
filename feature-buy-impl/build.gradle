@@ -1,0 +1,77 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+apply from: '../tests.gradle'
+apply from: '../scripts/secrets.gradle'
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+
+    namespace 'io.novafoundation.nova.feature_buy_impl'
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
+    }
+}
+
+dependencies {
+    implementation project(':core-db')
+    implementation project(':common')
+    implementation project(':feature-wallet-api')
+    implementation project(':feature-account-api')
+    implementation project(':feature-buy-api')
+    implementation project(':runtime')
+
+    implementation kotlinDep
+
+    implementation androidDep
+    implementation materialDep
+    implementation constraintDep
+
+    implementation coroutinesDep
+    implementation coroutinesAndroidDep
+    implementation viewModelKtxDep
+    implementation liveDataKtxDep
+    implementation lifeCycleKtxDep
+
+    implementation daggerDep
+    kapt daggerKapt
+
+    implementation roomDep
+    kapt roomKapt
+
+    implementation lifecycleDep
+    kapt lifecycleKapt
+
+    testImplementation jUnitDep
+    testImplementation mockitoDep
+
+    implementation insetterDep
+
+    implementation shimmerDep
+
+    androidTestImplementation androidTestRunnerDep
+    androidTestImplementation androidTestRulesDep
+    androidTestImplementation androidJunitDep
+}
