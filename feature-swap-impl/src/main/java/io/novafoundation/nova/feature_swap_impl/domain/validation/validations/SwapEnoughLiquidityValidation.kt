@@ -1,8 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.domain.validation.validations
 
 import io.novafoundation.nova.common.validation.ValidationStatus
-import io.novafoundation.nova.common.validation.valid
-import io.novafoundation.nova.common.validation.validationError
+import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
@@ -15,10 +14,9 @@ class SwapEnoughLiquidityValidation(
 
     override suspend fun validate(value: SwapValidationPayload): ValidationStatus<SwapValidationFailure> {
         val quoteResult = quoteRetriever(value)
-        if (quoteResult.isFailure) {
-            return NotEnoughLiquidity.validationError()
-        }
 
-        return valid()
+        return validOrError(quoteResult.isSuccess) {
+            NotEnoughLiquidity
+        }
     }
 }
