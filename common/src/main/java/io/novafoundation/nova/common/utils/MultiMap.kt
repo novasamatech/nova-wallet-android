@@ -1,7 +1,7 @@
 package io.novafoundation.nova.common.utils
 
 typealias MutableMultiMap<K, V> = MutableMap<K, MutableSet<V>>
-typealias MultiMap<K, V> = MutableMap<K, out Set<V>>
+typealias MultiMap<K, V> = Map<K, Set<V>>
 
 fun <K, V> mutableMultiMapOf(): MutableMultiMap<K, V> = mutableMapOf()
 
