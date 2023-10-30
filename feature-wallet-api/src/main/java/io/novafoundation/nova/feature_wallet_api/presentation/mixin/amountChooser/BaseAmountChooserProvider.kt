@@ -6,6 +6,8 @@ import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.common.validation.FieldValidator
+import io.novafoundation.nova.common.validation.getReasonOrNull
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -43,7 +45,8 @@ private const val DEBOUNCE_DURATION_MILLIS = 500
 open class BaseAmountChooserProvider(
     coroutineScope: CoroutineScope,
     tokenFlow: Flow<Token?>,
-    private val maxActionProvider: MaxActionProvider?
+    private val maxActionProvider: MaxActionProvider?,
+    private val fieldValidator: FieldValidator? = null,
 ) : AmountChooserMixinBase.Presentation,
     CoroutineScope by coroutineScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
@@ -62,6 +65,10 @@ open class BaseAmountChooserProvider(
     )
     final override val amountInput = inputState.map { it.value }
         .stateIn(this, SharingStarted.Eagerly, initialValue = "")
+
+    override val fieldError: Flow<String?> = fieldValidator?.observe(amountInput)
+        ?.map { it.getReasonOrNull() }
+        ?: flowOf(null)
 
     final override val amountState: Flow<InputState<BigDecimal?>> = inputState
         .map { inputState ->

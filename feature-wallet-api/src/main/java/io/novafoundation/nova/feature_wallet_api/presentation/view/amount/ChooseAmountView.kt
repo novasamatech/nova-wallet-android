@@ -52,6 +52,10 @@ class ChooseAmountView @JvmOverloads constructor(
         chooseAmountInput.setFiatAmount(fiat)
     }
 
+    override fun setError(error: String?) {
+        // TODO not implemented
+    }
+
     override fun setMaxAmountDisplay(maxAmountDisplay: String?) {
         chooseAmountBalance.setTextOrHide(maxAmountDisplay)
     }

@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenI
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin.SwapInputAssetModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountInputView
+import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputContainer
+import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputError
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputFiat
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputField
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputImage
@@ -42,8 +44,8 @@ class SwapAmountInputView @JvmOverloads constructor(
 
     init {
         inflate(context, R.layout.view_swap_amount_input, this)
-        background = context.getInputBackground()
-        setAddStatesFromChildren(true)
+        swapAmountInputContainer.background = context.getInputBackground()
+        swapAmountInputContainer.setAddStatesFromChildren(true)
     }
 
     fun setModel(model: SwapInputAssetModel) {
@@ -56,6 +58,11 @@ class SwapAmountInputView @JvmOverloads constructor(
 
     override fun setFiatAmount(fiat: String?) {
         swapAmountInputFiat.setTextOrHide(fiat)
+    }
+
+    override fun setError(error: String?) {
+        swapAmountInputError.text = error
+        setErrorEnabled(error != null)
     }
 
     private fun setTitle(title: CharSequence) {
@@ -74,6 +81,7 @@ class SwapAmountInputView @JvmOverloads constructor(
                 swapAmountInputImage.loadTokenIcon(icon.assetIconUrl, imageLoader)
                 swapAmountInputImage.setBackgroundResource(R.drawable.bg_token_container)
             }
+
             SwapInputAssetModel.SwapAssetIcon.NotChosen -> {
                 swapAmountInputImage.setImageTint(context.getColor(R.color.icon_accent))
                 swapAmountInputImage.setImageResource(R.drawable.ic_add)
@@ -85,10 +93,10 @@ class SwapAmountInputView @JvmOverloads constructor(
     fun setErrorEnabled(enabled: Boolean) {
         if (enabled) {
             amountInput.setTextColor(context.getColor(R.color.text_negative))
-            background = context.getInputBackgroundError()
+            swapAmountInputContainer.background = context.getInputBackgroundError()
         } else {
             amountInput.setTextColor(context.getColor(R.color.text_primary))
-            background = context.getInputBackground()
+            swapAmountInputContainer.background = context.getInputBackground()
         }
     }
 }

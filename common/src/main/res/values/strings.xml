@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="swap_field_validation_not_enough_liquidity">Not enough liquidity</string>
+    <string name="swap_field_validation_not_enough_amount_to_swap">Not enough tokens to swap</string>
+    <string name="swap_field_validation_to_low_amount_out">You can’t receive less than %s</string>
 
     <string name="swap_too_low_amount_to_stay_abow_ed_title">You are trying to swap too small amount</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message">Amount of %s is less than minimum balance of %s</string>

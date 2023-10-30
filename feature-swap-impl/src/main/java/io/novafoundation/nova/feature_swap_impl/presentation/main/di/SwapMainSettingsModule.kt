@@ -18,7 +18,11 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettin
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
+import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -34,6 +38,28 @@ class SwapMainSettingsModule {
     ) = SwapAmountInputMixinFactory(chainRegistry, resourceManager)
 
     @Provides
+    @ScreenScope
+    fun provideLiquidityFieldValidatorFactory(resourceManager: ResourceManager): LiquidityFieldValidatorFactory {
+        return LiquidityFieldValidatorFactory(resourceManager)
+    }
+
+    @Provides
+    @ScreenScope
+    fun provideEnoughAmountToSwapValidatorFactory(resourceManager: ResourceManager): EnoughAmountToSwapValidatorFactory {
+        return EnoughAmountToSwapValidatorFactory(resourceManager)
+    }
+
+    @Provides
+    @ScreenScope
+    fun provideSwapAmountAboveEDFieldValidatorFactory(
+        resourceManager: ResourceManager,
+        chainRegistry: ChainRegistry,
+        assetSourceRegistry: AssetSourceRegistry
+    ): SwapReceiveAmountAboveEDFieldValidatorFactory {
+        return SwapReceiveAmountAboveEDFieldValidatorFactory(resourceManager, chainRegistry, assetSourceRegistry)
+    }
+
+    @Provides
     @IntoMap
     @ViewModelKey(SwapMainSettingsViewModel::class)
     fun provideViewModel(
@@ -47,6 +73,9 @@ class SwapMainSettingsModule {
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         lastQuoteStoreSharedStateProvider: LastQuoteStoreSharedStateProvider,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        liquidityFieldValidatorFactory: LiquidityFieldValidatorFactory,
+        enoughAmountToSwapValidatorFactory: EnoughAmountToSwapValidatorFactory,
+        swapReceiveAmountAboveEDFieldValidatorFactory: SwapReceiveAmountAboveEDFieldValidatorFactory,
         payload: SwapSettingsPayload,
         validationExecutor: ValidationExecutor
     ): ViewModel {
@@ -62,7 +91,10 @@ class SwapMainSettingsModule {
             lastQuoteStoreSharedStateProvider = lastQuoteStoreSharedStateProvider,
             actionAwaitableFactory = actionAwaitableMixinFactory,
             payload = payload,
-            validationExecutor = validationExecutor
+            validationExecutor = validationExecutor,
+            liquidityFieldValidatorFactory = liquidityFieldValidatorFactory,
+            enoughAmountToSwapValidatorFactory = enoughAmountToSwapValidatorFactory,
+            swapReceiveAmountAboveEDFieldValidatorFactory = swapReceiveAmountAboveEDFieldValidatorFactory
         )
     }
 

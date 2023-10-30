@@ -31,6 +31,8 @@ interface AmountChooserMixinBase : CoroutineScope {
     )
     val amountInput: StateFlow<String>
 
+    val fieldError: Flow<String?>
+
     val maxAction: MaxAction
 
     val requestFocusLiveData: MutableLiveData<Event<Unit>>
