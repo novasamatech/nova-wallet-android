@@ -158,6 +158,9 @@
     <string name="assets_balance_details_locks_phrelect">Выборы</string>
     <string name="assets_balance_details_locks_staking">Стейкинг</string>
     <string name="assets_balance_details_locks_vesting">Вестинг</string>
+    <string name="assets_buy_tokens_placeholder_button">Купить токены</string>
+    <string name="assets_crowdloan_unlock_banner_description">Получили свои DOT из краудлоунов? Начните стейкать DOT уже сегодня, чтобы получить максимальные вознаграждения!</string>
+    <string name="assets_crowdloan_unlock_banner_title">Максимизируйте награды от DOT 🚀</string>
     <string name="assets_filter_title">Фильтр токенов</string>
     <string name="assets_manage_tokens_all_networks">Все сети</string>
     <string name="assets_manage_tokens_title">Управление токенами</string>
@@ -166,10 +169,11 @@
     <string name="assets_search_hint">Поиск по названию сети или токена</string>
     <string name="assets_search_placeholder">Токены и сети с указанным именем\nне найдены</string>
     <string name="assets_select_send_your_wallets">Ваши кошельки</string>
-    <string name="assets_send_flow_placeholder">У вас нет токенов для отправки.\nКупите или внесите токены на свой счет.</string>
-    <string name="assets_send_flow_placeholder_button">Купить токены</string>
+    <string name="assets_send_flow_placeholder">У вас нет токенов для отправки.\nКупите или получите токены\nна свой аккаунт.</string>
     <string name="biometric_auth_title">Биометрия</string>
     <string name="buy_completed">Покупка совершена! Ожидайте до 60 минут. Вы можете отслеживать статус по электронной почте.</string>
+    <string name="buy_provider_open_confirmation_message">Для продолжения покупки вы будете перенаправлены из приложения Nova Wallet на сайт %s</string>
+    <string name="buy_provider_open_confirmation_title">Продолжить в браузере?</string>
     <string name="choose_amount_asset">Токен</string>
     <string name="choose_amount_available_balance">Свободный баланс</string>
     <string name="choose_amount_error_balance">К сожалению, запрос проверки баланса не выполнен. Пожалуйста, попробуйте позже.</string>
@@ -754,7 +758,7 @@
     <string name="runtime_update_failure_title">Ошибка обновления среды выполнения</string>
     <string name="search_contacts">Контакты</string>
     <string name="search_header_my_accounts">мои аккаунты</string>
-    <string name="search_pool_no_pools_found_placeholder">Пул с введенным именем или номером не найден. Убедитесь, что вы ввели правильные данные</string>
+    <string name="search_pool_no_pools_found_placeholder">Пул с введенным именем или\nномером не найден. Убедитесь, что вы\nввели правильные данные</string>
     <string name="search_recipient_hint">Адрес аккаунта или имя аккаунта</string>
     <string name="search_recipient_welcome_v2_2_0">Здесь появятся результаты поиска</string>
     <string name="search_result_header">Результат поиска</string>
@@ -875,7 +879,7 @@
     <string name="staking_main_stake_balance_staked">Застейкано</string>
     <string name="staking_manage_title">Управление</string>
     <string name="staking_max_format" formatted="false">%s (макс. %s )</string>
-    <string name="staking_max_nominators_reached_message">Достигнуто максимальное количество номинаторов</string>
+    <string name="staking_max_nominators_reached_message">Достигнуто максимальное количество номинаторов. Пожалуйста, попробуйте позже</string>
     <string name="staking_max_nominators_reached_title">Невозможно начать стейкинг</string>
     <string name="staking_min_stake">Мин. стейк</string>
     <string name="staking_missing_account_message">Вы должны добавить %s аккаунт в кошелек для того, чтобы начать стейкинг</string>
@@ -1175,7 +1179,7 @@
     <string name="wallet_asset_receive_token">Получить %s</string>
     <string name="wallet_asset_send">Перевести</string>
     <string name="wallet_assets">Активы</string>
-    <string name="wallet_assets_empty">Здесь появятся ваши активы.\nУбедитесь, что фильтр \"Скрыть нулевой баланс\" отключен.</string>
+    <string name="wallet_assets_empty">Здесь появятся ваши активы.\nУбедитесь, что фильтр\n\"Скрыть нулевой баланс\" отключен.</string>
     <string name="wallet_assets_total_title">Стоимость активов</string>
     <string name="wallet_balance_available">Доступно</string>
     <string name="wallet_balance_bonded">Застейкано</string>

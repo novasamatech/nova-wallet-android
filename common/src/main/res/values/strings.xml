@@ -38,7 +38,16 @@
     <string name="wallet_asset_swap">Swap</string>
     <string name="fragment_swap_main_settings_select_token">Select a token</string>
 
-    <string name="assets_send_flow_placeholder_button">Buy tokens</string>
+
+    <string name="assets_crowdloan_unlock_banner_title">Boost your DOT 🚀</string>
+    <string name="assets_crowdloan_unlock_banner_description">Received your DOT back from crowdloans? Start staking your DOT today to get the maximum possible rewards!</string>
+
+    <string name="buy_provider_open_confirmation_title">Continue in browser?</string>
+    <string name="buy_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>
+
+    <!--<string name="assets_send_flow_placeholder_button">Buy tokens</string>-->
+    <string name="assets_buy_tokens_placeholder_button">Buy tokens</string>
+
     <string name="assets_send_flow_placeholder">You don’t have tokens to send.\nBuy or Deposit tokens to your account.</string>
     <string name="common_days_and_hours_format_with_delimeter">%s and %s</string>
     <string name="common_frequency_days_daily">daily</string>

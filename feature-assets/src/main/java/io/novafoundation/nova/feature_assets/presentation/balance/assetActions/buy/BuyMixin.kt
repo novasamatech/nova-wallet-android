@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface BuyMixin {
 
-    class IntegrationPayload(val integrator: BuyTokenRegistry.Integrator<*>)
+    class IntegrationPayload(val buyProvider: BuyProvider, val integrator: BuyTokenRegistry.Integrator<*>)
 
     val awaitProviderChoosing: ChooseOneOfManyAwaitable<BuyProvider>
 
@@ -30,7 +30,9 @@ fun BaseFragment<*>.setupBuyIntegration(
     mixin.integrateWithBuyProviderEvent.observeEvent {
         with(it) {
             when (integrator) {
-                is ExternalProvider.Integrator -> integrator.openBuyFlow(requireContext())
+                is ExternalProvider.Integrator -> showBuyDisclaimer(requireContext(), buyProvider) {
+                    integrator.openBuyFlow(requireContext())
+                }
             }
         }
     }
