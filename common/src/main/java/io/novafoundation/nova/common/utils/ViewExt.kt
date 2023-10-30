@@ -276,7 +276,7 @@ fun TextView.setCompoundDrawableTint(@ColorRes tintRes: Int) {
     TextViewCompat.setCompoundDrawableTintList(this, ColorStateList.valueOf(tintColor))
 }
 
-fun TextView.setTextOrHide(newText: String?) {
+fun TextView.setTextOrHide(newText: CharSequence?) {
     if (newText != null) {
         text = newText
         setVisible(true)

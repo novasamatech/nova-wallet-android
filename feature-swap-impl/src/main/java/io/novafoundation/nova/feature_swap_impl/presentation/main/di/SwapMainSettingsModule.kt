@@ -12,17 +12,20 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsViewModel
-import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
+import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -36,6 +39,12 @@ class SwapMainSettingsModule {
         chainRegistry: ChainRegistry,
         resourceManager: ResourceManager
     ) = SwapAmountInputMixinFactory(chainRegistry, resourceManager)
+
+    @Provides
+    @ScreenScope
+    fun provideSwapInputMixinPriceImpactFiatFormatterFactory(
+        priceImpactFormatter: PriceImpactFormatter
+    ) = SwapInputMixinPriceImpactFiatFormatterFactory(priceImpactFormatter)
 
     @Provides
     @ScreenScope
@@ -71,12 +80,14 @@ class SwapMainSettingsModule {
         chainRegistry: ChainRegistry,
         assetUseCase: ArbitraryAssetUseCase,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-        lastQuoteStoreSharedStateProvider: LastQuoteStoreSharedStateProvider,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         liquidityFieldValidatorFactory: LiquidityFieldValidatorFactory,
         enoughAmountToSwapValidatorFactory: EnoughAmountToSwapValidatorFactory,
         swapReceiveAmountAboveEDFieldValidatorFactory: SwapReceiveAmountAboveEDFieldValidatorFactory,
         payload: SwapSettingsPayload,
+        swapUpdateSystemFactory: SwapUpdateSystemFactory,
+        swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
+        lastQuoteStoreSharedStateProvider: LastQuoteStoreSharedStateProvider,
         validationExecutor: ValidationExecutor
     ): ViewModel {
         return SwapMainSettingsViewModel(
@@ -88,9 +99,11 @@ class SwapMainSettingsModule {
             chainRegistry = chainRegistry,
             assetUseCase = assetUseCase,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
-            lastQuoteStoreSharedStateProvider = lastQuoteStoreSharedStateProvider,
             actionAwaitableFactory = actionAwaitableMixinFactory,
             payload = payload,
+            swapUpdateSystemFactory = swapUpdateSystemFactory,
+            swapInputMixinPriceImpactFiatFormatterFactory = swapInputMixinPriceImpactFiatFormatterFactory,
+            lastQuoteStoreSharedStateProvider = lastQuoteStoreSharedStateProvider,
             validationExecutor = validationExecutor,
             liquidityFieldValidatorFactory = liquidityFieldValidatorFactory,
             enoughAmountToSwapValidatorFactory = enoughAmountToSwapValidatorFactory,

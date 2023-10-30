@@ -58,7 +58,7 @@ class SwapAmountInputView @JvmOverloads constructor(
         amountInput.isVisible = model.showInput
     }
 
-    override fun setFiatAmount(fiat: String?) {
+    override fun setFiatAmount(fiat: CharSequence?) {
         swapAmountInputFiat.setTextOrHide(fiat)
     }
 

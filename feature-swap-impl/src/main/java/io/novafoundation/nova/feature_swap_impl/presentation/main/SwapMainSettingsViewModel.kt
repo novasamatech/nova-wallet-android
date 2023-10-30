@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
 import io.novafoundation.nova.feature_swap_impl.R
+import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin
@@ -42,6 +43,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmou
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
@@ -70,6 +72,7 @@ import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
@@ -77,6 +80,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
@@ -94,6 +98,7 @@ import java.math.BigDecimal
 import kotlinx.coroutines.flow.combine
 import kotlin.time.Duration.Companion.milliseconds
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SwapMainSettingsViewModel(
     private val swapRouter: SwapRouter,
     private val swapInteractor: SwapInteractor,
@@ -110,6 +115,8 @@ class SwapMainSettingsViewModel(
     swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
+    private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
+    private val swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory
 ) : BaseViewModel(), Validatable by validationExecutor {
 
     private val swapSettingState = async {
@@ -121,12 +128,20 @@ class SwapMainSettingsViewModel(
     }
 
     private val swapSettings = swapSettingsStateProvider.swapSettingsFlow(viewModelScope)
+        .share()
 
     private val quotingState = MutableStateFlow<QuotingState>(QuotingState.Default)
 
     private val assetOutFlow = swapSettings.assetFlowOf(SwapSettings::assetOut)
     private val assetInFlow = swapSettings.assetFlowOf(SwapSettings::assetIn)
     private val feeAssetFlow = swapSettings.assetFlowOf(SwapSettings::feeAsset)
+
+    private val priceImpact = quotingState.map { quoteState ->
+        when (quoteState) {
+            is QuotingState.NotAvailable, QuotingState.Loading -> null
+            is QuotingState.Loaded -> quoteState.value.priceImpact
+        }
+    }
 
     private val originChainFlow = swapSettings
         .mapNotNull { it.assetIn?.chainId }
@@ -159,6 +174,7 @@ class SwapMainSettingsViewModel(
         coroutineScope = viewModelScope,
         tokenFlow = assetOutFlow.token().nullOnStart(),
         emptyAssetTitle = R.string.swap_field_asset_to_title,
+        fiatFormatter = swapInputMixinPriceImpactFiatFormatterFactory.create(priceImpact),
         fieldValidator = getAmountOutFieldValidator()
     )
 
@@ -204,6 +220,8 @@ class SwapMainSettingsViewModel(
         handleInputChanges(amountOutInput, SwapSettings::assetOut, SwapDirection.SPECIFIED_OUT)
 
         setupQuoting()
+
+        setupUpdateSystem()
 
         feeMixin.setupFees()
     }
@@ -306,6 +324,12 @@ class SwapMainSettingsViewModel(
         swapSettingState().setFeeAsset(newFeeToken)
     }
 
+    private fun setupUpdateSystem() = launch {
+        swapUpdateSystemFactory.create(viewModelScope)
+            .start()
+            .launchIn(viewModelScope)
+    }
+
     @OptIn(FlowPreview::class)
     private fun GenericFeeLoaderMixin.Presentation<SwapFee>.setupFees() {
         quotingState
@@ -393,29 +417,33 @@ class SwapMainSettingsViewModel(
     }
 
     private fun setupQuoting() {
-        swapSettings.mapNotNull { swapSettings ->
-            val swapQuoteArgs = swapSettings.toQuoteArgs(
-                tokenIn = { assetInFlow.ensureToken(it) },
-                tokenOut = { assetOutFlow.ensureToken(it) },
-            )
+        setupPerSwapSettingQuoting()
 
-            swapQuoteArgs?.let { it to swapSettings }
-        }
-            .mapLatest { (quoteArgs, swapSettings) ->
-                quotingState.value = QuotingState.Loading
+        setupPerBlockQuoting()
 
-                val quote = swapInteractor.quote(quoteArgs)
+        storeQuotingState()
+    }
 
-                quotingState.value = quote.fold(
-                    onSuccess = { QuotingState.Loaded(it, quoteArgs, swapSettings.feeAsset!!) },
-                    onFailure = { QuotingState.NotAvailable }
-                )
-
-                quote to swapSettings
-            }
-            .onEach { (quoteResult, swapSettings) -> handleNewQuote(quoteResult, swapSettings) }
+    private fun setupPerSwapSettingQuoting() {
+        swapSettings.mapLatest(::performQuote)
             .launchIn(viewModelScope)
+    }
 
+    private fun setupPerBlockQuoting() {
+        swapSettings.map { it.assetIn?.chainId }
+            .distinctUntilChanged()
+            .flatMapLatest { chainId ->
+                if (chainId == null) return@flatMapLatest emptyFlow()
+
+                swapInteractor.blockNumberUpdates(chainId)
+            }.onEach {
+                val currentSwapSettings = swapSettings.first()
+
+                performQuote(currentSwapSettings)
+            }.launchIn(viewModelScope)
+    }
+
+    private fun storeQuotingState() {
         // Store quote to use last quotes on confirmation screen
         quotingState.onEach {
             val storedState = when (it) {
@@ -425,6 +453,24 @@ class SwapMainSettingsViewModel(
 
             lastQuoteStore.await().setLastQuote(storedState)
         }.launchIn(this)
+    }
+
+    private suspend fun performQuote(swapSettings: SwapSettings) {
+        val swapQuoteArgs = swapSettings.toQuoteArgs(
+            tokenIn = { assetInFlow.ensureToken(it) },
+            tokenOut = { assetOutFlow.ensureToken(it) },
+        ) ?: return
+
+        quotingState.value = QuotingState.Loading
+
+        val quote = swapInteractor.quote(swapQuoteArgs)
+
+        quotingState.value = quote.fold(
+            onSuccess = { QuotingState.Loaded(it, swapQuoteArgs, swapSettings.feeAsset!!) },
+            onFailure = { QuotingState.NotAvailable }
+        )
+
+        handleNewQuote(quote, swapSettings)
     }
 
     private fun handleNewQuote(quoteResult: Result<SwapQuote>, swapSettings: SwapSettings) {

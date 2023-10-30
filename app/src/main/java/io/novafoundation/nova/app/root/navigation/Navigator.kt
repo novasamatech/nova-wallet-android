@@ -73,6 +73,7 @@ import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.Welco
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 import io.novafoundation.nova.splash.SplashRouter
@@ -81,6 +82,7 @@ import kotlinx.coroutines.flow.Flow
 class Navigator(
     private val navigationHolder: NavigationHolder,
     private val walletConnectDelegate: WalletConnectRouter,
+    private val stakingDashboardDelegate: StakingDashboardRouter
 ) : BaseNavigator(navigationHolder),
     SplashRouter,
     OnboardingRouter,
@@ -332,6 +334,10 @@ class Navigator(
 
     override fun openWalletConnectScan() {
         walletConnectDelegate.openScanPairingQrCode()
+    }
+
+    override fun openStaking() {
+        stakingDashboardDelegate.openStakingDashboard()
     }
 
     override fun openSwapFlow() {

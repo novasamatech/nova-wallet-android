@@ -26,7 +26,7 @@ sealed class YieldBoostValidationFailure {
 
     class NotEnoughToPayToPayFees(
         override val chainAsset: Chain.Asset,
-        override val availableToPayFees: BigDecimal,
+        override val maxUsable: BigDecimal,
         override val fee: BigDecimal
     ) : YieldBoostValidationFailure(), NotEnoughToPayFeesError
 }

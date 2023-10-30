@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatWithoutSymbol
 import io.novafoundation.nova.common.validation.FieldValidationResult
+import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.R
@@ -56,8 +57,8 @@ class SwapOptionsViewModel(
 
     val slippageWarningState = slippageInputValidationResult.map { formatSlippageWarning(it) }
 
-    val resetButtonEnabled = combine(slippageInput, swapSettingsStateFlow) { input, settings ->
-        formatResetButtonVisibility(input, settings)
+    val resetButtonEnabled = combine(slippageInput, slippageConfig) { input, slippageConfig ->
+        formatResetButtonVisibility(input, slippageConfig)
     }
 
     val buttonState = combine(slippageInput, swapSettingsStateFlow, slippageInputValidationResult) { input, state, validationStatus ->
@@ -133,7 +134,7 @@ class SwapOptionsViewModel(
         }
     }
 
-    private suspend fun formatResetButtonVisibility(slippageInput: String, settings: SwapSettings): Boolean {
-        return slippageInput.formatToPercent() != settings.slippage
+    private suspend fun formatResetButtonVisibility(slippageInput: String, slippageConfig: SlippageConfig): Boolean {
+        return slippageInput.formatToPercent() != slippageConfig.defaultSlippage
     }
 }

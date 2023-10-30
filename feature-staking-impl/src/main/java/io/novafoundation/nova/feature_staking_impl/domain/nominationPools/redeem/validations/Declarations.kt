@@ -25,7 +25,7 @@ private fun NominationPoolsRedeemValidationSystemBuilder.enoughToPayFees() {
         error = { payload, leftForFees ->
             NominationPoolsRedeemValidationFailure.NotEnoughBalanceToPayFees(
                 chainAsset = payload.asset.token.configuration,
-                availableToPayFees = leftForFees,
+                maxUsable = leftForFees,
                 fee = payload.fee
             )
         }

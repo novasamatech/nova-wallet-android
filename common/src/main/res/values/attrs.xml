@@ -234,6 +234,13 @@
         <attr name="expandableId" format="reference" />
     </declare-styleable>
 
+    <declare-styleable name="PromoBannerView">
+        <attr name="promoBanner_image" format="reference" />
+        <attr name="promoBanner_background" format="reference|color" />
+        <attr name="promoBanner_title" format="string" />
+        <attr name="promoBanner_description" format="string" />
+    </declare-styleable>
+
     <declare-styleable name="ListChooserView">
         <attr name="listChooserView_label" format="string" />
         <attr name="listChooserView_value" format="string" />

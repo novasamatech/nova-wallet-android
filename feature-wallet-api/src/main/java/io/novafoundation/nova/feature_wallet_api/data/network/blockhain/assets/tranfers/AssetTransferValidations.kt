@@ -38,7 +38,7 @@ sealed class AssetTransferValidationFailure {
 
         class InCommissionAsset(
             override val chainAsset: Chain.Asset,
-            override val availableToPayFees: BigDecimal,
+            override val maxUsable: BigDecimal,
             override val fee: BigDecimal
         ) : NotEnoughFunds(), NotEnoughToPayFeesError
 

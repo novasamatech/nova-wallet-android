@@ -2,10 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:background="@color/secondary_screen_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/swapMainSettingsToolbar"
@@ -76,17 +76,6 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/swapMainSettingsReceiveTitle" />
-
-    <io.novafoundation.nova.common.view.AlertView
-        android:id="@+id/swapMainSettingsAlert"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        android:visibility="gone"
-        android:text="@string/swap_error_pair_not_supported"
-        app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsReceiveInput"
-        app:style="error" />
 
     <io.novafoundation.nova.common.view.AlertView
         android:id="@+id/swapMainSettingsAlert"
@@ -170,9 +159,9 @@
         android:id="@+id/swapMainSettingsMinBalanceAlert"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsDetails"
         app:style="info" />
 

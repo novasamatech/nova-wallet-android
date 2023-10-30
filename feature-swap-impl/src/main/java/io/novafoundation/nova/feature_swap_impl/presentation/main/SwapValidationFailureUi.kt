@@ -26,12 +26,12 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpik
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.invokeMaxClick
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleNonPositiveAmount
 import java.math.BigDecimal
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 fun CoroutineScope.mapSwapValidationFailureToUI(
@@ -180,7 +180,7 @@ fun CoroutineScope.handleErrorToSwapMax(
                 title = resourceManager.getString(R.string.swap_failure_swap_max_button),
                 action = {
                     launch {
-                        amountInputMixin.maxAction.maxClick.first()?.invoke()
+                        amountInputMixin.invokeMaxClick()
                     }
                 }
             ),
@@ -211,11 +211,7 @@ fun CoroutineScope.handleErrorToSwapMin(
                 action = {
                     launch {
                         amountOutInputMixin.requestFocusLiveData.sendEvent()
-                        amountOutInputMixin.inputState.value = AmountChooserMixinBase.InputState(
-                            reason.existentialDeposit.toPlainString(),
-                            initiatedByUser = true,
-                            inputKind = AmountChooserMixinBase.InputState.InputKind.REGULAR
-                        )
+                        amountOutInputMixin.setAmount(reason.existentialDeposit)
                     }
                 }
             ),

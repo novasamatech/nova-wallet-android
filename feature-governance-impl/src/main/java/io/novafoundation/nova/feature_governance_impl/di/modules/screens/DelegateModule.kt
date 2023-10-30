@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -19,8 +20,6 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.common.chooseTrack.ChooseTrackInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.data.repository.DelegationBannerRepository
-import io.novafoundation.nova.feature_governance_impl.data.repository.RealDelegationBannerRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.RealRemoveVotesSuggestionRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.RemoveVotesSuggestionRepository
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.repository.DelegateCommonRepository
@@ -35,20 +34,16 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegati
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.RealChooseTrackInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.TrackCategorizer
+import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.RealDelegateMappers
-import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.DelegatesSharedComputation
+import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 @Module
 class DelegateModule {
-
-    @Provides
-    @FeatureScope
-    fun provideDelegationBannerService(preferences: Preferences): DelegationBannerRepository = RealDelegationBannerRepository(preferences)
 
     @Provides
     @FeatureScope
@@ -65,10 +60,10 @@ class DelegateModule {
     @Provides
     @FeatureScope
     fun provideDelegateListInteractor(
-        delegationBannerService: DelegationBannerRepository,
+        bannerVisibilityRepository: BannerVisibilityRepository,
         delegatesSharedComputation: DelegatesSharedComputation
     ): DelegateListInteractor = RealDelegateListInteractor(
-        delegationBannerService = delegationBannerService,
+        bannerVisibilityRepository = bannerVisibilityRepository,
         delegatesSharedComputation = delegatesSharedComputation
     )
 

@@ -55,7 +55,7 @@ class AssetSendFlowViewModel(
             return PlaceholderModel(
                 text = resourceManager.getString(R.string.assets_send_flow_placeholder),
                 imageRes = R.drawable.ic_no_search_results,
-                buttonText = resourceManager.getString(R.string.assets_send_flow_placeholder_button),
+                buttonText = resourceManager.getString(R.string.assets_buy_tokens_placeholder_button),
             )
         } else {
             return super.getPlaceholder(query, assets)

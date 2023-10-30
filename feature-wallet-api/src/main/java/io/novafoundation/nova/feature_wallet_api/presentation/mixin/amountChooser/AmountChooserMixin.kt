@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
@@ -13,12 +14,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlinx.coroutines.flow.first
 
 typealias MaxClick = () -> Unit
 
 interface AmountChooserMixinBase : CoroutineScope {
 
-    val fiatAmount: Flow<String>
+    val fiatAmount: Flow<CharSequence>
 
     val inputState: MutableStateFlow<InputState<String>>
 
@@ -45,6 +47,11 @@ interface AmountChooserMixinBase : CoroutineScope {
         val amountState: Flow<InputState<BigDecimal?>>
 
         val backPressuredAmount: Flow<BigDecimal>
+    }
+
+    interface FiatFormatter {
+
+        fun formatFlow(tokenFlow: Flow<Token>, amountFlow: Flow<BigDecimal>): Flow<CharSequence>
     }
 
     sealed class AmountErrorState {
@@ -102,10 +109,14 @@ fun AmountChooserMixinBase.AmountErrorState.getMessageOrNull(): String? {
     }
 }
 
-fun AmountChooserMixin.Presentation.setAmount(amount: BigDecimal) {
-    inputState.value = InputState(value = amount.toPlainString(), initiatedByUser = false, inputKind = InputKind.REGULAR)
+fun AmountChooserMixinBase.Presentation.setAmount(amount: BigDecimal, initiatedByUser: Boolean = false) {
+    inputState.value = InputState(value = amount.toPlainString(), initiatedByUser, inputKind = InputKind.REGULAR)
 }
 
-fun AmountChooserMixin.Presentation.setAmountInput(amountInput: String) {
-    inputState.value = InputState(value = amountInput, initiatedByUser = false, inputKind = InputKind.REGULAR)
+fun AmountChooserMixinBase.Presentation.setAmountInput(amountInput: String, initiatedByUser: Boolean = false) {
+    inputState.value = InputState(value = amountInput, initiatedByUser, inputKind = InputKind.REGULAR)
+}
+
+suspend fun AmountChooserMixinBase.Presentation.invokeMaxClick() {
+    maxAction.maxClick.first()?.invoke()
 }

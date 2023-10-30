@@ -48,6 +48,7 @@ open class BaseAmountChooserProvider(
     coroutineScope: CoroutineScope,
     tokenFlow: Flow<Token?>,
     private val maxActionProvider: MaxActionProvider?,
+    fiatFormatter: AmountChooserMixinBase.FiatFormatter = DefaultFiatFormatter(),
     private val fieldValidator: FieldValidator? = null,
 ) : AmountChooserMixinBase.Presentation,
     CoroutineScope by coroutineScope,
@@ -93,9 +94,7 @@ open class BaseAmountChooserProvider(
     @Deprecated("Use amountState instead")
     override val amount: Flow<BigDecimal> = _amount
 
-    override val fiatAmount: Flow<String> = combine(tokenFlow.filterNotNull(), _amount) { token, amount ->
-        token.amountToFiat(amount).formatAsCurrency(token.currency)
-    }
+    override val fiatAmount: Flow<CharSequence> = fiatFormatter.formatFlow(tokenFlow.filterNotNull(), _amount)
         .shareInBackground()
 
     override val backPressuredAmount: Flow<BigDecimal>

@@ -55,6 +55,10 @@
         <item name="android:textSize">?attr/textSizeSubHeadline</item>
     </style>
 
+    <style name="TextAppearance.NovaFoundation.SemiBold.SubHeadline.Primary">
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
     <style name="TextAppearance.NovaFoundation.SemiBold.Caption3">
         <item name="android:textSize">9sp</item>
         <item name="lineHeight">11sp</item>

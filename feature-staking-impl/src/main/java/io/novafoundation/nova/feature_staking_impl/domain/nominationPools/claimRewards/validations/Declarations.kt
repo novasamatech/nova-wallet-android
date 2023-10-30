@@ -43,7 +43,7 @@ private fun NominationPoolsClaimRewardsValidationSystemBuilder.enoughToPayFees()
         error = { payload, leftForFees ->
             NominationPoolsClaimRewardsValidationFailure.NotEnoughBalanceToPayFees(
                 chainAsset = payload.asset.token.configuration,
-                availableToPayFees = leftForFees,
+                maxUsable = leftForFees,
                 fee = payload.fee
             )
         }

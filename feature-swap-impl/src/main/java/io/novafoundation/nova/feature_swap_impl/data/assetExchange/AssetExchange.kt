@@ -12,12 +12,13 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import kotlinx.coroutines.CoroutineScope
 
 interface AssetExchange {
 
     interface Factory {
 
-        suspend fun create(chainId: ChainId): AssetExchange?
+        suspend fun create(chainId: ChainId, coroutineScope: CoroutineScope): AssetExchange?
     }
 
     /**

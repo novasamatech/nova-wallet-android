@@ -49,7 +49,7 @@ class ChooseAmountView @JvmOverloads constructor(
         chooseAmountInput.setAssetName(name)
     }
 
-    override fun setFiatAmount(fiat: String?) {
+    override fun setFiatAmount(fiat: CharSequence?) {
         chooseAmountInput.setFiatAmount(fiat)
     }
 
