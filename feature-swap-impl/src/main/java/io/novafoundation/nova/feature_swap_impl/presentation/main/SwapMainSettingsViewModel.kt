@@ -106,7 +106,7 @@ class SwapMainSettingsViewModel(
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
     private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
-    private val payload: SwapSettingsPayload
+    private val payload: SwapSettingsPayload,
     private val swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory
 ) : BaseViewModel() {
 
