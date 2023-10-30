@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
-import io.novafoundation.nova.feature_assets.presentation.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGroupedAssetsToUi

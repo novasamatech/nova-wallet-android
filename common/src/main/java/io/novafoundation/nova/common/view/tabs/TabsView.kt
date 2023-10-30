@@ -11,9 +11,12 @@ import androidx.lifecycle.Lifecycle
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.updatePadding
+import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 
 typealias OnTabSelected = (index: Int) -> Unit
+
+private val DEFAULT_BACKGROUND_TINT = R.color.segmented_background
 
 class TabsView @JvmOverloads constructor(
     context: Context,
@@ -25,9 +28,9 @@ class TabsView @JvmOverloads constructor(
     private var onTabSelected: OnTabSelected? = null
 
     init {
-        background = context.getRoundedCornerDrawable(R.color.segmented_background)
-
         updatePadding(top = 4.dp, bottom = 4.dp, start = 4.dp)
+
+        attrs?.let(::applyAttributes)
     }
 
     fun addTab(title: String) {
@@ -71,6 +74,11 @@ class TabsView @JvmOverloads constructor(
         val height = MeasureSpec.makeMeasureSpec(40.dp, MeasureSpec.EXACTLY)
 
         super.onMeasure(widthMeasureSpec, height)
+    }
+
+    private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.TabsView) {
+        val backgroundTint = it.getResourceId(R.styleable.TabsView_TabsView_backgroundTint, DEFAULT_BACKGROUND_TINT)
+        background = context.getRoundedCornerDrawable(fillColorRes = backgroundTint)
     }
 }
 

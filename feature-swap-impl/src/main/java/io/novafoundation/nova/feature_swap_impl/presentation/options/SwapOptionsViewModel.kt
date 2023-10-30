@@ -14,13 +14,12 @@ import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.R
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
+import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SlippageFieldValidatorFactory
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -31,8 +30,8 @@ class SwapOptionsViewModel(
     private val swapRouter: SwapRouter,
     private val resourceManager: ResourceManager,
     private val swapSettingsStateProvider: SwapSettingsStateProvider,
-    private val assetExchangeFactory: AssetConversionExchangeFactory,
-    private val slippageFieldValidatorFactory: SlippageFieldValidatorFactory
+    private val slippageFieldValidatorFactory: SlippageFieldValidatorFactory,
+    private val swapInteractor: SwapInteractor
 ) : BaseViewModel() {
 
     private val swapSettingState = async {
@@ -42,25 +41,20 @@ class SwapOptionsViewModel(
     private val swapSettingsStateFlow = flowOfAll { swapSettingState.await().selectedOption }
         .shareInBackground()
 
-    private val assetExchange = swapSettingsStateFlow.mapNotNull { it.assetIn }
-        .map { assetExchangeFactory.create(it.chainId) }
-        .filterNotNull()
-        .shareInBackground()
-
-    private val slippageConfig = assetExchange.map { it.slippageConfig() }
+    private val slippageConfig = swapSettingsStateFlow
+        .mapNotNull { it.assetIn }
+        .mapNotNull { swapInteractor.slippageConfig(it.chainId) }
         .shareInBackground()
 
     val slippageInput = MutableStateFlow("")
 
-    private val slippageFieldValidator = assetExchange.map { slippageFieldValidatorFactory.create(it) }
+    private val slippageFieldValidator = slippageConfig.map { slippageFieldValidatorFactory.create(it) }
         .shareInBackground()
 
-    private val slippageInputValidationResult = slippageFieldValidator.flatMapLatest { it.observe(slippageInput) }
+    val slippageInputValidationResult = slippageFieldValidator.flatMapLatest { it.observe(slippageInput) }
         .shareInBackground()
 
     val slippageWarningState = slippageInputValidationResult.map { formatSlippageWarning(it) }
-
-    val slippageErrorState = slippageInputValidationResult.map { formatSlippageError(it) }
 
     val resetButtonEnabled = combine(slippageInput, swapSettingsStateFlow) { input, settings ->
         formatResetButtonVisibility(input, settings)
@@ -95,7 +89,7 @@ class SwapOptionsViewModel(
 
     fun applyClicked() {
         launch {
-            val slippage = slippageInput.value.formatToPercent()
+            val slippage = slippageInput.value.formatToPercent() ?: return@launch
             swapSettingState.await().setSlippage(slippage)
             swapRouter.back()
         }
@@ -106,24 +100,16 @@ class SwapOptionsViewModel(
     }
 
     fun backClicked() {
-        backClicked()
+        swapRouter.back()
     }
 
-    private suspend fun String.formatToPercent(): Percent {
+    private suspend fun String.formatToPercent(): Percent? {
         val defaultSlippage = slippageConfig.first().defaultSlippage
         return if (isEmpty()) {
             defaultSlippage
         } else {
-            return Percent(this.toDouble())
+            return this.toDoubleOrNull()?.let { Percent(it) }
         }
-    }
-
-    private fun formatSlippageError(validationResult: FieldValidationResult): String? {
-        if (validationResult is FieldValidationResult.Error) {
-            return validationResult.reason
-        }
-
-        return null
     }
 
     private fun formatSlippageWarning(validationResult: FieldValidationResult): String? {

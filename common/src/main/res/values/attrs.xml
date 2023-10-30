@@ -172,6 +172,7 @@
         <attr name="style" format="enum">
             <enum name="warning" value="0" />
             <enum name="error" value="1" />
+            <enum name="info" value="2" />
         </attr>
 
         <attr name="styleBackgroundColor" format="color" />
@@ -268,6 +269,14 @@
 
     <declare-styleable name="SlideShowView">
         <attr name="SlideShowView_slideDelayMillis" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="HintsView">
+        <attr name="HintsView_singleHint" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="TabsView">
+        <attr name="TabsView_backgroundTint" format="reference|color" />
     </declare-styleable>
 
     <declare-styleable name="TipsInputField">

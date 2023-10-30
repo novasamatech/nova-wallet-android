@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoos
 import androidx.annotation.StringRes
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -11,12 +12,24 @@ import kotlinx.coroutines.flow.StateFlow
 import java.math.BigDecimal
 import java.math.BigInteger
 
+typealias MaxClick = () -> Unit
+
 interface AmountChooserMixinBase : CoroutineScope {
+
+    val fiatAmount: Flow<String>
 
     val inputState: MutableStateFlow<InputState<String>>
 
-    @Deprecated("Use amountInput instead")
+    @Deprecated(
+        message = "Use `inputState` instead",
+        replaceWith = ReplaceWith(
+            expression = "inputState.map { it.value }",
+            imports = ["kotlinx.coroutines.flow.map"]
+        )
+    )
     val amountInput: StateFlow<String>
+
+    val maxAction: MaxAction
 
     interface Presentation : AmountChooserMixinBase {
 
@@ -28,12 +41,19 @@ interface AmountChooserMixinBase : CoroutineScope {
         val backPressuredAmount: Flow<BigDecimal>
     }
 
-    interface Factory {
+    class InputState<T>(val value: T, val initiatedByUser: Boolean, val inputKind: InputKind) {
 
-        fun create(scope: CoroutineScope)
+        enum class InputKind {
+            REGULAR, MAX_ACTION
+        }
     }
 
-    class InputState<T>(val value: T, val initiatedByUser: Boolean)
+    interface MaxAction {
+
+        val display: Flow<String?>
+
+        val maxClick: Flow<MaxClick?>
+    }
 }
 
 interface AmountChooserMixin : AmountChooserMixinBase {
@@ -41,8 +61,6 @@ interface AmountChooserMixin : AmountChooserMixinBase {
     val usedAssetFlow: Flow<Asset>
 
     val assetModel: Flow<ChooseAmountModel>
-
-    val fiatAmount: Flow<String>
 
     interface Presentation : AmountChooserMixin, AmountChooserMixinBase.Presentation
 
@@ -65,9 +83,9 @@ interface AmountChooserMixin : AmountChooserMixinBase {
 }
 
 fun AmountChooserMixin.Presentation.setAmount(amount: BigDecimal) {
-    inputState.value = InputState(value = amount.toPlainString(), initiatedByUser = false)
+    inputState.value = InputState(value = amount.toPlainString(), initiatedByUser = false, inputKind = InputKind.REGULAR)
 }
 
 fun AmountChooserMixin.Presentation.setAmountInput(amountInput: String) {
-    inputState.value = InputState(value = amountInput, initiatedByUser = false)
+    inputState.value = InputState(value = amountInput, initiatedByUser = false, inputKind = InputKind.REGULAR)
 }

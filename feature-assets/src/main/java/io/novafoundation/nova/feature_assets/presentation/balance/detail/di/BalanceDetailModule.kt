@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
-import io.novafoundation.nova.feature_assets.presentation.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin

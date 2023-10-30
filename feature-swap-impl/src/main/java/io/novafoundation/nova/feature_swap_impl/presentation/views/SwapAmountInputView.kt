@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.view.shape.getInputBackgroundError
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin.SwapInputAssetModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountInputView
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputFiat
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputField
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputImage
@@ -29,11 +30,10 @@ class SwapAmountInputView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr),
-    WithContextExtensions by WithContextExtensions(
-        context
-    ) {
+    WithContextExtensions by WithContextExtensions(context),
+    AmountInputView {
 
-    val amountInput: EditText
+    override val amountInput: EditText
         get() = swapAmountInputField
 
     private val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
@@ -54,8 +54,8 @@ class SwapAmountInputView @JvmOverloads constructor(
         amountInput.isVisible = model.showInput
     }
 
-    fun setFiatAmount(priceAmount: CharSequence?) {
-        swapAmountInputFiat.setTextOrHide(priceAmount)
+    fun setFiatAmount(fiat: CharSequence?) {
+        swapAmountInputFiat.setTextOrHide(fiat)
     }
 
     private fun setTitle(title: CharSequence) {

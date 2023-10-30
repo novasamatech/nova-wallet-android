@@ -120,6 +120,11 @@ open class TableCellView @JvmOverloads constructor(
         image.makeVisible()
     }
 
+    fun setOnValueClickListener(onClick: View.OnClickListener?) {
+        valuePrimary.setOnClickListener(onClick)
+        valueSecondary.setOnClickListener(onClick)
+    }
+
     fun loadImage(
         url: String?,
         @DrawableRes placeholderRes: Int? = null,

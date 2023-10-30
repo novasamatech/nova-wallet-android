@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
@@ -39,5 +40,27 @@ fun SwapQuote.swapRate(): BigDecimal {
 }
 
 class SwapFee(
-    val networkFee: Fee
-)
+    override val networkFee: Fee,
+    val minimumBalanceBuyIn: MinimumBalanceBuyIn,
+) : GenericFee
+
+val SwapFee.totalDeductedPlanks: Balance
+    get() = networkFee.amount + minimumBalanceBuyIn.commissionAssetToSpendOnBuyIn
+
+sealed class MinimumBalanceBuyIn {
+
+    class NeedsToBuyMinimumBalance(
+        val nativeAsset: Chain.Asset,
+        val nativeMinimumBalance: Balance,
+        val commissionAsset: Chain.Asset,
+        val commissionAssetToSpendOnBuyIn: Balance
+    ) : MinimumBalanceBuyIn()
+
+    object NoBuyInNeeded : MinimumBalanceBuyIn()
+}
+
+val MinimumBalanceBuyIn.commissionAssetToSpendOnBuyIn: Balance
+    get() = when (this) {
+        is MinimumBalanceBuyIn.NeedsToBuyMinimumBalance -> commissionAssetToSpendOnBuyIn
+        MinimumBalanceBuyIn.NoBuyInNeeded -> Balance.ZERO
+    }

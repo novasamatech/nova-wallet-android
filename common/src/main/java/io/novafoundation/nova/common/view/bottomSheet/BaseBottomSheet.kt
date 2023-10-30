@@ -16,7 +16,11 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-abstract class BaseBottomSheet(context: Context, style: Int = R.style.BottomSheetDialog) :
+abstract class BaseBottomSheet(
+    context: Context,
+    style: Int = R.style.BottomSheetDialog,
+    private val onCancel: (() -> Unit)? = null,
+) :
     BottomSheetDialog(context, style),
     DialogExtensions,
     CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.Main) {
@@ -32,6 +36,10 @@ abstract class BaseBottomSheet(context: Context, style: Int = R.style.BottomShee
         window?.decorView
             ?.findViewById<View>(R.id.touch_outside)
             ?.isFocusable = false
+
+        onCancel?.let {
+            setOnCancelListener { onCancel.invoke() }
+        }
     }
 
     init {

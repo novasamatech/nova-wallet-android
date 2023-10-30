@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation
+package io.novafoundation.nova.feature_wallet_api.presentation.model
 
 import android.os.Parcelable
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
