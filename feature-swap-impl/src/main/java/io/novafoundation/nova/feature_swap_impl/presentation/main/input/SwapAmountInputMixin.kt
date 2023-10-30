@@ -1,25 +1,14 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main.input
 
 import io.novafoundation.nova.common.utils.images.Icon
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase
-import java.math.BigDecimal
 import kotlinx.coroutines.flow.Flow
 
 interface SwapAmountInputMixin : AmountChooserMixinBase {
 
-    val fiatAmount: Flow<CharSequence>
-
-    val maxAvailable: Flow<String?>
-
     val assetModel: Flow<SwapInputAssetModel>
 
     interface Presentation : SwapAmountInputMixin, AmountChooserMixinBase.Presentation
-
-    interface FiatFormatter {
-
-        fun formatFlow(assetFlow: Flow<Asset>, amountFlow: Flow<BigDecimal>): Flow<CharSequence>
-    }
 
     class SwapInputAssetModel(
         val assetIcon: SwapAssetIcon,

@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -41,7 +40,8 @@ private const val DEBOUNCE_DURATION_MILLIS = 500
 open class BaseAmountChooserProvider(
     coroutineScope: CoroutineScope,
     tokenFlow: Flow<Token?>,
-    private val maxActionProvider: MaxActionProvider?
+    private val maxActionProvider: MaxActionProvider?,
+    fiatFormatter: AmountChooserMixinBase.FiatFormatter = DefaultFiatFormatter(),
 ) : AmountChooserMixinBase.Presentation,
     CoroutineScope by coroutineScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
@@ -73,9 +73,7 @@ open class BaseAmountChooserProvider(
     @Deprecated("Use amountState instead")
     override val amount: Flow<BigDecimal> = _amount
 
-    override val fiatAmount: Flow<String> = combine(tokenFlow.filterNotNull(), _amount) { token, amount ->
-        token.amountToFiat(amount).formatAsCurrency(token.currency)
-    }
+    override val fiatAmount: Flow<CharSequence> = fiatFormatter.formatFlow(tokenFlow.filterNotNull(), _amount)
         .shareInBackground()
 
     override val backPressuredAmount: Flow<BigDecimal>
