@@ -80,7 +80,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
 
     override fun subscribe(viewModel: SwapMainSettingsViewModel) {
         setupSwapAmountInput(viewModel.amountInInput, swapMainSettingsPayInput)
-        setupSwapAmountInput(viewModel.amountOutInput, swapMainSettingsReceiveInput, fiatAmount = viewModel.amountOutFiat)
+        setupSwapAmountInput(viewModel.amountOutInput, swapMainSettingsReceiveInput)
         setupFeeLoading(viewModel.feeMixin, swapMainSettingsDetailsNetworkFee)
 
         viewModel.amountInInput.maxAvailable.observe {

@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmou
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -32,6 +33,12 @@ class SwapMainSettingsModule {
     ) = SwapAmountInputMixinFactory(chainRegistry, resourceManager)
 
     @Provides
+    @ScreenScope
+    fun provideSwapInputMixinPriceImpactFiatFormatterFactory(
+        priceImpactFormatter: PriceImpactFormatter
+    ) = SwapInputMixinPriceImpactFiatFormatterFactory(priceImpactFormatter)
+
+    @Provides
     @IntoMap
     @ViewModelKey(SwapMainSettingsViewModel::class)
     fun provideViewModel(
@@ -44,7 +51,7 @@ class SwapMainSettingsModule {
         assetUseCase: ArbitraryAssetUseCase,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         payload: SwapSettingsPayload,
-        priceImpactFormatter: PriceImpactFormatter
+        swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -56,7 +63,7 @@ class SwapMainSettingsModule {
             assetUseCase = assetUseCase,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             payload = payload,
-            priceImpactFormatter = priceImpactFormatter
+            swapInputMixinPriceImpactFiatFormatterFactory = swapInputMixinPriceImpactFiatFormatterFactory
         )
     }
 
