@@ -60,6 +60,8 @@ import io.novafoundation.nova.common.utils.sequrity.RealAutomaticInteractionGate
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
+import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.description.RealDescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.common.view.input.chooser.RealListChooserMixinFactory
 import jp.co.soramitsu.fearless_utils.encrypt.Signer
@@ -304,4 +306,8 @@ class CommonModule {
     fun provideBannerVisibilityRepository(
         preferences: Preferences
     ): BannerVisibilityRepository = RealBannerVisibilityRepository(preferences)
+
+    @Provides
+    @ApplicationScope
+    fun provideDescriptionBottomSheetLauncher(): DescriptionBottomSheetLauncher = RealDescriptionBottomSheetLauncher()
 }
