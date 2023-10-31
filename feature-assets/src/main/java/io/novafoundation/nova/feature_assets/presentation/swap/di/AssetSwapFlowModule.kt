@@ -35,7 +35,7 @@ class AssetSwapFlowModule {
     fun provideSwapExecutor(
         initialSwapFlowExecutor: InitialSwapFlowExecutor,
         assetsRouter: AssetsRouter,
-        swapSettingsStateProvider: SwapSettingsStateProvider,
+        swapSettingsStateProvider: SwapSettingsStateProvider
     ): SwapFlowExecutorFactory {
         return SwapFlowExecutorFactory(initialSwapFlowExecutor, assetsRouter, swapSettingsStateProvider)
     }

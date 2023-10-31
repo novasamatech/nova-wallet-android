@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser
 
+import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.inBackground
@@ -81,6 +83,8 @@ open class BaseAmountChooserProvider(
 
     override val maxAction: AmountChooserMixinBase.MaxAction = RealMaxAction()
 
+    override val requestFocusLiveData: MutableLiveData<Event<Unit>> = MutableLiveData()
+
     private fun String.parseBigDecimalOrNull() = replace(",", "").toBigDecimalOrNull()
 
     private fun defaultState(): InputState<String> = InputState(value = "", initiatedByUser = true, inputKind = InputKind.REGULAR)
@@ -110,7 +114,7 @@ open class BaseAmountChooserProvider(
         }.inBackground()
 
         override val maxClick: Flow<MaxClick?> = maxAvailableForActionAmount.map { maxAvailableForAction ->
-            if (maxAvailableForAction != null) createImmediateMaxClicked(maxAvailableForAction) else createDelayedMaxClicked()
+            getMaxClickAction(maxAvailableForAction)
         }.inBackground()
 
         init {
@@ -152,6 +156,14 @@ open class BaseAmountChooserProvider(
                     inputState.value = maxAmountInputState(newAmount)
                 }
                 .launchIn(this@BaseAmountChooserProvider)
+        }
+
+        private fun getMaxClickAction(maxAvailableForAction: BigDecimal?): MaxClick {
+            return if (maxAvailableForAction != null) {
+                createImmediateMaxClicked(maxAvailableForAction)
+            } else {
+                createDelayedMaxClicked()
+            }
         }
 
         private fun cancelDelayedInputOnInputChange() {

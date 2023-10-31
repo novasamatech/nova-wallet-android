@@ -13,7 +13,7 @@ import java.math.BigDecimal
 
 interface NotEnoughToPayFeesError {
     val chainAsset: Chain.Asset
-    val availableToPayFees: BigDecimal
+    val maxUsable: BigDecimal
     val fee: BigDecimal
 }
 
@@ -35,11 +35,11 @@ class EnoughAmountToTransferValidation<P, E>(
         return if (fee + amount <= available) {
             ValidationStatus.Valid()
         } else {
-            val availableToPayFees = (available - amount).coerceAtLeast(BigDecimal.ZERO)
+            val maxUsable = (available - fee).coerceAtLeast(BigDecimal.ZERO)
 
             val failureLevel = if (skippable) DefaultFailureLevel.WARNING else DefaultFailureLevel.ERROR
 
-            ValidationStatus.NotValid(failureLevel, errorProducer(value, availableToPayFees))
+            ValidationStatus.NotValid(failureLevel, errorProducer(value, maxUsable))
         }
     }
 }
@@ -70,11 +70,11 @@ fun ResourceManager.zeroAmount() = getString(R.string.common_amount_low) to
     getString(R.string.common_zero_amount_error)
 
 fun handleNotEnoughFeeError(error: NotEnoughToPayFeesError, resourceManager: ResourceManager): TitleAndMessage {
-    val title = resourceManager.getString(R.string.common_cannot_pay_network_fee_title)
+    val title = resourceManager.getString(R.string.common_not_enough_funds_title)
 
-    val availableToPayFees = error.availableToPayFees.formatTokenAmount(error.chainAsset)
+    val maxUsable = error.maxUsable.formatTokenAmount(error.chainAsset)
     val fee = error.fee.formatTokenAmount(error.chainAsset)
-    val message = resourceManager.getString(R.string.common_cannot_pay_network_fee_message, fee, availableToPayFees)
+    val message = resourceManager.getString(R.string.common_cannot_pay_network_fee_message, maxUsable, fee)
 
     return title to message
 }

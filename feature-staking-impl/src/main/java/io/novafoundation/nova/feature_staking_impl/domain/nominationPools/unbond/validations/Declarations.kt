@@ -42,7 +42,7 @@ private fun NominationPoolsUnbondValidationSystemBuilder.enoughToPayFees() {
         error = { payload, leftForFees ->
             NominationPoolsUnbondValidationFailure.NotEnoughBalanceToPayFees(
                 chainAsset = payload.asset.token.configuration,
-                availableToPayFees = leftForFees,
+                maxUsable = leftForFees,
                 fee = payload.fee
             )
         }
@@ -71,6 +71,6 @@ private fun NominationPoolsUnbondValidationSystemBuilder.sufficientCommissionBal
         fee = { it.fee },
         total = { it.asset.total },
         chainWithAsset = { ChainWithAsset(it.chain, it.chain.utilityAsset) },
-        error = { NominationPoolsUnbondValidationFailure.ToStayAboveED(it.chain.utilityAsset) }
+        error = { payload, _ -> NominationPoolsUnbondValidationFailure.ToStayAboveED(payload.chain.utilityAsset) }
     )
 }

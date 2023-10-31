@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDeposit
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import java.math.BigDecimal
 
 interface InsufficientTotalToStayAboveEDError {
     val asset: Chain.Asset
@@ -18,7 +19,7 @@ class EnoughTotalToStayAboveEDValidation<P, E>(
     private val fee: AmountProducer<P>,
     private val totalBalance: AmountProducer<P>,
     private val chainWithAsset: (P) -> ChainWithAsset,
-    private val error: (P) -> E
+    private val error: (P, BigDecimal) -> E
 ) : Validation<P, E> {
 
     override suspend fun validate(value: P): ValidationStatus<E> {
@@ -26,7 +27,7 @@ class EnoughTotalToStayAboveEDValidation<P, E>(
         val asset = chainWithAsset(value).asset
         val existentialDeposit = assetSourceRegistry.existentialDeposit(chain, asset)
         return validOrError(totalBalance(value) - fee(value) >= existentialDeposit) {
-            error(value)
+            error(value, existentialDeposit)
         }
     }
 }
@@ -37,7 +38,7 @@ class EnoughTotalToStayAboveEDValidationFactory(private val assetSourceRegistry:
         fee: AmountProducer<P>,
         total: AmountProducer<P>,
         chainWithAsset: (P) -> ChainWithAsset,
-        error: (P) -> E
+        error: (P, BigDecimal) -> E
     ): EnoughTotalToStayAboveEDValidation<P, E> {
         return EnoughTotalToStayAboveEDValidation(
             assetSourceRegistry = assetSourceRegistry,
@@ -54,7 +55,7 @@ fun <P, E> EnoughTotalToStayAboveEDValidationFactory.validate(
     fee: AmountProducer<P>,
     total: AmountProducer<P>,
     chainWithAsset: (P) -> ChainWithAsset,
-    error: (P) -> E
+    error: (P, BigDecimal) -> E
 ) {
     validate(create(fee, total, chainWithAsset, error))
 }

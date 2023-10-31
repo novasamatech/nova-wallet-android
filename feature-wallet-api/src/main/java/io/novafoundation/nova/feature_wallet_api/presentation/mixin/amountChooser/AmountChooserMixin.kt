@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser
 
 import androidx.annotation.StringRes
+import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
@@ -12,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlinx.coroutines.flow.first
 
 typealias MaxClick = () -> Unit
 
@@ -31,6 +34,8 @@ interface AmountChooserMixinBase : CoroutineScope {
     val amountInput: StateFlow<String>
 
     val maxAction: MaxAction
+
+    val requestFocusLiveData: MutableLiveData<Event<Unit>>
 
     interface Presentation : AmountChooserMixinBase {
 
@@ -88,10 +93,14 @@ interface AmountChooserMixin : AmountChooserMixinBase {
     }
 }
 
-fun AmountChooserMixin.Presentation.setAmount(amount: BigDecimal) {
-    inputState.value = InputState(value = amount.toPlainString(), initiatedByUser = false, inputKind = InputKind.REGULAR)
+fun AmountChooserMixinBase.Presentation.setAmount(amount: BigDecimal, initiatedByUser: Boolean = false) {
+    inputState.value = InputState(value = amount.toPlainString(), initiatedByUser, inputKind = InputKind.REGULAR)
 }
 
-fun AmountChooserMixin.Presentation.setAmountInput(amountInput: String) {
-    inputState.value = InputState(value = amountInput, initiatedByUser = false, inputKind = InputKind.REGULAR)
+fun AmountChooserMixinBase.Presentation.setAmountInput(amountInput: String, initiatedByUser: Boolean = false) {
+    inputState.value = InputState(value = amountInput, initiatedByUser, inputKind = InputKind.REGULAR)
+}
+
+suspend fun AmountChooserMixinBase.Presentation.invokeMaxClick() {
+    maxAction.maxClick.first()?.invoke()
 }

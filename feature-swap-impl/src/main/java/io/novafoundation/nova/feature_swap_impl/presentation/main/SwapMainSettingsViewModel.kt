@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -17,6 +18,8 @@ import io.novafoundation.nova.common.utils.formatting.NumberAbbreviation
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.nullOnStart
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.SimpleAlertModel
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
@@ -27,14 +30,15 @@ import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.state.swapSettingsFlow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -102,16 +106,22 @@ class SwapMainSettingsViewModel(
     private val resourceManager: ResourceManager,
     private val chainRegistry: ChainRegistry,
     private val assetUseCase: ArbitraryAssetUseCase,
+    private val payload: SwapSettingsPayload,
+    private val validationExecutor: ValidationExecutor,
+    lastQuoteStoreSharedStateProvider: LastQuoteStoreSharedStateProvider,
     swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
     private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
-    private val payload: SwapSettingsPayload,
     private val swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory
-) : BaseViewModel() {
+) : BaseViewModel(), Validatable by validationExecutor {
 
     private val swapSettingState = async {
         swapSettingsStateProvider.getSwapSettingsState(viewModelScope)
+    }
+
+    private val lastQuoteStore = async {
+        lastQuoteStoreSharedStateProvider.create(viewModelScope)
     }
 
     private val swapSettings = swapSettingsStateProvider.swapSettingsFlow(viewModelScope)
@@ -174,6 +184,8 @@ class SwapMainSettingsViewModel(
     val showDetails: Flow<Boolean> = quotingState.map { it !is QuotingState.NotAvailable }
         .shareInBackground()
 
+    private val _validationProgress = MutableStateFlow(false)
+
     val buttonState: Flow<DescriptiveButtonState> = flowOf { DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue)) }
 
     val swapDirectionFlipped: MutableLiveData<Event<SwapDirection>> = MutableLiveData()
@@ -222,8 +234,36 @@ class SwapMainSettingsViewModel(
         }
     }
 
-    fun confirmButtonClicked() {
-        swapRouter.openSwapConfirmation()
+    fun applyButtonClicked() {
+        launch {
+            val assetIn = assetInFlow.first() ?: return@launch
+            val validationSystem = swapInteractor.validationSystem(assetIn.token.configuration.chainId) ?: return@launch
+            val lastQuoteState = lastQuoteStore().getLastQuote() ?: return@launch
+            val payload = swapInteractor.getValidationPayload(
+                swapSettings = swapSettings.first(),
+                quoteArgs = lastQuoteState.first,
+                swapQuote = lastQuoteState.second,
+                swapFee = feeMixin.loadedFeeOrNullFlow().first() ?: return@launch
+            ) ?: return@launch
+
+            validationExecutor.requireValid(
+                validationSystem = validationSystem,
+                payload = payload,
+                progressConsumer = _validationProgress.progressConsumer(),
+                validationFailureTransformerCustom = { status, actions ->
+                    viewModelScope.mapSwapValidationFailureToUI(
+                        resourceManager,
+                        status,
+                        actions,
+                        feeMixin,
+                        amountInInput,
+                        amountOutInput
+                    )
+                },
+            ) { validPayload ->
+                swapRouter.openSwapConfirmation()
+            }
+        }
     }
 
     fun rateDetailsClicked() {
@@ -341,6 +381,8 @@ class SwapMainSettingsViewModel(
         setupPerSwapSettingQuoting()
 
         setupPerBlockQuoting()
+
+        storeQuotingState()
     }
 
     private fun setupPerSwapSettingQuoting() {
@@ -360,6 +402,18 @@ class SwapMainSettingsViewModel(
 
                 performQuote(currentSwapSettings)
             }.launchIn(viewModelScope)
+    }
+
+    private fun storeQuotingState() {
+        // Store quote to use last quotes on confirmation screen
+        quotingState.onEach {
+            val storedState = when (it) {
+                is QuotingState.Loaded -> it.quoteArgs to it.value
+                else -> null
+            }
+
+            lastQuoteStore.await().setLastQuote(storedState)
+        }.launchIn(this)
     }
 
     private suspend fun performQuote(swapSettings: SwapSettings) {
@@ -404,7 +458,7 @@ class SwapMainSettingsViewModel(
                 tokenOut = tokenOut(assetOut!!),
                 amount = amount!!,
                 swapDirection = swapDirection!!,
-                slippage = slippage,
+                slippage = slippage
             )
         } else {
             null

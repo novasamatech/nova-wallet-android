@@ -112,7 +112,7 @@ private class DirectStakingProperties(
             error = { payload, availableToPayFees ->
                 StartMultiStakingValidationFailure.NotEnoughToPayFees(
                     chainAsset = payload.asset.token.configuration,
-                    availableToPayFees = availableToPayFees,
+                    maxUsable = availableToPayFees,
                     fee = payload.fee.decimalAmount
                 )
             }
