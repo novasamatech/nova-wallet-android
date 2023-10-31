@@ -8,6 +8,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountInputView
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxActionAvailability
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxAvailableView
@@ -50,6 +51,10 @@ class ChooseAmountView @JvmOverloads constructor(
 
     override fun setFiatAmount(fiat: CharSequence?) {
         chooseAmountInput.setFiatAmount(fiat)
+    }
+
+    override fun setError(errorState: AmountChooserMixinBase.AmountErrorState) {
+        // TODO not implemented
     }
 
     override fun setMaxAmountDisplay(maxAmountDisplay: String?) {

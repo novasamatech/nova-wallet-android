@@ -7,10 +7,12 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Disabled
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Enabled
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.accumulate
 import io.novafoundation.nova.common.utils.event
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.CompoundNumberFormatter
 import io.novafoundation.nova.common.utils.formatting.DynamicPrecisionFormatter
 import io.novafoundation.nova.common.utils.formatting.FixedPrecisionFormatter
@@ -18,6 +20,8 @@ import io.novafoundation.nova.common.utils.formatting.NumberAbbreviation
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.nullOnStart
+import io.novafoundation.nova.common.validation.CompoundFieldValidator
+import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.SimpleAlertModel
@@ -40,6 +44,9 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.state.swapSettingsFlow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -49,6 +56,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.AmountErrorState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProviderDsl.deductFee
@@ -87,16 +95,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import kotlinx.coroutines.flow.combine
 import kotlin.time.Duration.Companion.milliseconds
-
-sealed class QuotingState {
-
-    object Loading : QuotingState()
-
-    object NotAvailable : QuotingState()
-
-    class Loaded(val value: SwapQuote, val quoteArgs: SwapQuoteArgs, val feeAsset: Chain.Asset) : QuotingState()
-}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SwapMainSettingsViewModel(
@@ -108,6 +108,9 @@ class SwapMainSettingsViewModel(
     private val assetUseCase: ArbitraryAssetUseCase,
     private val payload: SwapSettingsPayload,
     private val validationExecutor: ValidationExecutor,
+    private val liquidityFieldValidatorFactory: LiquidityFieldValidatorFactory,
+    private val swapReceiveAmountAboveEDFieldValidatorFactory: SwapReceiveAmountAboveEDFieldValidatorFactory,
+    private val enoughAmountToSwapValidatorFactory: EnoughAmountToSwapValidatorFactory,
     lastQuoteStoreSharedStateProvider: LastQuoteStoreSharedStateProvider,
     swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
@@ -127,7 +130,7 @@ class SwapMainSettingsViewModel(
     private val swapSettings = swapSettingsStateProvider.swapSettingsFlow(viewModelScope)
         .share()
 
-    private val quotingState = MutableStateFlow<QuotingState>(QuotingState.NotAvailable)
+    private val quotingState = MutableStateFlow<QuotingState>(QuotingState.Default)
 
     private val assetOutFlow = swapSettings.assetFlowOf(SwapSettings::assetOut)
     private val assetInFlow = swapSettings.assetFlowOf(SwapSettings::assetIn)
@@ -135,7 +138,7 @@ class SwapMainSettingsViewModel(
 
     private val priceImpact = quotingState.map { quoteState ->
         when (quoteState) {
-            is QuotingState.NotAvailable, QuotingState.Loading -> null
+            is QuotingState.NotAvailable, QuotingState.Loading, QuotingState.Default -> null
             is QuotingState.Loaded -> quoteState.value.priceImpact
         }
     }
@@ -163,30 +166,38 @@ class SwapMainSettingsViewModel(
         emptyAssetTitle = R.string.swap_field_asset_from_title,
         maxActionProvider = assetInFlow
             .providingMaxOf(Asset::transferableInPlanks)
-            .deductFee(feeMixin, SwapFee::totalDeductedPlanks)
+            .deductFee(feeMixin, SwapFee::totalDeductedPlanks),
+        fieldValidator = getAmountInFieldValidator()
     )
 
     val amountOutInput = swapAmountInputMixinFactory.create(
         coroutineScope = viewModelScope,
         tokenFlow = assetOutFlow.token().nullOnStart(),
         emptyAssetTitle = R.string.swap_field_asset_to_title,
-        fiatFormatter = swapInputMixinPriceImpactFiatFormatterFactory.create(priceImpact)
+        fiatFormatter = swapInputMixinPriceImpactFiatFormatterFactory.create(priceImpact),
+        fieldValidator = getAmountOutFieldValidator()
     )
 
     val rateDetails: Flow<ExtendedLoadingState<String>> = quotingState.map {
         when (it) {
-            is QuotingState.NotAvailable, QuotingState.Loading -> ExtendedLoadingState.Loading
+            is QuotingState.NotAvailable, QuotingState.Loading, QuotingState.Default -> ExtendedLoadingState.Loading
             is QuotingState.Loaded -> ExtendedLoadingState.Loaded(formatRate(it.value))
         }
     }
         .shareInBackground()
 
-    val showDetails: Flow<Boolean> = quotingState.map { it !is QuotingState.NotAvailable }
+    val showDetails: Flow<Boolean> = quotingState.map { it !is QuotingState.NotAvailable && it !is QuotingState.Default }
         .shareInBackground()
 
     private val _validationProgress = MutableStateFlow(false)
 
-    val buttonState: Flow<DescriptiveButtonState> = flowOf { DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue)) }
+    val buttonState: Flow<DescriptiveButtonState> = combine(
+        accumulate(amountInInput.fieldError, amountOutInput.fieldError),
+        assetOutFlow,
+        amountInInput.inputState,
+        amountOutInput.inputState,
+        ::formatButtonStates
+    )
 
     val swapDirectionFlipped: MutableLiveData<Event<SwapDirection>> = MutableLiveData()
 
@@ -279,6 +290,10 @@ class SwapMainSettingsViewModel(
         val newSettings = swapSettingState().flipAssets()
 
         applyFlipToUi(previousSettings, newSettings)
+    }
+
+    fun openOptions() {
+        swapRouter.openSwapOptions()
     }
 
     fun backClicked() {
@@ -375,6 +390,29 @@ class SwapMainSettingsViewModel(
         val rateAmountFormatted = rate.formatTokenAmount(swapQuote.assetOut)
 
         return "$assetInUnitFormatted ≈ $rateAmountFormatted"
+    }
+
+    private fun formatButtonStates(
+        errorStates: List<AmountErrorState>,
+        assetOut: Asset?,
+        amountIn: InputState<String>,
+        amountOut: InputState<String>
+    ): DescriptiveButtonState {
+        return when {
+            assetOut == null -> {
+                Disabled(resourceManager.getString(R.string.swap_main_settings_select_token_disabled_button_state))
+            }
+
+            amountIn.value.isEmpty() && amountOut.value.isEmpty() -> {
+                Disabled(resourceManager.getString(R.string.swap_main_settings_enter_amount_disabled_button_state))
+            }
+
+            errorStates.any { it is AmountErrorState.Invalid } -> {
+                Disabled(resourceManager.getString(R.string.swap_main_settings_wrong_amount_disabled_button_state))
+            }
+
+            else -> return Enabled(resourceManager.getString(R.string.common_continue))
+        }
     }
 
     private fun setupQuoting() {
@@ -525,8 +563,15 @@ class SwapMainSettingsViewModel(
             .token
     }
 
-    fun openOptions() {
-        swapRouter.openSwapOptions()
+    private fun getAmountInFieldValidator(): FieldValidator {
+        return CompoundFieldValidator(
+            enoughAmountToSwapValidatorFactory.create(assetInFlow),
+            liquidityFieldValidatorFactory.create(quotingState)
+        )
+    }
+
+    private fun getAmountOutFieldValidator(): FieldValidator {
+        return swapReceiveAmountAboveEDFieldValidatorFactory.create(assetOutFlow)
     }
 
     private val amountInputFormatter = CompoundNumberFormatter(

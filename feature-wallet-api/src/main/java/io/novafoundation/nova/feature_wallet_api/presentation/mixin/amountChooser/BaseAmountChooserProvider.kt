@@ -6,10 +6,14 @@ import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.common.validation.FieldValidationResult
+import io.novafoundation.nova.common.validation.FieldValidator
+import io.novafoundation.nova.common.validation.getReasonOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.AmountErrorState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
@@ -44,6 +48,7 @@ open class BaseAmountChooserProvider(
     tokenFlow: Flow<Token?>,
     private val maxActionProvider: MaxActionProvider?,
     fiatFormatter: AmountChooserMixinBase.FiatFormatter = DefaultFiatFormatter(),
+    private val fieldValidator: FieldValidator? = null,
 ) : AmountChooserMixinBase.Presentation,
     CoroutineScope by coroutineScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
@@ -62,6 +67,19 @@ open class BaseAmountChooserProvider(
     )
     final override val amountInput = inputState.map { it.value }
         .stateIn(this, SharingStarted.Eagerly, initialValue = "")
+
+    override val fieldError: Flow<AmountErrorState> = fieldValidator?.observe(amountInput)
+        ?.map { formatValidationResultToErrorState(it) }
+        ?: flowOf(AmountErrorState.Valid)
+
+    private fun formatValidationResultToErrorState(result: FieldValidationResult): AmountErrorState {
+        val reason = result.getReasonOrNull()
+        return if (reason != null) {
+            AmountErrorState.Invalid(reason)
+        } else {
+            AmountErrorState.Valid
+        }
+    }
 
     final override val amountState: Flow<InputState<BigDecimal?>> = inputState
         .map { inputState ->
