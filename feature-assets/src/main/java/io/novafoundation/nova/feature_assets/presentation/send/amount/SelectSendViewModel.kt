@@ -48,6 +48,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -171,8 +172,6 @@ class SelectSendViewModel(
         setInitialState()
 
         setupFees()
-
-        syncCrossChainConfig()
     }
 
     fun nextClicked() = launch {
@@ -223,19 +222,17 @@ class SelectSendViewModel(
     }
 
     fun destinationChainClicked() = launch {
-        val destinations = availableCrossChainDestinations.first()
-        if (destinations.isEmpty()) return@launch
-
-        val payload = withContext(Dispatchers.Default) {
-            SelectCrossChainDestinationBottomSheet.Payload(
-                destinations = buildDestinationsMap(destinations),
-                selectedChain = destinationChainWithAsset.first().chain
-            )
-        }
-
-        val newDestinationChain = chooseDestinationChain.awaitAction(payload)
+        val selectedChain = destinationChain.first()
+        val newDestinationChain = awaitNewDirectionSelection(selectedChain) ?: return@launch
 
         destinationChainWithAsset.emit(newDestinationChain)
+    }
+
+    fun originChainClicked() = launch {
+        val selectedChain = originChain.first()
+        val newDestinationChain = awaitNewDirectionSelection(selectedChain) ?: return@launch
+
+        originChainWithAsset.emit(newDestinationChain)
     }
 
     fun selectRecipientWallet() {
@@ -287,8 +284,18 @@ class SelectSendViewModel(
         }
     }
 
-    private fun syncCrossChainConfig() = launch {
-        sendInteractor.syncCrossChainConfig()
+    private suspend fun awaitNewDirectionSelection(selectedChain: Chain): ChainWithAsset? {
+        val destinations = availableCrossChainDestinations.first()
+        if (destinations.isEmpty()) return null
+
+        val payload = withContext(Dispatchers.Default) {
+            SelectCrossChainDestinationBottomSheet.Payload(
+                destinations = buildDestinationsMap(destinations),
+                selectedChain = selectedChain
+            )
+        }
+
+        return chooseDestinationChain.awaitAction(payload)
     }
 
     private fun setupFees() {
@@ -479,6 +486,7 @@ class SelectSendViewModel(
             }
         }
     }
+
 
     private class CrossChainDirection(
         val chainWithAsset: ChainWithAsset,
