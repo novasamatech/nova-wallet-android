@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="common_get_token_format">Get %s</string>
+
     <string name="swap_custom_fee_selector_description">Token for paying network fee</string>
     <string name="swap_custom_fee_selector_footer">Network fee is added on top of entered amount</string>
     <string name="swap_minimum_balance_buy_in_alert">To pay network fee with %s, Nova will automatically swap %s for %s to maintain your account\'s minimum DOT balance.</string>

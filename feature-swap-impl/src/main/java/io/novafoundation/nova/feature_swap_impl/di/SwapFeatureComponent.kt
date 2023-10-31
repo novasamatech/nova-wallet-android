@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.di.SwapConfirmationComponent
@@ -46,6 +47,7 @@ interface SwapFeatureComponent : SwapFeatureApi {
             RuntimeApi::class,
             WalletFeatureApi::class,
             AccountFeatureApi::class,
+            BuyFeatureApi::class,
             DbApi::class,
         ]
     )

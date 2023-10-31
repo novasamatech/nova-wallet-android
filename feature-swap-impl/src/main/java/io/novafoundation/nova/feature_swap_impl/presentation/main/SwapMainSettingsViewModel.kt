@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.utils.formatting.FixedPrecisionFormatter
 import io.novafoundation.nova.common.utils.formatting.NumberAbbreviation
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.nullOnStart
 import io.novafoundation.nova.common.view.SimpleAlertModel
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
@@ -65,6 +66,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
@@ -80,6 +82,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -188,6 +191,27 @@ class SwapMainSettingsViewModel(
         .shareInBackground()
 
     val changeFeeTokenEvent = actionAwaitableFactory.create<FeeAssetSelectorBottomSheet.Payload, Chain.Asset>()
+
+    private val getAssetInOptions = swapInteractor.availableGetAssetInOptionsFlow(
+        chainAssetFlow = swapSettings.map { it.assetIn }.distinctUntilChanged()
+    ).shareInBackground()
+
+    val getAssetInOptionsButtonState = combine(assetInFlow, getAssetInOptions, amountInInput.amountState) { assetIn, getAssetInOptions, amountState ->
+        val amount = amountState.value
+
+        if (amount == null || assetIn == null) return@combine DescriptiveButtonState.Gone
+
+        val balanceOverTransferable = amount > assetIn.transferable || assetIn.transferable.isZero
+
+        if (balanceOverTransferable && getAssetInOptions.isNotEmpty()) {
+            val symbol = assetIn.token.configuration.symbol
+            DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_get_token_format, symbol))
+        } else {
+            DescriptiveButtonState.Gone
+        }
+    }
+        .onStart { emit(DescriptiveButtonState.Gone) }
+        .shareInBackground()
 
     init {
         initAssetIn()

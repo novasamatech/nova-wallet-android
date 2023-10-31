@@ -5,6 +5,9 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.utils.mapToSet
+import io.novafoundation.nova.core_db.model.AssetAndChainId
 import io.novafoundation.nova.core_db.model.AssetLocal
 import io.novafoundation.nova.core_db.model.AssetWithToken
 import kotlinx.coroutines.flow.Flow
@@ -32,6 +35,15 @@ private const val RETRIEVE_SUPPORTED_ACCOUNT_ASSETS_QUERY = """
     LEFT JOIN tokens AS t ON ca.symbol = t.tokenSymbol AND currency.id = t.currencyId
 """
 
+private const val RETRIEVE_ASSETS_SQL_META_ID = """
+    SELECT *, ca.chainId as ca_chainId, ca.id as ca_assetId FROM chain_assets AS ca
+    LEFT JOIN assets AS a ON a.assetId = ca.id AND a.chainId = ca.chainId AND a.metaId = :metaId
+    INNER JOIN currencies as currency ON currency.selected = 1
+    LEFT JOIN tokens AS t ON ca.symbol = t.tokenSymbol AND currency.id = t.currencyId
+    WHERE ca.chainId || ':' || ca.id in (:joinedChainAndAssetIds)
+"""
+
+
 interface AssetReadOnlyCache {
 
     fun observeSyncedAssets(metaId: Long): Flow<List<AssetWithToken>>
@@ -43,6 +55,8 @@ interface AssetReadOnlyCache {
     suspend fun getSupportedAssets(metaId: Long): List<AssetWithToken>
 
     fun observeAsset(metaId: Long, chainId: String, assetId: Int): Flow<AssetWithToken>
+
+    fun observeAssets(metaId: Long, assetIds: Collection<AssetAndChainId>): Flow<List<AssetWithToken>>
 
     suspend fun getAssetWithToken(metaId: Long, chainId: String, assetId: Int): AssetWithToken?
 
@@ -86,6 +100,17 @@ abstract class AssetDao : AssetReadOnlyCache {
 
     @Delete(entity = AssetLocal::class)
     abstract suspend fun clearAssets(assetIds: List<ClearAssetsParams>)
+
+    @Query(RETRIEVE_ASSETS_SQL_META_ID)
+    protected abstract fun observeJoinedAssets(metaId: Long, joinedChainAndAssetIds: Set<String>): Flow<List<AssetWithToken>>
+
+    override fun observeAssets(metaId: Long, assetIds: Collection<AssetAndChainId>): Flow<List<AssetWithToken>> {
+       return flowOfAll {
+           val joinedChainAndAssetIds = assetIds.mapToSet { (chainId, assetId) -> "${chainId}:${assetId}" }
+
+           observeJoinedAssets(metaId, joinedChainAndAssetIds)
+       }
+    }
 }
 
 class ClearAssetsParams(val chainId: String, val assetId: Int)

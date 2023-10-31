@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableDestinations
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableOutDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.transferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
@@ -113,7 +113,7 @@ class SendInteractor(
         return crossChainTransfersRepository.configurationFlow().map { configuration ->
             val chainsById = chainRegistry.chainsById.first()
 
-            configuration.availableDestinations(origin).mapNotNull { (chainId, assetId) ->
+            configuration.availableOutDestinations(origin).mapNotNull { (chainId, assetId) ->
                 val chain = chainsById[chainId] ?: return@mapNotNull null
                 val asset = chain.assetsById[assetId] ?: return@mapNotNull null
 

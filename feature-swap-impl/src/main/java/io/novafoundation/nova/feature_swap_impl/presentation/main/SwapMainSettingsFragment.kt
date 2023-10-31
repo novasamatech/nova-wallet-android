@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettin
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetailsNetworkFee
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetailsRate
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsFlip
+import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsGetAssetIn
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsMaxAmount
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsMinBalanceAlert
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsPayInput
@@ -116,5 +117,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
                 onCancel = it.onCancel
             ).show()
         }
+
+        viewModel.getAssetInOptionsButtonState.observe(swapMainSettingsGetAssetIn::setState)
     }
 }
