@@ -7,8 +7,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.invoke
-import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
@@ -20,10 +19,10 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectAddressForTransactionRequester
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
+import io.novafoundation.nova.feature_account_api.view.ChainChipModel
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDirectionModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
@@ -35,6 +34,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.BaseAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
@@ -44,15 +44,17 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOpt
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
-import io.novafoundation.nova.runtime.multiNetwork.asset
+import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -62,30 +64,35 @@ import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
 class SelectSendViewModel(
+    private val chainRegistry: ChainRegistry,
     private val interactor: WalletInteractor,
     private val sendInteractor: SendInteractor,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val router: AssetsRouter,
-    private val assetPayload: AssetPayload,
+    private val payload: SendPayload,
     private val initialRecipientAddress: String?,
-    private val chainRegistry: ChainRegistry,
     private val validationExecutor: ValidationExecutor,
-    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-    private val selectedAccountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,
-    private val addressInputMixinFactory: AddressInputMixinFactory,
-    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    amountChooserMixinFactory: AmountChooserMixin.Factory,
     private val selectAddressRequester: SelectAddressForTransactionRequester,
-    private val externalActions: ExternalActions.Presentation
+    private val externalActions: ExternalActions.Presentation,
+    private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
+    actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    selectedAccountUseCase: SelectedAccountUseCase,
+    addressInputMixinFactory: AddressInputMixinFactory,
+    amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     ExternalActions by externalActions {
 
-    private val originChain by lazyAsync { chainRegistry.getChain(assetPayload.chainId) }
-    private val originChainAsset by lazyAsync { chainRegistry.asset(assetPayload.chainId, assetPayload.chainAssetId) }
-
+    private val originChainWithAsset = singleReplaySharedFlow<ChainWithAsset>()
     private val destinationChainWithAsset = singleReplaySharedFlow<ChainWithAsset>()
+
+    private val originAsset = originChainWithAsset.map { it.asset }
+    private val originChain = originChainWithAsset.map { it.chain }
+
+    private val destinationAsset = destinationChainWithAsset.map { it.asset }
+    private val destinationChain = destinationChainWithAsset.map { it.chain }
 
     val addressInputMixin = with(addressInputMixinFactory) {
         val destinationChain = destinationChainWithAsset.map { it.chain }
@@ -105,21 +112,18 @@ class SelectSendViewModel(
         )
     }
 
-    private val availableCrossChainDestinations = flow {
-        val origin = originChainAsset()
-
-        emitAll(sendInteractor.availableCrossChainDestinationsFlow(origin))
-    }
+    private val availableCrossChainDestinations = availableCrossChainDestinations()
         .onStart { emit(emptyList()) }
         .shareInBackground()
 
-    val isSelectAddressAvailable = destinationChainWithAsset
-        .map { metaAccountGroupingInteractor.hasAvailableMetaAccountsForDestination(assetPayload.chainId, it.chain.id) }
-        .inBackground()
-        .share()
+    val isSelectAddressAvailable = combine(originChain, destinationChain) { originChain, destinationChain ->
+        metaAccountGroupingInteractor.hasAvailableMetaAccountsForDestination(originChain.id, destinationChain.id)
+    }
+        .shareInBackground()
 
     val transferDirectionModel = combine(
         availableCrossChainDestinations,
+        originChainWithAsset,
         destinationChainWithAsset,
         ::buildTransferDirectionModel
     ).shareInBackground()
@@ -132,31 +136,29 @@ class SelectSendViewModel(
 
     private val sendInProgressFlow = MutableStateFlow(false)
 
-    private val assetFlow = interactor.assetFlow(assetPayload.chainId, assetPayload.chainAssetId)
-        .inBackground()
-        .share()
+    private val originAssetFlow = originAsset.flatMapLatest(interactor::assetFlow)
+        .shareInBackground()
 
-    private val commissionAssetFlow = interactor.commissionAssetFlow(assetPayload.chainId)
-        .inBackground()
-        .share()
+    private val commissionAssetFlow = originChain.flatMapLatest(interactor::commissionAssetFlow)
+        .shareInBackground()
 
     val originFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(commissionAssetFlow)
-    val crossChainFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(assetFlow)
+    val crossChainFeeMixin: FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(originAssetFlow)
 
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
-        assetFlow = assetFlow,
+        assetFlow = originAssetFlow,
         balanceLabel = R.string.wallet_balance_transferable,
         balanceField = Asset::transferable,
     )
 
     val continueButtonStateLiveData = combine(
         sendInProgressFlow,
-        amountChooserMixin.amountInput
-    ) { sending, amountRaw ->
+        amountChooserMixin.inputState
+    ) { sending, amountState ->
         when {
             sending -> ButtonState.PROGRESS
-            amountRaw.isNotEmpty() -> ButtonState.NORMAL
+            amountState.value.isNotEmpty() -> ButtonState.NORMAL
             else -> ButtonState.DISABLED
         }
     }
@@ -181,7 +183,7 @@ class SelectSendViewModel(
 
         val transfer = buildTransfer(
             destination = destinationChainWithAsset.first(),
-            amount = amountChooserMixin.amount.first(),
+            amount = amountChooserMixin.amountState.first().value ?: return@launch,
             address = addressInputMixin.getAddress(),
         )
 
@@ -190,10 +192,10 @@ class SelectSendViewModel(
                 assetTransfer = transfer,
                 fee = originFee,
             ),
-            crossChainFee = crossChainFee?.decimalAmount,
-            originFee = originFee.decimalAmount,
+            crossChainFee = crossChainFee?.networkFeeDecimalAmount,
+            originFee = originFee.networkFeeDecimalAmount,
             originCommissionAsset = commissionAssetFlow.first(),
-            originUsedAsset = assetFlow.first()
+            originUsedAsset = originAssetFlow.first()
         )
 
         validationExecutor.requireValid(
@@ -239,8 +241,9 @@ class SelectSendViewModel(
     fun selectRecipientWallet() {
         launch {
             val selectedAddress = addressInputMixin.inputFlow.value
-            val currentDestination = destinationChainWithAsset.first().chain
-            val request = SelectAddressForTransactionRequester.Request(assetPayload.chainId, currentDestination.id, selectedAddress)
+            val currentOriginChain = originChain.first()
+            val currentDestinationChain = destinationChain.first()
+            val request = SelectAddressForTransactionRequester.Request(currentOriginChain.id, currentDestinationChain.id, selectedAddress)
             selectAddressRequester.openRequest(request)
         }
     }
@@ -269,7 +272,19 @@ class SelectSendViewModel(
     private fun setInitialState() = launch {
         initialRecipientAddress?.let { addressInputMixin.inputFlow.value = it }
 
-        destinationChainWithAsset.emit(ChainWithAsset(originChain(), originChainAsset()))
+        when (payload) {
+            is SendPayload.SpecifiedOrigin -> {
+                val origin = chainRegistry.chainWithAsset(payload.origin.chainId, payload.origin.chainAssetId)
+                originChainWithAsset.emit(origin)
+                destinationChainWithAsset.emit(origin)
+            }
+            is SendPayload.SpecifiedDestination -> {
+                val destination = chainRegistry.chainWithAsset(payload.destination.chainId, payload.destination.chainAssetId)
+                val origin = availableCrossChainDestinations.first().first().chainWithAsset
+                destinationChainWithAsset.emit(destination)
+                originChainWithAsset.emit(origin)
+            }
+        }
     }
 
     private fun syncCrossChainConfig() = launch {
@@ -301,7 +316,10 @@ class SelectSendViewModel(
         val transferDraft = TransferDraft(
             amount = validPayload.transfer.amount,
             originFee = mapFeeToParcel(validPayload.transfer.decimalFee),
-            origin = assetPayload,
+            origin = AssetPayload(
+                chainId = validPayload.transfer.originChain.id,
+                chainAssetId = validPayload.transfer.originChainAsset.id
+            ),
             destination = AssetPayload(
                 chainId = validPayload.transfer.destinationChain.id,
                 chainAssetId = validPayload.transfer.destinationChainAsset.id
@@ -318,11 +336,13 @@ class SelectSendViewModel(
         amount: BigDecimal,
         address: String,
     ): AssetTransfer {
+        val origin = originChainWithAsset.first()
+
         return BaseAssetTransfer(
             sender = selectedAccount.first(),
             recipient = address,
-            originChain = originChain(),
-            originChainAsset = originChainAsset(),
+            originChain = origin.chain,
+            originChainAsset = origin.asset,
             destinationChain = destination.chain,
             destinationChainAsset = destination.asset,
             amount = amount,
@@ -330,49 +350,138 @@ class SelectSendViewModel(
         )
     }
 
-    private suspend fun buildTransferDirectionModel(
-        availableCrossChainDestinations: List<ChainWithAsset>,
-        destinationChain: ChainWithAsset
+    private fun buildTransferDirectionModel(
+        availableCrossChainDestinations: List<CrossChainDirection>,
+        origin: ChainWithAsset,
+        destination: ChainWithAsset
     ): TransferDirectionModel {
-        val chainSymbol = originChainAsset().symbol
+        return when (payload) {
+            is SendPayload.SpecifiedDestination -> buildInTransferDirectionModel(availableCrossChainDestinations, origin, destination)
+            is SendPayload.SpecifiedOrigin ->  buildOutTransferDirectionModel(availableCrossChainDestinations, origin, destination)
+        }
+    }
 
-        return if (availableCrossChainDestinations.isEmpty()) {
+    private fun buildInTransferDirectionModel(
+        availableCrossChainDestinations: List<CrossChainDirection>,
+        origin: ChainWithAsset,
+        destination: ChainWithAsset
+    ): TransferDirectionModel {
+        val chainSymbol = origin.asset.symbol
+        val destinationChip = ChainChipModel(
+            chainUi = mapChainToUi(destination.chain),
+            changeable = false // when in is specified destination is never changeable
+        )
+        val originLabel = resourceManager.getString(R.string.wallet_send_tokens_from, chainSymbol)
+
+        return if (availableCrossChainDestinations.size > 1) {
             TransferDirectionModel(
-                originChainUi = mapChainToUi(originChain()),
-                originChainLabel = resourceManager.getString(R.string.wallet_send_tokens_on, chainSymbol),
-                destinationChainUi = null
+                originChip = ChainChipModel(
+                    chainUi = mapChainToUi(origin.chain),
+                    changeable = true
+                ),
+                originChainLabel = originLabel,
+                destinationChip = destinationChip
             )
         } else {
             TransferDirectionModel(
-                originChainUi = mapChainToUi(originChain()),
-                originChainLabel = resourceManager.getString(R.string.wallet_send_tokens_from, chainSymbol),
-                destinationChainUi = mapChainToUi(destinationChain.chain)
+                originChip = ChainChipModel(
+                    chainUi = mapChainToUi(origin.chain),
+                    changeable = false
+                ),
+                originChainLabel = originLabel,
+                destinationChip = destinationChip
             )
         }
     }
 
-    private suspend fun buildDestinationsMap(crossChainDestinations: List<ChainWithAsset>): Map<TextHeader, List<CrossChainDestinationModel>> {
-        val crossChainDestinationModels = crossChainDestinations.map {
-            CrossChainDestinationModel(
-                chainWithAsset = it,
-                chainUi = mapChainToUi(it.chain)
-            )
-        }
-        val onChainDestination = CrossChainDestinationModel(
-            chainWithAsset = ChainWithAsset(originChain(), originChainAsset()),
-            chainUi = transferDirectionModel.first().originChainUi
+    private fun buildOutTransferDirectionModel(
+        availableCrossChainDestinations: List<CrossChainDirection>,
+        origin: ChainWithAsset,
+        destination: ChainWithAsset
+    ): TransferDirectionModel {
+        val chainSymbol = origin.asset.symbol
+        val originChip = ChainChipModel(
+            chainUi = mapChainToUi(origin.chain),
+            changeable = false // when out is specified origin is never changeable
         )
 
-        return buildMap {
-            put(
-                TextHeader(resourceManager.getString(R.string.wallet_send_on_chain)),
-                listOf(onChainDestination)
+        return if (availableCrossChainDestinations.isNotEmpty()) {
+            TransferDirectionModel(
+                originChip = originChip,
+                originChainLabel = resourceManager.getString(R.string.wallet_send_tokens_from, chainSymbol),
+                destinationChip = ChainChipModel(
+                    chainUi = mapChainToUi(destination.chain),
+                    changeable = true // we can always change between at least one cross chain transfer and on-chain one
+                )
             )
-
-            put(
-                TextHeader(resourceManager.getString(R.string.wallet_send_cross_chain)),
-                crossChainDestinationModels
+        } else {
+            TransferDirectionModel(
+                originChip = originChip,
+                originChainLabel = resourceManager.getString(R.string.wallet_send_tokens_on, chainSymbol),
+                destinationChip = null
             )
         }
     }
+
+    private suspend fun buildDestinationsMap(crossChainDestinations: List<CrossChainDirection>): Map<TextHeader, List<CrossChainDestinationModel>> {
+        val crossChainDestinationModels = crossChainDestinations.map {
+            CrossChainDestinationModel(
+                chainWithAsset = it.chainWithAsset,
+                chainUi = mapChainToUi(it.chainWithAsset.chain),
+                balance = it.balances?.let { asset -> mapAmountToAmountModel(asset.transferable, asset) }
+            )
+        }
+
+        val onChainDestinationModel = if (payload is SendPayload.SpecifiedOrigin) {
+            val origin = originChainWithAsset.first()
+
+            CrossChainDestinationModel(
+                chainWithAsset = origin,
+                chainUi = mapChainToUi(origin.chain),
+                balance = null
+            )
+        } else {
+            null
+        }
+
+        return buildMap {
+            onChainDestinationModel?.let {
+                put(TextHeader(resourceManager.getString(R.string.wallet_send_on_chain)), listOf(onChainDestinationModel))
+            }
+
+            put(TextHeader(resourceManager.getString(R.string.wallet_send_cross_chain)), crossChainDestinationModels)
+        }
+    }
+
+    private fun availableCrossChainDestinations(): Flow<List<CrossChainDirection>> {
+        return when (payload) {
+            is SendPayload.SpecifiedDestination -> availableInDirections()
+            is SendPayload.SpecifiedOrigin -> availableOutDirections()
+        }
+    }
+
+    private fun availableInDirections(): Flow<List<CrossChainDirection>> {
+        return crossChainTransfersUseCase.incomingCrossChainDirections(destinationAsset).mapList { incomingDirection ->
+            CrossChainDirection(
+                chainWithAsset = ChainWithAsset(incomingDirection.chain, incomingDirection.asset.token.configuration),
+                balances = incomingDirection.asset
+            )
+        }
+    }
+
+    private fun availableOutDirections(): Flow<List<CrossChainDirection>> {
+        return originAsset.flatMapLatest {
+            crossChainTransfersUseCase.outcomingCrossChainDirections(it).mapList { incomingDirection ->
+                CrossChainDirection(
+                    chainWithAsset = ChainWithAsset(incomingDirection.chain, incomingDirection.asset),
+                    balances = null
+                )
+            }
+        }
+    }
+
+    private class CrossChainDirection(
+        val chainWithAsset: ChainWithAsset,
+        val balances: Asset?
+    )
 }

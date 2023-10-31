@@ -12,4 +12,6 @@ interface SwapRouter : ReturnableRouter {
     fun selectAssetOut(selectedAsset: AssetPayload?)
 
     fun openSwapOptions()
+
+    fun openSendCrossChain(destination: AssetPayload, recipientAddress: String?)
 }

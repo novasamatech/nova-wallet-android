@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.SelectCrossChainDestinationBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
@@ -43,9 +42,9 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
 
     companion object {
 
-        fun getBundle(assetPayload: AssetPayload, recipientAddress: String? = null) = bundleOf(
+        fun getBundle(payload: SendPayload, recipientAddress: String? = null) = bundleOf(
             KEY_ADDRESS to recipientAddress,
-            KEY_ASSET_PAYLOAD to assetPayload
+            KEY_ASSET_PAYLOAD to payload
         )
     }
 
@@ -66,8 +65,6 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
 
         selectWallet.background = getRoundedCornerDrawable(cornerSizeDp = 8).withRippleMask(getRippleMask(cornerSizeDp = 8))
         selectWallet.setOnClickListener { viewModel.selectRecipientWallet() }
-
-        selectSendDestinationChain.setChangeable(true)
 
         selectSendCrossChainFee.makeGone() // gone inititally
         selectSendCrossChainFee.setTitle(R.string.wallet_send_cross_chain_fee)
@@ -112,11 +109,11 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
         }
 
         viewModel.transferDirectionModel.observe {
-            selectSendOriginChain.setChain(it.originChainUi)
+            selectSendOriginChain.setModel(it.originChip)
             selectSendFromTitle.text = it.originChainLabel
 
-            if (it.destinationChainUi != null) {
-                selectSendDestinationChain.setChain(it.destinationChainUi)
+            if (it.destinationChip != null) {
+                selectSendDestinationChain.setModel(it.destinationChip)
                 selectSendDestinationChain.makeVisible()
                 selectSendToTitle.makeVisible()
             } else {

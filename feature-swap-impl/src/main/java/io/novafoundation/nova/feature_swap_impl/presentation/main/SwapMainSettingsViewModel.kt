@@ -19,6 +19,8 @@ import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.nullOnStart
 import io.novafoundation.nova.common.view.SimpleAlertModel
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
@@ -114,6 +116,7 @@ class SwapMainSettingsViewModel(
     private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
     private val payload: SwapSettingsPayload,
     private val swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
 ) : BaseViewModel() {
 
     private val swapSettingState = async {
@@ -291,7 +294,20 @@ class SwapMainSettingsViewModel(
     }
 
     private fun onGetAssetInOptionSelected(option: GetAssetInOption) {
-        showMessage("Selected ${option.name}")
+        when(option) {
+            GetAssetInOption.RECEIVE -> showMessage("TODO")
+            GetAssetInOption.CROSS_CHAIN -> onCrossChainTransferSelected()
+            GetAssetInOption.BUY -> showMessage("TODO")
+        }
+    }
+
+    private fun onCrossChainTransferSelected() = launch {
+        val chainAssetIn = chainAssetIn.first() ?: return@launch
+        val assetInChain = originChainFlow.first()
+
+        val currentAddress = selectedAccountUseCase.getSelectedMetaAccount().addressIn(assetInChain)
+
+        swapRouter.openSendCrossChain(AssetPayload(chainAssetIn.chainId, chainAssetIn.id), currentAddress)
     }
 
     private fun initAssetIn() {

@@ -8,14 +8,15 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGroupedAssetsToUi
 import io.novafoundation.nova.feature_assets.presentation.flow.AssetFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import kotlinx.coroutines.flow.Flow
 
 class AssetSendFlowViewModel(
@@ -42,8 +43,8 @@ class AssetSendFlowViewModel(
 
     override fun assetClicked(assetModel: AssetModel) {
         val chainAsset = assetModel.token.configuration
-        val assePayload = AssetPayload(chainAsset.chainId, chainAsset.id)
-        router.openSend(assePayload)
+        val assetPayload = AssetPayload(chainAsset.chainId, chainAsset.id)
+        router.openSend(SendPayload.SpecifiedOrigin(assetPayload))
     }
 
     override fun mapAssets(assets: Map<AssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<Any> {

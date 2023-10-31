@@ -163,11 +163,9 @@ suspend fun ChainRegistry.asset(fullChainAssetId: FullChainAssetId): Chain.Asset
     return asset(fullChainAssetId.chainId, fullChainAssetId.assetId)
 }
 
-suspend fun ChainRegistry.assets(ids: Collection<FullChainAssetId>): List<Chain.Asset> {
-    val chains = chainsById()
-
+fun ChainsById.assets(ids: Collection<FullChainAssetId>): List<Chain.Asset> {
     return ids.map { (chainId, assetId) ->
-        chains.getValue(chainId).assetsById.getValue(assetId)
+        getValue(chainId).assetsById.getValue(assetId)
     }
 }
 
