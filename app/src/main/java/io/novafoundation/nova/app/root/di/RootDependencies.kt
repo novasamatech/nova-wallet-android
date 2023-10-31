@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_assets.data.buyToken.BuyTokenRegistry
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
@@ -41,8 +40,6 @@ interface RootDependencies {
     fun walletRepository(): WalletRepository
 
     fun appLinksProvider(): AppLinksProvider
-
-    fun buyTokenRegistry(): BuyTokenRegistry
 
     fun resourceManager(): ResourceManager
 

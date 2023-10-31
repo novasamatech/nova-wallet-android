@@ -1,11 +1,10 @@
-package io.novafoundation.nova.feature_assets.data.buyToken.providers
+package io.novafoundation.nova.feature_buy_impl.domain.providers
 
 import android.content.Context
 import android.net.Uri
 import io.novafoundation.nova.common.utils.appendNullableQueryParameter
 import io.novafoundation.nova.common.utils.showBrowser
-import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.data.buyToken.ExternalProvider
+import io.novafoundation.nova.feature_buy_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 private const val BLOCKCHAIN_KEY = "blockchain"

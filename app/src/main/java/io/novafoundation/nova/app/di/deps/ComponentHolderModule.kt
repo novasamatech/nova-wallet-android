@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureHolder
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureHolder
+import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
+import io.novafoundation.nova.feature_buy_impl.di.BuyFeatureHolder
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureHolder
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
@@ -199,4 +201,10 @@ interface ComponentHolderModule {
     @ClassKey(SwapFeatureApi::class)
     @IntoMap
     fun provideSwapFeature(holder: SwapFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(BuyFeatureApi::class)
+    @IntoMap
+    fun provideBuyFeature(holder: BuyFeatureHolder): FeatureApiHolder
 }

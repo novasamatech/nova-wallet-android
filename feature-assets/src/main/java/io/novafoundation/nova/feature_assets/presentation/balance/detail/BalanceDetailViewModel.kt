@@ -13,16 +13,14 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mapTokenToTokenModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
@@ -30,6 +28,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.balanceId
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -48,7 +48,7 @@ class BalanceDetailViewModel(
     private val sendInteractor: SendInteractor,
     private val router: AssetsRouter,
     private val assetPayload: AssetPayload,
-    buyMixinFactory: BuyMixinFactory,
+    buyMixinFactory: BuyMixin.Factory,
     private val transactionHistoryMixin: TransactionHistoryMixin,
     private val accountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,

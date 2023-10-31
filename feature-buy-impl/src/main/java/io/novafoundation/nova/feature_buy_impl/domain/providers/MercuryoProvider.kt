@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.data.buyToken.providers
+package io.novafoundation.nova.feature_buy_impl.domain.providers
 
 import android.content.Context
 import android.net.Uri
@@ -6,13 +6,11 @@ import io.novafoundation.nova.common.utils.appendNullableQueryParameter
 import io.novafoundation.nova.common.utils.sha512
 import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.common.utils.urlEncoded
-import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.data.buyToken.ExternalProvider
+import io.novafoundation.nova.feature_buy_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 
 private const val TYPE_BUY = "buy"
-
 private const val NETWORK_KEY = "network"
 
 class MercuryoProvider(

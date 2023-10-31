@@ -1,6 +1,7 @@
-package io.novafoundation.nova.feature_assets.data.buyToken
+package io.novafoundation.nova.feature_buy_impl.domain.providers
 
 import android.content.Context
+import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry
 
 interface ExternalProvider : BuyTokenRegistry.Provider<ExternalProvider.Integrator> {
 

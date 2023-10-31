@@ -1,15 +1,13 @@
-package io.novafoundation.nova.feature_assets.data.buyToken
+package io.novafoundation.nova.feature_buy_api.domain
 
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
-class BuyTokenRegistry(providers: List<Provider<*>>) {
+typealias BuyProvider = BuyTokenRegistry.Provider<*>
 
-    private val providerById = providers.associateBy(Provider<*>::id)
+interface BuyTokenRegistry {
 
-    fun availableProvidersFor(chainAsset: Chain.Asset) = providerById
-        .filterKeys { key -> chainAsset.buyProviders.containsKey(key) }
-        .map { it.value }
+    fun availableProvidersFor(chainAsset: Chain.Asset): List<Provider<*>>
 
     interface Provider<I : Integrator<*>> {
         val id: String

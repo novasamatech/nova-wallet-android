@@ -15,12 +15,11 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenI
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
-import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.setupBuyButton
-import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.setupBuyIntegration
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNotSupportedWarningBottomSheet
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.showState
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetaiActions
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailBack
@@ -49,6 +48,9 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
 
     @Inject
     lateinit var imageLoader: ImageLoader
+
+    @Inject
+    lateinit var buyMixinUi: BuyMixinUi
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -94,7 +96,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
     }
 
     override fun inject() {
-        val token = arguments!![KEY_TOKEN] as AssetPayload
+        val token = argument<AssetPayload>(KEY_TOKEN)
 
         FeatureUtils.getFeature<AssetsFeatureComponent>(
             requireContext(),
@@ -108,8 +110,8 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
     override fun subscribe(viewModel: BalanceDetailViewModel) {
         viewModel.state.observe(transfersContainer::showState)
 
-        setupBuyIntegration(mixin = viewModel.buyMixin)
-        setupBuyButton(buyButton = balanceDetaiActions.buy, viewModel.buyEnabled) {
+        buyMixinUi.setupBuyIntegration(this, viewModel.buyMixin)
+        buyMixinUi.setupBuyButton(this, balanceDetaiActions.buy, viewModel.buyEnabled) {
             viewModel.buyClicked()
         }
 
