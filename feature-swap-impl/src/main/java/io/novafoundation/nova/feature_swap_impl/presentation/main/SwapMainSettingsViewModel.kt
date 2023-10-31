@@ -195,10 +195,9 @@ class SwapMainSettingsViewModel(
         accumulate(amountInInput.fieldError, amountOutInput.fieldError),
         assetOutFlow,
         amountInInput.inputState,
-        amountOutInput.inputState
-    ) { fieldErrorStates, assetOut, amountIn, amountOut ->
-        formatButtonStates(fieldErrorStates, assetOut, amountIn, amountOut)
-    }
+        amountOutInput.inputState,
+        ::formatButtonStates
+    )
 
     val swapDirectionFlipped: MutableLiveData<Event<SwapDirection>> = MutableLiveData()
 

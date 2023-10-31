@@ -27,7 +27,6 @@ class CompoundFieldValidator(
     constructor(vararg validators: FieldValidator) : this(validators.toList())
 
     override fun observe(inputStream: Flow<String>): Flow<FieldValidationResult> {
-        // The negative side of this approach is that we run all validations despite one of them may be failed
         return validators.map { it.observe(inputStream) }
             .combine()
             .map {
