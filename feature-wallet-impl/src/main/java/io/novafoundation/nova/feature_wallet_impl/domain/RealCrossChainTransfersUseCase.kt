@@ -33,7 +33,7 @@ internal class RealCrossChainTransfersUseCase(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val computationalCache: ComputationalCache,
-): CrossChainTransfersUseCase {
+) : CrossChainTransfersUseCase {
 
     override fun incomingCrossChainDirections(destination: Flow<Chain.Asset?>): Flow<List<IncomingDirection>> {
         return withFlowScope { scope ->

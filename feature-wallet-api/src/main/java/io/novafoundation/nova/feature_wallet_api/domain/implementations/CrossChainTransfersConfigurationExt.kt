@@ -75,7 +75,7 @@ fun CrossChainTransfersConfiguration.availableInDestinations(destination: Chain.
             val hasDestination = originAssetTransfers.xcmTransfers
                 .any { it.type != XcmTransferType.UNKNOWN && it.destination.fullDestinationAssetId == requiredDestinationId }
 
-            FullChainAssetId(originChainId, originAssetTransfers.assetId).takeIf { hasDestination  }
+            FullChainAssetId(originChainId, originAssetTransfers.assetId).takeIf { hasDestination }
         }
     }
 }
@@ -181,7 +181,6 @@ private fun CrossChainTransfersConfiguration.originAssetLocationOf(assetTransfer
 private fun CrossChainTransfersConfiguration.outComingAssetTransfers(origin: Chain.Asset): CrossChainTransfersConfiguration.AssetTransfers? {
     return chains[origin.chainId]?.find { it.assetId == origin.id }
 }
-
 
 private val CrossChainTransfersConfiguration.XcmDestination.fullDestinationAssetId: FullChainAssetId
     get() = FullChainAssetId(chainId, assetId)

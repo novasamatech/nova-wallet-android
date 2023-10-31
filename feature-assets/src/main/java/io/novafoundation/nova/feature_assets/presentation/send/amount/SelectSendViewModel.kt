@@ -364,7 +364,7 @@ class SelectSendViewModel(
     ): TransferDirectionModel {
         return when (payload) {
             is SendPayload.SpecifiedDestination -> buildInTransferDirectionModel(availableCrossChainDestinations, origin, destination)
-            is SendPayload.SpecifiedOrigin ->  buildOutTransferDirectionModel(availableCrossChainDestinations, origin, destination)
+            is SendPayload.SpecifiedOrigin -> buildOutTransferDirectionModel(availableCrossChainDestinations, origin, destination)
         }
     }
 
@@ -486,7 +486,6 @@ class SelectSendViewModel(
             }
         }
     }
-
 
     private class CrossChainDirection(
         val chainWithAsset: ChainWithAsset,

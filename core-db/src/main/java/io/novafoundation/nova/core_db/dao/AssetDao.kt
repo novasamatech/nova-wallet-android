@@ -43,7 +43,6 @@ private const val RETRIEVE_ASSETS_SQL_META_ID = """
     WHERE ca.chainId || ':' || ca.id in (:joinedChainAndAssetIds)
 """
 
-
 interface AssetReadOnlyCache {
 
     fun observeSyncedAssets(metaId: Long): Flow<List<AssetWithToken>>
@@ -105,11 +104,11 @@ abstract class AssetDao : AssetReadOnlyCache {
     protected abstract fun observeJoinedAssets(metaId: Long, joinedChainAndAssetIds: Set<String>): Flow<List<AssetWithToken>>
 
     override fun observeAssets(metaId: Long, assetIds: Collection<AssetAndChainId>): Flow<List<AssetWithToken>> {
-       return flowOfAll {
-           val joinedChainAndAssetIds = assetIds.mapToSet { (chainId, assetId) -> "${chainId}:${assetId}" }
+        return flowOfAll {
+            val joinedChainAndAssetIds = assetIds.mapToSet { (chainId, assetId) -> "$chainId:$assetId" }
 
-           observeJoinedAssets(metaId, joinedChainAndAssetIds)
-       }
+            observeJoinedAssets(metaId, joinedChainAndAssetIds)
+        }
     }
 }
 

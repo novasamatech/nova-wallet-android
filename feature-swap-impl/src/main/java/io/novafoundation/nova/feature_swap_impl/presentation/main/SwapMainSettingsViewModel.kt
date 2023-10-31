@@ -294,7 +294,7 @@ class SwapMainSettingsViewModel(
     }
 
     private fun onGetAssetInOptionSelected(option: GetAssetInOption) {
-        when(option) {
+        when (option) {
             GetAssetInOption.RECEIVE -> showMessage("TODO")
             GetAssetInOption.CROSS_CHAIN -> onCrossChainTransferSelected()
             GetAssetInOption.BUY -> showMessage("TODO")
