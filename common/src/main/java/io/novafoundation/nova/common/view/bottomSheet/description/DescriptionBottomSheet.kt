@@ -2,10 +2,7 @@ package io.novafoundation.nova.common.view.bottomSheet.description
 
 import android.content.Context
 import android.os.Bundle
-import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.base.BaseFragment
-import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import kotlinx.android.synthetic.main.bottom_sheet_description.sheetDescriptionDetails

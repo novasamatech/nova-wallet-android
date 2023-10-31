@@ -133,7 +133,7 @@ interface CommonApi {
     fun rootScope(): RootScope
 
     fun bakingParallaxCardCache(): BackingParallaxCardLruCache
-    
+
     fun descriptionBottomSheetLauncher(): DescriptionBottomSheetLauncher
 
     val systemCallExecutor: SystemCallExecutor
