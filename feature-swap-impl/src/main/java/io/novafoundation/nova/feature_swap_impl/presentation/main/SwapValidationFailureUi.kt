@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.NotEnoughFunds
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin
 import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.amountIsTooBig
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpikeDetected
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
@@ -202,8 +203,8 @@ fun CoroutineScope.handleErrorToSwapMin(
             title = resourceManager.getString(R.string.swap_too_low_amount_to_stay_abow_ed_title),
             message = resourceManager.getString(
                 R.string.swap_too_low_amount_to_stay_abow_ed_message,
-                reason.amount.formatTokenAmount(reason.asset),
-                reason.existentialDeposit.formatTokenAmount(reason.asset),
+                reason.amountInPlanks.formatPlanks(reason.asset),
+                reason.existentialDeposit.formatPlanks(reason.asset),
             ),
             customStyle = R.style.AccentAlertDialogTheme,
             okAction = CustomDialogDisplayer.Payload.DialogAction(
@@ -211,7 +212,8 @@ fun CoroutineScope.handleErrorToSwapMin(
                 action = {
                     launch {
                         amountOutInputMixin.requestFocusLiveData.sendEvent()
-                        amountOutInputMixin.setAmount(reason.existentialDeposit)
+                        val existentialDepositAmount = reason.asset.amountFromPlanks(reason.existentialDeposit)
+                        amountOutInputMixin.setAmount(existentialDepositAmount)
                     }
                 }
             ),

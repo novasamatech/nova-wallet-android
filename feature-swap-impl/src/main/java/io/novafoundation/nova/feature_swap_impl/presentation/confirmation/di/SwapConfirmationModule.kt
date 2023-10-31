@@ -9,7 +9,14 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.SwapRateFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationViewModel
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class SwapConfirmationModule {
@@ -17,8 +24,26 @@ class SwapConfirmationModule {
     @Provides
     @IntoMap
     @ViewModelKey(SwapConfirmationViewModel::class)
-    fun provideViewModel(resourceManager: ResourceManager): ViewModel {
-        return SwapConfirmationViewModel(resourceManager)
+    fun provideViewModel(
+        resourceManager: ResourceManager,
+        swapConfirmationPayload: SwapConfirmationPayload,
+        walletRepository: WalletRepository,
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+        swapRateFormatter: SwapRateFormatter,
+        priceImpactFormatter: PriceImpactFormatter,
+        walletUiUseCase: WalletUiUseCase
+    ): ViewModel {
+        return SwapConfirmationViewModel(
+            resourceManager,
+            swapConfirmationPayload,
+            walletRepository,
+            accountRepository,
+            chainRegistry,
+            swapRateFormatter,
+            priceImpactFormatter,
+            walletUiUseCase
+        )
     }
 
     @Provides

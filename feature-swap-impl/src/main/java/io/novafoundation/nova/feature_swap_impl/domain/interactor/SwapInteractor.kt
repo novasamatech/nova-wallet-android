@@ -66,7 +66,7 @@ class SwapInteractor(
             .drop(1) // skip immediate value from the cache to not perform double-quote on chain change
     }
 
-    suspend fun validationSystem(chainId: ChainId): SwapValidationSystem {
+    fun validationSystem(): SwapValidationSystem {
         val sharedQuoteValidationRetriever = SharedQuoteValidationRetriever(swapService)
 
         return ValidationSystem {
@@ -115,12 +115,12 @@ class SwapInteractor(
             detailedAssetIn = SwapValidationPayload.SwapAssetData(
                 chain = chainIn,
                 asset = walletRepository.getAsset(metaAccount.id, assetIn) ?: return null,
-                amount = assetIn.amountFromPlanks(swapQuote.planksIn)
+                amountInPlanks = swapQuote.planksIn
             ),
             detailedAssetOut = SwapValidationPayload.SwapAssetData(
                 chain = chainOut,
                 asset = walletRepository.getAsset(metaAccount.id, assetOut) ?: return null,
-                amount = assetOut.amountFromPlanks(swapQuote.planksOut)
+                amountInPlanks = swapQuote.planksOut
             ),
             slippage = swapSettings.slippage,
             feeAsset = walletRepository.getAsset(metaAccount.id, feeChainAsset) ?: return null,

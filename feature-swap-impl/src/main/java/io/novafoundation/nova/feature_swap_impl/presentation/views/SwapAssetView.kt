@@ -39,14 +39,14 @@ class SwapAssetView @JvmOverloads constructor(
     }
 
     fun setModel(model: Model) {
-        setAssetImageUrl(model.assetImageUrl)
+        setAssetImageUrl(model.assetIcon)
         setAmount(model.amount)
         setNetwork(model.networkImage, model.networkName)
     }
 
-    private fun setAssetImageUrl(imageUrl: String) {
+    private fun setAssetImageUrl(icon: Icon) {
         swapAssetImage.setImageTint(context.getColor(R.color.icon_primary))
-        swapAssetImage.loadTokenIcon(imageUrl, imageLoader)
+        swapAssetImage.setIcon(icon, imageLoader)
         swapAssetImage.setBackgroundResource(R.drawable.bg_token_container)
     }
 
@@ -61,7 +61,7 @@ class SwapAssetView @JvmOverloads constructor(
     }
 
     class Model(
-        val assetImageUrl: String,
+        val assetIcon: Icon,
         val amount: AmountModel,
         val networkImage: Icon,
         val networkName: String

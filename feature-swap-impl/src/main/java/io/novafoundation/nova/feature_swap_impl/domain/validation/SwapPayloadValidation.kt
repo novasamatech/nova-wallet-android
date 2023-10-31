@@ -28,7 +28,7 @@ data class SwapValidationPayload(
     data class SwapAssetData(
         val chain: Chain,
         val asset: Asset,
-        val amount: BigDecimal
+        val amountInPlanks: BigInteger
     )
 }
 
@@ -37,7 +37,7 @@ val SwapValidationPayload.isFeePayingByAssetIn: Boolean
 
 val SwapValidationPayload.swapAmountInFeeToken: BigInteger
     get() = if (isFeePayingByAssetIn) {
-        detailedAssetIn.asset.token.planksFromAmount(detailedAssetIn.amount)
+        detailedAssetIn.amountInPlanks
     } else {
         BigInteger.ZERO
     }

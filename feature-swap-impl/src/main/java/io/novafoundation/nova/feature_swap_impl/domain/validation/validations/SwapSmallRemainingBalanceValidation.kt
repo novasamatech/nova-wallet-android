@@ -27,7 +27,7 @@ class SwapSmallRemainingBalanceValidation(
 
         val assetInTotal = value.detailedAssetIn.asset.totalInPlanks
         val toBuyAmountToKeepEDInFeeAsset = value.toBuyAmountToKeepMainEDInFeeAsset
-        val swapAmount = chainAssetIn.planksFromAmount(value.detailedAssetIn.amount)
+        val swapAmount = value.detailedAssetIn.amountInPlanks
         val assetInExistentialDeposit = assetBalances.existentialDeposit(chainIn, chainAssetIn)
         val totalDeductedAmount = value.totalDeductedAmountInFeeToken
         val remainingBalance = assetInTotal - swapAmount - totalDeductedAmount

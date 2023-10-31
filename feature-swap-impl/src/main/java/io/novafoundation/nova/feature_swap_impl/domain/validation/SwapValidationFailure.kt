@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeChangeDete
 import io.novafoundation.nova.feature_wallet_api.domain.validation.NotEnoughToPayFeesError
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
+import java.math.BigInteger
 
 sealed class SwapValidationFailure {
 
@@ -38,8 +39,8 @@ sealed class SwapValidationFailure {
 
     class AmountOutIsTooLowToStayAboveED(
         val asset: Chain.Asset,
-        val amount: BigDecimal,
-        val existentialDeposit: BigDecimal
+        val amountInPlanks: BigInteger,
+        val existentialDeposit: BigInteger
     ) : SwapValidationFailure()
 
     sealed class InsufficientBalance : SwapValidationFailure() {
