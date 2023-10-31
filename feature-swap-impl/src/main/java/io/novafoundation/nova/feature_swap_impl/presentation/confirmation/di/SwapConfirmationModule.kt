@@ -11,7 +11,9 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationViewModel
@@ -25,6 +27,7 @@ class SwapConfirmationModule {
     @IntoMap
     @ViewModelKey(SwapConfirmationViewModel::class)
     fun provideViewModel(
+        swapInteractor: SwapInteractor,
         resourceManager: ResourceManager,
         swapConfirmationPayload: SwapConfirmationPayload,
         walletRepository: WalletRepository,
@@ -32,9 +35,11 @@ class SwapConfirmationModule {
         chainRegistry: ChainRegistry,
         swapRateFormatter: SwapRateFormatter,
         priceImpactFormatter: PriceImpactFormatter,
-        walletUiUseCase: WalletUiUseCase
+        walletUiUseCase: WalletUiUseCase,
+        slippageAlertMixinFactory: SlippageAlertMixinFactory
     ): ViewModel {
         return SwapConfirmationViewModel(
+            swapInteractor,
             resourceManager,
             swapConfirmationPayload,
             walletRepository,
@@ -42,7 +47,8 @@ class SwapConfirmationModule {
             chainRegistry,
             swapRateFormatter,
             priceImpactFormatter,
-            walletUiUseCase
+            walletUiUseCase,
+            slippageAlertMixinFactory
         )
     }
 

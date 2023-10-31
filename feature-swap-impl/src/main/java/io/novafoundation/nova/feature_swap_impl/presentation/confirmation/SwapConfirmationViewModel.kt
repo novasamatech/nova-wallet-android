@@ -15,7 +15,9 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.chain.icon
 import io.novafoundation.nova.feature_swap_impl.R
+import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationPayload.AmountWithAsset
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.model.SwapConfirmationDetailsModel
@@ -33,20 +35,27 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class SwapConfirmationViewModel(
+    private val swapInteractor: SwapInteractor,
     private val resourceManager: ResourceManager,
-    private val swapConfirmationPayload: SwapConfirmationPayload,
+    private val payload: SwapConfirmationPayload,
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
     private val swapRateFormatter: SwapRateFormatter,
     private val priceImpactFormatter: PriceImpactFormatter,
-    private val walletUiUseCase: WalletUiUseCase
+    private val walletUiUseCase: WalletUiUseCase,
+    private val slippageAlertMixinFactory: SlippageAlertMixinFactory
 ) : BaseViewModel() {
+
+    private val slippageConfigFlow = flowOf { swapInteractor.slippageConfig(payload.amountWithAssetIn.assetPayload.chainId) }
+        .filterNotNull()
+    private val slippageFlow = flowOf { payload.slippage.asPerbill().toPercent() }
+    
+    private val slippageAlertMixin = slippageAlertMixinFactory.create(slippageConfigFlow, slippageFlow)
 
     val swapDetails = MutableStateFlow<SwapConfirmationDetailsModel?>(null)
 
@@ -56,6 +65,8 @@ class SwapConfirmationViewModel(
     val account: Flow<AddressModel> = flowOf {
         AddressModel("J6b7XsdA42gafKso3gSsd9KsapTtASfr2z4rPt", resourceManager.getDrawable(R.drawable.ic_nova_logo))
     }
+
+    val slippageAlertMessage: Flow<String?> = slippageAlertMixin.slippageAlertMessage
 
     init {
         launch {
@@ -89,15 +100,15 @@ class SwapConfirmationViewModel(
 
     private suspend fun initPayload() {
         val metaAccount = accountRepository.getSelectedMetaAccount()
-        val chainWithAssetIn = getChainWithAsset(swapConfirmationPayload.amountWithAssetIn.assetPayload)
-        val chainWithAssetOut = getChainWithAsset(swapConfirmationPayload.amountWithAssetOut.assetPayload)
+        val chainWithAssetIn = getChainWithAsset(payload.amountWithAssetIn.assetPayload)
+        val chainWithAssetOut = getChainWithAsset(payload.amountWithAssetOut.assetPayload)
         swapDetails.value = SwapConfirmationDetailsModel(
-            assetInDetails = formatAssetDetails(metaAccount, chainWithAssetIn, swapConfirmationPayload.amountWithAssetIn.amount),
-            assetOutDetails = formatAssetDetails(metaAccount, chainWithAssetOut, swapConfirmationPayload.amountWithAssetOut.amount),
-            rate = formatRate(swapConfirmationPayload.rate, chainWithAssetIn.asset, chainWithAssetOut.asset),
-            priceDifference = formatPriceDifference(swapConfirmationPayload.priceDifference.asPerbill()),
-            slippage = swapConfirmationPayload.slippage.asPerbill().format(),
-            networkFee = formatNetworkFee(metaAccount, swapConfirmationPayload.networkFee)
+            assetInDetails = formatAssetDetails(metaAccount, chainWithAssetIn, payload.amountWithAssetIn.amount),
+            assetOutDetails = formatAssetDetails(metaAccount, chainWithAssetOut, payload.amountWithAssetOut.amount),
+            rate = formatRate(payload.rate, chainWithAssetIn.asset, chainWithAssetOut.asset),
+            priceDifference = formatPriceDifference(payload.priceDifference.asPerbill()),
+            slippage = payload.slippage.asPerbill().format(),
+            networkFee = formatNetworkFee(metaAccount, payload.networkFee)
         )
     }
 

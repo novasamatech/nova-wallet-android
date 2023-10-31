@@ -8,6 +8,7 @@ import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.view.setTextOrHide
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.view.showAddress
@@ -16,6 +17,7 @@ import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAccount
+import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAlert
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAssetFrom
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAssetTo
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationButton
@@ -75,5 +77,7 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
 
         viewModel.wallet.observe { swapConfirmationWallet.showWallet(it) }
         viewModel.account.observe { swapConfirmationAccount.showAddress(it) }
+
+        viewModel.slippageAlertMessage.observe { swapConfirmationAlert.setTextOrHide(it) }
     }
 }

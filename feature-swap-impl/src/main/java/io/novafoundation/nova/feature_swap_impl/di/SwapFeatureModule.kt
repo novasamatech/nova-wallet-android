@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreShared
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealPriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealSwapRateFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SwapRateFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
@@ -97,6 +98,12 @@ class SwapFeatureModule {
     @FeatureScope
     fun provideSwapRateFormatter(): SwapRateFormatter {
         return RealSwapRateFormatter()
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSlippageAlertMixinFactory(resourceManager: ResourceManager): SlippageAlertMixinFactory {
+        return SlippageAlertMixinFactory(resourceManager)
     }
 
     @Provides

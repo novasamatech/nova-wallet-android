@@ -15,10 +15,11 @@
         app:titleText="@string/wallet_asset_swap" />
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginTop="12dp"
+        android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@+id/swapConfirmationToolbar">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -47,22 +48,22 @@
             <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_arrow_right"
-                android:padding="8dp"
                 android:background="@drawable/bg_secondary_background_circle"
-                app:tint="@color/icon_secondary"
+                android:padding="8dp"
+                android:src="@drawable/ic_arrow_right"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/swapConfirmationAssetTo"
                 app:layout_constraintStart_toEndOf="@+id/swapConfirmationAssetFrom"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/icon_secondary" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <io.novafoundation.nova.common.view.TableView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginHorizontal="16dp">
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp">
 
             <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/swapConfirmationRate"
@@ -97,8 +98,8 @@
         <io.novafoundation.nova.common.view.TableView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginHorizontal="16dp">
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp">
 
             <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/swapConfirmationWallet"
@@ -110,12 +111,22 @@
                 android:id="@+id/swapConfirmationAccount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/swap_account_title"
-                app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"/>
+                app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
+                app:title="@string/swap_account_title" />
 
         </io.novafoundation.nova.common.view.TableView>
 
     </LinearLayout>
+
+    <io.novafoundation.nova.common.view.AlertView
+        android:id="@+id/swapConfirmationAlert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        app:alertMode="warning"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        tools:layout_editor_absoluteX="16dp" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/swapConfirmationButton"
