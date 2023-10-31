@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.presentation.main
+package io.novafoundation.nova.feature_swap_impl.presentation.main.view
 
 import android.content.Context
 import android.os.Bundle

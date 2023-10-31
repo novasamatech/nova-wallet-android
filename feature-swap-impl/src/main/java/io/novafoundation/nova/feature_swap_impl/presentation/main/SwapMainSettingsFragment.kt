@@ -17,6 +17,8 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.setupSwapAmountInput
+import io.novafoundation.nova.feature_swap_impl.presentation.main.view.FeeAssetSelectorBottomSheet
+import io.novafoundation.nova.feature_swap_impl.presentation.main.view.GetAssetInBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsContinue
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetails
@@ -64,6 +66,8 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         swapMainSettingsDetailsRate.setOnClickListener { viewModel.rateDetailsClicked() }
         swapMainSettingsDetailsNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
         swapMainSettingsContinue.setOnClickListener { viewModel.confirmButtonClicked() }
+
+        swapMainSettingsGetAssetIn.setOnClickListener { viewModel.getAssetInClicked() }
     }
 
     override fun inject() {
@@ -119,5 +123,14 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         }
 
         viewModel.getAssetInOptionsButtonState.observe(swapMainSettingsGetAssetIn::setState)
+
+        viewModel.selectGetAssetInOption.awaitableActionLiveData.observeEvent {
+            GetAssetInBottomSheet(
+                context = requireContext(),
+                onCancel = it.onCancel,
+                payload = it.payload,
+                onClicked = it.onSuccess
+            ).show()
+        }
     }
 }

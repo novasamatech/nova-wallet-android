@@ -33,10 +33,13 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsSt
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
+import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.main.view.FeeAssetSelectorBottomSheet
+import io.novafoundation.nova.feature_swap_impl.presentation.main.view.GetAssetInBottomSheet
 import io.novafoundation.nova.feature_swap_impl.presentation.state.swapSettingsFlow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -110,7 +113,7 @@ class SwapMainSettingsViewModel(
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
     private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
     private val payload: SwapSettingsPayload,
-    private val swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory
+    private val swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
 ) : BaseViewModel() {
 
     private val swapSettingState = async {
@@ -119,6 +122,11 @@ class SwapMainSettingsViewModel(
 
     private val swapSettings = swapSettingsStateProvider.swapSettingsFlow(viewModelScope)
         .share()
+
+    private val chainAssetIn = swapSettings
+        .map { it.assetIn }
+        .distinctUntilChanged()
+        .shareInBackground()
 
     private val quotingState = MutableStateFlow<QuotingState>(QuotingState.NotAvailable)
 
@@ -185,16 +193,14 @@ class SwapMainSettingsViewModel(
         .map(::prepareMinimumBalanceBuyInAlertIfNeeded)
         .shareInBackground()
 
-    val canChangeFeeToken = swapSettings.map { it.assetIn }
-        .distinctUntilChanged()
+    val canChangeFeeToken = chainAssetIn
         .map(::isEditFeeTokenAvailable)
         .shareInBackground()
 
     val changeFeeTokenEvent = actionAwaitableFactory.create<FeeAssetSelectorBottomSheet.Payload, Chain.Asset>()
 
-    private val getAssetInOptions = swapInteractor.availableGetAssetInOptionsFlow(
-        chainAssetFlow = swapSettings.map { it.assetIn }.distinctUntilChanged()
-    ).shareInBackground()
+    private val getAssetInOptions = swapInteractor.availableGetAssetInOptionsFlow(chainAssetIn)
+        .shareInBackground()
 
     val getAssetInOptionsButtonState = combine(assetInFlow, getAssetInOptions, amountInInput.amountState) { assetIn, getAssetInOptions, amountState ->
         val amount = amountState.value
@@ -212,6 +218,8 @@ class SwapMainSettingsViewModel(
     }
         .onStart { emit(DescriptiveButtonState.Gone) }
         .shareInBackground()
+
+    val selectGetAssetInOption = actionAwaitableFactory.create<GetAssetInBottomSheet.Payload, GetAssetInOption>()
 
     init {
         initAssetIn()
@@ -265,8 +273,25 @@ class SwapMainSettingsViewModel(
         applyFlipToUi(previousSettings, newSettings)
     }
 
+    fun getAssetInClicked() = launch {
+        val assetIn = chainAssetIn.first() ?: return@launch
+        val availableOptions = getAssetInOptions.first()
+
+        val payload = GetAssetInBottomSheet.Payload(
+            chainAsset = assetIn,
+            availableOptions = availableOptions
+        )
+
+        val selectedOption = selectGetAssetInOption.awaitAction(payload)
+        onGetAssetInOptionSelected(selectedOption)
+    }
+
     fun backClicked() {
         swapRouter.back()
+    }
+
+    private fun onGetAssetInOptionSelected(option: GetAssetInOption) {
+        showMessage("Selected ${option.name}")
     }
 
     private fun initAssetIn() {

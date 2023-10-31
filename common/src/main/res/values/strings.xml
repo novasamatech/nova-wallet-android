@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="wallet_cross_chain_transfer">Cross-chain transfer</string>
+
+    <string name="common_hexadecimal_string">Hexadecimal string</string>
+
+    <string name="swap_get_token_using">Get %s using</string>
+    <string name="swap_get_token_cross_chain_description">Transfer %s from another network</string>
+    <string name="swap_get_token_receive_description">Receive %s with QR or your address</string>
+    <string name="swap_get_token_buy_description">Instantly buy %s with a credit card</string>
+
     <string name="common_get_token_format">Get %s</string>
 
     <string name="swap_custom_fee_selector_description">Token for paying network fee</string>
