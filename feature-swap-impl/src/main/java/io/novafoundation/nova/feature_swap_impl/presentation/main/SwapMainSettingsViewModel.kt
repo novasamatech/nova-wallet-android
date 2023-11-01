@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
+import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.CompoundNumberFormatter
 import io.novafoundation.nova.common.utils.formatting.DynamicPrecisionFormatter
@@ -21,6 +22,7 @@ import io.novafoundation.nova.common.utils.nullOnStart
 import io.novafoundation.nova.common.view.SimpleAlertModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
@@ -117,6 +119,7 @@ class SwapMainSettingsViewModel(
     private val payload: SwapSettingsPayload,
     private val swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
     private val selectedAccountUseCase: SelectedAccountUseCase,
+    private val buyMixinFactory: BuyMixin.Factory
 ) : BaseViewModel() {
 
     private val swapSettingState = async {
@@ -160,6 +163,8 @@ class SwapMainSettingsViewModel(
             initialStatusValue = FeeStatus.NoFee
         )
     )
+
+    val buyMixin = buyMixinFactory.create(viewModelScope)
 
     val amountInInput = swapAmountInputMixinFactory.create(
         coroutineScope = viewModelScope,
@@ -297,7 +302,7 @@ class SwapMainSettingsViewModel(
         when (option) {
             GetAssetInOption.RECEIVE -> showMessage("TODO")
             GetAssetInOption.CROSS_CHAIN -> onCrossChainTransferSelected()
-            GetAssetInOption.BUY -> showMessage("TODO")
+            GetAssetInOption.BUY -> buySelected()
         }
     }
 
@@ -308,6 +313,11 @@ class SwapMainSettingsViewModel(
         val currentAddress = selectedAccountUseCase.getSelectedMetaAccount().addressIn(assetInChain)
 
         swapRouter.openSendCrossChain(AssetPayload(chainAssetIn.chainId, chainAssetIn.id), currentAddress)
+    }
+
+    private fun buySelected() = launch {
+        val chainAssetIn = chainAssetIn.firstNotNull() ?: return@launch
+        buyMixin.buyClicked(chainAssetIn)
     }
 
     private fun initAssetIn() {

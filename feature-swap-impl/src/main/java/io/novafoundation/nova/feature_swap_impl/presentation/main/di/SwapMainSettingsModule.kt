@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
@@ -57,7 +58,8 @@ class SwapMainSettingsModule {
         payload: SwapSettingsPayload,
         swapUpdateSystemFactory: SwapUpdateSystemFactory,
         swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
-        accountUseCase: SelectedAccountUseCase
+        accountUseCase: SelectedAccountUseCase,
+        buyMixinFactory: BuyMixin.Factory
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -72,7 +74,8 @@ class SwapMainSettingsModule {
             payload = payload,
             swapUpdateSystemFactory = swapUpdateSystemFactory,
             swapInputMixinPriceImpactFiatFormatterFactory = swapInputMixinPriceImpactFiatFormatterFactory,
-            selectedAccountUseCase = accountUseCase
+            selectedAccountUseCase = accountUseCase,
+            buyMixinFactory = buyMixinFactory
         )
     }
 
