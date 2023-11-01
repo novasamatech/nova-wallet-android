@@ -29,7 +29,7 @@ fun ValidationSystem.Companion.voteReferendumValidationSystem(
         error = { payload, leftForFees ->
             VoteReferendumValidationFailure.NotEnoughToPayFees(
                 chainAsset = payload.asset.token.configuration,
-                availableToPayFees = leftForFees,
+                maxUsable = leftForFees,
                 fee = payload.fee
             )
         }

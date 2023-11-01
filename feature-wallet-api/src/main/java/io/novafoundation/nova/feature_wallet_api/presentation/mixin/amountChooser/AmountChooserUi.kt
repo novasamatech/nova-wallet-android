@@ -16,6 +16,8 @@ interface AmountInputView {
     val amountInput: EditText
 
     fun setFiatAmount(fiat: CharSequence?)
+
+    fun setError(errorState: AmountChooserMixinBase.AmountErrorState)
 }
 
 interface MaxAvailableView {
@@ -55,6 +57,11 @@ fun BaseFragment<*>.setupAmountChooserBase(
 ) {
     amountInputView.amountInput.bindToAmountInput(mixin.inputState, lifecycleScope)
     mixin.fiatAmount.observe(amountInputView::setFiatAmount)
+    mixin.fieldError.observe(amountInputView::setError)
+
+    mixin.requestFocusLiveData.observeEvent {
+        amountInputView.amountInput.requestFocus()
+    }
 
     if (maxAvailableView == null) return
 

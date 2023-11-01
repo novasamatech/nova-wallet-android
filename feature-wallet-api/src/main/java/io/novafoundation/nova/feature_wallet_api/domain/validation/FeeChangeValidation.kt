@@ -15,8 +15,9 @@ import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
-import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -24,11 +25,11 @@ import java.math.BigDecimal
 
 private val FEE_RATIO_THRESHOLD = 1.5.toBigDecimal()
 
-class FeeChangeValidation<P, E>(
-    private val calculateFee: suspend (P) -> DecimalFee,
+class FeeChangeValidation<P, E, F : GenericFee>(
+    private val calculateFee: suspend (P) -> GenericDecimalFee<F>,
     private val currentFee: (P) -> BigDecimal,
     private val chainAsset: (P) -> Chain.Asset,
-    private val error: (FeeChangeDetectedFailure.Payload) -> E
+    private val error: (FeeChangeDetectedFailure.Payload<F>) -> E
 ) : Validation<P, E> {
 
     override suspend fun validate(value: P): ValidationStatus<E> {
@@ -50,31 +51,45 @@ class FeeChangeValidation<P, E>(
     }
 }
 
-interface FeeChangeDetectedFailure {
+interface FeeChangeDetectedFailure<T : GenericFee> {
 
-    class Payload(
+    class Payload<T : GenericFee>(
         val needsUserAttention: Boolean,
         val oldFee: BigDecimal,
-        val newFee: DecimalFee,
+        val newFee: GenericDecimalFee<T>,
         val chainAsset: Chain.Asset,
     )
 
-    val payload: Payload
+    val payload: Payload<T>
 }
 
-fun <P, E> ValidationSystemBuilder<P, E>.checkForFeeChanges(
+fun <P, E> ValidationSystemBuilder<P, E>.checkForSimpleFeeChanges(
     calculateFee: suspend (P) -> Fee,
     currentFee: (P) -> BigDecimal,
     chainAsset: (P) -> Chain.Asset,
-    error: (FeeChangeDetectedFailure.Payload) -> E
+    error: (FeeChangeDetectedFailure.Payload<SimpleFee>) -> E
+) {
+    checkForFeeChanges(
+        calculateFee = { payload -> SimpleFee(calculateFee(payload)) },
+        currentFee = currentFee,
+        chainAsset = chainAsset,
+        error = error
+    )
+}
+
+fun <P, E, F : GenericFee> ValidationSystemBuilder<P, E>.checkForFeeChanges(
+    calculateFee: suspend (P) -> F,
+    currentFee: (P) -> BigDecimal,
+    chainAsset: (P) -> Chain.Asset,
+    error: (FeeChangeDetectedFailure.Payload<F>) -> E
 ) = validate(
     FeeChangeValidation(
         calculateFee = { payload ->
             val newFee = calculateFee(payload)
 
-            DecimalFee(
-                genericFee = SimpleFee(newFee),
-                networkFeeDecimalAmount = chainAsset(payload).amountFromPlanks(newFee.amount)
+            GenericDecimalFee(
+                genericFee = calculateFee(payload),
+                networkFeeDecimalAmount = chainAsset(payload).amountFromPlanks(newFee.networkFee.amount)
             )
         },
         currentFee = currentFee,
@@ -83,11 +98,23 @@ fun <P, E> ValidationSystemBuilder<P, E>.checkForFeeChanges(
     )
 )
 
-fun CoroutineScope.handleFeeSpikeDetected(
-    error: FeeChangeDetectedFailure,
+fun <T : GenericFee> CoroutineScope.handleFeeSpikeDetected(
+    error: FeeChangeDetectedFailure<T>,
     resourceManager: ResourceManager,
     feeLoaderMixin: FeeLoaderMixin.Presentation,
     actions: ValidationFlowActions<*>
+): TransformedFailure? = handleFeeSpikeDetected(
+    error = error,
+    resourceManager = resourceManager,
+    actions = actions,
+    setFee = { feeLoaderMixin.setFee(it.newFee.fee) }
+)
+
+fun <T : GenericFee> CoroutineScope.handleFeeSpikeDetected(
+    error: FeeChangeDetectedFailure<T>,
+    resourceManager: ResourceManager,
+    actions: ValidationFlowActions<*>,
+    setFee: suspend (error: FeeChangeDetectedFailure.Payload<T>) -> Unit,
 ): TransformedFailure? {
     if (!error.payload.needsUserAttention) {
         actions.resumeFlow()
@@ -107,8 +134,7 @@ fun CoroutineScope.handleFeeSpikeDetected(
                 title = resourceManager.getString(R.string.common_proceed),
                 action = {
                     launch {
-                        feeLoaderMixin.setFee(error.payload.newFee.fee)
-
+                        setFee(error.payload)
                         actions.resumeFlow()
                     }
                 }
@@ -117,7 +143,7 @@ fun CoroutineScope.handleFeeSpikeDetected(
                 title = resourceManager.getString(R.string.common_refresh_fee),
                 action = {
                     launch {
-                        feeLoaderMixin.setFee(error.payload.newFee.fee)
+                        setFee(error.payload)
                     }
                 }
             )

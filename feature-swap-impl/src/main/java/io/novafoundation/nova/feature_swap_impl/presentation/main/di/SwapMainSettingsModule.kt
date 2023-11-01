@@ -11,17 +11,24 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
+import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsViewModel
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -43,6 +50,28 @@ class SwapMainSettingsModule {
     ) = SwapInputMixinPriceImpactFiatFormatterFactory(priceImpactFormatter)
 
     @Provides
+    @ScreenScope
+    fun provideLiquidityFieldValidatorFactory(resourceManager: ResourceManager): LiquidityFieldValidatorFactory {
+        return LiquidityFieldValidatorFactory(resourceManager)
+    }
+
+    @Provides
+    @ScreenScope
+    fun provideEnoughAmountToSwapValidatorFactory(resourceManager: ResourceManager): EnoughAmountToSwapValidatorFactory {
+        return EnoughAmountToSwapValidatorFactory(resourceManager)
+    }
+
+    @Provides
+    @ScreenScope
+    fun provideSwapAmountAboveEDFieldValidatorFactory(
+        resourceManager: ResourceManager,
+        chainRegistry: ChainRegistry,
+        assetSourceRegistry: AssetSourceRegistry
+    ): SwapReceiveAmountAboveEDFieldValidatorFactory {
+        return SwapReceiveAmountAboveEDFieldValidatorFactory(resourceManager, chainRegistry, assetSourceRegistry)
+    }
+
+    @Provides
     @IntoMap
     @ViewModelKey(SwapMainSettingsViewModel::class)
     fun provideViewModel(
@@ -55,11 +84,17 @@ class SwapMainSettingsModule {
         assetUseCase: ArbitraryAssetUseCase,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        liquidityFieldValidatorFactory: LiquidityFieldValidatorFactory,
+        enoughAmountToSwapValidatorFactory: EnoughAmountToSwapValidatorFactory,
+        swapReceiveAmountAboveEDFieldValidatorFactory: SwapReceiveAmountAboveEDFieldValidatorFactory,
         payload: SwapSettingsPayload,
         swapUpdateSystemFactory: SwapUpdateSystemFactory,
         swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
         accountUseCase: SelectedAccountUseCase,
-        buyMixinFactory: BuyMixin.Factory
+        buyMixinFactory: BuyMixin.Factory,
+        lastQuoteStoreSharedStateProvider: LastQuoteStoreSharedStateProvider,
+        validationExecutor: ValidationExecutor,
+        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -74,6 +109,12 @@ class SwapMainSettingsModule {
             payload = payload,
             swapUpdateSystemFactory = swapUpdateSystemFactory,
             swapInputMixinPriceImpactFiatFormatterFactory = swapInputMixinPriceImpactFiatFormatterFactory,
+            lastQuoteStoreSharedStateProvider = lastQuoteStoreSharedStateProvider,
+            validationExecutor = validationExecutor,
+            liquidityFieldValidatorFactory = liquidityFieldValidatorFactory,
+            enoughAmountToSwapValidatorFactory = enoughAmountToSwapValidatorFactory,
+            swapReceiveAmountAboveEDFieldValidatorFactory = swapReceiveAmountAboveEDFieldValidatorFactory,
+            descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             selectedAccountUseCase = accountUseCase,
             buyMixinFactory = buyMixinFactory
         )

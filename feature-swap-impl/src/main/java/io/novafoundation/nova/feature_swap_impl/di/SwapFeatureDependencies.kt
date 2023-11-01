@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -97,6 +98,8 @@ interface SwapFeatureDependencies {
     val assetSourceRegistry: AssetSourceRegistry
 
     val chainStateRepository: ChainStateRepository
+
+    val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
 
     val crossChainTransfersRepository: CrossChainTransfersRepository
 

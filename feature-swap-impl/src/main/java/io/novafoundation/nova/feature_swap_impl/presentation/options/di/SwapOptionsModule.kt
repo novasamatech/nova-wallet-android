@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
@@ -33,14 +34,16 @@ class SwapOptionsModule {
         resourceManager: ResourceManager,
         swapSettingsStateProvider: SwapSettingsStateProvider,
         slippageFieldValidatorFactory: SlippageFieldValidatorFactory,
-        swapInteractor: SwapInteractor
+        swapInteractor: SwapInteractor,
+        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
     ): ViewModel {
         return SwapOptionsViewModel(
             swapRouter,
             resourceManager,
             swapSettingsStateProvider,
             slippageFieldValidatorFactory,
-            swapInteractor
+            swapInteractor,
+            descriptionBottomSheetLauncher
         )
     }
 

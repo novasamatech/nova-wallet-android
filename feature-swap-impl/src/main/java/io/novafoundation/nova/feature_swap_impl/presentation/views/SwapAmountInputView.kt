@@ -17,7 +17,11 @@ import io.novafoundation.nova.common.view.shape.getInputBackgroundError
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin.SwapInputAssetModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.AmountErrorState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountInputView
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.getMessageOrNull
+import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputContainer
+import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputError
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputFiat
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputField
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputImage
@@ -42,8 +46,8 @@ class SwapAmountInputView @JvmOverloads constructor(
 
     init {
         inflate(context, R.layout.view_swap_amount_input, this)
-        background = context.getInputBackground()
-        setAddStatesFromChildren(true)
+        swapAmountInputContainer.background = context.getInputBackground()
+        swapAmountInputContainer.setAddStatesFromChildren(true)
     }
 
     fun setModel(model: SwapInputAssetModel) {
@@ -56,6 +60,11 @@ class SwapAmountInputView @JvmOverloads constructor(
 
     override fun setFiatAmount(fiat: CharSequence?) {
         swapAmountInputFiat.setTextOrHide(fiat)
+    }
+
+    override fun setError(errorState: AmountErrorState) {
+        swapAmountInputError.text = errorState.getMessageOrNull()
+        setErrorEnabled(errorState is AmountErrorState.Invalid)
     }
 
     private fun setTitle(title: CharSequence) {
@@ -86,10 +95,10 @@ class SwapAmountInputView @JvmOverloads constructor(
     fun setErrorEnabled(enabled: Boolean) {
         if (enabled) {
             amountInput.setTextColor(context.getColor(R.color.text_negative))
-            background = context.getInputBackgroundError()
+            swapAmountInputContainer.background = context.getInputBackgroundError()
         } else {
             amountInput.setTextColor(context.getColor(R.color.text_primary))
-            background = context.getInputBackground()
+            swapAmountInputContainer.background = context.getInputBackground()
         }
     }
 }

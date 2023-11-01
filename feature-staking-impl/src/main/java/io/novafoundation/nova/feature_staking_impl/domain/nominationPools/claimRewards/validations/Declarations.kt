@@ -32,7 +32,7 @@ private fun NominationPoolsClaimRewardsValidationSystemBuilder.sufficientCommiss
         fee = { it.fee },
         total = { it.asset.total },
         chainWithAsset = { ChainWithAsset(it.chain, it.chain.utilityAsset) },
-        error = { NominationPoolsClaimRewardsValidationFailure.ToStayAboveED(it.chain.utilityAsset) }
+        error = { payload, _ -> NominationPoolsClaimRewardsValidationFailure.ToStayAboveED(payload.chain.utilityAsset) }
     )
 }
 
@@ -43,7 +43,7 @@ private fun NominationPoolsClaimRewardsValidationSystemBuilder.enoughToPayFees()
         error = { payload, leftForFees ->
             NominationPoolsClaimRewardsValidationFailure.NotEnoughBalanceToPayFees(
                 chainAsset = payload.asset.token.configuration,
-                availableToPayFees = leftForFees,
+                maxUsable = leftForFees,
                 fee = payload.fee
             )
         }

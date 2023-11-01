@@ -9,7 +9,7 @@ sealed class ChooseDelegationAmountValidationFailure {
 
     class NotEnoughToPayFees(
         override val chainAsset: Chain.Asset,
-        override val availableToPayFees: BigDecimal,
+        override val maxUsable: BigDecimal,
         override val fee: BigDecimal
     ) : ChooseDelegationAmountValidationFailure(), NotEnoughToPayFeesError
 

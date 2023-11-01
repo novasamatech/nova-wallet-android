@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.validation.observeErrors
+import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.setTextOrHide
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
@@ -18,6 +19,7 @@ import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import kotlinx.android.synthetic.main.fragment_swap_options.swapOptionsAlert
 import kotlinx.android.synthetic.main.fragment_swap_options.swapOptionsApplyButton
 import kotlinx.android.synthetic.main.fragment_swap_options.swapOptionsSlippageInput
+import kotlinx.android.synthetic.main.fragment_swap_options.swapOptionsSlippageTitle
 import kotlinx.android.synthetic.main.fragment_swap_options.swapOptionsToolbar
 
 class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel>() {
@@ -35,6 +37,7 @@ class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel>() {
         swapOptionsToolbar.setHomeButtonListener { viewModel.backClicked() }
         swapOptionsToolbar.setRightActionClickListener { viewModel.resetClicked() }
         swapOptionsApplyButton.setOnClickListener { viewModel.applyClicked() }
+        swapOptionsSlippageTitle.setOnClickListener { viewModel.slippageInfoClicked() }
     }
 
     override fun inject() {
@@ -48,6 +51,7 @@ class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel>() {
     }
 
     override fun subscribe(viewModel: SwapOptionsViewModel) {
+        observeDescription(viewModel)
         swapOptionsSlippageInput.content.bindTo(viewModel.slippageInput, viewModel.viewModelScope, moveSelectionToEndOnInsertion = true)
         viewModel.defaultSlippage.observe { swapOptionsSlippageInput.setHint(it) }
         viewModel.slippageTips.observe {
