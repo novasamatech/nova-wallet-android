@@ -38,4 +38,8 @@ class SwapNavigator(
 
         commonDelegate.openSend(payload, recipientAddress)
     }
+
+    override fun openReceive(assetPayload: AssetPayload) {
+        commonDelegate.openReceive(assetPayload)
+    }
 }

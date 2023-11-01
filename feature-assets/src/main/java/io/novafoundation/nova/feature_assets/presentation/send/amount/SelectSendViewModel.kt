@@ -59,7 +59,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -114,7 +113,6 @@ class SelectSendViewModel(
     }
 
     private val availableCrossChainDestinations = availableCrossChainDestinations()
-        .onStart { emit(emptyList()) }
         .shareInBackground()
 
     val isSelectAddressAvailable = combine(originChain, destinationChain) { originChain, destinationChain ->

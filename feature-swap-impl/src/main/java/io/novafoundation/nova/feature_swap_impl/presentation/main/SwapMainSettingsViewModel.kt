@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
-import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.CompoundNumberFormatter
 import io.novafoundation.nova.common.utils.formatting.DynamicPrecisionFormatter
@@ -300,7 +299,7 @@ class SwapMainSettingsViewModel(
 
     private fun onGetAssetInOptionSelected(option: GetAssetInOption) {
         when (option) {
-            GetAssetInOption.RECEIVE -> showMessage("TODO")
+            GetAssetInOption.RECEIVE -> receiveSelected()
             GetAssetInOption.CROSS_CHAIN -> onCrossChainTransferSelected()
             GetAssetInOption.BUY -> buySelected()
         }
@@ -316,8 +315,13 @@ class SwapMainSettingsViewModel(
     }
 
     private fun buySelected() = launch {
-        val chainAssetIn = chainAssetIn.firstNotNull() ?: return@launch
+        val chainAssetIn = chainAssetIn.first() ?: return@launch
         buyMixin.buyClicked(chainAssetIn)
+    }
+
+    private fun receiveSelected() = launch {
+        val chainAssetIn = chainAssetIn.first() ?: return@launch
+        swapRouter.openReceive(AssetPayload(chainAssetIn.chainId, chainAssetIn.id))
     }
 
     private fun initAssetIn() {
