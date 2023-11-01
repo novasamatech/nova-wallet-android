@@ -80,6 +80,7 @@ import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
@@ -554,7 +555,13 @@ class SwapMainSettingsViewModel(
 
         quotingState.value = quote.fold(
             onSuccess = { QuotingState.Loaded(it, swapQuoteArgs, swapSettings.feeAsset!!) },
-            onFailure = { QuotingState.NotAvailable }
+            onFailure = {
+                if (it is CancellationException) {
+                    QuotingState.Loading
+                } else {
+                    QuotingState.NotAvailable
+                }
+            }
         )
 
         handleNewQuote(quote, swapSettings)
