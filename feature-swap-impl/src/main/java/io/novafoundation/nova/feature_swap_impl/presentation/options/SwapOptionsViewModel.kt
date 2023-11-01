@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatWithoutSymbol
 import io.novafoundation.nova.common.validation.FieldValidationResult
+import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
@@ -32,8 +33,9 @@ class SwapOptionsViewModel(
     private val resourceManager: ResourceManager,
     private val swapSettingsStateProvider: SwapSettingsStateProvider,
     private val slippageFieldValidatorFactory: SlippageFieldValidatorFactory,
-    private val swapInteractor: SwapInteractor
-) : BaseViewModel() {
+    private val swapInteractor: SwapInteractor,
+    private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
+) : BaseViewModel(), DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
 
     private val swapSettingState = async {
         swapSettingsStateProvider.getSwapSettingsState(viewModelScope)
@@ -79,6 +81,13 @@ class SwapOptionsViewModel(
                 slippageInput.value = selectedSlippage.formatWithoutSymbol()
             }
         }
+    }
+
+    fun slippageInfoClicked() {
+        launchDescriptionBottomSheet(
+            titleRes = R.string.swap_slippage_title,
+            descriptionRes = R.string.swap_slippage_description
+        )
     }
 
     fun tipClicked(index: Int) {

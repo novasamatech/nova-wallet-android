@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.postToUiThread
 import io.novafoundation.nova.common.utils.setSelectionEnd
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
@@ -77,6 +78,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
     }
 
     override fun subscribe(viewModel: SwapMainSettingsViewModel) {
+        observeDescription(viewModel)
         observeValidations(viewModel)
         setupSwapAmountInput(viewModel.amountInInput, swapMainSettingsPayInput, swapMainSettingsMaxAmount)
         setupSwapAmountInput(viewModel.amountOutInput, swapMainSettingsReceiveInput, maxAvailableView = null)
