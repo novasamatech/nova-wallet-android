@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.RealPriceImp
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealSwapRateFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SwapRateFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -66,6 +67,12 @@ class SwapFeatureModule {
     @FeatureScope
     fun provideLastQuoteStoreSharedStateProvider(computationalCache: ComputationalCache): LastQuoteStoreSharedStateProvider {
         return LastQuoteStoreSharedStateProvider(computationalCache)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSwapConfirmationPayloadFormatter(chainRegistry: ChainRegistry): SwapConfirmationPayloadFormatter {
+        return SwapConfirmationPayloadFormatter(chainRegistry)
     }
 
     @Provides

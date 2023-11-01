@@ -11,10 +11,12 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setTextOrHide
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
+import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
+import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAccount
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAlert
@@ -46,6 +48,7 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
 
     override fun initViews() {
         swapConfirmationToolbar.applyStatusBarInsets()
+        swapConfirmationButton.prepareForProgress(this)
         swapConfirmationRate.setOnClickListener { viewModel.rateClicked() }
         swapConfirmationPriceDifference.setOnClickListener { viewModel.priceDifferenceClicked() }
         swapConfirmationSlippage.setOnClickListener { viewModel.slippageClicked() }
@@ -65,6 +68,7 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
     }
 
     override fun subscribe(viewModel: SwapConfirmationViewModel) {
+        setupExternalActions(viewModel)
         viewModel.swapDetails.observe {
             it ?: return@observe
             swapConfirmationAssetFrom.setModel(it.assetInDetails)
@@ -76,8 +80,10 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
         }
 
         viewModel.wallet.observe { swapConfirmationWallet.showWallet(it) }
-        viewModel.account.observe { swapConfirmationAccount.showAddress(it) }
+        viewModel.addressFlow.observe { swapConfirmationAccount.showAddress(it) }
 
         viewModel.slippageAlertMessage.observe { swapConfirmationAlert.setTextOrHide(it) }
+
+        viewModel.validationProgress.observe(swapConfirmationButton::setState)
     }
 }

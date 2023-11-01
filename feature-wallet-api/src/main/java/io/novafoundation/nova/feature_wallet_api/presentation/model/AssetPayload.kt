@@ -10,3 +10,5 @@ class AssetPayload(val chainId: ChainId, val chainAssetId: Int) : Parcelable
 
 val AssetPayload.fullChainAssetId: FullChainAssetId
     get() = FullChainAssetId(chainId, chainAssetId)
+
+fun FullChainAssetId.toAssetPayload(): AssetPayload = AssetPayload(chainId, assetId)

@@ -20,13 +20,13 @@ import io.novafoundation.nova.common.utils.formatting.NumberAbbreviation
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.nullOnStart
-import io.novafoundation.nova.common.utils.toPerbill
 import io.novafoundation.nova.common.validation.CompoundFieldValidator
 import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.common.view.SimpleAlertModel
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
@@ -49,7 +49,8 @@ import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreShared
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SwapRateFormatter
-import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationPayload
+import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
+import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
@@ -73,6 +74,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericF
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeOrNullFlow
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
+import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -123,7 +125,8 @@ class SwapMainSettingsViewModel(
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
     private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
     private val swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
-    private val swapRateFormatter: SwapRateFormatter
+    private val swapRateFormatter: SwapRateFormatter,
+    private val swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter,
 ) : BaseViewModel(), Validatable by validationExecutor {
 
     private val swapSettingState = async {
@@ -197,6 +200,14 @@ class SwapMainSettingsViewModel(
         .shareInBackground()
 
     private val _validationProgress = MutableStateFlow(false)
+
+    val validationProgress = _validationProgress.map { submitting ->
+        if (submitting) {
+            ButtonState.PROGRESS
+        } else {
+            ButtonState.NORMAL
+        }
+    }
 
     val buttonState: Flow<DescriptiveButtonState> = combine(
         accumulate(amountInInput.fieldError, amountOutInput.fieldError),
@@ -562,8 +573,11 @@ class SwapMainSettingsViewModel(
 
     private suspend fun getValidationPayload(): SwapValidationPayload? {
         val lastQuoteState = lastQuoteStore().getLastQuote() ?: return null
+        val swapSettings = swapSettings.first()
         return swapInteractor.getValidationPayload(
-            swapSettings = swapSettings.first(),
+            assetIn = swapSettings.assetIn ?: return null,
+            assetOut = swapSettings.assetIn ?: return null,
+            feeAsset = swapSettings.feeAsset ?: return null,
             quoteArgs = lastQuoteState.first,
             swapQuote = lastQuoteState.second,
             swapFee = feeMixin.loadedFeeOrNullFlow().first() ?: return null
@@ -584,23 +598,15 @@ class SwapMainSettingsViewModel(
 
     private fun openSwapConfirmation(validPayload: SwapValidationPayload) {
         val payload = SwapConfirmationPayload(
-            amountWithAssetIn = validPayload.detailedAssetIn.toAmountWithAsset(),
-            amountWithAssetOut = validPayload.detailedAssetOut.toAmountWithAsset(),
+            swapQuoteModel = swapConfirmationPayloadFormatter.mapSwapQuoteToModel(validPayload.swapQuote),
+            feeAsset = validPayload.feeAsset.token.configuration.fullId.toAssetPayload(),
             rate = validPayload.swapQuote.swapRate(),
-            priceDifference = validPayload.swapQuote.priceImpact.toPerbill().value,
-            slippage = validPayload.slippage.toPerbill().value,
-            networkFee = SwapConfirmationPayload.AmountWithAsset(
-                amount = validPayload.swapFee.networkFee.amount,
-                assetPayload = AssetPayload(
-                    chainId = validPayload.feeAsset.token.configuration.chainId,
-                    chainAssetId = validPayload.feeAsset.token.configuration.id
-                )
-            ),
+            slippage = validPayload.slippage.value,
+            swapFee = swapConfirmationPayloadFormatter.mapFeeToModel(validPayload.swapFee)
         )
 
         swapRouter.openSwapConfirmation(payload)
     }
-
 
     private val amountInputFormatter = CompoundNumberFormatter(
         abbreviations = listOf(
@@ -620,14 +626,4 @@ class SwapMainSettingsViewModel(
     )
 
     private fun Flow<Asset?>.token(): Flow<Token?> = map { it?.token }
-
-    private fun SwapValidationPayload.SwapAssetData.toAmountWithAsset(): SwapConfirmationPayload.AmountWithAsset {
-        return SwapConfirmationPayload.AmountWithAsset(
-            amount = amountInPlanks,
-            assetPayload = AssetPayload(
-                chainId = chain.id,
-                chainAssetId = asset.token.configuration.id
-            )
-        )
-    }
 }

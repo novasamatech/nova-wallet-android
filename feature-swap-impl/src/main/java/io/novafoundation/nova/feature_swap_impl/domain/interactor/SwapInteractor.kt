@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_swap_impl.domain.interactor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicHash
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
@@ -10,7 +11,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.domain.validation.utils.SharedQuoteValidationRetriever
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationSystem
@@ -26,7 +26,6 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.swapFeeSuffici
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapSmallRemainingBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -47,6 +46,10 @@ class SwapInteractor(
 
     suspend fun quote(quoteArgs: SwapQuoteArgs): Result<SwapQuote> {
         return swapService.quote(quoteArgs)
+    }
+
+    suspend fun executeSwap(swapExecuteArgs: SwapExecuteArgs): Result<ExtrinsicHash> {
+        return swapService.swap(swapExecuteArgs)
     }
 
     suspend fun canPayFeeInCustomAsset(asset: Chain.Asset): Boolean {
@@ -93,22 +96,21 @@ class SwapInteractor(
     }
 
     suspend fun getValidationPayload(
-        swapSettings: SwapSettings,
+        assetIn: Chain.Asset,
+        assetOut: Chain.Asset,
+        feeAsset: Chain.Asset,
         quoteArgs: SwapQuoteArgs,
         swapQuote: SwapQuote,
         swapFee: SwapFee
     ): SwapValidationPayload? {
         val metaAccount = accountRepository.getSelectedMetaAccount()
-        val assetIn = swapSettings.assetIn ?: return null
-        val assetOut = swapSettings.assetOut ?: return null
-        val feeChainAsset = swapSettings.feeAsset ?: return null
         val chainIn = chainRegistry.getChain(swapQuote.assetIn.chainId)
         val chainOut = chainRegistry.getChain(swapQuote.assetOut.chainId)
         val nativeChainAssetIn = chainIn.commissionAsset
 
         val executeArgs = quoteArgs.toExecuteArgs(
             quotedBalance = swapQuote.quotedBalance,
-            customFeeAsset = feeChainAsset,
+            customFeeAsset = feeAsset,
             nativeAsset = walletRepository.getAsset(metaAccount.id, nativeChainAssetIn) ?: return null
         )
         return SwapValidationPayload(
@@ -122,8 +124,8 @@ class SwapInteractor(
                 asset = walletRepository.getAsset(metaAccount.id, assetOut) ?: return null,
                 amountInPlanks = swapQuote.planksOut
             ),
-            slippage = swapSettings.slippage,
-            feeAsset = walletRepository.getAsset(metaAccount.id, feeChainAsset) ?: return null,
+            slippage = quoteArgs.slippage,
+            feeAsset = walletRepository.getAsset(metaAccount.id, feeAsset) ?: return null,
             swapFee = swapFee,
             swapQuote = swapQuote,
             swapQuoteArgs = quoteArgs,

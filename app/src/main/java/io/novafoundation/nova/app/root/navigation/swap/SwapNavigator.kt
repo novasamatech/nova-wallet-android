@@ -3,11 +3,13 @@ package io.novafoundation.nova.app.root.navigation.swap
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
+import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
+import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
 import io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment
 import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationFragment
-import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationPayload
+import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 
 class SwapNavigator(
@@ -21,6 +23,10 @@ class SwapNavigator(
 
     override fun openSwapOptions() {
         navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapOptionsFragment)
+    }
+
+    override fun finishSwapFlow(assetPayload: AssetPayload) {
+        navigationHolder.navController?.navigate(R.id.action_swapConfirmationFragment_to_assetDetails, BalanceDetailFragment.getBundle(assetPayload))
     }
 
     override fun selectAssetIn(selectedAsset: AssetPayload?) {

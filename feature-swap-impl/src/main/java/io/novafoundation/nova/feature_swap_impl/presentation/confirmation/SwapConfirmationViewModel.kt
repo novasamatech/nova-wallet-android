@@ -1,44 +1,83 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.confirmation
 
+import android.util.Log
+import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.BACKGROUND_TRANSPARENT
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.Perbill
-import io.novafoundation.nova.common.utils.asPerbill
+import io.novafoundation.nova.common.utils.Percent
+import io.novafoundation.nova.common.utils.asPercent
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.images.Icon
-import io.novafoundation.nova.common.utils.toPercent
+import io.novafoundation.nova.common.validation.TransformedFailure
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.ValidationFlowActions
+import io.novafoundation.nova.common.validation.ValidationStatus
+import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.icon
-import io.novafoundation.nova.feature_swap_impl.R
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.editedBalance
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
+import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SwapRateFormatter
-import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationPayload.AmountWithAsset
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.model.SwapConfirmationDetailsModel
+import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
+import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.main.mapSwapValidationFailureToUI
 import io.novafoundation.nova.feature_swap_impl.presentation.views.SwapAssetView
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
+import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+private class SwapConfirmationState(
+    val swapQuoteArgs: SwapQuoteArgs,
+    val swapQuote: SwapQuote,
+    val feeAsset: Chain.Asset,
+    val swapFee: SwapFee
+)
 
 class SwapConfirmationViewModel(
+    private val swapRouter: SwapRouter,
     private val swapInteractor: SwapInteractor,
     private val resourceManager: ResourceManager,
     private val payload: SwapConfirmationPayload,
@@ -48,29 +87,63 @@ class SwapConfirmationViewModel(
     private val swapRateFormatter: SwapRateFormatter,
     private val priceImpactFormatter: PriceImpactFormatter,
     private val walletUiUseCase: WalletUiUseCase,
-    private val slippageAlertMixinFactory: SlippageAlertMixinFactory
-) : BaseViewModel() {
+    private val slippageAlertMixinFactory: SlippageAlertMixinFactory,
+    private val addressIconGenerator: AddressIconGenerator,
+    private val validationExecutor: ValidationExecutor,
+    private val tokenRepository: TokenRepository,
+    private val externalActions: ExternalActions.Presentation,
+    private val swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter
+) : BaseViewModel(),
+    ExternalActions by externalActions,
+    Validatable by validationExecutor {
 
-    private val slippageConfigFlow = flowOf { swapInteractor.slippageConfig(payload.amountWithAssetIn.assetPayload.chainId) }
-        .filterNotNull()
-    private val slippageFlow = flowOf { payload.slippage.asPerbill().toPercent() }
-    
-    private val slippageAlertMixin = slippageAlertMixinFactory.create(slippageConfigFlow, slippageFlow)
+    private val confirmationStateFlow = MutableStateFlow<SwapConfirmationState?>(null)
 
-    val swapDetails = MutableStateFlow<SwapConfirmationDetailsModel?>(null)
-
-    val wallet: Flow<WalletModel> = walletUiUseCase.selectedWalletUiFlow(showAddressIcon = true)
+    private val metaAccount = accountRepository.selectedMetaAccountFlow()
         .shareInBackground()
 
-    val account: Flow<AddressModel> = flowOf {
-        AddressModel("J6b7XsdA42gafKso3gSsd9KsapTtASfr2z4rPt", resourceManager.getDrawable(R.drawable.ic_nova_logo))
+    private val slippageConfigFlow = confirmationStateFlow
+        .filterNotNull()
+        .map { swapInteractor.slippageConfig(it.swapQuote.assetIn.chainId) }
+        .filterNotNull()
+        .shareInBackground()
+
+    private val slippageFlow = flowOf { payload.slippage.asPercent() }
+        .shareInBackground()
+
+    private val slippageAlertMixin = slippageAlertMixinFactory.create(slippageConfigFlow, slippageFlow)
+
+    private val chainInFlow = confirmationStateFlow
+        .filterNotNull()
+        .map { chainRegistry.getChain(it.swapQuote.assetIn.chainId) }
+        .shareInBackground()
+
+    private val _validationProgress = MutableStateFlow(false)
+
+    val validationProgress = _validationProgress.map { submitting ->
+        if (submitting) {
+            ButtonState.PROGRESS
+        } else {
+            ButtonState.NORMAL
+        }
+    }
+
+    val swapDetails = confirmationStateFlow
+        .filterNotNull()
+        .map { formatToSwapDetailsModel(it) }
+
+    val wallet: Flow<WalletModel> = metaAccount.map { walletUiUseCase.walletUiFor(it) }
+
+    val addressFlow: Flow<AddressModel> = combine(chainInFlow, metaAccount) { chain, metaAccount ->
+        val accountId = metaAccount.requireAddressIn(chain)
+        addressIconGenerator.createAddressModel(chain, accountId, 5, accountName = null, background = BACKGROUND_TRANSPARENT)
     }
 
     val slippageAlertMessage: Flow<String?> = slippageAlertMixin.slippageAlertMessage
 
     init {
         launch {
-            initPayload()
+            initConfirmationState()
         }
     }
 
@@ -91,24 +164,56 @@ class SwapConfirmationViewModel(
     }
 
     fun accountClicked() {
-        TODO("Not yet implemented")
+        launch {
+            val chainFlow = chainInFlow.first()
+            val addressModel = addressFlow.first()
+
+            val type = ExternalActions.Type.Address(addressModel.address)
+
+            externalActions.showExternalActions(type, chainFlow)
+        }
     }
 
     fun confirmButtonClicked() {
-        TODO("Not yet implemented")
+        launch {
+            val validationSystem = swapInteractor.validationSystem()
+            val payload = getValidationPayload() ?: return@launch
+
+            validationExecutor.requireValid(
+                validationSystem = validationSystem,
+                payload = payload,
+                progressConsumer = _validationProgress.progressConsumer(),
+                validationFailureTransformerCustom = ::formatValidationFailure,
+            ) { validPayload ->
+                executeSwap(validPayload.swapExecuteArgs)
+            }
+        }
     }
 
-    private suspend fun initPayload() {
+    private fun executeSwap(swapExecuteArgs: SwapExecuteArgs) {
+        launch {
+            val result = withContext(Dispatchers.Default) { swapInteractor.executeSwap(swapExecuteArgs) }
+            result.onSuccess {
+                swapRouter.finishSwapFlow(swapExecuteArgs.assetIn.fullId.toAssetPayload())
+            }.onFailure {
+                Log.e("SwapError", "Failed to execute swap", it)
+            }
+        }
+    }
+
+    private suspend fun formatToSwapDetailsModel(confirmationState: SwapConfirmationState): SwapConfirmationDetailsModel {
         val metaAccount = accountRepository.getSelectedMetaAccount()
-        val chainWithAssetIn = getChainWithAsset(payload.amountWithAssetIn.assetPayload)
-        val chainWithAssetOut = getChainWithAsset(payload.amountWithAssetOut.assetPayload)
-        swapDetails.value = SwapConfirmationDetailsModel(
-            assetInDetails = formatAssetDetails(metaAccount, chainWithAssetIn, payload.amountWithAssetIn.amount),
-            assetOutDetails = formatAssetDetails(metaAccount, chainWithAssetOut, payload.amountWithAssetOut.amount),
-            rate = formatRate(payload.rate, chainWithAssetIn.asset, chainWithAssetOut.asset),
-            priceDifference = formatPriceDifference(payload.priceDifference.asPerbill()),
-            slippage = payload.slippage.asPerbill().format(),
-            networkFee = formatNetworkFee(metaAccount, payload.networkFee)
+        val assetIn = confirmationState.swapQuote.assetIn
+        val assetOut = confirmationState.swapQuote.assetOut
+        val chainIn = chainRegistry.getChain(assetIn.chainId)
+        val chainOut = chainRegistry.getChain(assetOut.chainId)
+        return SwapConfirmationDetailsModel(
+            assetInDetails = formatAssetDetails(metaAccount, chainIn, assetIn, confirmationState.swapQuote.planksIn),
+            assetOutDetails = formatAssetDetails(metaAccount, chainOut, assetOut, confirmationState.swapQuote.planksOut),
+            rate = formatRate(payload.rate, assetIn, assetOut),
+            priceDifference = formatPriceDifference(confirmationState.swapQuote.priceImpact),
+            slippage = payload.slippage.asPercent().format(),
+            networkFee = formatAmount(metaAccount, assetIn, confirmationState.swapFee.networkFee.amount)
         )
     }
 
@@ -117,13 +222,18 @@ class SwapConfirmationViewModel(
         return chainRegistry.chainWithAsset(fullChainAssetId.chainId, fullChainAssetId.assetId)
     }
 
-    private suspend fun formatAssetDetails(metaAccount: MetaAccount, chainWithAsset: ChainWithAsset, amountInPlanks: BigInteger): SwapAssetView.Model {
-        val amount = formatAmount(metaAccount, chainWithAsset.asset, amountInPlanks)
+    private suspend fun formatAssetDetails(
+        metaAccount: MetaAccount,
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        amountInPlanks: BigInteger
+    ): SwapAssetView.Model {
+        val amount = formatAmount(metaAccount, chainAsset, amountInPlanks)
         return SwapAssetView.Model(
-            assetIcon = chainWithAsset.asset.icon(),
+            assetIcon = chainAsset.icon(),
             amount = amount,
-            networkImage = Icon.FromLink(chainWithAsset.chain.icon),
-            networkName = chainWithAsset.chain.name
+            networkImage = Icon.FromLink(chain.icon),
+            networkName = chain.name
         )
     }
 
@@ -131,18 +241,66 @@ class SwapConfirmationViewModel(
         return swapRateFormatter.format(rate, assetIn, assetOut)
     }
 
-    private fun formatPriceDifference(priceDifference: Perbill): CharSequence? {
-        return priceImpactFormatter.format(priceDifference.toPercent())
+    private fun formatPriceDifference(priceDifference: Percent): CharSequence? {
+        return priceImpactFormatter.format(priceDifference)
     }
 
-    private suspend fun formatNetworkFee(metaAccount: MetaAccount, amountWithAsset: AmountWithAsset): AmountModel {
-        val fullChainAssetId = amountWithAsset.assetPayload.fullChainAssetId
-        val chainWithAsset = chainRegistry.chainWithAsset(fullChainAssetId.chainId, fullChainAssetId.assetId)
-        return formatAmount(metaAccount, chainWithAsset.asset, amountWithAsset.amount)
+    private suspend fun formatNetworkFee(metaAccount: MetaAccount, assetIn: Chain.Asset, swapFee: SwapFee): AmountModel {
+        return formatAmount(metaAccount, assetIn, swapFee.networkFee.amount)
     }
 
     private suspend fun formatAmount(metaAccount: MetaAccount, chainAsset: Chain.Asset, amount: BigInteger): AmountModel {
         val asset = walletRepository.getAsset(metaAccount.id, chainAsset)!!
         return mapAmountToAmountModel(amount, asset.token, includeZeroFiat = false, estimatedFiat = true)
+    }
+
+    private suspend fun getValidationPayload(): SwapValidationPayload? {
+        val confirmationState = confirmationStateFlow.value ?: return null
+        return swapInteractor.getValidationPayload(
+            assetIn = confirmationState.swapQuote.assetIn,
+            assetOut = confirmationState.swapQuote.assetOut,
+            feeAsset = confirmationState.feeAsset,
+            quoteArgs = confirmationState.swapQuoteArgs,
+            swapQuote = confirmationState.swapQuote,
+            swapFee = confirmationState.swapFee
+        )
+    }
+
+    private fun formatValidationFailure(
+        status: ValidationStatus.NotValid<SwapValidationFailure>,
+        actions: ValidationFlowActions<SwapValidationPayload>
+    ): TransformedFailure? {
+        return null
+
+        return viewModelScope.mapSwapValidationFailureToUI(
+            resourceManager,
+            status,
+            actions,
+            TODO(),
+            TODO(),
+            TODO()
+        )
+    }
+
+    private suspend fun initConfirmationState() {
+        val swapQuote = swapConfirmationPayloadFormatter.mapSwapQuoteFromModel(payload.swapQuoteModel)
+        val swapFee = swapConfirmationPayloadFormatter.mapFeeFromModel(payload.swapFee)
+        val assetIn = swapQuote.assetIn
+        val assetOut = swapQuote.assetOut
+        val feeAsset = chainRegistry.asset(payload.feeAsset.fullChainAssetId)
+        val quoteArgs = SwapQuoteArgs(
+            tokenRepository.getToken(assetIn),
+            tokenRepository.getToken(assetOut),
+            swapQuote.editedBalance,
+            swapQuote.direction,
+            slippageFlow.first()
+        )
+
+        confirmationStateFlow.value = SwapConfirmationState(
+            swapQuoteArgs = quoteArgs,
+            swapQuote = swapQuote,
+            feeAsset = feeAsset,
+            swapFee = swapFee
+        )
     }
 }

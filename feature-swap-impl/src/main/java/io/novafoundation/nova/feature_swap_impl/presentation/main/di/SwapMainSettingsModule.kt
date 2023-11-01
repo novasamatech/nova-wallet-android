@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsSt
 import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SwapRateFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
@@ -90,7 +91,8 @@ class SwapMainSettingsModule {
         swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
         lastQuoteStoreSharedStateProvider: LastQuoteStoreSharedStateProvider,
         validationExecutor: ValidationExecutor,
-        swapRateFormatter: SwapRateFormatter
+        swapRateFormatter: SwapRateFormatter,
+        swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -110,7 +112,8 @@ class SwapMainSettingsModule {
             liquidityFieldValidatorFactory = liquidityFieldValidatorFactory,
             enoughAmountToSwapValidatorFactory = enoughAmountToSwapValidatorFactory,
             swapReceiveAmountAboveEDFieldValidatorFactory = swapReceiveAmountAboveEDFieldValidatorFactory,
-            swapRateFormatter = swapRateFormatter
+            swapRateFormatter = swapRateFormatter,
+            swapConfirmationPayloadFormatter = swapConfirmationPayloadFormatter
         )
     }
 

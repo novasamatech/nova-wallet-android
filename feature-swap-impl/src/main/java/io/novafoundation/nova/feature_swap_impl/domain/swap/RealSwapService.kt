@@ -73,7 +73,7 @@ internal class RealSwapService(
     }
 
     override suspend fun quote(args: SwapQuoteArgs): Result<SwapQuote> {
-        val computationScope = CoroutineScope(coroutineContext)
+        val computationScope = CoroutineScope(Dispatchers.Default + coroutineContext)
 
         return runCatching {
             val exchange = exchanges(computationScope).getValue(args.tokenIn.configuration.chainId)

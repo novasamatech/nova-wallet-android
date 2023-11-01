@@ -53,6 +53,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
 
     override fun initViews() {
         swapMainSettingsToolbar.applyStatusBarInsets()
+        swapMainSettingsContinue.prepareForProgress(this)
         swapMainSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
         swapMainSettingsToolbar.setRightActionClickListener { viewModel.openOptions() }
 
@@ -118,5 +119,8 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
                 onCancel = it.onCancel
             ).show()
         }
+
+
+        viewModel.validationProgress.observe(swapMainSettingsContinue::setState)
     }
 }
