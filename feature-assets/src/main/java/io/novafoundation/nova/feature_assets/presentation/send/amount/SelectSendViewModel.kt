@@ -330,7 +330,8 @@ class SelectSendViewModel(
                 chainAssetId = validPayload.transfer.destinationChainAsset.id
             ),
             recipientAddress = validPayload.transfer.recipient,
-            crossChainFee = validPayload.crossChainFee
+            crossChainFee = validPayload.crossChainFee,
+            openAssetDetailsOnCompletion = payload is SendPayload.SpecifiedOrigin
         )
 
         router.openConfirmTransfer(transferDraft)

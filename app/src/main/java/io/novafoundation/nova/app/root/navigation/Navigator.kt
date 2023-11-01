@@ -341,6 +341,10 @@ class Navigator(
         stakingDashboardDelegate.openStakingDashboard()
     }
 
+    override fun closeSendFlow() {
+        navController?.navigate(R.id.action_close_send_flow)
+    }
+
     override fun openSwapFlow() {
         val payload = SwapFlowPayload.InitialSelecting
         navController?.navigate(R.id.action_mainFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))

@@ -221,7 +221,11 @@ class ConfirmSendViewModel(
         val chain = originChain()
         val chainAsset = originAsset()
 
-        router.openAssetDetails(AssetPayload(chain.id, chainAsset.id))
+        if (transferDraft.openAssetDetailsOnCompletion) {
+            router.openAssetDetails(AssetPayload(chain.id, chainAsset.id))
+        } else {
+            router.closeSendFlow()
+        }
     }
 
     private suspend fun buildValidationPayload(): AssetTransferPayload {
@@ -242,7 +246,7 @@ class ConfirmSendViewModel(
                 commissionAssetToken = commissionAssetFlow.first().token,
                 decimalFee = originFee,
             ),
-            originFee = originFee.decimalAmount,
+            originFee = originFee.networkFeeDecimalAmount,
             originCommissionAsset = commissionAssetFlow.first(),
             originUsedAsset = assetFlow.first(),
             crossChainFee = transferDraft.crossChainFee
