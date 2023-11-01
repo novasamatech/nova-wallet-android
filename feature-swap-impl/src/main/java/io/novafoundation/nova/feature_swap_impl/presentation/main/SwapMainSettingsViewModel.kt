@@ -421,7 +421,7 @@ class SwapMainSettingsViewModel(
     }
 
     @OptIn(FlowPreview::class)
-    private fun GenericFeeLoaderMixin.Presentation<SwapFee>.setupFees() {111
+    private fun GenericFeeLoaderMixin.Presentation<SwapFee>.setupFees() {
         quotingState
             .onEach {
                 when (it) {

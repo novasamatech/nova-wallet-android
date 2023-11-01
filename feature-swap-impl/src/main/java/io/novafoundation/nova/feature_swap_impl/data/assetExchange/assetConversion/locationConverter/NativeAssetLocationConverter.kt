@@ -31,7 +31,7 @@ class NativeAssetLocationConverter(
         }
     }
 
-    private fun Chain.expectedParentsInNativeInterior() : BigInteger {
+    private fun Chain.expectedParentsInNativeInterior(): BigInteger {
         return if (additional.relaychainAsNative()) {
             BigInteger.ONE
         } else {
