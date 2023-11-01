@@ -43,6 +43,7 @@ data class Chain(
         val themeColor: String?,
         val stakingWiki: String?,
         val defaultBlockTimeMillis: Long?,
+        val relaychainAsNative: Boolean?
     )
 
     data class Types(
