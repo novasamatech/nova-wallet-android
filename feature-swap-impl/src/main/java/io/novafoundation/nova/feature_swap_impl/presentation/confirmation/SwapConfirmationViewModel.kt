@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.confirmation
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.BACKGROUND_TRANSPARENT
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -98,6 +96,8 @@ enum class MaxAction {
     DISABLED
 }
 
+const val ICON_IN_DP = 20
+
 class SwapConfirmationViewModel(
     private val swapRouter: SwapRouter,
     private val swapInteractor: SwapInteractor,
@@ -182,7 +182,7 @@ class SwapConfirmationViewModel(
 
     val addressFlow: Flow<AddressModel> = combine(chainWithAssetFlow, metaAccountFlow) { chainWithAsset, metaAccount ->
         val accountId = metaAccount.requireAddressIn(chainWithAsset.chain)
-        addressIconGenerator.createAddressModel(chainWithAsset.chain, accountId, 5, accountName = null, background = BACKGROUND_TRANSPARENT)
+        addressIconGenerator.createAddressModel(chainWithAsset.chain, accountId, ICON_IN_DP, accountName = null)
     }
 
     val slippageAlertMessage: Flow<String?> = slippageAlertMixin.slippageAlertMessage
@@ -382,7 +382,7 @@ class SwapConfirmationViewModel(
             val assetOut = swapQuote.assetOut
             val swapFee = swapConfirmationPayloadFormatter.mapFeeFromModel(payload.swapFee)
             val feeAsset = chainRegistry.asset(payload.feeAsset.fullChainAssetId)
-            Log.d("Deadlock check", "1")
+
             val quoteArgs = SwapQuoteArgs(
                 tokenRepository.getToken(assetIn),
                 tokenRepository.getToken(assetOut),
@@ -391,14 +391,12 @@ class SwapConfirmationViewModel(
                 slippageFlow.first()
             )
 
-            Log.d("Deadlock check", "2")
             feeMixin.setFee(swapFee)
             confirmationStateFlow.value = SwapConfirmationState(
                 swapQuoteArgs = quoteArgs,
                 swapQuote = swapQuote,
                 feeAsset = feeAsset
             )
-            Log.d("Deadlock check", "3")
         }
     }
 
