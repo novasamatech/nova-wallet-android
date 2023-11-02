@@ -29,6 +29,7 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.common.view.SimpleAlertModel
+import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
@@ -126,9 +127,12 @@ class SwapMainSettingsViewModel(
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
     private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
     private val swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
+    private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val swapRateFormatter: SwapRateFormatter,
     private val swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter,
-) : BaseViewModel(), Validatable by validationExecutor {
+) : BaseViewModel(),
+    DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
+    Validatable by validationExecutor {
 
     private val swapSettingState = async {
         swapSettingsStateProvider.getSwapSettingsState(viewModelScope)
@@ -277,11 +281,17 @@ class SwapMainSettingsViewModel(
     }
 
     fun rateDetailsClicked() {
-        TODO("Not yet implemented")
+        launchDescriptionBottomSheet(
+            titleRes = R.string.swap_rate_title,
+            descriptionRes = R.string.swap_rate_description
+        )
     }
 
     fun networkFeeClicked() {
-        TODO("Not yet implemented")
+        launchDescriptionBottomSheet(
+            titleRes = R.string.swap_network_fee_title,
+            descriptionRes = R.string.swap_network_fee_description
+        )
     }
 
     fun flipAssets() = launch {
