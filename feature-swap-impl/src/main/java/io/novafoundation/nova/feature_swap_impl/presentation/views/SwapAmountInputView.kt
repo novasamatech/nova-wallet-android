@@ -59,7 +59,7 @@ class SwapAmountInputView @JvmOverloads constructor(
     }
 
     override fun setFiatAmount(fiat: CharSequence?) {
-        swapAmountInputFiat.setTextOrHide(fiat)
+        swapAmountInputFiat.text = fiat
     }
 
     override fun setError(errorState: AmountErrorState) {

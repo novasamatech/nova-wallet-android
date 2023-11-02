@@ -197,6 +197,7 @@ class SwapMainSettingsViewModel(
 
     val buttonState: Flow<DescriptiveButtonState> = combine(
         accumulate(amountInInput.fieldError, amountOutInput.fieldError),
+        assetInFlow,
         assetOutFlow,
         amountInInput.inputState,
         amountOutInput.inputState,
@@ -404,13 +405,18 @@ class SwapMainSettingsViewModel(
 
     private fun formatButtonStates(
         errorStates: List<AmountErrorState>,
+        assetIn: Asset?,
         assetOut: Asset?,
         amountIn: InputState<String>,
         amountOut: InputState<String>
     ): DescriptiveButtonState {
         return when {
+            assetIn == null -> {
+                Disabled(resourceManager.getString(R.string.swap_main_settings_asset_in_not_selecting_button_state))
+            }
+
             assetOut == null -> {
-                Disabled(resourceManager.getString(R.string.swap_main_settings_select_token_disabled_button_state))
+                Disabled(resourceManager.getString(R.string.swap_main_settings_asset_out_not_selecting_button_state))
             }
 
             amountIn.value.isEmpty() && amountOut.value.isEmpty() -> {

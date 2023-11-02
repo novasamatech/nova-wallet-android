@@ -45,7 +45,7 @@ class SwapOptionsViewModel(
         .shareInBackground()
 
     private val slippageConfig = swapSettingsStateFlow
-        .mapNotNull { it.assetIn }
+        .mapNotNull { it.assetIn ?: it.assetOut }
         .mapNotNull { swapInteractor.slippageConfig(it.chainId) }
         .shareInBackground()
 
