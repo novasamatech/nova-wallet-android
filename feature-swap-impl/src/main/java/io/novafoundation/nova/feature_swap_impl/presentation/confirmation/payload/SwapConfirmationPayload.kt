@@ -52,4 +52,3 @@ class SwapConfirmationPayload(
         SPECIFIED_OUT
     }
 }
-

@@ -248,6 +248,7 @@ class SwapConfirmationViewModel(
                 validationFailureTransformerCustom = ::formatValidationFailure,
             ) { validPayload ->
                 executeSwap(validPayload.swapExecuteArgs)
+                _validationProgress.value = false
             }
         }
     }

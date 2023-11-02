@@ -275,6 +275,7 @@ class SwapMainSettingsViewModel(
                 progressConsumer = _validationProgress.progressConsumer(),
                 validationFailureTransformerCustom = ::formatValidationFailure,
             ) { validPayload ->
+                _validationProgress.value = false
                 openSwapConfirmation(validPayload)
             }
         }

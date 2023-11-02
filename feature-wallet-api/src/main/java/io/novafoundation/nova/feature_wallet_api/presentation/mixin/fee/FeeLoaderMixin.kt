@@ -157,7 +157,6 @@ fun <F : GenericFee> GenericFeeLoaderMixin<F>.getFeeOrNull(): F? {
         ?.genericFee
 }
 
-
 fun FeeLoaderMixin.Factory.create(assetFlow: Flow<Asset>) = create(assetFlow.map { it.token })
 fun FeeLoaderMixin.Factory.create(tokenUseCase: TokenUseCase) = create(tokenUseCase.currentTokenFlow())
 

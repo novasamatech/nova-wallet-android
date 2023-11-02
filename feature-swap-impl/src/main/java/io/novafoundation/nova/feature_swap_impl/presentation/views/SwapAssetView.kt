@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.setImageTint
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getInputBackground
-import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.android.synthetic.main.view_swap_asset.view.swapAssetAmount

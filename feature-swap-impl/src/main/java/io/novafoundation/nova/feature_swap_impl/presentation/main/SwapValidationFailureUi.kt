@@ -176,7 +176,6 @@ fun CoroutineScope.handleErrorToSwapMax(
             okAction = CustomDialogDisplayer.Payload.DialogAction(
                 title = resourceManager.getString(R.string.swap_failure_swap_max_button),
                 action = {
-
                     positiveButtonClick()
                 }
             ),

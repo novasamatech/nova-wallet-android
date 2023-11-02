@@ -122,7 +122,6 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
             ).show()
         }
 
-
         viewModel.validationProgress.observe(swapMainSettingsContinue::setState)
     }
 }

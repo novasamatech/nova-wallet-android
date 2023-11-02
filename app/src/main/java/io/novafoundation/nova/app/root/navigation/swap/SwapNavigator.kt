@@ -4,7 +4,6 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
-import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
 import io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment
 import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter

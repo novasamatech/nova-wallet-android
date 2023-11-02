@@ -6,8 +6,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.fullId
@@ -73,7 +71,6 @@ class SwapConfirmationPayloadFormatter(
         }
         return SwapConfirmationPayload.FeeDetails(swapFee.networkFee.amount, minimumBalanceBuyIn)
     }
-
 
     fun SwapConfirmationPayload.Direction.mapFromModel(): SwapDirection {
         return when (this) {
