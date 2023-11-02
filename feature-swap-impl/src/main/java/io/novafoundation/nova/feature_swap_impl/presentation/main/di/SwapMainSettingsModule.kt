@@ -111,8 +111,7 @@ class SwapMainSettingsModule {
             liquidityFieldValidatorFactory = liquidityFieldValidatorFactory,
             enoughAmountToSwapValidatorFactory = enoughAmountToSwapValidatorFactory,
             swapReceiveAmountAboveEDFieldValidatorFactory = swapReceiveAmountAboveEDFieldValidatorFactory,
-            descriptionBottomSheetLauncher = descriptionBottomSheetLauncher
-            swapReceiveAmountAboveEDFieldValidatorFactory = swapReceiveAmountAboveEDFieldValidatorFactory,
+            descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             swapRateFormatter = swapRateFormatter,
             swapConfirmationPayloadFormatter = swapConfirmationPayloadFormatter
         )

@@ -35,8 +35,9 @@ class SwapOptionsViewModel(
     private val swapSettingsStateProvider: SwapSettingsStateProvider,
     private val slippageFieldValidatorFactory: SlippageFieldValidatorFactory,
     private val swapInteractor: SwapInteractor,
+    private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val slippageAlertMixinFactory: SlippageAlertMixinFactory
-) : BaseViewModel() {
+) : BaseViewModel(), DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
 
     private val swapSettingState = async {
         swapSettingsStateProvider.getSwapSettingsState(viewModelScope)

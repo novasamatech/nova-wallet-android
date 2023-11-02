@@ -20,6 +20,7 @@ import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
+import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
@@ -37,6 +38,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.editedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
+import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
@@ -114,9 +116,11 @@ class SwapConfirmationViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter,
     private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    Validatable by validationExecutor {
+    Validatable by validationExecutor,
+    DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
 
     private val confirmationStateFlow = MutableStateFlow<SwapConfirmationState?>(null)
 
@@ -194,19 +198,31 @@ class SwapConfirmationViewModel(
     }
 
     fun rateClicked() {
-        TODO("Not yet implemented")
+        launchDescriptionBottomSheet(
+            titleRes = R.string.swap_rate_title,
+            descriptionRes = R.string.swap_rate_description
+        )
     }
 
     fun priceDifferenceClicked() {
-        TODO("Not yet implemented")
+        launchDescriptionBottomSheet(
+            titleRes = R.string.swap_price_difference_title,
+            descriptionRes = R.string.swap_price_difference_description
+        )
     }
 
     fun slippageClicked() {
-        TODO("Not yet implemented")
+        launchDescriptionBottomSheet(
+            titleRes = R.string.swap_slippage_title,
+            descriptionRes = R.string.swap_slippage_description
+        )
     }
 
     fun networkFeeClicked() {
-        TODO("Not yet implemented")
+        launchDescriptionBottomSheet(
+            titleRes = R.string.swap_network_fee_title,
+            descriptionRes = R.string.swap_network_fee_description
+        )
     }
 
     fun accountClicked() {
@@ -241,8 +257,6 @@ class SwapConfirmationViewModel(
             val result = withContext(Dispatchers.Default) { swapInteractor.executeSwap(swapExecuteArgs) }
             result.onSuccess {
                 swapRouter.finishSwapFlow(swapExecuteArgs.assetIn.fullId.toAssetPayload())
-            }.onFailure {
-                // TODO fallback: something went wrong
             }
         }
     }

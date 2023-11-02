@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -50,7 +51,8 @@ class SwapConfirmationModule {
         tokenRepository: TokenRepository,
         externalActions: ExternalActions.Presentation,
         swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter,
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory
+        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
     ): ViewModel {
         return SwapConfirmationViewModel(
             swapRouter,
@@ -69,7 +71,8 @@ class SwapConfirmationModule {
             tokenRepository,
             externalActions,
             swapConfirmationPayloadFormatter,
-            feeLoaderMixinFactory
+            feeLoaderMixinFactory,
+            descriptionBottomSheetLauncher
         )
     }
 
