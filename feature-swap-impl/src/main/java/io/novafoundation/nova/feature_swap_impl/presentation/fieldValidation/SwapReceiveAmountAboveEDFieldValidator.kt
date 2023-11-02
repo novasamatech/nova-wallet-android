@@ -41,7 +41,7 @@ class SwapReceiveAmountAboveEDFieldValidator(
             val existentialDeposit = assetWithExistentialDeposit.second
 
             when {
-                amount > BigDecimal.ZERO && asset.total + amount < existentialDeposit -> {
+                amount >= BigDecimal.ZERO && asset.total + amount < existentialDeposit -> {
                     val formattedExistentialDeposit = existentialDeposit.formatTokenAmount(asset.token.configuration)
                     FieldValidationResult.Error(
                         resourceManager.getString(R.string.swap_field_validation_to_low_amount_out, formattedExistentialDeposit)

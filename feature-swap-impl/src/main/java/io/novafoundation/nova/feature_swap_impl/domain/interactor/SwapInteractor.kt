@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.domain.validation.utils.SharedQuoteValidationRetriever
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationSystem
-import io.novafoundation.nova.feature_swap_impl.domain.validation.positiveAmount
+import io.novafoundation.nova.feature_swap_impl.domain.validation.positiveAmountIn
 import io.novafoundation.nova.feature_swap_impl.domain.validation.availableSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.checkForFeeChanges
 import io.novafoundation.nova.feature_swap_impl.domain.validation.enoughLiquidity
@@ -34,6 +34,7 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
+import io.novafoundation.nova.feature_swap_impl.domain.validation.positiveAmountOut
 
 class SwapInteractor(
     private val swapService: SwapService,
@@ -73,7 +74,9 @@ class SwapInteractor(
         val sharedQuoteValidationRetriever = SharedQuoteValidationRetriever(swapService)
 
         return ValidationSystem {
-            positiveAmount()
+            positiveAmountIn()
+
+            positiveAmountOut()
 
             availableSlippage(swapService)
 
