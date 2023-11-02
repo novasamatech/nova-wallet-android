@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoos
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
