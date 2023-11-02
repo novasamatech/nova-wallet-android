@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setTextOrHide
 import io.novafoundation.nova.common.view.showValueOrHide
@@ -17,7 +18,7 @@ import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
-import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAccount
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAlert
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAssetFrom
@@ -48,6 +49,7 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
 
     override fun initViews() {
         swapConfirmationToolbar.applyStatusBarInsets()
+        swapConfirmationToolbar.setHomeButtonListener { viewModel.backClicked() }
         swapConfirmationButton.prepareForProgress(this)
         swapConfirmationRate.setOnClickListener { viewModel.rateClicked() }
         swapConfirmationPriceDifference.setOnClickListener { viewModel.priceDifferenceClicked() }
@@ -68,15 +70,16 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
     }
 
     override fun subscribe(viewModel: SwapConfirmationViewModel) {
+        observeValidations(viewModel)
         setupExternalActions(viewModel)
+        setupFeeLoading(viewModel.feeMixin, swapConfirmationNetworkFee)
+
         viewModel.swapDetails.observe {
-            it ?: return@observe
             swapConfirmationAssetFrom.setModel(it.assetInDetails)
             swapConfirmationAssetTo.setModel(it.assetOutDetails)
             swapConfirmationRate.showValue(it.rate)
             swapConfirmationPriceDifference.showValueOrHide(it.priceDifference)
             swapConfirmationSlippage.showValue(it.slippage)
-            swapConfirmationNetworkFee.showAmount(it.networkFee)
         }
 
         viewModel.wallet.observe { swapConfirmationWallet.showWallet(it) }

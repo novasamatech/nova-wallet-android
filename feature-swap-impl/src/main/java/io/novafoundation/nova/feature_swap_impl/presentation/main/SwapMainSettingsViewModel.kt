@@ -20,6 +20,7 @@ import io.novafoundation.nova.common.utils.formatting.NumberAbbreviation
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.nullOnStart
+import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.validation.CompoundFieldValidator
 import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -45,7 +46,6 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmou
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
-import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SwapRateFormatter
@@ -66,8 +66,10 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatP
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.AmountErrorState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.invokeMaxClick
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProviderDsl.deductFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProviderDsl.providingMaxOf
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
@@ -119,7 +121,6 @@ class SwapMainSettingsViewModel(
     private val liquidityFieldValidatorFactory: LiquidityFieldValidatorFactory,
     private val swapReceiveAmountAboveEDFieldValidatorFactory: SwapReceiveAmountAboveEDFieldValidatorFactory,
     private val enoughAmountToSwapValidatorFactory: EnoughAmountToSwapValidatorFactory,
-    lastQuoteStoreSharedStateProvider: LastQuoteStoreSharedStateProvider,
     swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
@@ -131,10 +132,6 @@ class SwapMainSettingsViewModel(
 
     private val swapSettingState = async {
         swapSettingsStateProvider.getSwapSettingsState(viewModelScope)
-    }
-
-    private val lastQuoteStore = async {
-        lastQuoteStoreSharedStateProvider.create(viewModelScope)
     }
 
     private val swapSettings = swapSettingsStateProvider.swapSettingsFlow(viewModelScope)
@@ -416,8 +413,6 @@ class SwapMainSettingsViewModel(
         setupPerSwapSettingQuoting()
 
         setupPerBlockQuoting()
-
-        storeQuotingState()
     }
 
     private fun setupPerSwapSettingQuoting() {
@@ -437,18 +432,6 @@ class SwapMainSettingsViewModel(
 
                 performQuote(currentSwapSettings)
             }.launchIn(viewModelScope)
-    }
-
-    private fun storeQuotingState() {
-        // Store quote to use last quotes on confirmation screen
-        quotingState.onEach {
-            val storedState = when (it) {
-                is QuotingState.Loaded -> it.quoteArgs to it.value
-                else -> null
-            }
-
-            lastQuoteStore.await().setLastQuote(storedState)
-        }.launchIn(this)
     }
 
     private suspend fun performQuote(swapSettings: SwapSettings) {
@@ -572,14 +555,15 @@ class SwapMainSettingsViewModel(
     }
 
     private suspend fun getValidationPayload(): SwapValidationPayload? {
-        val lastQuoteState = lastQuoteStore().getLastQuote() ?: return null
+        val quotingState = quotingState.value
+        if (quotingState !is QuotingState.Loaded) return null
         val swapSettings = swapSettings.first()
         return swapInteractor.getValidationPayload(
             assetIn = swapSettings.assetIn ?: return null,
             assetOut = swapSettings.assetIn ?: return null,
             feeAsset = swapSettings.feeAsset ?: return null,
-            quoteArgs = lastQuoteState.first,
-            swapQuote = lastQuoteState.second,
+            quoteArgs = quotingState.quoteArgs,
+            swapQuote = quotingState.value,
             swapFee = feeMixin.loadedFeeOrNullFlow().first() ?: return null
         )
     }
@@ -591,10 +575,29 @@ class SwapMainSettingsViewModel(
         resourceManager,
         status,
         actions,
-        feeMixin,
-        amountInInput,
-        amountOutInput
+        ::setFee,
+        ::setMaxAvailableAmountIn,
+        ::setMinAmountOut,
     )
+
+    private fun setFee(swapFee: SwapFee) {
+        launch {
+            feeMixin.setFee(swapFee)
+        }
+    }
+
+    private fun setMaxAvailableAmountIn() {
+        launch {
+            amountInInput.invokeMaxClick()
+        }
+    }
+
+    private fun setMinAmountOut(chainAsset: Chain.Asset, amountInPlanks: Balance) {
+        launch {
+            amountOutInput.requestFocusLiveData.sendEvent()
+            amountOutInput.setAmount(chainAsset.amountFromPlanks(amountInPlanks))
+        }
+    }
 
     private fun openSwapConfirmation(validPayload: SwapValidationPayload) {
         val payload = SwapConfirmationPayload(

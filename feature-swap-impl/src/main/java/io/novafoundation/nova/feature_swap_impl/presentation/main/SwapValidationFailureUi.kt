@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_swap_impl.presentation.main
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
@@ -19,29 +18,26 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.NewRateExceededSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.InvalidSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.NotEnoughFunds
-import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin
 import io.novafoundation.nova.feature_wallet_api.R
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.amountIsTooBig
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpikeDetected
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.invokeMaxClick
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleNonPositiveAmount
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
+import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 fun CoroutineScope.mapSwapValidationFailureToUI(
     resourceManager: ResourceManager,
     status: ValidationStatus.NotValid<SwapValidationFailure>,
     actions: ValidationFlowActions<*>,
-    feeLoaderMixin: GenericFeeLoaderMixin.Presentation<SwapFee>,
-    amountInInputMixin: SwapAmountInputMixin.Presentation,
-    amountOutInputMixin: SwapAmountInputMixin.Presentation,
+    setNewFee: (SwapFee) -> Unit,
+    amountInSwapMaxAction: () -> Unit,
+    amountOutSwapMinAction: (Chain.Asset, Balance) -> Unit
 ): TransformedFailure? {
     return when (val reason = status.reason) {
         NotEnoughFunds.InUsedAsset -> resourceManager.amountIsTooBig().asDefault()
@@ -67,7 +63,7 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
 
         NotEnoughLiquidity -> TitleAndMessage(resourceManager.getString(R.string.swap_not_enought_liquidity_failure), second = null).asDefault()
 
-        is AmountOutIsTooLowToStayAboveED -> handleErrorToSwapMin(reason, resourceManager, amountOutInputMixin)
+        is AmountOutIsTooLowToStayAboveED -> handleErrorToSwapMin(reason, resourceManager, amountOutSwapMinAction)
 
         is TooSmallRemainingBalance.NoNeedsToBuyMainAssetED -> handleTooSmallRemainingBalance(
             title = resourceManager.getString(R.string.swap_failure_too_small_remaining_balance_title),
@@ -78,7 +74,7 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
             ),
             resourceManager = resourceManager,
             actions = actions,
-            amountInputMixin = amountInInputMixin
+            positiveButtonClick = amountInSwapMaxAction
         )
 
         is TooSmallRemainingBalance.NeedsToBuyMainAssetED -> handleTooSmallRemainingBalance(
@@ -94,7 +90,7 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
             ),
             resourceManager = resourceManager,
             actions = actions,
-            amountInputMixin = amountInInputMixin
+            positiveButtonClick = amountInSwapMaxAction
         )
 
         is InsufficientBalance.NoNeedsToBuyMainAssetED -> handleInsufficientBalance(
@@ -105,7 +101,7 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
                 reason.fee.amount.formatPlanks(reason.feeAsset)
             ),
             resourceManager = resourceManager,
-            amountInputMixin = amountInInputMixin
+            positiveButtonClick = amountInSwapMaxAction
         )
 
         is InsufficientBalance.NeedsToBuyMainAssetED -> handleInsufficientBalance(
@@ -119,14 +115,14 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
                 reason.feeAsset.symbol
             ),
             resourceManager = resourceManager,
-            amountInputMixin = amountInInputMixin
+            positiveButtonClick = amountInSwapMaxAction
         )
 
         is FeeChangeDetected -> handleFeeSpikeDetected(
             error = reason,
             resourceManager = resourceManager,
             actions = actions,
-            setFee = { feeLoaderMixin.setFee(it.newFee.genericFee) }
+            setFee = { setNewFee(it.newFee.genericFee) },
         )
     }
 }
@@ -135,15 +131,15 @@ fun CoroutineScope.handleInsufficientBalance(
     title: String,
     message: String,
     resourceManager: ResourceManager,
-    amountInputMixin: SwapAmountInputMixin.Presentation
+    positiveButtonClick: () -> Unit
 ): TransformedFailure {
     return handleErrorToSwapMax(
         title = title,
         message = message,
         resourceManager = resourceManager,
-        amountInputMixin = amountInputMixin,
         negativeButtonText = resourceManager.getString(R.string.common_cancel),
-        clickNegativeButton = { }
+        positiveButtonClick = positiveButtonClick,
+        negativeButtonClick = { }
     )
 }
 
@@ -152,15 +148,15 @@ fun CoroutineScope.handleTooSmallRemainingBalance(
     message: String,
     resourceManager: ResourceManager,
     actions: ValidationFlowActions<*>,
-    amountInputMixin: SwapAmountInputMixin.Presentation
+    positiveButtonClick: () -> Unit
 ): TransformedFailure {
     return handleErrorToSwapMax(
         title = title,
         message = message,
         resourceManager = resourceManager,
-        amountInputMixin = amountInputMixin,
         negativeButtonText = resourceManager.getString(R.string.common_proceed),
-        clickNegativeButton = { actions.resumeFlow() }
+        positiveButtonClick = positiveButtonClick,
+        negativeButtonClick = { actions.resumeFlow() }
     )
 }
 
@@ -168,9 +164,9 @@ fun CoroutineScope.handleErrorToSwapMax(
     title: String,
     message: String,
     resourceManager: ResourceManager,
-    amountInputMixin: SwapAmountInputMixin.Presentation,
     negativeButtonText: String,
-    clickNegativeButton: () -> Unit
+    positiveButtonClick: () -> Unit,
+    negativeButtonClick: () -> Unit
 ): TransformedFailure {
     return TransformedFailure.Custom(
         CustomDialogDisplayer.Payload(
@@ -180,14 +176,13 @@ fun CoroutineScope.handleErrorToSwapMax(
             okAction = CustomDialogDisplayer.Payload.DialogAction(
                 title = resourceManager.getString(R.string.swap_failure_swap_max_button),
                 action = {
-                    launch {
-                        amountInputMixin.invokeMaxClick()
-                    }
+
+                    positiveButtonClick()
                 }
             ),
             cancelAction = CustomDialogDisplayer.Payload.DialogAction(
                 title = negativeButtonText,
-                action = clickNegativeButton
+                action = negativeButtonClick
             )
         )
     )
@@ -196,7 +191,7 @@ fun CoroutineScope.handleErrorToSwapMax(
 fun CoroutineScope.handleErrorToSwapMin(
     reason: AmountOutIsTooLowToStayAboveED,
     resourceManager: ResourceManager,
-    amountOutInputMixin: SwapAmountInputMixin.Presentation
+    swapMinAmountAction: (Chain.Asset, BigInteger) -> Unit
 ): TransformedFailure {
     return TransformedFailure.Custom(
         CustomDialogDisplayer.Payload(
@@ -209,13 +204,7 @@ fun CoroutineScope.handleErrorToSwapMin(
             customStyle = R.style.AccentAlertDialogTheme,
             okAction = CustomDialogDisplayer.Payload.DialogAction(
                 title = resourceManager.getString(R.string.swap_failure_swap_min_button),
-                action = {
-                    launch {
-                        amountOutInputMixin.requestFocusLiveData.sendEvent()
-                        val existentialDepositAmount = reason.asset.amountFromPlanks(reason.existentialDeposit)
-                        amountOutInputMixin.setAmount(existentialDepositAmount)
-                    }
-                }
+                action = { swapMinAmountAction(reason.asset, reason.existentialDeposit) }
             ),
             cancelAction = CustomDialogDisplayer.Payload.DialogAction(
                 title = resourceManager.getString(R.string.common_cancel),

@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapCo
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -48,7 +49,8 @@ class SwapConfirmationModule {
         validationExecutor: ValidationExecutor,
         tokenRepository: TokenRepository,
         externalActions: ExternalActions.Presentation,
-        swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter
+        swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter,
+        feeLoaderMixinFactory: FeeLoaderMixin.Factory
     ): ViewModel {
         return SwapConfirmationViewModel(
             swapRouter,
@@ -66,7 +68,8 @@ class SwapConfirmationModule {
             validationExecutor,
             tokenRepository,
             externalActions,
-            swapConfirmationPayloadFormatter
+            swapConfirmationPayloadFormatter,
+            feeLoaderMixinFactory
         )
     }
 

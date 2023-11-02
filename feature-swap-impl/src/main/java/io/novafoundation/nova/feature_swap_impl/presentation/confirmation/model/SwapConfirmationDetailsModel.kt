@@ -8,6 +8,5 @@ class SwapConfirmationDetailsModel(
     val assetOutDetails: SwapAssetView.Model,
     val rate: String,
     val priceDifference: CharSequence?,
-    val slippage: String,
-    val networkFee: AmountModel
+    val slippage: String
 )

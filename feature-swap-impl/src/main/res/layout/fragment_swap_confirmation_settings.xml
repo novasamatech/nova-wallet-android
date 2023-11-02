@@ -86,11 +86,10 @@
                 app:title="@string/swap_slippage_title"
                 app:titleIcon="@drawable/ic_info_cicrle_filled_16" />
 
-            <io.novafoundation.nova.common.view.TableCellView
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
                 android:id="@+id/swapConfirmationNetworkFee"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/swap_network_fee_title"
                 app:titleIcon="@drawable/ic_info_cicrle_filled_16" />
 
         </io.novafoundation.nova.common.view.TableView>
@@ -124,6 +123,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
+        android:visibility="gone"
         app:alertMode="warning"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
         tools:layout_editor_absoluteX="16dp" />

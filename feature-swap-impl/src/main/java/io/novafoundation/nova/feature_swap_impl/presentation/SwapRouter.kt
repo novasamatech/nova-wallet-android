@@ -14,5 +14,5 @@ interface SwapRouter : ReturnableRouter {
 
     fun openSwapOptions()
 
-    fun finishSwapFlow(toAssetPayload: AssetPayload)
+    fun finishSwapFlow(assetPayload: AssetPayload)
 }
