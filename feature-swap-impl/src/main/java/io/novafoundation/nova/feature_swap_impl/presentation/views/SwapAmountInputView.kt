@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIconOrMakeGone
 import io.novafoundation.nova.common.utils.setImageTint
-import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.common.view.shape.getInputBackgroundError
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
@@ -48,6 +47,10 @@ class SwapAmountInputView @JvmOverloads constructor(
         inflate(context, R.layout.view_swap_amount_input, this)
         swapAmountInputContainer.background = context.getInputBackground()
         swapAmountInputContainer.setAddStatesFromChildren(true)
+    }
+
+    fun setSelectTokenClickListener(listener: OnClickListener) {
+        swapAmountInputContainer.setOnClickListener(listener)
     }
 
     fun setModel(model: SwapInputAssetModel) {
@@ -93,6 +96,7 @@ class SwapAmountInputView @JvmOverloads constructor(
     }
 
     fun setErrorEnabled(enabled: Boolean) {
+        swapAmountInputError.isVisible = enabled
         if (enabled) {
             amountInput.setTextColor(context.getColor(R.color.text_negative))
             swapAmountInputContainer.background = context.getInputBackgroundError()
