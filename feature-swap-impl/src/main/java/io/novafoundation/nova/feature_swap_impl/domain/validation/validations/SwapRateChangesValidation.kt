@@ -1,10 +1,9 @@
 package io.novafoundation.nova.feature_swap_impl.domain.validation.validations
 
-import io.novafoundation.nova.common.utils.Perbill
-import io.novafoundation.nova.common.utils.asPerbill
 import io.novafoundation.nova.common.utils.toPerbill
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.valid
+import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
@@ -21,28 +20,23 @@ class SwapRateChangesValidation(
 ) : SwapValidation {
 
     override suspend fun validate(value: SwapValidationPayload): ValidationStatus<SwapValidationFailure> {
-        val slippage = value.slippage.toPerbill()
         val newQuote = getNewRate(value)
-        val rateDifference = value.swapExecuteArgs.swapLimit.calculateRateDifference(newQuote.quotedBalance)
+        val swapLimit = value.swapExecuteArgs.swapLimit
 
-        if (rateDifference > slippage) {
-            return NewRateExceededSlippage(
+        return validOrError(swapLimit.isBalanceInSwapLimits(newQuote.quotedBalance)) {
+            NewRateExceededSlippage(
                 value.detailedAssetIn.asset.token.configuration,
                 value.detailedAssetOut.asset.token.configuration,
                 value.swapQuote.swapRate(),
                 newQuote.swapRate()
-            ).validationError()
+            )
         }
-
-        return valid()
     }
 }
 
-private fun SwapLimit.calculateRateDifference(quotedBalance: Balance): Perbill {
-    val rateDifference = when (this) {
-        is SwapLimit.SpecifiedIn -> (amountOutMin.toBigDecimal() - quotedBalance.toBigDecimal()) / quotedBalance.toBigDecimal()
-        is SwapLimit.SpecifiedOut -> (quotedBalance.toBigDecimal() - amountInMax.toBigDecimal()) / quotedBalance.toBigDecimal()
+private fun SwapLimit.isBalanceInSwapLimits(quotedBalance: Balance): Boolean {
+    return when (this) {
+        is SwapLimit.SpecifiedIn -> quotedBalance >= amountOutMin
+        is SwapLimit.SpecifiedOut -> quotedBalance <= amountInMax
     }
-
-    return rateDifference.asPerbill()
 }
