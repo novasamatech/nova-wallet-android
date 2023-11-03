@@ -1,10 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.domain.validation.validations
 
-import io.novafoundation.nova.common.utils.toPerbill
 import io.novafoundation.nova.common.validation.ValidationStatus
-import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validOrError
-import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
