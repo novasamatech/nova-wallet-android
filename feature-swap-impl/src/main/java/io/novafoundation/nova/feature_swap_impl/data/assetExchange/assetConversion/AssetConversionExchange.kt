@@ -138,11 +138,11 @@ private class AssetConversionExchange(
     override suspend fun slippageConfig(): SlippageConfig {
         return SlippageConfig(
             defaultSlippage = Percent(0.5),
-            slippageTips = listOf(Percent(0.1), Percent(1.0), Percent(3.0)),
-            minAvailableSlippage = Percent(0.1),
+            slippageTips = listOf(Percent(0.1), Percent(0.5), Percent(1.0)),
+            minAvailableSlippage = Percent(0.01),
             maxAvailableSlippage = Percent(50.0),
-            smallSlippage = Percent(0.5),
-            bigSlippage = Percent(2.5)
+            smallSlippage = Percent(0.05),
+            bigSlippage = Percent(1.0)
         )
     }
 
