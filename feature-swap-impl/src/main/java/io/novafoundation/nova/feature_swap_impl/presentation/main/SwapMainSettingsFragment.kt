@@ -64,7 +64,8 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         }
         swapMainSettingsDetailsRate.setOnClickListener { viewModel.rateDetailsClicked() }
         swapMainSettingsDetailsNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
-        swapMainSettingsContinue.setOnClickListener { viewModel.applyButtonClicked() }
+        swapMainSettingsContinue.setOnClickListener { viewModel.continueButtonClicked() }
+        swapMainSettingsContinue.prepareForProgress(this)
     }
 
     override fun inject() {
