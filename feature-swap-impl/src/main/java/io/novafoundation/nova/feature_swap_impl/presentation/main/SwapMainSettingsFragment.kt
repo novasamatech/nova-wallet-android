@@ -57,8 +57,8 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         swapMainSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
         swapMainSettingsToolbar.setRightActionClickListener { viewModel.openOptions() }
 
-        swapMainSettingsPayInput.setOnClickListener { viewModel.selectPayToken() }
-        swapMainSettingsReceiveInput.setOnClickListener { viewModel.selectReceiveToken() }
+        swapMainSettingsPayInput.setSelectTokenClickListener { viewModel.selectPayToken() }
+        swapMainSettingsReceiveInput.setSelectTokenClickListener { viewModel.selectReceiveToken() }
         swapMainSettingsFlip.setOnClickListener {
             viewModel.flipAssets()
         }
