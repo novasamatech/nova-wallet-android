@@ -18,8 +18,9 @@ import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsViewModel
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
-import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.SwapRateFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
@@ -88,9 +89,10 @@ class SwapMainSettingsModule {
         payload: SwapSettingsPayload,
         swapUpdateSystemFactory: SwapUpdateSystemFactory,
         swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
-        lastQuoteStoreSharedStateProvider: LastQuoteStoreSharedStateProvider,
         validationExecutor: ValidationExecutor,
-        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
+        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
+        swapRateFormatter: SwapRateFormatter,
+        swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -105,12 +107,13 @@ class SwapMainSettingsModule {
             payload = payload,
             swapUpdateSystemFactory = swapUpdateSystemFactory,
             swapInputMixinPriceImpactFiatFormatterFactory = swapInputMixinPriceImpactFiatFormatterFactory,
-            lastQuoteStoreSharedStateProvider = lastQuoteStoreSharedStateProvider,
             validationExecutor = validationExecutor,
             liquidityFieldValidatorFactory = liquidityFieldValidatorFactory,
             enoughAmountToSwapValidatorFactory = enoughAmountToSwapValidatorFactory,
             swapReceiveAmountAboveEDFieldValidatorFactory = swapReceiveAmountAboveEDFieldValidatorFactory,
-            descriptionBottomSheetLauncher = descriptionBottomSheetLauncher
+            descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
+            swapRateFormatter = swapRateFormatter,
+            swapConfirmationPayloadFormatter = swapConfirmationPayloadFormatter
         )
     }
 

@@ -16,9 +16,12 @@ import io.novafoundation.nova.feature_swap_impl.domain.swap.RealSwapService
 import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
-import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealPriceImpactFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.RealSwapRateFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.SwapRateFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -61,8 +64,8 @@ class SwapFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideLastQuoteStoreSharedStateProvider(computationalCache: ComputationalCache): LastQuoteStoreSharedStateProvider {
-        return LastQuoteStoreSharedStateProvider(computationalCache)
+    fun provideSwapConfirmationPayloadFormatter(chainRegistry: ChainRegistry): SwapConfirmationPayloadFormatter {
+        return SwapConfirmationPayloadFormatter(chainRegistry)
     }
 
     @Provides
@@ -89,6 +92,18 @@ class SwapFeatureModule {
     @FeatureScope
     fun providePriceImpactFormatter(resourceManager: ResourceManager): PriceImpactFormatter {
         return RealPriceImpactFormatter(resourceManager)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSwapRateFormatter(): SwapRateFormatter {
+        return RealSwapRateFormatter()
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSlippageAlertMixinFactory(resourceManager: ResourceManager): SlippageAlertMixinFactory {
+        return SlippageAlertMixinFactory(resourceManager)
     }
 
     @Provides

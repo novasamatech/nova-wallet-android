@@ -86,7 +86,7 @@
         android:text="@string/swap_error_pair_not_supported"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsReceiveInput"
-        app:style="error"
+        app:alertMode="error"
         app:styleIcon="@drawable/ic_close_circle"
         app:styleIconTint="@color/icon_negative" />
 
@@ -163,7 +163,7 @@
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsDetails"
-        app:style="info" />
+        app:alertMode="info" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/swapMainSettingsContinue"

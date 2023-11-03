@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
-class SwapQuoteArgs(
+data class SwapQuoteArgs(
     val tokenIn: Token,
     val tokenOut: Token,
     val amount: Balance,

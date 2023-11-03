@@ -20,9 +20,12 @@ import io.novafoundation.nova.common.utils.formatting.NumberAbbreviation
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.nullOnStart
+import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.validation.CompoundFieldValidator
 import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.ValidationFlowActions
+import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.SimpleAlertModel
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
@@ -43,7 +46,11 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmou
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
-import io.novafoundation.nova.feature_swap_impl.domain.swap.LastQuoteStoreSharedStateProvider
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
+import io.novafoundation.nova.feature_swap_impl.presentation.common.SwapRateFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
+import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
@@ -56,18 +63,19 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.AmountErrorState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProviderDsl.deductFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProviderDsl.providingMaxOf
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.invokeMaxClick
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.provideMaxWithFeeDeducted
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeOrNullFlow
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
+import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -112,23 +120,20 @@ class SwapMainSettingsViewModel(
     private val liquidityFieldValidatorFactory: LiquidityFieldValidatorFactory,
     private val swapReceiveAmountAboveEDFieldValidatorFactory: SwapReceiveAmountAboveEDFieldValidatorFactory,
     private val enoughAmountToSwapValidatorFactory: EnoughAmountToSwapValidatorFactory,
-    lastQuoteStoreSharedStateProvider: LastQuoteStoreSharedStateProvider,
     swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
     private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
     private val swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
-    private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
+    private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
+    private val swapRateFormatter: SwapRateFormatter,
+    private val swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter,
 ) : BaseViewModel(),
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
     Validatable by validationExecutor {
 
     private val swapSettingState = async {
         swapSettingsStateProvider.getSwapSettingsState(viewModelScope)
-    }
-
-    private val lastQuoteStore = async {
-        lastQuoteStoreSharedStateProvider.create(viewModelScope)
     }
 
     private val swapSettings = swapSettingsStateProvider.swapSettingsFlow(viewModelScope)
@@ -168,9 +173,7 @@ class SwapMainSettingsViewModel(
         coroutineScope = viewModelScope,
         tokenFlow = assetInFlow.token().nullOnStart(),
         emptyAssetTitle = R.string.swap_field_asset_from_title,
-        maxActionProvider = assetInFlow
-            .providingMaxOf(Asset::transferableInPlanks)
-            .deductFee(feeMixin, SwapFee::totalDeductedPlanks),
+        maxActionProvider = assetInFlow.provideMaxWithFeeDeducted(Asset::transferableInPlanks, feeMixin, SwapFee::totalDeductedPlanks),
         fieldValidator = getAmountInFieldValidator()
     )
 
@@ -194,6 +197,8 @@ class SwapMainSettingsViewModel(
         .shareInBackground()
 
     private val _validationProgress = MutableStateFlow(false)
+
+    val validationProgress = _validationProgress
 
     val buttonState: Flow<DescriptiveButtonState> = combine(
         accumulate(amountInInput.fieldError, amountOutInput.fieldError),
@@ -252,32 +257,17 @@ class SwapMainSettingsViewModel(
 
     fun applyButtonClicked() {
         launch {
-            val assetIn = assetInFlow.first() ?: return@launch
-            val validationSystem = swapInteractor.validationSystem(assetIn.token.configuration.chainId) ?: return@launch
-            val lastQuoteState = lastQuoteStore().getLastQuote() ?: return@launch
-            val payload = swapInteractor.getValidationPayload(
-                swapSettings = swapSettings.first(),
-                quoteArgs = lastQuoteState.first,
-                swapQuote = lastQuoteState.second,
-                swapFee = feeMixin.loadedFeeOrNullFlow().first() ?: return@launch
-            ) ?: return@launch
+            val validationSystem = swapInteractor.validationSystem()
+            val payload = getValidationPayload() ?: return@launch
 
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
                 progressConsumer = _validationProgress.progressConsumer(),
-                validationFailureTransformerCustom = { status, actions ->
-                    viewModelScope.mapSwapValidationFailureToUI(
-                        resourceManager,
-                        status,
-                        actions,
-                        feeMixin,
-                        amountInInput,
-                        amountOutInput
-                    )
-                },
+                validationFailureTransformerCustom = ::formatValidationFailure,
             ) { validPayload ->
-                swapRouter.openSwapConfirmation()
+                _validationProgress.value = false
+                openSwapConfirmation(validPayload)
             }
         }
     }
@@ -395,12 +385,7 @@ class SwapMainSettingsViewModel(
     }
 
     private fun formatRate(swapQuote: SwapQuote): String {
-        val rate = swapQuote.swapRate()
-
-        val assetInUnitFormatted = BigDecimal.ONE.formatTokenAmount(swapQuote.assetIn)
-        val rateAmountFormatted = rate.formatTokenAmount(swapQuote.assetOut)
-
-        return "$assetInUnitFormatted ≈ $rateAmountFormatted"
+        return swapRateFormatter.format(swapQuote.swapRate(), swapQuote.assetIn, swapQuote.assetOut)
     }
 
     private fun formatButtonStates(
@@ -435,8 +420,6 @@ class SwapMainSettingsViewModel(
         setupPerSwapSettingQuoting()
 
         setupPerBlockQuoting()
-
-        storeQuotingState()
     }
 
     private fun setupPerSwapSettingQuoting() {
@@ -456,18 +439,6 @@ class SwapMainSettingsViewModel(
 
                 performQuote(currentSwapSettings)
             }.launchIn(viewModelScope)
-    }
-
-    private fun storeQuotingState() {
-        // Store quote to use last quotes on confirmation screen
-        quotingState.onEach {
-            val storedState = when (it) {
-                is QuotingState.Loaded -> it.quoteArgs to it.value
-                else -> null
-            }
-
-            lastQuoteStore.await().setLastQuote(storedState)
-        }.launchIn(this)
     }
 
     private suspend fun performQuote(swapSettings: SwapSettings) {
@@ -588,6 +559,63 @@ class SwapMainSettingsViewModel(
 
     private fun getAmountOutFieldValidator(): FieldValidator {
         return swapReceiveAmountAboveEDFieldValidatorFactory.create(assetOutFlow)
+    }
+
+    private suspend fun getValidationPayload(): SwapValidationPayload? {
+        val quotingState = quotingState.value
+        if (quotingState !is QuotingState.Loaded) return null
+        val swapSettings = swapSettings.first()
+        return swapInteractor.getValidationPayload(
+            assetIn = swapSettings.assetIn ?: return null,
+            assetOut = swapSettings.assetIn ?: return null,
+            feeAsset = swapSettings.feeAsset ?: return null,
+            quoteArgs = quotingState.quoteArgs,
+            swapQuote = quotingState.value,
+            swapFee = feeMixin.loadedFeeOrNullFlow().first() ?: return null
+        )
+    }
+
+    private fun formatValidationFailure(
+        status: ValidationStatus.NotValid<SwapValidationFailure>,
+        actions: ValidationFlowActions<SwapValidationPayload>
+    ) = viewModelScope.mapSwapValidationFailureToUI(
+        resourceManager,
+        status,
+        actions,
+        ::setFee,
+        ::setMaxAvailableAmountIn,
+        ::setMinAmountOut,
+    )
+
+    private fun setFee(swapFee: SwapFee) {
+        launch {
+            feeMixin.setFee(swapFee)
+        }
+    }
+
+    private fun setMaxAvailableAmountIn() {
+        launch {
+            amountInInput.invokeMaxClick()
+        }
+    }
+
+    private fun setMinAmountOut(chainAsset: Chain.Asset, amountInPlanks: Balance) {
+        launch {
+            amountOutInput.requestFocusLiveData.sendEvent()
+            amountOutInput.setAmount(chainAsset.amountFromPlanks(amountInPlanks))
+        }
+    }
+
+    private fun openSwapConfirmation(validPayload: SwapValidationPayload) {
+        val payload = SwapConfirmationPayload(
+            swapQuoteModel = swapConfirmationPayloadFormatter.mapSwapQuoteToModel(validPayload.swapQuote),
+            feeAsset = validPayload.feeAsset.token.configuration.fullId.toAssetPayload(),
+            rate = validPayload.swapQuote.swapRate(),
+            slippage = validPayload.slippage.value,
+            swapFee = swapConfirmationPayloadFormatter.mapFeeToModel(validPayload.swapFee)
+        )
+
+        swapRouter.openSwapConfirmation(payload)
     }
 
     private val amountInputFormatter = CompoundNumberFormatter(

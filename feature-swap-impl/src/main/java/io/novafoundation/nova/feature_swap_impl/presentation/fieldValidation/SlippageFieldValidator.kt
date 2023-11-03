@@ -36,14 +36,6 @@ class SlippageFieldValidator(
                 )
             }
 
-            value < slippageConfig.smallSlippage -> {
-                FieldValidationResult.Warning(resourceManager.getString(R.string.swap_slippage_warning_too_small))
-            }
-
-            value > slippageConfig.bigSlippage -> {
-                FieldValidationResult.Warning(resourceManager.getString(R.string.swap_slippage_warning_too_big))
-            }
-
             else -> FieldValidationResult.Ok
         }
     }

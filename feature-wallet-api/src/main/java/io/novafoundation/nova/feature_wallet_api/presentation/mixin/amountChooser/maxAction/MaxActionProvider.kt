@@ -5,6 +5,8 @@ import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider.MaxAvailableForAction
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProviderDsl.deductFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProviderDsl.providingMaxOf
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
@@ -106,4 +108,14 @@ object MaxActionProviderDsl {
     ): MaxActionProvider {
         return FeeAwareMaxActionProvider(feeLoaderMixin, extractTotalFee, inner = this)
     }
+}
+
+fun <F : GenericFee> Flow<Asset?>.provideMaxWithFeeDeducted(
+    field: (Asset) -> Balance,
+    feeLoaderMixin: GenericFeeLoaderMixin<F>,
+    extractTotalFee: (F) -> Balance,
+    allowMaxAction: Boolean = true
+): MaxActionProvider {
+    return providingMaxOf(field, allowMaxAction)
+        .deductFee(feeLoaderMixin, extractTotalFee)
 }

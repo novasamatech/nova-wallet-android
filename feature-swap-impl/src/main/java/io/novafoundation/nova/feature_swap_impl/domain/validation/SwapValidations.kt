@@ -61,7 +61,7 @@ fun SwapValidationSystemBuilder.sufficientBalanceInFeeAsset() = sufficientBalanc
 
 fun SwapValidationSystemBuilder.sufficientBalanceInUsedAsset() = sufficientBalance(
     available = { it.detailedAssetIn.asset.transferable },
-    amount = { it.detailedAssetIn.amount },
+    amount = { it.detailedAssetIn.asset.token.amountFromPlanks(it.detailedAssetIn.amountInPlanks) },
     fee = { BigDecimal.ZERO },
     error = { _, _ ->
         SwapValidationFailure.NotEnoughFunds.InUsedAsset
@@ -82,6 +82,6 @@ fun SwapValidationSystemBuilder.checkForFeeChanges(
 )
 
 fun SwapValidationSystemBuilder.positiveAmount() = positiveAmount(
-    amount = { it.detailedAssetIn.amount },
+    amount = { it.detailedAssetIn.asset.token.amountFromPlanks(it.detailedAssetIn.amountInPlanks) },
     error = { SwapValidationFailure.NonPositiveAmount }
 )

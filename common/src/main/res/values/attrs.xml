@@ -169,7 +169,7 @@
     </declare-styleable>
 
     <declare-styleable name="AlertView">
-        <attr name="style" format="enum">
+        <attr name="alertMode" format="enum">
             <enum name="warning" value="0" />
             <enum name="error" value="1" />
             <enum name="info" value="2" />

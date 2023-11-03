@@ -30,7 +30,7 @@ class CompoundFieldValidator(
         return validators.map { it.observe(inputStream) }
             .combine()
             .map {
-                it.firstOrNull { it is FieldValidationResult.Error || it is FieldValidationResult.Warning }
+                it.firstOrNull { it is FieldValidationResult.Error }
                     ?: FieldValidationResult.Ok
             }
     }
@@ -40,14 +40,11 @@ sealed class FieldValidationResult {
     object Ok : FieldValidationResult()
 
     class Error(val reason: String) : FieldValidationResult()
-
-    class Warning(val reason: String) : FieldValidationResult()
 }
 
 fun FieldValidationResult.getReasonOrNull(): String? {
     return when (this) {
         is FieldValidationResult.Error -> reason
-        is FieldValidationResult.Warning -> reason
         else -> null
     }
 }
@@ -59,8 +56,7 @@ fun ValidatableInputField.observeErrors(
     scope.launch {
         flow.collect { validationResult ->
             when (validationResult) {
-                is FieldValidationResult.Ok,
-                is FieldValidationResult.Warning -> {
+                is FieldValidationResult.Ok -> {
                     hideError()
                 }
 

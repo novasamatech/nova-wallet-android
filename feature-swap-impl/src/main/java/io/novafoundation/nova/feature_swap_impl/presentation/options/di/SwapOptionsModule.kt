@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBot
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SlippageFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.options.SwapOptionsViewModel
 
@@ -35,7 +36,8 @@ class SwapOptionsModule {
         swapSettingsStateProvider: SwapSettingsStateProvider,
         slippageFieldValidatorFactory: SlippageFieldValidatorFactory,
         swapInteractor: SwapInteractor,
-        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
+        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
+        slippageAlertMixinFactory: SlippageAlertMixinFactory
     ): ViewModel {
         return SwapOptionsViewModel(
             swapRouter,
@@ -43,7 +45,8 @@ class SwapOptionsModule {
             swapSettingsStateProvider,
             slippageFieldValidatorFactory,
             swapInteractor,
-            descriptionBottomSheetLauncher
+            descriptionBottomSheetLauncher,
+            slippageAlertMixinFactory
         )
     }
 
