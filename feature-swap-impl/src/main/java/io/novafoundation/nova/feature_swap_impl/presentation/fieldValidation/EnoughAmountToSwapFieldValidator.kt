@@ -5,9 +5,9 @@ import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import java.math.BigDecimal
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import java.math.BigDecimal
 
 class EnoughAmountToSwapValidatorFactory(
     private val resourceManager: ResourceManager

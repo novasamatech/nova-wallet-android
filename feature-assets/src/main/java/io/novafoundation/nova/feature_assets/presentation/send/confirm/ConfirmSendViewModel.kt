@@ -19,12 +19,11 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.AddressD
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_assets.presentation.send.TransferDirectionModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.autoFixSendValidationPayload
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.hints.ConfirmSendHintsMixinFactory
@@ -37,6 +36,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDec
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
@@ -48,6 +48,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+
+class ConfirmSendChainsModel(
+    val origin: ChainUi,
+    val originChainLabel: String,
+    val destination: ChainUi?
+)
 
 class ConfirmSendViewModel(
     private val interactor: WalletInteractor,
@@ -215,7 +221,11 @@ class ConfirmSendViewModel(
         val chain = originChain()
         val chainAsset = originAsset()
 
-        router.openAssetDetails(AssetPayload(chain.id, chainAsset.id))
+        if (transferDraft.openAssetDetailsOnCompletion) {
+            router.openAssetDetails(AssetPayload(chain.id, chainAsset.id))
+        } else {
+            router.closeSendFlow()
+        }
     }
 
     private suspend fun buildValidationPayload(): AssetTransferPayload {
@@ -236,7 +246,7 @@ class ConfirmSendViewModel(
                 commissionAssetToken = commissionAssetFlow.first().token,
                 decimalFee = originFee,
             ),
-            originFee = originFee.decimalAmount,
+            originFee = originFee.networkFeeDecimalAmount,
             originCommissionAsset = commissionAssetFlow.first(),
             originUsedAsset = assetFlow.first(),
             crossChainFee = transferDraft.crossChainFee
@@ -244,16 +254,16 @@ class ConfirmSendViewModel(
     }
 
     private suspend fun createTransferDirectionModel() = if (transferDraft.isCrossChain) {
-        TransferDirectionModel(
-            originChainUi = mapChainToUi(originChain()),
+        ConfirmSendChainsModel(
+            origin = mapChainToUi(originChain()),
             originChainLabel = resourceManager.getString(R.string.wallet_send_from_network),
-            destinationChainUi = mapChainToUi(destinationChain())
+            destination = mapChainToUi(destinationChain())
         )
     } else {
-        TransferDirectionModel(
-            originChainUi = mapChainToUi(originChain()),
+        ConfirmSendChainsModel(
+            origin = mapChainToUi(originChain()),
             originChainLabel = resourceManager.getString(R.string.common_network),
-            destinationChainUi = null
+            destination = null
         )
     }
 }

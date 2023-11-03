@@ -5,11 +5,9 @@ import android.os.Bundle
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
+import io.novafoundation.nova.common.view.bottomSheet.list.fixed.textWithDescriptionItem
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
-import kotlinx.android.synthetic.main.item_source_type.view.itemSourceTypeIcon
-import kotlinx.android.synthetic.main.item_source_type.view.itemSourceTypeSubtitle
-import kotlinx.android.synthetic.main.item_source_type.view.itemSourceTypeTitle
 
 class ImportTypeChooserBottomSheet(
     context: Context,
@@ -32,7 +30,7 @@ class ImportTypeChooserBottomSheet(
         item(
             type = SecretType.SEED,
             title = R.string.recovery_raw_seed,
-            subtitle = R.string.account_private_key,
+            subtitle = R.string.common_hexadecimal_string,
             icon = R.drawable.ic_raw_seed
         )
 
@@ -52,12 +50,12 @@ class ImportTypeChooserBottomSheet(
     ) {
         if (type !in allowedSources) return
 
-        item(R.layout.item_source_type) {
-            it.itemSourceTypeIcon.setImageResource(icon)
-            it.itemSourceTypeTitle.setText(title)
-            it.itemSourceTypeSubtitle.setText(subtitle)
-
-            it.setDismissingClickListener { onChosen(type) }
+        textWithDescriptionItem(
+            titleRes = title,
+            descriptionRes = subtitle,
+            iconRes = icon,
+        ) {
+            onChosen(type)
         }
     }
 }

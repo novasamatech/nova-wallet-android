@@ -10,5 +10,6 @@ interface MyselfBehaviorProvider {
 interface MyselfBehavior {
 
     suspend fun myselfAvailable(): Boolean
+
     suspend fun myself(): String?
 }

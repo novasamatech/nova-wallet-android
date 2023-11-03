@@ -14,5 +14,9 @@ interface SwapRouter : ReturnableRouter {
 
     fun openSwapOptions()
 
+    fun openSendCrossChain(destination: AssetPayload, recipientAddress: String?)
+
+    fun openReceive(assetPayload: AssetPayload)
+
     fun finishSwapFlow(assetPayload: AssetPayload)
 }

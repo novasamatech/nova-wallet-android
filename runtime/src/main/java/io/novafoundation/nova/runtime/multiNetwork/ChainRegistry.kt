@@ -163,6 +163,12 @@ suspend fun ChainRegistry.asset(fullChainAssetId: FullChainAssetId): Chain.Asset
     return asset(fullChainAssetId.chainId, fullChainAssetId.assetId)
 }
 
+fun ChainsById.assets(ids: Collection<FullChainAssetId>): List<Chain.Asset> {
+    return ids.map { (chainId, assetId) ->
+        getValue(chainId).assetsById.getValue(assetId)
+    }
+}
+
 suspend inline fun ChainRegistry.findChain(predicate: (Chain) -> Boolean): Chain? = currentChains.first().firstOrNull(predicate)
 suspend inline fun ChainRegistry.findChains(predicate: (Chain) -> Boolean): List<Chain> = currentChains.first().filter(predicate)
 

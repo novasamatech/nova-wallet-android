@@ -144,6 +144,18 @@ class WalletRepositoryImpl(
             .distinctUntilChanged()
     }
 
+    override fun assetsFlow(metaId: Long, chainAssets: List<Chain.Asset>): Flow<List<Asset>> = flowOfAll {
+        val chainAssetsById = chainAssets.associateBy { AssetAndChainId(it.chainId, it.id) }
+
+        assetCache.observeAssets(metaId, chainAssetsById.keys).map { dbAssets ->
+            dbAssets.mapNotNull { assetWithToken ->
+                val chainAsset = chainAssetsById[assetWithToken.assetAndChainId] ?: return@mapNotNull null
+
+                mapAssetLocalToAsset(assetWithToken, chainAsset)
+            }
+        }.distinctUntilChanged()
+    }
+
     override suspend fun getAsset(accountId: AccountId, chainAsset: Chain.Asset): Asset? {
         val assetLocal = getAsset(accountId, chainAsset.chainId, chainAsset.id)
 

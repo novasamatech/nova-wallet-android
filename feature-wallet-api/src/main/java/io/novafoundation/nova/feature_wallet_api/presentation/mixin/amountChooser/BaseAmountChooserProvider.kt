@@ -104,7 +104,11 @@ open class BaseAmountChooserProvider(
 
     override val requestFocusLiveData: MutableLiveData<Event<Unit>> = MutableLiveData()
 
-    private fun String.parseBigDecimalOrNull() = replace(",", "").toBigDecimalOrNull()
+    private fun String.parseBigDecimalOrNull(): BigDecimal? {
+        if (isEmpty()) return BigDecimal.ZERO
+
+        return replace(",", "").toBigDecimalOrNull()
+    }
 
     private fun defaultState(): InputState<String> = InputState(value = "", initiatedByUser = true, inputKind = InputKind.REGULAR)
 

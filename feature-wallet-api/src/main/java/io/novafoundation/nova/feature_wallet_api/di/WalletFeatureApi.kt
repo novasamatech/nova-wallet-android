@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.CoinPriceInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -66,4 +67,6 @@ interface WalletFeatureApi {
     val balanceLocksUpdaterFactory: BalanceLocksUpdaterFactory
 
     val coinPriceRepository: CoinPriceRepository
+
+    val crossChainTransfersUseCase: CrossChainTransfersUseCase
 }

@@ -25,6 +25,7 @@ private const val CHAIN_ADDITIONAL_TIP = "defaultTip"
 private const val CHAIN_THEME_COLOR = "themeColor"
 private const val CHAIN_STAKING_WIKI = "stakingWiki"
 private const val DEFAULT_BLOCK_TIME = "defaultBlockTime"
+private const val RELAYCHAIN_AS_NATIVE = "relaychainAsNative"
 
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
@@ -42,7 +43,8 @@ fun mapRemoteChainToLocal(
             defaultTip = (it[CHAIN_ADDITIONAL_TIP] as? String)?.toBigInteger(),
             themeColor = (it[CHAIN_THEME_COLOR] as? String),
             stakingWiki = (it[CHAIN_STAKING_WIKI] as? String),
-            defaultBlockTimeMillis = it[DEFAULT_BLOCK_TIME].asGsonParsedLongOrNull()
+            defaultBlockTimeMillis = it[DEFAULT_BLOCK_TIME].asGsonParsedLongOrNull(),
+            relaychainAsNative = it[RELAYCHAIN_AS_NATIVE] as? Boolean
         )
     }
 

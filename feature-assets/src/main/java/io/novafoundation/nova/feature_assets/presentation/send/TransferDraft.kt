@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_assets.presentation.send
 
 import android.os.Parcelable
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeParcelModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import kotlinx.android.parcel.Parcelize
 import java.math.BigDecimal
 
@@ -13,7 +13,8 @@ class TransferDraft(
     val crossChainFee: BigDecimal?,
     val origin: AssetPayload,
     val destination: AssetPayload,
-    val recipientAddress: String
+    val recipientAddress: String,
+    val openAssetDetailsOnCompletion: Boolean,
 ) : Parcelable
 
 val TransferDraft.isCrossChain

@@ -619,6 +619,15 @@
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_open_exit"
             app:popUpTo="@id/mainFragment" />
+
+        <action
+            android:id="@+id/action_close_send_flow"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/selectSendFragment" />
     </fragment>
 
     <fragment
