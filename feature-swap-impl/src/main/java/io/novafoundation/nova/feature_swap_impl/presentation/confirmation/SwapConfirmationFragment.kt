@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
+import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.common.view.setTextOrHide
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
@@ -89,6 +90,6 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
 
         viewModel.slippageAlertMessage.observe { swapConfirmationAlert.setTextOrHide(it) }
 
-        viewModel.validationProgress.observe(swapConfirmationButton::setState)
+        viewModel.validationProgress.observe(swapConfirmationButton::setProgress)
     }
 }

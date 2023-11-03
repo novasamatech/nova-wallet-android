@@ -27,7 +27,6 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.common.view.SimpleAlertModel
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
@@ -68,8 +67,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.invokeMaxClick
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProviderDsl.deductFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProviderDsl.providingMaxOf
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.provideMaxWithFeeDeducted
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
@@ -175,9 +173,7 @@ class SwapMainSettingsViewModel(
         coroutineScope = viewModelScope,
         tokenFlow = assetInFlow.token().nullOnStart(),
         emptyAssetTitle = R.string.swap_field_asset_from_title,
-        maxActionProvider = assetInFlow
-            .providingMaxOf(Asset::transferableInPlanks)
-            .deductFee(feeMixin, SwapFee::totalDeductedPlanks),
+        maxActionProvider = assetInFlow.provideMaxWithFeeDeducted(Asset::transferableInPlanks, feeMixin, SwapFee::totalDeductedPlanks),
         fieldValidator = getAmountInFieldValidator()
     )
 
@@ -202,13 +198,7 @@ class SwapMainSettingsViewModel(
 
     private val _validationProgress = MutableStateFlow(false)
 
-    val validationProgress = _validationProgress.map { submitting ->
-        if (submitting) {
-            ButtonState.PROGRESS
-        } else {
-            ButtonState.NORMAL
-        }
-    }
+    val validationProgress = _validationProgress
 
     val buttonState: Flow<DescriptiveButtonState> = combine(
         accumulate(amountInInput.fieldError, amountOutInput.fieldError),
