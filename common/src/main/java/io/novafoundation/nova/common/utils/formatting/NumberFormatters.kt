@@ -78,10 +78,6 @@ private val trillionAbbreviation = NumberAbbreviation(
 
 private val defaultNumberFormatter = defaultNumberFormatter()
 
-fun BigDecimal.toStripTrailingZerosString(): String {
-    return stripTrailingZeros().toPlainString()
-}
-
 fun BigDecimal.format(roundingMode: RoundingMode = RoundingMode.FLOOR): String {
     return defaultNumberFormatter.format(this, roundingMode)
 }

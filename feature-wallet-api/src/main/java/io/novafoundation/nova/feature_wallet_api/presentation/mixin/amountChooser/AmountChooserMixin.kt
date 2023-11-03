@@ -3,8 +3,6 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoos
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
@@ -112,7 +110,7 @@ fun AmountChooserMixinBase.AmountErrorState.getMessageOrNull(): String? {
 }
 
 fun AmountChooserMixinBase.Presentation.setAmount(amount: BigDecimal, initiatedByUser: Boolean = false) {
-    inputState.value = InputState(value = amount.toStripTrailingZerosString(), initiatedByUser, inputKind = InputKind.REGULAR)
+    inputState.value = InputState(value = amount.toPlainString(), initiatedByUser, inputKind = InputKind.REGULAR)
 }
 
 fun AmountChooserMixinBase.Presentation.setAmountInput(amountInput: String, initiatedByUser: Boolean = false) {

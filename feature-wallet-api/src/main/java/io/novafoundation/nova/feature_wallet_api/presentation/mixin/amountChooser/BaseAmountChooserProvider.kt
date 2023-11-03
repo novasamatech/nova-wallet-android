@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.firstNotNull
-import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.FieldValidationResult
@@ -192,7 +191,7 @@ open class BaseAmountChooserProvider(
         }
 
         private fun maxAmountInputState(amount: BigDecimal): InputState<String> {
-            return InputState(amount.toStripTrailingZerosString(), initiatedByUser = true, inputKind = InputKind.MAX_ACTION)
+            return InputState(amount.toPlainString(), initiatedByUser = true, inputKind = InputKind.MAX_ACTION)
         }
 
         private fun MaxActionProvider?.maxAvailableForAction(): Flow<Balance?> = this?.maxAvailableForAction?.balance() ?: flowOf(null)
