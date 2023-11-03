@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -21,6 +22,7 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.nullOnStart
+import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.common.validation.CompoundFieldValidator
 import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -430,6 +432,13 @@ class SwapMainSettingsViewModel(
             }
             .filterIsInstance<QuotingState.Loaded>()
             .debounce(300.milliseconds)
+            .zipWithPrevious()
+            .mapNotNull { (previous, current) ->
+                current.takeIf {
+                    // allow same value in case user quickly switcher from this value to another and back without waiting for fee loading
+                    previous != current || feeMixin.feeLiveData.value !is FeeStatus.Loaded
+                }
+            }
             .onEach { quoteState ->
                 val swapArgs = quoteState.quoteArgs.toExecuteArgs(
                     quotedBalance = quoteState.value.quotedBalance,
@@ -513,7 +522,7 @@ class SwapMainSettingsViewModel(
     }
 
     private fun setupPerSwapSettingQuoting() {
-        swapSettings.mapLatest(::performQuote)
+        swapSettings.mapLatest { performQuote(it, shouldShowLoading = true) }
             .launchIn(viewModelScope)
     }
 
@@ -527,7 +536,7 @@ class SwapMainSettingsViewModel(
             }.onEach {
                 val currentSwapSettings = swapSettings.first()
 
-                performQuote(currentSwapSettings)
+                performQuote(currentSwapSettings, shouldShowLoading = false)
             }.launchIn(viewModelScope)
     }
 
@@ -543,13 +552,15 @@ class SwapMainSettingsViewModel(
         }.launchIn(this)
     }
 
-    private suspend fun performQuote(swapSettings: SwapSettings) {
+    private suspend fun performQuote(swapSettings: SwapSettings, shouldShowLoading: Boolean) {
         val swapQuoteArgs = swapSettings.toQuoteArgs(
             tokenIn = { assetInFlow.ensureToken(it) },
             tokenOut = { assetOutFlow.ensureToken(it) },
         ) ?: return
 
-        quotingState.value = QuotingState.Loading
+        if (shouldShowLoading) {
+            quotingState.value = QuotingState.Loading
+        }
 
         val quote = swapInteractor.quote(swapQuoteArgs)
 
@@ -563,6 +574,8 @@ class SwapMainSettingsViewModel(
                 }
             }
         )
+
+        Log.d("RX", "New quote arrived: ${quotingState.value}")
 
         handleNewQuote(quote, swapSettings)
     }
