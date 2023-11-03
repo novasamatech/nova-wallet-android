@@ -211,7 +211,23 @@ class SwapMainSettingsViewModel(
     }
         .shareInBackground()
 
-    val showDetails: Flow<Boolean> = quotingState.map { it is QuotingState.Loaded }
+    val showDetails: Flow<Boolean> = combine(
+        amountInInput.inputState,
+        amountOutInput.inputState,
+        quotingState
+    ) { amountInputState, amountOutState, quotingState ->
+        val isAmountEmpty = amountInputState.value.isEmpty() || amountOutState.value.isEmpty()
+
+        when {
+            !isAmountEmpty -> true
+            quotingState is QuotingState.Loaded -> true
+            quotingState is QuotingState.NotAvailable -> false
+            quotingState is QuotingState.Default -> false
+            else -> null // Don't do anything if it's loading state
+        }
+    }
+        .filterNotNull()
+        .distinctUntilChanged()
         .shareInBackground()
 
     private val _validationProgress = MutableStateFlow(false)
@@ -225,7 +241,7 @@ class SwapMainSettingsViewModel(
         assetInFlow,
         assetOutFlow,
         ::formatButtonStates
-    )
+    ).distinctUntilChanged()
 
     val swapDirectionFlipped: MutableLiveData<Event<SwapDirection>> = MutableLiveData()
 
@@ -257,6 +273,7 @@ class SwapMainSettingsViewModel(
         }
     }
         .onStart { emit(DescriptiveButtonState.Gone) }
+        .distinctUntilChanged()
         .shareInBackground()
 
     val selectGetAssetInOption = actionAwaitableFactory.create<GetAssetInBottomSheet.Payload, GetAssetInOption>()
@@ -500,9 +517,11 @@ class SwapMainSettingsViewModel(
 
             quotingState is QuotingState.Loading -> DescriptiveButtonState.Loading
 
-            quotingState !is QuotingState.Loaded -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_continue))
+            quotingState is QuotingState.NotAvailable || inputs.any { it.value.isEmpty() } -> {
+                DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_continue))
+            }
 
-            else -> return DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
+            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
         }
     }
 
