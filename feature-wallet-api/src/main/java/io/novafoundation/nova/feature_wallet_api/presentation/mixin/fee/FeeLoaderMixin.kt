@@ -149,6 +149,14 @@ fun <F : GenericFee> GenericFeeLoaderMixin<F>.loadedFeeOrNullFlow(): Flow<F?> {
     }
 }
 
+fun <F : GenericFee> GenericFeeLoaderMixin<F>.getFeeOrNull(): F? {
+    return feeLiveData.value
+        .castOrNull<FeeStatus.Loaded<F>>()
+        ?.feeModel
+        ?.decimalFee
+        ?.genericFee
+}
+
 fun FeeLoaderMixin.Factory.create(assetFlow: Flow<Asset>) = create(assetFlow.map { it.token })
 fun FeeLoaderMixin.Factory.create(tokenUseCase: TokenUseCase) = create(tokenUseCase.currentTokenFlow())
 

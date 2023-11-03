@@ -6,7 +6,8 @@
     <string name="swap_slippage_description">Swap slippage is a common occurrence in decentralized trading where the final price of a swap transaction might slightly differ from the expected price, due to changing market conditions.</string>
     <string name="swap_network_fee_description">A network fees charged by the blockchain to process and validate any transactions. May vary depending on network conditions or transaction speed.</string>
 
-    <string name="swap_main_settings_select_token_disabled_button_state">Select tokens to swap</string>
+    <string name="swap_main_settings_asset_in_not_selecting_button_state">Select token to pay</string>
+    <string name="swap_main_settings_asset_out_not_selecting_button_state">Select token to receive</string>
     <string name="swap_main_settings_enter_amount_disabled_button_state">Enter amount</string>
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Enter other amount</string>
 

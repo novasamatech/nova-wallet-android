@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.postToUiThread
 import io.novafoundation.nova.common.utils.setSelectionEnd
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
+import io.novafoundation.nova.common.view.setProgress
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
@@ -62,11 +63,12 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
 
     override fun initViews() {
         swapMainSettingsToolbar.applyStatusBarInsets()
+        swapMainSettingsContinue.prepareForProgress(this)
         swapMainSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
         swapMainSettingsToolbar.setRightActionClickListener { viewModel.openOptions() }
 
-        swapMainSettingsPayInput.setOnClickListener { viewModel.selectPayToken() }
-        swapMainSettingsReceiveInput.setOnClickListener { viewModel.selectReceiveToken() }
+        swapMainSettingsPayInput.setSelectTokenClickListener { viewModel.selectPayToken() }
+        swapMainSettingsReceiveInput.setSelectTokenClickListener { viewModel.selectReceiveToken() }
         swapMainSettingsFlip.setOnClickListener {
             viewModel.flipAssets()
         }
@@ -131,6 +133,8 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
                 onCancel = it.onCancel
             ).show()
         }
+
+        viewModel.validationProgress.observe(swapMainSettingsContinue::setProgress)
 
         viewModel.getAssetInOptionsButtonState.observe(swapMainSettingsGetAssetIn::setState)
 

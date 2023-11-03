@@ -48,37 +48,39 @@
         app:layout_constraintTop_toBottomOf="@+id/swapAssetAmount"
         tools:text="135.87$" />
 
-
-    <ImageView
-        android:id="@+id/swapAssetNetworkImage"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:layout_marginStart="12dp"
-        app:layout_constraintBottom_toBottomOf="@+id/swapAssetNetwork"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/swapAssetNetwork"
-        tools:src="@drawable/ic_nova_logo" />
-
-    <TextView
-        android:id="@+id/swapAssetNetwork"
-        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="12dp"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="20dp"
-        android:ellipsize="end"
-        android:includeFontPadding="false"
-        android:lines="1"
-        android:textColor="@color/text_secondary"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/swapAssetNetworkImage"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/swapAssetFiat"
-        app:layout_constraintVertical_bias="1.0"
-        app:layout_goneMarginStart="0dp"
-        tools:text="Polkadot Asset Hub" />
+        app:layout_goneMarginTop="36dp">
 
+        <ImageView
+            android:id="@+id/swapAssetNetworkImage"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/swapAssetNetwork"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:src="@drawable/ic_nova_logo" />
+
+        <TextView
+            android:id="@+id/swapAssetNetwork"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:lines="1"
+            android:textColor="@color/text_secondary"
+            tools:text="Polkadot Asset Hub" />
+
+    </LinearLayout>
 </merge>

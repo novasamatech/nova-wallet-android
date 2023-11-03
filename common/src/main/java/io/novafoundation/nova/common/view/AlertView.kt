@@ -73,7 +73,7 @@ class AlertView @JvmOverloads constructor(
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.AlertView) {
-        val stylePreset = it.getEnum(R.styleable.AlertView_style, StylePreset.WARNING)
+        val stylePreset = it.getEnum(R.styleable.AlertView_alertMode, StylePreset.WARNING)
         val styleFromPreset = styleFromPreset(stylePreset)
 
         val backgroundColorRes = it.getResourceId(R.styleable.AlertView_styleBackgroundColor, styleFromPreset.backgroundColorRes)

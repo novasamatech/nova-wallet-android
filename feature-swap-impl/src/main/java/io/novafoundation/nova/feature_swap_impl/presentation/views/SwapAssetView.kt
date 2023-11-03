@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.setImageTint
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getInputBackground
-import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.android.synthetic.main.view_swap_asset.view.swapAssetAmount
@@ -39,14 +38,14 @@ class SwapAssetView @JvmOverloads constructor(
     }
 
     fun setModel(model: Model) {
-        setAssetImageUrl(model.assetImageUrl)
+        setAssetImageUrl(model.assetIcon)
         setAmount(model.amount)
         setNetwork(model.networkImage, model.networkName)
     }
 
-    private fun setAssetImageUrl(imageUrl: String) {
+    private fun setAssetImageUrl(icon: Icon) {
         swapAssetImage.setImageTint(context.getColor(R.color.icon_primary))
-        swapAssetImage.loadTokenIcon(imageUrl, imageLoader)
+        swapAssetImage.setIcon(icon, imageLoader)
         swapAssetImage.setBackgroundResource(R.drawable.bg_token_container)
     }
 
@@ -61,7 +60,7 @@ class SwapAssetView @JvmOverloads constructor(
     }
 
     class Model(
-        val assetImageUrl: String,
+        val assetIcon: Icon,
         val amount: AmountModel,
         val networkImage: Icon,
         val networkName: String

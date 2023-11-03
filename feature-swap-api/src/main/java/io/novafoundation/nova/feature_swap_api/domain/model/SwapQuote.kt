@@ -24,6 +24,12 @@ data class SwapQuote(
     }
 }
 
+val SwapQuote.editedBalance: Balance
+    get() = when (direction) {
+        SwapDirection.SPECIFIED_IN -> planksIn
+        SwapDirection.SPECIFIED_OUT -> planksOut
+    }
+
 val SwapQuote.quotedBalance: Balance
     get() = when (direction) {
         SwapDirection.SPECIFIED_IN -> planksOut

@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.toBuyAmountToKeepMainEDInFeeAsset
 import io.novafoundation.nova.feature_swap_impl.domain.validation.totalDeductedAmountInFeeToken
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import jp.co.soramitsu.fearless_utils.hash.isPositive
 
 class SwapSmallRemainingBalanceValidation(
@@ -27,7 +26,7 @@ class SwapSmallRemainingBalanceValidation(
 
         val assetInTotal = value.detailedAssetIn.asset.totalInPlanks
         val toBuyAmountToKeepEDInFeeAsset = value.toBuyAmountToKeepMainEDInFeeAsset
-        val swapAmount = chainAssetIn.planksFromAmount(value.detailedAssetIn.amount)
+        val swapAmount = value.detailedAssetIn.amountInPlanks
         val assetInExistentialDeposit = assetBalances.existentialDeposit(chainIn, chainAssetIn)
         val totalDeductedAmount = value.totalDeductedAmountInFeeToken
         val remainingBalance = assetInTotal - swapAmount - totalDeductedAmount

@@ -40,7 +40,18 @@
         android:id="@+id/swapConfirmationFragment"
         android:name="io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationFragment"
         android:label="SwapConfirmationFragment"
-        tools:layout="@layout/fragment_swap_confirmation_settings" />
+        tools:layout="@layout/fragment_swap_confirmation_settings">
+
+        <action
+            android:id="@+id/action_swapConfirmationFragment_to_assetDetails"
+            app:destination="@id/balanceDetailFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/mainFragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/selectAssetSwapFlowFragment"
