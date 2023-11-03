@@ -93,7 +93,6 @@ class SwapMainSettingsModule {
         swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
         accountUseCase: SelectedAccountUseCase,
         buyMixinFactory: BuyMixin.Factory,
-        lastQuoteStoreSharedStateProvider: LastQuoteStoreSharedStateProvider,
         validationExecutor: ValidationExecutor,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         swapRateFormatter: SwapRateFormatter,
@@ -119,7 +118,6 @@ class SwapMainSettingsModule {
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             swapRateFormatter = swapRateFormatter,
             swapConfirmationPayloadFormatter = swapConfirmationPayloadFormatter,
-            descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             selectedAccountUseCase = accountUseCase,
             buyMixinFactory = buyMixinFactory
         )
