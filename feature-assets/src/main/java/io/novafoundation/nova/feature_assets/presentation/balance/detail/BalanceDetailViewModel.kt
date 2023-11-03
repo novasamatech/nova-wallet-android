@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mapTokenToTokenModel
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
+import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
@@ -142,7 +143,7 @@ class BalanceDetailViewModel(
     }
 
     fun sendClicked() {
-        router.openSend(assetPayload)
+        router.openSend(SendPayload.SpecifiedOrigin(assetPayload))
     }
 
     fun receiveClicked() = checkControllableAsset {

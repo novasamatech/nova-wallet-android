@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericF
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
-class SwapQuote(
+data class SwapQuote(
     val assetIn: Chain.Asset,
     val assetOut: Chain.Asset,
     val planksIn: Balance,
@@ -23,6 +23,12 @@ class SwapQuote(
         }
     }
 }
+
+val SwapQuote.editedBalance: Balance
+    get() = when (direction) {
+        SwapDirection.SPECIFIED_IN -> planksIn
+        SwapDirection.SPECIFIED_OUT -> planksOut
+    }
 
 val SwapQuote.quotedBalance: Balance
     get() = when (direction) {

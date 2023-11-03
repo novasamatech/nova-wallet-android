@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.InlineFee
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
+import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
@@ -20,7 +21,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
-import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.CompoundMultiLocationConverter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.ForeignAssetsLocationConverter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.LocalAssetsLocationConverter
@@ -67,11 +67,10 @@ class AssetConversionExchangeFactory(
 
     override suspend fun create(chainId: ChainId, coroutineScope: CoroutineScope): AssetExchange? {
         val chain = chainRegistry.getChainOrNull(chainId) ?: return null
-        val parentChain = chain.parentId?.let { chainRegistry.getChain(it) }
         val runtimeAsync = coroutineScope.async { chainRegistry.getRuntime(chainId) }
 
         val converter = CompoundMultiLocationConverter(
-            NativeAssetLocationConverter(chain, parentChain),
+            NativeAssetLocationConverter(chain),
             LocalAssetsLocationConverter(chain, runtimeAsync),
             ForeignAssetsLocationConverter(chain, runtimeAsync)
         )

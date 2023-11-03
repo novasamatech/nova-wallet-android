@@ -35,10 +35,12 @@ fun mapAmountToAmountModel(
     amountInPlanks: BigInteger,
     token: Token,
     includeZeroFiat: Boolean = true,
+    estimatedFiat: Boolean = false
 ): AmountModel = mapAmountToAmountModel(
     amount = token.amountFromPlanks(amountInPlanks),
     token = token,
-    includeZeroFiat = includeZeroFiat
+    includeZeroFiat = includeZeroFiat,
+    estimatedFiat = estimatedFiat
 )
 
 fun mapAmountToAmountModel(
@@ -47,7 +49,8 @@ fun mapAmountToAmountModel(
     includeZeroFiat: Boolean = true,
     includeAssetTicker: Boolean = true,
     tokenAmountSign: AmountSign = AmountSign.NONE,
-    roundingMode: RoundingMode = RoundingMode.FLOOR
+    roundingMode: RoundingMode = RoundingMode.FLOOR,
+    estimatedFiat: Boolean = false
 ): AmountModel {
     val fiatAmount = token.amountToFiat(amount)
 
@@ -57,9 +60,16 @@ fun mapAmountToAmountModel(
         amount.format(roundingMode)
     }
 
+    var formattedFiat = fiatAmount.takeIf { it != BigDecimal.ZERO || includeZeroFiat }
+        ?.formatAsCurrency(token.currency, roundingMode)
+
+    if (estimatedFiat && formattedFiat != null) {
+        formattedFiat = "~$formattedFiat"
+    }
+
     return AmountModel(
         token = tokenAmountSign.signSymbol + unsignedTokenAmount,
-        fiat = fiatAmount.takeIf { it != BigDecimal.ZERO || includeZeroFiat }?.formatAsCurrency(token.currency, roundingMode)
+        fiat = formattedFiat
     )
 }
 

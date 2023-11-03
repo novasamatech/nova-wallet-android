@@ -18,9 +18,10 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendViewModel
+import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -32,40 +33,42 @@ class SelectSendModule {
     @IntoMap
     @ViewModelKey(SelectSendViewModel::class)
     fun provideViewModel(
+        chainRegistry: ChainRegistry,
         interactor: WalletInteractor,
         sendInteractor: SendInteractor,
         metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
-        validationExecutor: ValidationExecutor,
-        selectedAccountUseCase: SelectedAccountUseCase,
         router: AssetsRouter,
-        chainRegistry: ChainRegistry,
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        payload: SendPayload,
+        initialRecipientAddress: String?,
+        validationExecutor: ValidationExecutor,
         resourceManager: ResourceManager,
-        amountChooserMixinFactory: AmountChooserMixin.Factory,
-        addressInputMixinFactory: AddressInputMixinFactory,
-        assetPayload: AssetPayload,
-        recipientAddress: String?,
+        selectAddressRequester: SelectAddressCommunicator,
+        externalActions: ExternalActions.Presentation,
+        crossChainTransfersUseCase: CrossChainTransfersUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        selectAddressCommunicator: SelectAddressCommunicator,
-        externalActions: ExternalActions.Presentation
+        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        selectedAccountUseCase: SelectedAccountUseCase,
+        addressInputMixinFactory: AddressInputMixinFactory,
+        amountChooserMixinFactory: AmountChooserMixin.Factory,
     ): ViewModel {
         return SelectSendViewModel(
+            chainRegistry = chainRegistry,
             interactor = interactor,
+            sendInteractor = sendInteractor,
             metaAccountGroupingInteractor = metaAccountGroupingInteractor,
             router = router,
-            assetPayload = assetPayload,
-            chainRegistry = chainRegistry,
-            feeLoaderMixinFactory = feeLoaderMixinFactory,
-            resourceManager = resourceManager,
-            amountChooserMixinFactory = amountChooserMixinFactory,
-            sendInteractor = sendInteractor,
+            payload = payload,
+            initialRecipientAddress = initialRecipientAddress,
             validationExecutor = validationExecutor,
+            resourceManager = resourceManager,
+            selectAddressRequester = selectAddressRequester,
+            externalActions = externalActions,
+            crossChainTransfersUseCase = crossChainTransfersUseCase,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            feeLoaderMixinFactory = feeLoaderMixinFactory,
             selectedAccountUseCase = selectedAccountUseCase,
             addressInputMixinFactory = addressInputMixinFactory,
-            initialRecipientAddress = recipientAddress,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            selectAddressRequester = selectAddressCommunicator,
-            externalActions = externalActions
+            amountChooserMixinFactory = amountChooserMixinFactory
         )
     }
 

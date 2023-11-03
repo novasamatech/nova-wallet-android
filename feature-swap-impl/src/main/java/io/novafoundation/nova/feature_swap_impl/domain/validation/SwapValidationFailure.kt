@@ -38,8 +38,8 @@ sealed class SwapValidationFailure {
 
     class AmountOutIsTooLowToStayAboveED(
         val asset: Chain.Asset,
-        val amount: BigDecimal,
-        val existentialDeposit: BigDecimal
+        val amountInPlanks: Balance,
+        val existentialDeposit: Balance
     ) : SwapValidationFailure()
 
     sealed class InsufficientBalance : SwapValidationFailure() {

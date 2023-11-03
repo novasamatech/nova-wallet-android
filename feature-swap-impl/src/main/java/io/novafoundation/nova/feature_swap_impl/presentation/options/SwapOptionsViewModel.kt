@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsSt
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SlippageFieldValidatorFactory
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +35,8 @@ class SwapOptionsViewModel(
     private val swapSettingsStateProvider: SwapSettingsStateProvider,
     private val slippageFieldValidatorFactory: SlippageFieldValidatorFactory,
     private val swapInteractor: SwapInteractor,
-    private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
+    private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
+    private val slippageAlertMixinFactory: SlippageAlertMixinFactory
 ) : BaseViewModel(), DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
 
     private val swapSettingState = async {
@@ -57,7 +59,12 @@ class SwapOptionsViewModel(
     val slippageInputValidationResult = slippageFieldValidator.flatMapLatest { it.observe(slippageInput) }
         .shareInBackground()
 
-    val slippageWarningState = slippageInputValidationResult.map { formatSlippageWarning(it) }
+    private val slippageAlertMixin = slippageAlertMixinFactory.create(
+        slippageConfig,
+        slippageInput.map { it.formatToPercent() }
+    )
+
+    val slippageWarningState = slippageAlertMixin.slippageAlertMessage
 
     val resetButtonEnabled = combine(slippageInput, slippageConfig) { input, slippageConfig ->
         formatResetButtonVisibility(input, slippageConfig)
@@ -120,14 +127,6 @@ class SwapOptionsViewModel(
         } else {
             return this.toDoubleOrNull()?.let { Percent(it) }
         }
-    }
-
-    private fun formatSlippageWarning(validationResult: FieldValidationResult): String? {
-        if (validationResult is FieldValidationResult.Warning) {
-            return validationResult.reason
-        }
-
-        return null
     }
 
     private suspend fun formatButtonState(

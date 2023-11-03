@@ -46,6 +46,17 @@
         android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/swapMainSettingsPayTitle" />
 
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/swapMainSettingsGetAssetIn"
+        style="@style/Widget.Nova.Button.AccentSecondaryTransparent.Small"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsPayInput"
+        tools:text="Get KSM" />
+
     <ImageView
         android:id="@+id/swapMainSettingsFlip"
         android:layout_width="40dp"
@@ -55,7 +66,7 @@
         app:layout_constraintBottom_toTopOf="@+id/swapMainSettingsReceiveInput"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsPayInput" />
+        app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsGetAssetIn" />
 
     <TextView
         android:id="@+id/swapMainSettingsReceiveTitle"
@@ -67,7 +78,7 @@
         android:text="@string/fragment_swap_main_settings_receive_title"
         android:textColor="@color/text_secondary"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/swapMainSettingsPayInput" />
+        app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsGetAssetIn" />
 
     <io.novafoundation.nova.feature_swap_impl.presentation.views.SwapAmountInputView
         android:id="@+id/swapMainSettingsReceiveInput"
@@ -86,7 +97,7 @@
         android:text="@string/swap_error_pair_not_supported"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsReceiveInput"
-        app:style="error"
+        app:alertMode="error"
         app:styleIcon="@drawable/ic_close_circle"
         app:styleIconTint="@color/icon_negative" />
 
@@ -163,7 +174,7 @@
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsDetails"
-        app:style="info" />
+        app:alertMode="info" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/swapMainSettingsContinue"

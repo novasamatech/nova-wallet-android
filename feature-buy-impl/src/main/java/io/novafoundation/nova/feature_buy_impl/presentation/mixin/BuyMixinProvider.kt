@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_buy_api.domain.BuyProvider
 import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry
+import io.novafoundation.nova.feature_buy_api.domain.hasProvidersFor
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -52,7 +53,7 @@ private class BuyMixinProvider(
     override val integrateWithBuyProviderEvent = MutableLiveData<Event<BuyMixin.IntegrationPayload>>()
 
     override fun buyEnabledFlow(chainAsset: Chain.Asset): Flow<Boolean> {
-        return flowOf { buyTokenRegistry.availableProvidersFor(chainAsset).isNotEmpty() }
+        return flowOf { buyTokenRegistry.hasProvidersFor(chainAsset) }
     }
 
     override fun buyClicked(chainAsset: Chain.Asset) {
