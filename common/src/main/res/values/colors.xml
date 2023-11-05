@@ -34,6 +34,9 @@
     <color name="conviction_slider_text_5x">#DAC71B</color>
     <color name="conviction_slider_text_6x">#F19B27</color>
 
+    <color name="crowdloan_banner_gradient_start">#BD387F</color>
+    <color name="crowdloan_banner_gradient_end">#FF7A00</color>
+
     <!-- Icon Colors -->
     <color name="icon_primary">#E0FFFFFF</color>
     <color name="icon_secondary">#52FFFFFF</color>

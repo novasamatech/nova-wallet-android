@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -122,4 +123,6 @@ interface GovernanceFeatureDependencies {
     val partialRetriableMixinFactory: PartialRetriableMixin.Factory
 
     val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+
+    val bannerVisibilityRepository: BannerVisibilityRepository
 }

@@ -11,7 +11,7 @@ interface DelegateListInteractor {
 
     fun shouldShowDelegationBanner(): Flow<Boolean>
 
-    fun hideDelegationBanner()
+    suspend fun hideDelegationBanner()
 
     suspend fun getDelegates(
         governanceOption: SupportedGovernanceOption,

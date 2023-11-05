@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.interfaces.FileProvider
@@ -208,4 +209,6 @@ interface AssetsFeatureDependencies {
     val operationDao: OperationDao
 
     val coinPriceRepository: CoinPriceRepository
+
+    val bannerVisibilityRepository: BannerVisibilityRepository
 }
