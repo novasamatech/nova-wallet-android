@@ -211,18 +211,11 @@ class SwapMainSettingsViewModel(
     }
         .shareInBackground()
 
-    val showDetails: Flow<Boolean> = combine(
-        amountInInput.inputState,
-        amountOutInput.inputState,
-        quotingState
-    ) { amountInputState, amountOutState, quotingState ->
-        val isAmountEmpty = amountInputState.value.isEmpty() || amountOutState.value.isEmpty()
-
-        when {
-            !isAmountEmpty -> true
-            quotingState is QuotingState.Loaded -> true
-            quotingState is QuotingState.NotAvailable -> false
-            quotingState is QuotingState.Default -> false
+    val showDetails: Flow<Boolean> = quotingState.map {
+        when (it) {
+            is QuotingState.Loaded -> true
+            is QuotingState.NotAvailable -> false
+            is QuotingState.Default -> false
             else -> null // Don't do anything if it's loading state
         }
     }
@@ -242,6 +235,7 @@ class SwapMainSettingsViewModel(
         assetOutFlow,
         ::formatButtonStates
     ).distinctUntilChanged()
+        .debounce(100)
 
     val swapDirectionFlipped: MutableLiveData<Event<SwapDirection>> = MutableLiveData()
 
