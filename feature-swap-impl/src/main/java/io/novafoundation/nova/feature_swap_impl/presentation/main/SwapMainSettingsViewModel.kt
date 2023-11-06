@@ -214,8 +214,8 @@ class SwapMainSettingsViewModel(
     val showDetails: Flow<Boolean> = quotingState.map {
         when (it) {
             is QuotingState.Loaded -> true
+            is QuotingState.Default,
             is QuotingState.NotAvailable -> false
-            is QuotingState.Default -> false
             else -> null // Don't do anything if it's loading state
         }
     }
