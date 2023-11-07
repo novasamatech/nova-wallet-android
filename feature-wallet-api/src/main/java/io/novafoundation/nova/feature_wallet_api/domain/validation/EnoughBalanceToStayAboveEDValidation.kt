@@ -10,14 +10,14 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
-interface InsufficientTotalToStayAboveEDError {
+interface InsufficientBalanceToStayAboveEDError {
     val asset: Chain.Asset
 }
 
-class EnoughTotalToStayAboveEDValidation<P, E>(
+class EnoughBalanceToStayAboveEDValidation<P, E>(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val fee: AmountProducer<P>,
-    private val totalBalance: AmountProducer<P>,
+    private val balance: AmountProducer<P>,
     private val chainWithAsset: (P) -> ChainWithAsset,
     private val error: (P, BigDecimal) -> E
 ) : Validation<P, E> {
@@ -26,7 +26,7 @@ class EnoughTotalToStayAboveEDValidation<P, E>(
         val chain = chainWithAsset(value).chain
         val asset = chainWithAsset(value).asset
         val existentialDeposit = assetSourceRegistry.existentialDeposit(chain, asset)
-        return validOrError(totalBalance(value) - fee(value) >= existentialDeposit) {
+        return validOrError(balance(value) - fee(value) >= existentialDeposit) {
             error(value, existentialDeposit)
         }
     }
@@ -36,14 +36,14 @@ class EnoughTotalToStayAboveEDValidationFactory(private val assetSourceRegistry:
 
     fun <P, E> create(
         fee: AmountProducer<P>,
-        total: AmountProducer<P>,
+        balance: AmountProducer<P>,
         chainWithAsset: (P) -> ChainWithAsset,
         error: (P, BigDecimal) -> E
-    ): EnoughTotalToStayAboveEDValidation<P, E> {
-        return EnoughTotalToStayAboveEDValidation(
+    ): EnoughBalanceToStayAboveEDValidation<P, E> {
+        return EnoughBalanceToStayAboveEDValidation(
             assetSourceRegistry = assetSourceRegistry,
             fee = fee,
-            totalBalance = total,
+            balance = balance,
             chainWithAsset = chainWithAsset,
             error = error
         )
@@ -53,9 +53,28 @@ class EnoughTotalToStayAboveEDValidationFactory(private val assetSourceRegistry:
 context(ValidationSystemBuilder<P, E>)
 fun <P, E> EnoughTotalToStayAboveEDValidationFactory.validate(
     fee: AmountProducer<P>,
-    total: AmountProducer<P>,
+    balance: AmountProducer<P>,
     chainWithAsset: (P) -> ChainWithAsset,
     error: (P, BigDecimal) -> E
 ) {
-    validate(create(fee, total, chainWithAsset, error))
+    validate(create(fee, balance, chainWithAsset, error))
+}
+
+
+fun <P, E> ValidationSystemBuilder<P, E>.enoughBalanceToStayAboveEDValidation(
+    assetSourceRegistry: AssetSourceRegistry,
+    fee: AmountProducer<P>,
+    balance: AmountProducer<P>,
+    chainWithAsset: (P) -> ChainWithAsset,
+    error: (P, BigDecimal) -> E
+) {
+    validate(
+        EnoughBalanceToStayAboveEDValidation(
+            assetSourceRegistry = assetSourceRegistry,
+            fee = fee,
+            balance = balance,
+            chainWithAsset = chainWithAsset,
+            error = error
+        )
+    )
 }

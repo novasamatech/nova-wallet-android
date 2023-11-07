@@ -17,6 +17,7 @@ import io.novafoundation.nova.core_db.converters.NetworkTypeConverters
 import io.novafoundation.nova.core_db.converters.NftTypeConverters
 import io.novafoundation.nova.core_db.converters.OperationConverters
 import io.novafoundation.nova.core_db.dao.AccountDao
+import io.novafoundation.nova.core_db.dao.AccountInfoDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
@@ -42,6 +43,7 @@ import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.dao.StorageDao
 import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
+import io.novafoundation.nova.core_db.migrations.AddAccountInfo_49_50
 import io.novafoundation.nova.core_db.migrations.AddAdditionalFieldToChains_12_13
 import io.novafoundation.nova.core_db.migrations.AddBrowserHostSettings_34_35
 import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
@@ -90,6 +92,7 @@ import io.novafoundation.nova.core_db.migrations.RemoveColorFromChains_17_18
 import io.novafoundation.nova.core_db.migrations.StakingRewardPeriods_42_43
 import io.novafoundation.nova.core_db.migrations.TransferFiatAmount_40_41
 import io.novafoundation.nova.core_db.migrations.WatchOnlyChainAccounts_16_17
+import io.novafoundation.nova.core_db.model.AccountInfoLocal
 import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.core_db.model.AssetLocal
@@ -156,6 +159,7 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         StakingDashboardItemLocal::class,
         StakingRewardPeriodLocal::class,
         ExternalBalanceLocal::class,
+        AccountInfoLocal::class
     ],
 )
 @TypeConverters(
@@ -205,6 +209,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddStakingDashboardItems_41_42, StakingRewardPeriods_42_43)
                     .addMigrations(AddRewardAccountToStakingDashboard_43_44, AddStakingTypeToTotalRewards_44_45, AddExternalBalances_45_46)
                     .addMigrations(AddPoolIdToOperations_46_47, AddEventIdToOperation_47_48, AddSwapOption_48_49)
+                    .addMigrations(AddAccountInfo_49_50)
                     .build()
             }
             return instance!!
@@ -262,4 +267,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun stakingRewardPeriodDao(): StakingRewardPeriodDao
 
     abstract fun externalBalanceDao(): ExternalBalanceDao
+
+    abstract fun accountInfoDao(): AccountInfoDao
 }

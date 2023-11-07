@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpik
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleNonPositiveAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -40,6 +41,8 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
     amountOutSwapMinAction: (Chain.Asset, Balance) -> Unit
 ): TransformedFailure? {
     return when (val reason = status.reason) {
+        is NotEnoughFunds.ToStayAboveED -> handleInsufficientBalanceCommission(reason, resourceManager).asDefault()
+
         NotEnoughFunds.InUsedAsset -> resourceManager.amountIsTooBig().asDefault()
 
         is NotEnoughFunds.InCommissionAsset -> handleNotEnoughFeeError(reason, resourceManager).asDefault()
@@ -117,6 +120,25 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
             resourceManager = resourceManager,
             positiveButtonClick = amountInSwapMaxAction
         )
+
+        is InsufficientBalance.BalanceNotConsiderConsumers -> TitleAndMessage(
+            resourceManager.getString(R.string.swap_invalid_slippage_failure_title),
+            resourceManager.getString(
+                R.string.swap_failure_balance_not_consider_consumers,
+                reason.existentialDeposit.formatPlanks(reason.nativeAsset),
+                reason.swapFee.networkFee.amount.formatPlanks(reason.feeAsset)
+            )
+        ).asDefault()
+
+        is InsufficientBalance.BalanceNotConsiderInsufficientReceiveAsset -> TitleAndMessage(
+            resourceManager.getString(R.string.swap_invalid_slippage_failure_title),
+            resourceManager.getString(
+                R.string.swap_failure_balance_not_consider_non_sufficient_assets,
+                reason.existentialDeposit.formatPlanks(reason.assetIn),
+                reason.assetOut.symbol
+            )
+        ).asDefault()
+
 
         is FeeChangeDetected -> handleFeeSpikeDetected(
             error = reason,

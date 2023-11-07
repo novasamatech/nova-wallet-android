@@ -8,6 +8,7 @@ import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigDecimal
+import kotlinx.coroutines.flow.Flow
 
 interface AssetTransfer {
     val sender: MetaAccount
@@ -70,6 +71,11 @@ interface AssetTransfers {
     suspend fun calculateFee(transfer: AssetTransfer): Fee
 
     suspend fun performTransfer(transfer: WeightedAssetTransfer): Result<String>
+
+    /* TODO consider consumers
+    suspend fun totalCanDropBelowMinimumBalance(): Boolean
+
+    suspend fun totalCanDropBelowMinimumBalanceFlow(): Flow<Boolean>*/
 
     suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean
 
