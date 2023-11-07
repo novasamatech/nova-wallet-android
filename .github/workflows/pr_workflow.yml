@@ -50,8 +50,10 @@ jobs:
           else
             echo "Comment found with 'Release notes'"
             release_notes=$(echo $comment | awk -F'Release notes:' '{print $2}' | tr "'" '"' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+            # Escape double quotes in the release notes
+            release_notes=$(echo $release_notes | sed 's/"/\\"/g')
             echo "Release notes: $release_notes"
-            echo "::set-output name=release_notes::\"$release_notes\""
+            echo "::set-output name=release_notes::$release_notes"
           fi
 
       - name: Extract version from branch name
