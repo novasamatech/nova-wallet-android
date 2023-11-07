@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationSystem
@@ -34,17 +35,15 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.swapFeeSuffici
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapSmallRemainingBalance
 import io.novafoundation.nova.feature_swap_impl.domain.validation.utils.SharedQuoteValidationRetriever
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.repository.AccountInfoRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.incomingCrossChainDirectionsAvailable
-import io.novafoundation.nova.feature_wallet_api.domain.updater.AccountInfoUpdateSystemFactory
 import io.novafoundation.nova.runtime.ext.commissionAsset
-import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
@@ -59,16 +58,11 @@ class SwapInteractor(
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
     private val walletRepository: WalletRepository,
-    private val accountInfoUpdateSystemFactory: AccountInfoUpdateSystemFactory,
-    private val accountInfoRepository: AccountInfoRepository
+    private val swapUpdateSystemFactory: SwapUpdateSystemFactory
 ) {
 
-    fun getUpdateSystem(chainFlow: Flow<Chain>): UpdateSystem {
-        return accountInfoUpdateSystemFactory.create(chainFlow) // SwapUpdateSystemFactory
-    }
-
-    fun observeAccountInfo(chain: Chain): Flow<AccountInfo> {
-        return accountInfoRepository.observeAccountInfo(chain)
+    suspend fun getUpdateSystem(chainFlow: Flow<Chain>, coroutineScope: CoroutineScope): UpdateSystem {
+        return swapUpdateSystemFactory.create(chainFlow, coroutineScope) // SwapUpdateSystemFactory
     }
 
     fun availableGetAssetInOptionsFlow(chainAssetFlow: Flow<Chain.Asset?>): Flow<Set<GetAssetInOption>> {
@@ -138,13 +132,13 @@ class SwapInteractor(
 
             sufficientBalanceInFeeAsset()
 
+            sufficientBalanceConsideringConsumersValidation(assetSourceRegistry)
+
+            sufficientBalanceConsideringNonSufficientAssetsValidation(assetSourceRegistry)
+
             swapSmallRemainingBalance(assetSourceRegistry)
 
             sufficientAssetOutBalanceToStayAboveED(assetSourceRegistry)
-
-            sufficientBalanceConsideringConsumersValidation(assetSourceRegistry, accountInfoRepository)
-
-            sufficientBalanceConsideringNonSufficientAssetsValidation(assetSourceRegistry)
 
             checkForFeeChanges(swapService)
         }

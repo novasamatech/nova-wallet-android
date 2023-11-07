@@ -54,7 +54,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenReposito
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
@@ -78,7 +78,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -144,7 +143,17 @@ class SwapConfirmationViewModel(
     }
         .shareInBackground()
 
-    private val assetInFlow = arbitraryAssetUseCase.assetFlow(payload.swapQuoteModel.assetIn.chainId, payload.swapQuoteModel.assetIn.chainAssetId)
+    private val assetInFlow = arbitraryAssetUseCase.assetFlow(
+        payload.swapQuoteModel.assetIn.chainId,
+        payload.swapQuoteModel.assetIn.chainAssetId
+    )
+        .filterNotNull()
+        .shareInBackground()
+
+    private val assetOutFlow = arbitraryAssetUseCase.assetFlow(
+        payload.swapQuoteModel.assetOut.chainId,
+        payload.swapQuoteModel.assetOut.chainAssetId
+    )
         .filterNotNull()
         .shareInBackground()
 
@@ -152,10 +161,6 @@ class SwapConfirmationViewModel(
 
     private val tokenInFlow = assetInFlow.map { it.token }
         .shareInBackground()
-
-    private val accountInfoFlow = chainWithAssetFlow.flatMapLatest {
-        swapInteractor.observeAccountInfo(it.chain)
-    }.shareInBackground()
 
     val feeMixin = feeLoaderMixinFactory.createGeneric<SwapFee>(
         tokenFlow = tokenInFlow,
@@ -247,9 +252,9 @@ class SwapConfirmationViewModel(
 
     private fun createMaxActionProvider(): MaxActionProvider {
         return maxActionProviderFactory.create(
-            assetFlow = assetInFlow,
+            assetInFlow = assetInFlow,
+            assetOutFlow = assetOutFlow,
             field = Asset::transferableInPlanks,
-            accountInfoFlow = accountInfoFlow,
             feeLoaderMixin = feeMixin,
             extractTotalFee = SwapFee::totalDeductedPlanks
         )

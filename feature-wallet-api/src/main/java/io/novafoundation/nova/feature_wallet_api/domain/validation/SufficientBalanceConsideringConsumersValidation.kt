@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
-import io.novafoundation.nova.feature_wallet_api.data.repository.AccountInfoRepository
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.totalCanBeDroppedBelowMinimumBalance
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
@@ -15,7 +15,6 @@ import jp.co.soramitsu.fearless_utils.hash.isPositive
 
 class SufficientBalanceConsideringConsumersValidation<P, E>(
     private val assetSourceRegistry: AssetSourceRegistry,
-    private val accountInfoRepository: AccountInfoRepository,
     private val chainExtractor: (P) -> Chain,
     private val assetExtractor: (P) -> Chain.Asset,
     private val totalBalanceExtractor: (P) -> BigInteger,
@@ -28,9 +27,9 @@ class SufficientBalanceConsideringConsumersValidation<P, E>(
         val chain = chainExtractor(value)
         val asset = assetExtractor(value)
 
-        val accountInfo = accountInfoRepository.getAccountInfo(chain)
+        val totalCanDropBelowMinimumBalance = assetSourceRegistry.totalCanBeDroppedBelowMinimumBalance(asset)
 
-        if (asset.isCommissionAsset && accountInfo.consumers.isPositive()) {
+        if (asset.isCommissionAsset && totalCanDropBelowMinimumBalance) {
             val totalBalance = totalBalanceExtractor(value)
             val amount = amountExtractor(value)
             val fee = feeExtractor(value)
@@ -45,7 +44,6 @@ class SufficientBalanceConsideringConsumersValidation<P, E>(
 
 fun <P, E> ValidationSystemBuilder<P, E>.sufficientBalanceConsideringConsumersValidation(
     assetSourceRegistry: AssetSourceRegistry,
-    accountInfoRepository: AccountInfoRepository,
     chainExtractor: (P) -> Chain,
     assetExtractor: (P) -> Chain.Asset,
     totalBalanceExtractor: (P) -> BigInteger,
@@ -55,7 +53,6 @@ fun <P, E> ValidationSystemBuilder<P, E>.sufficientBalanceConsideringConsumersVa
 ) = validate(
     SufficientBalanceConsideringConsumersValidation(
         assetSourceRegistry,
-        accountInfoRepository,
         chainExtractor,
         assetExtractor,
         totalBalanceExtractor,

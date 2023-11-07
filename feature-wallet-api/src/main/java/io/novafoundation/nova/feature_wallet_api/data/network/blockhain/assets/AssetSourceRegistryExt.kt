@@ -13,6 +13,10 @@ suspend fun AssetSourceRegistry.existentialDepositInPlanks(chain: Chain, chainAs
     return sourceFor(chainAsset).balance.existentialDeposit(chain, chainAsset)
 }
 
+suspend fun AssetSourceRegistry.totalCanBeDroppedBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
+    return sourceFor(chainAsset).transfers.totalCanDropBelowMinimumBalance(chainAsset)
+}
+
 suspend fun AssetSourceRegistry.isSelfSufficientAsset(chainAsset: Chain.Asset): Boolean {
     return sourceFor(chainAsset).balance.isSelfSufficient(chainAsset)
 }

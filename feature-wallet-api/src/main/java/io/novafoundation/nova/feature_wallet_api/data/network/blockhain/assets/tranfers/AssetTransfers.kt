@@ -72,10 +72,9 @@ interface AssetTransfers {
 
     suspend fun performTransfer(transfer: WeightedAssetTransfer): Result<String>
 
-    /* TODO consider consumers
-    suspend fun totalCanDropBelowMinimumBalance(): Boolean
+    suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean
 
-    suspend fun totalCanDropBelowMinimumBalanceFlow(): Flow<Boolean>*/
+    fun totalCanDropBelowMinimumBalanceFlow(chainAsset: Chain.Asset): Flow<Boolean>
 
     suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean
 

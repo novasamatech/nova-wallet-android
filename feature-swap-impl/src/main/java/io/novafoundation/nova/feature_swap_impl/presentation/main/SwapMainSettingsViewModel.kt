@@ -47,7 +47,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.R
-import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
@@ -77,8 +76,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.invokeMaxClick
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.constructMaxActionProvider
+import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
@@ -137,7 +135,6 @@ class SwapMainSettingsViewModel(
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val buyMixinFactory: BuyMixin.Factory,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
-    private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
     private val swapRateFormatter: SwapRateFormatter,
     private val swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter,
     private val maxActionProviderFactory: MaxActionProviderFactory,
@@ -182,10 +179,6 @@ class SwapMainSettingsViewModel(
     private val nativeAssetFlow = originChainFlow
         .flatMapLatest { assetUseCase.assetFlow(it.commissionAsset) }
         .shareInBackground()
-
-    private val accountInfoFlow = originChainFlow.flatMapLatest {
-        swapInteractor.observeAccountInfo(it)
-    }.shareInBackground()
 
     val feeMixin = feeLoaderMixinFactory.createGeneric<SwapFee>(
         tokenFlow = feeAssetFlow.map { it?.token },
@@ -271,8 +264,6 @@ class SwapMainSettingsViewModel(
     val selectGetAssetInOption = actionAwaitableFactory.create<GetAssetInBottomSheet.Payload, GetAssetInOption>()
 
     init {
-        startUpdateSystem()
-
         initAssetIn()
 
         handleInputChanges(amountInInput, SwapSettings::assetIn, SwapDirection.SPECIFIED_IN)
@@ -364,17 +355,11 @@ class SwapMainSettingsViewModel(
         swapRouter.back()
     }
 
-    private fun startUpdateSystem() {
-        swapInteractor.getUpdateSystem(originChainFlow)
-            .start()
-            .launchIn(viewModelScope)
-    }
-
     private fun createMaxActionProvider(): MaxActionProvider {
         return maxActionProviderFactory.create(
-            assetFlow = assetInFlow,
+            assetInFlow = assetInFlow,
+            assetOutFlow = assetOutFlow,
             field = Asset::transferableInPlanks,
-            accountInfoFlow = accountInfoFlow,
             feeLoaderMixin = feeMixin,
             extractTotalFee = SwapFee::totalDeductedPlanks
         )
@@ -431,7 +416,7 @@ class SwapMainSettingsViewModel(
     }
 
     private fun setupUpdateSystem() = launch {
-        swapUpdateSystemFactory.create(viewModelScope)
+        swapInteractor.getUpdateSystem(originChainFlow, viewModelScope)
             .start()
             .launchIn(viewModelScope)
     }

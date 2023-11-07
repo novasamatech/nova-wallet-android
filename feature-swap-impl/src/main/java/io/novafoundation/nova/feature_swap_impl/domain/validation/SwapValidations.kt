@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.Sw
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapSlippageRangeValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapSmallRemainingBalanceValidation
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.repository.AccountInfoRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
 import io.novafoundation.nova.feature_wallet_api.domain.validation.enoughBalanceToStayAboveEDValidation
@@ -43,11 +42,9 @@ fun SwapValidationSystemBuilder.swapSmallRemainingBalance(
 )
 
 fun SwapValidationSystemBuilder.sufficientBalanceConsideringConsumersValidation(
-    assetSourceRegistry: AssetSourceRegistry,
-    accountInfoRepository: AccountInfoRepository
+    assetSourceRegistry: AssetSourceRegistry
 ) = sufficientBalanceConsideringConsumersValidation(
     assetSourceRegistry,
-    accountInfoRepository,
     chainExtractor = { it.detailedAssetIn.chain },
     assetExtractor = { it.detailedAssetIn.asset.token.configuration },
     totalBalanceExtractor = { it.detailedAssetIn.asset.totalInPlanks },

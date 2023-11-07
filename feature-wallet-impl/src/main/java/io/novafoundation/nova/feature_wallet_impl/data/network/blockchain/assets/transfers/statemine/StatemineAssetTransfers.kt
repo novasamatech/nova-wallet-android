@@ -23,6 +23,8 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.Addres
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import java.math.BigInteger
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 class StatemineAssetTransfers(
     chainRegistry: ChainRegistry,
@@ -34,6 +36,14 @@ class StatemineAssetTransfers(
 ) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory) {
 
     override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem()
+
+    override suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
+        return false
+    }
+
+    override fun totalCanDropBelowMinimumBalanceFlow(chainAsset: Chain.Asset): Flow<Boolean> {
+        return flowOf(false)
+    }
 
     override suspend fun transferFunctions(chainAsset: Chain.Asset): List<Pair<String, String>> {
         val type = chainAsset.requireStatemine()

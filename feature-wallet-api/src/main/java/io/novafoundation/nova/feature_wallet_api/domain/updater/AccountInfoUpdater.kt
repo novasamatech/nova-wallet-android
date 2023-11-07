@@ -1,66 +1,50 @@
 package io.novafoundation.nova.feature_wallet_api.domain.updater
 
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.core.updater.SharedRequestsBuilder
-import io.novafoundation.nova.core.updater.UpdateScope
-import io.novafoundation.nova.core.updater.Updater
-import io.novafoundation.nova.core_db.dao.AccountInfoDao
+import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.ChainUpdateScope
-import io.novafoundation.nova.feature_wallet_api.data.cache.bindAccountInfoOrDefault
-import io.novafoundation.nova.feature_wallet_api.data.repository.AccountInfoRepository
-import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.network.updaters.SingleStorageKeyUpdater
+import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
+import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.map
 
 class AccountInfoUpdaterFactory(
-    private val accountInfoRepository: AccountInfoRepository,
+    private val storageCache: StorageCache,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry
 ) {
-    fun create(chainUpdateScope: ChainUpdateScope): AccountInfoUpdater {
+
+    fun create(chainUpdateScope: ChainUpdateScope, sharedState: SelectedAssetOptionSharedState<*>): AccountInfoUpdater {
         return AccountInfoUpdater(
-            chainUpdateScope,
-            accountInfoRepository,
-            accountRepository,
-            chainRegistry
+            chainUpdateScope = chainUpdateScope,
+            storageCache = storageCache,
+            sharedState = sharedState,
+            accountRepository = accountRepository,
+            chainRegistry = chainRegistry
         )
     }
 }
 
 class AccountInfoUpdater(
     chainUpdateScope: ChainUpdateScope,
-    private val accountInfoRepository: AccountInfoRepository,
+    storageCache: StorageCache,
+    sharedState: SelectedAssetOptionSharedState<*>,
+    chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
-    private val chainRegistry: ChainRegistry
-) : Updater<Chain> { //SingleKeyStorageUpdater
+) : SingleStorageKeyUpdater<Chain>(chainUpdateScope, sharedState, chainRegistry, storageCache) {
 
     override val requiredModules: List<String> = listOf(Modules.SYSTEM)
 
-    override val scope: UpdateScope<Chain> = chainUpdateScope
-
-    // Not handle case for ethereum chain
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder, scopeValue: Chain): Flow<Updater.SideEffect> {
+    override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: Chain): String? {
         val metaAccount = accountRepository.getSelectedMetaAccount()
-        val accountId = metaAccount.accountIdIn(scopeValue) ?: return emptyFlow()
-        val runtime = chainRegistry.getRuntime(scopeValue.id)
-        val storageKey = runtime.metadata.module(Modules.SYSTEM)
-            .storage("Account")
-            .storageKey(runtime, accountId)
-
-        return storageSubscriptionBuilder.subscribe(storageKey).map {
-            val accountInfo = bindAccountInfoOrDefault(it.value, runtime)
-            //TODO Save to local storage
-            accountInfoRepository.saveAccountInfo(scopeValue, accountInfo)
-        }.noSideAffects()
+        val accountId = metaAccount.accountIdIn(scopeValue) ?: return null
+        return runtime.metadata.module(Modules.SYSTEM).storage("Account").storageKey(runtime, accountId)
     }
 }
 

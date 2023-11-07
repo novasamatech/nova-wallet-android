@@ -122,7 +122,7 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
         )
 
         is InsufficientBalance.BalanceNotConsiderConsumers -> TitleAndMessage(
-            resourceManager.getString(R.string.swap_invalid_slippage_failure_title),
+            resourceManager.getString(R.string.common_not_enough_funds_title),
             resourceManager.getString(
                 R.string.swap_failure_balance_not_consider_consumers,
                 reason.existentialDeposit.formatPlanks(reason.nativeAsset),
@@ -131,7 +131,7 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
         ).asDefault()
 
         is InsufficientBalance.BalanceNotConsiderInsufficientReceiveAsset -> TitleAndMessage(
-            resourceManager.getString(R.string.swap_invalid_slippage_failure_title),
+            resourceManager.getString(R.string.common_not_enough_funds_title),
             resourceManager.getString(
                 R.string.swap_failure_balance_not_consider_non_sufficient_assets,
                 reason.existentialDeposit.formatPlanks(reason.assetIn),

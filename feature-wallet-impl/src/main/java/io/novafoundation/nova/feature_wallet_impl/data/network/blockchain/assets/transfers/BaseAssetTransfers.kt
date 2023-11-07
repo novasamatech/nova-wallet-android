@@ -32,7 +32,7 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.callOrNull
 import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
 
 abstract class BaseAssetTransfers(
-    private val chainRegistry: ChainRegistry,
+    internal val chainRegistry: ChainRegistry,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val extrinsicService: ExtrinsicService,
     private val phishingValidationFactory: PhishingValidationFactory,
