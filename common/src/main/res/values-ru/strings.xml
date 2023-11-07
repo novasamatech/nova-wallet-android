@@ -159,6 +159,8 @@
     <string name="assets_balance_details_locks_staking">Стейкинг</string>
     <string name="assets_balance_details_locks_vesting">Вестинг</string>
     <string name="assets_buy_tokens_placeholder_button">Купить токены</string>
+    <string name="assets_crowdloan_unlock_banner_description">Получили свои DOT из краудлоунов? Начните стейкать DOT уже сегодня, чтобы получить максимальные вознаграждения!</string>
+    <string name="assets_crowdloan_unlock_banner_title">Максимизируйте награды от DOT 🚀</string>
     <string name="assets_filter_title">Фильтр токенов</string>
     <string name="assets_manage_tokens_all_networks">Все сети</string>
     <string name="assets_manage_tokens_title">Управление токенами</string>

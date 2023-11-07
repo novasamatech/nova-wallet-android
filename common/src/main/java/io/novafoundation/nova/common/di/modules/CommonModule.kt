@@ -16,6 +16,8 @@ import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.FileProviderImpl
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
+import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
+import io.novafoundation.nova.common.data.repository.RealBannerVisibilityRepository
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1Impl
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
@@ -52,8 +54,8 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
-import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.sequrity.RealAutomaticInteractionGate
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -296,4 +298,10 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideRootScope() = RootScope()
+
+    @Provides
+    @ApplicationScope
+    fun provideBannerVisibilityRepository(
+        preferences: Preferences
+    ): BannerVisibilityRepository = RealBannerVisibilityRepository(preferences)
 }
