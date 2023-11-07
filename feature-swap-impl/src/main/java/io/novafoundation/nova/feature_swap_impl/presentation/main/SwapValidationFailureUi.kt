@@ -139,7 +139,6 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
             )
         ).asDefault()
 
-
         is FeeChangeDetected -> handleFeeSpikeDetected(
             error = reason,
             resourceManager = resourceManager,

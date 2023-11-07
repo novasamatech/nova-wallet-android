@@ -1,13 +1,11 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction
 
 import androidx.lifecycle.asFlow
-import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.runtime.ext.fullId
-import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 

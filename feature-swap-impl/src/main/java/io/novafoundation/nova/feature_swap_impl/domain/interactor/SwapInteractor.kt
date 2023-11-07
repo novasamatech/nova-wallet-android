@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_swap_impl.domain.interactor
 
-import io.novafoundation.nova.common.data.network.runtime.binding.AccountInfo
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.core.updater.UpdateSystem

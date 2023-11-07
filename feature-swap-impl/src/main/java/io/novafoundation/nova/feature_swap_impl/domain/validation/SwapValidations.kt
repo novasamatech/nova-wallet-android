@@ -94,7 +94,6 @@ fun SwapValidationSystemBuilder.sufficientAssetOutBalanceToStayAboveED(
     assetSourceRegistry: AssetSourceRegistry
 ) = sufficientAmountOutToStayAboveEDValidation(assetSourceRegistry)
 
-
 fun SwapValidationSystemBuilder.sufficientBalanceToPayFeeConsideringED(
     assetSourceRegistry: AssetSourceRegistry
 ) = enoughBalanceToStayAboveEDValidation(

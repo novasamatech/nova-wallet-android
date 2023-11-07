@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
-import jp.co.soramitsu.fearless_utils.hash.isPositive
 
 class SufficientBalanceConsideringConsumersValidation<P, E>(
     private val assetSourceRegistry: AssetSourceRegistry,

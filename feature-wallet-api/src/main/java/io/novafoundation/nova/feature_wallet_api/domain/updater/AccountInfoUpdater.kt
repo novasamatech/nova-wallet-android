@@ -47,4 +47,3 @@ class AccountInfoUpdater(
         return runtime.metadata.module(Modules.SYSTEM).storage("Account").storageKey(runtime, accountId)
     }
 }
-
