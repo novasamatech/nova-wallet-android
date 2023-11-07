@@ -29,6 +29,7 @@ jobs:
 
   make-or-update-pr:
     runs-on: ubuntu-latest
+    permissions: write-all
     # needs: checkRef
     # if: needs.checkRef.outputs.is_rc == 1
 
@@ -51,7 +52,7 @@ jobs:
           echo "::set-output name=version::${GITHUB_REF#refs/heads/rc/}"
 
       - name: Create new branch and file in nova-wallet-android-releases repo
-        uses: peter-evans/repository-dispatch@v1
+        uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: novasamatech/nova-wallet-android-releases
