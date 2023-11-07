@@ -51,7 +51,6 @@ import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
 import io.novafoundation.nova.core_db.migrations.AddEnabledColumnToChainAssets_30_31
 import io.novafoundation.nova.core_db.migrations.AddEventIdToOperation_47_48
-import io.novafoundation.nova.core_db.migrations.AddSwapOption_48_49
 import io.novafoundation.nova.core_db.migrations.AddExternalBalances_45_46
 import io.novafoundation.nova.core_db.migrations.AddExtrinsicContentField_37_38
 import io.novafoundation.nova.core_db.migrations.AddFavouriteDApps_9_10
@@ -70,6 +69,7 @@ import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AddSourceToLocalAsset_28_29
 import io.novafoundation.nova.core_db.migrations.AddStakingDashboardItems_41_42
 import io.novafoundation.nova.core_db.migrations.AddStakingTypeToTotalRewards_44_45
+import io.novafoundation.nova.core_db.migrations.AddSwapOption_48_49
 import io.novafoundation.nova.core_db.migrations.AddTransferApisTable_29_30
 import io.novafoundation.nova.core_db.migrations.AddVersioningToGovernanceDapps_32_33
 import io.novafoundation.nova.core_db.migrations.AddWalletConnectSessions_39_40
@@ -85,6 +85,7 @@ import io.novafoundation.nova.core_db.migrations.FixMigrationConflicts_13_14
 import io.novafoundation.nova.core_db.migrations.GovernanceFlagToEnum_26_27
 import io.novafoundation.nova.core_db.migrations.NullableSubstrateAccountId_21_22
 import io.novafoundation.nova.core_db.migrations.NullableSubstratePublicKey_15_16
+import io.novafoundation.nova.core_db.migrations.RefactorOperations_49_50
 import io.novafoundation.nova.core_db.migrations.RemoveChainForeignKeyFromChainAccount_11_12
 import io.novafoundation.nova.core_db.migrations.RemoveColorFromChains_17_18
 import io.novafoundation.nova.core_db.migrations.StakingRewardPeriods_42_43
@@ -104,7 +105,6 @@ import io.novafoundation.nova.core_db.model.FavouriteDAppLocal
 import io.novafoundation.nova.core_db.model.GovernanceDAppLocal
 import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
-import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.PhishingAddressLocal
 import io.novafoundation.nova.core_db.model.PhishingSiteLocal
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
@@ -121,9 +121,15 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.ChainRuntimeInfoLocal
 import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
+import io.novafoundation.nova.core_db.model.operation.DirectRewardTypeLocal
+import io.novafoundation.nova.core_db.model.operation.ExtrinsicTypeLocal
+import io.novafoundation.nova.core_db.model.operation.OperationBaseLocal
+import io.novafoundation.nova.core_db.model.operation.PoolRewardTypeLocal
+import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
+import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 49,
+    version = 50,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -133,7 +139,12 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         StorageEntryLocal::class,
         AccountStakingLocal::class,
         TotalRewardLocal::class,
-        OperationLocal::class,
+        OperationBaseLocal::class,
+        TransferTypeLocal::class,
+        DirectRewardTypeLocal::class,
+        PoolRewardTypeLocal::class,
+        ExtrinsicTypeLocal::class,
+        SwapTypeLocal::class,
         ChainLocal::class,
         ChainNodeLocal::class,
         ChainAssetLocal::class,
@@ -205,6 +216,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddStakingDashboardItems_41_42, StakingRewardPeriods_42_43)
                     .addMigrations(AddRewardAccountToStakingDashboard_43_44, AddStakingTypeToTotalRewards_44_45, AddExternalBalances_45_46)
                     .addMigrations(AddPoolIdToOperations_46_47, AddEventIdToOperation_47_48, AddSwapOption_48_49)
+                    .addMigrations(RefactorOperations_49_50)
                     .build()
             }
             return instance!!

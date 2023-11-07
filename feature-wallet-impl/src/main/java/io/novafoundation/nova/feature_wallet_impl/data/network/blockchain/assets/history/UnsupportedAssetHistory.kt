@@ -22,7 +22,7 @@ class UnsupportedAssetHistory : AssetHistory {
         return Result.failure(UnsupportedOperationException("Unsupported"))
     }
 
-    override fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter> {
+    override fun availableOperationFilters(chain: Chain, asset: Chain.Asset): Set<TransactionFilter> {
         return emptySet()
     }
 

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin
 
 import android.text.TextUtils
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.capitalize
@@ -24,19 +25,13 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatP
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.commissionAsset
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 import java.math.BigInteger
 
 private class EllipsizedString(val value: String, val elipsize: TextUtils.TruncateAt)
-
-private val Operation.Type.operationStatus
-    get() = when (this) {
-        is Operation.Type.Extrinsic -> status
-        is Operation.Type.Reward -> Operation.Status.COMPLETED
-        is Operation.Type.Transfer -> status
-    }
 
 private fun Chain.Asset.formatPlanksSigned(planks: BigInteger, negative: Boolean): String {
     val amount = amountFromPlanks(planks)
@@ -82,6 +77,15 @@ private fun mapStatusToStatusAppearance(status: Operation.Status): OperationStat
 @DrawableRes
 private fun transferDirectionIcon(isIncome: Boolean): Int {
     return if (isIncome) R.drawable.ic_arrow_down else R.drawable.ic_arrow_up
+}
+
+@ColorRes
+private fun incomeTextColor(isIncome: Boolean, operationStatus: Operation.Status): Int {
+    return when {
+        operationStatus == Operation.Status.FAILED -> R.color.text_tertiary
+        isIncome -> R.color.text_positive
+        else -> R.color.text_primary
+    }
 }
 
 private fun String.itemToCapitalizedWords(): String {
@@ -171,6 +175,14 @@ private fun substrateCallUi(
     }
 }
 
+private fun Operation.Type.Swap.isIncome(chainAsset: Chain.Asset): Boolean {
+    return chainAsset.fullId == amountOut.chainAsset.fullId
+}
+
+private fun Operation.Type.Swap.formatSubHeader(): String {
+    return "${amountIn.chainAsset.symbol} → ${amountOut.chainAsset.symbol}"
+}
+
 fun mapOperationToOperationModel(
     chain: Chain,
     token: Token,
@@ -178,7 +190,7 @@ fun mapOperationToOperationModel(
     nameIdentifier: AddressDisplayUseCase.Identifier,
     resourceManager: ResourceManager,
 ): OperationModel {
-    val statusAppearance = mapStatusToStatusAppearance(operation.type.operationStatus)
+    val statusAppearance = mapStatusToStatusAppearance(operation.status)
     val formattedTime = resourceManager.formatTime(operation.time)
 
     return with(operation) {
@@ -202,11 +214,7 @@ fun mapOperationToOperationModel(
             is Operation.Type.Transfer -> {
                 val isIncome = operationType.isIncome(chain)
 
-                val amountColor = when {
-                    operationType.status == Operation.Status.FAILED -> R.color.text_tertiary
-                    isIncome -> R.color.text_positive
-                    else -> R.color.text_primary
-                }
+                val amountColor = incomeTextColor(isIncome, operation.status)
 
                 val nameOrAddress = nameIdentifier.nameOrAddress(operationType.displayAddress(isIncome))
 
@@ -230,7 +238,7 @@ fun mapOperationToOperationModel(
             }
 
             is Operation.Type.Extrinsic -> {
-                val amountColor = if (operationType.status == Operation.Status.FAILED) R.color.text_tertiary else R.color.text_primary
+                val amountColor = if (operation.status == Operation.Status.FAILED) R.color.text_tertiary else R.color.text_primary
                 val (header, subHeader) = mapExtrinsicContentToHeaderAndSubHeader(operationType.content, resourceManager)
 
                 OperationModel(
@@ -243,6 +251,23 @@ fun mapOperationToOperationModel(
                     subHeaderEllipsize = subHeader.elipsize,
                     statusAppearance = statusAppearance,
                     operationIcon = operation.chainAsset.iconUrl?.asIcon() ?: R.drawable.ic_nova.asIcon()
+                )
+            }
+
+            is Operation.Type.Swap -> {
+                val isIncome = operationType.isIncome(chainAsset)
+                val amount = if (isIncome) operationType.amountOut.amount else operationType.amountIn.amount
+
+                OperationModel(
+                    id = id,
+                    amount = chainAsset.formatPlanksSigned(amount, negative = !isIncome),
+                    amountColorRes = incomeTextColor(isIncome, operation.status),
+                    amountDetails = mapToFiatWithTime(token, operationType.fiatAmount, formattedTime, resourceManager),
+                    header = resourceManager.getString(R.string.wallet_asset_swap),
+                    statusAppearance = statusAppearance,
+                    subHeader = operationType.formatSubHeader(),
+                    subHeaderEllipsize = TextUtils.TruncateAt.END,
+                    operationIcon = R.drawable.ic_flip_swap.asIcon()
                 )
             }
         }
@@ -294,7 +319,7 @@ suspend fun mapOperationToParcel(
                     fee = operationType.fee,
                     formattedFee = feeFormatted,
                     isIncome = isIncome,
-                    statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus),
+                    statusAppearance = mapStatusToStatusAppearance(operation.status),
                     transferDirectionIcon = transferDirectionIcon(isIncome)
                 )
             }
@@ -341,9 +366,12 @@ suspend fun mapOperationToParcel(
                     content = mapExtrinsicContentToParcel(operationType, extrinsicHash, resourceManager),
                     fee = formatFee(chainAsset, operationType),
                     fiatFee = operationType.fiatFee?.formatAsCurrency(currency),
-                    statusAppearance = mapStatusToStatusAppearance(operationType.operationStatus)
+                    statusAppearance = mapStatusToStatusAppearance(operation.status)
                 )
             }
+
+            // TODO swap details
+            is Operation.Type.Swap -> OperationParcelizeModel.Swap()
         }
     }
 }
