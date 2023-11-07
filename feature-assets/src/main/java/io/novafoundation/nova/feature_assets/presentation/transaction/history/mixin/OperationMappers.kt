@@ -1,9 +1,12 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin
 
+import android.os.Build
 import android.text.TextUtils
+import android.text.style.ImageSpan
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.buildSpannable
 import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.common.utils.splitSnakeOrCamelCase
@@ -179,8 +182,27 @@ private fun Operation.Type.Swap.isIncome(chainAsset: Chain.Asset): Boolean {
     return chainAsset.fullId == amountOut.chainAsset.fullId
 }
 
-private fun Operation.Type.Swap.formatSubHeader(): String {
-    return "${amountIn.chainAsset.symbol} → ${amountOut.chainAsset.symbol}"
+private fun Operation.Type.Swap.formatSubHeader(resourceManager: ResourceManager): CharSequence {
+    val iconColor = resourceManager.getColor(R.color.chip_icon)
+    val chevronSize = resourceManager.measureInPx(12)
+    val arrowRight = resourceManager.getDrawable(R.drawable.ic_arrow_right).apply {
+        setBounds(0, 0, chevronSize, chevronSize)
+        setTint(iconColor)
+    }
+
+    val imageAlignment = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        ImageSpan.ALIGN_CENTER
+    } else {
+        ImageSpan.ALIGN_BASELINE
+    }
+
+    return buildSpannable(resourceManager) {
+        append(amountIn.chainAsset.symbol)
+        append(" ")
+        appendSpan(ImageSpan(arrowRight, imageAlignment))
+        append(" ")
+        append(amountOut.chainAsset.symbol)
+    }
 }
 
 fun mapOperationToOperationModel(
@@ -265,7 +287,7 @@ fun mapOperationToOperationModel(
                     amountDetails = mapToFiatWithTime(token, operationType.fiatAmount, formattedTime, resourceManager),
                     header = resourceManager.getString(R.string.wallet_asset_swap),
                     statusAppearance = statusAppearance,
-                    subHeader = operationType.formatSubHeader(),
+                    subHeader = operationType.formatSubHeader(resourceManager),
                     subHeaderEllipsize = TextUtils.TruncateAt.END,
                     operationIcon = R.drawable.ic_flip_swap.asIcon()
                 )
