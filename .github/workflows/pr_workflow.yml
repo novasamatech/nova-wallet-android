@@ -25,19 +25,48 @@ jobs:
         run: |
           echo "Output: ${{ steps.check_ref.outputs.ref_contains_rc }}"
 
-  build:
+  make-or-update-pr:
     runs-on: ubuntu-latest
-
+  
     steps:
-      - name: Check if comment contains "Release notes"
-        if: github.ref == 'refs/heads/master'
-        uses: actions/github-script@v4
+      - name: Find Comment
+        uses: peter-evans/find-comment@v2
+        id: fc
         with:
-          script: |
-            const comment = github.event.pull_request.comments.find(c => c.body.includes('Release notes'));
-            if (!comment) {
-              console.log('No comment found with "Release notes"');
-              throw new Error('Missing release notes');
-            } else {
-              console.log('Comment found with "Release notes"');
-            }
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: Release notes
+
+      - name: Extract release notes from comment
+        id: check_release_notes
+        run: |
+          comment="${{ steps.fc.outputs.comment-body }}"
+          if [[ -z "$comment" ]]; then
+            echo "No comment found with 'Release notes'"
+            exit 1
+          else
+            echo "Comment found with 'Release notes'"
+            release_notes=$(echo $comment | awk -F'Release notes:' '{print $2}' | xargs)
+            echo "Release notes: $release_notes"
+            echo "::set-output name=release_notes::$release_notes"
+          fi
+
+      - name: Extract version from branch name
+        id: extract_version
+        run: |
+          echo "::set-output name=version::${GITHUB_REF#refs/heads/rc/}"
+
+      - name: Create new branch and file in nova-wallet-android-releases repo
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: novasamatech/nova-wallet-android-releases
+          event-type: create-branch-and-file
+          client-payload: '{"version": "${{ steps.extract_version.outputs.version }}", "release_notes": "${{ steps.check_release_notes.outputs.release_notes }}"}'
+
+      - name: Update entrypoint_release.json
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: novasamatech/nova-wallet-android-releases
+          event-type: update-entrypoint
+          client-payload: '{"version": "${{ steps.extract_version.outputs.version }}", "time": "2023-10-27T12:00:00Z", "severity": "Major"}'
