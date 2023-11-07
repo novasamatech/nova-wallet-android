@@ -22,6 +22,5 @@ val RefactorOperations_49_50 = object : Migration(49, 50) {
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_operation_extrinsics_operationId_address_chainId_assetId` ON `operation_extrinsics` (`operationId`, `address`, `chainId`, `assetId`)")
         database.execSQL("CREATE TABLE IF NOT EXISTS `operation_swaps` (`operationId` TEXT NOT NULL, `address` TEXT NOT NULL, `chainId` TEXT NOT NULL, `assetId` INTEGER NOT NULL, `fee_amount` TEXT NOT NULL, `fee_chainId` TEXT NOT NULL, `fee_assetId` INTEGER NOT NULL, `assetIn_amount` TEXT NOT NULL, `assetIn_chainId` TEXT NOT NULL, `assetIn_assetId` INTEGER NOT NULL, `assetOut_amount` TEXT NOT NULL, `assetOut_chainId` TEXT NOT NULL, `assetOut_assetId` INTEGER NOT NULL, PRIMARY KEY(`operationId`, `address`, `chainId`, `assetId`), FOREIGN KEY(`operationId`, `address`, `chainId`, `assetId`) REFERENCES `operations`(`id`, `address`, `chainId`, `assetId`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_operation_swaps_operationId_address_chainId_assetId` ON `operation_swaps` (`operationId`, `address`, `chainId`, `assetId`)")
-
     }
 }
