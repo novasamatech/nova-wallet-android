@@ -1,3 +1,5 @@
+@file:Suppress("ktlint")
+
 package io.novafoundation.nova.core_db.migrations
 
 import androidx.room.migration.Migration

@@ -43,7 +43,7 @@ class SubqueryHistoryRequest(
     filters: Set<TransactionFilter>,
     asset: Asset,
     chain: Chain,
-): SubQueryFilters {
+) : SubQueryFilters {
     val query = """
     {
         query {

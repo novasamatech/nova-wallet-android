@@ -61,7 +61,6 @@ fun mapOperationToOperationLocalDb(
         source = source
     )
 
-
     OperationLocal(
         base = base,
         type = typeLocal

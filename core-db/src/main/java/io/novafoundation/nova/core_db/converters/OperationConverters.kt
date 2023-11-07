@@ -18,7 +18,6 @@ class OperationConverters {
     @TypeConverter
     fun toOperationStatus(ordinal: Int) = OperationBaseLocal.Status.values()[ordinal]
 
-
     @TypeConverter
     fun fromExtrinsicContentType(type: ExtrinsicTypeLocal.ContentType) = type.name
 

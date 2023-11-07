@@ -61,7 +61,9 @@ class NativeAssetHistory(
 
     override fun availableOperationFilters(chain: Chain, asset: Chain.Asset): Set<TransactionFilter> {
         return setOfNotNull(
-            TransactionFilter.TRANSFER, TransactionFilter.EXTRINSIC, TransactionFilter.REWARD,
+            TransactionFilter.TRANSFER,
+            TransactionFilter.EXTRINSIC,
+            TransactionFilter.REWARD,
             TransactionFilter.SWAP.takeIf { chain.isSwapSupported() }
         )
     }

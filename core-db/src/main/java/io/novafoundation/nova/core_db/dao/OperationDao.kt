@@ -91,7 +91,10 @@ abstract class OperationDao {
         """
     )
     abstract fun observe(
-        address: String, chainId: String, chainAssetId: Int, statusUp: OperationBaseLocal.Status = OperationBaseLocal.Status.PENDING
+        address: String,
+        chainId: String,
+        chainAssetId: Int,
+        statusUp: OperationBaseLocal.Status = OperationBaseLocal.Status.PENDING
     ): Flow<List<OperationJoin>>
 
     @Query(
@@ -101,12 +104,18 @@ abstract class OperationDao {
         """
     )
     abstract suspend fun getTransferType(
-        operationId: String, address: String, chainId: String, chainAssetId: Int
+        operationId: String,
+        address: String,
+        chainId: String,
+        chainAssetId: Int
     ): TransferTypeLocal?
 
     @Transaction
     open suspend fun insertFromRemote(
-        accountAddress: String, chainId: String, chainAssetId: Int, operations: List<OperationLocal>
+        accountAddress: String,
+        chainId: String,
+        chainAssetId: Int,
+        operations: List<OperationLocal>
     ) {
         clearBySource(accountAddress, chainId, chainAssetId, OperationBaseLocal.Source.REMOTE)
 
@@ -125,17 +134,26 @@ abstract class OperationDao {
 
     @Query("DELETE FROM operations WHERE $ID_FILTER AND source = :source")
     protected abstract suspend fun clearBySource(
-        address: String, chainId: String, chainAssetId: Int, source: OperationBaseLocal.Source
+        address: String,
+        chainId: String,
+        chainAssetId: Int,
+        source: OperationBaseLocal.Source
     ): Int
 
     @Query("DELETE FROM operations WHERE time < :minTime AND $ID_FILTER")
     protected abstract suspend fun clearOld(
-        address: String, chainId: String, chainAssetId: Int, minTime: Long
+        address: String,
+        chainId: String,
+        chainAssetId: Int,
+        minTime: Long
     ): Int
 
     @Query("DELETE FROM operations WHERE $ID_FILTER AND hash in (:hashes)")
     protected abstract suspend fun clearByHashes(
-        address: String, chainId: String, chainAssetId: Int, hashes: Set<String>
+        address: String,
+        chainId: String,
+        chainAssetId: Int,
+        hashes: Set<String>
     ): Int
 
     private suspend fun insertOperationType(type: OperationTypeLocal) {
