@@ -60,13 +60,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: novasamatech/nova-wallet-android-releases
-          event-type: create-branch-and-file
-          client-payload: '{"version": "${{ steps.extract_version.outputs.version }}", "release_notes": "${{ steps.check_release_notes.outputs.release_notes }}"}'
-
-      - name: Update entrypoint_release.json
-        uses: peter-evans/repository-dispatch@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: novasamatech/nova-wallet-android-releases
-          event-type: update-entrypoint
-          client-payload: '{"version": "${{ steps.extract_version.outputs.version }}", "time": "2023-10-27T12:00:00Z", "severity": "Major"}'
+          event-type: create-pr
+          client-payload: '{"version": "${{ steps.extract_version.outputs.version }}", "release_notes": "${{ steps.check_release_notes.outputs.release_notes }}, "time": "2023-10-27T12:00:00Z", "severity": "Major"}'
