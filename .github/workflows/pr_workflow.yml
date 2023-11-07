@@ -50,11 +50,17 @@ jobs:
         id: extract_version
         run: |
           echo "::set-output name=version::${GITHUB_REF#refs/heads/rc/}"
+      
+      - uses: tibdex/github-app-token@v1
+        id: generate-token
+        with:
+          app_id: ${{ secrets.PR_APP_ID }}
+          private_key: ${{ secrets.PR_APP_TOKEN }}
 
       - name: Create new branch and file in nova-wallet-android-releases repo
         uses: peter-evans/repository-dispatch@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.generate-token.outputs.token }}
           repository: novasamatech/nova-wallet-android-releases
           event-type: create-pr
           client-payload: '{"version": "${{ steps.extract_version.outputs.version }}", "comment_link": "${{ steps.create_link.outputs.comment_link }}", "time": "2023-10-27T12:00:00Z", "severity": "Major"}'
