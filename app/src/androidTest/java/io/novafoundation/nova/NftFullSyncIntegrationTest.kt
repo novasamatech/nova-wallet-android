@@ -46,7 +46,7 @@ class NftFullSyncIntegrationTest {
 
         nftRepository.initialNftSync(metaAccount, true)
 
-        nftRepository.allNftFlow(metaAccount)
+        nftRepository.allNftWithMetadataFlow(metaAccount)
             .map { nfts -> nfts.filter { !it.isFullySynced } }
             .takeWhile { it.isNotEmpty() }
             .onEach { unsyncedNfts ->

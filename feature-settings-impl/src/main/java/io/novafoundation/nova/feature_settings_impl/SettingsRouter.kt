@@ -4,6 +4,8 @@ interface SettingsRouter {
 
     fun openWallets()
 
+    fun openNftList()
+
     fun openCurrencies()
 
     fun openLanguages()

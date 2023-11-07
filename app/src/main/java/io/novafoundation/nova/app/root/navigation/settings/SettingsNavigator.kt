@@ -21,6 +21,10 @@ class SettingsNavigator(
         delegate.openWallets()
     }
 
+    override fun openNftList() {
+        performNavigation(R.id.action_mainFragment_to_nfts_nav_graph)
+    }
+
     override fun openCurrencies() = performNavigation(R.id.action_mainFragment_to_currenciesFragment)
 
     override fun openLanguages() = performNavigation(R.id.action_mainFragment_to_languagesFragment)

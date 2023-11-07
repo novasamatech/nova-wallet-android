@@ -14,6 +14,7 @@ fun mapNftTypeLocalToTypeKey(
     NftLocal.Type.UNIQUES -> Nft.Type.Key.UNIQUES
     NftLocal.Type.RMRK1 -> Nft.Type.Key.RMRKV1
     NftLocal.Type.RMRK2 -> Nft.Type.Key.RMRKV2
+    NftLocal.Type.NFTS -> Nft.Type.Key.NFTS
 }
 
 fun nftIssuance(nftLocal: NftLocal): Nft.Issuance {
@@ -40,37 +41,13 @@ fun nftPrice(nftLocal: NftLocal): BigInteger? {
 fun mapNftLocalToNft(
     chainsById: Map<ChainId, Chain>,
     metaAccount: MetaAccount,
-    nftLocal: NftLocal
+    nftLocal: NftLocal,
+    collectionName: String?,
+    collectionMedia: String?
 ): Nft? {
     val chain = chainsById[nftLocal.chainId] ?: return null
 
-    val type = when (nftLocal.type) {
-        NftLocal.Type.UNIQUES -> Nft.Type.Uniques(
-            instanceId = nftLocal.instanceId!!.toBigInteger(),
-            collectionId = nftLocal.collectionId.toBigInteger(),
-        )
-        NftLocal.Type.RMRK1 -> Nft.Type.Rmrk1(
-            instanceId = nftLocal.instanceId!!,
-            collectionId = nftLocal.collectionId
-        )
-        NftLocal.Type.RMRK2 -> Nft.Type.Rmrk2(
-            collectionId = nftLocal.collectionId
-        )
-    }
-
-    val details = if (nftLocal.wholeDetailsLoaded) {
-        val issuance = nftIssuance(nftLocal)
-
-        Nft.Details.Loaded(
-            name = nftLocal.name,
-            label = nftLocal.label,
-            media = nftLocal.media,
-            price = nftPrice(nftLocal),
-            issuance = issuance,
-        )
-    } else {
-        Nft.Details.Loadable
-    }
+    val type = mapNftLocalToNftType(nftLocal)
 
     return Nft(
         identifier = nftLocal.identifier,
@@ -80,6 +57,34 @@ fun mapNftLocalToNft(
         owner = metaAccount.accountIdIn(chain)!!,
         metadataRaw = nftLocal.metadata,
         type = type,
-        details = details
+        details = Nft.Details.Loaded(
+            name = nftLocal.name,
+            label = nftLocal.label,
+            media = nftLocal.media,
+            price = nftPrice(nftLocal),
+            collectionName = collectionName,
+            collectionMedia = collectionMedia
+        ),
+        wholeDetailsLoaded = nftLocal.wholeDetailsLoaded
     )
+}
+
+fun mapNftLocalToNftType(nftLocal: NftLocal): Nft.Type {
+    return when (nftLocal.type) {
+        NftLocal.Type.UNIQUES -> Nft.Type.Uniques(
+            instanceId = nftLocal.instanceId!!.toBigInteger(),
+            collectionId = nftLocal.collectionId.toBigInteger()
+        )
+        NftLocal.Type.RMRK1 -> Nft.Type.Rmrk1(
+            instanceId = nftLocal.instanceId!!,
+            collectionId = nftLocal.collectionId
+        )
+        NftLocal.Type.RMRK2 -> Nft.Type.Rmrk2(
+            collectionId = nftLocal.collectionId
+        )
+        NftLocal.Type.NFTS -> Nft.Type.Nfts(
+            instanceId = nftLocal.instanceId!!.toBigInteger(),
+            collectionId = nftLocal.collectionId.toBigInteger()
+        )
+    }
 }

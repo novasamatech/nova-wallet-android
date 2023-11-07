@@ -2,6 +2,7 @@ package io.novafoundation.nova.common.di.modules
 
 import android.content.Context
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.neovisionaries.ws.client.WebSocketFactory
 import dagger.Module
 import dagger.Provides
@@ -89,10 +90,20 @@ class NetworkModule {
 
     @Provides
     @ApplicationScope
+    @NetworkSerialization
+    fun provideNetworkGson(): Gson {
+        return GsonBuilder()
+            .setLenient()
+            .create()
+    }
+
+    @Provides
+    @ApplicationScope
     fun provideApiCreator(
-        okHttpClient: OkHttpClient
+        okHttpClient: OkHttpClient,
+        @NetworkSerialization gson: Gson
     ): NetworkApiCreator {
-        return NetworkApiCreator(okHttpClient, "https://placeholder.com")
+        return NetworkApiCreator(okHttpClient, gson, "https://placeholder.com")
     }
 
     @Provides

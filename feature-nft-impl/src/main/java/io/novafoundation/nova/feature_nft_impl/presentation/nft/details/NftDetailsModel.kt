@@ -13,11 +13,19 @@ class NftDetailsModel(
     val collection: Collection?,
     val owner: AddressModel,
     val creator: AddressModel?,
-    val network: ChainUi
+    val network: ChainUi,
+    val isSupportedForSend: Boolean,
+    val tags: List<String>,
+    val attributes: List<Attribute>
 ) {
 
     class Collection(
         val name: String,
         val media: String?
+    )
+
+    class Attribute(
+        val label: String,
+        val value: String
     )
 }

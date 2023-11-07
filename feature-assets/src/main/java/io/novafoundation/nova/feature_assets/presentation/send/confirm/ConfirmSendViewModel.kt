@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
@@ -43,6 +42,7 @@ import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -124,15 +124,8 @@ class ConfirmSendViewModel(
         .inBackground()
         .share()
 
-    private val _transferSubmittingLiveData = MutableStateFlow(false)
-
-    val sendButtonStateLiveData = _transferSubmittingLiveData.map { submitting ->
-        if (submitting) {
-            ButtonState.PROGRESS
-        } else {
-            ButtonState.NORMAL
-        }
-    }
+    private val _transferSubmittingFlow = MutableStateFlow(false)
+    val sendButtonStateFlow = _transferSubmittingFlow.asStateFlow()
 
     init {
         setInitialState()
@@ -163,7 +156,7 @@ class ConfirmSendViewModel(
         validationExecutor.requireValid(
             validationSystem = sendInteractor.validationSystemFor(payload.transfer),
             payload = payload,
-            progressConsumer = _transferSubmittingLiveData.progressConsumer(),
+            progressConsumer = _transferSubmittingFlow.progressConsumer(),
             autoFixPayload = ::autoFixSendValidationPayload,
             validationFailureTransformerCustom = { status, actions ->
                 viewModelScope.mapAssetTransferValidationFailureToUI(
@@ -208,7 +201,7 @@ class ConfirmSendViewModel(
                 finishSendFlow()
             }.onFailure(::showError)
 
-        _transferSubmittingLiveData.value = false
+        _transferSubmittingFlow.value = false
     }
 
     private suspend fun finishSendFlow() {

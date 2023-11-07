@@ -299,6 +299,8 @@
     <string name="common_none">Нет</string>
     <string name="common_not_enough_funds_message">К сожалению, у вас недостаточно средств для оплаты сетевого сбора.</string>
     <string name="common_not_enough_funds_title">Недостаточный баланс</string>
+    <string name="common_nft_absent_title">NFT отсутствует</string>
+    <string name="common_nft_absent_message">К сожалению, выбранная NFT не принадлежит текущему кошельку</string>
     <string name="common_off">Выкл</string>
     <string name="common_ok">OK</string>
     <string name="common_ok_back">Хорошо, назад</string>
@@ -577,8 +579,9 @@
     <string name="network_info_title">Информация ноды</string>
     <string name="network_status_connecting">Подключение…</string>
     <string name="nft_collection">Коллекция</string>
+    <string name="nft_token">Токен ID</string>
     <string name="nft_created_by">Создатель</string>
-    <string name="nft_issuance_limited_format" formatted="false">#%s Издание из %s</string>
+    <string name="nft_price">Цена</string>
     <string name="nft_issuance_unlimited">Неограниченная серия</string>
     <string name="nft_owned_by">Владелец</string>
     <string name="nft_price_not_listed">Без цены</string>
@@ -781,6 +784,7 @@
     <string name="settings_community">Сообщество</string>
     <string name="settings_email">Написать разработчикам</string>
     <string name="settings_general">Основные</string>
+    <string name="settings_more">Больше</string>
     <string name="settings_pin_code_verification_confirmation_message">Каждая операция подписи на кошельках с парой ключей (созданной в кошельке nova или импортированной) должна требовать проверки PIN-кода перед созданием подписи</string>
     <string name="settings_pin_code_verification_confirmation_title">Запрашивать аутентификацию для подписи операций</string>
     <string name="settings_preferences">Предпочтения</string>
@@ -1226,7 +1230,8 @@
     <string name="wallet_nickname_create_caption_v2_2_0">Примеры имён: Мой аккаунт, Валидатор, Dotsama краудлоуны, и т.д.</string>
     <string name="wallet_receive_description">Поделитесь этим QR-кодом с отправителем</string>
     <string name="wallet_receive_description_v2_2_0">Покажите QR код отправителю для сканирования</string>
-    <string name="wallet_receive_share_message" formatted="false">Мой %s адрес для получения %s:</string>
+    <string name="wallet_receive_share_message_token" formatted="false">Мой %s адрес для получения %s:</string>
+    <string name="wallet_receive_share_message" formatted="false">Мой %s адрес:</string>
     <string name="wallet_receive_share_qr">Поделиться</string>
     <string name="wallet_recipient">Получатель</string>
     <string name="wallet_search_empty_title">Убедитесь, что адрес\nиз правильной сети</string>
@@ -1283,4 +1288,8 @@
     <string name="yield_boost_stake_increase_time">Частота увеличения стейка</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost будет автоматически стейкать %s все мои переводные токены выше %s</string>
     <string name="yiled_boost_yield_boosted">С Yield Boost</string>
+    <string name="nft_receive">Получить NFT</string>
+    <string name="nft_send">Отправить NFT</string>
+    <string name="nft_on_chain">на</string>
+    <string name="nft_search_hint">Поиск по названию NFT или коллекции</string>
 </resources>

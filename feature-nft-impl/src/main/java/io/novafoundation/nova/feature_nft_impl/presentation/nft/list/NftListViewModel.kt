@@ -7,39 +7,64 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
-import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_nft_impl.domain.nft.list.NftListInteractor
-import io.novafoundation.nova.feature_nft_impl.domain.nft.list.PricedNft
-import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatIssuance
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.groupNftCards
+import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.mapNftToListItem
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class NftListViewModel(
     private val router: NftRouter,
     private val resourceManager: ResourceManager,
-    private val interactor: NftListInteractor,
+    private val interactor: NftListInteractor
 ) : BaseViewModel() {
 
     private val nftsFlow = interactor.userNftsFlow()
         .inBackground()
-        .share()
 
     val nftCountFlow = nftsFlow.map { it.size.format() }
         .share()
+        .state(initialValue = "0")
 
-    val nftListItemsFlow = nftsFlow.mapList(::mapNftToListItem)
+    private val hiddenCollections = mutableSetOf<String>()
+    private val hiddenCollectionChanged = MutableStateFlow("")
+
+    val nftListItemsFlow = nftsFlow.combine(hiddenCollectionChanged) { nfts, _ -> nfts }
+        .mapList { resourceManager.mapNftToListItem(it) }
+        .map { groupNftCards(it, hiddenCollections) }
         .inBackground()
-        .share()
+        .state(initialValue = emptyList())
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
     val hideRefreshEvent: LiveData<Event<Unit>> = _hideRefreshEvent
+
+
+    init {
+        subscribeUpdateNftListWhenOwnerChanged()
+    }
+
+    private fun subscribeUpdateNftListWhenOwnerChanged() {
+        interactor.subscribeNftOwnerChanged()
+            .inBackground()
+            .launchIn(this)
+    }
 
     fun syncNfts() {
         viewModelScope.launch {
@@ -49,50 +74,40 @@ class NftListViewModel(
         }
     }
 
-    fun nftClicked(nftListItem: NftListItem) = launch {
-        if (nftListItem.content is LoadingState.Loaded) {
-            router.openNftDetails(nftListItem.identifier)
+    fun nftClicked(nftListCard: NftListItem.NftListCard) = launch {
+        if (nftListCard.content is LoadingState.Loaded) {
+            router.openNftDetails(nftListCard.identifier)
         }
     }
 
-    fun loadableNftShown(nftListItem: NftListItem) = launch(Dispatchers.Default) {
-        val pricedNft = nftsFlow.first().firstOrNull { it.nft.identifier == nftListItem.identifier }
+    fun loadableNftShown(nftListCard: NftListItem.NftListCard) = launch(Dispatchers.Default) {
+        val pricedNft = nftsFlow.first().firstOrNull { it.nft.identifier == nftListCard.identifier }
             ?: return@launch
 
         interactor.fullSyncNft(pricedNft.nft)
     }
 
-    private fun mapNftToListItem(pricedNft: PricedNft): NftListItem {
-        val content = when (val details = pricedNft.nft.details) {
-            Nft.Details.Loadable -> LoadingState.Loading()
-
-            is Nft.Details.Loaded -> {
-                val issuanceFormatted = resourceManager.formatIssuance(details.issuance)
-
-                val amountModel = if (details.price != null && pricedNft.nftPriceToken != null) {
-                    mapAmountToAmountModel(details.price!!, pricedNft.nftPriceToken)
-                } else {
-                    null
-                }
-
-                LoadingState.Loaded(
-                    NftListItem.Content(
-                        issuance = issuanceFormatted,
-                        title = details.name ?: pricedNft.nft.instanceId ?: pricedNft.nft.collectionId,
-                        price = amountModel,
-                        media = details.media
-                    )
-                )
-            }
-        }
-
-        return NftListItem(
-            identifier = pricedNft.nft.identifier,
-            content = content
-        )
-    }
-
     fun backClicked() {
         router.back()
+    }
+
+    fun onNftReceiveClick() {
+        router.openNftReceiveFlowFragment()
+    }
+
+    fun onNftSendClick() {
+        router.openNftSendFlowFragment()
+    }
+
+    fun toggleCollection(collection: String) {
+        viewModelScope.launch {
+            if (hiddenCollections.contains(collection)) {
+                hiddenCollections.remove(collection)
+                hiddenCollectionChanged.emit("expand:$collection")
+            } else {
+                hiddenCollections.add(collection)
+                hiddenCollectionChanged.emit("collapse:$collection")
+            }
+        }
     }
 }

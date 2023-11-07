@@ -17,13 +17,109 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit"
-            android:id="@+id/action_nftListFragment_to_nftDetailsFragment"
+            android:id="@+id/action_to_nftDetailsFragment"
             app:destination="@id/nftDetailsFragment" />
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_show_nftReceiveFlowFragment"
+            app:destination="@id/nftReceiveFlowFragment" />
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_show_nftSendFlowFragment"
+            app:destination="@id/nftSendFlowFragment" />
+
     </fragment>
 
     <fragment
         tools:layout="@layout/fragment_nft_details"
         android:id="@+id/nftDetailsFragment"
         android:name="io.novafoundation.nova.feature_nft_impl.presentation.nft.details.NftDetailsFragment"
-        android:label="NftDetailsFragment" />
+        android:label="NftDetailsFragment" >
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_nftListFragment_to_inputAddressNftFragment"
+            app:destination="@id/inputAddressNftFragment" />
+    </fragment>
+
+    <fragment
+        tools:layout="@layout/fragment_input_address_nft"
+        android:id="@+id/inputAddressNftFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.send.amount.InputAddressNftFragment"
+        android:label="addressInputNftFragment">
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_inputAddressNftFragment_to_confirmSendFragment"
+            app:destination="@id/confirmSendFragment" />
+
+    </fragment>
+
+    <fragment
+        tools:layout="@layout/fragment_confirm_nft_send"
+        android:id="@+id/confirmSendFragment"
+        android:name="io.novafoundation.nova.feature_nft_impl.presentation.nft.send.confirm.ConfirmNftSendFragment"
+        android:label="confirmSendFragment">
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_show_nftListFragment"
+            app:popUpTo="@id/nftListFragment" />
+    </fragment>
+
+    <fragment
+        tools:layout="@layout/fragment_nft_receive_flow"
+        android:id="@+id/nftReceiveFlowFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.receive.flow.NftReceiveFlowFragment"
+        android:label="nftReceiveFlowFragment">
+
+        <action
+            android:id="@+id/action_open_receive"
+            app:destination="@id/receiveFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        tools:layout="@layout/fragment_nft_send_flow"
+        android:id="@+id/nftSendFlowFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.send.flow.NftSendFlowFragment"
+        android:label="nftSendFlowFragment">
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_nftSendFlowFragment_to_inputAddressNftFragment"
+            app:destination="@id/inputAddressNftFragment" />
+
+    </fragment>
+
+    <fragment
+        tools:layout="@layout/fragment_receive"
+        android:id="@+id/receiveFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment"
+        android:label="receiveFragment">
+    </fragment>
+
 </navigation>

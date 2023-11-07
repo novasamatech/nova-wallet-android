@@ -25,6 +25,8 @@ data class NftLocal(
     val name: String? = null,
     val label: String? = null,
     val media: String? = null,
+    val tags: String? = null,
+    val attributes: String? = null,
     // --- !metadata fields ---
 
     val issuanceTotal: Int? = null,
@@ -34,7 +36,7 @@ data class NftLocal(
 ) : Identifiable {
 
     enum class Type {
-        UNIQUES, RMRK1, RMRK2
+        UNIQUES, RMRK1, RMRK2, NFTS
     }
 
     override fun equals(other: Any?): Boolean {

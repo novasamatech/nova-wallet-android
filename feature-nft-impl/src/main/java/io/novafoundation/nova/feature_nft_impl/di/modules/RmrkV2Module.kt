@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_nft_impl.di.modules
 
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -25,6 +26,7 @@ class RmrkV2Module {
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
         singularV2Api: SingularV2Api,
-        nftDao: NftDao
-    ) = RmrkV2NftProvider(chainRegistry, accountRepository, singularV2Api, nftDao)
+        nftDao: NftDao,
+        gson: Gson
+    ) = RmrkV2NftProvider(chainRegistry, accountRepository, singularV2Api, nftDao, gson)
 }

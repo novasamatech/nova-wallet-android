@@ -787,6 +787,8 @@
     <string name="wallet_currency_category_fiat">Fiat currencies</string>
     <string name="wallet_currency_category_popular_fiat">Popular fiat currencies</string>
 
+    <string name="settings_nfts_title" translatable="false">NFTs</string>
+
     <string name="assets_select_send_your_wallets">Your wallets</string>
 
     <string name="assets_balance_details_locks_staking">Staking</string>
@@ -1048,11 +1050,12 @@
     <string name="common_price">Price</string>
 
     <string name="nft_collection">Collection</string>
+    <string name="nft_token">Token ID</string>
     <string name="nft_owned_by">Owned by</string>
     <string name="nft_created_by">Created by</string>
+    <string name="nft_price">Price</string>
 
     <string name="nft_issuance_unlimited">Unlimited series</string>
-    <string name="nft_issuance_limited_format">#%s Edition of %s</string>
     <string name="nft_your_nfts">Your NFTs</string>
 
     <string name="wallet_assets_empty">Your assets will appear here.\nMake sure the "Hide zero balances" filter is turned off</string>
@@ -1210,6 +1213,8 @@
     <string name="common_no_screenshot_message_v2_2_0">We are going to show your mnemonic. Make sure no one can see your screen and do not take screenshots — they can be collected by third-party malware</string>
     <string name="common_not_enough_funds_message">Sorry, you don\'t have enough funds to pay the network fee.</string>
     <string name="common_not_enough_funds_title">Insufficient balance</string>
+    <string name="common_nft_absent_title">NFT absent</string>
+    <string name="common_nft_absent_message">Unfortunately, the selected NFT does not belong to the current wallet</string>
     <string name="common_ok">OK</string>
     <string name="common_options_title">Select an option</string>
     <string name="common_proceed">Proceed</string>
@@ -1367,6 +1372,7 @@
     <string name="settings_community">Community</string>
     <string name="settings_email">Email</string>
     <string name="settings_general">General</string>
+    <string name="settings_more">More</string>
     <string name="settings_preferences">Preferences</string>
     <string name="settings_security">Security</string>
     <string name="settings_support">Support &amp; Feedback</string>
@@ -1594,7 +1600,9 @@
     <string name="wallet_nickname_create_caption_v2_2_0">Name examples: Main account, My validator, Dotsama crowdloans, etc.</string>
     <string name="wallet_receive_description">Share this QR to sender</string>
     <string name="wallet_receive_description_v2_2_0">Let sender scan this QR code</string>
-    <string name="wallet_receive_share_message" formatted="false">My %s address to receive %s:</string>
+    <!-- <string name="wallet_receive_share_message" formatted="false">My %s address to receive %s:</string> -->
+    <string name="wallet_receive_share_message_token" formatted="false">My %s address to receive %s:</string>
+    <string name="wallet_receive_share_message" formatted="false">My %s address:</string>
     <string name="wallet_receive_share_qr">Share QR code</string>
     <string name="wallet_search_empty_title">Make sure that the address is\nfrom the right network</string>
     <string name="wallet_search_empty_title_v2_2_0">Address format is invalid.\nMake sure that address\nbelongs to the right network</string>
@@ -1609,4 +1617,8 @@
     <string name="wallet_transfer_details_title">Transfer details</string>
     <string name="wallet_your_balance">Your balance</string>
     <string name="yesterday">Yesterday</string>
+    <string name="nft_receive">Receive NFT</string>
+    <string name="nft_send">Send NFT</string>
+    <string name="nft_on_chain">on</string>
+    <string name="nft_search_hint">Search by NFT name or Collection name</string>
 </resources>
