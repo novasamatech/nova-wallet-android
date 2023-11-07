@@ -131,9 +131,9 @@ class SwapInteractor(
 
             sufficientBalanceInFeeAsset()
 
-            sufficientBalanceConsideringConsumersValidation(assetSourceRegistry)
-
             sufficientBalanceConsideringNonSufficientAssetsValidation(assetSourceRegistry)
+
+            sufficientBalanceConsideringConsumersValidation(assetSourceRegistry)
 
             swapSmallRemainingBalance(assetSourceRegistry)
 

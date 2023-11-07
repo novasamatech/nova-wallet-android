@@ -155,7 +155,7 @@ import io.novafoundation.nova.core_db.model.chain.MetaAccountLocal
         CoinPriceLocal::class,
         StakingDashboardItemLocal::class,
         StakingRewardPeriodLocal::class,
-        ExternalBalanceLocal::class
+        ExternalBalanceLocal::class,
     ],
 )
 @TypeConverters(
