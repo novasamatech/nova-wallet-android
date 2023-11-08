@@ -19,8 +19,6 @@ import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.recipientCan
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
 // native coin transfer has a fixed fee
 private val NATIVE_COIN_TRANSFER_GAS_LIMIT = 21_000.toBigInteger()
@@ -42,14 +40,6 @@ class EvmNativeAssetTransfers(
         recipientCanAcceptTransfer(assetSourceRegistry)
 
         checkForFeeChanges(assetSourceRegistry)
-    }
-
-    override suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
-        return true
-    }
-
-    override fun totalCanDropBelowMinimumBalanceFlow(chainAsset: Chain.Asset): Flow<Boolean> {
-        return flowOf(true)
     }
 
     override suspend fun calculateFee(transfer: AssetTransfer): Fee {

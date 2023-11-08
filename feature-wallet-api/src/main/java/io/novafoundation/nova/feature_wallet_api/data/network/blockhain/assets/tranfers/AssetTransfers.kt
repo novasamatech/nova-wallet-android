@@ -9,6 +9,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import java.math.BigDecimal
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 interface AssetTransfer {
     val sender: MetaAccount
@@ -72,9 +73,13 @@ interface AssetTransfers {
 
     suspend fun performTransfer(transfer: WeightedAssetTransfer): Result<String>
 
-    suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean
+    suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
+        return true
+    }
 
-    fun totalCanDropBelowMinimumBalanceFlow(chainAsset: Chain.Asset): Flow<Boolean>
+    fun totalCanDropBelowMinimumBalanceFlow(chainAsset: Chain.Asset): Flow<Boolean> {
+        return flowOf(true)
+    }
 
     suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean
 

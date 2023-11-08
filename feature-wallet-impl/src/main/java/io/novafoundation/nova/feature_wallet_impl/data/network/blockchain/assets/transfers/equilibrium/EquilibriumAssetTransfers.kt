@@ -31,8 +31,6 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storage
 import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
 private const val TRANSFER_CALL = "transfer"
 
@@ -55,14 +53,6 @@ class EquilibriumAssetTransfers(
 
         notDeadRecipientInUsedAsset(assetSourceRegistry)
         recipientCanAcceptTransfer(assetSourceRegistry)
-    }
-
-    override suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
-        return true
-    }
-
-    override fun totalCanDropBelowMinimumBalanceFlow(chainAsset: Chain.Asset): Flow<Boolean> {
-        return flowOf(true)
     }
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {

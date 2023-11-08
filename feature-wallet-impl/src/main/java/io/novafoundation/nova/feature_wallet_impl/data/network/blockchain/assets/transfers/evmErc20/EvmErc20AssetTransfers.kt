@@ -22,8 +22,6 @@ import io.novafoundation.nova.runtime.ethereum.transaction.builder.contractCall
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.ext.requireErc20
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
 // a conservative upper limit. Usually transfer takes around 30-50k
 private val ERC_20_UPPER_GAS_LIMIT = 200_000.toBigInteger()
@@ -46,14 +44,6 @@ class EvmErc20AssetTransfers(
         recipientCanAcceptTransfer(assetSourceRegistry)
 
         checkForFeeChanges(assetSourceRegistry)
-    }
-
-    override suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
-        return true
-    }
-
-    override fun totalCanDropBelowMinimumBalanceFlow(chainAsset: Chain.Asset): Flow<Boolean> {
-        return flowOf(true)
     }
 
     override suspend fun calculateFee(transfer: AssetTransfer): Fee {

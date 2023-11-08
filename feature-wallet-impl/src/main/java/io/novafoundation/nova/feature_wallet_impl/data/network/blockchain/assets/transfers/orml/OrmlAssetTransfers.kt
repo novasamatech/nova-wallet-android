@@ -19,8 +19,6 @@ import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.instances.AddressInstanceConstructor
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigInteger
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
 class OrmlAssetTransfers(
     chainRegistry: ChainRegistry,
@@ -49,14 +47,6 @@ class OrmlAssetTransfers(
     }
 
     override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem()
-
-    override suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
-        return true
-    }
-
-    override fun totalCanDropBelowMinimumBalanceFlow(chainAsset: Chain.Asset): Flow<Boolean> {
-        return flowOf(true)
-    }
 
     private fun ExtrinsicBuilder.ormlTransfer(
         chainAsset: Chain.Asset,
