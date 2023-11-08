@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountInfo
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.isZero
-import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -17,12 +16,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalTo
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.BaseAssetTransfers
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
-import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import jp.co.soramitsu.fearless_utils.hash.isPositive
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
@@ -31,7 +27,6 @@ import jp.co.soramitsu.fearless_utils.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 class NativeAssetTransfers(
