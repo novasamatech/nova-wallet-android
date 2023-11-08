@@ -85,7 +85,7 @@ private fun transferDirectionIcon(isIncome: Boolean): Int {
 @ColorRes
 private fun incomeTextColor(isIncome: Boolean, operationStatus: Operation.Status): Int {
     return when {
-        operationStatus == Operation.Status.FAILED -> R.color.text_tertiary
+        operationStatus == Operation.Status.FAILED -> R.color.text_secondary
         isIncome -> R.color.text_positive
         else -> R.color.text_primary
     }
@@ -260,7 +260,7 @@ fun mapOperationToOperationModel(
             }
 
             is Operation.Type.Extrinsic -> {
-                val amountColor = if (operation.status == Operation.Status.FAILED) R.color.text_tertiary else R.color.text_primary
+                val amountColor = if (operation.status == Operation.Status.FAILED) R.color.text_secondary else R.color.text_primary
                 val (header, subHeader) = mapExtrinsicContentToHeaderAndSubHeader(operationType.content, resourceManager)
 
                 OperationModel(
