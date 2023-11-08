@@ -4,9 +4,9 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,9 +30,9 @@ class HistoryFiltersProviderFactory(
         val key = "$FILTERS__PROVIDER_TAG:$chainId:$chainAssetId"
 
         return computationalCache.useCache(key, scope) {
-            val chainAsset = chainRegistry.asset(chainId, chainAssetId)
+            val (chain, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
             val source = assetSourceRegistry.sourceFor(chainAsset)
-            val allAvailableFilters = source.history.availableOperationFilters(chainAsset)
+            val allAvailableFilters = source.history.availableOperationFilters(chain, chainAsset)
 
             HistoryFiltersProvider(allAvailableFilters)
         }

@@ -62,6 +62,9 @@ sealed class OperationParcelizeModel : Parcelable {
         val statusAppearance: OperationStatusAppearance,
         @DrawableRes val transferDirectionIcon: Int
     ) : Parcelable, OperationParcelizeModel()
+
+    @Parcelize
+    class Swap() : Parcelable, OperationParcelizeModel()
 }
 
 @Parcelize

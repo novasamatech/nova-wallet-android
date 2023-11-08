@@ -48,12 +48,6 @@ interface WalletRepository {
         chainAsset: Chain.Asset
     ): Asset?
 
-    suspend fun getContacts(
-        accountId: AccountId,
-        chain: Chain,
-        query: String
-    ): Set<String>
-
     suspend fun insertPendingTransfer(
         hash: String,
         assetTransfer: AssetTransfer,

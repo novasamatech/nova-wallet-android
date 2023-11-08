@@ -105,7 +105,7 @@ class EvmNativeAssetHistory(
         }
     }
 
-    override fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter> {
+    override fun availableOperationFilters(chain: Chain, asset: Chain.Asset): Set<TransactionFilter> {
         return setOf(TransactionFilter.TRANSFER, TransactionFilter.EXTRINSIC)
     }
 
@@ -148,6 +148,7 @@ class EvmNativeAssetHistory(
             time = remote.timeStamp.seconds.inWholeMilliseconds,
             chainAsset = chainAsset,
             extrinsicHash = remote.hash,
+            status = remote.operationStatus(),
         )
     }
 
@@ -163,7 +164,6 @@ class EvmNativeAssetHistory(
             fiatAmount = coinRate?.convertPlanks(chainAsset, remote.value),
             receiver = remote.to,
             sender = remote.from,
-            status = remote.operationStatus(),
             fee = remote.feeUsed
         )
     }
@@ -180,7 +180,6 @@ class EvmNativeAssetHistory(
             ),
             fee = remote.feeUsed,
             fiatFee = coinRate?.convertPlanks(chainAsset, remote.feeUsed),
-            status = remote.operationStatus()
         )
     }
 
