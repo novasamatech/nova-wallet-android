@@ -61,7 +61,7 @@ class SwapInteractor(
 ) {
 
     suspend fun getUpdateSystem(chainFlow: Flow<Chain>, coroutineScope: CoroutineScope): UpdateSystem {
-        return swapUpdateSystemFactory.create(chainFlow, coroutineScope) // SwapUpdateSystemFactory
+        return swapUpdateSystemFactory.create(chainFlow, coroutineScope)
     }
 
     fun availableGetAssetInOptionsFlow(chainAssetFlow: Flow<Chain.Asset?>): Flow<Set<GetAssetInOption>> {

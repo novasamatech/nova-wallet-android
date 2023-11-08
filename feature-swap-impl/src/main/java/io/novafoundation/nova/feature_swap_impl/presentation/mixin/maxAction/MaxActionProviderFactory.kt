@@ -26,11 +26,11 @@ class MaxActionProviderFactory(
     ): MaxActionProvider {
         return assetInFlow.providingMaxOf(field, allowMaxAction)
             .deductFee(feeLoaderMixin, extractTotalFee)
-            .considerConsumers(assetOutFlow, assetSourceRegistry, chainRegistry)
+            .disallowReapingIfHasDependents(assetOutFlow, assetSourceRegistry, chainRegistry)
     }
 }
 
-private fun MaxActionProvider.considerConsumers(
+private fun MaxActionProvider.disallowReapingIfHasDependents(
     assetOutFlow: Flow<Asset?>,
     assetSourceRegistry: AssetSourceRegistry,
     chainRegistry: ChainRegistry

@@ -45,11 +45,11 @@ class EvmNativeAssetTransfers(
     }
 
     override suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
-        return false
+        return true
     }
 
     override fun totalCanDropBelowMinimumBalanceFlow(chainAsset: Chain.Asset): Flow<Boolean> {
-        return flowOf(false)
+        return flowOf(true)
     }
 
     override suspend fun calculateFee(transfer: AssetTransfer): Fee {

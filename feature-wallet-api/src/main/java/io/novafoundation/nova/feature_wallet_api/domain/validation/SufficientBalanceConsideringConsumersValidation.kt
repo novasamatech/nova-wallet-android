@@ -8,18 +8,18 @@ import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.totalCanBeDroppedBelowMinimumBalance
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigInteger
 
 class SufficientBalanceConsideringConsumersValidation<P, E>(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val chainExtractor: (P) -> Chain,
     private val assetExtractor: (P) -> Chain.Asset,
-    private val totalBalanceExtractor: (P) -> BigInteger,
-    private val feeExtractor: (P) -> BigInteger,
-    private val amountExtractor: (P) -> BigInteger,
-    private val error: (P, existentialDeposit: BigInteger) -> E
+    private val totalBalanceExtractor: (P) -> Balance,
+    private val feeExtractor: (P) -> Balance,
+    private val amountExtractor: (P) -> Balance,
+    private val error: (P, existentialDeposit: Balance) -> E
 ) : Validation<P, E> {
 
     override suspend fun validate(value: P): ValidationStatus<E> {
@@ -45,10 +45,10 @@ fun <P, E> ValidationSystemBuilder<P, E>.sufficientBalanceConsideringConsumersVa
     assetSourceRegistry: AssetSourceRegistry,
     chainExtractor: (P) -> Chain,
     assetExtractor: (P) -> Chain.Asset,
-    totalBalanceExtractor: (P) -> BigInteger,
-    feeExtractor: (P) -> BigInteger,
-    amountExtractor: (P) -> BigInteger,
-    error: (P, existentialDeposit: BigInteger) -> E
+    totalBalanceExtractor: (P) -> Balance,
+    feeExtractor: (P) -> Balance,
+    amountExtractor: (P) -> Balance,
+    error: (P, existentialDeposit: Balance) -> E
 ) = validate(
     SufficientBalanceConsideringConsumersValidation(
         assetSourceRegistry,

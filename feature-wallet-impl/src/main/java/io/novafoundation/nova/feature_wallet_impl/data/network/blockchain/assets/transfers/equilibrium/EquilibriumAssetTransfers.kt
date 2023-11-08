@@ -58,11 +58,11 @@ class EquilibriumAssetTransfers(
     }
 
     override suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
-        return false
+        return true
     }
 
     override fun totalCanDropBelowMinimumBalanceFlow(chainAsset: Chain.Asset): Flow<Boolean> {
-        return flowOf(false)
+        return flowOf(true)
     }
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {

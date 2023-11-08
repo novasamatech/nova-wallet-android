@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.data.network.runtime.binding
 
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.system
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
@@ -68,9 +69,9 @@ fun bindAccountInfo(scale: String, runtime: RuntimeSnapshot): AccountInfo {
     val dynamicInstance = type.fromHexOrNull(runtime, scale).cast<Struct.Instance>()
 
     return AccountInfo(
-        consumers = dynamicInstance.getTyped("consumers"),
-        providers = dynamicInstance.getTyped("providers"),
-        sufficients = dynamicInstance.getTyped("sufficients"),
+        consumers = dynamicInstance.getTyped<BigInteger?>("consumers").orZero(),
+        providers = dynamicInstance.getTyped<BigInteger?>("providers").orZero(),
+        sufficients = dynamicInstance.getTyped<BigInteger?>("sufficients").orZero(),
         data = bindAccountData(dynamicInstance.getTyped("data"))
     )
 }

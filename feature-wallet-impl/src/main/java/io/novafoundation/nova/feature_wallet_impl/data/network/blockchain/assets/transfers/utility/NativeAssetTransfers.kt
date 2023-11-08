@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountInfo
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.isZero
+import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -18,6 +20,7 @@ import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import jp.co.soramitsu.fearless_utils.hash.isPositive
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
@@ -44,8 +47,6 @@ class NativeAssetTransfers(
     override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem()
 
     override suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
-        if (!chainAsset.isCommissionAsset) return false
-
         val chain = chainRegistry.getChain(chainAsset.chainId)
         val metaAccount = accountRepository.getSelectedMetaAccount()
 
@@ -55,12 +56,10 @@ class NativeAssetTransfers(
             binding = { it, runtime -> it?.let { bindAccountInfo(it, runtime) } }
         )
 
-        return accountInfo != null && accountInfo.consumers.isPositive()
+        return accountInfo != null && accountInfo.consumers.isZero
     }
 
     override fun totalCanDropBelowMinimumBalanceFlow(chainAsset: Chain.Asset): Flow<Boolean> {
-        if (!chainAsset.isCommissionAsset) return flowOf(false)
-
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
             val chain = chainRegistry.getChain(chainAsset.chainId)
 
@@ -69,7 +68,7 @@ class NativeAssetTransfers(
                 keyBuilder = { getAccountInfoStorageKey(metaAccount, chain, it) },
                 binder = { it, runtime -> it?.let { bindAccountInfo(it, runtime) } }
             ).filterNotNull()
-                .map { it.consumers.isPositive() }
+                .map { it.consumers.isZero }
         }
     }
 
