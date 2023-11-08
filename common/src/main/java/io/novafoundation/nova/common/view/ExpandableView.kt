@@ -18,6 +18,11 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import kotlinx.android.synthetic.main.view_banner.view.bannerImage
 
+enum class ExpandableViewState {
+    COLLAPSE,
+    EXPAND
+}
+
 class ExpandableView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -53,6 +58,17 @@ class ExpandableView @JvmOverloads constructor(
         }
     }
 
+    fun setImage(@DrawableRes imageRes: Int) {
+        bannerImage.setImageResource(imageRes)
+    }
+
+    fun setState(state: ExpandableViewState) {
+        when (state) {
+            ExpandableViewState.COLLAPSE -> collapse()
+            ExpandableViewState.EXPAND -> expand()
+        }
+    }
+
     private fun applyAttributes(attrs: AttributeSet?) {
         attrs?.let {
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.ExpandableView)
@@ -65,15 +81,24 @@ class ExpandableView @JvmOverloads constructor(
     }
 
     private fun toggle() {
-        if (expandCollapseAnimator.isRunning) return
-        expandCollapseAnimator.removeAllListeners()
         if (expandablePart?.isVisible == true) {
-            expandCollapseAnimator.setFloatValues(0f, -1f)
-            expandCollapseAnimator.doOnEnd { expandablePart?.makeGone() }
+            collapse()
         } else {
-            expandCollapseAnimator.setFloatValues(-1f, 0f)
-            expandCollapseAnimator.doOnStart { expandablePart?.makeVisible() }
+            expand()
         }
+    }
+
+    private fun collapse() {
+        expandCollapseAnimator.removeAllListeners()
+        expandCollapseAnimator.setFloatValues(0f, -1f)
+        expandCollapseAnimator.doOnEnd { expandablePart?.makeGone() }
+        expandCollapseAnimator.start()
+    }
+
+    private fun expand() {
+        expandCollapseAnimator.removeAllListeners()
+        expandCollapseAnimator.setFloatValues(-1f, 0f)
+        expandCollapseAnimator.doOnStart { expandablePart?.makeVisible() }
         expandCollapseAnimator.start()
     }
 
@@ -85,9 +110,5 @@ class ExpandableView @JvmOverloads constructor(
         }
 
         super.addView(child, params)
-    }
-
-    fun setImage(@DrawableRes imageRes: Int) {
-        bannerImage.setImageResource(imageRes)
     }
 }
