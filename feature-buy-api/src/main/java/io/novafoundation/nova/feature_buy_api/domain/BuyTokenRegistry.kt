@@ -27,3 +27,7 @@ interface BuyTokenRegistry {
         fun openBuyFlow(using: T)
     }
 }
+
+fun BuyTokenRegistry.hasProvidersFor(chainAsset: Chain.Asset): Boolean {
+    return availableProvidersFor(chainAsset).isNotEmpty()
+}

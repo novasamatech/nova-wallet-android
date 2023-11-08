@@ -78,6 +78,10 @@ private val trillionAbbreviation = NumberAbbreviation(
 
 private val defaultNumberFormatter = defaultNumberFormatter()
 
+fun BigDecimal.toStripTrailingZerosString(): String {
+    return stripTrailingZeros().toPlainString()
+}
+
 fun BigDecimal.format(roundingMode: RoundingMode = RoundingMode.FLOOR): String {
     return defaultNumberFormatter.format(this, roundingMode)
 }
@@ -137,8 +141,6 @@ fun Date.formatDateSinceEpoch(resourceManager: ResourceManager): String {
 fun Long.formatDaysSinceEpoch(context: Context): String? {
     val currentDays = System.currentTimeMillis().daysFromMillis()
     val diff = currentDays - this
-
-    if (diff < 0) throw IllegalArgumentException("Past date should be less than current")
 
     return when (diff) {
         0L -> context.getString(R.string.today)

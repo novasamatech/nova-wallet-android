@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.SubstrateAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
+import io.novafoundation.nova.runtime.ext.isSwapSupported
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -58,8 +59,13 @@ class NativeAssetHistory(
             }.filterOwn(accountId)
     }
 
-    override fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter> {
-        return setOf(TransactionFilter.TRANSFER, TransactionFilter.EXTRINSIC, TransactionFilter.REWARD)
+    override fun availableOperationFilters(chain: Chain, asset: Chain.Asset): Set<TransactionFilter> {
+        return setOfNotNull(
+            TransactionFilter.TRANSFER,
+            TransactionFilter.EXTRINSIC,
+            TransactionFilter.REWARD,
+            TransactionFilter.SWAP.takeIf { chain.isSwapSupported() }
+        )
     }
 
     private fun GenericCall.Instance.isTransfer(runtime: RuntimeSnapshot): Boolean {

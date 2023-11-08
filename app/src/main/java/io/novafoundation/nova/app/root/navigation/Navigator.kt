@@ -45,6 +45,7 @@ import io.novafoundation.nova.feature_assets.presentation.model.OperationParceli
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
+import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
 import io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment
 import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
@@ -70,10 +71,10 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.sel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerFragment
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 import io.novafoundation.nova.splash.SplashRouter
@@ -226,8 +227,8 @@ class Navigator(
         args = TransactionHistoryFilterFragment.getBundle(payload)
     )
 
-    override fun openSend(assetPayload: AssetPayload, initialRecipientAddress: String?) {
-        val extras = SelectSendFragment.getBundle(assetPayload, initialRecipientAddress)
+    override fun openSend(payload: SendPayload, initialRecipientAddress: String?) {
+        val extras = SelectSendFragment.getBundle(payload, initialRecipientAddress)
 
         navController?.navigate(R.id.action_open_send, extras)
     }
@@ -338,6 +339,10 @@ class Navigator(
 
     override fun openStaking() {
         stakingDashboardDelegate.openStakingDashboard()
+    }
+
+    override fun closeSendFlow() {
+        navController?.navigate(R.id.action_close_send_flow)
     }
 
     override fun openSwapFlow() {

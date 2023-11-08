@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="wallet_filters_swaps">Swaps</string>
 
     <string name="swap_rate_description">Exchange rate between two different cryptocurrencies. It represents how much of one cryptocurrency you can get in exchange for a certain amount of another cryptocurrency.</string>
     <string name="swap_price_difference_description">Price difference refers to the difference in price between two different assets. When making a swap in crypto, the price difference is usually the difference between the price of the asset you are swapping for and the price of the asset you are swapping with.</string>
     <string name="swap_slippage_description">Swap slippage is a common occurrence in decentralized trading where the final price of a swap transaction might slightly differ from the expected price, due to changing market conditions.</string>
     <string name="swap_network_fee_description">A network fees charged by the blockchain to process and validate any transactions. May vary depending on network conditions or transaction speed.</string>
 
-    <string name="swap_main_settings_select_token_disabled_button_state">Select tokens to swap</string>
+    <string name="swap_main_settings_asset_in_not_selecting_button_state">Select token to pay</string>
+    <string name="swap_main_settings_asset_out_not_selecting_button_state">Select token to receive</string>
     <string name="swap_main_settings_enter_amount_disabled_button_state">Enter amount</string>
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Enter other amount</string>
 
@@ -34,6 +36,17 @@
 
     <string name="swap_failure_swap_max_button">Swap max</string>
     <string name="swap_failure_swap_min_button">Swap min</string>
+
+    <string name="wallet_cross_chain_transfer">Cross-chain transfer</string>
+
+    <string name="common_hexadecimal_string">Hexadecimal string</string>
+
+    <string name="swap_get_token_using">Get %s using</string>
+    <string name="swap_get_token_cross_chain_description">Transfer %s from another network</string>
+    <string name="swap_get_token_receive_description">Receive %s with QR or your address</string>
+    <string name="swap_get_token_buy_description">Instantly buy %s with a credit card</string>
+
+    <string name="common_get_token_format">Get %s</string>
 
     <string name="swap_custom_fee_selector_description">Token for paying network fee</string>
     <string name="swap_custom_fee_selector_footer">Network fee is added on top of entered amount</string>

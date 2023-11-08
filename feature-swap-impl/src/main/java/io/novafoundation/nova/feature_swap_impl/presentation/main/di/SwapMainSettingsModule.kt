@@ -13,6 +13,8 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
@@ -25,9 +27,9 @@ import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.Eno
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -89,6 +91,8 @@ class SwapMainSettingsModule {
         payload: SwapSettingsPayload,
         swapUpdateSystemFactory: SwapUpdateSystemFactory,
         swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
+        accountUseCase: SelectedAccountUseCase,
+        buyMixinFactory: BuyMixin.Factory,
         validationExecutor: ValidationExecutor,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         swapRateFormatter: SwapRateFormatter,
@@ -113,7 +117,9 @@ class SwapMainSettingsModule {
             swapReceiveAmountAboveEDFieldValidatorFactory = swapReceiveAmountAboveEDFieldValidatorFactory,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             swapRateFormatter = swapRateFormatter,
-            swapConfirmationPayloadFormatter = swapConfirmationPayloadFormatter
+            swapConfirmationPayloadFormatter = swapConfirmationPayloadFormatter,
+            selectedAccountUseCase = accountUseCase,
+            buyMixinFactory = buyMixinFactory
         )
     }
 

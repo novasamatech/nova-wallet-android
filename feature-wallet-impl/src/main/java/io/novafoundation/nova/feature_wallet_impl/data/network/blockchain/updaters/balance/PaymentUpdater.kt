@@ -6,7 +6,8 @@ import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.OperationDao
-import io.novafoundation.nova.core_db.model.OperationLocal
+import io.novafoundation.nova.core_db.model.operation.OperationBaseLocal
+import io.novafoundation.nova.core_db.model.operation.OperationLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -129,24 +130,25 @@ private class PaymentUpdater(
         accountId: ByteArray,
     ): OperationLocal {
         val localStatus = when (extrinsic.status) {
-            ExtrinsicStatus.SUCCESS -> OperationLocal.Status.COMPLETED
-            ExtrinsicStatus.FAILURE -> OperationLocal.Status.FAILED
-            ExtrinsicStatus.UNKNOWN -> OperationLocal.Status.PENDING
+            ExtrinsicStatus.SUCCESS -> OperationBaseLocal.Status.COMPLETED
+            ExtrinsicStatus.FAILURE -> OperationBaseLocal.Status.FAILED
+            ExtrinsicStatus.UNKNOWN -> OperationBaseLocal.Status.PENDING
         }
+        val address = chain.addressOf(accountId)
 
-        val localCopy = operationDao.getOperation(extrinsic.hash)
+        val localCopy = operationDao.getTransferType(extrinsic.hash, address, chain.id, chainAsset.id)
 
         return OperationLocal.manualTransfer(
             hash = extrinsic.hash,
             chainId = chain.id,
-            address = chain.addressOf(accountId),
+            address = address,
             chainAssetId = chainAsset.id,
             amount = extrinsic.amountInPlanks,
             senderAddress = chain.addressOf(extrinsic.senderId),
             receiverAddress = chain.addressOf(extrinsic.recipientId),
             fee = localCopy?.fee,
             status = localStatus,
-            source = OperationLocal.Source.BLOCKCHAIN,
+            source = OperationBaseLocal.Source.BLOCKCHAIN,
         )
     }
 }

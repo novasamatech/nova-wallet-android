@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.SwapRateForm
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationViewModel
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -52,7 +53,8 @@ class SwapConfirmationModule {
         externalActions: ExternalActions.Presentation,
         swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
+        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
+        assetUseCase: ArbitraryAssetUseCase,
     ): ViewModel {
         return SwapConfirmationViewModel(
             swapRouter,
@@ -72,7 +74,8 @@ class SwapConfirmationModule {
             externalActions,
             swapConfirmationPayloadFormatter,
             feeLoaderMixinFactory,
-            descriptionBottomSheetLauncher
+            descriptionBottomSheetLauncher,
+            assetUseCase
         )
     }
 

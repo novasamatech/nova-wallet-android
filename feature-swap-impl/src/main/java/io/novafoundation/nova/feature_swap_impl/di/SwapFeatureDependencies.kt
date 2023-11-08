@@ -19,8 +19,13 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
+import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
@@ -95,4 +100,14 @@ interface SwapFeatureDependencies {
     val chainStateRepository: ChainStateRepository
 
     val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
+
+    val crossChainTransfersRepository: CrossChainTransfersRepository
+
+    val buyTokenRegistry: BuyTokenRegistry
+
+    val buyMixinFactory: BuyMixin.Factory
+
+    val buyMixinUi: BuyMixinUi
+
+    val crossChainTransfersUseCase: CrossChainTransfersUseCase
 }

@@ -73,6 +73,8 @@ fun List<MultiLocation.Junction>.toInterior() = when (size) {
     else -> MultiLocation.Interior.Junctions(this)
 }
 
+fun MultiLocation.Interior.isHere() = this is MultiLocation.Interior.Here
+
 private fun List<MultiLocation.Junction>.sorted(): List<MultiLocation.Junction> {
     return sortedBy(MultiLocation.Junction::order)
 }

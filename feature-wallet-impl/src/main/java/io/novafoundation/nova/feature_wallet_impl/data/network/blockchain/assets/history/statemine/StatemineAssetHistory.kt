@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.SubstrateAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
+import io.novafoundation.nova.runtime.ext.isSwapSupported
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.ext.palletNameOrDefault
 import io.novafoundation.nova.runtime.ext.requireStatemine
@@ -61,10 +62,11 @@ class StatemineAssetHistory(
             }.filterOwn(accountId)
     }
 
-    override fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter> {
+    override fun availableOperationFilters(chain: Chain, asset: Chain.Asset): Set<TransactionFilter> {
         return setOfNotNull(
             TransactionFilter.TRANSFER,
-            TransactionFilter.EXTRINSIC.takeIf { asset.isUtilityAsset }
+            TransactionFilter.EXTRINSIC.takeIf { asset.isUtilityAsset },
+            TransactionFilter.SWAP.takeIf { chain.isSwapSupported() }
         )
     }
 
