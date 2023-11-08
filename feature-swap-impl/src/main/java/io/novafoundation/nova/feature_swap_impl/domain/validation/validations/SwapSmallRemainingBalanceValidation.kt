@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_swap_api.domain.model.nativeMinimumBalance
+import io.novafoundation.nova.feature_swap_api.domain.model.requireNativeAsset
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.TooSmallRemainingBalance
@@ -25,19 +26,20 @@ class SwapSmallRemainingBalanceValidation(
         val assetBalances = assetSourceRegistry.sourceFor(chainAssetIn).balance
 
         val assetInTotal = value.detailedAssetIn.asset.totalInPlanks
-        val toBuyAmountToKeepEDInFeeAsset = value.toBuyAmountToKeepMainEDInFeeAsset
         val swapAmount = value.detailedAssetIn.amountInPlanks
         val assetInExistentialDeposit = assetBalances.existentialDeposit(chainIn, chainAssetIn)
         val totalDeductedAmount = value.totalDeductedAmountInFeeToken
         val remainingBalance = assetInTotal - swapAmount - totalDeductedAmount
 
         if (remainingBalance.isPositive() && remainingBalance < assetInExistentialDeposit) {
+            val toBuyAmountToKeepEDInFeeAsset = value.toBuyAmountToKeepMainEDInFeeAsset
             return if (toBuyAmountToKeepEDInFeeAsset.isZero) {
                 TooSmallRemainingBalance.NoNeedsToBuyMainAssetED(chainAssetIn, remainingBalance, assetInExistentialDeposit).validationError()
             } else {
                 TooSmallRemainingBalance.NeedsToBuyMainAssetED(
                     feeChainAsset,
                     chainAssetIn,
+                    value.swapFee.minimumBalanceBuyIn.requireNativeAsset(),
                     assetInExistentialDeposit,
                     toBuyAmountToKeepEDInCommissionAsset = value.swapFee.minimumBalanceBuyIn.nativeMinimumBalance,
                     toSellAmountToKeepEDUsingAssetIn = toBuyAmountToKeepEDInFeeAsset,

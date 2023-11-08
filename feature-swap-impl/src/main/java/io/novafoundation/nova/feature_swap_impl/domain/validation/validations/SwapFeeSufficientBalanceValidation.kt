@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_swap_api.domain.model.nativeMinimumBalance
+import io.novafoundation.nova.feature_swap_api.domain.model.requireNativeAsset
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.InsufficientBalance
@@ -32,6 +33,7 @@ class SwapFeeSufficientBalanceValidation : SwapValidation {
                 InsufficientBalance.NeedsToBuyMainAssetED(
                     value.feeAsset.token.configuration,
                     chainAssetIn,
+                    value.swapFee.minimumBalanceBuyIn.requireNativeAsset(),
                     toBuyAmountToKeepEDInCommissionAsset = value.swapFee.minimumBalanceBuyIn.nativeMinimumBalance,
                     toSellAmountToKeepEDUsingAssetIn = toBuyAmountToKeepEDInFeeAsset,
                     maxAmountToSwap,
