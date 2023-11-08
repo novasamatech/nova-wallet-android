@@ -211,7 +211,7 @@ class SwapMainSettingsViewModel(
     }
         .shareInBackground()
 
-    val showDetails: Flow<Boolean> = quotingState.map {
+    val showDetails: Flow<Boolean> = quotingState.mapNotNull {
         when (it) {
             is QuotingState.Loaded -> true
             is QuotingState.Default,
@@ -219,7 +219,6 @@ class SwapMainSettingsViewModel(
             else -> null // Don't do anything if it's loading state
         }
     }
-        .filterNotNull()
         .distinctUntilChanged()
         .shareInBackground()
 
