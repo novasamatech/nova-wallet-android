@@ -6,10 +6,12 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.constant
 import io.novafoundation.nova.common.utils.electionProviderMultiPhaseOrNull
-import io.novafoundation.nova.common.utils.numberConstant
+import io.novafoundation.nova.common.utils.numberConstantOrNull
 import io.novafoundation.nova.common.utils.voterListOrNull
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListLocator
 import io.novafoundation.nova.feature_staking_impl.domain.model.BagListNode
+import io.novafoundation.nova.runtime.ext.Geneses
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.binding.collectionOf
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -37,6 +39,11 @@ class LocalBagListRepository(
     private val localStorage: StorageDataSource
 ) : BagListRepository {
 
+    private val knownMaxElectingVoters = mapOf(
+        Chain.Geneses.KUSAMA to 12500,
+        Chain.Geneses.POLKADOT to 22500,
+    )
+
     override suspend fun bagThresholds(chainId: ChainId): List<BagListNode.Score>? {
         return localStorage.query(chainId) {
             runtime.metadata.voterListOrNull()?.constant("BagThresholds")?.getAs(collectionOf(::score))
@@ -51,7 +58,8 @@ class LocalBagListRepository(
 
     override suspend fun maxElectingVotes(chainId: ChainId): BigInteger? {
         return localStorage.query(chainId) {
-            runtime.metadata.electionProviderMultiPhaseOrNull()?.numberConstant("MaxElectingVoters", runtime)
+            runtime.metadata.electionProviderMultiPhaseOrNull()?.numberConstantOrNull("MaxElectingVoters", runtime)
+                ?: knownMaxElectingVoters[chainId]?.toBigInteger()
         }
     }
 
