@@ -54,6 +54,7 @@ sealed class SwapValidationFailure {
         class NeedsToBuyMainAssetED(
             val feeAsset: Chain.Asset,
             val assetIn: Chain.Asset,
+            val nativeAsset: Chain.Asset,
             val toBuyAmountToKeepEDInCommissionAsset: Balance,
             val toSellAmountToKeepEDUsingAssetIn: Balance,
             val maxSwapAmount: Balance,
@@ -72,6 +73,7 @@ sealed class SwapValidationFailure {
         class NeedsToBuyMainAssetED(
             val feeAsset: Chain.Asset,
             val assetIn: Chain.Asset,
+            val nativeAsset: Chain.Asset,
             val assetInExistentialDeposit: Balance,
             val toBuyAmountToKeepEDInCommissionAsset: Balance,
             val toSellAmountToKeepEDUsingAssetIn: Balance,

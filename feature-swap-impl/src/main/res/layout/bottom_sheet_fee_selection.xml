@@ -30,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
-        android:text="@string/swap_custom_fee_selector_footer" />
+        android:text="@string/swap_custom_fee_selector_description" />
 
     <io.novafoundation.nova.common.view.tabs.TabsView
         android:id="@+id/bottomSheetFeeSelectionAssets"

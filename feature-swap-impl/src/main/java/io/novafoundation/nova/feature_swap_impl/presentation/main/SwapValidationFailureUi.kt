@@ -84,8 +84,8 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
                 reason.assetInExistentialDeposit.formatPlanks(reason.assetIn),
                 reason.fee.amount.formatPlanks(reason.feeAsset),
                 reason.toSellAmountToKeepEDUsingAssetIn.formatPlanks(reason.assetIn),
-                reason.toBuyAmountToKeepEDInCommissionAsset.formatPlanks(reason.feeAsset),
-                reason.feeAsset.symbol,
+                reason.toBuyAmountToKeepEDInCommissionAsset.formatPlanks(reason.nativeAsset),
+                reason.nativeAsset.symbol,
                 reason.remainingBalance.formatPlanks(reason.assetIn)
             ),
             resourceManager = resourceManager,
@@ -111,8 +111,8 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
                 reason.maxSwapAmount.formatPlanks(reason.assetIn),
                 reason.fee.amount.formatPlanks(reason.feeAsset),
                 reason.toSellAmountToKeepEDUsingAssetIn.formatPlanks(reason.assetIn),
-                reason.toBuyAmountToKeepEDInCommissionAsset.formatPlanks(reason.feeAsset),
-                reason.feeAsset.symbol
+                reason.toBuyAmountToKeepEDInCommissionAsset.formatPlanks(reason.nativeAsset),
+                reason.nativeAsset.symbol
             ),
             resourceManager = resourceManager,
             positiveButtonClick = amountInSwapMaxAction

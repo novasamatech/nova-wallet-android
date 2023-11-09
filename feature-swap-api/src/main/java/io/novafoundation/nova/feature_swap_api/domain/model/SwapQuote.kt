@@ -71,6 +71,13 @@ val MinimumBalanceBuyIn.commissionAssetToSpendOnBuyIn: Balance
         MinimumBalanceBuyIn.NoBuyInNeeded -> Balance.ZERO
     }
 
+fun MinimumBalanceBuyIn.requireNativeAsset(): Chain.Asset {
+    return when (this) {
+        is MinimumBalanceBuyIn.NeedsToBuyMinimumBalance -> nativeAsset
+        MinimumBalanceBuyIn.NoBuyInNeeded -> throw IllegalStateException("No buy-in needed")
+    }
+}
+
 val MinimumBalanceBuyIn.nativeMinimumBalance: Balance
     get() = when (this) {
         is MinimumBalanceBuyIn.NeedsToBuyMinimumBalance -> nativeMinimumBalance
