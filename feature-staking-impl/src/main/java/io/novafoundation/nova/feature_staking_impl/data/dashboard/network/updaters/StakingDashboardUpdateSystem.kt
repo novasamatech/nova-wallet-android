@@ -1,8 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters
 
+import android.util.Log
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.CollectionDiffer
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.inserted
+import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.core.updater.Updater
@@ -31,6 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -73,19 +77,23 @@ class RealStakingDashboardUpdateSystem(
             val offChainSyncFlow = debouncedOffChainSyncFlow(metaAccount, stakingOptionsWithChain, stakingChains)
                 .shareIn(accountScope, started = SharingStarted.Eagerly, replay = 1)
 
-            val updateFlows = stakingChains.flatMap { stakingChain ->
-                val sharedRequestsBuilder = sharedRequestsBuilderFactory.create(stakingChain.id)
+            val updateFlows = stakingChains.map { stakingChain ->
+                flowOfAll {
+                    val sharedRequestsBuilder = sharedRequestsBuilderFactory.create(stakingChain.id)
 
-                val chainUpdates = stakingChain.utilityAsset.supportedStakingOptions().mapNotNull { stakingType ->
-                    val updater = updaterFactory.createUpdater(stakingChain, stakingType, metaAccount, offChainSyncFlow)
-                        ?: return@mapNotNull null
+                    val chainUpdates = stakingChain.utilityAsset.supportedStakingOptions().mapNotNull { stakingType ->
+                        val updater = updaterFactory.createUpdater(stakingChain, stakingType, metaAccount, offChainSyncFlow)
+                            ?: return@mapNotNull null
 
-                    updater.listenForUpdates(sharedRequestsBuilder, Unit)
+                        updater.listenForUpdates(sharedRequestsBuilder, Unit)
+                    }
+
+                    sharedRequestsBuilder.subscribe(accountScope)
+
+                    chainUpdates.mergeIfMultiple()
+                }.catch {
+                    Log.d("StakingDashboardUpdateSystem", "Failed to sync staking dashboard status for ${stakingChain.name}")
                 }
-
-                sharedRequestsBuilder.subscribe(accountScope)
-
-                chainUpdates
             }
 
             updateFlows.merge()
