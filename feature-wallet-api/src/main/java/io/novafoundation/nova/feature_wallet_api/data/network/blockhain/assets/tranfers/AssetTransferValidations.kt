@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeChangeDetectedFailure
-import io.novafoundation.nova.feature_wallet_api.domain.validation.InsufficientTotalToStayAboveEDError
+import io.novafoundation.nova.feature_wallet_api.domain.validation.InsufficientBalanceToStayAboveEDError
 import io.novafoundation.nova.feature_wallet_api.domain.validation.NotEnoughToPayFeesError
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.runtime.ext.commissionAsset
@@ -42,7 +42,7 @@ sealed class AssetTransferValidationFailure {
             override val fee: BigDecimal
         ) : NotEnoughFunds(), NotEnoughToPayFeesError
 
-        class ToStayAboveED(override val asset: Chain.Asset) : NotEnoughFunds(), InsufficientTotalToStayAboveEDError
+        class ToStayAboveED(override val asset: Chain.Asset) : NotEnoughFunds(), InsufficientBalanceToStayAboveEDError
 
         class ToPayCrossChainFee(
             val usedAsset: Chain.Asset,

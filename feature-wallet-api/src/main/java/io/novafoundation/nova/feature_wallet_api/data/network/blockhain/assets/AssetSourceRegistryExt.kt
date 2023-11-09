@@ -12,3 +12,11 @@ suspend fun AssetSourceRegistry.existentialDeposit(chain: Chain, chainAsset: Cha
 suspend fun AssetSourceRegistry.existentialDepositInPlanks(chain: Chain, chainAsset: Chain.Asset): BigInteger {
     return sourceFor(chainAsset).balance.existentialDeposit(chain, chainAsset)
 }
+
+suspend fun AssetSourceRegistry.totalCanBeDroppedBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
+    return sourceFor(chainAsset).transfers.totalCanDropBelowMinimumBalance(chainAsset)
+}
+
+suspend fun AssetSourceRegistry.isSelfSufficientAsset(chainAsset: Chain.Asset): Boolean {
+    return sourceFor(chainAsset).balance.isSelfSufficient(chainAsset)
+}
