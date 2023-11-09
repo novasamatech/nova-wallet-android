@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsState
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.commissionAsset
+import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +23,10 @@ class RealSwapSettingsState(
         val current = selectedOption.value
         val chain = chainRegistry.getChain(asset.chainId)
 
-        val new = if (current.feeAsset == null || current.feeAsset!!.chainId != chain.id) {
+        val feeIsNotCommissionAsset = current.feeAsset?.isCommissionAsset == false
+        val feeIsInAnotherChain = current.feeAsset?.chainId != chain.id
+        val needToResetFeeToNative = feeIsNotCommissionAsset || feeIsInAnotherChain
+        val new = if (current.feeAsset == null || needToResetFeeToNative) {
             current.copy(assetIn = asset, feeAsset = chain.commissionAsset)
         } else {
             current.copy(assetIn = asset)

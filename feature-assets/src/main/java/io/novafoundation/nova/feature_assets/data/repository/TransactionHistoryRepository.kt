@@ -5,7 +5,8 @@ import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.common.utils.Filter
 import io.novafoundation.nova.common.utils.applyFilters
 import io.novafoundation.nova.core_db.dao.OperationDao
-import io.novafoundation.nova.core_db.model.OperationLocal
+import io.novafoundation.nova.core_db.model.operation.OperationBaseLocal
+import io.novafoundation.nova.core_db.model.operation.OperationJoin
 import io.novafoundation.nova.feature_assets.data.mappers.mapOperationLocalToOperation
 import io.novafoundation.nova.feature_assets.data.mappers.mapOperationToOperationLocalDb
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
@@ -79,7 +80,7 @@ class RealTransactionHistoryRepository(
         val dataPage = historySource.getFilteredOperations(pageSize, PageOffset.Loadable.FirstPage, filters, accountId, chain, chainAsset, currency)
         historySource.additionalFirstPageSync(chain, chainAsset, accountId, dataPage)
 
-        val localOperations = dataPage.map { mapOperationToOperationLocalDb(it, chainAsset, OperationLocal.Source.REMOTE) }
+        val localOperations = dataPage.map { mapOperationToOperationLocalDb(it, OperationBaseLocal.Source.REMOTE) }
 
         operationDao.insertFromRemote(accountAddress, chain.id, chainAsset.id, localOperations)
     }
@@ -117,13 +118,13 @@ class RealTransactionHistoryRepository(
 
         return operationDao.observe(accountAddress, chain.id, chainAsset.id)
             .transform { operations ->
-                emit(mapOperations(operations, chainAsset, coinPrices = emptyList()))
+                emit(mapOperations(operations, chainAsset, chain, coinPrices = emptyList()))
                 val coinPrices = runCatching {
-                    val fromTimestamp = operations.minOf { it.time }.milliseconds.inWholeSeconds
-                    val toTimestamp = operations.maxOf { it.time }.milliseconds.inWholeSeconds
+                    val fromTimestamp = operations.minOf { it.base.time }.milliseconds.inWholeSeconds
+                    val toTimestamp = operations.maxOf { it.base.time }.milliseconds.inWholeSeconds
                     coinPriceRepository.getCoinPriceRange(chainAsset.priceId!!, currency, fromTimestamp, toTimestamp)
                 }.getOrElse { emptyList() }
-                emit(mapOperations(operations, chainAsset, coinPrices))
+                emit(mapOperations(operations, chainAsset, chain, coinPrices))
             }
             .mapLatest { operations ->
                 val pageOffset = historySource.getSyncedPageOffset(accountId, chain, chainAsset)
@@ -132,11 +133,16 @@ class RealTransactionHistoryRepository(
             }
     }
 
-    private fun mapOperations(operations: List<OperationLocal>, chainAsset: Chain.Asset, coinPrices: List<HistoricalCoinRate>): List<Operation> {
-        return operations.map { operation ->
-            val operationTimestamp = operation.time.milliseconds.inWholeSeconds
+    private fun mapOperations(
+        operations: List<OperationJoin>,
+        chainAsset: Chain.Asset,
+        chain: Chain,
+        coinPrices: List<HistoricalCoinRate>,
+    ): List<Operation> {
+        return operations.mapNotNull { operation ->
+            val operationTimestamp = operation.base.time.milliseconds.inWholeSeconds
             val coinPrice = coinPrices.findNearestCoinRate(operationTimestamp)
-            mapOperationLocalToOperation(operation, chainAsset, coinPrice)
+            mapOperationLocalToOperation(operation, chainAsset, chain, coinPrice)
         }
     }
 

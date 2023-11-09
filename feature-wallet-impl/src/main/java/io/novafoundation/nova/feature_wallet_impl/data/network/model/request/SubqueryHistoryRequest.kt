@@ -1,12 +1,17 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.model.request
 
+import io.novafoundation.nova.common.data.network.subquery.SubQueryFilters
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.and
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.anyOf
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.not
+import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.or
 import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
+import io.novafoundation.nova.feature_wallet_impl.data.network.model.subQueryAssetId
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
+import io.novafoundation.nova.runtime.ext.isSwapSupported
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset
 
 private class ModuleRestriction(
@@ -36,8 +41,9 @@ class SubqueryHistoryRequest(
     pageSize: Int = 1,
     cursor: String? = null,
     filters: Set<TransactionFilter>,
-    asset: Asset
-) {
+    asset: Asset,
+    chain: Chain,
+) : SubQueryFilters {
     val query = """
     {
         query {
@@ -47,7 +53,7 @@ class SubqueryHistoryRequest(
                 orderBy: TIMESTAMP_DESC,
                 filter: { 
                     address:{ equalTo: "$accountAddress"},
-                    ${filters.toQueryFilter(asset)}
+                    ${filters.toQueryFilter(asset, chain)}
                 }
             ) {
                 pageInfo {
@@ -63,6 +69,7 @@ class SubqueryHistoryRequest(
                     ${rewardsResponseSections(asset)}
                     extrinsic
                     ${transferResponseSection(asset.type)}
+                    ${swapResponseSection(chain)}
                 }
             }
         }
@@ -70,23 +77,21 @@ class SubqueryHistoryRequest(
 
     """.trimIndent()
 
-    /*
-        or: [ {transfer: { notEqualTo: "null"} },  {extrinsic: { notEqualTo: "null"} } ]
-     */
-    private fun Set<TransactionFilter>.toQueryFilter(asset: Asset): String {
+    private fun Set<TransactionFilter>.toQueryFilter(asset: Asset, chain: Chain): String {
         val additionalFilters = not(isIgnoredExtrinsic(asset.type))
 
-        val filtersExpressions = mapNotNull { it.filterExpression(asset) }
+        val filtersExpressions = mapNotNull { it.filterExpression(asset, chain) }
         val userFilters = anyOf(filtersExpressions)
 
         return userFilters and additionalFilters
     }
 
-    private fun TransactionFilter.filterExpression(asset: Asset): String? {
+    private fun TransactionFilter.filterExpression(asset: Asset, chain: Chain): String? {
         return when (this) {
             TransactionFilter.TRANSFER -> transfersFilter(asset.type)
             TransactionFilter.REWARD -> rewardsFilter(asset)
             TransactionFilter.EXTRINSIC -> hasExtrinsic()
+            TransactionFilter.SWAP -> swapFilter(chain, asset)
         }.nullIfEmpty()
     }
 
@@ -94,6 +99,14 @@ class SubqueryHistoryRequest(
         return when (assetType) {
             Asset.Type.Native -> "transfer"
             else -> "assetTransfer"
+        }
+    }
+
+    private fun swapResponseSection(chain: Chain): String {
+        return if (chain.isSwapSupported()) {
+            "swap"
+        } else {
+            ""
         }
     }
 
@@ -118,13 +131,21 @@ class SubqueryHistoryRequest(
     }
 
     private fun transfersFilter(assetType: Asset.Type): String {
-        return when (assetType) {
-            Asset.Type.Native -> hasType("transfer")
-            is Asset.Type.Orml -> transferAssetHasId(assetType.currencyIdScale)
-            is Asset.Type.Statemine -> transferAssetHasId(assetType.id.toString())
-            is Asset.Type.Equilibrium -> transferAssetHasId(assetType.id.toString())
-            else -> throw IllegalArgumentException("Unsupported asset")
+        return if (assetType == Asset.Type.Native) {
+            hasType("transfer")
+        } else {
+            transferAssetHasId(assetType.subQueryAssetId())
         }
+    }
+
+    private fun swapFilter(chain: Chain, asset: Asset): String? {
+        if (!chain.isSwapSupported()) return null
+
+        val subQueryAssetId = asset.type.subQueryAssetId()
+        return or(
+            "swap".containsFilter("assetIdIn", subQueryAssetId),
+            "swap".containsFilter("assetIdOut", subQueryAssetId)
+        )
     }
 
     private fun hasExtrinsic() = hasType("extrinsic")
@@ -158,7 +179,7 @@ class SubqueryHistoryRequest(
     private fun moduleNamed(moduleName: String) = "extrinsic: {contains: {module: \"$moduleName\"}}"
     private fun hasType(typeName: String) = "$typeName: {isNull: false}"
 
-    private fun transferAssetHasId(assetId: String): String {
-        return "assetTransfer: { contains: { assetId: \"$assetId\" } }"
+    private fun transferAssetHasId(assetId: String?): String {
+        return "assetTransfer".containsFilter("assetId", assetId)
     }
 }

@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_swap_impl.domain.validation
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
-import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.domain.validation.utils.SharedQuoteValidationRetriever
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapEnoughLiquidityValidation
@@ -61,7 +60,7 @@ fun SwapValidationSystemBuilder.sufficientBalanceConsideringConsumersValidation(
 )
 
 fun SwapValidationSystemBuilder.rateNotExceedSlippage(sharedQuoteValidationRetriever: SharedQuoteValidationRetriever) = validate(
-    SwapRateChangesValidation { sharedQuoteValidationRetriever.retrieveQuote(it).getOrThrow().swapRate() }
+    SwapRateChangesValidation { sharedQuoteValidationRetriever.retrieveQuote(it).getOrThrow() }
 )
 
 fun SwapValidationSystemBuilder.enoughLiquidity(sharedQuoteValidationRetriever: SharedQuoteValidationRetriever) = validate(
@@ -113,7 +112,12 @@ fun SwapValidationSystemBuilder.checkForFeeChanges(
     error = SwapValidationFailure::FeeChangeDetected
 )
 
-fun SwapValidationSystemBuilder.positiveAmount() = positiveAmount(
+fun SwapValidationSystemBuilder.positiveAmountIn() = positiveAmount(
     amount = { it.detailedAssetIn.asset.token.amountFromPlanks(it.detailedAssetIn.amountInPlanks) },
+    error = { SwapValidationFailure.NonPositiveAmount }
+)
+
+fun SwapValidationSystemBuilder.positiveAmountOut() = positiveAmount(
+    amount = { it.detailedAssetOut.asset.token.amountFromPlanks(it.detailedAssetOut.amountInPlanks) },
     error = { SwapValidationFailure.NonPositiveAmount }
 )

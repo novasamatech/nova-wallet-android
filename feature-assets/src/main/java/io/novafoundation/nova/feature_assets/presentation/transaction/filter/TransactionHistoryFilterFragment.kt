@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFi
 import kotlinx.android.synthetic.main.fragment_transactions_filter.transactionFilterApplyBtn
 import kotlinx.android.synthetic.main.fragment_transactions_filter.transactionsFilterOtherTransactions
 import kotlinx.android.synthetic.main.fragment_transactions_filter.transactionsFilterRewards
+import kotlinx.android.synthetic.main.fragment_transactions_filter.transactionsFilterSwaps
 import kotlinx.android.synthetic.main.fragment_transactions_filter.transactionsFilterSwitchTransfers
 import kotlinx.android.synthetic.main.fragment_transactions_filter.transactionsFilterToolbar
 
@@ -45,6 +46,7 @@ class TransactionHistoryFilterFragment : BaseFragment<TransactionHistoryFilterVi
         transactionsFilterRewards.bindFilter(TransactionFilter.REWARD)
         transactionsFilterSwitchTransfers.bindFilter(TransactionFilter.TRANSFER)
         transactionsFilterOtherTransactions.bindFilter(TransactionFilter.EXTRINSIC)
+        transactionsFilterSwaps.bindFilter(TransactionFilter.SWAP)
 
         transactionFilterApplyBtn.setOnClickListener { viewModel.applyClicked() }
     }

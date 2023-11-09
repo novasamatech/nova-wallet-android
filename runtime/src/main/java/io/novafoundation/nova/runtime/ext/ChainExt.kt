@@ -56,6 +56,8 @@ fun Chain.Asset.supportedStakingOptions(): List<Chain.Asset.StakingType> {
     return staking.filter { it != UNSUPPORTED }
 }
 
+fun Chain.isSwapSupported(): Boolean = swap.isNotEmpty()
+
 fun Chain.Additional?.relaychainAsNative(): Boolean {
     return this?.relaychainAsNative ?: false
 }

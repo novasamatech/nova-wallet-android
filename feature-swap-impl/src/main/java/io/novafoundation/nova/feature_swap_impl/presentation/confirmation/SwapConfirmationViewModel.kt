@@ -147,23 +147,22 @@ class SwapConfirmationViewModel(
         payload.swapQuoteModel.assetIn.chainId,
         payload.swapQuoteModel.assetIn.chainAssetId
     )
-        .filterNotNull()
         .shareInBackground()
 
     private val assetOutFlow = arbitraryAssetUseCase.assetFlow(
         payload.swapQuoteModel.assetOut.chainId,
         payload.swapQuoteModel.assetOut.chainAssetId
     )
-        .filterNotNull()
         .shareInBackground()
 
     private val maxActionFlow = MutableStateFlow(MaxAction.DISABLED)
 
-    private val tokenInFlow = assetInFlow.map { it.token }
+    private val feeTokenFlow = arbitraryAssetUseCase.assetFlow(payload.feeAsset.chainId, payload.feeAsset.chainAssetId)
+        .map { it.token }
         .shareInBackground()
 
     val feeMixin = feeLoaderMixinFactory.createGeneric<SwapFee>(
-        tokenFlow = tokenInFlow,
+        tokenFlow = feeTokenFlow,
         configuration = GenericFeeLoaderMixin.Configuration(
             initialStatusValue = FeeStatus.Loading,
         )

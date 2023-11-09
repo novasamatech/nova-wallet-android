@@ -70,10 +70,6 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
 
         assetFlowToolbar.searchField.requestFocus()
         assetFlowToolbar.searchField.content.showSoftKeyboard()
-
-        onBackPressed {
-            assetFlowToolbar.searchField.hideSoftKeyboard()
-        }
     }
 
     override fun subscribe(viewModel: T) {

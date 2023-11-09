@@ -49,6 +49,7 @@
             android:scaleType="centerInside"
             android:src="@drawable/ic_close_circle"
             android:visibility="gone"
+            android:padding="16dp"
             app:tint="@color/icon_secondary"
             tools:visibility="visible" />
 

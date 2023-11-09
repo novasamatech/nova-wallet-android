@@ -8,8 +8,6 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
-import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Disabled
-import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Enabled
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.accumulate
@@ -207,13 +205,21 @@ class SwapMainSettingsViewModel(
 
     val rateDetails: Flow<ExtendedLoadingState<String>> = quotingState.map {
         when (it) {
-            is QuotingState.NotAvailable, QuotingState.Loading, QuotingState.Default -> ExtendedLoadingState.Loading
             is QuotingState.Loaded -> ExtendedLoadingState.Loaded(formatRate(it.value))
+            else -> ExtendedLoadingState.Loading
         }
     }
         .shareInBackground()
 
-    val showDetails: Flow<Boolean> = quotingState.map { it !is QuotingState.NotAvailable && it !is QuotingState.Default }
+    val showDetails: Flow<Boolean> = quotingState.mapNotNull {
+        when (it) {
+            is QuotingState.Loaded -> true
+            is QuotingState.Default,
+            is QuotingState.NotAvailable -> false
+            else -> null // Don't do anything if it's loading state
+        }
+    }
+        .distinctUntilChanged()
         .shareInBackground()
 
     private val _validationProgress = MutableStateFlow(false)
@@ -221,13 +227,14 @@ class SwapMainSettingsViewModel(
     val validationProgress = _validationProgress
 
     val buttonState: Flow<DescriptiveButtonState> = combine(
+        quotingState,
         accumulate(amountInInput.fieldError, amountOutInput.fieldError),
+        accumulate(amountInInput.inputState, amountOutInput.inputState),
         assetInFlow,
         assetOutFlow,
-        amountInInput.inputState,
-        amountOutInput.inputState,
         ::formatButtonStates
-    )
+    ).distinctUntilChanged()
+        .debounce(100)
 
     val swapDirectionFlipped: MutableLiveData<Event<SwapDirection>> = MutableLiveData()
 
@@ -259,6 +266,7 @@ class SwapMainSettingsViewModel(
         }
     }
         .onStart { emit(DescriptiveButtonState.Gone) }
+        .distinctUntilChanged()
         .shareInBackground()
 
     val selectGetAssetInOption = actionAwaitableFactory.create<GetAssetInBottomSheet.Payload, GetAssetInOption>()
@@ -296,7 +304,7 @@ class SwapMainSettingsViewModel(
         }
     }
 
-    fun applyButtonClicked() {
+    fun continueButtonClicked() {
         launch {
             val validationSystem = swapInteractor.validationSystem()
             val payload = getValidationPayload() ?: return@launch
@@ -487,30 +495,36 @@ class SwapMainSettingsViewModel(
     }
 
     private fun formatButtonStates(
+        quotingState: QuotingState,
         errorStates: List<AmountErrorState>,
+        inputs: List<InputState<String>>,
         assetIn: Asset?,
         assetOut: Asset?,
-        amountIn: InputState<String>,
-        amountOut: InputState<String>
     ): DescriptiveButtonState {
         return when {
             assetIn == null -> {
-                Disabled(resourceManager.getString(R.string.swap_main_settings_asset_in_not_selecting_button_state))
+                DescriptiveButtonState.Disabled(resourceManager.getString(R.string.swap_main_settings_asset_in_not_selecting_button_state))
             }
 
             assetOut == null -> {
-                Disabled(resourceManager.getString(R.string.swap_main_settings_asset_out_not_selecting_button_state))
+                DescriptiveButtonState.Disabled(resourceManager.getString(R.string.swap_main_settings_asset_out_not_selecting_button_state))
             }
 
-            amountIn.value.isEmpty() && amountOut.value.isEmpty() -> {
-                Disabled(resourceManager.getString(R.string.swap_main_settings_enter_amount_disabled_button_state))
+            inputs.all { it.value.isEmpty() } -> {
+                DescriptiveButtonState.Disabled(resourceManager.getString(R.string.swap_main_settings_enter_amount_disabled_button_state))
             }
 
             errorStates.any { it is AmountErrorState.Invalid } -> {
-                Disabled(resourceManager.getString(R.string.swap_main_settings_wrong_amount_disabled_button_state))
+                DescriptiveButtonState.Disabled(resourceManager.getString(R.string.swap_main_settings_wrong_amount_disabled_button_state))
             }
 
-            else -> return Enabled(resourceManager.getString(R.string.common_continue))
+            quotingState is QuotingState.Loading -> DescriptiveButtonState.Loading
+
+            quotingState is QuotingState.NotAvailable || inputs.any { it.value.isEmpty() } -> {
+                DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_continue))
+            }
+
+            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
         }
     }
 

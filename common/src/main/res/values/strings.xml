@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="wallet_filters_swaps">Swaps</string>
 
     <string name="swap_failure_balance_not_consider_consumers">You should keep at least %s after paying %s network fee as you are holding non sufficient tokens</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets">You must keep at least %s to receive %s token</string>
@@ -9,8 +10,8 @@
     <string name="swap_slippage_description">Swap slippage is a common occurrence in decentralized trading where the final price of a swap transaction might slightly differ from the expected price, due to changing market conditions.</string>
     <string name="swap_network_fee_description">A network fees charged by the blockchain to process and validate any transactions. May vary depending on network conditions or transaction speed.</string>
 
-    <string name="swap_main_settings_asset_in_not_selecting_button_state">Select token to pay</string>
-    <string name="swap_main_settings_asset_out_not_selecting_button_state">Select token to receive</string>
+    <string name="swap_main_settings_asset_in_not_selecting_button_state">Select a token to pay</string>
+    <string name="swap_main_settings_asset_out_not_selecting_button_state">Select a token to receive</string>
     <string name="swap_main_settings_enter_amount_disabled_button_state">Enter amount</string>
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Enter other amount</string>
 
@@ -52,7 +53,7 @@
 
     <string name="swap_custom_fee_selector_description">Token for paying network fee</string>
     <string name="swap_custom_fee_selector_footer">Network fee is added on top of entered amount</string>
-    <string name="swap_minimum_balance_buy_in_alert">To pay network fee with %s, Nova will automatically swap %s for %s to maintain your account\'s minimum DOT balance.</string>
+    <string name="swap_minimum_balance_buy_in_alert">To pay network fee with %s, Nova will automatically swap %s for %s to maintain your account\'s minimum %s balance.</string>
 
     <string name="swap_slippage_disabled_button_state">Enter other value</string>
     <string name="swap_slippage_error_not_in_available_range">Enter a value between %s and %s</string>

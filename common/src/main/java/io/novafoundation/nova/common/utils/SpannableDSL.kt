@@ -7,6 +7,7 @@ import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
+import androidx.annotation.StringRes
 import io.novafoundation.nova.common.resources.ResourceManager
 
 class SpannableStyler(val content: String) {
@@ -47,16 +48,29 @@ class SpannableBuilder(private val resourceManager: ResourceManager) {
 
     private val builder = SpannableStringBuilder()
 
-    fun appendColored(text: String, @ColorRes color: Int): SpannableBuilder {
+    fun appendColored(text: String, @ColorRes color: Int) {
         val span = ForegroundColorSpan(resourceManager.getColor(color))
 
-        return append(text, span)
+        append(text, span)
     }
 
-    fun append(text: String): SpannableBuilder {
-        builder.append(text)
+    fun appendColored(@StringRes textRes: Int, @ColorRes color: Int) {
+        val text = resourceManager.getString(textRes)
 
-        return this
+        return appendColored(text, color)
+    }
+
+    fun append(text: String) {
+        builder.append(text)
+    }
+
+    fun setFullSpan(span: Any) {
+        builder.setSpan(span, 0, builder.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+    }
+
+    fun appendSpan(span: Any) {
+        builder.append(" ")
+        builder.setSpan(span, builder.length - 1, builder.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
 
     fun build(): SpannableString = SpannableString(builder)
