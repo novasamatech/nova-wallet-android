@@ -1,8 +1,10 @@
 package io.novafoundation.nova.runtime.extrinsic
 
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
+import io.novafoundation.nova.runtime.mapper.toRuntimeVersion
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -11,8 +13,10 @@ import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.Signer
+import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.chain.RuntimeVersion
 
 class ExtrinsicBuilderFactory(
+    private val chainDao: ChainDao,
     private val rpcCalls: RpcCalls,
     private val chainRegistry: ChainRegistry,
     private val mortalityConstructor: MortalityConstructor,
@@ -55,7 +59,7 @@ class ExtrinsicBuilderFactory(
 
         val accountAddress = chain.addressOf(accountId)
 
-        val runtimeVersion = rpcCalls.getRuntimeVersion(chain.id)
+        val runtimeVersion = getRuntimeVersion(chain)
         val mortality = mortalityConstructor.constructMortality(chain.id)
 
         var nonce = rpcCalls.getNonce(chain.id, accountAddress)
@@ -78,5 +82,9 @@ class ExtrinsicBuilderFactory(
 
             newElement
         }
+    }
+
+    private suspend fun getRuntimeVersion(chain: Chain): RuntimeVersion {
+        return chainDao.runtimeInfo(chain.id)?.toRuntimeVersion() ?: throw IllegalStateException("No runtime version for chain ${chain.id}")
     }
 }
