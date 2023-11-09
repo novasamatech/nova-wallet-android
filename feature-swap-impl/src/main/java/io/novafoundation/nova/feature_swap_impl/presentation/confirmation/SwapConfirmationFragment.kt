@@ -23,8 +23,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payloa
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAccount
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAlert
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAssetFrom
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAssetTo
+import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAssets
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationButton
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationNetworkFee
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationPriceDifference
@@ -78,8 +77,7 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
         setupFeeLoading(viewModel.feeMixin, swapConfirmationNetworkFee)
 
         viewModel.swapDetails.observe {
-            swapConfirmationAssetFrom.setModel(it.assetInDetails)
-            swapConfirmationAssetTo.setModel(it.assetOutDetails)
+            swapConfirmationAssets.setModel(it.assets)
             swapConfirmationRate.showValue(it.rate)
             swapConfirmationPriceDifference.showValueOrHide(it.priceDifference)
             swapConfirmationSlippage.showValue(it.slippage)

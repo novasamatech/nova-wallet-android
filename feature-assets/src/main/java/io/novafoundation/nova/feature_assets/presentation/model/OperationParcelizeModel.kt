@@ -2,7 +2,9 @@ package io.novafoundation.nova.feature_assets.presentation.model
 
 import android.os.Parcelable
 import androidx.annotation.DrawableRes
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.android.parcel.Parcelize
@@ -58,14 +60,28 @@ sealed class OperationParcelizeModel : Parcelable {
         val receiver: String,
         val sender: String,
         val fee: BigInteger?,
-        val formattedFee: String,
         val statusAppearance: OperationStatusAppearance,
         @DrawableRes val transferDirectionIcon: Int
     ) : Parcelable, OperationParcelizeModel()
 
     @Parcelize
-    class Swap() : Parcelable, OperationParcelizeModel()
+    class Swap(
+        val amountIsAssetIn: Boolean,
+        val timeMillis: Long,
+        val amountIn: ChainAssetWithAmountParcelModel,
+        val amountOut: ChainAssetWithAmountParcelModel,
+        val amountFee: ChainAssetWithAmountParcelModel,
+        val originAddress: String,
+        val transactionHash: String?,
+        val statusAppearance: OperationStatusAppearance,
+    ) : Parcelable, OperationParcelizeModel()
 }
+
+@Parcelize
+class ChainAssetWithAmountParcelModel(
+    val assetId: AssetPayload,
+    val amount: Balance
+): Parcelable
 
 @Parcelize
 class AmountParcelModel(

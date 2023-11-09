@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.toPercent
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicHash
+import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
@@ -21,9 +22,9 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
-import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -82,10 +83,8 @@ internal class RealSwapService(
             val (amountIn, amountOut) = args.inAndOutAmounts(quote)
 
             SwapQuote(
-                assetIn = args.tokenIn.configuration,
-                assetOut = args.tokenOut.configuration,
-                planksIn = amountIn,
-                planksOut = amountOut,
+                amountIn = args.tokenIn.configuration.withAmount(amountIn),
+                amountOut = args.tokenOut.configuration.withAmount(amountOut),
                 direction = args.swapDirection,
                 priceImpact = args.calculatePriceImpact(amountIn, amountOut),
             )

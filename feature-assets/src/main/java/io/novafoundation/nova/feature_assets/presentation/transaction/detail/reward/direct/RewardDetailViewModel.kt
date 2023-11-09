@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.launch
 
@@ -21,7 +22,7 @@ class RewardDetailViewModel(
     private val addressDisplayUseCase: AddressDisplayUseCase,
     private val router: AssetsRouter,
     private val chainRegistry: ChainRegistry,
-    private val externalActions: ExternalActions.Presentation
+    private val externalActions: ExternalActions.Presentation,
 ) : BaseViewModel(),
     ExternalActions by externalActions {
 

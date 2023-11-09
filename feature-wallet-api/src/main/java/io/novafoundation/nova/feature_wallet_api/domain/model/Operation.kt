@@ -82,6 +82,10 @@ data class ChainAssetWithAmount(
     val amount: Balance,
 )
 
+fun Chain.Asset.withAmount(amount: Balance): ChainAssetWithAmount {
+    return ChainAssetWithAmount(this, amount)
+}
+
 fun Operation.Type.satisfies(filters: Set<TransactionFilter>): Boolean {
     return matchingTransactionFilter() in filters
 }

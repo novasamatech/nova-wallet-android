@@ -3,19 +3,30 @@ package io.novafoundation.nova.feature_swap_api.domain.model
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
 data class SwapQuote(
-    val assetIn: Chain.Asset,
-    val assetOut: Chain.Asset,
-    val planksIn: Balance,
-    val planksOut: Balance,
+    val amountIn: ChainAssetWithAmount,
+    val amountOut: ChainAssetWithAmount,
     val direction: SwapDirection,
     val priceImpact: Percent,
 ) {
+
+    val assetIn: Chain.Asset
+        get() = amountIn.chainAsset
+
+    val assetOut: Chain.Asset
+        get() = amountOut.chainAsset
+
+    val planksIn: Balance
+        get() = amountIn.amount
+
+    val planksOut: Balance
+        get() = amountOut.amount
 
     init {
         require(assetIn.chainId == assetOut.chainId) {
@@ -37,10 +48,14 @@ val SwapQuote.quotedBalance: Balance
     }
 
 fun SwapQuote.swapRate(): BigDecimal {
-    if (planksIn == Balance.ZERO) return BigDecimal.ZERO
+    return amountIn rateAgainst amountOut
+}
 
-    val amountIn = assetIn.amountFromPlanks(planksIn)
-    val amountOut = assetOut.amountFromPlanks(planksOut)
+infix fun ChainAssetWithAmount.rateAgainst(assetOut: ChainAssetWithAmount): BigDecimal {
+    if (amount == Balance.ZERO) return BigDecimal.ZERO
+
+    val amountIn = chainAsset.amountFromPlanks(amount)
+    val amountOut = assetOut.chainAsset.amountFromPlanks(assetOut.amount)
 
     return amountOut / amountIn
 }

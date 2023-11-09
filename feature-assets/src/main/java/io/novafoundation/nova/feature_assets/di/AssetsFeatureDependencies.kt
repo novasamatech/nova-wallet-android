@@ -43,6 +43,7 @@ import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updater
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayUseCase
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
@@ -53,7 +54,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.CoinPriceInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
@@ -163,8 +164,6 @@ interface AssetsFeatureDependencies {
 
     fun walletConnectSessionsUseCase(): WalletConnectSessionsUseCase
 
-    fun coinPriceInteractor(): CoinPriceInteractor
-
     val assetsSourceRegistry: AssetSourceRegistry
 
     fun nftRepository(): NftRepository
@@ -226,4 +225,8 @@ interface AssetsFeatureDependencies {
     val buyMixinUi: BuyMixinUi
 
     val crossChainTransfersUseCase: CrossChainTransfersUseCase
+
+    val arbitraryTokenUseCase: ArbitraryTokenUseCase
+
+    val swapRateFormatter: SwapRateFormatter
 }

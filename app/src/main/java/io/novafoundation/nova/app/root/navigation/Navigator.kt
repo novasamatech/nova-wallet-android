@@ -56,6 +56,7 @@ import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.Ma
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.direct.RewardDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.pool.PoolRewardDetailFragment
+import io.novafoundation.nova.feature_assets.presentation.transaction.detail.swap.SwapDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer.TransferDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
@@ -255,6 +256,12 @@ class Navigator(
         val bundle = PoolRewardDetailFragment.getBundle(reward)
 
         navController?.navigate(R.id.open_pool_reward_detail, bundle)
+    }
+
+    override fun openSwapDetail(swap: OperationParcelizeModel.Swap) {
+        val bundle = SwapDetailFragment.getBundle(swap)
+
+        navController?.navigate(R.id.open_swap_detail, bundle)
     }
 
     override fun openExtrinsicDetail(extrinsic: OperationParcelizeModel.Extrinsic) {

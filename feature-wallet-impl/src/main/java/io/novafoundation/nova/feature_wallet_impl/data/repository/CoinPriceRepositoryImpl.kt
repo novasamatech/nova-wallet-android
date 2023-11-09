@@ -5,10 +5,10 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceLocalDataSource
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import java.util.Calendar
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -21,18 +21,19 @@ class CoinPriceRepositoryImpl(
     private val remoteCoinPriceDataSource: CoinPriceRemoteDataSource
 ) : CoinPriceRepository {
 
-    override suspend fun getCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Long): CoinRate? {
-        var coinRate = cacheCoinPriceDataSource.getFloorCoinPriceAtTime(priceId, currency, timestamp)
-        val hasCeilingItem = cacheCoinPriceDataSource.hasCeilingCoinPriceAtTime(priceId, currency, timestamp)
+    override suspend fun getCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Duration): HistoricalCoinRate? {
+        val timestampInSeconds = timestamp.inWholeSeconds
+        var coinRate = cacheCoinPriceDataSource.getFloorCoinPriceAtTime(priceId, currency, timestampInSeconds)
+        val hasCeilingItem = cacheCoinPriceDataSource.hasCeilingCoinPriceAtTime(priceId, currency, timestampInSeconds)
         if (coinRate == null && !hasCeilingItem) {
-            val timeInMillis = timestamp.seconds.inWholeMilliseconds
+            val timeInMillis = timestamp.inWholeMilliseconds
             val coinRateForAllTime = loadAndCacheForAllTime(priceId, currency)
             val index = coinRateForAllTime.binarySearchFloor { it.timestamp.compareTo(timeInMillis) }
             coinRate = coinRateForAllTime.getOrNull(index)
 
             // If nearest coin rate timestamp is bigger than target timestamp it means that coingecko doesn't have data before coin rate timestamp
             // so in this case we should return null
-            if (coinRate != null && coinRate.timestamp > timestamp) {
+            if (coinRate != null && coinRate.timestamp > timestampInSeconds) {
                 return null
             }
         }

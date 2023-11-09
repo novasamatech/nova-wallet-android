@@ -32,7 +32,7 @@ fun GroupedList<AssetGroup, AssetWithOffChainBalance>.mapGroupedAssetsToUi(
 
 fun mapTokenToTokenModel(token: Token): TokenModel {
     return with(token) {
-        val rateChange = token.coinRateChange?.recentRateChange
+        val rateChange = token.coinRate?.recentRateChange
 
         val changeColorRes = when {
             rateChange == null || rateChange.isZero -> R.color.text_tertiary
@@ -42,8 +42,8 @@ fun mapTokenToTokenModel(token: Token): TokenModel {
 
         TokenModel(
             configuration = configuration,
-            rate = coinRateChange?.rate.orZero().formatAsCurrency(token.currency),
-            recentRateChange = (coinRateChange?.recentRateChange ?: BigDecimal.ZERO).formatAsChange(),
+            rate = coinRate?.rate.orZero().formatAsCurrency(token.currency),
+            recentRateChange = (coinRate?.recentRateChange ?: BigDecimal.ZERO).formatAsChange(),
             rateChangeColorRes = changeColorRes
         )
     }

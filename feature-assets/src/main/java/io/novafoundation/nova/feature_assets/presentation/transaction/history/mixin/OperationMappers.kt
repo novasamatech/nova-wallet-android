@@ -13,21 +13,22 @@ import io.novafoundation.nova.common.utils.splitSnakeOrCamelCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.model.AmountParcelModel
+import io.novafoundation.nova.feature_assets.presentation.model.ChainAssetWithAmountParcelModel
 import io.novafoundation.nova.feature_assets.presentation.model.ExtrinsicContentParcel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationStatusAppearance
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
+import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Extrinsic.Content
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Reward.RewardKind
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -321,9 +322,6 @@ suspend fun mapOperationToParcel(
             is Operation.Type.Transfer -> {
                 val chain = chainRegistry.getChain(chainAsset.chainId)
 
-                val feeFormatted = operationType.fee?.formatPlanks(chain.commissionAsset)
-                    ?: resourceManager.getString(R.string.common_unknown)
-
                 val isIncome = operationType.isIncome(chain)
 
                 OperationParcelizeModel.Transfer(
@@ -339,7 +337,6 @@ suspend fun mapOperationToParcel(
                     receiver = operationType.receiver,
                     sender = operationType.sender,
                     fee = operationType.fee,
-                    formattedFee = feeFormatted,
                     isIncome = isIncome,
                     statusAppearance = mapStatusToStatusAppearance(operation.status),
                     transferDirectionIcon = transferDirectionIcon(isIncome)
@@ -393,7 +390,23 @@ suspend fun mapOperationToParcel(
             }
 
             // TODO swap details
-            is Operation.Type.Swap -> OperationParcelizeModel.Swap()
+            is Operation.Type.Swap -> OperationParcelizeModel.Swap(
+                amountIsAssetIn = chainAsset.fullId == operationType.amountIn.chainAsset.fullId,
+                amountIn = mapAssetWithAmountToParcel(operationType.amountIn),
+                amountOut = mapAssetWithAmountToParcel(operationType.amountOut),
+                amountFee = mapAssetWithAmountToParcel(operationType.fee),
+                originAddress = operation.address,
+                transactionHash = operation.extrinsicHash,
+                statusAppearance = mapStatusToStatusAppearance(operation.status),
+                timeMillis = operation.time
+            )
         }
     }
+}
+
+private fun mapAssetWithAmountToParcel(assetWithAmount: ChainAssetWithAmount): ChainAssetWithAmountParcelModel {
+    return ChainAssetWithAmountParcelModel(
+        assetId = assetWithAmount.chainAsset.fullId.toAssetPayload(),
+        amount = assetWithAmount.amount
+    )
 }
