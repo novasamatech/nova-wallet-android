@@ -14,9 +14,8 @@
         android:layout_height="16dp"
         android:layout_gravity="center_vertical"
         android:gravity="center_vertical"
-        app:tint="@color/chip_icon"
         tools:layout_marginVertical="3dp"
-        tools:src="@drawable/ic_info_cicrle_filled_16" />
+        tools:src="@drawable/ic_info" />
 
     <Space
         android:id="@+id/chipDrawablePadding"

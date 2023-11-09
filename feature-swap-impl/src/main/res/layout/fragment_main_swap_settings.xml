@@ -151,14 +151,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:title="@string/swap_rate_title"
-                    app:titleIcon="@drawable/ic_info_cicrle_filled_16" />
+                    app:titleIcon="@drawable/ic_info" />
 
                 <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
                     android:id="@+id/swapMainSettingsDetailsNetworkFee"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:title="@string/swap_network_fee_title"
-                    app:titleIcon="@drawable/ic_info_cicrle_filled_16" />
+                    app:titleIcon="@drawable/ic_info" />
 
             </io.novafoundation.nova.common.view.TableView>
 

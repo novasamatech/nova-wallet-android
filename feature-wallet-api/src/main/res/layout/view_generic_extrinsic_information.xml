@@ -16,7 +16,7 @@
         android:id="@+id/viewGenericExtrinsicInformationAccount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
+        app:primaryValueEndIcon="@drawable/ic_info"
         app:title="@string/common_account" />
 
     <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView

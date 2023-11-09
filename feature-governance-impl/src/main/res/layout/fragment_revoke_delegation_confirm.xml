@@ -51,14 +51,14 @@
                         android:id="@+id/revokeDelegationConfirmDelegate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
+                        app:primaryValueEndIcon="@drawable/ic_info"
                         app:title="@string/delegation_delegate" />
 
                     <io.novafoundation.nova.common.view.TableCellView
                         android:id="@+id/revokeDelegationConfirmTracks"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
+                        app:primaryValueEndIcon="@drawable/ic_info"
                         app:title="@string/delegation_tracks" />
 
                     <io.novafoundation.nova.common.view.TableCellView
