@@ -40,27 +40,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:title="@string/swap_rate_title"
-                app:titleIcon="@drawable/ic_info_cicrle_filled_16" />
+                app:titleIcon="@drawable/ic_info" />
 
             <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/swapConfirmationPriceDifference"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:title="@string/swap_price_difference_title"
-                app:titleIcon="@drawable/ic_info_cicrle_filled_16" />
+                app:titleIcon="@drawable/ic_info" />
 
             <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/swapConfirmationSlippage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:title="@string/swap_slippage_title"
-                app:titleIcon="@drawable/ic_info_cicrle_filled_16" />
+                app:titleIcon="@drawable/ic_info" />
 
             <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
                 android:id="@+id/swapConfirmationNetworkFee"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:titleIcon="@drawable/ic_info_cicrle_filled_16" />
+                app:titleIcon="@drawable/ic_info" />
 
         </io.novafoundation.nova.common.view.TableView>
 
@@ -80,7 +80,7 @@
                 android:id="@+id/swapConfirmationAccount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
+                app:primaryValueEndIcon="@drawable/ic_info"
                 app:title="@string/swap_account_title" />
 
         </io.novafoundation.nova.common.view.TableView>

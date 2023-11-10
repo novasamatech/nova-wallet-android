@@ -2,6 +2,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
     <string name="wallet_filters_swaps">Swaps</string>
 
+    <string name="swap_failure_balance_not_consider_consumers">You should keep at least %s after paying %s network fee as you are holding non sufficient tokens</string>
+    <string name="swap_failure_balance_not_consider_non_sufficient_assets">You must keep at least %s to receive %s token</string>
+
     <string name="swap_rate_description">Exchange rate between two different cryptocurrencies. It represents how much of one cryptocurrency you can get in exchange for a certain amount of another cryptocurrency.</string>
     <string name="swap_price_difference_description">Price difference refers to the difference in price between two different assets. When making a swap in crypto, the price difference is usually the difference between the price of the asset you are swapping for and the price of the asset you are swapping with.</string>
     <string name="swap_slippage_description">Swap slippage is a common occurrence in decentralized trading where the final price of a swap transaction might slightly differ from the expected price, due to changing market conditions.</string>

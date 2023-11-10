@@ -30,7 +30,7 @@ private fun NominationPoolsClaimRewardsValidationSystemBuilder.sufficientCommiss
 ) {
     enoughTotalToStayAboveEDValidationFactory.validate(
         fee = { it.fee },
-        total = { it.asset.total },
+        balance = { it.asset.total },
         chainWithAsset = { ChainWithAsset(it.chain, it.chain.utilityAsset) },
         error = { payload, _ -> NominationPoolsClaimRewardsValidationFailure.ToStayAboveED(payload.chain.utilityAsset) }
     )

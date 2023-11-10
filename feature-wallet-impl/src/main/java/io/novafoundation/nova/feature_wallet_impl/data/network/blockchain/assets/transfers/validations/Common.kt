@@ -51,7 +51,7 @@ fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAbove
 ) {
     enoughTotalToStayAboveEDValidationFactory.validate(
         fee = { it.originFee },
-        total = { it.originCommissionAsset.total },
+        balance = { it.originCommissionAsset.total },
         chainWithAsset = { ChainWithAsset(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
         error = { payload, _ -> AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(payload.transfer.originChain.commissionAsset) }
     )

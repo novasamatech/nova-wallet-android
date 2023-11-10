@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmou
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -96,7 +97,8 @@ class SwapMainSettingsModule {
         validationExecutor: ValidationExecutor,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         swapRateFormatter: SwapRateFormatter,
-        swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter
+        swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter,
+        maxActionProviderFactory: MaxActionProviderFactory
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -109,7 +111,6 @@ class SwapMainSettingsModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             actionAwaitableFactory = actionAwaitableMixinFactory,
             payload = payload,
-            swapUpdateSystemFactory = swapUpdateSystemFactory,
             swapInputMixinPriceImpactFiatFormatterFactory = swapInputMixinPriceImpactFiatFormatterFactory,
             validationExecutor = validationExecutor,
             liquidityFieldValidatorFactory = liquidityFieldValidatorFactory,
@@ -119,7 +120,8 @@ class SwapMainSettingsModule {
             swapRateFormatter = swapRateFormatter,
             swapConfirmationPayloadFormatter = swapConfirmationPayloadFormatter,
             selectedAccountUseCase = accountUseCase,
-            buyMixinFactory = buyMixinFactory
+            buyMixinFactory = buyMixinFactory,
+            maxActionProviderFactory = maxActionProviderFactory
         )
     }
 

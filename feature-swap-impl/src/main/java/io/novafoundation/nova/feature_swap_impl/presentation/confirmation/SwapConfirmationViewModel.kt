@@ -56,7 +56,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.provideMaxWithFeeDeducted
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
+import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
@@ -117,7 +118,8 @@ class SwapConfirmationViewModel(
     private val swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter,
     private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
-    private val arbitraryAssetUseCase: ArbitraryAssetUseCase
+    private val arbitraryAssetUseCase: ArbitraryAssetUseCase,
+    private val maxActionProviderFactory: MaxActionProviderFactory,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -144,7 +146,16 @@ class SwapConfirmationViewModel(
     }
         .shareInBackground()
 
-    private val assetInFlow = arbitraryAssetUseCase.assetFlow(payload.swapQuoteModel.assetIn.chainId, payload.swapQuoteModel.assetIn.chainAssetId)
+    private val assetInFlow = arbitraryAssetUseCase.assetFlow(
+        payload.swapQuoteModel.assetIn.chainId,
+        payload.swapQuoteModel.assetIn.chainAssetId
+    )
+        .shareInBackground()
+
+    private val assetOutFlow = arbitraryAssetUseCase.assetFlow(
+        payload.swapQuoteModel.assetOut.chainId,
+        payload.swapQuoteModel.assetOut.chainAssetId
+    )
         .shareInBackground()
 
     private val maxActionFlow = MutableStateFlow(MaxAction.DISABLED)
@@ -160,7 +171,7 @@ class SwapConfirmationViewModel(
         )
     )
 
-    private val maxActionProvider = assetInFlow.provideMaxWithFeeDeducted(Asset::transferableInPlanks, feeMixin, SwapFee::totalDeductedPlanks)
+    private val maxActionProvider = createMaxActionProvider()
 
     private val _validationProgress = MutableStateFlow(false)
 
@@ -233,6 +244,16 @@ class SwapConfirmationViewModel(
                 executeSwap(validPayload.swapExecuteArgs)
             }
         }
+    }
+
+    private fun createMaxActionProvider(): MaxActionProvider {
+        return maxActionProviderFactory.create(
+            assetInFlow = assetInFlow,
+            assetOutFlow = assetOutFlow,
+            field = Asset::transferableInPlanks,
+            feeLoaderMixin = feeMixin,
+            extractTotalFee = SwapFee::totalDeductedPlanks
+        )
     }
 
     private fun executeSwap(swapExecuteArgs: SwapExecuteArgs) {

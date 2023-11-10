@@ -163,7 +163,7 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
     }
 
     private inline fun TableCellView.clickable(crossinline onClick: () -> Unit) {
-        setPrimaryValueEndIcon(R.drawable.ic_info_cicrle_filled_16)
+        setPrimaryValueEndIcon(R.drawable.ic_info)
 
         setOnClickListener { onClick() }
     }

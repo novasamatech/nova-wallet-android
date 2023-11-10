@@ -25,6 +25,8 @@ import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSetti
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.updater.AccountInfoUpdaterFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -81,6 +83,7 @@ class SwapFeatureModule {
         chainStateRepository: ChainStateRepository,
         buyTokenRegistry: BuyTokenRegistry,
         crossChainTransfersUseCase: CrossChainTransfersUseCase,
+        swapUpdateSystemFactory: SwapUpdateSystemFactory
     ): SwapInteractor {
         return SwapInteractor(
             swapService = swapService,
@@ -90,7 +93,8 @@ class SwapFeatureModule {
             assetSourceRegistry = assetSourceRegistry,
             accountRepository = accountRepository,
             chainRegistry = chainRegistry,
-            walletRepository = walletRepository
+            walletRepository = walletRepository,
+            swapUpdateSystemFactory = swapUpdateSystemFactory
         )
     }
 
@@ -123,17 +127,45 @@ class SwapFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideAccountInfoUpdaterFactory(
+        storageCache: StorageCache,
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry
+    ): AccountInfoUpdaterFactory {
+        return AccountInfoUpdaterFactory(
+            storageCache,
+            accountRepository,
+            chainRegistry
+        )
+    }
+
+    @Provides
+    @FeatureScope
     fun provideSwapUpdateSystemFactory(
         swapSettingsStateProvider: SwapSettingsStateProvider,
         chainRegistry: ChainRegistry,
         storageCache: StorageCache,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
+        accountInfoUpdaterFactory: AccountInfoUpdaterFactory
     ): SwapUpdateSystemFactory {
         return SwapUpdateSystemFactory(
             swapSettingsStateProvider = swapSettingsStateProvider,
             chainRegistry = chainRegistry,
             storageCache = storageCache,
-            storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory
+            storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
+            accountInfoUpdaterFactory = accountInfoUpdaterFactory
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideMaxActionProviderFactory(
+        assetSourceRegistry: AssetSourceRegistry,
+        chainRegistry: ChainRegistry,
+    ): MaxActionProviderFactory {
+        return MaxActionProviderFactory(
+            assetSourceRegistry = assetSourceRegistry,
+            chainRegistry = chainRegistry
         )
     }
 }

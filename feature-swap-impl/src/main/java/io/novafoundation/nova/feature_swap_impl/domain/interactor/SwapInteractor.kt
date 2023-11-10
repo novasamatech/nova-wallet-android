@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_impl.domain.interactor
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry
 import io.novafoundation.nova.feature_buy_api.domain.hasProvidersFor
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationSystem
@@ -23,8 +25,11 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.checkForFeeCha
 import io.novafoundation.nova.feature_swap_impl.domain.validation.enoughLiquidity
 import io.novafoundation.nova.feature_swap_impl.domain.validation.rateNotExceedSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientAssetOutBalanceToStayAboveED
+import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceConsideringConsumersValidation
+import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceConsideringNonSufficientAssetsValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceInFeeAsset
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceInUsedAsset
+import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceToPayFeeConsideringED
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapFeeSufficientBalance
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapSmallRemainingBalance
 import io.novafoundation.nova.feature_swap_impl.domain.validation.utils.SharedQuoteValidationRetriever
@@ -37,6 +42,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
@@ -52,7 +58,12 @@ class SwapInteractor(
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
     private val walletRepository: WalletRepository,
+    private val swapUpdateSystemFactory: SwapUpdateSystemFactory
 ) {
+
+    suspend fun getUpdateSystem(chainFlow: Flow<Chain>, coroutineScope: CoroutineScope): UpdateSystem {
+        return swapUpdateSystemFactory.create(chainFlow, coroutineScope)
+    }
 
     fun availableGetAssetInOptionsFlow(chainAssetFlow: Flow<Chain.Asset?>): Flow<Set<GetAssetInOption>> {
         return combine(
@@ -101,13 +112,15 @@ class SwapInteractor(
         return chainAssetFlow.map { it != null }
     }
 
-    suspend fun validationSystem(): SwapValidationSystem {
+    fun validationSystem(): SwapValidationSystem {
         val sharedQuoteValidationRetriever = SharedQuoteValidationRetriever(swapService)
 
         return ValidationSystem {
             positiveAmountIn()
 
             positiveAmountOut()
+
+            sufficientBalanceToPayFeeConsideringED(assetSourceRegistry)
 
             availableSlippage(swapService)
 
@@ -120,6 +133,10 @@ class SwapInteractor(
             swapFeeSufficientBalance()
 
             sufficientBalanceInFeeAsset()
+
+            sufficientBalanceConsideringNonSufficientAssetsValidation(assetSourceRegistry)
+
+            sufficientBalanceConsideringConsumersValidation(assetSourceRegistry)
 
             swapSmallRemainingBalance(assetSourceRegistry)
 
