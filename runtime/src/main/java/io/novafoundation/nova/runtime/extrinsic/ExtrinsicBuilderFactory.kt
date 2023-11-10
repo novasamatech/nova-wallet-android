@@ -59,7 +59,7 @@ class ExtrinsicBuilderFactory(
 
         val accountAddress = chain.addressOf(accountId)
 
-        val runtimeVersion = getRuntimeVersion(chain)
+        val runtimeVersion = getRuntimeVersion(chain) ?: return emptySequence()
         val mortality = mortalityConstructor.constructMortality(chain.id)
 
         var nonce = rpcCalls.getNonce(chain.id, accountAddress)
@@ -84,7 +84,7 @@ class ExtrinsicBuilderFactory(
         }
     }
 
-    private suspend fun getRuntimeVersion(chain: Chain): RuntimeVersion {
-        return chainDao.runtimeInfo(chain.id)?.toRuntimeVersion() ?: throw IllegalStateException("No runtime version for chain ${chain.id}")
+    private suspend fun getRuntimeVersion(chain: Chain): RuntimeVersion? {
+        return chainDao.runtimeInfo(chain.id)?.toRuntimeVersion()
     }
 }

@@ -6,8 +6,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 val AddTransactionVersionToRuntime_50_51 = object : Migration(50, 51) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("DELETE FROM chain_runtimes")
-
-        database.execSQL("ALTER TABLE chain_runtimes ADD COLUMN transactionVersion INTEGER NOT NULL DEFAULT 0")
+        database.execSQL("ALTER TABLE chain_runtimes ADD COLUMN transactionVersion INTEGER")
     }
 }
