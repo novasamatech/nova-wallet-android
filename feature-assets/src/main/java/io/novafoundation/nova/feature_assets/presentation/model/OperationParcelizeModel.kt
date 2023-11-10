@@ -81,7 +81,7 @@ sealed class OperationParcelizeModel : Parcelable {
 class ChainAssetWithAmountParcelModel(
     val assetId: AssetPayload,
     val amount: Balance
-): Parcelable
+) : Parcelable
 
 @Parcelize
 class AmountParcelModel(

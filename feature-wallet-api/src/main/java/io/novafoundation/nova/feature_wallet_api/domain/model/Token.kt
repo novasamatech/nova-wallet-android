@@ -25,7 +25,7 @@ data class Token(
     override val currency: Currency,
     override val coinRate: CoinRateChange?,
     override val configuration: Chain.Asset
-): TokenBase {
+) : TokenBase {
     // TODO move out of the class when Context Receivers will be stable
     fun BigDecimal.toPlanks() = planksFromAmount(this)
     fun BigInteger.toAmount() = amountFromPlanks(this)
@@ -35,7 +35,7 @@ data class HistoricalToken(
     override val currency: Currency,
     override val coinRate: HistoricalCoinRate?,
     override val configuration: Chain.Asset
-): TokenBase
+) : TokenBase
 
 fun TokenBase.toFiatOrNull(tokenAmount: BigDecimal): BigDecimal? = coinRate?.convertAmount(tokenAmount)
 

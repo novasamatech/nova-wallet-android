@@ -35,4 +35,3 @@ class SwapAssetsView @JvmOverloads constructor(
         val assetOut: SwapAssetView.Model
     )
 }
-

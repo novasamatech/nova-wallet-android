@@ -18,7 +18,7 @@ class SwapConfirmationPayloadFormatter(
 ) {
 
     suspend fun mapSwapQuoteFromModel(model: SwapConfirmationPayload.SwapQuoteModel): SwapQuote {
-        return with(model){
+        return with(model) {
             SwapQuote(
                 amountIn = chainRegistry.asset(assetIn.fullChainAssetId).withAmount(planksIn),
                 amountOut = chainRegistry.asset(assetOut.fullChainAssetId).withAmount(planksOut),

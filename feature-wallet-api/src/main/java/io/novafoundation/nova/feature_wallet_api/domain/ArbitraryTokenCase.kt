@@ -23,7 +23,7 @@ class RealArbitraryTokenUseCase(
 ) : ArbitraryTokenUseCase {
 
     override fun historicalTokenFlow(chainAsset: Chain.Asset, at: Duration): Flow<HistoricalToken> {
-       return flowOf { historicalToken(chainAsset, at) }
+        return flowOf { historicalToken(chainAsset, at) }
     }
 
     override suspend fun historicalToken(chainAsset: Chain.Asset, at: Duration): HistoricalToken = withContext(Dispatchers.IO) {
