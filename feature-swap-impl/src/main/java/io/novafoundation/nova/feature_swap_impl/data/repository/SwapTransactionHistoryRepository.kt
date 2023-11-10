@@ -27,7 +27,7 @@ interface SwapTransactionHistoryRepository {
 class RealSwapTransactionHistoryRepository(
     private val operationDao: OperationDao,
     private val chainRegistry: ChainRegistry,
-): SwapTransactionHistoryRepository {
+) : SwapTransactionHistoryRepository {
 
     override suspend fun insertPendingSwap(
         chainAsset: Chain.Asset,

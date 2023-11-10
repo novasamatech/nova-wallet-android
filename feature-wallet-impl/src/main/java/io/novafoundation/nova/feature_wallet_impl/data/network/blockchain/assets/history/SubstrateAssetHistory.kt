@@ -51,9 +51,7 @@ abstract class SubstrateAssetHistory(
                     cursorStorage.saveCursor(chain.id, chainAsset.id, accountId, cursor = null)
                 }
             }
-
     }
-
 
     override suspend fun getOperations(
         pageSize: Int,

@@ -233,7 +233,9 @@ class SwapConfirmationViewModel(
             val payload = getValidationPayload() ?: return@launch
 
             validationExecutor.requireValid(
-                validationSystem = validationSystem, payload = payload, progressConsumer = _validationProgress.progressConsumer(),
+                validationSystem = validationSystem,
+                payload = payload,
+                progressConsumer = _validationProgress.progressConsumer(),
                 validationFailureTransformerCustom = ::formatValidationFailure,
                 block = ::executeSwap
             )

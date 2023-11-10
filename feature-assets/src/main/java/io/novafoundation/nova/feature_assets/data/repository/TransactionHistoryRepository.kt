@@ -77,7 +77,17 @@ class RealTransactionHistoryRepository(
         val historySource = historySourceFor(chainAsset)
         val accountAddress = chain.addressOf(accountId)
 
-        val dataPageResult = runCatching { historySource.getFilteredOperations(pageSize, PageOffset.Loadable.FirstPage, filters, accountId, chain, chainAsset, currency) }
+        val dataPageResult = runCatching {
+            historySource.getFilteredOperations(
+                pageSize,
+                PageOffset.Loadable.FirstPage,
+                filters,
+                accountId,
+                chain,
+                chainAsset,
+                currency
+            )
+        }
         historySource.additionalFirstPageSync(chain, chainAsset, accountId, dataPageResult)
 
         val dataPage = dataPageResult.getOrThrow()
