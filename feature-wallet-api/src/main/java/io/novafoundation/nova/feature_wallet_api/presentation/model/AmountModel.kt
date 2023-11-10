@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.model
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.domain.model.TokenBase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import java.math.BigDecimal
@@ -33,19 +33,21 @@ fun mapAmountToAmountModel(
 
 fun mapAmountToAmountModel(
     amountInPlanks: BigInteger,
-    token: Token,
+    token: TokenBase,
     includeZeroFiat: Boolean = true,
-    estimatedFiat: Boolean = false
+    estimatedFiat: Boolean = false,
+    tokenAmountSign: AmountSign = AmountSign.NONE,
 ): AmountModel = mapAmountToAmountModel(
     amount = token.amountFromPlanks(amountInPlanks),
     token = token,
     includeZeroFiat = includeZeroFiat,
-    estimatedFiat = estimatedFiat
+    estimatedFiat = estimatedFiat,
+    tokenAmountSign = tokenAmountSign
 )
 
 fun mapAmountToAmountModel(
     amount: BigDecimal,
-    token: Token,
+    token: TokenBase,
     includeZeroFiat: Boolean = true,
     includeAssetTicker: Boolean = true,
     tokenAmountSign: AmountSign = AmountSign.NONE,

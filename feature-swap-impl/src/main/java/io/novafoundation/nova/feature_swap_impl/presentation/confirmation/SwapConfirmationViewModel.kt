@@ -11,13 +11,14 @@ import io.novafoundation.nova.common.utils.asPercent
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.description.launchNetworkFeeDescription
+import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
@@ -35,6 +36,10 @@ import io.novafoundation.nova.feature_swap_api.domain.model.editedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
+import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
+import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetView
+import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetsView
+import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
@@ -42,12 +47,10 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.common.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.model.SwapConfirmationDetailsModel
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.mapSwapValidationFailureToUI
-import io.novafoundation.nova.feature_swap_impl.presentation.views.SwapAssetView
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
@@ -68,8 +71,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
-import java.math.BigDecimal
-import java.math.BigInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -84,6 +85,8 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.math.BigDecimal
+import java.math.BigInteger
 
 private data class SwapConfirmationState(
     val swapQuoteArgs: SwapQuoteArgs,
@@ -197,10 +200,7 @@ class SwapConfirmationViewModel(
     }
 
     fun rateClicked() {
-        launchDescriptionBottomSheet(
-            titleRes = R.string.swap_rate_title,
-            descriptionRes = R.string.swap_rate_description
-        )
+        launchSwapRateDescription()
     }
 
     fun priceDifferenceClicked() {
@@ -218,10 +218,7 @@ class SwapConfirmationViewModel(
     }
 
     fun networkFeeClicked() {
-        launchDescriptionBottomSheet(
-            titleRes = R.string.swap_network_fee_title,
-            descriptionRes = R.string.swap_network_fee_description
-        )
+        launchNetworkFeeDescription()
     }
 
     fun accountClicked() {
@@ -277,8 +274,10 @@ class SwapConfirmationViewModel(
         val chainIn = chainRegistry.getChain(assetIn.chainId)
         val chainOut = chainRegistry.getChain(assetOut.chainId)
         return SwapConfirmationDetailsModel(
-            assetInDetails = formatAssetDetails(metaAccount, chainIn, assetIn, confirmationState.swapQuote.planksIn),
-            assetOutDetails = formatAssetDetails(metaAccount, chainOut, assetOut, confirmationState.swapQuote.planksOut),
+            assets = SwapAssetsView.Model(
+                assetIn = formatAssetDetails(metaAccount, chainIn, assetIn, confirmationState.swapQuote.planksIn),
+                assetOut = formatAssetDetails(metaAccount, chainOut, assetOut, confirmationState.swapQuote.planksOut)
+            ),
             rate = formatRate(payload.rate, assetIn, assetOut),
             priceDifference = formatPriceDifference(confirmationState.swapQuote.priceImpact),
             slippage = payload.slippage.asPercent().format()
@@ -295,8 +294,7 @@ class SwapConfirmationViewModel(
         return SwapAssetView.Model(
             assetIcon = chainAsset.icon(),
             amount = amount,
-            networkImage = Icon.FromLink(chain.icon),
-            networkName = chain.name
+            chainUi = mapChainToUi(chain),
         )
     }
 

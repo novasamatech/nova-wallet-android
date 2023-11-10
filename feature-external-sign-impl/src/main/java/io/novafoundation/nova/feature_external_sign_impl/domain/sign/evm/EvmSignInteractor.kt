@@ -309,7 +309,7 @@ class EvmSignInteractor(
                 source = Chain.Asset.Source.ERC20,
                 enabled = true
             ),
-            coinRateChange = null,
+            coinRate = null,
             currency = currency
         )
     }

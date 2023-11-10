@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.PoolRewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.RewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.TransactionDetailComponent
+import io.novafoundation.nova.feature_assets.presentation.transaction.detail.swap.di.SwapDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.di.TransactionHistoryFilterComponent
 import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
@@ -60,6 +61,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun confirmTransferComponentFactory(): ConfirmSendComponent.Factory
 
     fun transactionDetailComponentFactory(): TransactionDetailComponent.Factory
+
+    fun swapDetailComponentFactory(): SwapDetailComponent.Factory
 
     fun transactionHistoryComponentFactory(): TransactionHistoryFilterComponent.Factory
 

@@ -153,6 +153,10 @@ suspend fun ChainRegistry.chainWithAsset(chainId: String, assetId: Int): ChainWi
     return ChainWithAsset(chain, chain.assetsById.getValue(assetId))
 }
 
+suspend fun ChainRegistry.chainWithAsset(fullChainAssetId: FullChainAssetId): ChainWithAsset {
+    return chainWithAsset(fullChainAssetId.chainId, fullChainAssetId.assetId)
+}
+
 suspend fun ChainRegistry.asset(chainId: String, assetId: Int): Chain.Asset {
     val chain = chainsById.first().getValue(chainId)
 
