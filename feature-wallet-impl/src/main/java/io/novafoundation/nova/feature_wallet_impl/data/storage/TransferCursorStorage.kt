@@ -28,6 +28,13 @@ class TransferCursorStorage(
 
         preferences.putString(cursorKey(chainId, chainAssetId, accountId), toSave)
     }
+    fun hasCursor(
+        chainId: ChainId,
+        chainAssetId: Int,
+        accountId: AccountId,
+    ): Boolean {
+        return preferences.contains(cursorKey(chainId, chainAssetId, accountId))
+    }
 
     suspend fun awaitCursor(
         chainId: ChainId,

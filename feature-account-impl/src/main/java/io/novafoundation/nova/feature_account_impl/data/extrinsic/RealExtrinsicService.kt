@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.sum
 import io.novafoundation.nova.common.utils.takeWhileInclusive
 import io.novafoundation.nova.common.utils.tip
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWithOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsicWithOrigin
@@ -59,14 +60,14 @@ class RealExtrinsicService(
         )
     }
 
-    override suspend fun submitExtrinsicWithSelectedWallet(
+    override suspend fun submitExtrinsicWithSelectedWalletV2(
         chain: Chain,
         formExtrinsic: FormExtrinsicWithOrigin,
-    ): Result<String> {
+    ): Result<ExtrinsicSubmission> {
         val account = accountRepository.getSelectedMetaAccount()
-        val accountId = account.accountIdIn(chain)!!
+        val accountId = account.requireAccountIdIn(chain)
 
-        return submitExtrinsicWithAnySuitableWallet(chain, accountId, formExtrinsic)
+        return submitExtrinsicWithAnySuitableWalletV2(chain, accountId, formExtrinsic)
     }
 
     override suspend fun submitAndWatchExtrinsicWithSelectedWallet(
@@ -83,10 +84,17 @@ class RealExtrinsicService(
         chain: Chain,
         accountId: ByteArray,
         formExtrinsic: FormExtrinsicWithOrigin,
-    ): Result<String> = runCatching {
-        val extrinsic = buildExtrinsic(chain, accountId, formExtrinsic)
+    ): Result<String> = submitExtrinsicWithAnySuitableWalletV2(chain, accountId, formExtrinsic)
+        .map { it.hash }
 
-        rpcCalls.submitExtrinsic(chain.id, extrinsic)
+    private suspend fun submitExtrinsicWithAnySuitableWalletV2(
+        chain: Chain,
+        accountId: ByteArray,
+        formExtrinsic: FormExtrinsicWithOrigin,
+    ): Result<ExtrinsicSubmission> = runCatching {
+        val extrinsic = buildExtrinsic(chain, accountId, formExtrinsic)
+        val hash = rpcCalls.submitExtrinsic(chain.id, extrinsic)
+        ExtrinsicSubmission(hash, accountId)
     }
 
     override suspend fun submitAndWatchExtrinsicAnySuitableWallet(

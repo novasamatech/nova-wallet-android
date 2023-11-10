@@ -32,7 +32,7 @@ abstract class EvmAssetHistory(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        page: DataPage<Operation>
+        page: Result<DataPage<Operation>>
     ) {
         // nothing to do
     }

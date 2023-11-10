@@ -28,7 +28,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.icon
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
@@ -71,7 +70,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -84,7 +82,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -236,13 +233,10 @@ class SwapConfirmationViewModel(
             val payload = getValidationPayload() ?: return@launch
 
             validationExecutor.requireValid(
-                validationSystem = validationSystem,
-                payload = payload,
-                progressConsumer = _validationProgress.progressConsumer(),
+                validationSystem = validationSystem, payload = payload, progressConsumer = _validationProgress.progressConsumer(),
                 validationFailureTransformerCustom = ::formatValidationFailure,
-            ) { validPayload ->
-                executeSwap(validPayload.swapExecuteArgs)
-            }
+                block = ::executeSwap
+            )
         }
     }
 
@@ -256,15 +250,12 @@ class SwapConfirmationViewModel(
         )
     }
 
-    private fun executeSwap(swapExecuteArgs: SwapExecuteArgs) {
-        launch {
-            val result = withContext(Dispatchers.Default) { swapInteractor.executeSwap(swapExecuteArgs) }
-            result.onSuccess {
-                swapRouter.finishSwapFlow(swapExecuteArgs.assetIn.fullId.toAssetPayload())
-            }.onFailure(::showError)
+    private fun executeSwap(validationPayload: SwapValidationPayload) = launch {
+        swapInteractor.executeSwap(validationPayload.swapExecuteArgs, validationPayload.swapFee)
+            .onSuccess { swapRouter.finishSwapFlow(validationPayload.swapExecuteArgs.assetIn.fullId.toAssetPayload()) }
+            .onFailure(::showError)
 
-            _validationProgress.value = false
-        }
+        _validationProgress.value = false
     }
 
     private suspend fun formatToSwapDetailsModel(confirmationState: SwapConfirmationState): SwapConfirmationDetailsModel {
