@@ -118,7 +118,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
 
         viewModel.canChangeFeeToken.observe { canChangeFeeToken ->
             if (canChangeFeeToken) {
-                swapMainSettingsDetailsNetworkFee.setPrimaryValueStartIcon(R.drawable.ic_pencil_edit)
+                swapMainSettingsDetailsNetworkFee.setPrimaryValueStartIcon(R.drawable.ic_pencil_edit, R.color.icon_secondary)
                 swapMainSettingsDetailsNetworkFee.setOnValueClickListener { viewModel.editFeeTokenClicked() }
             } else {
                 swapMainSettingsDetailsNetworkFee.setPrimaryValueStartIcon(null)
