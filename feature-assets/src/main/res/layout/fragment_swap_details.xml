@@ -35,8 +35,8 @@
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_icon_container_on_color"
                 android:padding="11dp"
-                app:tint="@color/icon_secondary"
-                android:src="@drawable/ic_flip_swap" />
+                android:src="@drawable/ic_flip_swap"
+                app:tint="@color/icon_secondary" />
 
             <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
                 android:id="@+id/swapDetailAmount"
@@ -58,8 +58,8 @@
                 tools:textColor="@color/text_positive" />
 
             <io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetsView
-                android:layout_width="match_parent"
                 android:id="@+id/swapDetailAssets"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="24dp" />
@@ -76,14 +76,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:title="@string/swap_rate_title"
-                    app:titleIcon="@drawable/ic_info_cicrle_filled_16" />
+                    app:titleIcon="@drawable/ic_info" />
 
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/swapDetailFee"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:titleIcon="@drawable/ic_info_cicrle_filled_16"
-                    app:title="@string/network_fee" />
+                    app:title="@string/network_fee"
+                    app:titleIcon="@drawable/ic_info" />
             </io.novafoundation.nova.common.view.TableView>
 
             <io.novafoundation.nova.common.view.TableView
@@ -103,7 +103,7 @@
                     android:id="@+id/swapDetailAccount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
+                    app:primaryValueEndIcon="@drawable/ic_info"
                     app:title="@string/common_account" />
             </io.novafoundation.nova.common.view.TableView>
 
@@ -119,8 +119,7 @@
                     android:id="@+id/swapDetailHash"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
-                    app:primaryValueIconTint="@color/icon_secondary"
+                    app:primaryValueEndIcon="@drawable/ic_info"
                     app:title="@string/common_transaction_id" />
             </io.novafoundation.nova.common.view.TableView>
         </LinearLayout>

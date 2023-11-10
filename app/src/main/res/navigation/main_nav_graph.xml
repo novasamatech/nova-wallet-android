@@ -880,6 +880,7 @@
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment"
         android:label="validatorDetailsFragment"
         tools:layout="@layout/fragment_validator_details" />
+
     <fragment
         android:id="@+id/swapDetailFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.swap.SwapDetailFragment"

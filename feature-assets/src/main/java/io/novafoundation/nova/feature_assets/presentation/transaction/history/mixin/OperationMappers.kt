@@ -389,7 +389,6 @@ suspend fun mapOperationToParcel(
                 )
             }
 
-            // TODO swap details
             is Operation.Type.Swap -> OperationParcelizeModel.Swap(
                 amountIsAssetIn = chainAsset.fullId == operationType.amountIn.chainAsset.fullId,
                 amountIn = mapAssetWithAmountToParcel(operationType.amountIn),
