@@ -185,6 +185,10 @@ class NovaChipView @JvmOverloads constructor(
         }
     }
 
+    fun setIconTint(tintRes: Int?) {
+        chipIcon.setImageTintRes(tintRes)
+    }
+
     fun setIcon(icon: Icon?) {
         if (icon == null) {
             setIconDrawable(drawable = null)
@@ -210,7 +214,7 @@ class NovaChipView @JvmOverloads constructor(
     fun setStyle(@ColorRes backgroundColorRes: Int, @ColorRes textColorRes: Int, @ColorRes iconColorRes: Int) {
         setChipBackground(backgroundColorRes)
         chipText.setTextColorRes(textColorRes)
-        chipIcon.setImageTintRes(iconColorRes)
+        setIconTint(textColorRes)
     }
 
     fun setText(text: String?) {

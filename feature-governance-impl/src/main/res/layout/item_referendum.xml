@@ -64,7 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"
-            tools:chipIcon="@drawable/ic_info_cicrle_filled_16"
+            tools:chipIcon="@drawable/ic_info"
             tools:text="main agenda" />
 
         <io.novafoundation.nova.feature_governance_impl.presentation.view.NovaChipView

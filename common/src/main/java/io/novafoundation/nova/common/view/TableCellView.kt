@@ -161,11 +161,11 @@ open class TableCellView @JvmOverloads constructor(
         tableCellValueDivider.setVisible(visible)
     }
 
-    fun setPrimaryValueEndIcon(@DrawableRes icon: Int?, @ColorRes tint: Int = ICON_TINT_DEFAULT) {
+    fun setPrimaryValueEndIcon(@DrawableRes icon: Int?, @ColorRes tint: Int? = null) {
         tableCellValuePrimary.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 8, tint = tint)
     }
 
-    fun setPrimaryValueStartIcon(@DrawableRes icon: Int?, @ColorRes tint: Int = ICON_TINT_DEFAULT) {
+    fun setPrimaryValueStartIcon(@DrawableRes icon: Int?, @ColorRes tint: Int? = ICON_TINT_DEFAULT) {
         tableCellValuePrimary.setDrawableStart(icon, widthInDp = 16, paddingInDp = 8, tint = tint)
     }
 
@@ -234,7 +234,7 @@ open class TableCellView @JvmOverloads constructor(
 
         val primaryValueEndIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueEndIcon)
         primaryValueEndIcon?.let {
-            val primaryValueIconTint = typedArray.getResourceId(R.styleable.TableCellView_primaryValueIconTint, ICON_TINT_DEFAULT)
+            val primaryValueIconTint = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueIconTint)
 
             setPrimaryValueEndIcon(primaryValueEndIcon, primaryValueIconTint)
         }
@@ -280,7 +280,7 @@ fun TableCellView.showValueOrHide(primary: CharSequence?, secondary: String? = n
 @Suppress("LiftReturnOrAssignment")
 fun TableCellView.setExtraInfoAvailable(available: Boolean) {
     if (available) {
-        setPrimaryValueEndIcon(R.drawable.ic_info_cicrle_filled_16)
+        setPrimaryValueEndIcon(R.drawable.ic_info)
         isEnabled = true
     } else {
         setPrimaryValueEndIcon(null)

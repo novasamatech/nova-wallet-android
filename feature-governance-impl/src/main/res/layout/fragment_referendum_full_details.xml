@@ -39,8 +39,7 @@
                     android:id="@+id/referendumFullDetailsProposal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
-                    app:primaryValueIconTint="@color/text_tertiary"
+                    app:primaryValueEndIcon="@drawable/ic_info"
                     app:title="@string/referendum_full_details_proposer" />
 
                 <io.novafoundation.nova.common.view.TableCellView
@@ -61,8 +60,7 @@
                     android:id="@+id/referendumFullDetailsBeneficiary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
-                    app:primaryValueIconTint="@color/text_tertiary"
+                    app:primaryValueEndIcon="@drawable/ic_info"
                     app:title="@string/referendum_full_details_beneficiary" />
 
                 <io.novafoundation.nova.common.view.TableCellView
@@ -113,8 +111,7 @@
                     android:id="@+id/referendumFullDetailsCallHash"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
-                    app:primaryValueIconTint="@color/text_tertiary"
+                    app:primaryValueEndIcon="@drawable/ic_info"
                     app:title="@string/referendum_full_details_hash" />
 
             </io.novafoundation.nova.common.view.TableView>

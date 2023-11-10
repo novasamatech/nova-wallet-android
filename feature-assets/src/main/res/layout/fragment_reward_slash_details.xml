@@ -68,8 +68,7 @@
                     android:id="@+id/rewardDetailValidator"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
-                    app:primaryValueIconTint="@color/icon_secondary"
+                    app:primaryValueEndIcon="@drawable/ic_info"
                     app:title="@string/staking_reward_details_validator" />
 
                 <io.novafoundation.nova.common.view.TableCellView
@@ -98,8 +97,7 @@
                     android:id="@+id/rewardDetailEvent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
-                    app:primaryValueIconTint="@color/icon_secondary"
+                    app:primaryValueEndIcon="@drawable/ic_info"
                     app:title="@string/common_event" />
 
                 <io.novafoundation.nova.common.view.TableCellView

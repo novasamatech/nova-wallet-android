@@ -45,11 +45,10 @@
         android:layout_height="16dp"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="4dp"
-        android:src="@drawable/ic_info_cicrle_filled_16"
+        android:src="@drawable/ic_info"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/itemDelegatorAddress"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/icon_secondary" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/itemDelegatorVoteContainer"
