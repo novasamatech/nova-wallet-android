@@ -45,8 +45,6 @@ import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValuePrimary
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueProgress
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueSecondary
 
-private val ICON_TINT_DEFAULT = R.color.icon_secondary
-
 open class TableCellView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -165,7 +163,7 @@ open class TableCellView @JvmOverloads constructor(
         tableCellValuePrimary.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 8, tint = tint)
     }
 
-    fun setPrimaryValueStartIcon(@DrawableRes icon: Int?, @ColorRes tint: Int? = ICON_TINT_DEFAULT) {
+    fun setPrimaryValueStartIcon(@DrawableRes icon: Int?, @ColorRes tint: Int? = null) {
         tableCellValuePrimary.setDrawableStart(icon, widthInDp = 16, paddingInDp = 8, tint = tint)
     }
 
@@ -189,12 +187,12 @@ open class TableCellView @JvmOverloads constructor(
         }
     }
 
-    fun setTitleIconEnd(@DrawableRes icon: Int?) {
-        tableCellTitle.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 4, tint = ICON_TINT_DEFAULT)
+    fun setTitleIconEnd(@DrawableRes icon: Int?, tintRes: Int?) {
+        tableCellTitle.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 4, tint = tintRes)
     }
 
-    fun setTitleIconStart(@DrawableRes icon: Int?) {
-        tableCellTitle.setDrawableStart(icon, widthInDp = 16, paddingInDp = 4, tint = ICON_TINT_DEFAULT)
+    fun setTitleIconStart(@DrawableRes icon: Int?, tintRes: Int?) {
+        tableCellTitle.setDrawableStart(icon, widthInDp = 16, paddingInDp = 4, tint = tintRes)
     }
 
     fun showValue(primary: CharSequence, secondary: String? = null) {
@@ -241,7 +239,7 @@ open class TableCellView @JvmOverloads constructor(
 
         val primaryValueStartIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueStartIcon)
         primaryValueStartIcon?.let {
-            val primaryValueIconTint = typedArray.getResourceId(R.styleable.TableCellView_primaryValueIconTint, ICON_TINT_DEFAULT)
+            val primaryValueIconTint = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueIconTint)
 
             setPrimaryValueStartIcon(primaryValueStartIcon, primaryValueIconTint)
         }
@@ -250,10 +248,18 @@ open class TableCellView @JvmOverloads constructor(
         setPrimaryValueStyle(primaryValueStyle)
 
         val titleIconEnd = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIcon)
-        titleIconEnd?.let(::setTitleIconEnd)
+        titleIconEnd?.let {
+            val titleIconTint = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIconTint)
+
+            setTitleIconEnd(titleIconEnd, titleIconTint)
+        }
 
         val titleIconStart = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIconStart)
-        titleIconStart?.let(::setTitleIconStart)
+        titleIconStart?.let {
+            val titleIconTint = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleIconTint)
+
+            setTitleIconStart(titleIconStart, titleIconTint)
+        }
 
         val titleTextAppearance = typedArray.getResourceIdOrNull(R.styleable.TableCellView_titleValueTextAppearance)
         titleTextAppearance?.let(title::setTextAppearance)

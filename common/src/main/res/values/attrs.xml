@@ -88,6 +88,7 @@
         <attr name="secondaryValueTextAppearance" format="reference" />
         <attr name="titleIcon" format="reference|color" />
         <attr name="titleIconStart" format="reference|color" />
+        <attr name="titleIconTint" format="color" />
         <attr name="primaryValueIconTint" format="color" />
         <attr name="titleEllipsisable" format="boolean" />
     </declare-styleable>
