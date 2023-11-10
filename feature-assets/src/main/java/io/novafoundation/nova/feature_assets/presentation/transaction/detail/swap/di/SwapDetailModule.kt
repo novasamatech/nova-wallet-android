@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -33,6 +34,7 @@ class SwapDetailModule {
         arbitraryTokenUseCase: ArbitraryTokenUseCase,
         walletUiUseCase: WalletUiUseCase,
         swapRateFormatter: SwapRateFormatter,
+        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
     ): ViewModel {
         return SwapDetailViewModel(
             router = router,
@@ -42,7 +44,8 @@ class SwapDetailModule {
             externalActions = externalActions,
             arbitraryTokenUseCase = arbitraryTokenUseCase,
             walletUiUseCase = walletUiUseCase,
-            swapRateFormatter = swapRateFormatter
+            swapRateFormatter = swapRateFormatter,
+            descriptionBottomSheetLauncher = descriptionBottomSheetLauncher
         )
     }
 

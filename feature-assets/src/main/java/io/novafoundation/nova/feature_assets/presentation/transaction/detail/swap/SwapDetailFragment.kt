@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
+import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -52,6 +53,14 @@ class SwapDetailFragment : BaseFragment<SwapDetailViewModel>() {
         swapDetailAccount.setOnClickListener {
             viewModel.originAddressClicked()
         }
+
+        swapDetailRate.setOnClickListener {
+            viewModel.rateClicked()
+        }
+
+        swapDetailFee.setOnClickListener {
+            viewModel.feeClicked()
+        }
     }
 
     override fun inject() {
@@ -68,6 +77,7 @@ class SwapDetailFragment : BaseFragment<SwapDetailViewModel>() {
 
     override fun subscribe(viewModel: SwapDetailViewModel) {
         setupExternalActions(viewModel)
+        observeDescription(viewModel)
 
         with(viewModel.operation) {
             swapDetailStatus.showOperationStatus(statusAppearance)

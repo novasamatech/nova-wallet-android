@@ -136,7 +136,7 @@ class TransactionHistoryProvider(
                         router.openPoolRewardDetail(payload)
                     }
                     is OperationParcelizeModel.Swap -> {
-                        // TODO operation details
+                        router.openSwapDetail(payload)
                     }
                 }
             }

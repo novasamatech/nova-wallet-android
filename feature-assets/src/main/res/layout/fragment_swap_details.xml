@@ -36,7 +36,7 @@
                 android:background="@drawable/bg_icon_container_on_color"
                 android:padding="11dp"
                 app:tint="@color/icon_secondary"
-                tools:src="@drawable/ic_flip_swap" />
+                android:src="@drawable/ic_flip_swap" />
 
             <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
                 android:id="@+id/swapDetailAmount"

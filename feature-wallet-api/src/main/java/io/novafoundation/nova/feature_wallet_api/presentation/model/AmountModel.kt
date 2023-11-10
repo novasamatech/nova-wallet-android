@@ -35,12 +35,14 @@ fun mapAmountToAmountModel(
     amountInPlanks: BigInteger,
     token: TokenBase,
     includeZeroFiat: Boolean = true,
-    estimatedFiat: Boolean = false
+    estimatedFiat: Boolean = false,
+    tokenAmountSign: AmountSign = AmountSign.NONE,
 ): AmountModel = mapAmountToAmountModel(
     amount = token.amountFromPlanks(amountInPlanks),
     token = token,
     includeZeroFiat = includeZeroFiat,
-    estimatedFiat = estimatedFiat
+    estimatedFiat = estimatedFiat,
+    tokenAmountSign = tokenAmountSign
 )
 
 fun mapAmountToAmountModel(

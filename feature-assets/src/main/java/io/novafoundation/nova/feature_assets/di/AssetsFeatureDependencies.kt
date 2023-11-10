@@ -19,6 +19,7 @@ import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -229,4 +230,6 @@ interface AssetsFeatureDependencies {
     val arbitraryTokenUseCase: ArbitraryTokenUseCase
 
     val swapRateFormatter: SwapRateFormatter
+
+    val bottomSheetLauncher: DescriptionBottomSheetLauncher
 }

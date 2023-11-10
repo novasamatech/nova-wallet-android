@@ -39,6 +39,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetView
 import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetsView
+import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
@@ -188,10 +189,7 @@ class SwapConfirmationViewModel(
     }
 
     fun rateClicked() {
-        launchDescriptionBottomSheet(
-            titleRes = R.string.swap_rate_title,
-            descriptionRes = R.string.swap_rate_description
-        )
+        launchSwapRateDescription()
     }
 
     fun priceDifferenceClicked() {

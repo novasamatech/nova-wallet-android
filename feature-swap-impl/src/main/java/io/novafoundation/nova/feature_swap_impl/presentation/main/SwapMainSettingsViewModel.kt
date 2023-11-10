@@ -30,6 +30,7 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.SimpleAlertModel
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.description.launchNetworkFeeDescription
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
@@ -45,6 +46,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
@@ -322,17 +324,11 @@ class SwapMainSettingsViewModel(
     }
 
     fun rateDetailsClicked() {
-        launchDescriptionBottomSheet(
-            titleRes = R.string.swap_rate_title,
-            descriptionRes = R.string.swap_rate_description
-        )
+        launchSwapRateDescription()
     }
 
     fun networkFeeClicked() {
-        launchDescriptionBottomSheet(
-            titleRes = R.string.swap_network_fee_title,
-            descriptionRes = R.string.swap_network_fee_description
-        )
+        launchNetworkFeeDescription()
     }
 
     fun flipAssets() = launch {
