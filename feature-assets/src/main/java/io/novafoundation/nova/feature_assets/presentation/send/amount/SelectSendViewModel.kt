@@ -273,6 +273,7 @@ class SelectSendViewModel(
                 originChainWithAsset.emit(origin)
                 destinationChainWithAsset.emit(origin)
             }
+
             is SendPayload.SpecifiedDestination -> {
                 val destination = chainRegistry.chainWithAsset(payload.destination.chainId, payload.destination.chainAssetId)
                 val origin = availableCrossChainDestinations.first().first().chainWithAsset
@@ -308,6 +309,7 @@ class SelectSendViewModel(
             inputSource1 = amountChooserMixin.backPressuredAmount,
             inputSource2 = destinationChainWithAsset,
             inputSource3 = addressInputMixin.inputFlow,
+            invalidationSources = listOf(originChainWithAsset),
             scope = viewModelScope,
             feeConstructor = { amount, destinationChain, addressInput ->
                 val transfer = buildTransfer(destinationChain, amount, addressInput)

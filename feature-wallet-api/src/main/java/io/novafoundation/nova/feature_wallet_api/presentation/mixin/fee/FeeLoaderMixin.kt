@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.asFlow
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
+import io.novafoundation.nova.common.utils.accumulate
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.data.model.Fee
@@ -211,6 +212,7 @@ fun <I1, I2, I3> FeeLoaderMixin.Presentation.connectWith(
     inputSource1: Flow<I1>,
     inputSource2: Flow<I2>,
     inputSource3: Flow<I3>,
+    invalidationSources: List<Flow<*>>,
     scope: CoroutineScope,
     feeConstructor: suspend Token.(input1: I1, input2: I2, input3: I3) -> Fee?,
     onRetryCancelled: () -> Unit = {}
@@ -219,7 +221,8 @@ fun <I1, I2, I3> FeeLoaderMixin.Presentation.connectWith(
         inputSource1,
         inputSource2,
         inputSource3,
-    ) { input1, input2, input3 ->
+        invalidationSources.accumulate()
+    ) { input1, input2, input3, _ ->
         loadFeeV2(
             coroutineScope = scope,
             feeConstructor = { feeConstructor(it, input1, input2, input3) },
