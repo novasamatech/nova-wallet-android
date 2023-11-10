@@ -27,8 +27,12 @@ class SwapNavigator(
         navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapOptionsFragment)
     }
 
-    override fun finishSwapFlow(assetPayload: AssetPayload) {
+    override fun swapFlowToBalanceDetails(assetPayload: AssetPayload) {
         navigationHolder.navController?.navigate(R.id.action_swapConfirmationFragment_to_assetDetails, BalanceDetailFragment.getBundle(assetPayload))
+    }
+
+    override fun swapFlowToBalanceList() {
+        navigationHolder.navController?.navigate(R.id.action_swapConfirmationFragment_to_balanceList)
     }
 
     override fun selectAssetIn(selectedAsset: AssetPayload?) {

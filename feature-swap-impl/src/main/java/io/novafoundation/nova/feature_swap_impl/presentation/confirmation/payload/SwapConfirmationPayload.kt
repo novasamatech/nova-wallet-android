@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload
 
 import android.os.Parcelable
+import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapFinishFlowDestination
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import java.math.BigDecimal
@@ -12,7 +13,8 @@ class SwapConfirmationPayload(
     val rate: BigDecimal,
     val slippage: Double,
     val feeAsset: AssetPayload,
-    val swapFee: FeeDetails
+    val swapFee: FeeDetails,
+    val returnTo: SwapFinishFlowDestination
 ) : Parcelable {
 
     @Parcelize

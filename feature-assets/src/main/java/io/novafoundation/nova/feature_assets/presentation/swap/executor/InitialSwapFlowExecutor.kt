@@ -8,6 +8,6 @@ import kotlinx.coroutines.CoroutineScope
 class InitialSwapFlowExecutor(private val assetsRouter: AssetsRouter) : SwapFlowExecutor {
 
     override suspend fun openNextScreen(coroutineScope: CoroutineScope, chainAsset: Chain.Asset) {
-        assetsRouter.openSwapSettings(AssetPayload(chainAsset.chainId, chainAsset.id))
+        assetsRouter.openSwapSetupAmount(AssetPayload(chainAsset.chainId, chainAsset.id))
     }
 }

@@ -262,11 +262,17 @@ class SwapConfirmationViewModel(
     private fun executeSwap(swapExecuteArgs: SwapExecuteArgs) {
         launch {
             val result = withContext(Dispatchers.Default) { swapInteractor.executeSwap(swapExecuteArgs) }
-            result.onSuccess {
-                swapRouter.finishSwapFlow(swapExecuteArgs.assetIn.fullId.toAssetPayload())
-            }.onFailure(::showError)
+            result.onSuccess { navigateToNextScreen(swapExecuteArgs.assetIn) }
+                .onFailure(::showError)
 
             _validationProgress.value = false
+        }
+    }
+
+    private fun navigateToNextScreen(asset: Chain.Asset) {
+        when (payload.returnTo) {
+            SwapFinishFlowDestination.BALANCE_LIST -> swapRouter.swapFlowToBalanceList()
+            SwapFinishFlowDestination.BALANCE_DETAILS -> swapRouter.swapFlowToBalanceDetails(asset.fullId.toAssetPayload())
         }
     }
 

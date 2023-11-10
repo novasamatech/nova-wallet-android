@@ -86,6 +86,10 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
             viewModel.sendClicked()
         }
 
+        balanceDetaiActions.swap.setOnClickListener {
+            viewModel.swapClicked()
+        }
+
         balanceDetaiActions.receive.setOnClickListener {
             viewModel.receiveClicked()
         }
@@ -115,6 +119,8 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
             viewModel.buyClicked()
         }
 
+        viewModel.swapButtonEnabled.observe(balanceDetaiActions.swap::setEnabled)
+
         viewModel.assetDetailsModel.observe { asset ->
             balanceDetailTokenIcon.loadTokenIcon(asset.token.configuration.iconUrl, imageLoader)
             balanceDetailTokenName.text = asset.token.configuration.symbol
@@ -134,6 +140,8 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         }
 
         viewModel.showLockedDetailsEvent.observeEvent(::showLockedDetails)
+
+        viewModel.sendEnabled.observe(balanceDetaiActions.send::setEnabled)
 
         viewModel.sendEnabled.observe(balanceDetaiActions.send::setEnabled)
 

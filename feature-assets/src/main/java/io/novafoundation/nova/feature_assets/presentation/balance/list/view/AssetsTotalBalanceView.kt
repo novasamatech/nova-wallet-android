@@ -46,6 +46,7 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
         viewAssetsTotalBalanceLockedContainer.setVisible(totalBalance.isBreakdownAbailable)
 
         viewAssetsTotalBalanceLocked.text = totalBalance.lockedBalanceFiat
+        viewAssetsTotalBalanceSwap.isEnabled = totalBalance.enableSwap
     }
 
     fun onSendClick(clickListener: OnClickListener) {
