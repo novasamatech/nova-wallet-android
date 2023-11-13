@@ -21,6 +21,7 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.nullOnStart
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.common.validation.CompoundFieldValidator
@@ -220,6 +221,7 @@ class SwapMainSettingsViewModel(
             is QuotingState.Loaded -> true
             is QuotingState.Default,
             is QuotingState.NotAvailable -> false
+
             else -> null // Don't do anything if it's loading state
         }
     }
@@ -256,10 +258,13 @@ class SwapMainSettingsViewModel(
     private val getAssetInOptions = swapInteractor.availableGetAssetInOptionsFlow(chainAssetIn)
         .shareInBackground()
 
-    val getAssetInOptionsButtonState = combine(assetInFlow, getAssetInOptions, amountInInput.amountState) { assetIn, getAssetInOptions, amountState ->
-        val amount = amountState.value
-
-        if (amount == null || assetIn == null) return@combine DescriptiveButtonState.Gone
+    val getAssetInOptionsButtonState = combine(
+        assetInFlow,
+        getAssetInOptions,
+        amountInInput.amountState
+    ) { assetIn, getAssetInOptions, amountState ->
+        if (assetIn == null) return@combine DescriptiveButtonState.Gone
+        val amount = amountState.value.orZero()
 
         val balanceOverTransferable = amount > assetIn.transferable || assetIn.transferable.isZero
 
