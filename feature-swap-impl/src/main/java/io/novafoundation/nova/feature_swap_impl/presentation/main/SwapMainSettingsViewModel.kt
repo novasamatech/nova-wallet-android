@@ -21,6 +21,7 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.nullOnStart
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.common.validation.CompoundFieldValidator
@@ -263,7 +264,7 @@ class SwapMainSettingsViewModel(
         amountInInput.amountState
     ) { assetIn, getAssetInOptions, amountState ->
         if (assetIn == null) return@combine DescriptiveButtonState.Gone
-        val amount = amountState.value ?: BigDecimal.ZERO
+        val amount = amountState.value.orZero()
 
         val balanceOverTransferable = amount > assetIn.transferable || assetIn.transferable.isZero
 
