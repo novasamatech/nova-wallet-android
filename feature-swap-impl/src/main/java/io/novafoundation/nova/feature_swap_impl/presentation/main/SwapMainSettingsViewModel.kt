@@ -118,6 +118,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import java.math.BigInteger
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -182,6 +183,8 @@ class SwapMainSettingsViewModel(
         .flatMapLatest { assetUseCase.assetFlow(it.commissionAsset) }
         .shareInBackground()
 
+    private val maxActionProvider = createMaxActionProvider()
+
     val feeMixin = feeLoaderMixinFactory.createGeneric<SwapFee>(
         tokenFlow = feeAssetFlow.map { it?.token },
         configuration = GenericFeeLoaderMixin.Configuration(
@@ -195,7 +198,7 @@ class SwapMainSettingsViewModel(
         coroutineScope = viewModelScope,
         tokenFlow = assetInFlow.token().nullOnStart(),
         emptyAssetTitle = R.string.swap_field_asset_from_title,
-        maxActionProvider = createMaxActionProvider(),
+        maxActionProvider = maxActionProvider,
         fieldValidator = getAmountInFieldValidator()
     )
 
@@ -220,6 +223,7 @@ class SwapMainSettingsViewModel(
             is QuotingState.Loaded -> true
             is QuotingState.Default,
             is QuotingState.NotAvailable -> false
+
             else -> null // Don't do anything if it's loading state
         }
     }
@@ -256,10 +260,13 @@ class SwapMainSettingsViewModel(
     private val getAssetInOptions = swapInteractor.availableGetAssetInOptionsFlow(chainAssetIn)
         .shareInBackground()
 
-    val getAssetInOptionsButtonState = combine(assetInFlow, getAssetInOptions, amountInInput.amountState) { assetIn, getAssetInOptions, amountState ->
-        val amount = amountState.value
-
-        if (amount == null || assetIn == null) return@combine DescriptiveButtonState.Gone
+    val getAssetInOptionsButtonState = combine(
+        assetInFlow,
+        getAssetInOptions,
+        amountInInput.amountState
+    ) { assetIn, getAssetInOptions, amountState ->
+        if (assetIn == null) return@combine DescriptiveButtonState.Gone
+        val amount = amountState.value ?: BigDecimal.ZERO
 
         val balanceOverTransferable = amount > assetIn.transferable || assetIn.transferable.isZero
 
