@@ -1170,7 +1170,7 @@
     <string name="swap_main_settings_asset_out_not_selecting_button_state">Выберите токен для получения</string>
     <string name="swap_main_settings_enter_amount_disabled_button_state">Введите сумму</string>
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Введите другую сумму</string>
-    <string name="swap_minimum_balance_buy_in_alert" formatted="false">Чтобы оплатить комиссию сети с помощью %s, Nova автоматически обменяет %s на %s , чтобы поддерживать минимальный %s баланс вашей учетной записи.</string>
+    <string name="swap_minimum_balance_buy_in_alert" formatted="false">Чтобы оплатить комиссию сети с помощью %s, Nova автоматически обменяет %s на %s, чтобы поддерживать минимальный %s баланс вашей учетной записи.</string>
     <string name="swap_network_fee_description">Комиссия сети, взимается блокчейном за обработку и проверку транзакций. Может варьироваться в зависимости от условий сети или скорости транзакции.</string>
     <string name="swap_not_enought_liquidity_failure">В пуле недостаточно ликвидности для обмена</string>
     <string name="swap_price_difference_description">Разница в цене представляет собой разницу между двумя различными активами. При обмене криптовалюты под разницей в цене обычно имеется ввиду разница между ценой актива, которую вы получаете и ценой актива, которую вы платите.</string>
@@ -1237,7 +1237,7 @@
     <string name="wallet_asset_receive">Получить</string>
     <string name="wallet_asset_receive_token">Получить %s</string>
     <string name="wallet_asset_send">Перевести</string>
-    <string name="wallet_asset_swap">Обмен</string>
+    <string name="wallet_asset_swap">Обменять</string>
     <string name="wallet_assets">Активы</string>
     <string name="wallet_assets_empty">Здесь появятся ваши активы.\nУбедитесь, что фильтр\n\"Скрыть нулевой баланс\" отключен.</string>
     <string name="wallet_assets_total_title">Стоимость активов</string>
