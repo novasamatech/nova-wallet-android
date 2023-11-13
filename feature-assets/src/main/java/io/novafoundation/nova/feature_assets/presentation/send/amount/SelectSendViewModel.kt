@@ -307,12 +307,13 @@ class SelectSendViewModel(
         feeConstructor: suspend Token.(transfer: AssetTransfer) -> Fee?
     ) {
         connectWith(
-            inputSource1 = amountChooserMixin.backPressuredAmount,
+            inputSource1 = originChainWithAsset,
             inputSource2 = destinationChainWithAsset,
             inputSource3 = addressInputMixin.inputFlow,
-            inputSource4 = originChainWithAsset,
+            inputSource4 =  amountChooserMixin.backPressuredAmount,
             scope = viewModelScope,
-            feeConstructor = { amount, destinationChain, addressInput, originChain ->
+            expectedChain = { originChain, _, _, _ -> originChain.chain.id },
+            feeConstructor = { originChain, destinationChain, addressInput, amount ->
                 val transfer = buildTransfer(origin = originChain, destination = destinationChain, amount = amount, address = addressInput)
 
                 feeConstructor(transfer)

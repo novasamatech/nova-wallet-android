@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin.Configuration
 import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericFeeModel
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -56,12 +57,18 @@ interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
 
         suspend fun loadFeeSuspending(
             retryScope: CoroutineScope,
+            expectedChain: ChainId? = null,
             feeConstructor: suspend (Token) -> F?,
             onRetryCancelled: () -> Unit,
         )
 
+        /**
+         * @param expectedChain - Specify to force `feeConstructor` to wait until Token corresponds to the given `expectedChain`
+         * Useful when `tokenFlow` that mixin was initialized with can switch chains
+         */
         fun loadFeeV2Generic(
             coroutineScope: CoroutineScope,
+            expectedChain: ChainId? = null,
             feeConstructor: suspend (Token) -> F?,
             onRetryCancelled: () -> Unit,
         )
@@ -111,10 +118,12 @@ interface FeeLoaderMixin : GenericFeeLoaderMixin<SimpleFee> {
 
         fun loadFeeV2(
             coroutineScope: CoroutineScope,
+            expectedChain: ChainId? = null,
             feeConstructor: suspend (Token) -> Fee?,
             onRetryCancelled: () -> Unit,
         ) = loadFeeV2Generic(
             coroutineScope = coroutineScope,
+            expectedChain = expectedChain,
             feeConstructor = { token -> feeConstructor(token)?.let(::SimpleFee) },
             onRetryCancelled = onRetryCancelled
         )
@@ -212,6 +221,7 @@ fun <I1, I2, I3, I4> FeeLoaderMixin.Presentation.connectWith(
     inputSource3: Flow<I3>,
     inputSource4: Flow<I4>,
     scope: CoroutineScope,
+    expectedChain: ((I1, I2, I3, I4) -> ChainId)? = null,
     feeConstructor: suspend Token.(input1: I1, input2: I2, input3: I3, input4: I4) -> Fee?,
     onRetryCancelled: () -> Unit = {}
 ) {
@@ -223,6 +233,7 @@ fun <I1, I2, I3, I4> FeeLoaderMixin.Presentation.connectWith(
     ) { input1, input2, input3, input4 ->
         loadFeeV2(
             coroutineScope = scope,
+            expectedChain = expectedChain?.invoke(input1, input2, input3, input4),
             feeConstructor = { feeConstructor(it, input1, input2, input3, input4) },
             onRetryCancelled = onRetryCancelled
         )
