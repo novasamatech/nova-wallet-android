@@ -434,7 +434,7 @@ class SwapMainSettingsViewModel(
                 if (nativeAsset.transferable.isZero) return@filter true
                 if (feeModel == null) return@filter false
 
-                val isFeePaidInNativeAsset =  nativeAsset.token.configuration.fullId == feeModel.chainAsset.fullId
+                val isFeePaidInNativeAsset = nativeAsset.token.configuration.fullId == feeModel.chainAsset.fullId
                 val notEnoughNativeToPayFee = nativeAsset.transferable < feeModel.decimalFee.networkFeeDecimalAmount
 
                 isFeePaidInNativeAsset && notEnoughNativeToPayFee
