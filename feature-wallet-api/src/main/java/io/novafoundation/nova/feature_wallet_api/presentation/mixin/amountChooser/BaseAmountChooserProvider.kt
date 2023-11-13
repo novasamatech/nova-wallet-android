@@ -105,7 +105,7 @@ open class BaseAmountChooserProvider(
     override val requestFocusLiveData: MutableLiveData<Event<Unit>> = MutableLiveData()
 
     private fun String.parseBigDecimalOrNull(): BigDecimal? {
-        if (isEmpty()) return BigDecimal.ZERO
+        if (isEmpty()) return null
 
         return replace(",", "").toBigDecimalOrNull()
     }
