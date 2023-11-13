@@ -310,7 +310,7 @@ class SelectSendViewModel(
             inputSource1 = originChainWithAsset,
             inputSource2 = destinationChainWithAsset,
             inputSource3 = addressInputMixin.inputFlow,
-            inputSource4 =  amountChooserMixin.backPressuredAmount,
+            inputSource4 = amountChooserMixin.backPressuredAmount,
             scope = viewModelScope,
             expectedChain = { originChain, _, _, _ -> originChain.chain.id },
             feeConstructor = { originChain, destinationChain, addressInput, amount ->
