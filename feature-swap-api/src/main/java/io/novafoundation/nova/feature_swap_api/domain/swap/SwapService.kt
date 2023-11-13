@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_swap_api.domain.swap
 
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicHash
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
@@ -24,7 +24,7 @@ interface SwapService {
 
     suspend fun estimateFee(args: SwapExecuteArgs): SwapFee
 
-    suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicHash>
+    suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicSubmission>
 
     suspend fun slippageConfig(chainId: ChainId): SlippageConfig?
 }

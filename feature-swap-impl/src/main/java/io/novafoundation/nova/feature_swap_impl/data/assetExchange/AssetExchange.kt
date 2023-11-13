@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange
 
 import io.novafoundation.nova.common.utils.MultiMap
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicHash
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
@@ -35,7 +35,7 @@ interface AssetExchange {
 
     suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee
 
-    suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicHash>
+    suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicSubmission>
 
     suspend fun slippageConfig(): SlippageConfig
 }

@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.toPercent
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicHash
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
@@ -100,7 +100,7 @@ internal class RealSwapService(
         return SwapFee(networkFee = assetExchangeFee.networkFee, minimumBalanceBuyIn = assetExchangeFee.minimumBalanceBuyIn)
     }
 
-    override suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicHash> {
+    override suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicSubmission> {
         val computationScope = CoroutineScope(coroutineContext)
 
         return runCatching { exchanges(computationScope).getValue(args.assetIn.chainId) }

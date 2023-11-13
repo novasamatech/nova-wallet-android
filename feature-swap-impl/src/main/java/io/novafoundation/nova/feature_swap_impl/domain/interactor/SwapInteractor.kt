@@ -3,11 +3,11 @@ package io.novafoundation.nova.feature_swap_impl.domain.interactor
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.core.updater.UpdateSystem
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry
 import io.novafoundation.nova.feature_buy_api.domain.hasProvidersFor
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicHash
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
@@ -16,13 +16,15 @@ import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
+import io.novafoundation.nova.feature_swap_impl.data.repository.SwapTransactionHistoryRepository
 import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationSystem
-import io.novafoundation.nova.feature_swap_impl.domain.validation.positiveAmountIn
 import io.novafoundation.nova.feature_swap_impl.domain.validation.availableSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.checkForFeeChanges
 import io.novafoundation.nova.feature_swap_impl.domain.validation.enoughLiquidity
+import io.novafoundation.nova.feature_swap_impl.domain.validation.positiveAmountIn
+import io.novafoundation.nova.feature_swap_impl.domain.validation.positiveAmountOut
 import io.novafoundation.nova.feature_swap_impl.domain.validation.rateNotExceedSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientAssetOutBalanceToStayAboveED
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceConsideringConsumersValidation
@@ -43,11 +45,12 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
-import io.novafoundation.nova.feature_swap_impl.domain.validation.positiveAmountOut
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 class SwapInteractor(
     private val swapService: SwapService,
@@ -58,7 +61,8 @@ class SwapInteractor(
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
     private val walletRepository: WalletRepository,
-    private val swapUpdateSystemFactory: SwapUpdateSystemFactory
+    private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
+    private val swapTransactionHistoryRepository: SwapTransactionHistoryRepository
 ) {
 
     suspend fun getUpdateSystem(chainFlow: Flow<Chain>, coroutineScope: CoroutineScope): UpdateSystem {
@@ -83,8 +87,23 @@ class SwapInteractor(
         return swapService.quote(quoteArgs)
     }
 
-    suspend fun executeSwap(swapExecuteArgs: SwapExecuteArgs): Result<ExtrinsicHash> {
-        return swapService.swap(swapExecuteArgs)
+    suspend fun executeSwap(swapExecuteArgs: SwapExecuteArgs, swapFee: SwapFee): Result<ExtrinsicSubmission> = withContext(Dispatchers.IO) {
+        swapService.swap(swapExecuteArgs)
+            .onSuccess { submission ->
+                swapTransactionHistoryRepository.insertPendingSwap(
+                    chainAsset = swapExecuteArgs.assetIn,
+                    swapArgs = swapExecuteArgs,
+                    fee = swapFee,
+                    txSubmission = submission
+                )
+
+                swapTransactionHistoryRepository.insertPendingSwap(
+                    chainAsset = swapExecuteArgs.assetOut,
+                    swapArgs = swapExecuteArgs,
+                    fee = swapFee,
+                    txSubmission = submission
+                )
+            }
     }
 
     suspend fun canPayFeeInCustomAsset(asset: Chain.Asset): Boolean {

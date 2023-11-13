@@ -36,10 +36,21 @@ abstract class SubstrateAssetHistory(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        page: DataPage<Operation>
+        pageResult: Result<DataPage<Operation>>
     ) {
-        val newCursor = page.nextOffset.asCursorOrNull()?.value
-        cursorStorage.saveCursor(chain.id, chainAsset.id, accountId, newCursor)
+        pageResult
+            .onSuccess { page ->
+                val newCursor = page.nextOffset.asCursorOrNull()?.value
+                cursorStorage.saveCursor(chain.id, chainAsset.id, accountId, newCursor)
+            }
+            .onFailure {
+                // Empty cursor means we haven't yet synced any data for this asset
+                // However we still want to store null cursor on failure to show items
+                // that came not from the remote (e.g. local pending operations)
+                if (!cursorStorage.hasCursor(chain.id, chainAsset.id, accountId)) {
+                    cursorStorage.saveCursor(chain.id, chainAsset.id, accountId, cursor = null)
+                }
+            }
     }
 
     override suspend fun getOperations(

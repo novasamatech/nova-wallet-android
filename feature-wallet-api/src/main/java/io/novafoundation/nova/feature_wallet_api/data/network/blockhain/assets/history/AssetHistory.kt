@@ -25,7 +25,7 @@ interface AssetHistory {
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        page: DataPage<Operation>
+        page: Result<DataPage<Operation>>
     )
 
     suspend fun getOperations(

@@ -83,7 +83,7 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
             assetIn = wnd,
             assetOut = siri,
             swapLimit = SwapLimit.SpecifiedIn(
-                amountIn = siri.planksFromAmount(0.000001.toBigDecimal()),
+                expectedAmountIn = siri.planksFromAmount(0.000001.toBigDecimal()),
                 amountOutMin = Balance.ZERO
             ),
             customFeeAsset = null,
@@ -105,7 +105,7 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
             assetIn = siri,
             assetOut = wnd,
             swapLimit = SwapLimit.SpecifiedIn(
-                amountIn = siri.planksFromAmount(0.000001.toBigDecimal()),
+                expectedAmountIn = siri.planksFromAmount(0.000001.toBigDecimal()),
                 amountOutMin = Balance.ZERO
             ),
             customFeeAsset = siri,
