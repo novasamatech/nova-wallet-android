@@ -3,10 +3,10 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.model
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 
-fun Chain.Asset.Type.subQueryAssetId(): String? {
+fun Chain.Asset.Type.subQueryAssetId(): String {
     return when (this) {
         is Chain.Asset.Type.Equilibrium -> id.toString()
-        Chain.Asset.Type.Native -> null
+        Chain.Asset.Type.Native -> "native"
         is Chain.Asset.Type.Orml -> currencyIdScale
         is Chain.Asset.Type.Statemine -> id.subQueryAssetId()
         else -> error("Unsupported assetId type for SubQuery request: ${this::class.simpleName}")
