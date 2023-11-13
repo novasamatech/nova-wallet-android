@@ -734,8 +734,7 @@ class SwapMainSettingsViewModel(
             feeAsset = validPayload.feeAsset.token.configuration.fullId.toAssetPayload(),
             rate = validPayload.swapQuote.swapRate(),
             slippage = validPayload.slippage.value,
-            swapFee = swapConfirmationPayloadFormatter.mapFeeToModel(validPayload.swapFee),
-            returnTo = payload.returnTo,
+            swapFee = swapConfirmationPayloadFormatter.mapFeeToModel(validPayload.swapFee)
         )
 
         swapRouter.openSwapConfirmation(payload)

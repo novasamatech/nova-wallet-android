@@ -270,10 +270,7 @@ class SwapConfirmationViewModel(
     }
 
     private fun navigateToNextScreen(asset: Chain.Asset) {
-        when (payload.returnTo) {
-            SwapFinishFlowDestination.BALANCE_LIST -> swapRouter.swapFlowToBalanceList()
-            SwapFinishFlowDestination.BALANCE_DETAILS -> swapRouter.swapFlowToBalanceDetails(asset.fullId.toAssetPayload())
-        }
+        swapRouter.openBalanceDetails(asset.fullId.toAssetPayload())
     }
 
     private suspend fun formatToSwapDetailsModel(confirmationState: SwapConfirmationState): SwapConfirmationDetailsModel {

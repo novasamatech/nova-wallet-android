@@ -51,16 +51,6 @@
             app:popExitAnim="@anim/fragment_close_exit"
             app:popUpTo="@id/mainFragment" />
 
-        <action
-            android:id="@+id/action_swapConfirmationFragment_to_balanceList"
-            app:destination="@id/mainFragment"
-            app:enterAnim="@anim/fragment_close_enter"
-            app:exitAnim="@anim/fragment_close_exit"
-            app:launchSingleTop="true"
-            app:popEnterAnim="@anim/fragment_open_enter"
-            app:popExitAnim="@anim/fragment_open_exit"
-            app:popUpTo="@id/main_nav_graph" />
-
     </fragment>
 
     <fragment

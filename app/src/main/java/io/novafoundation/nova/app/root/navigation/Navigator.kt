@@ -72,7 +72,6 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
-import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapFinishFlowDestination
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
@@ -352,13 +351,7 @@ class Navigator(
     }
 
     override fun openSwapSetupAmount(assetPayload: AssetPayload) {
-        val returnTo = when (navController?.currentDestination?.id) {
-            R.id.swapFlowFragment -> SwapFinishFlowDestination.BALANCE_LIST
-            R.id.balanceDetailFragment -> SwapFinishFlowDestination.BALANCE_DETAILS
-            else -> throw IllegalStateException("Unknown current destination to open swap setup amount")
-        }
-
-        val payload = SwapSettingsPayload(assetPayload, returnTo)
+        val payload = SwapSettingsPayload(assetPayload)
         navController?.navigate(R.id.action_open_swapSetupAmount, SwapMainSettingsFragment.getBundle(payload))
     }
 
