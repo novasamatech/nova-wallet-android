@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.transform
 import java.math.BigDecimal
@@ -147,6 +148,12 @@ fun <F : GenericFee> GenericFeeLoaderMixin<F>.loadedFeeOrNullFlow(): Flow<F?> {
     return feeLiveData.asFlow().map {
         it.castOrNull<FeeStatus.Loaded<F>>()?.feeModel?.decimalFee?.genericFee
     }
+}
+
+fun <F : GenericFee> GenericFeeLoaderMixin<F>.loadedFeeModelOrNullFlow(): Flow<GenericFeeModel<F>?> {
+    return feeLiveData
+        .asFlow()
+        .map { it.castOrNull<FeeStatus.Loaded<F>>()?.feeModel }
 }
 
 fun <F : GenericFee> GenericFeeLoaderMixin<F>.getFeeOrNull(): F? {

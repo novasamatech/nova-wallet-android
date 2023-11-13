@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.accumulate
+import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.formatting.CompoundNumberFormatter
 import io.novafoundation.nova.common.utils.formatting.DynamicPrecisionFormatter
@@ -63,6 +64,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmou
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.view.FeeAssetSelectorBottomSheet
 import io.novafoundation.nova.feature_swap_impl.presentation.main.view.GetAssetInBottomSheet
+import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.state.swapSettingsFlow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -76,11 +78,11 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.invokeMaxClick
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
-import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeModelOrNullFlow
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeOrNullFlow
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
@@ -249,6 +251,7 @@ class SwapMainSettingsViewModel(
         .shareInBackground()
 
     val changeFeeTokenEvent = actionAwaitableFactory.create<FeeAssetSelectorBottomSheet.Payload, Chain.Asset>()
+    private val feeTokenOnceChangedManually = MutableStateFlow(false)
 
     private val getAssetInOptions = swapInteractor.availableGetAssetInOptionsFlow(chainAssetIn)
         .shareInBackground()
@@ -284,6 +287,8 @@ class SwapMainSettingsViewModel(
         setupUpdateSystem()
 
         feeMixin.setupFees()
+
+        setCustomFeeAssetIfNotEnoughNative()
     }
 
     fun selectPayToken() {
@@ -415,8 +420,30 @@ class SwapMainSettingsViewModel(
             selectedOption = swapSettings.feeAsset ?: return@launch
         )
         val newFeeToken = changeFeeTokenEvent.awaitAction(payload)
+        feeTokenOnceChangedManually.value = true
 
         swapSettingState().setFeeAsset(newFeeToken)
+    }
+
+    private fun setCustomFeeAssetIfNotEnoughNative() {
+        combineToPair(nativeAssetFlow, feeMixin.loadedFeeModelOrNullFlow())
+            .filter { (nativeAsset, feeModel) ->
+                val canChangeAutomatically = !feeTokenOnceChangedManually.value
+
+                if (!canChangeAutomatically) return@filter false
+                if (nativeAsset.transferable.isZero) return@filter true
+                if (feeModel == null) return@filter false
+
+                val isFeePaidInNativeAsset =  nativeAsset.token.configuration.fullId == feeModel.chainAsset.fullId
+                val notEnoughNativeToPayFee = nativeAsset.transferable < feeModel.decimalFee.networkFeeDecimalAmount
+
+                isFeePaidInNativeAsset && notEnoughNativeToPayFee
+            }.onEach {
+                val assetIn = swapSettings.first().assetIn ?: return@onEach
+
+                swapSettingState().setFeeAsset(assetIn)
+            }
+            .launchIn(this)
     }
 
     private fun setupUpdateSystem() = launch {
