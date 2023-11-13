@@ -182,8 +182,6 @@ class SwapMainSettingsViewModel(
         .flatMapLatest { assetUseCase.assetFlow(it.commissionAsset) }
         .shareInBackground()
 
-    private val maxActionProvider = createMaxActionProvider()
-
     val feeMixin = feeLoaderMixinFactory.createGeneric<SwapFee>(
         tokenFlow = feeAssetFlow.map { it?.token },
         configuration = GenericFeeLoaderMixin.Configuration(
@@ -197,7 +195,7 @@ class SwapMainSettingsViewModel(
         coroutineScope = viewModelScope,
         tokenFlow = assetInFlow.token().nullOnStart(),
         emptyAssetTitle = R.string.swap_field_asset_from_title,
-        maxActionProvider = maxActionProvider,
+        maxActionProvider = createMaxActionProvider(),
         fieldValidator = getAmountInFieldValidator()
     )
 
