@@ -28,7 +28,6 @@ import jp.co.soramitsu.fearless_utils.wsrpc.request.DeliveryType
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.author.SubmitAndWatchExtrinsicRequest
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.author.SubmitExtrinsicRequest
 import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.chain.RuntimeVersion
-import jp.co.soramitsu.fearless_utils.wsrpc.request.runtime.chain.RuntimeVersionRequest
 import jp.co.soramitsu.fearless_utils.wsrpc.subscriptionFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -98,7 +97,7 @@ class RpcCalls(
     }
 
     suspend fun getRuntimeVersion(chainId: ChainId): RuntimeVersion {
-        val request = RuntimeVersionRequest()
+        val request = StateRuntimeVersionRequest()
 
         return socketFor(chainId).executeAsync(request, mapper = pojo<RuntimeVersion>().nonNull())
     }

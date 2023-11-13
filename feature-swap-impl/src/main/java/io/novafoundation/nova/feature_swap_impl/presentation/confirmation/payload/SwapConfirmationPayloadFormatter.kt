@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
+import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.fullId
@@ -17,14 +18,14 @@ class SwapConfirmationPayloadFormatter(
 ) {
 
     suspend fun mapSwapQuoteFromModel(model: SwapConfirmationPayload.SwapQuoteModel): SwapQuote {
-        return SwapQuote(
-            chainRegistry.asset(model.assetIn.fullChainAssetId),
-            chainRegistry.asset(model.assetOut.fullChainAssetId),
-            model.planksIn,
-            model.planksOut,
-            model.direction.mapFromModel(),
-            model.priceImpact.asPercent()
-        )
+        return with(model) {
+            SwapQuote(
+                amountIn = chainRegistry.asset(assetIn.fullChainAssetId).withAmount(planksIn),
+                amountOut = chainRegistry.asset(assetOut.fullChainAssetId).withAmount(planksOut),
+                direction = model.direction.mapFromModel(),
+                priceImpact = model.priceImpact.asPercent()
+            )
+        }
     }
 
     fun mapSwapQuoteToModel(model: SwapQuote): SwapConfirmationPayload.SwapQuoteModel {

@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.accumulate
+import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.formatting.CompoundNumberFormatter
 import io.novafoundation.nova.common.utils.formatting.DynamicPrecisionFormatter
@@ -20,8 +21,8 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.nullOnStart
-import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.common.utils.sendEvent
+import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.common.validation.CompoundFieldValidator
 import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -30,6 +31,7 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.SimpleAlertModel
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.description.launchNetworkFeeDescription
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
@@ -42,17 +44,18 @@ import io.novafoundation.nova.feature_swap_api.domain.model.quotedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
+import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
-import io.novafoundation.nova.feature_swap_impl.presentation.common.SwapRateFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
-import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
@@ -61,6 +64,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmou
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.view.FeeAssetSelectorBottomSheet
 import io.novafoundation.nova.feature_swap_impl.presentation.main.view.GetAssetInBottomSheet
+import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.state.swapSettingsFlow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -74,11 +78,11 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.invokeMaxClick
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
-import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeModelOrNullFlow
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeOrNullFlow
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
@@ -247,6 +251,7 @@ class SwapMainSettingsViewModel(
         .shareInBackground()
 
     val changeFeeTokenEvent = actionAwaitableFactory.create<FeeAssetSelectorBottomSheet.Payload, Chain.Asset>()
+    private val feeTokenOnceChangedManually = MutableStateFlow(false)
 
     private val getAssetInOptions = swapInteractor.availableGetAssetInOptionsFlow(chainAssetIn)
         .shareInBackground()
@@ -282,6 +287,8 @@ class SwapMainSettingsViewModel(
         setupUpdateSystem()
 
         feeMixin.setupFees()
+
+        setCustomFeeAssetIfNotEnoughNative()
     }
 
     fun selectPayToken() {
@@ -322,17 +329,11 @@ class SwapMainSettingsViewModel(
     }
 
     fun rateDetailsClicked() {
-        launchDescriptionBottomSheet(
-            titleRes = R.string.swap_rate_title,
-            descriptionRes = R.string.swap_rate_description
-        )
+        launchSwapRateDescription()
     }
 
     fun networkFeeClicked() {
-        launchDescriptionBottomSheet(
-            titleRes = R.string.swap_network_fee_title,
-            descriptionRes = R.string.swap_network_fee_description
-        )
+        launchNetworkFeeDescription()
     }
 
     fun flipAssets() = launch {
@@ -419,8 +420,30 @@ class SwapMainSettingsViewModel(
             selectedOption = swapSettings.feeAsset ?: return@launch
         )
         val newFeeToken = changeFeeTokenEvent.awaitAction(payload)
+        feeTokenOnceChangedManually.value = true
 
         swapSettingState().setFeeAsset(newFeeToken)
+    }
+
+    private fun setCustomFeeAssetIfNotEnoughNative() {
+        combineToPair(nativeAssetFlow, feeMixin.loadedFeeModelOrNullFlow())
+            .filter { (nativeAsset, feeModel) ->
+                val canChangeAutomatically = !feeTokenOnceChangedManually.value
+
+                if (!canChangeAutomatically) return@filter false
+                if (nativeAsset.transferable.isZero) return@filter true
+                if (feeModel == null) return@filter false
+
+                val isFeePaidInNativeAsset = nativeAsset.token.configuration.fullId == feeModel.chainAsset.fullId
+                val notEnoughNativeToPayFee = nativeAsset.transferable < feeModel.decimalFee.networkFeeDecimalAmount
+
+                isFeePaidInNativeAsset && notEnoughNativeToPayFee
+            }.onEach {
+                val assetIn = swapSettings.first().assetIn ?: return@onEach
+
+                swapSettingState().setFeeAsset(assetIn)
+            }
+            .launchIn(this)
     }
 
     private fun setupUpdateSystem() = launch {

@@ -1,7 +1,8 @@
-package io.novafoundation.nova.feature_swap_impl.presentation.views
+package io.novafoundation.nova.feature_swap_api.presentation.view
 
 import android.content.Context
 import android.util.AttributeSet
+import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -9,9 +10,12 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.setImageTint
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getInputBackground
-import io.novafoundation.nova.feature_swap_impl.R
+import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
+import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
+import io.novafoundation.nova.feature_swap_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.android.synthetic.main.view_swap_asset.view.swapAssetAmount
 import kotlinx.android.synthetic.main.view_swap_asset.view.swapAssetFiat
@@ -40,7 +44,8 @@ class SwapAssetView @JvmOverloads constructor(
     fun setModel(model: Model) {
         setAssetImageUrl(model.assetIcon)
         setAmount(model.amount)
-        setNetwork(model.networkImage, model.networkName)
+        setNetwork(model.chainUi)
+        swapAssetAmount.setTextColorRes(model.amountTextColorRes)
     }
 
     private fun setAssetImageUrl(icon: Icon) {
@@ -54,15 +59,15 @@ class SwapAssetView @JvmOverloads constructor(
         swapAssetFiat.setTextOrHide(amount.fiat)
     }
 
-    private fun setNetwork(networkImage: Icon, networkName: String) {
-        swapAssetNetworkImage.setIcon(networkImage, imageLoader)
-        swapAssetNetwork.text = networkName
+    private fun setNetwork(chainUi: ChainUi) {
+        swapAssetNetworkImage.loadChainIcon(chainUi.icon, imageLoader)
+        swapAssetNetwork.text = chainUi.name
     }
 
     class Model(
         val assetIcon: Icon,
         val amount: AmountModel,
-        val networkImage: Icon,
-        val networkName: String
+        val chainUi: ChainUi,
+        @ColorRes val amountTextColorRes: Int = R.color.text_primary
     )
 }

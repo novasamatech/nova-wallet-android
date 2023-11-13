@@ -23,4 +23,5 @@ class ChainRuntimeInfoLocal(
     val chainId: String,
     val syncedVersion: Int,
     val remoteVersion: Int,
+    val transactionVersion: Int?,
 )

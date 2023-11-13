@@ -31,8 +31,7 @@
             android:includeFontPadding="false"
             android:text="@string/staking_rewards_about"
             android:textColor="?attr/colorAccent"
-            app:drawableStartCompat="@drawable/ic_info_cicrle_filled_16"
-            app:drawableTint="?attr/colorAccent" />
+            app:drawableStartCompat="@drawable/ic_info_accent"/>
 
         <ImageView
             android:layout_width="16dp"

@@ -70,6 +70,7 @@ import io.novafoundation.nova.core_db.migrations.AddSourceToLocalAsset_28_29
 import io.novafoundation.nova.core_db.migrations.AddStakingDashboardItems_41_42
 import io.novafoundation.nova.core_db.migrations.AddStakingTypeToTotalRewards_44_45
 import io.novafoundation.nova.core_db.migrations.AddSwapOption_48_49
+import io.novafoundation.nova.core_db.migrations.AddTransactionVersionToRuntime_50_51
 import io.novafoundation.nova.core_db.migrations.AddTransferApisTable_29_30
 import io.novafoundation.nova.core_db.migrations.AddVersioningToGovernanceDapps_32_33
 import io.novafoundation.nova.core_db.migrations.AddWalletConnectSessions_39_40
@@ -129,7 +130,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 50,
+    version = 51,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -216,7 +217,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddStakingDashboardItems_41_42, StakingRewardPeriods_42_43)
                     .addMigrations(AddRewardAccountToStakingDashboard_43_44, AddStakingTypeToTotalRewards_44_45, AddExternalBalances_45_46)
                     .addMigrations(AddPoolIdToOperations_46_47, AddEventIdToOperation_47_48, AddSwapOption_48_49)
-                    .addMigrations(RefactorOperations_49_50)
+                    .addMigrations(RefactorOperations_49_50, AddTransactionVersionToRuntime_50_51)
                     .build()
             }
             return instance!!

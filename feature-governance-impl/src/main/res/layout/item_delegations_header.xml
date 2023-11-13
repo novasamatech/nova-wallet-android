@@ -61,8 +61,7 @@
             android:paddingBottom="5dp"
             android:text="@string/delegation_list_describe_yourself_action"
             android:textColor="@color/button_text_accent"
-            app:drawableStartCompat="@drawable/ic_info_cicrle_filled_16"
-            app:drawableTint="@color/icon_accent"
+            app:drawableStartCompat="@drawable/ic_info_accent"
             app:layout_constraintStart_toStartOf="@+id/delegateBannerCardSubTitle"
             app:layout_constraintTop_toBottomOf="@+id/delegateBannerCardSubTitle" />
 

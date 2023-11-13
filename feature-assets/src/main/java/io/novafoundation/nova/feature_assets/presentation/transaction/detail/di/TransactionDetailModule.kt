@@ -14,8 +14,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer.TransactionDetailViewModel
-import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.CoinPriceInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -31,8 +30,7 @@ class TransactionDetailModule {
         chainRegistry: ChainRegistry,
         operation: OperationParcelizeModel.Transfer,
         externalActions: ExternalActions.Presentation,
-        currencyInteractor: CurrencyInteractor,
-        coinPriceInteractor: CoinPriceInteractor
+        arbitraryTokenUseCase: ArbitraryTokenUseCase
     ): ViewModel {
         return TransactionDetailViewModel(
             router,
@@ -41,8 +39,7 @@ class TransactionDetailModule {
             chainRegistry,
             operation,
             externalActions,
-            currencyInteractor,
-            coinPriceInteractor
+            arbitraryTokenUseCase
         )
     }
 

@@ -179,6 +179,7 @@ class SelectSendViewModel(
         val crossChainFee = crossChainFeeMixin.awaitOptionalDecimalFee()
 
         val transfer = buildTransfer(
+            origin = originChainWithAsset.first(),
             destination = destinationChainWithAsset.first(),
             amount = amountChooserMixin.amountState.first().value ?: return@launch,
             address = addressInputMixin.getAddress(),
@@ -273,6 +274,7 @@ class SelectSendViewModel(
                 originChainWithAsset.emit(origin)
                 destinationChainWithAsset.emit(origin)
             }
+
             is SendPayload.SpecifiedDestination -> {
                 val destination = chainRegistry.chainWithAsset(payload.destination.chainId, payload.destination.chainAssetId)
                 val origin = availableCrossChainDestinations.first().first().chainWithAsset
@@ -305,12 +307,14 @@ class SelectSendViewModel(
         feeConstructor: suspend Token.(transfer: AssetTransfer) -> Fee?
     ) {
         connectWith(
-            inputSource1 = amountChooserMixin.backPressuredAmount,
+            inputSource1 = originChainWithAsset,
             inputSource2 = destinationChainWithAsset,
             inputSource3 = addressInputMixin.inputFlow,
+            inputSource4 = amountChooserMixin.backPressuredAmount,
             scope = viewModelScope,
-            feeConstructor = { amount, destinationChain, addressInput ->
-                val transfer = buildTransfer(destinationChain, amount, addressInput)
+            expectedChain = { originChain, _, _, _ -> originChain.chain.id },
+            feeConstructor = { originChain, destinationChain, addressInput, amount ->
+                val transfer = buildTransfer(origin = originChain, destination = destinationChain, amount = amount, address = addressInput)
 
                 feeConstructor(transfer)
             }
@@ -338,11 +342,12 @@ class SelectSendViewModel(
     }
 
     private suspend fun buildTransfer(
+        origin: ChainWithAsset,
         destination: ChainWithAsset,
         amount: BigDecimal,
         address: String,
     ): AssetTransfer {
-        val origin = originChainWithAsset.first()
+        val commissionAsset = commissionAssetFlow.first { it.token.configuration.chainId == origin.chain.id }
 
         return BaseAssetTransfer(
             sender = selectedAccount.first(),
@@ -352,7 +357,7 @@ class SelectSendViewModel(
             destinationChain = destination.chain,
             destinationChainAsset = destination.asset,
             amount = amount,
-            commissionAssetToken = commissionAssetFlow.first().token,
+            commissionAssetToken = commissionAsset.token,
         )
     }
 

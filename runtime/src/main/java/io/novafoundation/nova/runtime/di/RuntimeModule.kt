@@ -56,10 +56,12 @@ class RuntimeModule {
     @Provides
     @ApplicationScope
     fun provideExtrinsicBuilderFactory(
+        chainDao: ChainDao,
         rpcCalls: RpcCalls,
         chainRegistry: ChainRegistry,
         mortalityConstructor: MortalityConstructor,
     ) = ExtrinsicBuilderFactory(
+        chainDao,
         rpcCalls,
         chainRegistry,
         mortalityConstructor

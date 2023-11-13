@@ -8,27 +8,42 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 import java.math.BigInteger
 
-data class Token(
-    val currency: Currency,
-    val coinRateChange: CoinRateChange?,
+interface TokenBase {
+
+    val currency: Currency
+
+    val coinRate: CoinRate?
+
     val configuration: Chain.Asset
-) {
-    // TODO move out of the class when Context Receivers will be stable
-    fun BigDecimal.toPlanks() = planksFromAmount(this)
-    fun BigInteger.toAmount() = amountFromPlanks(this)
 
     fun amountToFiat(tokenAmount: BigDecimal): BigDecimal = toFiatOrNull(tokenAmount).orZero()
 
     fun planksToFiat(tokenAmountPlanks: BigInteger): BigDecimal = planksToFiatOrNull(tokenAmountPlanks).orZero()
 }
 
-fun Token.toFiatOrNull(tokenAmount: BigDecimal): BigDecimal? = coinRateChange?.convertAmount(tokenAmount)
+data class Token(
+    override val currency: Currency,
+    override val coinRate: CoinRateChange?,
+    override val configuration: Chain.Asset
+) : TokenBase {
+    // TODO move out of the class when Context Receivers will be stable
+    fun BigDecimal.toPlanks() = planksFromAmount(this)
+    fun BigInteger.toAmount() = amountFromPlanks(this)
+}
 
-fun Token.planksToFiatOrNull(tokenAmountPlanks: BigInteger): BigDecimal? = coinRateChange?.convertPlanks(configuration, tokenAmountPlanks)
+data class HistoricalToken(
+    override val currency: Currency,
+    override val coinRate: HistoricalCoinRate?,
+    override val configuration: Chain.Asset
+) : TokenBase
 
-fun Token.amountFromPlanks(amountInPlanks: BigInteger) = configuration.amountFromPlanks(amountInPlanks)
+fun TokenBase.toFiatOrNull(tokenAmount: BigDecimal): BigDecimal? = coinRate?.convertAmount(tokenAmount)
 
-fun Token.planksFromAmount(amount: BigDecimal): BigInteger = configuration.planksFromAmount(amount)
+fun TokenBase.planksToFiatOrNull(tokenAmountPlanks: BigInteger): BigDecimal? = coinRate?.convertPlanks(configuration, tokenAmountPlanks)
+
+fun TokenBase.amountFromPlanks(amountInPlanks: BigInteger) = configuration.amountFromPlanks(amountInPlanks)
+
+fun TokenBase.planksFromAmount(amount: BigDecimal): BigInteger = configuration.planksFromAmount(amount)
 
 fun Chain.Asset.amountFromPlanks(amountInPlanks: BigInteger) = amountInPlanks.amountFromPlanks(precision)
 

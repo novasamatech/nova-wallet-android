@@ -7,8 +7,8 @@ import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.assetConversion
 import io.novafoundation.nova.common.utils.mutableMultiMapOf
 import io.novafoundation.nova.common.utils.put
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicHash
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.InlineFee
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
@@ -128,8 +128,8 @@ private class AssetConversionExchange(
         return convertNativeFeeToPayingTokenFee(nativeAssetFee, args)
     }
 
-    override suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicHash> {
-        return extrinsicService.submitExtrinsicWithSelectedWallet(chain) { origin ->
+    override suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicSubmission> {
+        return extrinsicService.submitExtrinsicWithSelectedWalletV2(chain) { origin ->
             executeSwap(args, origin)
         }
     }
@@ -232,7 +232,7 @@ private class AssetConversionExchange(
                 callName = "swap_exact_tokens_for_tokens",
                 arguments = mapOf(
                     "path" to path,
-                    "amount_in" to swapLimit.amountIn,
+                    "amount_in" to swapLimit.expectedAmountIn,
                     "amount_out_min" to swapLimit.amountOutMin,
                     "send_to" to origin,
                     "keep_alive" to keepAlive
@@ -244,7 +244,7 @@ private class AssetConversionExchange(
                 callName = "swap_tokens_for_exact_tokens",
                 arguments = mapOf(
                     "path" to path,
-                    "amount_out" to swapLimit.amountOut,
+                    "amount_out" to swapLimit.expectedAmountOut,
                     "amount_in_max" to swapLimit.amountInMax,
                     "send_to" to origin,
                     "keep_alive" to keepAlive

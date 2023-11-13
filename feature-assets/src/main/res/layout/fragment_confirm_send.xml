@@ -54,8 +54,7 @@
                     android:id="@+id/confirmSendSender"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
-                    app:primaryValueIconTint="@color/icon_secondary"
+                    app:primaryValueEndIcon="@drawable/ic_info"
                     app:title="@string/wallet_sender" />
 
                 <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
@@ -92,8 +91,7 @@
                     android:id="@+id/confirmSendRecipient"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryValueEndIcon="@drawable/ic_info_cicrle_filled_16"
-                    app:primaryValueIconTint="@color/icon_secondary"
+                    app:primaryValueEndIcon="@drawable/ic_info"
                     app:title="@string/wallet_recipient" />
 
             </io.novafoundation.nova.common.view.TableView>

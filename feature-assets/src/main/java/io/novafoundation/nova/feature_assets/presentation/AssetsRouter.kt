@@ -29,6 +29,8 @@ interface AssetsRouter {
 
     fun openPoolRewardDetail(reward: OperationParcelizeModel.PoolReward)
 
+    fun openSwapDetail(swap: OperationParcelizeModel.Swap)
+
     fun openSwitchWallet()
 
     fun openSelectAddress(arguments: Bundle)

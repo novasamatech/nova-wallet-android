@@ -271,7 +271,7 @@ class RuntimeSyncServiceTest {
     }
 
     private suspend fun chainDaoReturnsRuntimeInfo(remoteVersion: Int, syncedVersion: Int) {
-        whenever(chainDao.runtimeInfo(any())).thenReturn(ChainRuntimeInfoLocal("1", syncedVersion, remoteVersion))
+        whenever(chainDao.runtimeInfo(any())).thenReturn(ChainRuntimeInfoLocal("1", syncedVersion, remoteVersion, null))
     }
 
     private suspend fun RuntimeSyncService.awaitSync(chainId: String) = syncResultFlow(chainId).first()

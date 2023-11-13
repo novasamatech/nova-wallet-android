@@ -29,7 +29,7 @@ fun TableCellView.showChainsOverview(chainListOverview: ChainListOverview) {
 
     if (chainListOverview.hasMoreElements) {
         isClickable = true
-        setPrimaryValueEndIcon(R.drawable.ic_info_cicrle_filled_16)
+        setPrimaryValueEndIcon(R.drawable.ic_info)
     } else {
         isClickable = false
         setPrimaryValueEndIcon(null)

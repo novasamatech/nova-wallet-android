@@ -2,6 +2,7 @@ package io.novafoundation.nova.common.view.bottomSheet.description
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
@@ -11,6 +12,10 @@ interface DescriptionBottomSheetLauncher {
     val showDescriptionEvent: LiveData<Event<DescriptionModel>>
 
     fun launchDescriptionBottomSheet(titleRes: Int, descriptionRes: Int)
+}
+
+fun DescriptionBottomSheetLauncher.launchNetworkFeeDescription() {
+    launchDescriptionBottomSheet(R.string.network_fee, R.string.swap_network_fee_description)
 }
 
 class RealDescriptionBottomSheetLauncher : DescriptionBottomSheetLauncher {

@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
@@ -51,6 +52,7 @@ class AccountView @JvmOverloads constructor(
     fun setTitle(title: String) {
         addressTitle.text = title
     }
+
     fun setSubTitle(subTitle: String?) {
         addressSubtitle.setTextOrHide(subTitle)
     }
@@ -78,6 +80,10 @@ class AccountView @JvmOverloads constructor(
 
     fun setActionIcon(@DrawableRes icon: Int?) {
         setActionIcon(icon?.let(context::getDrawable))
+    }
+
+    fun setActionTint(tintRes: Int?) {
+        addressAction.setImageTintRes(tintRes)
     }
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.AccountView) { typedArray ->

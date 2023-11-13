@@ -35,8 +35,9 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceLocalDataSource
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryAssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.CoinPriceInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
@@ -276,7 +277,10 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideCoinPriceInteractor(coinPriceRepository: CoinPriceRepository) = CoinPriceInteractor(coinPriceRepository)
+    fun provideArbitraryTokenUseCase(
+        coinPriceRepository: CoinPriceRepository,
+        currencyRepository: CurrencyRepository
+    ): ArbitraryTokenUseCase = RealArbitraryTokenUseCase(coinPriceRepository, currencyRepository)
 
     @Provides
     @FeatureScope

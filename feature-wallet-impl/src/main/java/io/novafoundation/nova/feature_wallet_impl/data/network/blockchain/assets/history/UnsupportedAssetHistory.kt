@@ -26,7 +26,7 @@ class UnsupportedAssetHistory : AssetHistory {
         return emptySet()
     }
 
-    override suspend fun additionalFirstPageSync(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId, page: DataPage<Operation>) {
+    override suspend fun additionalFirstPageSync(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId, page: Result<DataPage<Operation>>) {
         // do nothing
     }
 

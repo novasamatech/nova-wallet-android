@@ -21,7 +21,7 @@ class RewardDetailViewModel(
     private val addressDisplayUseCase: AddressDisplayUseCase,
     private val router: AssetsRouter,
     private val chainRegistry: ChainRegistry,
-    private val externalActions: ExternalActions.Presentation
+    private val externalActions: ExternalActions.Presentation,
 ) : BaseViewModel(),
     ExternalActions by externalActions {
 
