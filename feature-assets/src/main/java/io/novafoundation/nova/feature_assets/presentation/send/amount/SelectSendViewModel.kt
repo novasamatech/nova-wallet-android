@@ -179,6 +179,7 @@ class SelectSendViewModel(
         val crossChainFee = crossChainFeeMixin.awaitOptionalDecimalFee()
 
         val transfer = buildTransfer(
+            origin = originChainWithAsset.first(),
             destination = destinationChainWithAsset.first(),
             amount = amountChooserMixin.amountState.first().value ?: return@launch,
             address = addressInputMixin.getAddress(),
@@ -309,10 +310,10 @@ class SelectSendViewModel(
             inputSource1 = amountChooserMixin.backPressuredAmount,
             inputSource2 = destinationChainWithAsset,
             inputSource3 = addressInputMixin.inputFlow,
-            invalidationSources = listOf(originChainWithAsset),
+            inputSource4 = originChainWithAsset,
             scope = viewModelScope,
-            feeConstructor = { amount, destinationChain, addressInput ->
-                val transfer = buildTransfer(destinationChain, amount, addressInput)
+            feeConstructor = { amount, destinationChain, addressInput, originChain ->
+                val transfer = buildTransfer(origin = originChain, destination = destinationChain, amount = amount, address = addressInput)
 
                 feeConstructor(transfer)
             }
@@ -340,11 +341,12 @@ class SelectSendViewModel(
     }
 
     private suspend fun buildTransfer(
+        origin: ChainWithAsset,
         destination: ChainWithAsset,
         amount: BigDecimal,
         address: String,
     ): AssetTransfer {
-        val origin = originChainWithAsset.first()
+        val commissionAsset = commissionAssetFlow.first { it.token.configuration.chainId == origin.chain.id }
 
         return BaseAssetTransfer(
             sender = selectedAccount.first(),
@@ -354,7 +356,7 @@ class SelectSendViewModel(
             destinationChain = destination.chain,
             destinationChainAsset = destination.asset,
             amount = amount,
-            commissionAssetToken = commissionAssetFlow.first().token,
+            commissionAssetToken = commissionAsset.token,
         )
     }
 
