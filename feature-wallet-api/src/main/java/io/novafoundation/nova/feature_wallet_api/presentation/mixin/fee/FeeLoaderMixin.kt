@@ -157,6 +157,12 @@ fun <F : GenericFee> GenericFeeLoaderMixin<F>.loadedFeeOrNullFlow(): Flow<F?> {
     }
 }
 
+fun <F : GenericFee> GenericFeeLoaderMixin<F>.loadedFeeModelOrNullFlow(): Flow<GenericFeeModel<F>?> {
+    return feeLiveData
+        .asFlow()
+        .map { it.castOrNull<FeeStatus.Loaded<F>>()?.feeModel }
+}
+
 fun <F : GenericFee> GenericFeeLoaderMixin<F>.getFeeOrNull(): F? {
     return feeLiveData.value
         .castOrNull<FeeStatus.Loaded<F>>()
