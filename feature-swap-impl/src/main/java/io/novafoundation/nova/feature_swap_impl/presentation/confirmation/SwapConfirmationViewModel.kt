@@ -254,7 +254,7 @@ class SwapConfirmationViewModel(
 
     private fun executeSwap(validationPayload: SwapValidationPayload) = launch {
         swapInteractor.executeSwap(validationPayload.swapExecuteArgs, validationPayload.swapFee)
-            .onSuccess { navigateToNextScreen(swapExecuteArgs.assetIn) }
+            .onSuccess { navigateToNextScreen(validationPayload.swapExecuteArgs.assetIn) }
             .onFailure(::showError)
 
         _validationProgress.value = false
