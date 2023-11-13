@@ -24,11 +24,22 @@ class SwapExecuteArgs(
     val nativeAsset: Asset,
 )
 
-sealed class SwapLimit {
+val SwapExecuteArgs.feeAsset: Chain.Asset
+    get() = customFeeAsset ?: assetIn
 
-    class SpecifiedIn(val amountIn: Balance, val amountOutMin: Balance) : SwapLimit()
+sealed class SwapLimit(val expectedAmountIn: Balance, val expectedAmountOut: Balance) {
 
-    class SpecifiedOut(val amountInMax: Balance, val amountOut: Balance) : SwapLimit()
+    class SpecifiedIn(
+        expectedAmountIn: Balance,
+        expectedAmountOut: Balance,
+        val amountOutMin: Balance
+    ) : SwapLimit(expectedAmountIn, expectedAmountOut)
+
+    class SpecifiedOut(
+        expectedAmountIn: Balance,
+        expectedAmountOut: Balance,
+        val amountInMax: Balance
+    ) : SwapLimit(expectedAmountIn, expectedAmountOut)
 }
 
 fun SwapQuoteArgs.toExecuteArgs(quotedBalance: Balance, customFeeAsset: Chain.Asset?, nativeAsset: Asset): SwapExecuteArgs {
@@ -53,7 +64,11 @@ private fun SpecifiedIn(amount: Balance, slippage: Percent, quotedBalance: Balan
     val lessAmountCoefficient = BigDecimal.ONE - slippage.fraction
     val amountOutMin = quotedBalance.toBigDecimal() * lessAmountCoefficient
 
-    return SwapLimit.SpecifiedIn(amountIn = amount, amountOutMin = amountOutMin.toBigInteger())
+    return SwapLimit.SpecifiedIn(
+        expectedAmountIn = amount,
+        expectedAmountOut = quotedBalance,
+        amountOutMin = amountOutMin.toBigInteger()
+    )
 }
 
 @Suppress("FunctionName")
@@ -61,5 +76,9 @@ private fun SpecifiedOut(amount: Balance, slippage: Percent, quotedBalance: Bala
     val moreAmountCoefficient = BigDecimal.ONE + slippage.fraction
     val amountInMax = quotedBalance.toBigDecimal() * moreAmountCoefficient
 
-    return SwapLimit.SpecifiedOut(amountOut = amount, amountInMax = amountInMax.toBigInteger())
+    return SwapLimit.SpecifiedOut(
+        expectedAmountIn = quotedBalance,
+        expectedAmountOut = amount,
+        amountInMax = amountInMax.toBigInteger()
+    )
 }

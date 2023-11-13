@@ -10,10 +10,13 @@ import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -100,18 +103,23 @@ private open class GenericFeeLoaderProvider<F : GenericFee>(
 
     override suspend fun loadFeeSuspending(
         retryScope: CoroutineScope,
+        expectedChain: ChainId?,
         feeConstructor: suspend (Token) -> F?,
         onRetryCancelled: () -> Unit,
     ): Unit = withContext(Dispatchers.IO) {
         feeLiveData.postValue(FeeStatus.Loading)
 
-        val token = tokenFlow.firstNotNull()
+        val token = if (expectedChain != null) {
+            tokenFlow.filterNotNull().first { it.configuration.chainId == expectedChain }
+        } else {
+            tokenFlow.firstNotNull()
+        }
 
         val value = runCatching {
             feeConstructor(token)
         }.fold(
             onSuccess = { genericFee -> onFeeLoaded(token, genericFee) },
-            onFailure = { exception -> onError(exception, retryScope, feeConstructor, onRetryCancelled) }
+            onFailure = { exception -> onError(exception, retryScope, expectedChain, feeConstructor, onRetryCancelled) }
         )
 
         value?.run { feeLiveData.postValue(this) }
@@ -119,12 +127,14 @@ private open class GenericFeeLoaderProvider<F : GenericFee>(
 
     override fun loadFeeV2Generic(
         coroutineScope: CoroutineScope,
+        expectedChain: ChainId?,
         feeConstructor: suspend (Token) -> F?,
         onRetryCancelled: () -> Unit
     ) {
         coroutineScope.launch {
             loadFeeSuspending(
                 retryScope = coroutineScope,
+                expectedChain = expectedChain,
                 feeConstructor = feeConstructor,
                 onRetryCancelled = onRetryCancelled
             )
@@ -157,6 +167,7 @@ private open class GenericFeeLoaderProvider<F : GenericFee>(
     private fun onError(
         exception: Throwable,
         retryScope: CoroutineScope,
+        expectedChain: ChainId?,
         feeConstructor: suspend (Token) -> F?,
         onRetryCancelled: () -> Unit,
     ) = if (exception !is CancellationException) {
@@ -165,7 +176,7 @@ private open class GenericFeeLoaderProvider<F : GenericFee>(
                 RetryPayload(
                     title = resourceManager.getString(R.string.choose_amount_network_error),
                     message = resourceManager.getString(R.string.choose_amount_error_fee),
-                    onRetry = { loadFeeV2Generic(retryScope, feeConstructor, onRetryCancelled) },
+                    onRetry = { loadFeeV2Generic(retryScope, expectedChain, feeConstructor, onRetryCancelled) },
                     onCancel = onRetryCancelled
                 )
             )

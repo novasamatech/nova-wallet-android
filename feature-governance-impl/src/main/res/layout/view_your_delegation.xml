@@ -18,6 +18,7 @@
             android:id="@+id/viewYourDelegationTracks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:title="@string/delegation_tracks"
             app:primaryValueEndIcon="@drawable/ic_info" />
 
         <io.novafoundation.nova.common.view.TableCellView
