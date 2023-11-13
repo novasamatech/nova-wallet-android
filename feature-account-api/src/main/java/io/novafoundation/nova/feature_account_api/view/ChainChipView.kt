@@ -43,7 +43,7 @@ class ChainChipView @JvmOverloads constructor(
     }
 
     fun setChangeable(changeable: Boolean) {
-        itemAssetGroupLabel.isEnabled = changeable
+        isEnabled = changeable
 
         if (changeable) {
             itemAssetGroupLabel.setTextColorRes(R.color.button_text_accent)
