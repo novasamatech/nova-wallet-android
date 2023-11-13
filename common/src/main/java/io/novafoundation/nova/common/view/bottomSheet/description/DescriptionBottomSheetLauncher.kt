@@ -15,7 +15,7 @@ interface DescriptionBottomSheetLauncher {
 }
 
 fun DescriptionBottomSheetLauncher.launchNetworkFeeDescription() {
-    launchDescriptionBottomSheet(R.string.swap_network_fee_title, R.string.swap_network_fee_description)
+    launchDescriptionBottomSheet(R.string.network_fee, R.string.swap_network_fee_description)
 }
 
 class RealDescriptionBottomSheetLauncher : DescriptionBottomSheetLauncher {
