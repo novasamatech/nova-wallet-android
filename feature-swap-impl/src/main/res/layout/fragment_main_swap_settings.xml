@@ -157,7 +157,7 @@
                     android:id="@+id/swapMainSettingsDetailsNetworkFee"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:title="@string/swap_network_fee_title"
+                    app:title="@string/network_fee"
                     app:titleIcon="@drawable/ic_info" />
 
             </io.novafoundation.nova.common.view.TableView>
