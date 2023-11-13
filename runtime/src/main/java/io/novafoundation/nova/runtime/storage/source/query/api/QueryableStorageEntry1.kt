@@ -12,6 +12,9 @@ typealias QueryableStorageBinder1<K, V> = (dynamicInstance: Any, key: K) -> V
 interface QueryableStorageEntry1<I, T : Any> {
 
     context(StorageQueryContext)
+    suspend fun keys(): List<I>
+
+    context(StorageQueryContext)
     suspend fun query(argument: I): T?
 
     context(StorageQueryContext)
@@ -41,7 +44,8 @@ suspend fun <I, T : Any> QueryableStorageEntry1<I, T>.queryNonNull(argument: I):
 
 internal class RealQueryableStorageEntry1<I, T : Any>(
     private val storageEntry: StorageEntry,
-    private val binding: QueryableStorageBinder1<I, T>
+    private val binding: QueryableStorageBinder1<I, T>,
+    @Suppress("UNCHECKED_CAST") private val keyBinding: QueryableStorageKeyBinder<I>? = null
 ) : QueryableStorageEntry1<I, T> {
 
     context(StorageQueryContext)
@@ -87,5 +91,17 @@ internal class RealQueryableStorageEntry1<I, T : Any>(
             keysArguments = keys,
             binding = { decoded, key -> decoded?.let { binding(it, key) } }
         )
+    }
+
+    context(StorageQueryContext)
+    override suspend fun keys(): List<I> {
+        return storageEntry.keys().map { (firstKey: Any?) ->
+            @Suppress("UNCHECKED_CAST")
+            if (firstKey != null && keyBinding != null) {
+                keyBinding.invoke(firstKey)
+            } else {
+                firstKey as I
+            }
+        }
     }
 }

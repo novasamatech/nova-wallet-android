@@ -66,7 +66,7 @@ class EvmErc20AssetHistory(
         return Result.success(emptyList())
     }
 
-    override fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter> {
+    override fun availableOperationFilters(chain: Chain, asset: Chain.Asset): Set<TransactionFilter> {
         return setOf(TransactionFilter.TRANSFER)
     }
 
@@ -90,11 +90,11 @@ class EvmErc20AssetHistory(
                 fiatAmount = coinRate?.convertPlanks(chainAsset, remote.value),
                 receiver = remote.to,
                 sender = remote.from,
-                status = Operation.Status.COMPLETED,
                 fee = remote.feeUsed
             ),
             time = remote.timeStamp.seconds.inWholeMilliseconds,
-            chainAsset = chainAsset
+            chainAsset = chainAsset,
+            status = Operation.Status.COMPLETED,
         )
     }
 }

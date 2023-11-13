@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@drawable/bg_primary_list_item"
+    android:layout_height="wrap_content"
+    tools:background="@color/bottom_sheet_background">
+
+    <ImageView
+        android:id="@+id/itemSheetDescriptiveActionIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:duplicateParentState="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/icon_primary_state_colors"
+        tools:src="@drawable/ic_file_outline" />
+
+    <TextView
+        android:id="@+id/itemSheetDescriptiveActionTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="16dp"
+        android:duplicateParentState="true"
+        android:textColor="@color/button_text_colors"
+        app:layout_constraintBottom_toTopOf="@+id/itemSheetDescriptiveActionSubtitle"
+        app:layout_constraintEnd_toStartOf="@+id/itemSheetDescriptiveActionArrow"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/itemSheetDescriptiveActionIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="@string/recovery_raw_seed" />
+
+    <TextView
+        android:id="@+id/itemSheetDescriptiveActionSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:textColor="@color/button_secondary_text_colors"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/itemSheetDescriptiveActionTitle"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:duplicateParentState="true"
+        app:layout_constraintStart_toStartOf="@+id/itemSheetDescriptiveActionTitle"
+        app:layout_constraintTop_toBottomOf="@+id/itemSheetDescriptiveActionTitle"
+        tools:text="@string/account_private_key" />
+
+    <ImageView
+        android:id="@+id/itemSheetDescriptiveActionArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_chevron_right"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/icon_secondary" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

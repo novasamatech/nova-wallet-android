@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.view
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -77,6 +78,14 @@ class PrimaryButton @JvmOverloads constructor(
             override fun disabledColor(context: Context) = context.getColor(R.color.button_background_inactive)
 
             override fun enabledColor(context: Context) = context.getColor(R.color.button_background_reject)
+        },
+
+        ACCENT_SECONDARY_TRANSPARENT {
+            override fun enabledColor(context: Context): Int = context.getColor(R.color.button_background_secondary)
+
+            override fun disabledColor(context: Context): Int = context.getColor(R.color.button_background_inactive_on_gradient)
+
+            override fun textColor(context: Context): ColorStateList = context.getColorStateList(R.color.button_accent_text_colors)
         };
 
         @ColorInt
@@ -84,6 +93,8 @@ class PrimaryButton @JvmOverloads constructor(
 
         @ColorInt
         abstract fun enabledColor(context: Context): Int
+
+        open fun textColor(context: Context): ColorStateList = context.getColorStateList(R.color.button_text_colors)
     }
 
     enum class Size(val heightDp: Int, val cornerSizeDp: Int, @StyleRes val textAppearance: Int) {
@@ -156,10 +167,6 @@ class PrimaryButton @JvmOverloads constructor(
         size = typedArray.getEnum(R.styleable.PrimaryButton_size, Size.LARGE)
         setTextAppearance(size.textAppearance)
 
-        // we set textColor since `setTextAppearance` above overrides it and sets to default one
-        val textColor = typedArray.getColorStateList(R.styleable.PrimaryButton_android_textColor)
-        setTextColor(textColor)
-
         minimumHeight = size.heightDp.dp(context)
 
         typedArray.getDrawable(R.styleable.PrimaryButton_iconSrc)?.let { icon = drawableToBitmap(it) }
@@ -187,6 +194,7 @@ class PrimaryButton @JvmOverloads constructor(
         val background = addRipple(baseBackground, mask = null, rippleColor = rippleColor)
 
         setBackground(background)
+        setTextColor(appearance.textColor(this))
     }
 
     private fun checkPreparedForProgress() {

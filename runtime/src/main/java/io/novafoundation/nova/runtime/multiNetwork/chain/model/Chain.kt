@@ -14,8 +14,6 @@ typealias BuyProviderArguments = Map<String, Any?>
 
 data class FullChainAssetId(val chainId: ChainId, val assetId: ChainAssetId)
 
-fun FullChainAssetId.toPair() = chainId to assetId
-
 data class Chain(
     val id: ChainId,
     val name: String,
@@ -31,6 +29,7 @@ data class Chain(
     val hasSubstrateRuntime: Boolean,
     val hasCrowdloans: Boolean,
     val governance: List<Governance>,
+    val swap: List<Swap>,
     val parentId: String?,
     val additional: Additional?
 ) : Identifiable {
@@ -44,6 +43,7 @@ data class Chain(
         val themeColor: String?,
         val stakingWiki: String?,
         val defaultBlockTimeMillis: Long?,
+        val relaychainAsNative: Boolean?
     )
 
     data class Types(
@@ -74,7 +74,7 @@ data class Chain(
             object Native : Type()
 
             data class Statemine(
-                val id: BigInteger,
+                val id: StatemineAssetId,
                 val palletName: String?
             ) : Type()
 
@@ -179,6 +179,10 @@ data class Chain(
 
     enum class Governance {
         V1, V2
+    }
+
+    enum class Swap {
+        ASSET_CONVERSION
     }
 
     override val identifier: String = id

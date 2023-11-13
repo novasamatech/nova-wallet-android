@@ -4,14 +4,13 @@ import io.novafoundation.nova.core_db.dao.CoinPriceDao
 import io.novafoundation.nova.core_db.model.CoinPriceLocal
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceLocalDataSource
-import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 
 class CoinPriceLocalDataSourceImpl(
     private val coinPriceDao: CoinPriceDao
 ) : CoinPriceLocalDataSource {
 
-    override suspend fun getFloorCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Long): CoinRate? {
+    override suspend fun getFloorCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Long): HistoricalCoinRate? {
         val coinPriceLocal = coinPriceDao.getFloorCoinPriceAtTime(priceId, currency.code, timestamp)
         return coinPriceLocal?.let { mapCoinPriceFromLocal(it) }
     }

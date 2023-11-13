@@ -2,7 +2,8 @@ package io.novafoundation.nova.runtime.multiNetwork.chain.mappers
 
 import android.util.Log
 import com.google.gson.Gson
-import io.novafoundation.nova.common.utils.asGsonParsedNumberOrNull
+import io.novafoundation.nova.common.utils.asGsonParsedNumber
+import io.novafoundation.nova.common.utils.enumValueOfOrNull
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.fromJsonOrNull
 import io.novafoundation.nova.common.utils.parseArbitraryObject
@@ -18,6 +19,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Nodes.NodeSelectionStrategy
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 
 fun mapStakingTypeToLocal(stakingType: Chain.Asset.StakingType): String = stakingType.name
 
@@ -81,10 +83,11 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
         null, ASSET_NATIVE -> Chain.Asset.Type.Native
 
         ASSET_STATEMINE -> {
-            val id = typeExtras?.get(STATEMINE_EXTRAS_ID)?.asGsonParsedNumberOrNull()
-            val palletName = typeExtras?.get(STATEMINE_EXTRAS_PALLET_NAME) as String?
+            val idRaw = typeExtras?.get(STATEMINE_EXTRAS_ID)!!
+            val id = mapStatemineAssetIdFromRaw(idRaw)
+            val palletName = typeExtras[STATEMINE_EXTRAS_PALLET_NAME] as String?
 
-            Chain.Asset.Type.Statemine(id!!, palletName)
+            Chain.Asset.Type.Statemine(id, palletName)
         }
 
         ASSET_ORML -> {
@@ -114,7 +117,7 @@ fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any
     is Chain.Asset.Type.Native -> ASSET_NATIVE to null
 
     is Chain.Asset.Type.Statemine -> ASSET_STATEMINE to mapOf(
-        STATEMINE_EXTRAS_ID to type.id.toString(),
+        STATEMINE_EXTRAS_ID to mapStatemineAssetIdToRaw(type.id),
         STATEMINE_EXTRAS_PALLET_NAME to type.palletName
     )
 
@@ -136,6 +139,23 @@ fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any
     )
 
     Chain.Asset.Type.Unsupported -> ASSET_UNSUPPORTED to null
+}
+
+private fun mapStatemineAssetIdToRaw(statemineAssetId: StatemineAssetId): String {
+    return when (statemineAssetId) {
+        is StatemineAssetId.Number -> statemineAssetId.value.toString()
+        is StatemineAssetId.ScaleEncoded -> statemineAssetId.scaleHex
+    }
+}
+
+fun mapStatemineAssetIdFromRaw(rawValue: Any): StatemineAssetId {
+    val asString = rawValue as? String ?: error("Invalid format")
+
+    return if (asString.startsWith("0x")) {
+        StatemineAssetId.ScaleEncoded(asString)
+    } else {
+        StatemineAssetId.Number(asString.asGsonParsedNumber())
+    }
 }
 
 fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal {
@@ -290,6 +310,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
             hasCrowdloans = hasCrowdloans,
             hasSubstrateRuntime = hasSubstrateRuntime,
             governance = mapGovernanceListFromLocal(governance),
+            swap = mapSwapListFromLocal(swap),
             additional = additional
         )
     }
@@ -317,4 +338,8 @@ fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson): Chain.Asset {
 
 private fun mapGovernanceListFromLocal(governanceLocal: String) = governanceLocal.split(",").mapNotNull {
     runCatching { Chain.Governance.valueOf(it) }.getOrNull()
+}
+
+private fun mapSwapListFromLocal(swapLocal: String) = swapLocal.split(",").mapNotNull {
+    enumValueOfOrNull<Chain.Swap>(swapLocal)
 }

@@ -61,14 +61,14 @@
                         android:id="@+id/newDelegationConfirmDelegate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                        app:primaryValueEndIcon="@drawable/ic_info"
                         app:title="@string/delegation_delegate" />
 
                     <io.novafoundation.nova.common.view.TableCellView
                         android:id="@+id/newDelegationConfirmTracks"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                        app:primaryValueEndIcon="@drawable/ic_info"
                         app:title="@string/delegation_tracks" />
 
                     <io.novafoundation.nova.common.view.TableCellView

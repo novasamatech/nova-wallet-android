@@ -42,7 +42,7 @@ suspend fun AddressIconGenerator.createAddressModel(
 suspend fun AddressIconGenerator.createOptionalAddressModel(
     chain: Chain,
     address: String,
-    sizeInDp: Int,
+    sizeInDp: Int = AddressIconGenerator.SIZE_SMALL,
     addressDisplayUseCase: AddressDisplayUseCase? = null,
     @ColorRes background: Int = AddressIconGenerator.BACKGROUND_DEFAULT,
 ): OptionalAddressModel {

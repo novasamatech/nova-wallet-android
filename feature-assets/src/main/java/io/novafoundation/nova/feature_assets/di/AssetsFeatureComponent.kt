@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_assets.presentation.receive.flow.di.AssetR
 import io.novafoundation.nova.feature_assets.presentation.send.amount.di.SelectSendComponent
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.di.ConfirmSendComponent
 import io.novafoundation.nova.feature_assets.presentation.send.flow.di.AssetSendFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.swap.di.AssetSwapFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.di.AddTokenEnterInfoComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChain.di.AddTokenSelectChainComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.di.ManageChainTokensComponent
@@ -27,11 +28,14 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.PoolRewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.RewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.TransactionDetailComponent
+import io.novafoundation.nova.feature_assets.presentation.transaction.detail.swap.di.SwapDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.di.TransactionHistoryFilterComponent
+import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
+import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -58,6 +62,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
 
     fun transactionDetailComponentFactory(): TransactionDetailComponent.Factory
 
+    fun swapDetailComponentFactory(): SwapDetailComponent.Factory
+
     fun transactionHistoryComponentFactory(): TransactionHistoryFilterComponent.Factory
 
     fun rewardDetailComponentFactory(): RewardDetailComponent.Factory
@@ -81,6 +87,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun addTokenEnterInfoComponentFactory(): AddTokenEnterInfoComponent.Factory
 
     fun sendFlowComponent(): AssetSendFlowComponent.Factory
+
+    fun swapFlowComponent(): AssetSwapFlowComponent.Factory
 
     fun receiveFlowComponent(): AssetReceiveFlowComponent.Factory
 
@@ -110,7 +118,9 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
             CrowdloanFeatureApi::class,
             StakingFeatureApi::class,
             Web3NamesApi::class,
-            WalletConnectFeatureApi::class
+            WalletConnectFeatureApi::class,
+            SwapFeatureApi::class,
+            BuyFeatureApi::class
         ]
     )
     interface AssetsFeatureDependenciesComponent : AssetsFeatureDependencies

@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.domain.validation.AmountProducer
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
-import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
+import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForSimpleFeeChanges
 import io.novafoundation.nova.feature_wallet_api.domain.validation.doNotCrossExistentialDeposit
 import io.novafoundation.nova.feature_wallet_api.domain.validation.notPhishingAccount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
@@ -51,15 +51,15 @@ fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAbove
 ) {
     enoughTotalToStayAboveEDValidationFactory.validate(
         fee = { it.originFee },
-        total = { it.originCommissionAsset.total },
+        balance = { it.originCommissionAsset.total },
         chainWithAsset = { ChainWithAsset(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
-        error = { AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(it.transfer.originChain.commissionAsset) }
+        error = { payload, _ -> AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(payload.transfer.originChain.commissionAsset) }
     )
 }
 
 fun AssetTransfersValidationSystemBuilder.checkForFeeChanges(
     assetSourceRegistry: AssetSourceRegistry
-) = checkForFeeChanges(
+) = checkForSimpleFeeChanges(
     calculateFee = {
         val transfers = assetSourceRegistry.sourceFor(it.transfer.originChainAsset).transfers
         transfers.calculateFee(it.transfer)
@@ -89,7 +89,7 @@ fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOrig
         AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(
             chainAsset = payload.transfer.originChain.commissionAsset,
             fee = payload.originFee,
-            availableToPayFees = availableToPayFees
+            maxUsable = availableToPayFees
         )
     }
 )

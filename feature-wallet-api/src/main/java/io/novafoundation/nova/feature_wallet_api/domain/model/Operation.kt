@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model
 
 import io.novafoundation.nova.common.utils.isZero
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -13,6 +14,7 @@ data class Operation(
     val time: Long,
     val chainAsset: Chain.Asset,
     val extrinsicHash: String?,
+    val status: Status,
 ) {
 
     sealed class Type {
@@ -21,7 +23,6 @@ data class Operation(
             val content: Content,
             val fee: BigInteger,
             val fiatFee: BigDecimal?,
-            val status: Status,
         ) : Type() {
 
             sealed class Content {
@@ -54,8 +55,14 @@ data class Operation(
             val fiatAmount: BigDecimal?,
             val receiver: String,
             val sender: String,
-            val status: Status,
             val fee: BigInteger?
+        ) : Type()
+
+        data class Swap(
+            val fee: ChainAssetWithAmount,
+            val amountIn: ChainAssetWithAmount,
+            val amountOut: ChainAssetWithAmount,
+            val fiatAmount: BigDecimal?
         ) : Type()
     }
 
@@ -68,6 +75,15 @@ data class Operation(
             }
         }
     }
+}
+
+data class ChainAssetWithAmount(
+    val chainAsset: Chain.Asset,
+    val amount: Balance,
+)
+
+fun Chain.Asset.withAmount(amount: Balance): ChainAssetWithAmount {
+    return ChainAssetWithAmount(this, amount)
 }
 
 fun Operation.Type.satisfies(filters: Set<TransactionFilter>): Boolean {
@@ -83,5 +99,6 @@ private fun Operation.Type.matchingTransactionFilter(): TransactionFilter {
         is Operation.Type.Extrinsic -> TransactionFilter.EXTRINSIC
         is Operation.Type.Reward -> TransactionFilter.REWARD
         is Operation.Type.Transfer -> TransactionFilter.TRANSFER
+        is Operation.Type.Swap -> TransactionFilter.SWAP
     }
 }

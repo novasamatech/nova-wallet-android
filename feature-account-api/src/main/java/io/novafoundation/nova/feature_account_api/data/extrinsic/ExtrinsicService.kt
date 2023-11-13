@@ -17,16 +17,29 @@ typealias FormExtrinsicWithOrigin = suspend ExtrinsicBuilder.(origin: AccountId)
 typealias FormMultiExtrinsicWithOrigin = suspend CallBuilder.(origin: AccountId) -> Unit
 typealias FormMultiExtrinsic = suspend CallBuilder.() -> Unit
 
+typealias ExtrinsicHash = String
+
+class ExtrinsicSubmission(val hash: String, val origin: AccountId)
+
 interface ExtrinsicService {
 
     suspend fun submitMultiExtrinsicWithSelectedWalletAwaitingInclusion(
         chain: Chain,
         formExtrinsic: FormMultiExtrinsicWithOrigin,
     ): RetriableMultiResult<ExtrinsicStatus.InBlock>
+
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated("Use submitExtrinsicWithSelectedWalletV2 instead")
     suspend fun submitExtrinsicWithSelectedWallet(
         chain: Chain,
         formExtrinsic: FormExtrinsicWithOrigin,
-    ): Result<String>
+    ): Result<ExtrinsicHash> = submitExtrinsicWithSelectedWalletV2(chain, formExtrinsic)
+        .map { it.hash }
+
+    suspend fun submitExtrinsicWithSelectedWalletV2(
+        chain: Chain,
+        formExtrinsic: FormExtrinsicWithOrigin,
+    ): Result<ExtrinsicSubmission>
 
     suspend fun submitAndWatchExtrinsicWithSelectedWallet(
         chain: Chain,
@@ -37,7 +50,7 @@ interface ExtrinsicService {
         chain: Chain,
         accountId: ByteArray,
         formExtrinsic: FormExtrinsicWithOrigin,
-    ): Result<String>
+    ): Result<ExtrinsicHash>
 
     suspend fun submitAndWatchExtrinsicAnySuitableWallet(
         chain: Chain,

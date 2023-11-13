@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.emptyEthereumAccountId
 import io.novafoundation.nova.common.utils.findIsInstanceOrNull
 import io.novafoundation.nova.common.utils.formatNamed
 import io.novafoundation.nova.common.utils.substrateAccountId
+import io.novafoundation.nova.core_db.model.AssetAndChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.NOMINATION_POOLS
@@ -56,6 +57,12 @@ fun Chain.Asset.supportedStakingOptions(): List<Chain.Asset.StakingType> {
     return staking.filter { it != UNSUPPORTED }
 }
 
+fun Chain.isSwapSupported(): Boolean = swap.isNotEmpty()
+
+fun Chain.Additional?.relaychainAsNative(): Boolean {
+    return this?.relaychainAsNative ?: false
+}
+
 enum class StakingTypeGroup {
 
     RELAYCHAIN, PARACHAIN, NOMINATION_POOL, UNSUPPORTED
@@ -89,6 +96,9 @@ const val UTILITY_ASSET_ID = 0
 
 val Chain.Asset.isUtilityAsset: Boolean
     get() = id == UTILITY_ASSET_ID
+
+inline val Chain.Asset.isCommissionAsset: Boolean
+    get() = isUtilityAsset
 
 private const val MOONBEAM_XC_PREFIX = "xc"
 
@@ -229,6 +239,8 @@ object ChainGeneses {
 
     const val KUSAMA = "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
     const val POLKADOT = "91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
+    const val WESTEND = "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
+
     const val STATEMINE = "48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a"
 
     const val ACALA = "fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c"
@@ -263,6 +275,8 @@ object ChainGeneses {
     const val TURING = "0f62b701fb12d02237a33b84818c11f621653d2b1614c777973babf4652b535d"
 
     const val ZEITGEIST = "1bf2a2ecb4a868de66ea8610f2ce7c8c43706561b6476031315f6640fe38e060"
+
+    const val WESTMINT = "67f9723393ef76214df0118c34bbbd3dbebc8ed46a10973a8c969d48fe7598c9"
 }
 
 object ChainIds {
@@ -283,6 +297,10 @@ fun Chain.Asset.requireStatemine(): Type.Statemine {
     require(type is Type.Statemine)
 
     return type
+}
+
+fun Chain.Asset.statemineOrNull(): Type.Statemine? {
+    return type as? Type.Statemine
 }
 
 fun Type.Statemine.palletNameOrDefault(): String {
@@ -333,3 +351,6 @@ fun Chain.findAssetByOrmlCurrencyId(runtime: RuntimeSnapshot, currencyId: Any?):
         currencyIdScale == asset.type.currencyIdScale
     }
 }
+
+val Chain.Asset.localId: AssetAndChainId
+    get() = AssetAndChainId(chainId, id)

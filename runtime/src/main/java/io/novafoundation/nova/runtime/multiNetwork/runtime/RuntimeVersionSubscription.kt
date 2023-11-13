@@ -22,9 +22,13 @@ class RuntimeVersionSubscription(
 
     init {
         connection.socketService.subscriptionFlow(SubscribeRuntimeVersionRequest)
-            .map { it.runtimeVersionChange().specVersion }
+            .map { it.runtimeVersionChange() }
             .onEach { runtimeVersion ->
-                chainDao.updateRemoteRuntimeVersionIfChainExists(chainId, runtimeVersion)
+                chainDao.updateRemoteRuntimeVersionIfChainExists(
+                    chainId,
+                    runtimeVersion = runtimeVersion.specVersion,
+                    transactionVersion = runtimeVersion.transactionVersion
+                )
 
                 runtimeSyncService.applyRuntimeVersion(chainId)
             }

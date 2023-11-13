@@ -4,12 +4,13 @@ import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.model.AssetAndChainId
-import io.novafoundation.nova.core_db.model.OperationLocal
 import io.novafoundation.nova.core_db.model.PhishingAddressLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
+import io.novafoundation.nova.core_db.model.operation.OperationBaseLocal
+import io.novafoundation.nova.core_db.model.operation.OperationLocal
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.findMetaAccountOrThrow
-import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
@@ -22,7 +23,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapAssetLocalToAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -144,6 +144,18 @@ class WalletRepositoryImpl(
             .distinctUntilChanged()
     }
 
+    override fun assetsFlow(metaId: Long, chainAssets: List<Chain.Asset>): Flow<List<Asset>> = flowOfAll {
+        val chainAssetsById = chainAssets.associateBy { AssetAndChainId(it.chainId, it.id) }
+
+        assetCache.observeAssets(metaId, chainAssetsById.keys).map { dbAssets ->
+            dbAssets.mapNotNull { assetWithToken ->
+                val chainAsset = chainAssetsById[assetWithToken.assetAndChainId] ?: return@mapNotNull null
+
+                mapAssetLocalToAsset(assetWithToken, chainAsset)
+            }
+        }.distinctUntilChanged()
+    }
+
     override suspend fun getAsset(accountId: AccountId, chainAsset: Chain.Asset): Asset? {
         val assetLocal = getAsset(accountId, chainAsset.chainId, chainAsset.id)
 
@@ -156,24 +168,15 @@ class WalletRepositoryImpl(
         return assetLocal?.let { mapAssetLocalToAsset(it, chainAsset) }
     }
 
-    override suspend fun getContacts(
-        accountId: AccountId,
-        chain: Chain,
-        query: String,
-    ): Set<String> {
-        return operationDao.getContacts(query, chain.addressOf(accountId), chain.id).toSet()
-    }
-
     override suspend fun insertPendingTransfer(
         hash: String,
         assetTransfer: AssetTransfer,
         fee: BigDecimal
     ) {
-        val operation = createOperation(
-            hash,
-            assetTransfer,
-            fee,
-            OperationLocal.Source.APP
+        val operation = createAppOperation(
+            hash = hash,
+            transfer = assetTransfer,
+            fee = fee,
         )
 
         operationDao.insert(operation)
@@ -204,13 +207,12 @@ class WalletRepositoryImpl(
     override suspend fun getAccountFreeBalance(chainId: ChainId, accountId: AccountId) =
         substrateSource.getAccountInfo(chainId, accountId).data.free
 
-    private fun createOperation(
+    private fun createAppOperation(
         hash: String,
         transfer: AssetTransfer,
         fee: BigDecimal,
-        source: OperationLocal.Source
     ): OperationLocal {
-        val senderAddress = transfer.sender.addressIn(transfer.originChain)!!
+        val senderAddress = transfer.sender.requireAddressIn(transfer.originChain)
 
         return OperationLocal.manualTransfer(
             hash = hash,
@@ -221,8 +223,8 @@ class WalletRepositoryImpl(
             senderAddress = senderAddress,
             receiverAddress = transfer.recipient,
             fee = transfer.commissionAssetToken.planksFromAmount(fee),
-            status = OperationLocal.Status.PENDING,
-            source = source
+            status = OperationBaseLocal.Status.PENDING,
+            source = OperationBaseLocal.Source.APP
         )
     }
 

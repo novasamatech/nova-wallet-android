@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.data.network.runtime.binding
 
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.system
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
@@ -14,11 +15,17 @@ class AccountData(
 )
 
 class AccountInfo(
-    val data: AccountData,
+    val consumers: BigInteger,
+    val providers: BigInteger,
+    val sufficients: BigInteger,
+    val data: AccountData
 ) {
 
     companion object {
         fun empty() = AccountInfo(
+            consumers = BigInteger.ZERO,
+            providers = BigInteger.ZERO,
+            sufficients = BigInteger.ZERO,
             data = AccountData(
                 free = BigInteger.ZERO,
                 reserved = BigInteger.ZERO,
@@ -62,6 +69,9 @@ fun bindAccountInfo(scale: String, runtime: RuntimeSnapshot): AccountInfo {
     val dynamicInstance = type.fromHexOrNull(runtime, scale).cast<Struct.Instance>()
 
     return AccountInfo(
+        consumers = dynamicInstance.getTyped<BigInteger?>("consumers").orZero(),
+        providers = dynamicInstance.getTyped<BigInteger?>("providers").orZero(),
+        sufficients = dynamicInstance.getTyped<BigInteger?>("sufficients").orZero(),
         data = bindAccountData(dynamicInstance.getTyped("data"))
     )
 }

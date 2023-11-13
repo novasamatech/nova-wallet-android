@@ -51,14 +51,14 @@
                         android:id="@+id/revokeDelegationConfirmDelegate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                        app:primaryValueEndIcon="@drawable/ic_info"
                         app:title="@string/delegation_delegate" />
 
                     <io.novafoundation.nova.common.view.TableCellView
                         android:id="@+id/revokeDelegationConfirmTracks"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                        app:primaryValueEndIcon="@drawable/ic_info"
                         app:title="@string/delegation_tracks" />
 
                     <io.novafoundation.nova.common.view.TableCellView
@@ -80,9 +80,10 @@
                         android:id="@+id/revokeDelegationConfirmUndelegatingPeriod"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        app:title="@string/delegation_undelegating_period"
                         app:titleEllipsisable="true"
                         app:titleIconStart="@drawable/ic_time_16"
-                        app:title="@string/delegation_undelegating_period" />
+                        app:titleIconTint="@color/icon_secondary" />
 
                 </io.novafoundation.nova.common.view.TableView>
 

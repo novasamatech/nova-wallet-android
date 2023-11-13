@@ -5,8 +5,8 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.RuntimeType
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.Type
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.DictEnum
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromByteArrayOrNull
-import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHexOrNull
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromByteArray
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.fromHex
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module
 import jp.co.soramitsu.fearless_utils.runtime.metadata.module.StorageEntry
@@ -87,6 +87,14 @@ fun RuntimeMetadata.storageReturnType(moduleName: String, storageName: String): 
     return module(moduleName).storage(storageName).returnType()
 }
 
-fun <D> RuntimeType<*, D>.fromHexOrIncompatible(scale: String, runtime: RuntimeSnapshot): D = fromHexOrNull(runtime, scale) ?: incompatible()
+fun <D> RuntimeType<*, D>.fromHexOrIncompatible(scale: String, runtime: RuntimeSnapshot): D = successOrIncompatible {
+    fromHex(runtime, scale)
+}
 
-fun <D> RuntimeType<*, D>.fromByteArrayOrIncompatible(scale: ByteArray, runtime: RuntimeSnapshot): D = fromByteArrayOrNull(runtime, scale) ?: incompatible()
+fun <D> RuntimeType<*, D>.fromByteArrayOrIncompatible(scale: ByteArray, runtime: RuntimeSnapshot): D = successOrIncompatible {
+    fromByteArray(runtime, scale)
+}
+
+private fun <T> successOrIncompatible(block: () -> T): T = runCatching {
+    block()
+}.getOrElse { incompatible() }

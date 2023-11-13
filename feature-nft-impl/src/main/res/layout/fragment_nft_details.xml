@@ -89,16 +89,14 @@
                 android:id="@+id/nftDetailsOnwer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
-                app:primaryValueIconTint="@color/icon_secondary"
+                app:primaryValueEndIcon="@drawable/ic_info"
                 app:title="@string/nft_owned_by" />
 
             <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/nftDetailsCreator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
-                app:primaryValueIconTint="@color/icon_secondary"
+                app:primaryValueEndIcon="@drawable/ic_info"
                 app:title="@string/nft_created_by" />
 
             <io.novafoundation.nova.common.view.TableCellView

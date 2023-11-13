@@ -44,6 +44,8 @@ class SetControllerFragment : BaseFragment<SetControllerViewModel>() {
 
         setControllerAdvertisement.setOnLearnMoreClickedListener { viewModel.onMoreClicked() }
         setControllerToolbar.setHomeButtonListener { viewModel.backClicked() }
+
+        setControllerController.setActionTint(R.color.icon_secondary)
     }
 
     override fun inject() {

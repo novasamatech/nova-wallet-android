@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:gravity="center_vertical"
+    tools:orientation="horizontal"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <TextView
+        android:id="@+id/viewMaxAmountAction"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:text="@string/fragment_swap_main_settings_max_button"
+        android:textColor="@color/button_text_accent" />
+
+    <TextView
+        android:id="@+id/viewMaxAmountValue"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_secondary"
+        tools:text="105.79 USDT" />
+
+</merge>

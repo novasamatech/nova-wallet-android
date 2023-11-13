@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.view.AccountView
 
 fun BaseFragment<*>.setupSelectWalletMixin(mixin: SelectWalletMixin, view: AccountView) {
     view.setActionIcon(R.drawable.ic_chevron_right)
+    view.setActionTint(R.color.icon_secondary)
     view.setShowBackground(true)
 
     mixin.selectedWalletModelFlow.observe {

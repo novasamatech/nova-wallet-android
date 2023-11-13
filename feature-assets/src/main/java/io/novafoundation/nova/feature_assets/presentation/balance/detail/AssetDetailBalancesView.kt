@@ -18,6 +18,6 @@ class AssetDetailBalancesView @JvmOverloads constructor(
 
     val locked = item(R.string.wallet_balance_locked).apply {
         setDividerVisible(false)
-        title.setDrawableEnd(R.drawable.ic_info_cicrle_filled_16, paddingInDp = 4, tint = R.color.icon_secondary)
+        title.setDrawableEnd(R.drawable.ic_info, paddingInDp = 4)
     }
 }

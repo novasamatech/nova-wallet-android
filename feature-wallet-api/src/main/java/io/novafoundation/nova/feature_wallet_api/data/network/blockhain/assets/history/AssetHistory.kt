@@ -19,13 +19,13 @@ interface AssetHistory {
         currency: Currency
     ): Result<List<TransferExtrinsic>>
 
-    fun availableOperationFilters(asset: Chain.Asset): Set<TransactionFilter>
+    fun availableOperationFilters(chain: Chain, asset: Chain.Asset): Set<TransactionFilter>
 
     suspend fun additionalFirstPageSync(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        page: DataPage<Operation>
+        page: Result<DataPage<Operation>>
     )
 
     suspend fun getOperations(

@@ -254,7 +254,6 @@
         <item name="android:paddingEnd">12dp</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:stateListAnimator">@null</item>
-        <item name="android:textColor">@color/button_text_colors</item>
         <item name="android:letterSpacing">0.02</item>
     </style>
 
@@ -283,6 +282,11 @@
         <item name="appearance">secondaryTransparent</item>
     </style>
 
+    <style name="Widget.Nova.Button.AccentSecondaryTransparent">
+        <item name="appearance">accentSecondaryTransparent</item>
+    </style>
+
+
     <!-- Button Small -->
 
     <style name="Widget.Nova.Button.PrimaryTransparent.Small">
@@ -303,6 +307,10 @@
     <style name="Widget.Nova.Button.SecondaryTransparent.Small">
         <item name="size">small</item>
         <item name="appearance">secondaryTransparent</item>
+    </style>
+
+    <style name="Widget.Nova.Button.AccentSecondaryTransparent.Small">
+        <item name="size">small</item>
     </style>
 
     <!--   Misc   -->
@@ -417,6 +425,14 @@
     <style name="Widget.Nova.WalletWithAddress" parent="">
         <item name="labelStyle">@style/TextAppearance.NovaFoundation.Regular.SubHeadline.Primary</item>
         <item name="messageStyle">@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary</item>
+    </style>
+
+    <style name="Widget.Nova.Tabs.OnLight" parent="">
+        <item name="TabsView_backgroundTint">@color/segmented_background</item>
+    </style>
+
+    <style name="Widget.Nova.Tabs.OnBlack" parent="">
+        <item name="TabsView_backgroundTint">@color/segmented_background_on_black</item>
     </style>
 
     <!-- Buttons -->

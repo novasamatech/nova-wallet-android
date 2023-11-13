@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -13,24 +14,28 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
-import io.novafoundation.nova.feature_assets.presentation.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_assets.presentation.balance.assetActions.buy.BuyMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mapTokenToTokenModel
-import io.novafoundation.nova.feature_assets.presentation.fullChainAssetId
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
+import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.balanceId
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
+import io.novafoundation.nova.runtime.ext.fullId
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
@@ -48,13 +53,14 @@ class BalanceDetailViewModel(
     private val sendInteractor: SendInteractor,
     private val router: AssetsRouter,
     private val assetPayload: AssetPayload,
-    buyMixinFactory: BuyMixinFactory,
+    buyMixinFactory: BuyMixin.Factory,
     private val transactionHistoryMixin: TransactionHistoryMixin,
     private val accountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,
     private val currencyInteractor: CurrencyInteractor,
     private val controllableAssetCheck: ControllableAssetCheckMixin,
     private val externalBalancesInteractor: ExternalBalancesInteractor,
+    private val swapAvailabilityInteractor: SwapAvailabilityInteractor
 ) : BaseViewModel(),
     TransactionHistoryUi by transactionHistoryMixin {
 
@@ -94,6 +100,10 @@ class BalanceDetailViewModel(
         .share()
 
     val buyMixin = buyMixinFactory.create(scope = this)
+
+    val swapButtonEnabled = assetFlow.flatMapLatest {
+        swapAvailabilityInteractor.swapAvailableFlow(it.token.configuration, viewModelScope)
+    }.shareInBackground()
 
     val buyEnabled: Flow<Boolean> = assetFlow
         .flatMapLatest { buyMixin.buyEnabledFlow(it.token.configuration) }
@@ -142,11 +152,18 @@ class BalanceDetailViewModel(
     }
 
     fun sendClicked() {
-        router.openSend(assetPayload)
+        router.openSend(SendPayload.SpecifiedOrigin(assetPayload))
     }
 
     fun receiveClicked() = checkControllableAsset {
         router.openReceive(assetPayload)
+    }
+
+    fun swapClicked() {
+        launch {
+            val chainAsset = assetFlow.first().token.configuration
+            router.openSwapSetupAmount(chainAsset.fullId.toAssetPayload())
+        }
     }
 
     fun buyClicked() = checkControllableAsset {

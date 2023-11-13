@@ -12,7 +12,7 @@ fun ValidationSystem.Companion.unlockReferendumValidationSystem(): UnlockReferen
         error = { payload, leftForFees ->
             UnlockGovernanceValidationFailure.NotEnoughToPayFees(
                 chainAsset = payload.asset.token.configuration,
-                availableToPayFees = leftForFees,
+                maxUsable = leftForFees,
                 fee = payload.fee
             )
         }

@@ -10,6 +10,16 @@ fun <T> bindList(dynamicInstance: Any?, itemBinder: (Any?) -> T): List<T> {
     }
 }
 
+inline fun <T1, T2> bindPair(
+    dynamicInstance: Any,
+    firstComponent: (Any?) -> T1,
+    secondComponent: (Any?) -> T2
+): Pair<T1, T2> {
+    val (first, second) = dynamicInstance.cast<List<*>>()
+
+    return firstComponent(first) to secondComponent(second)
+}
+
 // Maps are encoded as List<Pair<K, V>>
 fun <K, V> bindMap(dynamicInstance: Any?, keyBinder: (Any?) -> K, valueBinder: (Any?) -> V): Map<K, V> {
     if (dynamicInstance == null) return emptyMap()

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:background="@color/secondary_screen_background">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/swapDetailToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:homeButtonIcon="@drawable/ic_close"
+        app:titleText="Apr 10, 2022, 22:36"
+        app:titleTextAppearance="@style/TextAppearance.NovaFoundation.TransactionDetailToolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingBottom="16dp"
+        android:clipToPadding="false"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/swapDetailTransferDirection"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_icon_container_on_color"
+                android:padding="11dp"
+                android:src="@drawable/ic_flip_swap"
+                app:tint="@color/icon_secondary" />
+
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
+                android:id="@+id/swapDetailAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:id="@+id/swapDetailStatus"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
+                tools:drawablePadding="4dp"
+                tools:drawableStart="@drawable/ic_checkmark_circle_16"
+                tools:drawableTint="@color/icon_positive"
+                tools:text="completed"
+                tools:textColor="@color/text_positive" />
+
+            <io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetsView
+                android:id="@+id/swapDetailAssets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp" />
+
+            <io.novafoundation.nova.common.view.TableView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp">
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/swapDetailRate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/swap_rate_title"
+                    app:titleIcon="@drawable/ic_info" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/swapDetailFee"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/network_fee"
+                    app:titleIcon="@drawable/ic_info" />
+            </io.novafoundation.nova.common.view.TableView>
+
+            <io.novafoundation.nova.common.view.TableView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp">
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/swapDetailWallet"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/tabbar_wallet_title" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/swapDetailAccount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValueEndIcon="@drawable/ic_info"
+                    app:title="@string/common_account" />
+            </io.novafoundation.nova.common.view.TableView>
+
+            <io.novafoundation.nova.common.view.TableView
+                android:id="@+id/swapDetailTxSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp">
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/swapDetailHash"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValueEndIcon="@drawable/ic_info"
+                    app:title="@string/common_transaction_id" />
+            </io.novafoundation.nova.common.view.TableView>
+        </LinearLayout>
+
+    </ScrollView>
+</LinearLayout>

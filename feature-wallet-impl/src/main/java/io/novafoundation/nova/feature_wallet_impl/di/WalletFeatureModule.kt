@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.di
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
@@ -12,12 +13,11 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.CoinPriceDao
+import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
-import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryAssetUseCase
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -25,19 +25,26 @@ import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRep
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.CoinPriceLocalDataSourceImpl
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceLocalDataSource
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteDataSource
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.CoinPriceInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
@@ -45,7 +52,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderProviderFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.RealPaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainConfigApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.PalletXcmRepository
@@ -58,15 +64,13 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.CoinPriceRepos
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealBalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealChainAssetRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealCrossChainTransfersRepository
+import io.novafoundation.nova.feature_wallet_impl.data.repository.RealExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletConstants
 import io.novafoundation.nova.feature_wallet_impl.data.repository.TokenRepositoryImpl
-import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
-import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
-import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
-import io.novafoundation.nova.feature_wallet_impl.data.repository.RealExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.source.CoingeckoCoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
+import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -273,7 +277,10 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideCoinPriceInteractor(coinPriceRepository: CoinPriceRepository) = CoinPriceInteractor(coinPriceRepository)
+    fun provideArbitraryTokenUseCase(
+        coinPriceRepository: CoinPriceRepository,
+        currencyRepository: CurrencyRepository
+    ): ArbitraryTokenUseCase = RealArbitraryTokenUseCase(coinPriceRepository, currencyRepository)
 
     @Provides
     @FeatureScope
@@ -290,6 +297,24 @@ class WalletFeatureModule {
     ): EnoughTotalToStayAboveEDValidationFactory {
         return EnoughTotalToStayAboveEDValidationFactory(
             assetSourceRegistry
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideCrossChainTransfersUseCase(
+        crossChainTransfersRepository: CrossChainTransfersRepository,
+        walletRepository: WalletRepository,
+        chainRegistry: ChainRegistry,
+        accountRepository: AccountRepository,
+        computationalCache: ComputationalCache,
+    ): CrossChainTransfersUseCase {
+        return RealCrossChainTransfersUseCase(
+            crossChainTransfersRepository = crossChainTransfersRepository,
+            walletRepository = walletRepository,
+            chainRegistry = chainRegistry,
+            accountRepository = accountRepository,
+            computationalCache = computationalCache
         )
     }
 }

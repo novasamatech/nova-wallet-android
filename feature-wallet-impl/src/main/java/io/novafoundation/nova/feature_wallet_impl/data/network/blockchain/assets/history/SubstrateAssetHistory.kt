@@ -8,16 +8,20 @@ import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
+import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.findNearestCoinRate
+import io.novafoundation.nova.feature_wallet_impl.data.network.model.AssetsBySubQueryId
+import io.novafoundation.nova.feature_wallet_impl.data.network.model.assetsBySubQueryId
 import io.novafoundation.nova.feature_wallet_impl.data.network.model.request.SubqueryHistoryRequest
 import io.novafoundation.nova.feature_wallet_impl.data.network.model.response.SubqueryHistoryElementResponse
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.externalApi
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlin.time.Duration.Companion.seconds
@@ -32,10 +36,21 @@ abstract class SubstrateAssetHistory(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        page: DataPage<Operation>
+        pageResult: Result<DataPage<Operation>>
     ) {
-        val newCursor = page.nextOffset.asCursorOrNull()?.value
-        cursorStorage.saveCursor(chain.id, chainAsset.id, accountId, newCursor)
+        pageResult
+            .onSuccess { page ->
+                val newCursor = page.nextOffset.asCursorOrNull()?.value
+                cursorStorage.saveCursor(chain.id, chainAsset.id, accountId, newCursor)
+            }
+            .onFailure {
+                // Empty cursor means we haven't yet synced any data for this asset
+                // However we still want to store null cursor on failure to show items
+                // that came not from the remote (e.g. local pending operations)
+                if (!cursorStorage.hasCursor(chain.id, chainAsset.id, accountId)) {
+                    cursorStorage.saveCursor(chain.id, chainAsset.id, accountId, cursor = null)
+                }
+            }
     }
 
     override suspend fun getOperations(
@@ -102,7 +117,8 @@ abstract class SubstrateAssetHistory(
             pageSize = pageSize,
             cursor = cursor,
             filters = filters,
-            asset = chainAsset
+            asset = chainAsset,
+            chain = chain
         )
 
         val subqueryResponse = subqueryApi.getOperationsHistory(apiUrl, request).data.query
@@ -110,9 +126,11 @@ abstract class SubstrateAssetHistory(
         val latestOperationTimestamp = getLatestOperationTimestamp(subqueryResponse.historyElements)
         val coinPriceRange = getCoinPriceRange(chainAsset, currency, earliestOperationTimestamp, latestOperationTimestamp)
 
-        val operations = subqueryResponse.historyElements.nodes.map { node ->
+        val assetsBySubQueryId = chain.assetsBySubQueryId()
+
+        val operations = subqueryResponse.historyElements.nodes.mapNotNull { node ->
             val coinRate = coinPriceRange.findNearestCoinRate(node.timestamp)
-            mapNodeToOperation(node, coinRate, chainAsset)
+            mapNodeToOperation(node, coinRate, chainAsset, assetsBySubQueryId)
         }
 
         val pageInfo = subqueryResponse.historyElements.pageInfo
@@ -137,10 +155,14 @@ abstract class SubstrateAssetHistory(
         node: SubqueryHistoryElementResponse.Query.HistoryElements.Node,
         coinRate: CoinRate?,
         chainAsset: Chain.Asset,
-    ): Operation {
-        val type: Operation.Type = when {
+        chainAssetsBySubQueryId: AssetsBySubQueryId
+    ): Operation? {
+        val type: Operation.Type
+        val status: Operation.Status
+
+        when {
             node.reward != null -> with(node.reward) {
-                Operation.Type.Reward(
+                type = Operation.Type.Reward(
                     amount = amount,
                     fiatAmount = coinRate?.convertPlanks(chainAsset, amount),
                     isReward = isReward,
@@ -150,10 +172,11 @@ abstract class SubstrateAssetHistory(
                     ),
                     eventId = eventId(node.blockNumber, node.reward.eventIdx)
                 )
+                status = Operation.Status.COMPLETED
             }
 
             node.poolReward != null -> with(node.poolReward) {
-                Operation.Type.Reward(
+                type = Operation.Type.Reward(
                     amount = amount,
                     fiatAmount = coinRate?.convertPlanks(chainAsset, amount),
                     isReward = isReward,
@@ -162,42 +185,68 @@ abstract class SubstrateAssetHistory(
                     ),
                     eventId = eventId(node.blockNumber, node.poolReward.eventIdx)
                 )
+                status = Operation.Status.COMPLETED
             }
 
             node.extrinsic != null -> with(node.extrinsic) {
-                Operation.Type.Extrinsic(
+                type = Operation.Type.Extrinsic(
                     content = Operation.Type.Extrinsic.Content.SubstrateCall(module, call),
                     fee = fee,
                     fiatFee = coinRate?.convertPlanks(chainAsset, fee),
-                    status = Operation.Status.fromSuccess(success)
                 )
+                status = Operation.Status.fromSuccess(success)
             }
 
             node.transfer != null -> with(node.transfer) {
-                Operation.Type.Transfer(
+                type = Operation.Type.Transfer(
                     myAddress = node.address,
                     amount = amount,
                     fiatAmount = coinRate?.convertPlanks(chainAsset, amount),
                     receiver = to,
                     sender = from,
                     fee = fee,
-                    status = Operation.Status.fromSuccess(success),
                 )
+                status = Operation.Status.fromSuccess(success)
             }
 
             node.assetTransfer != null -> with(node.assetTransfer) {
-                Operation.Type.Transfer(
+                type = Operation.Type.Transfer(
                     myAddress = node.address,
                     amount = amount,
                     fiatAmount = coinRate?.convertPlanks(chainAsset, amount),
                     receiver = to,
                     sender = from,
-                    status = Operation.Status.fromSuccess(success),
                     fee = fee,
                 )
+                status = Operation.Status.fromSuccess(success)
             }
 
-            else -> throw IllegalStateException("All of the known operation type fields were null")
+            node.swap != null -> with(node.swap) {
+                val assetIn = chainAssetsBySubQueryId[assetIdIn] ?: return null
+                val assetOut = chainAssetsBySubQueryId[assetIdOut] ?: return null
+                val assetFee = chainAssetsBySubQueryId[assetIdFee] ?: return null
+
+                val amount = if (assetIn.fullId == chainAsset.fullId) amountIn else amountOut
+
+                type = Operation.Type.Swap(
+                    fee = ChainAssetWithAmount(
+                        chainAsset = assetFee,
+                        amount = fee,
+                    ),
+                    amountIn = ChainAssetWithAmount(
+                        chainAsset = assetIn,
+                        amount = amountIn,
+                    ),
+                    amountOut = ChainAssetWithAmount(
+                        chainAsset = assetOut,
+                        amount = amountOut,
+                    ),
+                    fiatAmount = coinRate?.convertPlanks(chainAsset, amount)
+                )
+                status = Operation.Status.fromSuccess(success ?: true)
+            }
+
+            else -> return null
         }
 
         return Operation(
@@ -206,7 +255,8 @@ abstract class SubstrateAssetHistory(
             type = type,
             time = node.timestamp.seconds.inWholeMilliseconds,
             chainAsset = chainAsset,
-            extrinsicHash = node.extrinsicHash
+            extrinsicHash = node.extrinsicHash,
+            status = status
         )
     }
 

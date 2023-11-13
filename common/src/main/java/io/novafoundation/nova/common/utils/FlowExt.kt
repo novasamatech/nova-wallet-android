@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.transformWhile
@@ -105,6 +106,11 @@ fun <T> List<Flow<T>>.mergeIfMultiple(): Flow<T> = when (size) {
     0 -> emptyFlow()
     1 -> first()
     else -> merge()
+}
+
+fun <K, V> List<Flow<Map<K, V>>>.accumulateMaps(): Flow<Map<K, V>> {
+    return mergeIfMultiple()
+        .runningFold(emptyMap()) { acc, directions -> acc + directions }
 }
 
 inline fun <T> withFlowScope(crossinline block: suspend (scope: CoroutineScope) -> Flow<T>): Flow<T> {
@@ -278,23 +284,53 @@ fun <T> singleReplaySharedFlow() = MutableSharedFlow<T>(replay = 1, onBufferOver
 
 fun <T> Flow<T>.inBackground() = flowOn(Dispatchers.Default)
 
+fun <T> Flow<T>.nullOnStart(): Flow<T?> {
+    return onStart<T?> { emit(null) }
+}
+
 fun InsertableInputField.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
     content.bindTo(flow, scope)
 }
 
-fun EditText.bindTo(flow: MutableSharedFlow<String>, scope: CoroutineScope) {
-    scope.launch {
-        flow.collect { input ->
-            if (text.toString() != input) {
-                setText(input)
-            }
+fun EditText.bindTo(
+    flow: MutableSharedFlow<String>,
+    scope: CoroutineScope,
+    moveSelectionToEndOnInsertion: Boolean = false,
+) {
+    bindTo(flow, scope, moveSelectionToEndOnInsertion, toT = { it }, fromT = { it })
+}
+
+inline fun <T> EditText.bindTo(
+    flow: MutableSharedFlow<T>,
+    scope: CoroutineScope,
+    moveSelectionToEndOnInsertion: Boolean = false,
+    crossinline toT: suspend (String) -> T,
+    crossinline fromT: suspend (T) -> String,
+) {
+    val textWatcher = onTextChanged {
+        scope.launch {
+            flow.emit(toT(it))
         }
     }
 
-    onTextChanged {
-        scope.launch {
-            flow.emit(it)
+    scope.launch {
+        flow.collect { input ->
+            val inputString = fromT(input)
+            if (text.toString() != inputString) {
+                removeTextChangedListener(textWatcher)
+                setText(inputString)
+                if (moveSelectionToEndOnInsertion) {
+                    moveSelectionToTheEnd()
+                }
+                addTextChangedListener(textWatcher)
+            }
         }
+    }
+}
+
+fun EditText.moveSelectionToTheEnd() {
+    if (hasFocus()) {
+        setSelection(text.length)
     }
 }
 

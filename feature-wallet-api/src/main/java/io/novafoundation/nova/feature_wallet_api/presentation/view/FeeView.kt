@@ -19,7 +19,7 @@ class FeeView @JvmOverloads constructor(
         setFeeStatus(FeeStatus.Loading)
     }
 
-    fun setFeeStatus(feeStatus: FeeStatus) {
+    fun setFeeStatus(feeStatus: FeeStatus<*>) {
         setVisible(feeStatus !is FeeStatus.NoFee)
 
         when (feeStatus) {

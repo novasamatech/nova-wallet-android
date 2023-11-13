@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:background="@color/divider"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <ImageView
+        android:id="@+id/swapAssetImage"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_token_container"
+        android:padding="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/icon_primary"
+        tools:src="@drawable/ic_token_ksm" />
+
+    <TextView
+        android:id="@+id/swapAssetAmount"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="middle"
+        android:includeFontPadding="false"
+        android:singleLine="true"
+        android:textColor="@color/text_primary"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/swapAssetImage"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="50.79 USDT" />
+
+    <TextView
+        android:id="@+id/swapAssetFiat"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:textColor="@color/text_tertiary"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/swapAssetAmount"
+        tools:text="135.87$" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/swapAssetFiat"
+        app:layout_goneMarginTop="36dp">
+
+        <ImageView
+            android:id="@+id/swapAssetNetworkImage"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/swapAssetNetwork"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:src="@drawable/ic_nova_logo" />
+
+        <TextView
+            android:id="@+id/swapAssetNetwork"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:lines="1"
+            android:textColor="@color/text_secondary"
+            tools:text="Polkadot Asset Hub" />
+
+    </LinearLayout>
+</merge>

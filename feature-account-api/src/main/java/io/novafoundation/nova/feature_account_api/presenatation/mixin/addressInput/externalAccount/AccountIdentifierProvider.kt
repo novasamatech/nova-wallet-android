@@ -31,6 +31,7 @@ interface AccountIdentifierProvider {
     }
 
     fun interface Factory {
+
         fun create(input: Flow<String>): AccountIdentifierProvider
     }
 }

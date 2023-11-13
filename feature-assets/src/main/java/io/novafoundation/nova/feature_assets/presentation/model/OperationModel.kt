@@ -12,6 +12,6 @@ class OperationModel(
     val header: String,
     val statusAppearance: OperationStatusAppearance,
     val operationIcon: Icon,
-    val subHeader: String,
+    val subHeader: CharSequence,
     val subHeaderEllipsize: TextUtils.TruncateAt
 )

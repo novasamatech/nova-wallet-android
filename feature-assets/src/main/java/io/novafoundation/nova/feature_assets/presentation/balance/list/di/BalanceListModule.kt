@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -75,6 +76,7 @@ class BalanceListModule {
         externalBalancesInteractor: ExternalBalancesInteractor,
         resourceManager: ResourceManager,
         walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
+        swapAvailabilityInteractor: SwapAvailabilityInteractor
     ): ViewModel {
         return BalanceListViewModel(
             walletInteractor = walletInteractor,
@@ -85,7 +87,8 @@ class BalanceListModule {
             balanceBreakdownInteractor = balanceBreakdownInteractor,
             externalBalancesInteractor = externalBalancesInteractor,
             resourceManager = resourceManager,
-            walletConnectSessionsUseCase = walletConnectSessionsUseCase
+            walletConnectSessionsUseCase = walletConnectSessionsUseCase,
+            swapAvailabilityInteractor = swapAvailabilityInteractor
         )
     }
 

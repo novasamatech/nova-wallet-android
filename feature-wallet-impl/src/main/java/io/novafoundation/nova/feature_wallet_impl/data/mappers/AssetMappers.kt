@@ -29,7 +29,7 @@ fun mapTokenLocalToToken(
 ): Token {
     return Token(
         currency = mapCurrencyFromLocal(currencyLocal),
-        coinRateChange = tokenLocal?.recentRateChange?.let { CoinRateChange(tokenLocal.recentRateChange.orZero(), tokenLocal.rate.orZero()) },
+        coinRate = tokenLocal?.recentRateChange?.let { CoinRateChange(tokenLocal.recentRateChange.orZero(), tokenLocal.rate.orZero()) },
         configuration = chainAsset
     )
 }

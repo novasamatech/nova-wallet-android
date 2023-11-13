@@ -49,7 +49,7 @@
                         android:id="@+id/confirmChangeValidatorsAccount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryValueIcon="@drawable/ic_info_cicrle_filled_16"
+                        app:primaryValueEndIcon="@drawable/ic_info"
                         app:title="@string/common_account" />
 
                     <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
@@ -69,7 +69,7 @@
                         android:id="@+id/confirmChangeValidatorsValidators"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryValueIcon="@drawable/ic_chevron_right"
+                        app:primaryValueEndIcon="@drawable/ic_chevron_right"
                         app:title="@string/staking_confirm_selected_validators" />
                 </io.novafoundation.nova.common.view.TableView>
 

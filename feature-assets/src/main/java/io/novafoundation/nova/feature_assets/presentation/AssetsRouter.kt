@@ -3,9 +3,11 @@ package io.novafoundation.nova.feature_assets.presentation
 import android.os.Bundle
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
+import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 
 interface AssetsRouter {
 
@@ -15,7 +17,7 @@ interface AssetsRouter {
 
     fun openFilter(payload: TransactionHistoryFilterPayload)
 
-    fun openSend(assetPayload: AssetPayload, initialRecipientAddress: String? = null)
+    fun openSend(payload: SendPayload, initialRecipientAddress: String? = null)
 
     fun openConfirmTransfer(transferDraft: TransferDraft)
 
@@ -26,6 +28,8 @@ interface AssetsRouter {
     fun openRewardDetail(reward: OperationParcelizeModel.Reward)
 
     fun openPoolRewardDetail(reward: OperationParcelizeModel.PoolReward)
+
+    fun openSwapDetail(swap: OperationParcelizeModel.Swap)
 
     fun openSwitchWallet()
 
@@ -61,5 +65,11 @@ interface AssetsRouter {
 
     fun openWalletConnectScan()
 
+    fun openSwapFlow()
+
+    fun openSwapSetupAmount(assetPayload: AssetPayload)
+
     fun openStaking()
+
+    fun closeSendFlow()
 }

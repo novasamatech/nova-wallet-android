@@ -63,8 +63,7 @@
             android:layout_height="16dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="4dp"
-            android:src="@drawable/ic_info_cicrle_filled_16"
-            app:tint="@color/icon_secondary" />
+            android:src="@drawable/ic_info"/>
 
     </LinearLayout>
 

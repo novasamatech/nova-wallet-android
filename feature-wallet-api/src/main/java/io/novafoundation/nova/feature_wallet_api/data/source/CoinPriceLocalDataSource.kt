@@ -1,12 +1,11 @@
 package io.novafoundation.nova.feature_wallet_api.data.source
 
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 
 interface CoinPriceLocalDataSource {
 
-    suspend fun getFloorCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Long): CoinRate?
+    suspend fun getFloorCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Long): HistoricalCoinRate?
 
     suspend fun hasCeilingCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Long): Boolean
 

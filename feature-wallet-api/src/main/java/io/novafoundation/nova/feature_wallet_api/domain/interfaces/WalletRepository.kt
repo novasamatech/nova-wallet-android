@@ -33,6 +33,11 @@ interface WalletRepository {
         chainAsset: Chain.Asset
     ): Flow<Asset>
 
+    fun assetsFlow(
+        metaId: Long,
+        chainAssets: List<Chain.Asset>
+    ): Flow<List<Asset>>
+
     suspend fun getAsset(
         accountId: AccountId,
         chainAsset: Chain.Asset
@@ -42,12 +47,6 @@ interface WalletRepository {
         metaId: Long,
         chainAsset: Chain.Asset
     ): Asset?
-
-    suspend fun getContacts(
-        accountId: AccountId,
-        chain: Chain,
-        query: String
-    ): Set<String>
 
     suspend fun insertPendingTransfer(
         hash: String,

@@ -51,7 +51,7 @@ buildscript {
 
         web3jVersion = '4.9.5'
 
-        fearlessLibVersion = '1.9.0'
+        fearlessLibVersion = '1.9.1'
 
         gifVersion = '1.2.19'
 

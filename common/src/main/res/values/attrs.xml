@@ -75,7 +75,8 @@
     <declare-styleable name="TableCellView">
         <attr name="title" />
         <attr name="dividerVisible" />
-        <attr name="primaryValueIcon" format="reference|color" />
+        <attr name="primaryValueEndIcon" format="reference|color" />
+        <attr name="primaryValueStartIcon" format="reference|color" />
         <attr name="primaryValueStyle" format="enum">
             <enum name="primary" value="0" />
             <enum name="secondary" value="1" />
@@ -87,6 +88,7 @@
         <attr name="secondaryValueTextAppearance" format="reference" />
         <attr name="titleIcon" format="reference|color" />
         <attr name="titleIconStart" format="reference|color" />
+        <attr name="titleIconTint" format="color" />
         <attr name="primaryValueIconTint" format="color" />
         <attr name="titleEllipsisable" format="boolean" />
     </declare-styleable>
@@ -116,6 +118,7 @@
             <enum name="secondaryTransparent" value="3" />
             <enum name="primaryPositive" value="4" />
             <enum name="primaryNegative" value="5" />
+            <enum name="accentSecondaryTransparent" value="6" />
         </attr>
 
         <attr name="size" format="enum">
@@ -168,13 +171,15 @@
     </declare-styleable>
 
     <declare-styleable name="AlertView">
-        <attr name="style" format="enum">
+        <attr name="alertMode" format="enum">
             <enum name="warning" value="0" />
             <enum name="error" value="1" />
+            <enum name="info" value="2" />
         </attr>
 
         <attr name="styleBackgroundColor" format="color" />
         <attr name="styleIcon" format="color|reference" />
+        <attr name="styleIconTint" format="color" />
 
         <attr name="android:text" />
     </declare-styleable>
@@ -226,6 +231,11 @@
         <attr name="showClose" />
     </declare-styleable>
 
+    <declare-styleable name="ExpandableView">
+        <attr name="chevronId" format="reference" />
+        <attr name="expandableId" format="reference" />
+    </declare-styleable>
+
     <declare-styleable name="PromoBannerView">
         <attr name="promoBanner_image" format="reference" />
         <attr name="promoBanner_background" format="reference|color" />
@@ -268,6 +278,21 @@
 
     <declare-styleable name="SlideShowView">
         <attr name="SlideShowView_slideDelayMillis" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="HintsView">
+        <attr name="HintsView_singleHint" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="TabsView">
+        <attr name="TabsView_backgroundTint" format="reference|color" />
+    </declare-styleable>
+
+    <declare-styleable name="TipsInputField">
+        <attr name="android:hint" />
+        <attr name="postfix" format="string" />
+        <attr name="android:digits" />
+        <attr name="android:inputType" />
     </declare-styleable>
 
 </resources>

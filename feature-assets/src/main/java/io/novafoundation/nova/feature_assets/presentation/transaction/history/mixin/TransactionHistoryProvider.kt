@@ -135,6 +135,9 @@ class TransactionHistoryProvider(
                     is OperationParcelizeModel.PoolReward -> {
                         router.openPoolRewardDetail(payload)
                     }
+                    is OperationParcelizeModel.Swap -> {
+                        router.openSwapDetail(payload)
+                    }
                 }
             }
         }
@@ -222,7 +225,7 @@ class TransactionHistoryProvider(
     private suspend fun allAvailableFilters(): Set<TransactionFilter> {
         val assetSource = assetsSourceRegistry.sourceFor(chainAssetAsync())
 
-        return assetSource.history.availableOperationFilters(chainAssetAsync())
+        return assetSource.history.availableOperationFilters(chainAsync(), chainAssetAsync())
     }
 
     private suspend fun transformDataToUi(data: List<Operation>, token: Token): List<Any> {

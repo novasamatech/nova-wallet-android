@@ -5,8 +5,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -18,6 +16,7 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.showOperationStatus
 import io.novafoundation.nova.feature_assets.presentation.model.toAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.view.showLoadingAmount
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailAmount
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailFee
 import kotlinx.android.synthetic.main.fragment_transfer_details.transactionDetailFrom
@@ -86,13 +85,7 @@ class TransferDetailFragment : BaseFragment<TransactionDetailViewModel>() {
 
             transactionDetailToolbar.setTitle(time.formatDateTime())
 
-            viewModel.fiatFee.observe { loadingState ->
-                if (loadingState is ExtendedLoadingState.Loading) {
-                    transactionDetailFee.showProgress()
-                } else {
-                    transactionDetailFee.showValue(formattedFee, loadingState.dataOrNull)
-                }
-            }
+            viewModel.fee.observe(transactionDetailFee::showLoadingAmount)
 
             transactionDetailAmount.setAmount(amount.toAmountModel())
             transactionDetailAmount.setTokenAmountTextColor(statusAppearance.amountTint)
