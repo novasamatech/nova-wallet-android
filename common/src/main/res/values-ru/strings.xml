@@ -1145,10 +1145,10 @@
     <string name="swap_custom_fee_selector_description">Токен для оплаты комиссии сети</string>
     <string name="swap_custom_fee_selector_footer">Комиссия сети добавится к введенной сумме</string>
     <string name="swap_error_pair_not_supported">Эта пара не поддерживается</string>
-    <string name="swap_failure_balance_not_consider_consumers" formatted="false">Вы должны сохранить как минимум %s после оплаты сетевой комиссии %s , поскольку вы храните не самодостаточные токены</string>
+    <string name="swap_failure_balance_not_consider_consumers" formatted="false">Вы должны сохранить как минимум %s после оплаты сетевой комиссии %s, поскольку вы храните не самодостаточные токены</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Вы должны сохранить как минимум %s, чтобы получить %s токены</string>
     <string name="swap_failure_insufficient_balance_message">Вы можете обменять до %1$s так как вам нужно заплатить комиссию сети в размере %2$s.</string>
-    <string name="swap_failure_insufficient_balance_with_buy_ed_message">Вы можете обменять до %1$s так как вам нужно заплатить комиссию сети в размере %2$s, а также конвертировать %3$s в %4$s , чтобы сохранить минимальный баланс %5$s.</string>
+    <string name="swap_failure_insufficient_balance_with_buy_ed_message">Вы можете обменять до %1$s так как вам нужно заплатить комиссию сети в размере %2$s, а также конвертировать %3$s в %4$s, чтобы сохранить минимальный баланс %5$s.</string>
     <string name="swap_failure_swap_max_button">Использовать максимум</string>
     <string name="swap_failure_swap_min_button">Использовать минимум</string>
     <string name="swap_failure_too_small_remaining_balance_message">На вашем балансе должно оставаться не менее %1$s. Хотите обменять максимум, добавив также оставшиеся %2$s?</string>
@@ -1170,7 +1170,7 @@
     <string name="swap_main_settings_asset_out_not_selecting_button_state">Выберите токен для получения</string>
     <string name="swap_main_settings_enter_amount_disabled_button_state">Введите сумму</string>
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Введите другую сумму</string>
-    <string name="swap_minimum_balance_buy_in_alert" formatted="false">Чтобы оплатить комиссию сети с помощью %s , Nova автоматически обменяет %s на %s , чтобы поддерживать минимальный %s баланс вашей учетной записи .</string>
+    <string name="swap_minimum_balance_buy_in_alert" formatted="false">Чтобы оплатить комиссию сети с помощью %s, Nova автоматически обменяет %s на %s , чтобы поддерживать минимальный %s баланс вашей учетной записи.</string>
     <string name="swap_network_fee_description">Комиссия сети, взимается блокчейном за обработку и проверку транзакций. Может варьироваться в зависимости от условий сети или скорости транзакции.</string>
     <string name="swap_not_enought_liquidity_failure">В пуле недостаточно ликвидности для обмена</string>
     <string name="swap_price_difference_description">Разница в цене представляет собой разницу между двумя различными активами. При обмене криптовалюты под разницей в цене обычно имеется ввиду разница между ценой актива, которую вы получаете и ценой актива, которую вы платите.</string>
@@ -1182,7 +1182,7 @@
     <string name="swap_rate_was_updated_failure_title">Обменный курс изменился</string>
     <string name="swap_settings_title">Настройки обмена</string>
     <string name="swap_slippage">Проскальзывание</string>
-    <string name="swap_slippage_description">Проскальзывание обмена - распространенное явление в децентрализованной торговле, когда конечная цена сделки по обмену может незначительно отличаться от ожидаемой в связи с изменением рыночных условий.</string>
+    <string name="swap_slippage_description">Проскальзывание - распространенное явление в децентрализованной торговле, когда конечная цена сделки по обмену может незначительно отличаться от ожидаемой в связи с изменением рыночных условий.</string>
     <string name="swap_slippage_disabled_button_state">Введите другое значение</string>
     <string name="swap_slippage_error_not_in_available_range" formatted="false">Введите значение между %s и %s</string>
     <string name="swap_slippage_title">Проскальзывание</string>
