@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.history.mi
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
@@ -88,7 +89,8 @@ class BalanceDetailModule {
         resourceManager: ResourceManager,
         currencyInteractor: CurrencyInteractor,
         controllableAssetCheckMixin: ControllableAssetCheckMixin,
-        externalBalancesInteractor: ExternalBalancesInteractor
+        externalBalancesInteractor: ExternalBalancesInteractor,
+        swapAvailabilityInteractor: SwapAvailabilityInteractor
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -102,7 +104,8 @@ class BalanceDetailModule {
             resourceManager = resourceManager,
             currencyInteractor = currencyInteractor,
             controllableAssetCheck = controllableAssetCheckMixin,
-            externalBalancesInteractor = externalBalancesInteractor
+            externalBalancesInteractor = externalBalancesInteractor,
+            swapAvailabilityInteractor = swapAvailabilityInteractor
         )
     }
 

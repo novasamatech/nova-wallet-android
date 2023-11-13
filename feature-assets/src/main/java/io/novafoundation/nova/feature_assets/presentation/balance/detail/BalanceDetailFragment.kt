@@ -86,6 +86,10 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
             viewModel.sendClicked()
         }
 
+        balanceDetaiActions.swap.setOnClickListener {
+            viewModel.swapClicked()
+        }
+
         balanceDetaiActions.receive.setOnClickListener {
             viewModel.receiveClicked()
         }
@@ -136,6 +140,8 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         viewModel.showLockedDetailsEvent.observeEvent(::showLockedDetails)
 
         viewModel.sendEnabled.observe(balanceDetaiActions.send::setEnabled)
+
+        viewModel.swapButtonEnabled.observe(balanceDetaiActions.swap::setEnabled)
 
         viewModel.acknowledgeLedgerWarning.awaitableActionLiveData.observeEvent {
             LedgerNotSupportedWarningBottomSheet(

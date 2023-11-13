@@ -27,7 +27,7 @@ class SwapNavigator(
         navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapOptionsFragment)
     }
 
-    override fun finishSwapFlow(assetPayload: AssetPayload) {
+    override fun openBalanceDetails(assetPayload: AssetPayload) {
         navigationHolder.navController?.navigate(R.id.action_swapConfirmationFragment_to_assetDetails, BalanceDetailFragment.getBundle(assetPayload))
     }
 

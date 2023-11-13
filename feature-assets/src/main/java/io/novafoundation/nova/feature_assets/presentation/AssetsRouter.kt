@@ -67,7 +67,7 @@ interface AssetsRouter {
 
     fun openSwapFlow()
 
-    fun openSwapSettings(assetPayload: AssetPayload)
+    fun openSwapSetupAmount(assetPayload: AssetPayload)
 
     fun openStaking()
 

@@ -18,5 +18,5 @@ interface SwapRouter : ReturnableRouter {
 
     fun openReceive(assetPayload: AssetPayload)
 
-    fun finishSwapFlow(assetPayload: AssetPayload)
+    fun openBalanceDetails(assetPayload: AssetPayload)
 }

@@ -254,10 +254,14 @@ class SwapConfirmationViewModel(
 
     private fun executeSwap(validationPayload: SwapValidationPayload) = launch {
         swapInteractor.executeSwap(validationPayload.swapExecuteArgs, validationPayload.swapFee)
-            .onSuccess { swapRouter.finishSwapFlow(validationPayload.swapExecuteArgs.assetIn.fullId.toAssetPayload()) }
+            .onSuccess { navigateToNextScreen(validationPayload.swapExecuteArgs.assetIn) }
             .onFailure(::showError)
 
         _validationProgress.value = false
+    }
+
+    private fun navigateToNextScreen(asset: Chain.Asset) {
+        swapRouter.openBalanceDetails(asset.fullId.toAssetPayload())
     }
 
     private suspend fun formatToSwapDetailsModel(confirmationState: SwapConfirmationState): SwapConfirmationDetailsModel {

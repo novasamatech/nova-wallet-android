@@ -357,9 +357,9 @@ class Navigator(
         navController?.navigate(R.id.action_mainFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))
     }
 
-    override fun openSwapSettings(assetPayload: AssetPayload) {
+    override fun openSwapSetupAmount(assetPayload: AssetPayload) {
         val payload = SwapSettingsPayload(assetPayload)
-        navController?.navigate(R.id.action_swapFlowFragment_to_swapSettings, SwapMainSettingsFragment.getBundle(payload))
+        navController?.navigate(R.id.action_open_swapSetupAmount, SwapMainSettingsFragment.getBundle(payload))
     }
 
     override fun openNfts() {
