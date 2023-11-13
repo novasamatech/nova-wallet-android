@@ -18,9 +18,7 @@
     <string name="swap_field_validation_not_enough_liquidity">Not enough liquidity</string>
     <string name="swap_field_validation_not_enough_amount_to_swap">Not enough tokens to swap</string>
     <string name="swap_field_validation_to_low_amount_out">You can’t receive less than %s</string>
-    <!--<string name="common_cannot_pay_network_fee_title">Not enough tokens to pay the fee</string>-->
 
-    <!--<string name="common_cannot_pay_network_fee_message">You don’t have enough balance to pay the network fee of %s.\nAvailable  balance to pay fee after operation: %s</string>-->
     <string name="common_cannot_pay_network_fee_message">You can use up to %s since you need to pay\n%s for network fee.</string>
 
     <string name="swap_too_low_amount_to_stay_abow_ed_title">You are trying to swap too small amount</string>
@@ -77,15 +75,12 @@
     <string name="swap_rate_title">Rate</string>
     <string name="swap_price_difference_title">Price difference</string>
     <string name="swap_slippage_title">Slippage</string>
-    <string name="swap_network_fee_title">Network fee</string>
-    <string name="swap_wallet_title">Wallet</string>
-    <string name="swap_account_title">Account</string>
+    <string name="common_wallet">Wallet</string>
 
     <string name="fragment_swap_main_settings_max_button">Max:</string>
     <string name="fragment_swap_main_settings_pay_title">You pay</string>
     <string name="fragment_swap_main_settings_receive_title">You receive</string>
     <string name="fragment_swap_main_settings_details_title">Swap details</string>
-    <string name="fragment_swap_main_settings_button_text">Select a token to receive</string>
     <string name="wallet_asset_swap">Swap</string>
     <string name="fragment_swap_main_settings_select_token">Select a token</string>
 
