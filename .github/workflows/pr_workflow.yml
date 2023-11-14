@@ -4,34 +4,37 @@ on:
   pull_request:
     branches:
       - 'develop' # master
-
+  pull_request_review_comment:
+    types: [created, edited, deleted]
+ 
 jobs:
-  # checkRef:
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     is_rc: ${{ steps.check_ref.outputs.ref_contains_rc }}
+  checkRef:
+    if: github.event.pull_request.base.ref == 'develop' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      is_rc: ${{ steps.check_ref.outputs.ref_contains_rc }}
     
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Check if "rc" is present in github.ref
-  #       id: check_ref
-  #       run: |
-  #         echo ${{ github.head_ref || github.ref_name }}
-  #         if [[ "${{ github.head_ref || github.ref_name }}" == *"/rc/"* ]]; then
-  #           echo "ref_contains_rc=1" >> $GITHUB_OUTPUT
-  #         else
-  #           echo "ref_contains_rc=0" >> $GITHUB_OUTPUT
-  #         fi
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check if "rc" is present in github.ref
+        id: check_ref
+        run: |
+          echo ${{ github.head_ref || github.ref_name }}
+          if [[ "${{ github.head_ref || github.ref_name }}" == *"rc"* ]]; then
+            echo "ref_contains_rc=1" >> $GITHUB_OUTPUT
+          else
+            echo "ref_contains_rc=0" >> $GITHUB_OUTPUT
+          fi
       
-  #     - name: Output check result
-  #       run: |
-  #         echo "Output: ${{ steps.check_ref.outputs.ref_contains_rc }}"
+      - name: Output check result
+        run: |
+          echo "Output: ${{ steps.check_ref.outputs.ref_contains_rc }}"
 
   make-or-update-pr:
     runs-on: ubuntu-latest
     permissions: write-all
-    # needs: checkRef
-    # if: needs.checkRef.outputs.is_rc == 1
+    needs: checkRef
+    if: needs.checkRef.outputs.is_rc == '1'
 
     steps:
       - name: Find Comment
@@ -44,18 +47,47 @@ jobs:
       - name: Create comment link
         id: create_link
         run: |
-          echo "::set-output name=comment_link::https://api.github.com/repos/${{ github.repository }}/issues/comments/${{ steps.fc.outputs.comment-id }}"
+          echo "COMMENT_LINK=https://api.github.com/repos/${{ github.repository }}/issues/comments/${{ steps.fc.outputs.comment-id }}" >> $GITHUB_ENV
+        shell: bash
 
       - name: Extract version from branch name
         id: extract_version
         run: |
-          echo "::set-output name=version::${GITHUB_REF#refs/heads/rc/}"
-      
+          VERSION=${{ github.head_ref }}
+          echo "::set-output name=version::${VERSION#*rc/}"
+
       - uses: tibdex/github-app-token@v1
         id: generate-token
         with:
           app_id: ${{ secrets.PR_APP_ID }}
           private_key: ${{ secrets.PR_APP_TOKEN }}
+      
+      - name: Run Python script
+        run: |
+          import requests
+          import sys
+          import os
+      
+          def parse_base_params(comment_link):
+            response = requests.get(comment_link).json()
+            try:
+              lines = response["body"].split("\n")
+            except:
+              print("Please, create a comment with 'Release time: YYYY-MM-DDTHH:MM:SSZ', 'Release severity: Major | Critical | Normal' and 'Release notes:'")
+              exit(1)
+            time = next((s.split(': ')[1] for s in lines if s.startswith('Release time: ')), '').strip()
+            severity = next((s.split(': ')[1] for s in lines if s.startswith('Release severity: ')), '').strip()
+
+            if not time or not severity:
+              print(f"Current values: Time - '{time}', Severity - '{severity}'")
+              print("Time or severity cannot be empty, please set it in the PR comment with lines 'Release time:' and 'Release severity:'")
+              sys.exit(1)
+
+            with open(os.getenv('GITHUB_ENV'), 'a') as f:
+                f.write(f'TIME={time}\n')
+                f.write(f'SEVERITY={severity}\n')
+          parse_base_params(os.getenv("COMMENT_LINK"))
+        shell: python
 
       - name: Create new branch and file in nova-wallet-android-releases repo
         uses: peter-evans/repository-dispatch@v2
@@ -63,4 +95,4 @@ jobs:
           token: ${{ steps.generate-token.outputs.token }}
           repository: novasamatech/nova-wallet-android-releases
           event-type: create-pr
-          client-payload: '{"version": "${{ steps.extract_version.outputs.version }}", "comment_link": "${{ steps.create_link.outputs.comment_link }}", "time": "2023-10-27T12:00:00Z", "severity": "Major"}'
+          client-payload: '{"version": "${{ steps.extract_version.outputs.version }}", "comment_link": "${{ env.COMMENT_LINK }}", "time": "${{ env.TIME }}", "severity": "${{ env.SEVERITY }}"}'
