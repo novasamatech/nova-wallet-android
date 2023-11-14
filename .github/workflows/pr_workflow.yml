@@ -44,7 +44,7 @@ jobs:
       - name: Create comment link
         id: create_link
         run: |
-          echo "::set-output name=comment_link::https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}#issuecomment-${{ steps.fc.outputs.comment-id }}"
+          echo "::set-output name=comment_link::https://api.github.com/repos/${{ github.repository }}/issues/comments/${{ steps.fc.outputs.comment-id }}"
 
       - name: Extract version from branch name
         id: extract_version
