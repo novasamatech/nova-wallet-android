@@ -6,7 +6,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 
-
 class RealtimeHistoryUpdate(
     val txHash: String,
     val status: Operation.Status,
@@ -35,7 +34,7 @@ class RealtimeHistoryUpdate(
             val amountFee: ChainAssetWithAmount,
             val senderId: AccountId,
             val receiverId: AccountId
-        ): Type() {
+        ) : Type() {
 
             override fun relates(accountId: AccountId): Boolean {
                 return senderId contentEquals accountId || receiverId contentEquals accountId

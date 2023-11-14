@@ -93,7 +93,7 @@ class AssetConversionSwapExtractor(
     private suspend fun ExtrinsicWithEvents.extractFee(
         chain: Chain,
         multiLocationConverter: MultiLocationConverter
-    ) : ChainAssetWithAmount {
+    ): ChainAssetWithAmount {
         val assetFee = assetFee(multiLocationConverter)
         if (assetFee != null) return assetFee
 
@@ -102,7 +102,7 @@ class AssetConversionSwapExtractor(
     }
 
     private fun GenericCall.Instance.isSwap(): Boolean {
-        return module.name == Modules.ASSET_CONVERSION
-            && function.name in calls
+        return module.name == Modules.ASSET_CONVERSION &&
+            function.name in calls
     }
 }

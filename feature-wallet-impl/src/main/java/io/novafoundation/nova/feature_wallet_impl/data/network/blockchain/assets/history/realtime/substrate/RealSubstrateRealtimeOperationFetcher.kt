@@ -12,11 +12,10 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicS
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicWithEvents
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.status
 
-
 internal class SubstrateRealtimeOperationFetcherFactory(
     private val multiLocationConverterFactory: MultiLocationConverterFactory,
     private val eventsRepository: EventsRepository
-): Factory {
+) : Factory {
 
     override fun create(sources: List<Factory.Source>): SubstrateRealtimeOperationFetcher {
         val extractors = sources.map { it.extractor() }
@@ -25,14 +24,14 @@ internal class SubstrateRealtimeOperationFetcherFactory(
     }
 
     private fun Factory.Source.extractor(): Extractor {
-        return when(this) {
+        return when (this) {
             is Factory.Source.FromExtractor -> extractor
             is Factory.Source.Known -> id.extractor()
         }
     }
 
     private fun Factory.Source.Known.Id.extractor(): Extractor {
-        return when(this) {
+        return when (this) {
             Factory.Source.Known.Id.ASSET_CONVERSION_SWAP -> assetConversionSwap()
         }
     }
@@ -45,7 +44,7 @@ internal class SubstrateRealtimeOperationFetcherFactory(
 private class RealSubstrateRealtimeOperationFetcher(
     private val repository: EventsRepository,
     private val extractors: List<Extractor>
-): SubstrateRealtimeOperationFetcher {
+) : SubstrateRealtimeOperationFetcher {
 
     override suspend fun extractRealtimeHistoryUpdates(
         chain: Chain,
@@ -68,7 +67,7 @@ private class RealSubstrateRealtimeOperationFetcher(
     }
 
     private fun ExtrinsicWithEvents.operationStatus(): Operation.Status {
-        return when(status()) {
+        return when (status()) {
             ExtrinsicStatus.SUCCESS -> Operation.Status.COMPLETED
             ExtrinsicStatus.FAILURE -> Operation.Status.FAILED
             null -> Operation.Status.PENDING

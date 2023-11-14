@@ -113,9 +113,9 @@ class EvmNativeAssetHistory(
 
     private fun TransactionReceipt?.extrinsicStatus(): Operation.Status {
         return when (this?.isStatusOK) {
-            true ->  Operation.Status.COMPLETED
-            false ->  Operation.Status.FAILED
-            null ->  Operation.Status.PENDING
+            true -> Operation.Status.COMPLETED
+            false -> Operation.Status.FAILED
+            null -> Operation.Status.PENDING
         }
     }
 

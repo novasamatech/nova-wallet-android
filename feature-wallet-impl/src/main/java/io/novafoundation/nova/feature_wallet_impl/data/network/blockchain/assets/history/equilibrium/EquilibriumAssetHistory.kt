@@ -34,7 +34,6 @@ class EquilibriumAssetHistory(
         return listOf(TransferExtractor().asSource())
     }
 
-
     override fun availableOperationFilters(chain: Chain, asset: Chain.Asset): Set<TransactionFilter> {
         return setOfNotNull(
             TransactionFilter.TRANSFER,

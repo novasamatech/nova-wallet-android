@@ -143,7 +143,7 @@ private class PaymentUpdater(
             fee = mapAssetWithAmountToLocal(swap.amountFee),
             amountIn = mapAssetWithAmountToLocal(swap.amountIn),
             amountOut = mapAssetWithAmountToLocal(swap.amountOut),
-            status =  mapOperationStatusToOperationLocalStatus(historyUpdate.status),
+            status = mapOperationStatusToOperationLocalStatus(historyUpdate.status),
             source = OperationBaseLocal.Source.BLOCKCHAIN
         )
     }

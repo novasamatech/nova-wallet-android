@@ -27,9 +27,9 @@ interface SubstrateRealtimeOperationFetcher {
 
         sealed class Source {
 
-            class FromExtractor(val extractor: Extractor): Source()
+            class FromExtractor(val extractor: Extractor) : Source()
 
-            class Known(val id: Id): Source() {
+            class Known(val id: Id) : Source() {
 
                 enum class Id {
                     ASSET_CONVERSION_SWAP

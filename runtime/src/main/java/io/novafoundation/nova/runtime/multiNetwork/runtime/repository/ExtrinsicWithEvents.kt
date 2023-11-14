@@ -23,7 +23,7 @@ class ExtrinsicWithEvents(
 fun ExtrinsicWithEvents.status(): ExtrinsicStatus? {
     return events.firstNotNullOfOrNull {
         when {
-            it.instanceOf(Modules.SYSTEM,  SUCCESS_EVENT) -> ExtrinsicStatus.SUCCESS
+            it.instanceOf(Modules.SYSTEM, SUCCESS_EVENT) -> ExtrinsicStatus.SUCCESS
             it.instanceOf(Modules.SYSTEM, FAILURE_EVENT) -> ExtrinsicStatus.FAILURE
             else -> null
         }
