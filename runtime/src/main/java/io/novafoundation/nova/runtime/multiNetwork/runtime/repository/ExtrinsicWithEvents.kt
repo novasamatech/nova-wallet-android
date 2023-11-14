@@ -31,7 +31,7 @@ fun ExtrinsicWithEvents.status(): ExtrinsicStatus? {
 }
 
 fun ExtrinsicWithEvents.nativeFee(): BigInteger? {
-    val event = events.firstOrNull { it.instanceOf(Modules.TRANSACTION_PAYMENT, "TransactionFeePaid") } ?: return null
+    val event = findEvent(Modules.TRANSACTION_PAYMENT, "TransactionFeePaid") ?: return null
     val (_, actualFee, tip) = event.arguments
 
     return bindNumber(actualFee) + bindNumber(tip)
