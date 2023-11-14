@@ -8,18 +8,18 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainFeeConfi
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee
-import io.novafoundation.nova.feature_wallet_api.domain.model.Junctions
-import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
-import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation.Junction
 import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
-import io.novafoundation.nova.feature_wallet_api.domain.model.junctionList
-import io.novafoundation.nova.feature_wallet_api.domain.model.order
-import io.novafoundation.nova.feature_wallet_api.domain.model.toInterior
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isParachain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.Junctions
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation.Junction
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.junctionList
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.order
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toInterior
 import java.math.BigInteger
 
 fun MultiLocation.localView(): MultiLocation {

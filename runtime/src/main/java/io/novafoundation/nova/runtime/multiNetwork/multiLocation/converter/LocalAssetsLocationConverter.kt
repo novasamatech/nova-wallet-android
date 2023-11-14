@@ -1,11 +1,7 @@
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter
+package io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter
 
 import io.novafoundation.nova.common.utils.PalletName
 import io.novafoundation.nova.common.utils.invoke
-import io.novafoundation.nova.feature_wallet_api.domain.model.Junctions
-import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
-import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation.Junction
-import io.novafoundation.nova.feature_wallet_api.domain.model.junctionList
 import io.novafoundation.nova.runtime.ext.palletNameOrDefault
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.ext.statemineOrNull
@@ -13,6 +9,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.asNumberOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.asNumberOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.Junctions
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation.Junction
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.junctionList
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.metadata.moduleOrNull
 import kotlinx.coroutines.Deferred

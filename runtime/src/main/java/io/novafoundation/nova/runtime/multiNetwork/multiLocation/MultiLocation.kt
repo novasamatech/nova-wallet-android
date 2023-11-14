@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_api.domain.model
+package io.novafoundation.nova.runtime.multiNetwork.multiLocation
 
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.removeHexPrefix
