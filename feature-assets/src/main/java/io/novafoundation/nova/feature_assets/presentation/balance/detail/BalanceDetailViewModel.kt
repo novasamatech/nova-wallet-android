@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.history.mi
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
@@ -162,7 +163,8 @@ class BalanceDetailViewModel(
     fun swapClicked() {
         launch {
             val chainAsset = assetFlow.first().token.configuration
-            router.openSwapSetupAmount(chainAsset.fullId.toAssetPayload())
+            val payload = SwapSettingsPayload.DefaultFlow(chainAsset.fullId.toAssetPayload())
+            router.openSwapSetupAmount(payload)
         }
     }
 

@@ -5,7 +5,7 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
-import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapSettingsPayload
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 
 @Subcomponent(
     modules = [
