@@ -16,6 +16,7 @@ import java.math.BigInteger
     ],
     foreignKeys = [
         ForeignKey(
+            onDelete = ForeignKey.CASCADE,
             entity = OperationBaseLocal::class,
             parentColumns = ["id", "address", "chainId", "assetId"],
             childColumns = ["operationId", "address", "chainId", "assetId"]
