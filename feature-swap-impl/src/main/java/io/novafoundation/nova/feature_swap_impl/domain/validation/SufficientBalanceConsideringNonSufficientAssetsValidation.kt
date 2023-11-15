@@ -20,7 +20,7 @@ class SufficientBalanceConsideringNonSufficientAssetsValidation(
         val isSelfSufficientAssetOut = assetSourceRegistry.isSelfSufficientAsset(assetOut.token.configuration)
 
         if (!isSelfSufficientAssetOut && assetIn.token.configuration.isCommissionAsset) {
-            val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(value.detailedAssetIn.chain, assetOut.token.configuration)
+            val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(value.detailedAssetIn.chain, assetIn.token.configuration)
             val fee = value.swapFee.networkFee.amount
 
             return validOrError(assetIn.totalInPlanks - existentialDeposit >= amount + fee) {
