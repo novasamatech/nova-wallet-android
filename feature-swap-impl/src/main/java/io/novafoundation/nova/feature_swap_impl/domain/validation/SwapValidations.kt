@@ -71,13 +71,7 @@ fun SwapValidationSystemBuilder.sufficientBalanceInFeeAsset() = sufficientBalanc
     available = { it.feeAsset.transferable },
     amount = { BigDecimal.ZERO },
     fee = { it.feeAsset.token.amountFromPlanks(it.swapFee.networkFee.amount) },
-    error = { payload, availableToPayFees ->
-        SwapValidationFailure.NotEnoughFunds.InCommissionAsset(
-            chainAsset = payload.feeAsset.token.configuration,
-            fee = payload.feeAsset.token.amountFromPlanks(payload.swapFee.networkFee.amount),
-            maxUsable = availableToPayFees
-        )
-    }
+    error = { _, _ -> SwapValidationFailure.NotEnoughFunds.ToPayFee }
 )
 
 fun SwapValidationSystemBuilder.sufficientBalanceInUsedAsset() = sufficientBalance(

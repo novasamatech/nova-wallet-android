@@ -32,11 +32,7 @@ sealed class SwapValidationFailure {
 
         object InUsedAsset : NotEnoughFunds()
 
-        class InCommissionAsset(
-            override val chainAsset: Chain.Asset,
-            override val maxUsable: BigDecimal,
-            override val fee: BigDecimal
-        ) : NotEnoughFunds(), NotEnoughToPayFeesError
+        object ToPayFee : NotEnoughFunds()
     }
 
     class AmountOutIsTooLowToStayAboveED(

@@ -139,6 +139,8 @@ class SwapInteractor(
 
             positiveAmountOut()
 
+            sufficientBalanceInFeeAsset()
+
             sufficientBalanceToPayFeeConsideringED(assetSourceRegistry)
 
             availableSlippage(swapService)
@@ -150,8 +152,6 @@ class SwapInteractor(
             sufficientBalanceInUsedAsset()
 
             swapFeeSufficientBalance()
-
-            sufficientBalanceInFeeAsset()
 
             sufficientBalanceConsideringNonSufficientAssetsValidation(assetSourceRegistry)
 
