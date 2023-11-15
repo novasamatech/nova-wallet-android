@@ -4,21 +4,22 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIde
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNonce
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.instanceOf
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallParser
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallAdapter
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallParseContext
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 
-class TreasurySpendParser : ReferendumCallParser {
+class TreasurySpendAdapter : ReferendumCallAdapter {
 
-    override suspend fun parse(preImage: PreImage, chainId: ChainId): ReferendumCall? = runCatching {
-        val call = preImage.call
-
+    override suspend fun fromCall(
+        call: GenericCall.Instance,
+        context: ReferendumCallParseContext
+    ): ReferendumCall? {
         if (!call.instanceOf(Modules.TREASURY, "spend")) return null
 
         val amount = bindNonce(call.arguments["amount"])
         val beneficiary = bindAccountIdentifier(call.arguments["beneficiary"])
 
-        ReferendumCall.TreasuryRequest(amount, beneficiary)
-    }.getOrNull()
+        return ReferendumCall.TreasuryRequest(amount, beneficiary)
+    }
 }

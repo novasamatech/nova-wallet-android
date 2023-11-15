@@ -273,6 +273,8 @@ fun GenericCall.Instance.instanceOf(functionCandidate: MetadataFunction): Boolea
 
 fun GenericCall.Instance.instanceOf(moduleName: String, callName: String): Boolean = moduleName == module.name && callName == function.name
 
+fun GenericCall.Instance.instanceOf(moduleName: String, vararg callNames: String): Boolean = moduleName == module.name && function.name in callNames
+
 fun GenericEvent.Instance.instanceOf(moduleName: String, eventName: String): Boolean = moduleName == module.name && eventName == event.name
 
 fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))
@@ -340,4 +342,6 @@ object Modules {
 
     const val TRANSACTION_PAYMENT = "TransactionPayment"
     const val ASSET_TX_PAYMENT = "AssetTxPayment"
+
+    const val UTILITY = "Utility"
 }
