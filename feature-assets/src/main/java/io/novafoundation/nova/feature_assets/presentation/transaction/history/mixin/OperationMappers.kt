@@ -286,7 +286,7 @@ fun mapOperationToOperationModel(
                     amount = chainAsset.formatPlanksSigned(amount, negative = !isIncome),
                     amountColorRes = incomeTextColor(isIncome, operation.status),
                     amountDetails = mapToFiatWithTime(token, operationType.fiatAmount, formattedTime, resourceManager),
-                    header = resourceManager.getString(R.string.wallet_asset_swap),
+                    header = resourceManager.getString(R.string.operations_swap_title),
                     statusAppearance = statusAppearance,
                     subHeader = operationType.formatSubHeader(resourceManager),
                     subHeaderEllipsize = TextUtils.TruncateAt.END,

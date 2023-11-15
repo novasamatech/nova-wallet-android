@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="wallet_send_insufficient_balance_commission">You don\'t have enough %s to pay fee and remain above minimal balance</string>
+
+    <string name="operations_swap_title">Swap</string>
+
     <string name="swap_repeat_operation">Repeat the operation</string>
 
     <string name="wallet_filters_swaps">Swaps</string>
@@ -1144,8 +1148,6 @@
     <string name="wallet_send_existential_warnining_transfer_dust">Your account will be removed from blockchain after transfer cause it makes total balance lower than minimal. Remaining balance will be transferred to recipient as well.</string>
     <string name="wallet_send_dead_recipient_commission_asset_title">Recipient is not able to accept transfer</string>
     <string name="wallet_send_dead_recipient_commission_asset_message">Your transfer will fail since the destination account does not have enough %s to accept other token transfers</string>
-
-    <string name="wallet_send_insufficient_balance_commission">You don\'t have enough %s to pay fees</string>
 
     <string name="common_close">Close</string>
 

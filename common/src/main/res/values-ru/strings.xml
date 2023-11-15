@@ -613,6 +613,7 @@
     <string name="onboarding_restore_wallet">У меня уже есть кошелёк</string>
     <string name="onboarding_terms_and_conditions_1_v2_2_0">Продолжая вы соглашаетесь с нашими\nУсловиями использования и Политикой конфиденциальности</string>
     <string name="onboarding_terms_and_conditions_2">Условиями использования</string>
+    <string name="operations_swap_title">Обмен</string>
     <string name="parachain_staking_alerts_bond_more_message">Один из ваших коллаторов не генерирует награды</string>
     <string name="parachain_staking_alerts_change_collator_message">Один из ваших коллаторов не выбран в текущем раунде</string>
     <string name="parachain_staking_alerts_redeem_message">Ваш период разблокировки %s истек. Не забудьте забрать разблокированные токены</string>
@@ -1180,6 +1181,7 @@
     <string name="swap_rate_title">Курс</string>
     <string name="swap_rate_was_updated_failure_message">Старый курс: %1$s ≈ %2$s.\nНовый курс: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Обменный курс изменился</string>
+    <string name="swap_repeat_operation">Повторить операцию</string>
     <string name="swap_settings_title">Настройки обмена</string>
     <string name="swap_slippage">Проскальзывание</string>
     <string name="swap_slippage_description">Проскальзывание - распространенное явление в децентрализованной торговле, когда конечная цена сделки по обмену может незначительно отличаться от ожидаемой в связи с изменением рыночных условий.</string>
@@ -1307,7 +1309,7 @@
     <string name="wallet_send_existential_warning_title">Перевод удалит аккаунт</string>
     <string name="wallet_send_existential_warnining_transfer_dust">Ваша учетная запись будет удалена из блокчейна после перевода, потому что общий баланс становится ниже минимального. Остаток также будет переведен получателю.</string>
     <string name="wallet_send_from_network">Из сети</string>
-    <string name="wallet_send_insufficient_balance_commission">У вас недостаточно %s для оплаты комиссии</string>
+    <string name="wallet_send_insufficient_balance_commission">У вас недостаточно %s, чтобы оплатить комиссию и остаться выше минимального баланса</string>
     <string name="wallet_send_myself">Себе</string>
     <string name="wallet_send_on_chain">Внутри сети</string>
     <string name="wallet_send_phishing_warning_text">Следующий адрес: %s как известно, используется для фишинга, поэтому мы не рекомендуем отправлять токены на этот адрес. Вы все равно хотите продолжить?</string>
