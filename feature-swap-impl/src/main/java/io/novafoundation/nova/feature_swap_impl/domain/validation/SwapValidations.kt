@@ -13,11 +13,9 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.Sw
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
-import io.novafoundation.nova.feature_wallet_api.domain.validation.enoughBalanceToStayAboveEDValidation
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalanceConsideringConsumersValidation
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import java.math.BigDecimal
 
 typealias SwapValidationSystem = ValidationSystem<SwapValidationPayload, SwapValidationFailure>
