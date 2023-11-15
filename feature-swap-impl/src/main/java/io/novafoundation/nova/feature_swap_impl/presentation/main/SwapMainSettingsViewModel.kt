@@ -47,6 +47,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
+import io.novafoundation.nova.feature_swap_api.presentation.model.mapFromModel
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
@@ -56,7 +57,6 @@ import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
-import io.novafoundation.nova.feature_swap_api.presentation.model.mapFromModel
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
@@ -282,6 +282,23 @@ class SwapMainSettingsViewModel(
         .shareInBackground()
 
     val selectGetAssetInOption = actionAwaitableFactory.create<GetAssetInBottomSheet.Payload, GetAssetInOption>()
+
+    private val amountInputFormatter = CompoundNumberFormatter(
+        abbreviations = listOf(
+            NumberAbbreviation(
+                threshold = BigDecimal.ZERO,
+                divisor = BigDecimal.ONE,
+                suffix = "",
+                formatter = DynamicPrecisionFormatter(minScale = 5, minPrecision = 3)
+            ),
+            NumberAbbreviation(
+                threshold = BigDecimal.ONE,
+                divisor = BigDecimal.ONE,
+                suffix = "",
+                formatter = FixedPrecisionFormatter(precision = 5)
+            ),
+        )
+    )
 
     init {
         initPayload()
@@ -802,23 +819,6 @@ class SwapMainSettingsViewModel(
 
         swapRouter.openSwapConfirmation(payload)
     }
-
-    private val amountInputFormatter = CompoundNumberFormatter(
-        abbreviations = listOf(
-            NumberAbbreviation(
-                threshold = BigDecimal.ZERO,
-                divisor = BigDecimal.ONE,
-                suffix = "",
-                formatter = DynamicPrecisionFormatter(minScale = 5, minPrecision = 3)
-            ),
-            NumberAbbreviation(
-                threshold = BigDecimal.ONE,
-                divisor = BigDecimal.ONE,
-                suffix = "",
-                formatter = FixedPrecisionFormatter(precision = 5)
-            ),
-        )
-    )
 
     private fun Flow<Asset?>.token(): Flow<Token?> = map { it?.token }
 }
