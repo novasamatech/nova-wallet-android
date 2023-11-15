@@ -26,6 +26,7 @@ import jp.co.soramitsu.fearless_utils.runtime.definitions.types.composite.Struct
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.DefaultSignedExtensions
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.Extrinsic
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
+import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericEvent
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.skipAliases
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import jp.co.soramitsu.fearless_utils.runtime.extrinsic.signer.genesisHash
@@ -272,6 +273,8 @@ fun GenericCall.Instance.instanceOf(functionCandidate: MetadataFunction): Boolea
 
 fun GenericCall.Instance.instanceOf(moduleName: String, callName: String): Boolean = moduleName == module.name && callName == function.name
 
+fun GenericEvent.Instance.instanceOf(moduleName: String, eventName: String): Boolean = moduleName == module.name && eventName == event.name
+
 fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))
 
 fun SignatureWrapper.asHexString() = signature.toHexString(withPrefix = true)
@@ -334,4 +337,7 @@ object Modules {
     const val NOMINATION_POOLS = "NominationPools"
 
     const val ASSET_CONVERSION = "AssetConversion"
+
+    const val TRANSACTION_PAYMENT = "TransactionPayment"
+    const val ASSET_TX_PAYMENT = "AssetTxPayment"
 }

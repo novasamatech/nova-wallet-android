@@ -11,28 +11,27 @@ import io.novafoundation.nova.core_db.model.operation.OperationLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
-import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
-import io.novafoundation.nova.feature_currency_api.domain.model.Currency
+import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetWithAmountToLocal
+import io.novafoundation.nova.feature_wallet_api.data.mappers.mapOperationStatusToOperationLocalStatus
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.enabledAssets
+import io.novafoundation.nova.runtime.ext.localId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicStatus
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.onEach
 
 class RealPaymentUpdaterFactory(
     private val operationDao: OperationDao,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val scope: AccountUpdateScope,
-    private val currencyRepository: CurrencyRepository
 ) : PaymentUpdaterFactory {
 
     override fun create(chain: Chain): Updater<MetaAccount> {
@@ -41,7 +40,6 @@ class RealPaymentUpdaterFactory(
             assetSourceRegistry = assetSourceRegistry,
             scope = scope,
             chain = chain,
-            currencyRepository = currencyRepository
         )
     }
 }
@@ -51,7 +49,6 @@ private class PaymentUpdater(
     private val assetSourceRegistry: AssetSourceRegistry,
     override val scope: AccountUpdateScope,
     private val chain: Chain,
-    private val currencyRepository: CurrencyRepository
 ) : Updater<MetaAccount> {
 
     override val requiredModules: List<String> = emptyList()
@@ -86,11 +83,8 @@ private class PaymentUpdater(
             .getOrNull()
             ?: return null
 
-        val currencyFlow = currencyRepository.observeSelectCurrency()
-
-        return combine(assetUpdateFlow, currencyFlow) { balanceUpdate, currency ->
-            assetSource.history.syncOperationsForBalanceChange(chainAsset, balanceUpdate, accountId, currency)
-            balanceUpdate
+        return assetUpdateFlow.onEach { balanceUpdate ->
+            assetSource.history.syncOperationsForBalanceChange(chainAsset, balanceUpdate, accountId)
         }
             .catch { logSyncError(chain, chainAsset, error = it) }
     }
@@ -103,12 +97,13 @@ private class PaymentUpdater(
         chainAsset: Chain.Asset,
         balanceSyncUpdate: BalanceSyncUpdate,
         accountId: AccountId,
-        currency: Currency
     ) {
         when (balanceSyncUpdate) {
-            is BalanceSyncUpdate.CauseFetchable -> fetchOperationsForBalanceChange(chain, chainAsset, balanceSyncUpdate.blockHash, accountId, currency)
-                .onSuccess { blockTransfers ->
-                    val localOperations = blockTransfers.map { transfer -> createTransferOperationLocal(chainAsset, transfer, accountId) }
+            is BalanceSyncUpdate.CauseFetchable -> runCatching { fetchOperationsForBalanceChange(chain, chainAsset, balanceSyncUpdate.blockHash, accountId) }
+                .onSuccess { blockOperations ->
+                    val localOperations = blockOperations
+                        .filter { it.type.relates(accountId) }
+                        .map { operation -> createOperationLocal(chainAsset, operation, accountId) }
 
                     operationDao.insertAll(localOperations)
                 }.onFailure {
@@ -116,7 +111,7 @@ private class PaymentUpdater(
                 }
 
             is BalanceSyncUpdate.CauseFetched -> {
-                val local = createTransferOperationLocal(chainAsset, balanceSyncUpdate.cause, accountId)
+                val local = createOperationLocal(chainAsset, balanceSyncUpdate.cause, accountId)
                 operationDao.insert(local)
             }
 
@@ -124,28 +119,54 @@ private class PaymentUpdater(
         }
     }
 
-    private suspend fun createTransferOperationLocal(
+    private suspend fun createOperationLocal(
         chainAsset: Chain.Asset,
-        extrinsic: TransferExtrinsic,
+        historyUpdate: RealtimeHistoryUpdate,
         accountId: ByteArray,
     ): OperationLocal {
-        val localStatus = when (extrinsic.status) {
-            ExtrinsicStatus.SUCCESS -> OperationBaseLocal.Status.COMPLETED
-            ExtrinsicStatus.FAILURE -> OperationBaseLocal.Status.FAILED
-            ExtrinsicStatus.UNKNOWN -> OperationBaseLocal.Status.PENDING
+        return when (val type = historyUpdate.type) {
+            is RealtimeHistoryUpdate.Type.Swap -> createSwapOperation(chainAsset, historyUpdate, type, accountId)
+            is RealtimeHistoryUpdate.Type.Transfer -> createTransferOperation(chainAsset, historyUpdate, type, accountId)
         }
+    }
+
+    private fun createSwapOperation(
+        chainAsset: Chain.Asset,
+        historyUpdate: RealtimeHistoryUpdate,
+        swap: RealtimeHistoryUpdate.Type.Swap,
+        accountId: ByteArray,
+    ): OperationLocal {
+        return OperationLocal.manualSwap(
+            hash = historyUpdate.txHash,
+            originAddress = chain.addressOf(accountId),
+            assetId = chainAsset.localId,
+            fee = mapAssetWithAmountToLocal(swap.amountFee),
+            amountIn = mapAssetWithAmountToLocal(swap.amountIn),
+            amountOut = mapAssetWithAmountToLocal(swap.amountOut),
+            status = mapOperationStatusToOperationLocalStatus(historyUpdate.status),
+            source = OperationBaseLocal.Source.BLOCKCHAIN
+        )
+    }
+
+    private suspend fun createTransferOperation(
+        chainAsset: Chain.Asset,
+        historyUpdate: RealtimeHistoryUpdate,
+        transfer: RealtimeHistoryUpdate.Type.Transfer,
+        accountId: ByteArray,
+    ): OperationLocal {
+        val localStatus = mapOperationStatusToOperationLocalStatus(historyUpdate.status)
         val address = chain.addressOf(accountId)
 
-        val localCopy = operationDao.getTransferType(extrinsic.hash, address, chain.id, chainAsset.id)
+        val localCopy = operationDao.getTransferType(historyUpdate.txHash, address, chain.id, chainAsset.id)
 
         return OperationLocal.manualTransfer(
-            hash = extrinsic.hash,
+            hash = historyUpdate.txHash,
             chainId = chain.id,
             address = address,
             chainAssetId = chainAsset.id,
-            amount = extrinsic.amountInPlanks,
-            senderAddress = chain.addressOf(extrinsic.senderId),
-            receiverAddress = chain.addressOf(extrinsic.recipientId),
+            amount = transfer.amountInPlanks,
+            senderAddress = chain.addressOf(transfer.senderId),
+            receiverAddress = chain.addressOf(transfer.recipientId),
             fee = localCopy?.fee,
             status = localStatus,
             source = OperationBaseLocal.Source.BLOCKCHAIN,

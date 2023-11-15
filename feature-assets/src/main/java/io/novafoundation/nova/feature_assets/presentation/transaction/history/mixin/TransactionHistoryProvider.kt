@@ -106,7 +106,7 @@ class TransactionHistoryProvider(
         ).onFailure {
             performTransition(Action.PageError(error = it))
 
-            Log.d(LOG_TAG, "Failed to sync operations page", it)
+            Log.w(LOG_TAG, "Failed to sync operations page", it)
         }
     }
 

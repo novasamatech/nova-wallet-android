@@ -16,6 +16,8 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeJoin
 import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeJoin
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
+import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetWithAmountToLocal
+import io.novafoundation.nova.feature_wallet_api.data.mappers.mapOperationStatusToOperationLocalStatus
 import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
@@ -25,12 +27,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Operation.Type.Rew
 import io.novafoundation.nova.feature_wallet_api.domain.model.convertPlanks
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-
-fun mapOperationStatusToOperationLocalStatus(status: Operation.Status) = when (status) {
-    Operation.Status.PENDING -> OperationBaseLocal.Status.PENDING
-    Operation.Status.COMPLETED -> OperationBaseLocal.Status.COMPLETED
-    Operation.Status.FAILED -> OperationBaseLocal.Status.FAILED
-}
 
 private fun mapOperationStatusLocalToOperationStatus(status: OperationBaseLocal.Status) = when (status) {
     OperationBaseLocal.Status.PENDING -> Operation.Status.PENDING
@@ -263,14 +259,5 @@ private fun mapAssetWithAmountFromLocal(
     return ChainAssetWithAmount(
         chainAsset = asset,
         amount = local.amount
-    )
-}
-
-private fun mapAssetWithAmountToLocal(
-    chainAssetWithAmount: ChainAssetWithAmount
-): SwapTypeLocal.AssetWithAmount = with(chainAssetWithAmount) {
-    return SwapTypeLocal.AssetWithAmount(
-        assetId = AssetAndChainId(chainAsset.chainId, chainAsset.id),
-        amount = amount
     )
 }

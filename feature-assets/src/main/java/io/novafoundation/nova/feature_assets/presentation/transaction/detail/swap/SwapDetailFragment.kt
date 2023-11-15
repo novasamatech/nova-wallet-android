@@ -26,6 +26,7 @@ import kotlinx.android.synthetic.main.fragment_swap_details.swapDetailRate
 import kotlinx.android.synthetic.main.fragment_swap_details.swapDetailStatus
 import kotlinx.android.synthetic.main.fragment_swap_details.swapDetailToolbar
 import kotlinx.android.synthetic.main.fragment_swap_details.swapDetailWallet
+import kotlinx.android.synthetic.main.fragment_swap_details.swapDetailsRepeatOperation
 
 private const val KEY_PAYLOAD = "SwapDetailFragment.Payload"
 
@@ -60,6 +61,10 @@ class SwapDetailFragment : BaseFragment<SwapDetailViewModel>() {
 
         swapDetailFee.setOnClickListener {
             viewModel.feeClicked()
+        }
+
+        swapDetailsRepeatOperation.setOnClickListener {
+            viewModel.repeatOperationClicked()
         }
     }
 

@@ -9,8 +9,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQuery
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 import javax.inject.Qualifier
@@ -66,12 +65,17 @@ class NativeAssetsModule {
     @FeatureScope
     fun provideHistory(
         chainRegistry: ChainRegistry,
-        eventsRepository: EventsRepository,
-        walletRepository: WalletRepository,
+        realtimeOperationFetcherFactory: SubstrateRealtimeOperationFetcher.Factory,
         subQueryOperationsApi: SubQueryOperationsApi,
         cursorStorage: TransferCursorStorage,
         coinPriceRepository: CoinPriceRepository
-    ) = NativeAssetHistory(chainRegistry, eventsRepository, walletRepository, subQueryOperationsApi, cursorStorage, coinPriceRepository)
+    ) = NativeAssetHistory(
+        chainRegistry = chainRegistry,
+        realtimeOperationFetcherFactory = realtimeOperationFetcherFactory,
+        walletOperationsApi = subQueryOperationsApi,
+        cursorStorage = cursorStorage,
+        coinPriceRepository = coinPriceRepository
+    )
 
     @Provides
     @NativeAsset

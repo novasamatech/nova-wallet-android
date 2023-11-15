@@ -1,7 +1,7 @@
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter
+package io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter
 
-import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 
 interface MultiLocationConverter {
 

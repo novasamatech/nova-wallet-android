@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRep
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.CoinPriceLocalDataSourceImpl
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
@@ -52,6 +53,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderProviderFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcherFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.RealPaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainConfigApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.PalletXcmRepository
@@ -73,6 +75,8 @@ import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorSto
 import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -180,12 +184,10 @@ class WalletFeatureModule {
         operationDao: OperationDao,
         assetSourceRegistry: AssetSourceRegistry,
         accountUpdateScope: AccountUpdateScope,
-        currencyRepository: CurrencyRepository
     ): PaymentUpdaterFactory = RealPaymentUpdaterFactory(
         operationDao,
         assetSourceRegistry,
         accountUpdateScope,
-        currencyRepository
     )
 
     @Provides
@@ -316,5 +318,14 @@ class WalletFeatureModule {
             accountRepository = accountRepository,
             computationalCache = computationalCache
         )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSubstrateRealtimeOperationFetcherFactory(
+        multiLocationConverterFactory: MultiLocationConverterFactory,
+        eventsRepository: EventsRepository
+    ): SubstrateRealtimeOperationFetcher.Factory {
+        return SubstrateRealtimeOperationFetcherFactory(multiLocationConverterFactory, eventsRepository)
     }
 }

@@ -21,11 +21,9 @@ private class ModuleRestriction(
     companion object
 }
 
-private fun ModuleRestriction.Companion.ignoreTransferExtrinsics(
-    moduleNames: List<String>
-) = moduleNames.map {
+private fun ModuleRestriction.Companion.ignoreSpecialOperationTypesExtrinsics() = listOf(
     ModuleRestriction(
-        moduleName = it,
+        moduleName = "balances",
         restrictedCalls = listOf(
             "transfer",
             "transferKeepAlive",
@@ -33,8 +31,15 @@ private fun ModuleRestriction.Companion.ignoreTransferExtrinsics(
             "forceTransfer",
             "transferAll"
         )
+    ),
+    ModuleRestriction(
+        moduleName = "assetConversion",
+        restrictedCalls = listOf(
+            "swapExactTokensForTokens",
+            "swapTokensForExactTokens",
+        )
     )
-}
+)
 
 class SubqueryHistoryRequest(
     accountAddress: String,
@@ -78,7 +83,7 @@ class SubqueryHistoryRequest(
     """.trimIndent()
 
     private fun Set<TransactionFilter>.toQueryFilter(asset: Asset, chain: Chain): String {
-        val additionalFilters = not(isIgnoredExtrinsic(asset.type))
+        val additionalFilters = not(isIgnoredExtrinsic())
 
         val filtersExpressions = mapNotNull { it.filterExpression(asset, chain) }
         val userFilters = anyOf(filtersExpressions)
@@ -150,15 +155,10 @@ class SubqueryHistoryRequest(
 
     private fun hasExtrinsic() = hasType("extrinsic")
 
-    private fun Asset.Type.transferModules(): List<String> {
-        return listOf("balances")
-    }
-
-    private fun isIgnoredExtrinsic(assetType: Asset.Type): String {
+    private fun isIgnoredExtrinsic(): String {
         val exists = hasExtrinsic()
-        val transferModules = assetType.transferModules()
 
-        val restrictedModulesList = ModuleRestriction.ignoreTransferExtrinsics(transferModules).map {
+        val restrictedModulesList = ModuleRestriction.ignoreSpecialOperationTypesExtrinsics().map {
             val restrictedCallsExpressions = it.restrictedCalls.map(::callNamed)
 
             and(

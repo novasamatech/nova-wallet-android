@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types
+package io.novafoundation.nova.runtime.multiNetwork.multiLocation
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindByteArray
@@ -7,11 +7,10 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.structOf
-import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
-import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation.Junction
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.Ids
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation.Junction
 import jp.co.soramitsu.fearless_utils.extensions.fromHex
 import jp.co.soramitsu.fearless_utils.extensions.toHexString
 import jp.co.soramitsu.fearless_utils.runtime.AccountId

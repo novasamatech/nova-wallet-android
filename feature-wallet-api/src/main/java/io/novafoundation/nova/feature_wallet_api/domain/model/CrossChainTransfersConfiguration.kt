@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import java.math.BigInteger
 
 class CrossChainTransfersConfiguration(

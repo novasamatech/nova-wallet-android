@@ -6,6 +6,8 @@ import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.common.data.model.asCursorOrNull
 import io.novafoundation.nova.common.utils.nullIfEmpty
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
@@ -29,8 +31,23 @@ import kotlin.time.Duration.Companion.seconds
 abstract class SubstrateAssetHistory(
     private val subqueryApi: SubQueryOperationsApi,
     private val cursorStorage: TransferCursorStorage,
+    private val realtimeOperationFetcherFactory: SubstrateRealtimeOperationFetcher.Factory,
     coinPriceRepository: CoinPriceRepository
 ) : BaseAssetHistory(coinPriceRepository) {
+
+    abstract fun realtimeFetcherSources(): List<SubstrateRealtimeOperationFetcher.Factory.Source>
+
+    override suspend fun fetchOperationsForBalanceChange(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        blockHash: String,
+        accountId: AccountId
+    ): List<RealtimeHistoryUpdate> {
+        val sources = realtimeFetcherSources()
+        val realtimeOperationFetcher = realtimeOperationFetcherFactory.create(sources)
+
+        return realtimeOperationFetcher.extractRealtimeHistoryUpdates(chain, chainAsset, blockHash)
+    }
 
     override suspend fun additionalFirstPageSync(
         chain: Chain,

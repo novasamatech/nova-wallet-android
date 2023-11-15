@@ -26,7 +26,9 @@ sealed interface RewardTypeLocal : OperationTypeLocal {
         ForeignKey(
             entity = OperationBaseLocal::class,
             parentColumns = ["id", "address", "chainId", "assetId"],
-            childColumns = ["operationId", "address", "chainId", "assetId"]
+            childColumns = ["operationId", "address", "chainId", "assetId"],
+            onDelete = ForeignKey.CASCADE,
+            deferred = true,
         )
     ]
 )
@@ -58,7 +60,9 @@ class DirectRewardTypeJoin(
         ForeignKey(
             entity = OperationBaseLocal::class,
             parentColumns = ["id", "address", "chainId", "assetId"],
-            childColumns = ["operationId", "address", "chainId", "assetId"]
+            childColumns = ["operationId", "address", "chainId", "assetId"],
+            onDelete = ForeignKey.CASCADE,
+            deferred = true,
         )
     ]
 )
