@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
-    <!--<string name="wallet_send_insufficient_balance_commission">You don\'t have enough %s to pay fees</string>-->
     <string name="wallet_send_insufficient_balance_commission">You don\'t have enough %s to pay fee and remain above minimal balance</string>
 
     <string name="operations_swap_title">Swap</string>
