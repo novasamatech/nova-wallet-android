@@ -45,7 +45,7 @@ class ReferendumDetailsModule {
     @FeatureScope
     fun providePreImageParser(
         callAdapters: Set<@JvmSuppressWildcards ReferendumCallAdapter>
-    ) : ReferendumPreImageParser {
+    ): ReferendumPreImageParser {
         return RealReferendumPreImageParser(callAdapters)
     }
 

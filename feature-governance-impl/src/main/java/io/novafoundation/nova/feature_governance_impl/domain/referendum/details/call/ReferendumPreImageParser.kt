@@ -36,7 +36,7 @@ class RealReferendumPreImageParser(
     override suspend fun parse(preImage: PreImage, chainId: ChainId): ReferendumCall? {
         val context = RealReferendumCallParseContext(chainId, knownAdapters)
 
-        return withContext(Dispatchers.IO){
+        return withContext(Dispatchers.IO) {
             context.parse(preImage.call)
         }
     }
