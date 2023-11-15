@@ -104,7 +104,9 @@ class BalanceDetailViewModel(
 
     val swapButtonEnabled = assetFlow.flatMapLatest {
         swapAvailabilityInteractor.swapAvailableFlow(it.token.configuration, viewModelScope)
-    }.shareInBackground()
+    }
+        .onStart { emit(false) }
+        .shareInBackground()
 
     val buyEnabled: Flow<Boolean> = assetFlow
         .flatMapLatest { buyMixin.buyEnabledFlow(it.token.configuration) }
