@@ -163,6 +163,7 @@ abstract class OperationDao {
             is PoolRewardTypeLocal -> insertPoolRewardType(type)
             is SwapTypeLocal -> insertSwapType(type)
             is TransferTypeLocal -> insertTransferType(type)
+            else -> {}
         }
     }
 
