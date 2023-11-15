@@ -42,7 +42,7 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
 
     @Test
     fun shouldRetrieveAvailableDirections() = runTest {
-        val allAvailableAssetIdsToSwap = swapService.assetsAvailableForSwap(this)
+        val allAvailableAssetIdsToSwap = swapService.assetsAvailableForSwap(this).first()
         val allAvailableChainAssetsToSwap = allAvailableAssetIdsToSwap.map {
             val (chain, asset) = chainRegistry.chainWithAsset(it.chainId, it.assetId)
 
@@ -84,7 +84,8 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
             assetOut = siri,
             swapLimit = SwapLimit.SpecifiedIn(
                 expectedAmountIn = siri.planksFromAmount(0.000001.toBigDecimal()),
-                amountOutMin = Balance.ZERO
+                amountOutMin = Balance.ZERO,
+                expectedAmountOut = Balance.ZERO
             ),
             customFeeAsset = null,
             nativeAsset = arbitraryAssetUseCase.assetFlow(westmint.commissionAsset).first()
@@ -106,7 +107,8 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
             assetOut = wnd,
             swapLimit = SwapLimit.SpecifiedIn(
                 expectedAmountIn = siri.planksFromAmount(0.000001.toBigDecimal()),
-                amountOutMin = Balance.ZERO
+                amountOutMin = Balance.ZERO,
+                expectedAmountOut = Balance.ZERO
             ),
             customFeeAsset = siri,
             nativeAsset = arbitraryAssetUseCase.assetFlow(westmint.commissionAsset).first()
@@ -146,7 +148,7 @@ class SwapServiceIntegrationTest : BaseIntegrationTest() {
     }
 
     private suspend fun CoroutineScope.findAvailableDirectionsFor(asset: Chain.Asset) {
-        val directionsForWnd = swapService.availableSwapDirectionsFor(asset, this)
+        val directionsForWnd = swapService.availableSwapDirectionsFor(asset, this).first()
         val directionsForWndFormatted = directionsForWnd.map { otherId ->
             val otherAsset = chainRegistry.asset(otherId)
 
