@@ -22,6 +22,7 @@ import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.nullOnStart
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.sendEvent
+import io.novafoundation.nova.common.utils.skipFirst
 import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.common.validation.CompoundFieldValidator
 import io.novafoundation.nova.common.validation.FieldValidator
@@ -45,6 +46,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
@@ -54,6 +56,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
+import io.novafoundation.nova.feature_swap_api.presentation.model.mapFromModel
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
@@ -281,7 +284,7 @@ class SwapMainSettingsViewModel(
     val selectGetAssetInOption = actionAwaitableFactory.create<GetAssetInBottomSheet.Payload, GetAssetInOption>()
 
     init {
-        initAssetIn()
+        initPayload()
 
         handleInputChanges(amountInInput, SwapSettings::assetIn, SwapDirection.SPECIFIED_IN)
         handleInputChanges(amountOutInput, SwapSettings::assetOut, SwapDirection.SPECIFIED_OUT)
@@ -405,10 +408,44 @@ class SwapMainSettingsViewModel(
         swapRouter.openReceive(AssetPayload(chainAssetIn.chainId, chainAssetIn.id))
     }
 
-    private fun initAssetIn() {
+    private fun initPayload() {
         launch {
-            val chainWithAsset = chainRegistry.asset(payload.assetPayload.fullChainAssetId)
-            swapSettingState().setAssetInUpdatingFee(chainWithAsset)
+            val assetIn = chainRegistry.asset(payload.assetIn.fullChainAssetId)
+            val swapSettingsState = swapSettingState.await()
+            when (payload) {
+                is SwapSettingsPayload.DefaultFlow -> swapSettingState().setAssetInUpdatingFee(assetIn)
+
+                is SwapSettingsPayload.RepeatOperation -> {
+                    val assetOut = chainRegistry.asset(payload.assetOut.fullChainAssetId)
+                    val oldSwapSettings = swapSettingsState.selectedOption.first()
+                    val direction = payload.direction.mapFromModel()
+
+                    val swapSettings = SwapSettings(
+                        assetIn = assetIn,
+                        assetOut = assetOut,
+                        amount = payload.amount,
+                        swapDirection = direction,
+                        feeAsset = chainRegistry.asset(payload.feeAsset.fullChainAssetId),
+                        slippage = oldSwapSettings.slippage
+                    )
+
+                    swapSettingsState.setSwapSettings(swapSettings)
+
+                    initInputSilently(direction, assetIn, assetOut, payload.amount)
+                }
+            }
+        }
+    }
+
+    private fun initInputSilently(direction: SwapDirection, assetIn: Chain.Asset, assetOut: Chain.Asset, amount: Balance) {
+        when (direction) {
+            SwapDirection.SPECIFIED_IN -> {
+                amountInInput.updateInput(assetIn, amount)
+            }
+
+            SwapDirection.SPECIFIED_OUT -> {
+                amountOutInput.updateInput(assetOut, amount)
+            }
         }
     }
 
@@ -663,6 +700,7 @@ class SwapMainSettingsViewModel(
     ) {
         amountInput.amountState
             .filter { it.initiatedByUser }
+            .skipFirst()
             .onEach { state ->
                 val asset = chainAsset(swapSettings.first()) ?: return@onEach
                 val planks = state.value?.let(asset::planksFromAmount)

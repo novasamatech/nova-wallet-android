@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -14,15 +14,19 @@
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         app:homeButtonIcon="@drawable/ic_close"
+        app:layout_constraintTop_toTopOf="parent"
         app:titleText="Apr 10, 2022, 22:36"
         app:titleTextAppearance="@style/TextAppearance.NovaFoundation.TransactionDetailToolbar" />
 
     <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingBottom="16dp"
+        android:layout_weight="1"
         android:clipToPadding="false"
-        android:layout_weight="1">
+        android:paddingBottom="84dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/swapDetailToolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -127,4 +131,14 @@
         </LinearLayout>
 
     </ScrollView>
-</LinearLayout>
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/swapDetailsRepeatOperation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/swap_repeat_operation"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

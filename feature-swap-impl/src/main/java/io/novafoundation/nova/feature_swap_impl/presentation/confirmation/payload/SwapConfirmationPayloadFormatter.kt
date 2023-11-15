@@ -3,9 +3,10 @@ package io.novafoundation.nova.feature_swap_impl.presentation.confirmation.paylo
 import io.novafoundation.nova.common.utils.asPercent
 import io.novafoundation.nova.feature_account_api.data.model.InlineFee
 import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
+import io.novafoundation.nova.feature_swap_api.presentation.model.mapFromModel
+import io.novafoundation.nova.feature_swap_api.presentation.model.mapToModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
@@ -71,19 +72,5 @@ class SwapConfirmationPayloadFormatter(
             MinimumBalanceBuyIn.NoBuyInNeeded -> SwapConfirmationPayload.FeeDetails.MinimumBalanceBuyIn.NoBuyInNeeded
         }
         return SwapConfirmationPayload.FeeDetails(swapFee.networkFee.amount, minimumBalanceBuyIn)
-    }
-
-    fun SwapConfirmationPayload.Direction.mapFromModel(): SwapDirection {
-        return when (this) {
-            SwapConfirmationPayload.Direction.SPECIFIED_IN -> SwapDirection.SPECIFIED_IN
-            SwapConfirmationPayload.Direction.SPECIFIED_OUT -> SwapDirection.SPECIFIED_OUT
-        }
-    }
-
-    fun SwapDirection.mapToModel(): SwapConfirmationPayload.Direction {
-        return when (this) {
-            SwapDirection.SPECIFIED_IN -> SwapConfirmationPayload.Direction.SPECIFIED_IN
-            SwapDirection.SPECIFIED_OUT -> SwapConfirmationPayload.Direction.SPECIFIED_OUT
-        }
     }
 }

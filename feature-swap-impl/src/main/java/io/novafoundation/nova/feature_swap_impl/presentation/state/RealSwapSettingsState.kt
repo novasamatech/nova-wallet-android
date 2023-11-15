@@ -67,4 +67,8 @@ class RealSwapSettingsState(
 
         return newSettings
     }
+
+    override fun setSwapSettings(swapSettings: SwapSettings) {
+        selectedOption.value = swapSettings
+    }
 }

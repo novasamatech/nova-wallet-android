@@ -19,4 +19,6 @@ interface SwapSettingsState : SelectedOptionSharedState<SwapSettings> {
     fun setSlippage(slippage: Percent)
 
     suspend fun flipAssets(): SwapSettings
+
+    fun setSwapSettings(swapSettings: SwapSettings)
 }

@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
@@ -549,6 +550,10 @@ fun <T> Flow<T>.observeInLifecycle(
     lifecycleCoroutineScope.launchWhenResumed {
         collect(observer)
     }
+}
+
+fun <T> Flow<T>.skipFirst(): Flow<T> {
+    return drop(1)
 }
 
 fun <T> Map<out T, MutableStateFlow<Boolean>>.checkEnabled(key: T) = get(key)?.value ?: false
