@@ -9,8 +9,9 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.updateNonLockableAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.TransferExtrinsic
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.runtime.ethereum.contract.base.queryBatched
 import io.novafoundation.nova.runtime.ethereum.contract.base.querySingle
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Queries
@@ -20,7 +21,6 @@ import io.novafoundation.nova.runtime.ext.requireErc20
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.awaitCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicStatus
 import jp.co.soramitsu.fearless_utils.extensions.asEthereumAddress
 import jp.co.soramitsu.fearless_utils.extensions.toAccountId
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -128,7 +128,7 @@ class EvmErc20AssetBalance(
         accountAddress: String,
         contractAddress: String,
         chainAsset: Chain.Asset,
-    ): Flow<TransferExtrinsic> {
+    ): Flow<RealtimeHistoryUpdate> {
         val addressTopic = TypeEncoder.encode(Address(accountAddress))
 
         val transferEvent = Erc20Queries.TRANSFER_EVENT
@@ -154,13 +154,15 @@ class EvmErc20AssetBalance(
             val log = logNotification.params.result
             val event = Erc20Queries.parseTransferEvent(log)
 
-            TransferExtrinsic(
-                senderId = event.from.accountId(),
-                recipientId = event.to.accountId(),
-                amountInPlanks = event.amount.value,
-                chainAsset = chainAsset,
-                status = ExtrinsicStatus.SUCCESS,
-                hash = log.transactionHash,
+            RealtimeHistoryUpdate(
+                status = Operation.Status.COMPLETED,
+                txHash = log.transactionHash,
+                type = RealtimeHistoryUpdate.Type.Transfer(
+                    senderId = event.from.accountId(),
+                    recipientId = event.to.accountId(),
+                    amountInPlanks = event.amount.value,
+                    chainAsset = chainAsset,
+                )
             )
         }
     }
@@ -170,5 +172,5 @@ private fun Address.accountId() = value.asEthereumAddress().toAccountId().value
 
 private class Erc20BalanceUpdate(
     val newBalance: Balance,
-    val cause: TransferExtrinsic?
+    val cause: RealtimeHistoryUpdate?
 )

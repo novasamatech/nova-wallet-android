@@ -21,19 +21,11 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeFee
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchangeQuote
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.CompoundMultiLocationConverter
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.ForeignAssetsLocationConverter
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.LocalAssetsLocationConverter
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.MultiLocationConverter
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.NativeAssetLocationConverter
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter.toMultiLocationOrThrow
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.api.assetConversionOrNull
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.api.pools
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.toEncodableInstance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.commissionAsset
@@ -46,7 +38,11 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.getChainOrNull
-import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.toMultiLocationOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import jp.co.soramitsu.fearless_utils.runtime.AccountId
@@ -55,10 +51,10 @@ import jp.co.soramitsu.fearless_utils.runtime.extrinsic.ExtrinsicBuilder
 import jp.co.soramitsu.fearless_utils.runtime.metadata.RuntimeMetadata
 import jp.co.soramitsu.fearless_utils.runtime.metadata.call
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
 
 class AssetConversionExchangeFactory(
     private val chainRegistry: ChainRegistry,
+    private val multiLocationConverterFactory: MultiLocationConverterFactory,
     private val remoteStorageSource: StorageDataSource,
     private val runtimeCallsApi: MultiChainRuntimeCallsApi,
     private val extrinsicService: ExtrinsicService,
@@ -67,13 +63,8 @@ class AssetConversionExchangeFactory(
 
     override suspend fun create(chainId: ChainId, coroutineScope: CoroutineScope): AssetExchange? {
         val chain = chainRegistry.getChainOrNull(chainId) ?: return null
-        val runtimeAsync = coroutineScope.async { chainRegistry.getRuntime(chainId) }
 
-        val converter = CompoundMultiLocationConverter(
-            NativeAssetLocationConverter(chain),
-            LocalAssetsLocationConverter(chain, runtimeAsync),
-            ForeignAssetsLocationConverter(chain, runtimeAsync)
-        )
+        val converter = multiLocationConverterFactory.default(chain, coroutineScope)
 
         return AssetConversionExchange(
             chain = chain,

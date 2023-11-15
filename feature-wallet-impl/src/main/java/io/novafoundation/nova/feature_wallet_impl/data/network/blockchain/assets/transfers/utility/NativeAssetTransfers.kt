@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.accountIdIn
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
@@ -74,10 +74,13 @@ class NativeAssetTransfers(
         )
     }
 
-    override suspend fun transferFunctions(chainAsset: Chain.Asset) = listOf(Modules.BALANCES to "transfer")
+    override suspend fun transferFunctions(chainAsset: Chain.Asset) = listOf(
+        Modules.BALANCES to "transfer",
+        Modules.BALANCES to "transfer_allow_death",
+    )
 
     private fun getAccountInfoStorageKey(metaAccount: MetaAccount, chain: Chain, runtime: RuntimeSnapshot): String {
-        val accountId = metaAccount.accountIdIn(chain)!!
+        val accountId = metaAccount.requireAccountIdIn(chain)
         return runtime.metadata.module(Modules.SYSTEM).storage("Account").storageKey(runtime, accountId)
     }
 }

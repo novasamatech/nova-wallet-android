@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.requireActualType
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.toEncodableInstance
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Fungibility
 import jp.co.soramitsu.fearless_utils.runtime.RuntimeSnapshot
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.Type

@@ -1,11 +1,11 @@
-package io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.locationConverter
+package io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter
 
-import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
-import io.novafoundation.nova.feature_wallet_api.domain.model.isHere
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.ext.relaychainAsNative
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.isHere
 import java.math.BigInteger
 
 class NativeAssetLocationConverter(

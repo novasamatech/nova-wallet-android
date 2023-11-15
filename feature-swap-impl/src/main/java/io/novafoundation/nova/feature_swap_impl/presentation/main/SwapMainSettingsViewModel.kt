@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -603,8 +602,6 @@ class SwapMainSettingsViewModel(
                 }
             }
         )
-
-        Log.d("RX", "New quote arrived: ${quotingState.value}")
 
         handleNewQuote(quote, swapSettings)
     }

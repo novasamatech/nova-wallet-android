@@ -4,8 +4,8 @@ package io.novafoundation.nova.feature_swap_impl.data.network.blockhain.api
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindPair
 import io.novafoundation.nova.common.utils.assetConversionOrNull
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.bindMultiLocation
-import io.novafoundation.nova.feature_wallet_api.domain.model.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.bindMultiLocation
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry1
