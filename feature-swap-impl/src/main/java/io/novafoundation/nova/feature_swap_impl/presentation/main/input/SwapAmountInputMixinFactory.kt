@@ -58,7 +58,8 @@ private class RealSwapAmountInputMixin(
     maxActionProvider = maxActionProvider,
     fiatFormatter = fiatFormatter,
     fieldValidator = fieldValidator
-), SwapAmountInputMixin.Presentation {
+),
+    SwapAmountInputMixin.Presentation {
 
     override val assetModel: Flow<SwapInputAssetModel> = tokenFlow.map {
         val chainAsset = it?.configuration
