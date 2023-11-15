@@ -27,7 +27,7 @@ sealed class SwapValidationFailure {
 
     sealed class NotEnoughFunds : SwapValidationFailure() {
 
-        class ToStayAboveED(override val asset: Chain.Asset) : NotEnoughFunds(), InsufficientBalanceToStayAboveEDError
+        class ToPayFeeAndStayAboveED(override val asset: Chain.Asset) : NotEnoughFunds(), InsufficientBalanceToStayAboveEDError
 
         object InUsedAsset : NotEnoughFunds()
 

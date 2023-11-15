@@ -31,10 +31,10 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBala
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceConsideringNonSufficientAssetsValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceInFeeAsset
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceInUsedAsset
-import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceToPayFeeConsideringED
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapFeeSufficientBalance
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapSmallRemainingBalance
 import io.novafoundation.nova.feature_swap_impl.domain.validation.utils.SharedQuoteValidationRetriever
+import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.sufficientNativeBalanceToPayFeeConsideringED
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -141,7 +141,7 @@ class SwapInteractor(
 
             sufficientBalanceInFeeAsset()
 
-            sufficientBalanceToPayFeeConsideringED(assetSourceRegistry)
+            sufficientNativeBalanceToPayFeeConsideringED(assetSourceRegistry, chainRegistry)
 
             availableSlippage(swapService)
 

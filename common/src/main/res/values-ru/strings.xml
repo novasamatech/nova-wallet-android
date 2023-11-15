@@ -1309,7 +1309,7 @@
     <string name="wallet_send_existential_warning_title">Перевод удалит аккаунт</string>
     <string name="wallet_send_existential_warnining_transfer_dust">Ваша учетная запись будет удалена из блокчейна после перевода, потому что общий баланс становится ниже минимального. Остаток также будет переведен получателю.</string>
     <string name="wallet_send_from_network">Из сети</string>
-    <string name="wallet_send_insufficient_balance_commission">У вас недостаточно %, чтобы оплатить комиссию и остаться выше минимального баланса</string>
+    <string name="wallet_send_insufficient_balance_commission">У вас недостаточно %s, чтобы оплатить комиссию и остаться выше минимального баланса</string>
     <string name="wallet_send_myself">Себе</string>
     <string name="wallet_send_on_chain">Внутри сети</string>
     <string name="wallet_send_phishing_warning_text">Следующий адрес: %s как известно, используется для фишинга, поэтому мы не рекомендуем отправлять токены на этот адрес. Вы все равно хотите продолжить?</string>

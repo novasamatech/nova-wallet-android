@@ -87,16 +87,6 @@ fun SwapValidationSystemBuilder.sufficientAssetOutBalanceToStayAboveED(
     assetSourceRegistry: AssetSourceRegistry
 ) = sufficientAmountOutToStayAboveEDValidation(assetSourceRegistry)
 
-fun SwapValidationSystemBuilder.sufficientBalanceToPayFeeConsideringED(
-    assetSourceRegistry: AssetSourceRegistry
-) = enoughBalanceToStayAboveEDValidation(
-    assetSourceRegistry,
-    fee = { it.feeAsset.token.amountFromPlanks(it.swapFee.networkFee.amount) },
-    balance = { it.feeAsset.free },
-    chainWithAsset = { ChainWithAsset(it.detailedAssetIn.chain, it.feeAsset.token.configuration) },
-    error = { payload, _ -> SwapValidationFailure.NotEnoughFunds.ToStayAboveED(payload.feeAsset.token.configuration) }
-)
-
 fun SwapValidationSystemBuilder.checkForFeeChanges(
     swapService: SwapService
 ) = checkForFeeChanges(

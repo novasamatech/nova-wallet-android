@@ -41,7 +41,7 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
     amountOutSwapMinAction: (Chain.Asset, Balance) -> Unit
 ): TransformedFailure? {
     return when (val reason = status.reason) {
-        is NotEnoughFunds.ToStayAboveED -> handleInsufficientBalanceCommission(reason, resourceManager).asDefault()
+        is NotEnoughFunds.ToPayFeeAndStayAboveED -> handleInsufficientBalanceCommission(reason, resourceManager).asDefault()
 
         NotEnoughFunds.InUsedAsset -> resourceManager.amountIsTooBig().asDefault()
 
