@@ -150,5 +150,5 @@ class RuntimeFactory(
 
     private fun fromJson(types: String): TypeDefinitionsTree = gson.fromJson(types, TypeDefinitionsTree::class.java)
 
-    private fun allSiTypeMappings() = SiTypeMapping.default() + SiVoteTypeMapping
+    private fun allSiTypeMappings() = SiTypeMapping.default() + SiVoteTypeMapping()
 }
