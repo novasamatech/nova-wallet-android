@@ -769,7 +769,7 @@ class SwapMainSettingsViewModel(
         val swapSettings = swapSettings.first()
         return swapInteractor.getValidationPayload(
             assetIn = swapSettings.assetIn ?: return null,
-            assetOut = swapSettings.assetIn ?: return null,
+            assetOut = swapSettings.assetOut ?: return null,
             feeAsset = swapSettings.feeAsset ?: return null,
             quoteArgs = quotingState.quoteArgs,
             swapQuote = quotingState.value,
