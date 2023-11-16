@@ -15,7 +15,7 @@ class SufficientAmountOutToStayAboveEDValidation(
         val assetOut = value.detailedAssetOut.asset
         val amountOut = value.detailedAssetOut.amountInPlanks
         val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(chainOut, assetOut.token.configuration)
-        return validOrError(assetOut.totalInPlanks + amountOut >= existentialDeposit) {
+        return validOrError(assetOut.freeInPlanks + amountOut >= existentialDeposit) {
             SwapValidationFailure.AmountOutIsTooLowToStayAboveED(
                 assetOut.token.configuration,
                 amountOut,

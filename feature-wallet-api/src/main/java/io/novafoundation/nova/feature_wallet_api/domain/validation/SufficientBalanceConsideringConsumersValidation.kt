@@ -15,7 +15,7 @@ class SufficientBalanceConsideringConsumersValidation<P, E>(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val chainExtractor: (P) -> Chain,
     private val assetExtractor: (P) -> Chain.Asset,
-    private val totalBalanceExtractor: (P) -> Balance,
+    private val balanceExtractor: (P) -> Balance,
     private val feeExtractor: (P) -> Balance,
     private val amountExtractor: (P) -> Balance,
     private val error: (P, existentialDeposit: Balance) -> E
@@ -30,12 +30,12 @@ class SufficientBalanceConsideringConsumersValidation<P, E>(
         return if (totalCanDropBelowMinimumBalance) {
             valid()
         } else {
-            val totalBalance = totalBalanceExtractor(value)
+            val balance = balanceExtractor(value)
             val amount = amountExtractor(value)
             val fee = feeExtractor(value)
 
             val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(chain, asset)
-            validOrError(totalBalance - existentialDeposit >= amount + fee) { error(value, existentialDeposit) }
+            validOrError(balance - existentialDeposit >= amount + fee) { error(value, existentialDeposit) }
         }
     }
 }
@@ -44,7 +44,7 @@ fun <P, E> ValidationSystemBuilder<P, E>.sufficientBalanceConsideringConsumersVa
     assetSourceRegistry: AssetSourceRegistry,
     chainExtractor: (P) -> Chain,
     assetExtractor: (P) -> Chain.Asset,
-    totalBalanceExtractor: (P) -> Balance,
+    balanceExtractor: (P) -> Balance,
     feeExtractor: (P) -> Balance,
     amountExtractor: (P) -> Balance,
     error: (P, existentialDeposit: Balance) -> E
@@ -53,7 +53,7 @@ fun <P, E> ValidationSystemBuilder<P, E>.sufficientBalanceConsideringConsumersVa
         assetSourceRegistry,
         chainExtractor,
         assetExtractor,
-        totalBalanceExtractor,
+        balanceExtractor,
         feeExtractor,
         amountExtractor,
         error,
