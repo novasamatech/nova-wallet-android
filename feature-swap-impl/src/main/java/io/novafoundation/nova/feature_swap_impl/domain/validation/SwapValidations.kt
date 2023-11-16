@@ -44,7 +44,7 @@ fun SwapValidationSystemBuilder.sufficientBalanceConsideringConsumersValidation(
     assetSourceRegistry,
     chainExtractor = { it.detailedAssetIn.chain },
     assetExtractor = { it.detailedAssetIn.asset.token.configuration },
-    totalBalanceExtractor = { it.detailedAssetIn.asset.totalInPlanks },
+    balanceExtractor = { it.detailedAssetIn.asset.freeInPlanks },
     feeExtractor = { it.totalDeductedAmountInFeeToken },
     amountExtractor = { it.detailedAssetIn.amountInPlanks },
     error = { payload, existentialDeposit ->
