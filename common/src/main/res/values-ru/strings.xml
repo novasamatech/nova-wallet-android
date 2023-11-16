@@ -209,7 +209,7 @@
     <string name="common_cancel_operation_warning">Вы уверены, что хотите отменить операцию?</string>
     <string name="common_cannot_find_app">К сожалению, у вас нет подходящего приложения для обработки этого запроса</string>
     <string name="common_cannot_open_link">Не удается открыть данную ссылку</string>
-    <string name="common_cannot_pay_network_fee_message" formatted="false">У вас недостаточно средств для оплаты комиссии сети в размере %s.\nДоступный баланс для оплаты комиссии после операции: %s</string>
+    <string name="common_cannot_pay_network_fee_message" formatted="false">Вы можете использовать не больше %s, поскольку вам нужно заплатить\n%s за комиссию за сети.</string>
     <string name="common_chain">Сеть</string>
     <string name="common_change">Изменить</string>
     <string name="common_choose_network">Выберите сеть</string>
