@@ -30,7 +30,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="@string/common_title"
-        android:textColor="@color/text_tertiary" />
+        android:textColor="@color/text_secondary" />
 
     <io.novafoundation.nova.common.view.input.TextInputView
         android:id="@+id/addToFavouritesTitleInput"
@@ -49,7 +49,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="@string/common_address"
-        android:textColor="@color/text_tertiary" />
+        android:textColor="@color/text_secondary" />
 
     <io.novafoundation.nova.common.view.input.TextInputView
         android:id="@+id/addToFavouritesAddressInput"

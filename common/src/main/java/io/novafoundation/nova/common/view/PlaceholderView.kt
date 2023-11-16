@@ -27,9 +27,9 @@ class PlaceholderView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     enum class Style(val showBackground: Boolean, val backgroundColorRes: Int?, val textColorRes: Int) {
-        BACKGROUND_PRIMARY(true, R.color.block_background, R.color.text_tertiary),
-        BACKGROUND_SECONDARY(true, R.color.block_background, R.color.text_tertiary),
-        NO_BACKGROUND(false, null, R.color.text_tertiary)
+        BACKGROUND_PRIMARY(true, R.color.block_background, R.color.text_secondary),
+        BACKGROUND_SECONDARY(true, R.color.block_background, R.color.text_secondary),
+        NO_BACKGROUND(false, null, R.color.text_secondary)
     }
 
     init {

@@ -38,7 +38,7 @@
         android:layout_marginEnd="16dp"
         android:text="@string/staking_select_custom"
         app:actionIcon="@drawable/ic_chevron_right"
-        app:actionTint="@color/text_tertiary"
+        app:actionTint="@color/text_secondary"
         app:dividerVisible="false"
         tools:background="@color/divider" />
 </LinearLayout>

@@ -144,7 +144,7 @@ class RealReferendumFormatter(
 
                 ReferendumStatusModel(
                     name = resourceManager.getString(titleRes),
-                    colorRes = R.color.text_tertiary
+                    colorRes = R.color.text_secondary
                 )
             }
             is ReferendumStatus.Ongoing.InQueue -> ReferendumStatusModel(
@@ -153,11 +153,11 @@ class RealReferendumFormatter(
                     status.position.index,
                     status.position.maxSize
                 ),
-                colorRes = R.color.text_tertiary
+                colorRes = R.color.text_secondary
             )
             is ReferendumStatus.Ongoing.Deciding -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_deciding),
-                colorRes = R.color.text_tertiary
+                colorRes = R.color.text_secondary
             )
             is ReferendumStatus.Ongoing.Confirming -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_passing),
@@ -177,11 +177,11 @@ class RealReferendumFormatter(
             )
             ReferendumStatus.NotExecuted.Cancelled -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_cancelled),
-                colorRes = R.color.text_tertiary
+                colorRes = R.color.text_secondary
             )
             ReferendumStatus.NotExecuted.TimedOut -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_timeout),
-                colorRes = R.color.text_tertiary
+                colorRes = R.color.text_secondary
             )
             ReferendumStatus.NotExecuted.Killed -> ReferendumStatusModel(
                 name = resourceManager.getString(R.string.referendum_status_killed),
@@ -348,7 +348,7 @@ class RealReferendumFormatter(
 
     private fun ReferendumTimeEstimation.TextStyle.Companion.regular() = ReferendumTimeEstimation.TextStyle(
         iconRes = R.drawable.ic_time_16,
-        textColorRes = R.color.text_tertiary,
+        textColorRes = R.color.text_secondary,
         iconColorRes = R.color.icon_secondary,
     )
 
@@ -409,7 +409,7 @@ class RealReferendumFormatter(
         return when (voteDirection) {
             VoteType.AYE -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_aye), R.color.text_positive)
             VoteType.NAY -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_nay), R.color.text_negative)
-            VoteType.ABSTAIN -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_abstain), R.color.text_tertiary)
+            VoteType.ABSTAIN -> VoteDirectionModel(resourceManager.getString(R.string.referendum_vote_abstain), R.color.text_secondary)
         }
     }
 }

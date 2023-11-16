@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textColor="@color/text_tertiary"
+        android:textColor="@color/text_secondary"
         tools:text="Your assets will appear here.\nMake sure the 'Hide zero balances' filter is turned off" />
 
     <TextView

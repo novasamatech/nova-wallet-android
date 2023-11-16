@@ -53,8 +53,8 @@ fun SelectedStakeTargetStatusModel.Companion.Inactive(
     SelectedStakeTargetStatusModel.TitleConfig(
         text = resourceManager.getString(R.string.staking_your_not_elected_format, groupSize),
         iconRes = R.drawable.ic_time_16,
-        iconTintRes = R.color.text_tertiary,
-        textColorRes = R.color.text_tertiary,
+        iconTintRes = R.color.text_secondary,
+        textColorRes = R.color.text_secondary,
     ),
     description = resourceManager.getString(description)
 )
@@ -75,8 +75,8 @@ fun SelectedStakeTargetStatusModel.Companion.Waiting(
     SelectedStakeTargetStatusModel.TitleConfig(
         text = title,
         iconRes = R.drawable.ic_time_16,
-        iconTintRes = R.color.text_tertiary,
-        textColorRes = R.color.text_tertiary,
+        iconTintRes = R.color.text_secondary,
+        textColorRes = R.color.text_secondary,
     ),
     description = resourceManager.getString(description)
 )

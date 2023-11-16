@@ -115,7 +115,7 @@
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="16dp"
                 android:text="@string/staking_period_current_date_title"
-                android:textColor="@color/text_tertiary" />
+                android:textColor="@color/text_secondary" />
 
             <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/customStakingPeriodEnd"

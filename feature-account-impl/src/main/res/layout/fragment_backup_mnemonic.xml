@@ -33,7 +33,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:text="@string/account_create_details_v2_2_0"
-        android:textColor="@color/text_tertiary" />
+        android:textColor="@color/text_secondary" />
 
     <io.novafoundation.nova.common.view.LabeledTextView
         android:id="@+id/backupMnemonicPhrase"
@@ -56,7 +56,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:text="@string/account_backup_secret_caption"
-        android:textColor="@color/text_tertiary" />
+        android:textColor="@color/text_secondary" />
 
     <Space
         android:layout_width="match_parent"

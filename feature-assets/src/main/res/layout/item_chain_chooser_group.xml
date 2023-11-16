@@ -8,7 +8,7 @@
     android:layout_marginTop="12dp"
     android:id="@+id/itemChainChooserGroup"
     android:layout_marginBottom="4dp"
-    android:textColor="@color/text_tertiary"
+    android:textColor="@color/text_secondary"
     tools:text="Cross-chain">
 
 </TextView>

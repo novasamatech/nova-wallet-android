@@ -91,7 +91,7 @@ class ManageTokensViewHolder(
         itemManageTokenMultichainEnabled.isChecked = item.enabled
         itemManageTokenMultichainEnabled.isEnabled = item.switchable
 
-        val contentColorRes = if (item.enabled) R.color.text_primary else R.color.text_tertiary
+        val contentColorRes = if (item.enabled) R.color.text_primary else R.color.text_secondary
         itemManageTokenMultichainIcon.setImageTintRes(contentColorRes)
         itemManageTokenMultichainSymbol.setTextColorRes(contentColorRes)
     }
