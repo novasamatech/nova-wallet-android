@@ -40,3 +40,7 @@ fun ExtrinsicWithEvents.nativeFee(): BigInteger? {
 fun ExtrinsicWithEvents.findEvent(module: String, event: String): GenericEvent.Instance? {
     return events.find { it.instanceOf(module, event) }
 }
+
+fun ExtrinsicWithEvents.findLastEvent(module: String, event: String): GenericEvent.Instance? {
+    return events.findLast { it.instanceOf(module, event) }
+}

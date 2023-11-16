@@ -15,7 +15,7 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.bindMultiLocati
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicWithEvents
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvent
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findLastEvent
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.nativeFee
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import kotlinx.coroutines.CoroutineScope
@@ -61,7 +61,9 @@ class AssetConversionSwapExtractor(
     }
 
     private fun ExtrinsicWithEvents.extractSwapAmounts(): Pair<Balance, Balance> {
-        val swapExecutedEvent = findEvent(Modules.ASSET_CONVERSION, "SwapExecuted")
+        // Swaps with custom fee token produce two SwapExecuted events, first one to swap for fees, second one for the actual swap
+        // So its important to take the last matching event
+        val swapExecutedEvent = findLastEvent(Modules.ASSET_CONVERSION, "SwapExecuted")
 
         return when {
             // successful swap, extract from event
