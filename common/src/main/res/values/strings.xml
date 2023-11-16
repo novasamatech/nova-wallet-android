@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="settings_wiki">Wiki</string>
+
     <string name="swap_repeat_operation">Repeat the operation</string>
 
     <string name="wallet_filters_swaps">Swaps</string>
