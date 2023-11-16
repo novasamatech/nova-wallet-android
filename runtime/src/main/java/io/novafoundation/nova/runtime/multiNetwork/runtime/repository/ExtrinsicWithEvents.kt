@@ -41,6 +41,10 @@ fun ExtrinsicWithEvents.findEvent(module: String, event: String): GenericEvent.I
     return events.find { it.instanceOf(module, event) }
 }
 
-fun ExtrinsicWithEvents.findLastEvent(module: String, event: String): GenericEvent.Instance? {
-    return events.findLast { it.instanceOf(module, event) }
+fun ExtrinsicWithEvents.hasEvent(module: String, event: String): Boolean {
+    return events.any { it.instanceOf(module, event) }
+}
+
+fun ExtrinsicWithEvents.findAllEvents(module: String, event: String): List<GenericEvent.Instance> {
+    return events.filter { it.instanceOf(module, event) }
 }

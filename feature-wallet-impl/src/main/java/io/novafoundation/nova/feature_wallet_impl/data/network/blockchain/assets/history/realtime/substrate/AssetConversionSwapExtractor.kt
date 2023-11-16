@@ -14,9 +14,12 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.bindMultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicWithEvents
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findLastEvent
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findAllEvents
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.hasEvent
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.nativeFee
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.status
 import jp.co.soramitsu.fearless_utils.runtime.definitions.types.generics.GenericCall
 import kotlinx.coroutines.CoroutineScope
 import kotlin.coroutines.coroutineContext
@@ -61,9 +64,28 @@ class AssetConversionSwapExtractor(
     }
 
     private fun ExtrinsicWithEvents.extractSwapAmounts(): Pair<Balance, Balance> {
-        // Swaps with custom fee token produce two SwapExecuted events, first one to swap for fees, second one for the actual swap
-        // So its important to take the last matching event
-        val swapExecutedEvent = findLastEvent(Modules.ASSET_CONVERSION, "SwapExecuted")
+        val isCustomFeeTokenUsed = hasEvent(Modules.ASSET_TX_PAYMENT, "AssetTxFeePaid")
+        val extrinsicStatus = status()
+        val allSwaps = findAllEvents(Modules.ASSET_CONVERSION, "SwapExecuted")
+
+        val swapExecutedEvent = when {
+            extrinsicStatus == ExtrinsicStatus.FAILURE -> null // we wont be able to extract swap from event
+
+            isCustomFeeTokenUsed -> {
+                // Swaps with custom fee token produce up to free SwapExecuted events, in the following order:
+                // SwapExecuted (Swap custom token fee to native token) - always present
+                // SwapExecuted (Real swap) - always present
+                // SwapExecuted (Refund remaining fee back to custom token)
+                // So we need to take the middle one
+
+                allSwaps.getOrNull(1)
+            }
+
+            else -> {
+                // Only one swap is possible in case
+                allSwaps.firstOrNull()
+            }
+        }
 
         return when {
             // successful swap, extract from event
