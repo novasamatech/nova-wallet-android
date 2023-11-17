@@ -4,6 +4,8 @@ import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.common.utils.tokens
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core_db.dao.LockDao
+import io.novafoundation.nova.core_db.model.AssetLocal.EDCountingModeLocal
+import io.novafoundation.nova.core_db.model.AssetLocal.TransferableModeLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
@@ -96,12 +98,17 @@ class OrmlAssetBalance(
         metaId: Long,
         chainAsset: Chain.Asset,
         ormlAccountData: OrmlAccountData
-    ) = assetCache.updateAsset(metaId, chainAsset) {
-        it.copy(
-            frozenInPlanks = ormlAccountData.frozen,
-            freeInPlanks = ormlAccountData.free,
-            reservedInPlanks = ormlAccountData.reserved
-        )
+    ) = assetCache.updateAsset(metaId, chainAsset) { local ->
+        with(ormlAccountData) {
+            local.copy(
+                frozenInPlanks = frozen,
+                freeInPlanks = free,
+                reservedInPlanks = reserved,
+                transferableMode = TransferableModeLocal.REGULAR,
+                edCountingMode = EDCountingModeLocal.TOTAL,
+            )
+        }
+
     }
 
     private fun RuntimeSnapshot.ormlBalanceKey(accountId: AccountId, chainAsset: Chain.Asset): String {

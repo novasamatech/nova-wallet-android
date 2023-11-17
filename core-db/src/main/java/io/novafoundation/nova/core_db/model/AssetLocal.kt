@@ -28,12 +28,21 @@ data class AssetLocal(
     val frozenInPlanks: BigInteger,
     val reservedInPlanks: BigInteger,
 
+    val transferableMode: TransferableModeLocal,
+    val edCountingMode: EDCountingModeLocal,
+
     // TODO move to runtime storage
     val bondedInPlanks: BigInteger,
     val redeemableInPlanks: BigInteger,
     val unbondingInPlanks: BigInteger,
 ) : Identifiable {
+
     companion object {
+
+        fun defaultTransferableMode(): TransferableModeLocal = TransferableModeLocal.REGULAR
+
+        fun defaultEdCountingMode(): EDCountingModeLocal = EDCountingModeLocal.TOTAL
+
         fun createEmpty(
             assetId: Int,
             chainId: String,
@@ -44,11 +53,21 @@ data class AssetLocal(
             metaId = metaId,
             freeInPlanks = BigInteger.ZERO,
             reservedInPlanks = BigInteger.ZERO,
+            transferableMode = defaultTransferableMode(),
+            edCountingMode = defaultEdCountingMode(),
             frozenInPlanks = BigInteger.ZERO,
             bondedInPlanks = BigInteger.ZERO,
             redeemableInPlanks = BigInteger.ZERO,
-            unbondingInPlanks = BigInteger.ZERO
+            unbondingInPlanks = BigInteger.ZERO,
         )
+    }
+
+    enum class TransferableModeLocal {
+        REGULAR, HOLDS_AND_FREEZES
+    }
+
+    enum class EDCountingModeLocal {
+        TOTAL, FREE
     }
 
     override val identifier: String

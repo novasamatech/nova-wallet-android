@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validatio
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.PublicCrowdloanValidation
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.balanceCountedTowardsED
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 @Module
@@ -52,7 +53,7 @@ class ContributeValidationsModule {
     fun provideExistentialWarningValidation(
         walletConstants: WalletConstants,
     ) = ContributeExistentialDepositValidation(
-        totalBalanceProducer = { it.asset.total },
+        countableTowardsEdBalance = { it.asset.balanceCountedTowardsED() },
         feeProducer = { it.fee },
         extraAmountProducer = { it.contributionAmount },
         existentialDeposit = {

@@ -7,14 +7,15 @@ import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDeposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.balanceCountedTowardsED
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import java.math.BigDecimal
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.map
+import java.math.BigDecimal
 
 class SwapReceiveAmountAboveEDFieldValidatorFactory(
     private val resourceManager: ResourceManager,
@@ -41,7 +42,7 @@ class SwapReceiveAmountAboveEDFieldValidator(
             val existentialDeposit = assetWithExistentialDeposit.second
 
             when {
-                amount >= BigDecimal.ZERO && asset.total + amount < existentialDeposit -> {
+                amount >= BigDecimal.ZERO && asset.balanceCountedTowardsED() + amount < existentialDeposit -> {
                     val formattedExistentialDeposit = existentialDeposit.formatTokenAmount(asset.token.configuration)
                     FieldValidationResult.Error(
                         resourceManager.getString(R.string.swap_field_validation_to_low_amount_out, formattedExistentialDeposit)

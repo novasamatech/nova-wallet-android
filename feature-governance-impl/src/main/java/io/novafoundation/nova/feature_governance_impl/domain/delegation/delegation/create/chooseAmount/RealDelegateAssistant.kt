@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.maxLockReplacing
+import io.novafoundation.nova.feature_wallet_api.domain.model.transferableReplacingFrozen
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
 
@@ -35,7 +36,7 @@ class RealDelegateAssistant(
 
         val currentTransferablePlanks = asset.transferableInPlanks
         val newLocked = otherMaxLocked.max(newGovernanceLocked)
-        val newTransferablePlanks = asset.freeInPlanks - newLocked
+        val newTransferablePlanks = asset.transferableReplacingFrozen(newLocked)
 
         return LocksChange(
             lockedAmountChange = Change(

@@ -174,7 +174,7 @@ private class AssetConversionExchange(
 
         val minimumBalance = assetBalances.existentialDeposit(chain, nativeChainAsset)
         // https://github.com/paritytech/polkadot-sdk/blob/39c04fdd9622792ba8478b1c1c300417943a034b/substrate/frame/transaction-payment/asset-conversion-tx-payment/src/payment.rs#L114
-        val shouldBuyMinimumBalance = nativeAsset.freeInPlanks < minimumBalance + nativeTokenFee.amount
+        val shouldBuyMinimumBalance = nativeAsset.balanceCountedTowardsEDInPlanks < minimumBalance + nativeTokenFee.amount
 
         val toBuyNativeFee = runtimeCallsApi.quoteFeeConversion(nativeTokenFee.amount, customFeeAsset)
 

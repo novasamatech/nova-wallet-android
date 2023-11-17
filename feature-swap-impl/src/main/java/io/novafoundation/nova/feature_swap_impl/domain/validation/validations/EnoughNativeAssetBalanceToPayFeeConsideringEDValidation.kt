@@ -24,7 +24,7 @@ class EnoughNativeAssetBalanceToPayFeeConsideringEDValidation(
         if (feeChainAsset.isCommissionAsset) {
             val chain = chainRegistry.getChain(feeChainAsset.chainId)
             val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(chain, feeChainAsset)
-            return validOrError(value.feeAsset.freeInPlanks - value.swapFee.networkFee.amount >= existentialDeposit) {
+            return validOrError(value.feeAsset.balanceCountedTowardsEDInPlanks - value.swapFee.networkFee.amount >= existentialDeposit) {
                 NotEnoughFunds.ToPayFeeAndStayAboveED(value.feeAsset.token.configuration)
             }
         }

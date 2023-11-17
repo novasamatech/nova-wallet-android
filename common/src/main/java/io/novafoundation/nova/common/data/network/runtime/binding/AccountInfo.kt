@@ -12,7 +12,26 @@ class AccountData(
     val free: BigInteger,
     val reserved: BigInteger,
     val frozen: BigInteger,
+    val flags: AccountDataFlags,
 )
+
+@JvmInline
+value class AccountDataFlags(val value: BigInteger) {
+
+    companion object {
+
+        fun default() = AccountDataFlags(BigInteger.ZERO)
+
+        private val HOLD_AND_FREEZES_ENABLED_MASK: BigInteger = BigInteger("80000000000000000000000000000000", 16)
+    }
+
+    fun holdsAndFreezesEnabled(): Boolean {
+        return flagEnabled(HOLD_AND_FREEZES_ENABLED_MASK)
+    }
+
+    @Suppress("SameParameterValue")
+    private fun flagEnabled(flag: BigInteger) = value and flag == flag
+}
 
 class AccountInfo(
     val consumers: BigInteger,
@@ -29,7 +48,8 @@ class AccountInfo(
             data = AccountData(
                 free = BigInteger.ZERO,
                 reserved = BigInteger.ZERO,
-                frozen = BigInteger.ZERO
+                frozen = BigInteger.ZERO,
+                flags = AccountDataFlags.default(),
             )
         )
     }
@@ -49,12 +69,21 @@ fun bindAccountData(dynamicInstance: Struct.Instance): AccountData {
     return AccountData(
         free = bindNumber(dynamicInstance["free"]),
         reserved = bindNumber(dynamicInstance["reserved"]),
-        frozen = frozen
+        frozen = frozen,
+        flags = bindAccountDataFlags(dynamicInstance["flags"])
     )
 }
 
 private fun hasSplitFrozen(accountInfo: Struct.Instance): Boolean {
     return "miscFrozen" in accountInfo.mapping
+}
+
+private fun bindAccountDataFlags(instance: Any?) : AccountDataFlags {
+    return if (instance != null) {
+        AccountDataFlags(bindNumber(instance))
+    } else {
+        AccountDataFlags.default()
+    }
 }
 
 @HelperBinding
