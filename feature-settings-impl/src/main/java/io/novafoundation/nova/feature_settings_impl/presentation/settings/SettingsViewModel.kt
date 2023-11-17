@@ -176,6 +176,10 @@ class SettingsViewModel(
         openLink(appLinksProvider.rateApp)
     }
 
+    fun wikiClicked() {
+        openLink(appLinksProvider.wikiBase)
+    }
+
     fun websiteClicked() {
         openLink(appLinksProvider.website)
     }

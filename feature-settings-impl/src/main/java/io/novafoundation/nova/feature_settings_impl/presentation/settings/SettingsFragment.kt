@@ -37,6 +37,7 @@ import kotlinx.android.synthetic.main.fragment_settings.settingsTwitter
 import kotlinx.android.synthetic.main.fragment_settings.settingsWalletConnect
 import kotlinx.android.synthetic.main.fragment_settings.settingsWallets
 import kotlinx.android.synthetic.main.fragment_settings.settingsWebsite
+import kotlinx.android.synthetic.main.fragment_settings.settingsWiki
 import kotlinx.android.synthetic.main.fragment_settings.settingsYoutube
 
 class SettingsFragment : BaseFragment<SettingsViewModel>() {
@@ -68,8 +69,9 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         settingsTerms.setOnClickListener { viewModel.termsClicked() }
         settingsPrivacy.setOnClickListener { viewModel.privacyClicked() }
 
-        settingsEmail.setOnClickListener { viewModel.emailClicked() }
         settingsRateUs.setOnClickListener { viewModel.rateUsClicked() }
+        settingsWiki.setOnClickListener { viewModel.wikiClicked() }
+        settingsEmail.setOnClickListener { viewModel.emailClicked() }
 
         settingsBiometricAuth.setOnClickListener { viewModel.changeBiometricAuth() }
         settingsPinCodeVerification.setOnClickListener { viewModel.changePincodeVerification() }

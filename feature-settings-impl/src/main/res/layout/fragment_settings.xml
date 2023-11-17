@@ -183,6 +183,13 @@
                 app:title="@string/about_rate_app" />
 
             <io.novafoundation.nova.feature_settings_impl.presentation.settings.view.SettingsItemView
+                android:id="@+id/settingsWiki"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_nova_wiki"
+                app:title="@string/settings_wiki" />
+
+            <io.novafoundation.nova.feature_settings_impl.presentation.settings.view.SettingsItemView
                 android:id="@+id/settingsEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
