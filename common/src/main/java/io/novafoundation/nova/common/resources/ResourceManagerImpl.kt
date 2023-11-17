@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.resources
 
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.text.format.DateUtils
 import androidx.core.content.ContextCompat
@@ -106,5 +107,9 @@ class ResourceManagerImpl(
 
     override fun getDimensionPixelSize(id: Int): Int {
         return contextManager.getApplicationContext().resources.getDimensionPixelSize(id)
+    }
+
+    override fun getFont(fontRes: Int): Typeface {
+        return contextManager.getApplicationContext().resources.getFont(fontRes)
     }
 }

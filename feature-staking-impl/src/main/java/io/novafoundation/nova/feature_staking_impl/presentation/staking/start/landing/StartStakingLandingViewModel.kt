@@ -20,6 +20,7 @@ import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.fontSpan
 import io.novafoundation.nova.common.utils.formatAsSpannable
 import io.novafoundation.nova.common.utils.formatting.duration.BoundedDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.DayAndHourDurationFormatter
@@ -235,6 +236,7 @@ class StartStakingLandingViewModel(
         val clickablePart = resourceManager.getString(R.string.start_staking_fragment_more_info_clicable_part)
             .toSpannable(colorSpan(clickableTextColor))
             .setFullSpan(clickableSpan { novaWikiClicked(chain.additional?.stakingWiki) })
+            .setFullSpan(fontSpan(resourceManager, R.font.public_sans_semi_bold))
             .setEndSpan(drawableSpan(chevronRight))
 
         return SpannableFormatter.format(
